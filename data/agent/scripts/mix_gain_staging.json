@@ -1,0 +1,20 @@
+{
+  "name": "Gain staging",
+  "vars": {
+    "channels": [
+      0
+    ],
+    "peakDb": 0,
+    "targetDb": -6
+  },
+  "steps": [
+    {
+      "cmd": "mix.gainStaging",
+      "args": {
+        "channels": "$channels",
+        "peakDb": "$peakDb",
+        "targetDb": "$targetDb"
+      }
+    }
+  ]
+}

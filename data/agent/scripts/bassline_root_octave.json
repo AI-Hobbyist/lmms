@@ -1,0 +1,72 @@
+{
+  "name": "Root octave bass",
+  "vars": {
+    "name": "Bass",
+    "start": 0,
+    "bars": 4,
+    "roots": [
+      24,
+      31,
+      33,
+      29
+    ]
+  },
+  "steps": [
+    {
+      "cmd": "track.create",
+      "args": {
+        "type": "Instrument",
+        "name": "$name"
+      },
+      "let": "track"
+    },
+    {
+      "cmd": "clip.create",
+      "args": {
+        "track": "$track.index",
+        "position": "$start",
+        "length": {
+          "expr": "$bars * $ticksPerBar"
+        }
+      },
+      "let": "clip"
+    },
+    {
+      "loop": {
+        "var": "bar",
+        "from": 0,
+        "to": "$bars"
+      },
+      "steps": [
+        {
+          "loop": {
+            "var": "eighth",
+            "from": 0,
+            "to": 8
+          },
+          "steps": [
+            {
+              "cmd": "midi.addNotes",
+              "args": {
+                "track": "$track.index",
+                "clip": "$clip.index",
+                "notes": [
+                  {
+                    "key": {
+                      "expr": "$roots[$bar % 4] + ($eighth % 2) * 12"
+                    },
+                    "position": {
+                      "expr": "$bar * $ticksPerBar + $eighth * 24"
+                    },
+                    "length": "1/8",
+                    "volume": 95
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

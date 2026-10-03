@@ -1,0 +1,18 @@
+{
+  "name": "Verse to chorus",
+  "vars": {
+    "startBar": 0,
+    "endBar": 4,
+    "destinationBar": 4
+  },
+  "steps": [
+    {
+      "cmd": "arrange.duplicateSection",
+      "args": {
+        "startBar": "$startBar",
+        "endBar": "$endBar",
+        "destinationBar": "$destinationBar"
+      }
+    }
+  ]
+}

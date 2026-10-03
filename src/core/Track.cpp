@@ -53,6 +53,7 @@ Track::Track(Type type, TrackContainer* tc)
 	, m_name()
 	, m_mutedModel(false, this, tr("Mute"))
 	, m_soloModel(false, this, tr("Solo"))
+	, m_mutedBeforeSolo(false)
 	, m_clips()
 {	
 	m_trackContainer->addTrack( this );

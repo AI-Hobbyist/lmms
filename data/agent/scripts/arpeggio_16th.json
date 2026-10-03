@@ -1,0 +1,65 @@
+{
+  "name": "Sixteenth arpeggio",
+  "vars": {
+    "name": "Arpeggio",
+    "start": 0,
+    "bars": 4,
+    "keys": [
+      48,
+      52,
+      55,
+      60
+    ]
+  },
+  "steps": [
+    {
+      "cmd": "track.create",
+      "args": {
+        "type": "Instrument",
+        "name": "$name"
+      },
+      "let": "track"
+    },
+    {
+      "cmd": "clip.create",
+      "args": {
+        "track": "$track.index",
+        "position": "$start",
+        "length": {
+          "expr": "$bars * $ticksPerBar"
+        }
+      },
+      "let": "clip"
+    },
+    {
+      "loop": {
+        "var": "step",
+        "from": 0,
+        "to": {
+          "expr": "$bars * 16"
+        }
+      },
+      "steps": [
+        {
+          "cmd": "midi.addNotes",
+          "args": {
+            "track": "$track.index",
+            "clip": "$clip.index",
+            "notes": [
+              {
+                "key": {
+                  "expr": "$keys[$step % 4]"
+                },
+                "position": {
+                  "expr": "$step * 12"
+                },
+                "length": "1/16",
+                "volume": 85
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

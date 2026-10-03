@@ -1,0 +1,21 @@
+{
+  "name": "Humanize groove",
+  "vars": {
+    "track": 0,
+    "clip": 0,
+    "timing": 3,
+    "velocity": 8
+  },
+  "steps": [
+    {
+      "cmd": "midi.humanize",
+      "args": {
+        "track": "$track",
+        "clip": "$clip",
+        "timing": "$timing",
+        "velocity": "$velocity",
+        "seed": "$seed"
+      }
+    }
+  ]
+}

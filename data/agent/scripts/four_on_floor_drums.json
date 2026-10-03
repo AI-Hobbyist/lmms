@@ -1,0 +1,121 @@
+{
+  "name": "Four on floor drums",
+  "vars": {
+    "name": "Drums",
+    "start": 0,
+    "bars": 4,
+    "kick": 36,
+    "snare": 38,
+    "hat": 42
+  },
+  "steps": [
+    {
+      "cmd": "track.create",
+      "args": {
+        "type": "Instrument",
+        "name": "$name"
+      },
+      "let": "track"
+    },
+    {
+      "cmd": "clip.create",
+      "args": {
+        "track": "$track.index",
+        "position": "$start",
+        "length": {
+          "expr": "$bars * $ticksPerBar"
+        }
+      },
+      "let": "clip"
+    },
+    {
+      "loop": {
+        "var": "bar",
+        "from": 0,
+        "to": "$bars"
+      },
+      "steps": [
+        {
+          "loop": {
+            "var": "beat",
+            "from": 0,
+            "to": 4
+          },
+          "steps": [
+            {
+              "cmd": "midi.addNotes",
+              "args": {
+                "track": "$track.index",
+                "clip": "$clip.index",
+                "notes": [
+                  {
+                    "key": "$kick",
+                    "position": {
+                      "expr": "$bar * $ticksPerBar + $beat * 48"
+                    },
+                    "length": "1/8",
+                    "volume": 110
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "foreach": {
+            "var": "beat",
+            "in": [
+              1,
+              3
+            ]
+          },
+          "steps": [
+            {
+              "cmd": "midi.addNotes",
+              "args": {
+                "track": "$track.index",
+                "clip": "$clip.index",
+                "notes": [
+                  {
+                    "key": "$snare",
+                    "position": {
+                      "expr": "$bar * $ticksPerBar + $beat * 48"
+                    },
+                    "length": "1/8",
+                    "volume": 90
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "loop": {
+            "var": "eighth",
+            "from": 0,
+            "to": 8
+          },
+          "steps": [
+            {
+              "cmd": "midi.addNotes",
+              "args": {
+                "track": "$track.index",
+                "clip": "$clip.index",
+                "notes": [
+                  {
+                    "key": "$hat",
+                    "position": {
+                      "expr": "$bar * $ticksPerBar + $eighth * 24"
+                    },
+                    "length": "1/16",
+                    "volume": 65
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

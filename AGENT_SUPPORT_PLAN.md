@@ -275,7 +275,7 @@ public:
 返回：
 
 ```json
-{ "ok": true, "data": { "track": 3, "path": "song/track:3" } }
+{ "ok": true, "data": { "index": 3, "path": "song/track:3" } }
 ```
 
 自动化写值（路径寻址）：
@@ -283,7 +283,7 @@ public:
 ```json
 { "name": "automation.addTarget", "arguments": {
     "track": 3, "clip": 0, "target": "song/track:3/instrument/volume",
-    "nodes": [ { "pos": "bar:0", "value": 0.6 }, { "pos": "bar:3.2", "value": 1.0 } ] } }
+    "nodes": [ { "pos": 0, "value": 0.6 }, { "pos": 672, "value": 1.0 } ] } }
 ```
 
 ---
@@ -315,11 +315,11 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 | `compose.chordProgression` | 建轨 → 按时值铺和弦音符（支持 `I-V-vi-IV`、`Am7` 等符号） → 可选转位/加转位音 |
 | `compose.arpeggio` | 把指定 clip 的和弦展开为 1/8 或 1/16 琶音，可选模式（up/down/updown/random） |
 | `compose.drumPattern` | 按风格模板（four_on_floor / trap / rock…）写 GM 鼓音符 |
-| `compose.bassline` | 跟随和弦根音生成八分律动，可选滑音/闷音 |
+| `compose.bassline` | 跟随和弦根音生成根音/八度律动；滑音和闷音取决于乐器，后续按需扩展 |
 | `edit.humanize` | 对选区做时间/力度/微调抖动（带 `seed` 可复现） |
 | `edit.quantize` | 网格量化（复用 `PianoRoll` 量化值域 `Quantizations[]`，`include/Editor.h:35`） |
 | `arrange.duplicateSection` | 复制小节区间（含全部轨道裁剪/平移），生成 verse→chorus |
-| `mix.gainStaging` | 按目标峰值批量设置通道音量 + 预留 headroom |
+| `mix.gainStaging` | 使用调用方提供的实测 `peakDb`，按 `targetDb/headroomDb` 调整通道增益；首期不自动分析音频峰值 |
 | `render.preview` | 渲染区间到临时 WAV，返回文件路径与任务状态，由调用方播放 |
 
 ### 5.4 脚本入口与可选辅助工具
@@ -340,13 +340,13 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
     { "let": "drums", "cmd": "track.create",
       "args": { "type": "Instrument", "name": "Drums", "parent": "song" } },
     { "let": "clip", "cmd": "clip.create",
-      "args": { "track": "$drums", "position": "bar:0", "length": "bar:4" } },
+      "args": { "track": "$drums.index", "position": "bar:0", "length": "bar:4" } },
     { "loop": { "var": "b", "from": 0, "to": 4 },
       "steps": [
-        { "cmd": "midi.addNotes", "args": { "track": "$drums", "clip": "$clip", "notes": [
-            { "pos": "bar:$b+0",    "len": "1/4", "key": "$kick",  "vol": 110 },
-            { "pos": "bar:$b+1",    "len": "1/8", "key": "$kick",  "vol": 84  },
-            { "pos": "bar:$b+2.75", "len": "1/4", "key": "$snare", "vol": 96  } ] } }
+        { "cmd": "midi.addNotes", "args": { "track": "$drums.index", "clip": "$clip.index", "notes": [
+            { "position": {"expr":"$b * $ticksPerBar"},      "length": "1/4", "key": "$kick",  "volume": 110 },
+            { "position": {"expr":"$b * $ticksPerBar + 48"}, "length": "1/8", "key": "$kick",  "volume": 84  },
+            { "position": {"expr":"$b * $ticksPerBar + 132"},"length": "1/4", "key": "$snare", "volume": 96  } ] } }
       ] }
   ]
 }
@@ -357,17 +357,18 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 | 节点 | 语义 |
 |------|------|
 | `cmd` + `args` | 执行命令；`let/save` 保存返回 `data` 到变量 |
-| `loop{var,from,to,step}` | 数值循环（含上限保护，默认 512 次） |
+| `loop{var,from,to,step}` | 数值循环，to 不包含；默认 step=1，最多 512 次，循环变量局部生效 |
 | `foreach{var,in}` | 遍历列表（如和弦数组、文件列表） |
 | `if{expr}/else` | 条件分支 |
 | `call{script}` | 调用其它内置脚本（可传参） |
 | `assert{expr,msg}` | 断言（失败即回滚） |
 | `random{var,a,b,seed}` | 可复现随机 |
+| `value` + `let/save` | 计算并保存值；不修改工程 |
 
 ### 6.3 表达式与音乐字面量
 
-- 数值表达式：`+ - * / %`、括号、比较与布尔运算（**内置极小子集实现，零依赖**）；变量 `$name`；
-- 音乐字面量：音符名 `"C4"`、时值 `"1/4"|"1/8t"`、位置 `"bar:3.2"`（第 3 小节第 2 拍）、`"step:7"`；
+- 数值表达式：`+ - * / %`、括号、比较与布尔运算（**内置极小子集实现，零依赖**）；变量 `$name`、字段 `$name.index`、数组索引 `$keys[$i % 4]`；显式计算使用 `{"expr":"..."}`，不在普通路径或名称中插入表达式；
+- 音乐字面量：音符名 `"C4"` 按 LMMS 原生 C0=0 对应 key=48；时值 `"1/4"|"1/8t"` 分别为 48/16 ticks；`"bar:3.2"` 表示从第 0 小节起计的 3 小节加两个四分音符拍，`"step:7"` 为 84 ticks。仅在音高/时间参数中转换，不改变文件名或普通文本；量化 grid/rate 使用整数音符分母；
 - 随机与选择：`random(a,b)`、`pick([...])`、`shuffle([...])`（带 seed）；
 - 表达式仅实现上述内置子集；不引入 exprtk、通用脚本 VM 或额外语言绑定。
 
@@ -375,15 +376,18 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 
 | 语义 | 规则 |
 |------|------|
-| 事务 | 整个脚本 = 一个批次（一次撤销单位）；`dryRun` 时不落盘、只返回 diff |
+| 事务 | 工程编辑脚本 = 一个批次（一次撤销单位）；`dryRun` 实际执行后回滚并返回 diff |
+| 外部操作 | 文件写入、配置和播放只能作为独立单命令脚本，不与工程编辑混合；使用各命令的 dryRun，文件写入不属于工程撤销 |
 | 错误 | 任一步失败 → 回滚批次并返回失败步号与错误详情，由调用方决定后续操作 |
-| 上限 | 总步数 ≤ 20000；单循环 ≤ 512；`midi.addNotes` 单次 ≤ 4096 音符 |
+| 上限 | 总执行步数（含循环迭代）≤ 20000；单循环 ≤ 512；`midi.addNotes` 单次 ≤ 4096 音符；嵌套 ≤16；用户变量 ≤1024；表达式 ≤4096 字符/1024 节点 |
 | 诊断 | 记录执行错误、失败步号与必要耗时；长任务状态通过查询接口提供 |
 | 可复现 | 脚本与执行结果保留 `seed` 和 LMMS 版本 |
 
 ### 6.5 内置脚本库（`data/agent/scripts/`）
 
 `four_on_floor_drums.json`、`pop_chord_progression.json`、`arpeggio_16th.json`、`bassline_root_octave.json`、`humanize_groove.json`、`scale_snap.json`、`arrange_verse_to_chorus.json`、`mix_gain_staging.json`、`render_preview.json` 等。
+
+四个生成脚本创建原生 MIDI 数据，乐器由调用方另行加载；编辑脚本要求目标 Clip 已存在，`scale_snap` 要求指定音阶已经设置。`four_on_floor` 是鼓脚本别名。资源编译进 WANT_AGENT 构建，不依赖工作目录。
 
 ---
 
@@ -568,6 +572,14 @@ MCP 首期暴露业务命令与 `agent.runScript`。本地帮助、上下文别�
 - L2 已覆盖 TripleOscillator、AudioFileProcessor、Amplifier、Peak Controller，提供类型、范围、步长、中心值与 `.../params/<原生参数名>` 模型路径；可用于 `model.*`、自动化和控制器连接。未实现反射的插件及非模型文件参数保留 L1 通道。L2 拒绝错误类型、整数小数值和越界值。
 - 覆盖审计将附录 C 的 A1～A3 展开为 **136 个命令**：运行时注册逐项检查，测试源内 136/136 均有显式调用；这表示命令覆盖，不表示源码行覆盖。补充用例发现并修复停止状态的位置查询及依赖 GUI 的 solo 联动；验证工程保存/重载、选区 humanize seed 重现、覆盖控制和外部写入不泄漏到失败事务。原生 MIDI 文件导入支持 Song 主轨和其已有乐器目标；Pattern 行通过 `midi.*` 填充，拒绝把歌曲级 MIDI 导入到 Pattern 容器。
 - 最终 MSVC Release / Qt 6.10.3 重编译七组回归 **7/7 passed**；真实 DLL 的原生 A3 集成 **21 passed / 0 failed / 0 skipped**（含初始化与清理），A1 乐器插件及 A2 效果/LADSPA 集成各 **3 passed / 0 failed / 0 skipped**。`WANT_AGENT=OFF` 主程序构建通过，生成目标中无 Agent 源码与测试，`AutomatableModelTest` **1/1 passed**。A3 单独提交；A4 工具层和脚本验收另行实施。
+
+**A4 验收记录（2026-10-04）**：
+
+- 工具定义直接来自运行时命令 schema；当前 MCP 目录为 **159 个工具**，其中 agent 域仅开放 `agent.runScript`，五个本地辅助接口不进入 MCP 目录。生成的 [命令手册](data/agent/command-reference.md) 包含 **164 个注册命令**及其参数 schema。
+- JSON 脚本实现变量、字段/数组索引、循环、foreach、条件、断言、内置调用和固定 seed 随机；表达式为受限内置实现。工程编辑整批撤销，dryRun 实际执行并回滚，错误返回步号和位置；文件/配置/播放限制为独立单命令脚本。参数绑定在外部操作前检查，避免无效 let/save 在写文件后才失败。
+- 九个内置脚本进入 Qt 资源，提供无 GUI `AgentHarness` 和高层编曲/编辑/排列/增益/预览入口；高层命令生成命令步骤，复用原生总线。现有和弦 Clip 可转换琶音；小节排列按原生负偏移切分跨界 MIDI/采样 Clip。增益调整明确要求调用方实测峰值，预览文件由调用方播放与清理。
+- 回归验证变量/控制流、seed 重现、失败回滚、一次撤销/重做、预览不留历史、循环与非法节点限制、内置脚本、段落边界、现有和弦转琶音及真实 WAV 预览。切分后的采样经渲染、解码和非零峰值检查。修复新轨道 `mutedBeforeSolo` 未初始化，以及采样 Clip 复制构造函数的无效 Qt 槽连接。
+- 最终 MSVC Release / Qt 6.10.3 主程序及 Harness 构建通过；联合 CTest **8/8 passed**，A4 **13 passed / 0 failed / 0 skipped**，原生 A3 DLL 集成 **21 passed / 0 failed / 0 skipped**。`WANT_AGENT=OFF` 主程序构建通过，模型测试 **1/1 passed**；生成目标没有 Agent 源码、Harness 或 A4 测试。Harness 脚本冒烟与工具/手册导出通过。A4 单独提交；本机 HTTP MCP 传输仍属于阶段二。
 
 ### 10.3 阶段二：可选 HTTP MCP 服务器（子里程碑 B0~B4）
 
@@ -790,18 +802,18 @@ flowchart LR
 
 | 命令 | 说明 | 关键参数 | 状态 |
 |------|------|----------|------|
-| `compose.chordProgression` | 写和弦进行（`I-V-vi-IV`、`Am7` 等） | `track?`,`clip?`,`progression`,`rhythm`,`range` | A4 |
+| `compose.chordProgression` | 每小节写一个和弦（`I-V-vi-IV`、`Am7` 等）；可选转位 | `track?`,`clip?`,`progression`,`bars`,`root`,`inversion`,`start` | A4 |
 | `compose.arpeggio` | 琶音（up/down/updown/random） | `track`,`clip`,`rate`,`mode` | A4 |
-| `compose.drumPattern` | 鼓型模板（four_on_floor/trap/rock/…） | `style`,`bars`,`variation` | A4 |
-| `compose.bassline` | 低音线（跟随和弦根音） | `style`,`octave` | A4 |
-| `compose.melodyVariation` | 旋律变奏（移调/节奏变形/加花） | `track`,`clip`,`style` | A4 |
+| `compose.drumPattern` | 4/4 鼓型模板（four_on_floor/trap/rock） | `style`,`bars`,`velocity` | A4 |
+| `compose.bassline` | 根音/八度低音线，跟随和弦进行 | `progression`,`root`,`bars`,`division` | A4 |
+| `compose.melodyVariation` | 复制片段、可选移调、seed 时间/力度变化 | `track`,`clip`,`position?`,`semitones?`,`timing`,`velocity`,`seed` | A4 |
 | `edit.quantize` | 量化封装（= `midi.quantize` 的选区版本） | `range`,`grid` | A4 |
 | `edit.transpose` | 选区移调 | — | A4 |
 | `edit.humanize` | 人性化（= `midi.humanize`） | — | A4 |
-| `arrange.duplicateSection` | 复制小节区间（全轨） | `fromBar`,`toBar`,`to` | A4 |
-| `arrange.insertBars/deleteBars` | 增删小节（全轨平移） | `bar`,`count` | A4 |
-| `mix.gainStaging` | 音量/headroom 批处理 | `targetPeak` | A4 |
-| `render.preview` | 渲染区间到临时 WAV，返回本机文件路径与任务信息，调用方自行播放 | `fromBar`,`toBar` | A4（MCP 试听/导出联调属 B4） |
+| `arrange.duplicateSection` | 复制半开小节区间（Song 全轨，边界裁剪） | `startBar`,`endBar`,`destinationBar` | A4 |
+| `arrange.insertBars/deleteBars` | 增删小节，全轨平移并切分跨界片段 | `startBar`，插入用 `bars`，删除用 `endBar` | A4 |
+| `mix.gainStaging` | 根据调用方实测峰值调整音量/headroom | `channels`,`peakDb`,`targetDb`,`headroomDb` | A4 |
+| `render.preview` | 渲染到临时 WAV，返回本机路径与任务，调用方播放和清理文件 | `range:{start,end}`（ticks） | A4（MCP 试听/导出联调属 B4） |
 
 **agent（元工具）**
 

@@ -5,6 +5,11 @@ set(LMMS_SRCS
 	agent/CommandSchema.cpp
 	agent/CoreCommands.cpp
 	agent/ExportCommands.cpp
+	agent/ToolRegistry.cpp
+	agent/ScriptExpression.cpp
+	agent/ProjectSnapshot.cpp
+	agent/ScriptRunner.cpp
+	agent/HighLevelCommands.cpp
 
 	PARENT_SCOPE
 )

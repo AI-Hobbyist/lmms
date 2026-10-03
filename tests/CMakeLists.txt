@@ -18,6 +18,7 @@ if(WANT_AGENT)
 		src/agent/CoreCommandsTest.cpp
 		src/agent/MixAutomationCommandsTest.cpp
 		src/agent/A3CommandsTest.cpp
+		src/agent/A4CommandsTest.cpp
 	)
 endif()
 
@@ -42,3 +43,11 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
 	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)
 endforeach()
+
+if(WANT_AGENT)
+	add_executable(AgentHarness src/agent/AgentHarness.cpp)
+	target_include_directories(AgentHarness PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
+	target_static_libraries(AgentHarness PRIVATE lmmsobjs)
+	target_link_libraries(AgentHarness PRIVATE ${QT_LIBRARIES})
+	target_compile_features(AgentHarness PRIVATE cxx_std_20)
+endif()

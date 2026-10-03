@@ -1,0 +1,74 @@
+{
+  "name": "Pop chord progression",
+  "vars": {
+    "name": "Chords",
+    "start": 0,
+    "bars": 4,
+    "root": 48,
+    "chords": [
+      [0, 4, 7],
+      [7, 11, 14],
+      [9, 12, 16],
+      [5, 9, 12]
+    ]
+  },
+  "steps": [
+    {
+      "cmd": "track.create",
+      "args": {
+        "type": "Instrument",
+        "name": "$name"
+      },
+      "let": "track"
+    },
+    {
+      "cmd": "clip.create",
+      "args": {
+        "track": "$track.index",
+        "position": "$start",
+        "length": {
+          "expr": "$bars * $ticksPerBar"
+        }
+      },
+      "let": "clip"
+    },
+    {
+      "loop": {
+        "var": "bar",
+        "from": 0,
+        "to": "$bars"
+      },
+      "steps": [
+        {
+          "foreach": {
+            "var": "interval",
+            "in": "$chords[$bar % 4]"
+          },
+          "steps": [
+            {
+              "cmd": "midi.addNotes",
+              "args": {
+                "track": "$track.index",
+                "clip": "$clip.index",
+                "notes": [
+                  {
+                    "key": {
+                      "expr": "$root + $interval"
+                    },
+                    "position": {
+                      "expr": "$bar * $ticksPerBar"
+                    },
+                    "length": {
+                      "expr": "$ticksPerBar"
+                    },
+                    "volume": 90
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

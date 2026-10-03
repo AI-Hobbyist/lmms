@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/agent/scripts">
+    <file>four_on_floor_drums.json</file>
+    <file>pop_chord_progression.json</file>
+    <file>arpeggio_16th.json</file>
+    <file>bassline_root_octave.json</file>
+    <file>humanize_groove.json</file>
+    <file>scale_snap.json</file>
+    <file>arrange_verse_to_chorus.json</file>
+    <file>mix_gain_staging.json</file>
+    <file>render_preview.json</file>
+  </qresource>
+</RCC>
