@@ -188,12 +188,13 @@ struct HttpMcpServer::Impl
 			}
 		}
 		const auto authorization = client->request.headers.value("authorization");
-		const auto expected = "Bearer " + token;
-		unsigned int difference = authorization.size() == expected.size() ? 0 : 1;
+		const auto supplied = authorization.mid(7);
+		const auto& expected = token;
+		unsigned int difference = authorization.left(7).toLower() == "bearer " && supplied.size() == expected.size() ? 0 : 1;
 		for (int i = 0; i < expected.size(); ++i)
 		{
 			difference |= static_cast<unsigned char>(expected[i]) ^
-				(i < authorization.size() ? static_cast<unsigned char>(authorization[i]) : 0);
+				(i < supplied.size() ? static_cast<unsigned char>(supplied[i]) : 0);
 		}
 		if (difference)
 		{

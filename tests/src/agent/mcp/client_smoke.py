@@ -5,16 +5,21 @@ Run with an AgentHarness executable; the child exits normally after its short li
 import argparse
 import asyncio
 import subprocess
+import sys
 import threading
 import os
 import secrets
 import httpx2
+import struct
+import tempfile
+import time
+from pathlib import Path
 
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
-async def discover(endpoint, execute=False):
+async def discover(endpoint, execute=False, render=False):
     async with httpx2.AsyncClient(headers={"Authorization": "Bearer " + os.environ["LMMS_MCP_TOKEN"]}) as client, \
             streamable_http_client(endpoint, http_client=client) as (read, write):
         async with ClientSession(read, write, read_timeout_seconds=5) as session:
@@ -34,6 +39,8 @@ async def discover(endpoint, execute=False):
             print(f"Official SDK: initialize, {len(tools)} schemas, ping and JSON transport passed.", flush=True)
             if execute:
                 await execution(session)
+            if render:
+                await render_cycle(session)
 
 
 async def execution(session):
@@ -76,13 +83,89 @@ async def execution(session):
     print("Official SDK: writes, invalid arguments, dryRun, rollback, undo/redo and eight concurrent calls passed.", flush=True)
 
 
+def check_wave(path):
+    data = Path(path).read_bytes()
+    assert data[:4] == b"RIFF" and data[8:12] == b"WAVE", path
+    offset, fmt, audio = 12, None, None
+    while offset + 8 <= len(data):
+        name, size = struct.unpack_from("<4sI", data, offset)
+        chunk = data[offset + 8:offset + 8 + size]
+        if name == b"fmt ":
+            fmt = struct.unpack_from("<HHIIHH", chunk)
+        if name == b"data":
+            audio = chunk
+        offset += 8 + size + (size & 1)
+    assert fmt and audio, path
+    kind, channels, rate, _, block, bits = fmt
+    assert kind == 1 and bits in (16, 24), fmt
+    width = bits // 8
+    peak = max(abs(int.from_bytes(audio[i:i + width], "little", signed=True)) for i in range(0, len(audio), width)) / (1 << (bits - 1))
+    duration = len(audio) / block / rate
+    assert channels == 2 and 1 <= duration <= 8 and peak > 0.001, (fmt, duration, peak)
+    return duration, peak, rate
+
+
+async def render_cycle(session):
+    async def call(name, args=None, ok=True):
+        result = (await session.call_tool(name, args or {})).model_dump(by_alias=True)["structuredContent"]
+        assert result["ok"] == ok, result
+        return result["data"]
+    async def finished(task):
+        deadline = time.monotonic() + 8
+        while time.monotonic() < deadline:
+            result = await call("export.status", {"task": task})
+            if result["status"] != "running":
+                assert result["status"] == "completed", result
+                return result
+            await asyncio.sleep(0.02)
+        raise AssertionError("Audio task did not finish within eight seconds.")
+    before = await call("track.list")
+    music = await call("agent.runScript", {"script": "pop_chord_progression", "vars": {"bars": 1}, "seed": 42})
+    track = music["vars"]["track"]["index"]
+    await call("instrument.load", {"track": track, "plugin": "tripleoscillator"})
+    preview = await call("render.preview", {"range": {"start": 0, "end": 192}})
+    preview_path = preview["path"]
+    try:
+        preview_done = await finished(preview["task"])
+        assert preview_done["bytes"] > 44
+        preview_wave = check_wave(preview_path)
+        with tempfile.TemporaryDirectory(prefix="lmms-mcp-") as folder:
+            output = str(Path(folder) / "composition.wav")
+            task = await call("export.audio", {"path": output, "format": "wav", "range": {"start": 0, "end": 192},
+                "quality": {"bitDepth": 16, "sampleRate": 22050}})
+            await finished(task["task"])
+            output_wave = check_wave(output)
+            assert output_wave[2] == 22050, output_wave
+            cancelled_path = str(Path(folder) / "cancelled.wav")
+            task = await call("export.audio", {"path": cancelled_path, "range": {"start": 0, "end": 192 * 4096}})
+            await call("track.create", {"type": "Instrument"}, ok=False)
+            cancel = await call("export.cancel", {"task": task["task"]})
+            assert cancel["status"] == "cancelled", cancel
+            assert not Path(cancelled_path).exists()
+        await call("history.undo")  # Instrument load.
+        await call("history.undo")  # Entire built-in composition.
+        assert await call("track.list") == before
+        timings = []
+        for _ in range(50):
+            started = time.perf_counter()
+            await call("query.songSummary")
+            timings.append((time.perf_counter() - started) * 1000)
+        timings.sort()
+        print(f"Official SDK: composition -> preview -> WAV export -> cancellation -> undo passed; "
+              f"preview duration={preview_wave[0]:.2f}s peak={preview_wave[1]:.4f}, export rate={output_wave[2]}; "
+              f"50 queries median={timings[25]:.2f}ms p95={timings[47]:.2f}ms max={timings[-1]:.2f}ms.", flush=True)
+    finally:
+        Path(preview_path).unlink(missing_ok=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("harness")
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--render", action="store_true")
     args = parser.parse_args()
     os.environ["LMMS_MCP_TOKEN"] = secrets.token_urlsafe(32)
-    process = subprocess.Popen([args.harness, "--mcp", "--duration", "10"], stdout=subprocess.PIPE, text=True)
+    process = subprocess.Popen([args.harness, "--mcp", "--duration", "25" if args.render else "10"], stdout=subprocess.PIPE, text=True)
     try:
         endpoint = None
         for line in process.stdout:
@@ -96,8 +179,11 @@ def main():
                 print(line.rstrip(), flush=True)
         reader = threading.Thread(target=forward, daemon=True)
         reader.start()
-        asyncio.run(discover(endpoint, args.execute))
-        assert process.wait(timeout=20) == 0, "Harness cleanup failed."
+        asyncio.run(discover(endpoint, args.execute, args.render))
+        example = Path(__file__).resolve().parents[4] / "data/agent/mcp_client.py"
+        subprocess.run([sys.executable, str(example), endpoint], check=True, timeout=10)
+        print("Documented Python connection example passed.", flush=True)
+        assert process.wait(timeout=35) == 0, "Harness cleanup failed."
         reader.join(timeout=1)
     finally:
         if process.poll() is None:

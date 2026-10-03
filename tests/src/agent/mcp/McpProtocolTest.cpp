@@ -63,7 +63,8 @@ private slots:
 	{
 		QCOMPARE(body(exchange("{")).value("error").toObject().value("code").toInt(), -32700);
 		for (const auto& input : {QByteArray("[]"), QByteArray(R"({"jsonrpc":"1.0","id":1,"method":"ping"})"),
-			QByteArray(R"({"jsonrpc":"2.0","id":null,"method":"ping"})"), QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","params":[]})")})
+			QByteArray(R"({"jsonrpc":"2.0","id":null,"method":"ping"})"), QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","params":[]})"),
+			QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","result":{}})"), QByteArray(R"({"jsonrpc":"2.0","method":"initialize"})")})
 		{
 			QVERIFY(exchange(input).startsWith("HTTP/1.1 400"));
 		}

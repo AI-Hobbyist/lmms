@@ -9,6 +9,7 @@
 #include "agent/ScriptRunner.h"
 #include "agent/ToolRegistry.h"
 #include "Engine.h"
+#include "NotePlayHandle.h"
 #include "lmmsconfig.h"
 #ifdef WANT_AGENT_MCP
 #include "agent/mcp/HttpMcpServer.h"
@@ -16,6 +17,15 @@
 #endif
 
 using namespace lmms::agent;
+namespace
+{
+// Match the application's note-handle cache lifetime for native MIDI rendering.
+struct NoteCacheLifetime
+{
+	NoteCacheLifetime() { lmms::NotePlayHandleManager::init(); }
+	~NoteCacheLifetime() { lmms::NotePlayHandleManager::free(); }
+};
+}
 int main(int argc, char** argv)
 {
 	QCoreApplication application(argc, argv);
@@ -35,6 +45,7 @@ int main(int argc, char** argv)
 		const int index = args.indexOf(name);
 		return index >= 0 && index + 1 < args.size() ? args[index + 1] : QString();
 	};
+	NoteCacheLifetime noteCache;
 #ifdef WANT_AGENT_MCP
 	if (args.contains("--mcp"))
 	{

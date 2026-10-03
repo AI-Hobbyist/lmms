@@ -1,6 +1,7 @@
 #include "agent/mcp/McpProtocol.h"
 #include "agent/ToolRegistry.h"
 #include "agent/CommandBus.h"
+#include "agent/ExportCommands.h"
 #include "lmmsversion.h"
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -8,7 +9,7 @@
 #include <QJsonParseError>
 #include <QUuid>
 #include <QTimer>
-#include <QThread>
+#include <QPointer>
 #include <cmath>
 
 namespace lmms::agent::mcp
@@ -56,7 +57,11 @@ bool validId(const QJsonValue& id)
 QString McpProtocol::version() { return "2025-11-25"; }
 McpProtocol::McpProtocol(HttpMcpServer& server) : QObject(&server)
 {
-	server.setHandler([this](const HttpRequest& request, HttpMcpServer::Reply reply) { handle(request, std::move(reply)); });
+	const QPointer<McpProtocol> guard(this);
+	server.setHandler([guard](const HttpRequest& request, HttpMcpServer::Reply reply) {
+		if (guard) { guard->handle(request, std::move(reply)); }
+		else { reply(failure(503, -32603, "The MCP protocol handler is unavailable.")); }
+	});
 	connect(&server, &HttpMcpServer::stateChanged, this, [this, &server] {
 		if (!server.isRunning()) { reset(); }
 		if (server.state() == HttpMcpServer::State::Stopping && !m_exportTask.isEmpty())
@@ -81,8 +86,9 @@ void McpProtocol::drain()
 	if (m_executing || m_queue.empty()) { return; }
 	auto request = std::move(m_queue.front()); m_queue.pop_front();
 	m_executing = true;
+	const bool exportingBefore = hasActiveAudioExport();
 	const auto result = CommandBus::instance().execute(request.name, request.arguments);
-	if (result.ok && !request.arguments.value("dryRun").toBool())
+	if (result.ok && !exportingBefore && hasActiveAudioExport() && !request.arguments.value("dryRun").toBool())
 	{
 		auto task = result.data.value("task").toString();
 		if (task.isEmpty()) { task = result.data.value("lastResult").toObject().value("task").toString(); }
@@ -90,9 +96,11 @@ void McpProtocol::drain()
 	}
 	m_executing = false;
 	const auto value = result.toJson();
+	const QPointer<McpProtocol> guard(this);
 	request.reply(success(request.id, {{"content", QJsonArray{QJsonObject{{"type", "text"},
 		{"text", QString::fromUtf8(QJsonDocument(value).toJson(QJsonDocument::Compact))}}}},
 		{"structuredContent", value}, {"isError", !result.ok}}));
+	if (!guard) { return; }
 	if (!m_queue.empty() && !m_scheduled)
 	{
 		m_scheduled = true; QTimer::singleShot(0, this, [this] { drain(); });
@@ -146,6 +154,11 @@ void McpProtocol::handle(const HttpRequest& request, HttpMcpServer::Reply reply)
 	}
 	const auto method = methodValue.toString();
 	const auto params = message.value("params").toObject();
+	if ((!methodValue.isUndefined() && (message.contains("result") || message.contains("error"))) ||
+		(method == "initialize" && !hasId))
+	{
+		reply(failure(400, -32600, "Invalid JSON-RPC request shape.")); return;
+	}
 	if (method == "initialize" && hasId)
 	{
 		const auto client = params.value("clientInfo").toObject();

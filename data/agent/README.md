@@ -16,6 +16,8 @@ AgentHarness accepts:
 - --vars JSON: override script variables with a JSON object.
 - --seed INT: use a reproducible 32-bit seed.
 - --dry-run: execute project edits and roll them back, returning their diff.
+- --mcp --duration SECONDS: run the loopback MCP service for a bounded test lifetime
+  (requires WANT_AGENT_MCP and LMMS_MCP_TOKEN).
 
 For example, run AgentHarness --builtin pop_chord_progression --seed 42 --dry-run.
 The result contains variables, the last command result, step counts, a bounded
@@ -48,4 +50,5 @@ to 60 seconds for an export before cancelling it.
 
 MCP clients discover tools through tools/list. Optional local agent metadata and
 diffPreview helpers are excluded from the MCP tool catalog. This layer generates
-tool definitions; the optional loopback HTTP transport belongs to phase B.
+tool definitions. The optional loopback HTTP transport is described in [MCP.md](MCP.md),
+with an official SDK connection example and the service's configuration and limits.

@@ -47,6 +47,7 @@ private slots:
 			QVERIFY(rejected.startsWith("HTTP/1.1 401")); QVERIFY(!rejected.contains(Token));
 		}
 		QVERIFY(exchange(server, host, auth).startsWith("HTTP/1.1 405"));
+		QVERIFY(exchange(server, host, "bearer " + Token).startsWith("HTTP/1.1 405"));
 		QVERIFY(exchange(server, host, auth, "http://" + host).startsWith("HTTP/1.1 405"));
 		QVERIFY(exchange(server, host, auth, "").startsWith("HTTP/1.1 403"));
 		QVERIFY(exchange(server, "localhost:" + QByteArray::number(server.port()), auth).startsWith("HTTP/1.1 405"));

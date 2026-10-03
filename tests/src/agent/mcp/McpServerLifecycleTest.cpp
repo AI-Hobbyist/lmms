@@ -5,6 +5,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
+#include <vector>
 #include "agent/mcp/HttpMcpServer.h"
 
 using namespace lmms::agent::mcp;
@@ -79,6 +80,22 @@ private slots:
 			QCOMPARE(server.connectionCount(), 0);
 			QVERIFY(server.findChildren<QTcpSocket*>().isEmpty());
 		}
+	}
+	void boundsRepliesAndConnections()
+	{
+		HttpMcpServer server; QVERIFY(server.start(0, TestToken));
+		server.setHandler([](const HttpRequest&, HttpMcpServer::Reply reply) { reply({200, {}, QByteArray(8 * 1024 * 1024 + 1, 'x')}); });
+		QVERIFY(request(server.port(), "POST /mcp HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}").startsWith("HTTP/1.1 503"));
+		QTRY_COMPARE(server.connectionCount(), 0);
+		std::vector<std::unique_ptr<QTcpSocket>> sockets;
+		for (int i = 0; i < 34; ++i)
+		{
+			auto socket = std::make_unique<QTcpSocket>(); socket->connectToHost(QHostAddress::LocalHost, server.port());
+			sockets.push_back(std::move(socket));
+		}
+		QTRY_COMPARE(server.connectionCount(), 32);
+		server.stop(); QTRY_COMPARE(server.connectionCount(), 0);
+		for (const auto& socket : sockets) { QTRY_COMPARE(socket->state(), QAbstractSocket::UnconnectedState); }
 	}
 	void rejectsAmbiguousOrOversizedRequests()
 	{
