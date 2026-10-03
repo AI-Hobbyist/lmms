@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE lmms-project>
+<lmms-project creator="LMMS" creatorversion="1.3.0" version="1.0" type="song">
+  <head bpm="140" mastervol="100" masterpitch="0" timesig_numerator="4" timesig_denominator="4"/>
+  <song>
+    <trackcontainer>
+      <track type="0" name="Legacy VST2" muted="0">
+        <instrumenttrack vol="100" pan="0" pitch="0" basenote="57" fxch="0">
+          <instrument name="vestige">
+            <vestige plugin="uservst:@ARCH@/fixtures/Release/Vst2Baseline.dll" program="1" numparams="1" param0="0:Gain:0.25"/>
+          </instrument>
+          <fxchain enabled="0" numofeffects="0"/>
+        </instrumenttrack>
+        <pattern name="Frozen note" type="1" pos="0" len="192" steps="16">
+          <note key="57" pos="0" len="96" vol="100" pan="0"/>
+        </pattern>
+      </track>
+    </trackcontainer>
+  </song>
+</lmms-project>

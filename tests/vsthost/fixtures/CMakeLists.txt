@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.13)
+project(LmmsVstFixtures LANGUAGES CXX)
+add_library(Vst2Baseline MODULE Vst2Baseline.cpp)
+target_compile_features(Vst2Baseline PRIVATE cxx_std_20)
+target_include_directories(Vst2Baseline PRIVATE ../../../include)
+set_target_properties(Vst2Baseline PROPERTIES PREFIX "")
