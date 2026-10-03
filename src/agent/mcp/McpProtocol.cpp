@@ -1,11 +1,14 @@
 #include "agent/mcp/McpProtocol.h"
 #include "agent/ToolRegistry.h"
+#include "agent/CommandBus.h"
 #include "lmmsversion.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QUuid>
+#include <QTimer>
+#include <QThread>
 #include <cmath>
 
 namespace lmms::agent::mcp
@@ -58,7 +61,32 @@ McpProtocol::McpProtocol(HttpMcpServer& server) : QObject(&server)
 		if (!server.isRunning()) { reset(); }
 	});
 }
-void McpProtocol::reset() { m_session.clear(); m_initialized = false; }
+void McpProtocol::reset()
+{
+	m_session.clear(); m_initialized = false;
+	while (!m_queue.empty())
+	{
+		auto request = std::move(m_queue.front()); m_queue.pop_front();
+		request.reply(failure(503, -32800, "The MCP session stopped or was replaced.", request.id));
+	}
+}
+void McpProtocol::drain()
+{
+	m_scheduled = false;
+	if (m_executing || m_queue.empty()) { return; }
+	auto request = std::move(m_queue.front()); m_queue.pop_front();
+	m_executing = true;
+	const auto result = CommandBus::instance().execute(request.name, request.arguments);
+	m_executing = false;
+	const auto value = result.toJson();
+	request.reply(success(request.id, {{"content", QJsonArray{QJsonObject{{"type", "text"},
+		{"text", QString::fromUtf8(QJsonDocument(value).toJson(QJsonDocument::Compact))}}}},
+		{"structuredContent", value}, {"isError", !result.ok}}));
+	if (!m_queue.empty() && !m_scheduled)
+	{
+		m_scheduled = true; QTimer::singleShot(0, this, [this] { drain(); });
+	}
+}
 void McpProtocol::handle(const HttpRequest& request, HttpMcpServer::Reply reply)
 {
 	if (request.path != "/mcp") { reply(failure(404, -32600, "Use /mcp.")); return; }
@@ -129,6 +157,16 @@ void McpProtocol::handle(const HttpRequest& request, HttpMcpServer::Reply reply)
 	if (!hasId)
 	{
 		if (method == "notifications/initialized") { m_initialized = true; }
+		if (method == "notifications/cancelled")
+		{
+			const auto cancelled = params.value("requestId");
+			for (auto pending = m_queue.begin(); pending != m_queue.end(); ++pending)
+			{
+				if (pending->id != cancelled) { continue; }
+				auto request = std::move(*pending); m_queue.erase(pending);
+				request.reply(failure(200, -32800, "Cancelled before execution.", request.id)); break;
+			}
+		}
 		reply({202, {}, {}}); return;
 	}
 	if (methodValue.isUndefined()) { reply({202, {}, {}}); return; }
@@ -138,6 +176,31 @@ void McpProtocol::handle(const HttpRequest& request, HttpMcpServer::Reply reply)
 	{
 		if (params.contains("cursor")) { reply(failure(200, -32602, "This tool list is not paginated.", id)); return; }
 		reply(success(id, {{"tools", ToolRegistry::tools()}})); return;
+	}
+	if (method == "tools/call")
+	{
+		const auto name = params.value("name");
+		if (!name.isString() || (params.contains("arguments") && !params.value("arguments").isObject()))
+		{
+			reply(failure(200, -32602, "tools/call requires a name and object arguments.", id)); return;
+		}
+		bool exported = false;
+		for (const auto& tool : ToolRegistry::tools())
+		{
+			if (tool.toObject().value("name") == name) { exported = true; break; }
+		}
+		if (!exported) { reply(failure(200, -32602, "Unknown MCP tool.", id)); return; }
+		for (const auto& pending : m_queue)
+		{
+			if (pending.id == id) { reply(failure(200, -32600, "Duplicate pending request id.", id)); return; }
+		}
+		if (m_queue.size() >= 16) { reply(failure(503, -32603, "The MCP command queue is full.", id)); return; }
+		m_queue.push_back({id, name.toString(), params.value("arguments").toObject(), std::move(reply)});
+		if (!m_scheduled && !m_executing)
+		{
+			m_scheduled = true; QTimer::singleShot(0, this, [this] { drain(); });
+		}
+		return;
 	}
 	reply(failure(200, -32601, "Unknown MCP method.", id));
 }

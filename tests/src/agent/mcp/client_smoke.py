@@ -11,7 +11,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
-async def discover(endpoint):
+async def discover(endpoint, execute=False):
     async with streamable_http_client(endpoint) as (read, write):
         async with ClientSession(read, write, read_timeout_seconds=5) as session:
             initialized = await session.initialize()
@@ -28,11 +28,54 @@ async def discover(endpoint):
                 assert schema["type"] == "object", tool.name
             await session.send_ping()
             print(f"Official SDK: initialize, {len(tools)} schemas, ping and JSON transport passed.", flush=True)
+            if execute:
+                await execution(session)
+
+
+async def execution(session):
+    async def call(name, arguments=None, ok=True):
+        result = await session.call_tool(name, arguments or {})
+        value = result.model_dump(by_alias=True)["structuredContent"]
+        assert value["ok"] == ok and result.model_dump(by_alias=True)["isError"] == (not ok), value
+        return value["data"]
+    before = await call("track.list")
+    script = {"steps": [
+        {"cmd": "track.create", "args": {"type": "Instrument", "name": "MCP notes"}, "let": "track"},
+        {"cmd": "clip.create", "args": {"track": "$track.index", "position": 0, "length": 192}, "let": "clip"},
+        {"cmd": "midi.addNotes", "args": {"track": "$track.index", "clip": "$clip.index", "notes": [
+            {"key": 48, "position": 0, "length": 48, "volume": 90},
+            {"key": 52, "position": 48, "length": 48, "volume": 80}]}}]}
+    preview = await call("agent.runScript", {"script": script, "dryRun": True})
+    assert preview["diff"], preview
+    assert await call("track.list") == before
+    await call("agent.runScript", {"script": script})
+    tracks = (await call("track.list"))["tracks"]
+    track = len(tracks) - 1
+    notes = await call("query.notes", {"track": track, "clip": 0})
+    assert len(notes["notes"]) == 2, notes
+    await call("midi.addNotes", {"track": track, "clip": 0, "notes": [{"key": -99}]}, ok=False)
+    assert await call("query.notes", {"track": track, "clip": 0}) == notes
+    await call("agent.runScript", {"script": {"steps": [
+        {"cmd": "track.create", "args": {"type": "Instrument"}},
+        {"assert": {"expr": False, "msg": "rollback check"}}]}}, ok=False)
+    assert (await call("track.list"))["tracks"] == tracks
+    await call("history.undo")
+    assert await call("track.list") == before
+    await call("history.redo")
+    assert len((await call("query.notes", {"track": track, "clip": 0}))["notes"]) == 2
+    await call("history.undo")
+    parallel = await asyncio.gather(*(call("track.create", {"type": "Instrument", "name": f"Concurrent {i}"}) for i in range(8)))
+    assert len({entry["index"] for entry in parallel}) == 8, parallel
+    for _ in parallel:
+        await call("history.undo")
+    assert await call("track.list") == before
+    print("Official SDK: writes, invalid arguments, dryRun, rollback, undo/redo and eight concurrent calls passed.", flush=True)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("harness")
+    parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
     process = subprocess.Popen([args.harness, "--mcp", "--duration", "10"], stdout=subprocess.PIPE, text=True)
     try:
@@ -48,7 +91,7 @@ def main():
                 print(line.rstrip(), flush=True)
         reader = threading.Thread(target=forward, daemon=True)
         reader.start()
-        asyncio.run(discover(endpoint))
+        asyncio.run(discover(endpoint, args.execute))
         assert process.wait(timeout=20) == 0, "Harness cleanup failed."
         reader.join(timeout=1)
     finally:
