@@ -240,6 +240,13 @@ void Song::processNextBuffer()
 				trackList.push_back(m_midiClipToPlay->getTrack());
 			}
 			break;
+		case PlayMode::AutomationClip:
+			if (m_automationClipToPlay)
+			{
+				clipNum = m_automationClipToPlay->getTrack()->getClipNum(m_automationClipToPlay);
+				trackList.push_back(m_automationClipToPlay->getTrack());
+			}
+			break;
 
 		default:
 			return;
@@ -289,9 +296,9 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::patternStore()->lengthOfCurrentPattern(), 0});
 			}
-			else if (m_playMode == PlayMode::MidiClip && m_loopMidiClip && !loopEnabled)
+			else if ((m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip) && previewClip() && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(-m_midiClipToPlay->startTimeOffset(), m_midiClipToPlay->length() - m_midiClipToPlay->startTimeOffset());
+				enforceLoop(-previewClip()->startTimeOffset(), previewClip()->length() - previewClip()->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -374,15 +381,29 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_c
 		clipNum = patternTrack->patternIndex();
 	}
 		break;
+	case PlayMode::AutomationClip:
+		if (!m_automationClipToPlay) { return; }
+		break;
 	default:
 		return;
 	}
 
-	values = container->automatedValuesAt(timeStart, clipNum);
+	if (m_playMode == PlayMode::AutomationClip)
+	{
+		values = automatedValuesFromTracks(tracklist, timeStart + m_automationClipToPlay->startPosition(),
+			m_automationClipToPlay->getTrack()->getClipNum(m_automationClipToPlay));
+	}
+	else { values = container->automatedValuesAt(timeStart, clipNum); }
 	const TrackList& tracks = container->tracks();
 
 	Track::clipVector clips;
-	for (Track* track : tracks)
+	TimePos recordingTime = timeStart;
+	if (m_playMode == PlayMode::AutomationClip)
+	{
+		clips.push_back(const_cast<AutomationClip *>(m_automationClipToPlay));
+		recordingTime += m_automationClipToPlay->startPosition();
+	}
+	else for (Track* track : tracks)
 	{
 		if (track->type() == Track::Type::Automation) {
 			track->getClipsInRange(clips, 0, timeStart);
@@ -393,7 +414,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_c
 	for (Clip* clip : clips)
 	{
 		auto p = dynamic_cast<AutomationClip *>(clip);
-		TimePos relTime = timeStart - p->startPosition();
+		TimePos relTime = recordingTime - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
@@ -494,6 +515,45 @@ int Song::getExportProgress() const
 	}
 
 	return (float)pos/(float)m_exportEffectiveLength*100.0f;
+}
+
+bool Song::setPlayMode(PlayMode mode, const Clip *clip)
+{
+	if (static_cast<int>(mode) < 0 || mode >= PlayMode::Count) { return false; }
+	const auto *midi = dynamic_cast<const MidiClip *>(clip);
+	const auto *automation = dynamic_cast<const AutomationClip *>(clip);
+	if ((mode == PlayMode::MidiClip && !midi) || (mode == PlayMode::AutomationClip && !automation)) { return false; }
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	if (!isStopped()) { stop(); }
+	m_playMode = mode;
+	m_midiClipToPlay = mode == PlayMode::MidiClip ? midi : nullptr;
+	m_automationClipToPlay = mode == PlayMode::AutomationClip ? automation : nullptr;
+	m_recording = false;
+	emit playbackStateChanged();
+	return true;
+}
+
+const Clip *Song::previewClip() const
+{
+	if (m_playMode == PlayMode::MidiClip) { return m_midiClipToPlay; }
+	if (m_playMode == PlayMode::AutomationClip) { return m_automationClipToPlay; }
+	return nullptr;
+}
+
+void Song::stopPreviewOf(const Clip *clip)
+{
+	if (clip && previewClip() == clip) { stop(); }
+}
+
+void Song::playAutomationClip(const AutomationClip *clip, bool loop)
+{
+	if (!setPlayMode(PlayMode::AutomationClip, clip)) { return; }
+	m_loopMidiClip = loop;
+	m_playing = true;
+	m_paused = false;
+	m_vstSyncController.setPlaybackState(true);
+	savePlayStartPosition();
+	emit playbackStateChanged();
 }
 
 void Song::playSong()
@@ -659,9 +719,9 @@ void Song::stop()
 	switch (timeline.stopBehaviour())
 	{
 		case Timeline::StopBehaviour::BackToZero:
-			if (m_playMode == PlayMode::MidiClip)
+			if ((m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip) && previewClip())
 			{
-				timeline.setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+				timeline.setTicks(std::max(0, -previewClip()->startTimeOffset()));
 			}
 			else
 			{
@@ -1017,9 +1077,10 @@ void Song::saveProjectState( DataFile &dataFile )
 	runtime.setAttribute( "fileName", m_fileName );
 	runtime.setAttribute( "oldFileName", m_oldFileName );
 	runtime.setAttribute( "loopMidiClip", m_loopMidiClip );
-	if( m_midiClipToPlay != nullptr && m_playMode == PlayMode::MidiClip )
+	runtime.setAttribute( "currentPattern", Engine::patternStore()->currentPattern() );
+	if( const auto *clip = previewClip() )
 	{
-		const auto *track = m_midiClipToPlay->getTrack();
+		const auto *track = clip->getTrack();
 		const auto *container = track->trackContainer();
 		const auto &containerTracks = container->tracks();
 		const auto &clips = track->getClips();
@@ -1027,7 +1088,7 @@ void Song::saveProjectState( DataFile &dataFile )
 		runtime.setAttribute( "previewTrack", static_cast<int>( std::distance( containerTracks.begin(),
 			std::find( containerTracks.begin(), containerTracks.end(), track ) ) ) );
 		runtime.setAttribute( "previewClip", static_cast<int>( std::distance( clips.begin(),
-			std::find( clips.begin(), clips.end(), m_midiClipToPlay ) ) ) );
+			std::find( clips.begin(), clips.end(), clip ) ) ) );
 	}
 	for( std::size_t index = 0; index < PlayModeCount; ++index )
 	{
@@ -1188,8 +1249,14 @@ void Song::restoreProjectState( DataFile &dataFile )
 		m_paused = runtime.attribute( "paused" ).toInt() != 0;
 		m_recording = runtime.attribute( "recording" ).toInt() != 0;
 		m_loopMidiClip = runtime.attribute( "loopMidiClip" ).toInt() != 0;
+		const int pattern = runtime.attribute( "currentPattern" ).toInt();
+		if( pattern >= 0 && pattern < Engine::patternStore()->numOfPatterns() )
+		{
+			Engine::patternStore()->setCurrentPattern( pattern );
+		}
 		m_midiClipToPlay = nullptr;
-		if( m_playMode == PlayMode::MidiClip )
+		m_automationClipToPlay = nullptr;
+		if( m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip )
 		{
 			const auto &previewTracks = runtime.attribute( "previewParent" ) == "song" ? tracks() : Engine::patternStore()->tracks();
 			const int trackIndex = runtime.attribute( "previewTrack", "-1" ).toInt();
@@ -1199,10 +1266,11 @@ void Song::restoreProjectState( DataFile &dataFile )
 				const auto &clips = previewTracks[trackIndex]->getClips();
 				if( clipIndex >= 0 && clipIndex < static_cast<int>( clips.size() ) )
 				{
-					m_midiClipToPlay = dynamic_cast<MidiClip *>( clips[clipIndex] );
+					if( m_playMode == PlayMode::MidiClip ) { m_midiClipToPlay = dynamic_cast<MidiClip *>( clips[clipIndex] ); }
+					else { m_automationClipToPlay = dynamic_cast<AutomationClip *>( clips[clipIndex] ); }
 				}
 			}
-			if( m_midiClipToPlay == nullptr ) { m_playing = false; m_paused = false; }
+			if( previewClip() == nullptr ) { m_playing = false; m_paused = false; m_playMode = PlayMode::None; }
 		}
 		m_vstSyncController.setPlaybackState( m_playing && !m_paused );
 		emit playbackStateChanged();

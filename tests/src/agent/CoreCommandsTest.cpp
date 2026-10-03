@@ -1,10 +1,18 @@
 #include <QtTest>
 
 #include <QJsonArray>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryDir>
 
 #include "agent/CommandBus.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
+#include "PatternStore.h"
+#include "PluginFactory.h"
+#include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "Song.h"
 #include "TimePos.h"
 #include "Track.h"
@@ -60,6 +68,25 @@ private slots:
 	{
 		lmms::Engine::getSong()->clearProject();
 		lmms::Engine::projectJournal()->clearJournal();
+	}
+
+	void cleanup()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		if( bus.isBatchActive() ) { QVERIFY( bus.rollbackBatch().ok ); }
+		lmms::Engine::getSong()->stop();
+	}
+
+	void registersThePlannedA1Commands()
+	{
+		QStringList names;
+		for( const auto &descriptor : lmms::agent::CommandBus::instance().descriptors() ) { names.append( descriptor.name ); }
+		for( const auto &name : { "song.setPlayMode", "track.clone", "track.move", "track.setHeight", "track.setColor",
+			"track.setMixerChannel", "clip.duplicate", "clip.setColor", "clip.setAutoResize", "clip.setStartTimeOffset",
+			"midi.updateNote", "midi.removeNotes", "midi.quantize", "midi.transpose" } )
+		{
+			QVERIFY2( names.contains( name ), name );
+		}
 	}
 
 	void createsEightBarDrumPatternAndQueriesIt()
@@ -188,6 +215,190 @@ private slots:
 		QCOMPARE( afterRedo.data.value( "trackCount" ).toInt(), 1 );
 		QCOMPARE( bus.execute( "query.notes", QJsonObject{ { "track", 0 }, { "clip", 0 } } )
 			.data.value( "notes" ).toArray().size(), 32 );
+	}
+
+	void editsTrackAndClipPropertiesWithOneUndoStep()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		QVERIFY( bus.beginBatch( "Track and clip editing" ) );
+		QVERIFY( bus.execute( "track.create", { { "name", "Original" } } ).ok );
+		QVERIFY( bus.execute( "track.create", { { "name", "Sample" }, { "type", "sample" }, { "index", 0 } } ).ok );
+		QVERIFY( bus.execute( "track.clone", { { "track", "Original" }, { "name", "Copy" } } ).ok );
+		QVERIFY( bus.execute( "track.move", { { "track", "Copy" }, { "newIndex", 0 } } ).ok );
+		QVERIFY( bus.execute( "track.setHeight", { { "track", "song/track:0" }, { "value", 64 } } ).ok );
+		QVERIFY( bus.execute( "track.setColor", { { "track", "Copy" }, { "value", "#123456" } } ).ok );
+		QVERIFY( bus.execute( "track.setMixerChannel", { { "track", 0 }, { "channel", 0 } } ).ok );
+		QVERIFY( bus.execute( "clip.create", { { "track", "Copy" }, { "length", 192 } } ).ok );
+		QVERIFY( bus.execute( "clip.setAutoResize", { { "track", 0 }, { "clip", 0 }, { "value", false } } ).ok );
+		QVERIFY( bus.execute( "clip.setStartTimeOffset", { { "track", 0 }, { "clip", 0 }, { "value", -12 } } ).ok );
+		QVERIFY( bus.execute( "clip.setColor", { { "track", 0 }, { "clip", 0 }, { "value", "#abcdef" } } ).ok );
+		QVERIFY( bus.execute( "clip.duplicate", { { "track", 0 }, { "clip", 0 } } ).ok );
+		QVERIFY( bus.execute( "clip.move", { { "track", 0 }, { "clip", 1 }, { "bar", 4 } } ).ok );
+		QVERIFY( bus.execute( "track.setName", { { "track", 0 }, { "value", "Edited" } } ).ok );
+		const auto beforePreview = bus.execute( "track.list" ).data.value( "tracks" ).toArray();
+		QVERIFY( bus.execute( "track.clone", { { "track", 0 }, { "dryRun", true } } ).ok );
+		QCOMPARE( bus.execute( "track.list" ).data.value( "tracks" ).toArray(), beforePreview );
+		QCOMPARE( bus.batchDepth(), 1 );
+		QVERIFY( bus.endBatch( true ).ok );
+		QCOMPARE( lmms::Engine::projectJournal()->undoDepth(), 1 );
+		const auto detail = bus.execute( "query.trackDetail", { { "track", "Edited" } } );
+		QVERIFY( detail.ok );
+		QCOMPARE( detail.data.value( "height" ).toInt(), 64 );
+		QCOMPARE( detail.data.value( "color" ).toString(), QString( "#123456" ) );
+		QVERIFY( detail.data.value( "effects" ).isArray() );
+		const auto clips = detail.data.value( "clips" ).toArray();
+		QCOMPARE( clips.size(), 2 );
+		QCOMPARE( clips[1].toObject().value( "start" ).toInt(), 4 * lmms::TimePos::ticksPerBar() );
+		QCOMPARE( clips[1].toObject().value( "startTimeOffset" ).toInt(), -12 );
+		QCOMPARE( clips[1].toObject().value( "color" ).toString(), QString( "#abcdef" ) );
+		QVERIFY( !clips[1].toObject().value( "autoResize" ).toBool() );
+		QVERIFY( bus.execute( "history.undo" ).ok );
+		QCOMPARE( lmms::Engine::getSong()->tracks().size(), std::size_t{ 0 } );
+		QVERIFY( bus.execute( "history.redo" ).ok );
+		QCOMPARE( bus.execute( "track.list" ).data.value( "tracks" ).toArray(), beforePreview );
+	}
+
+	void editsNotesUsingReturnedIndicesAndFilteredPages()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		QVERIFY( bus.execute( "track.create" ).ok );
+		QVERIFY( bus.execute( "clip.create", { { "track", 0 } } ).ok );
+		const auto added = bus.execute( "midi.addNotes", { { "track", 0 }, { "clip", 0 }, { "notes", QJsonArray{
+			QJsonObject{ { "position", 25 }, { "length", 12 }, { "key", 60 } },
+			QJsonObject{ { "position", 1 }, { "length", 12 }, { "key", 62 } },
+			QJsonObject{ { "position", 50 }, { "length", 12 }, { "key", 60 } }
+		} } } );
+		QVERIFY( added.ok );
+		QCOMPARE( added.data.value( "indices" ).toArray(), ( QJsonArray{ 1, 0, 2 } ) );
+		const auto updated = bus.execute( "midi.updateNote", { { "track", 0 }, { "clip", 0 }, { "note", 1 },
+			{ "fields", QJsonObject{ { "position", 70 }, { "volume", 80 } } } } );
+		QVERIFY( updated.ok );
+		QCOMPARE( updated.data.value( "index" ).toInt(), 2 );
+		const auto filtered = bus.execute( "query.notes", { { "track", 0 }, { "clip", 0 }, { "keys", QJsonArray{ 60 } },
+			{ "range", QJsonObject{ { "start", 0 }, { "end", 100 } } }, { "page", 1 }, { "pageSize", 1 } } );
+		QVERIFY( filtered.ok );
+		QCOMPARE( filtered.data.value( "total" ).toInt(), 2 );
+		QCOMPARE( filtered.data.value( "notes" ).toArray()[0].toObject().value( "position" ).toInt(), 70 );
+		const auto original = bus.execute( "midi.getNotes", { { "track", 0 }, { "clip", 0 } } ).data;
+		const auto preview = bus.execute( "midi.transpose", { { "track", 0 }, { "clip", 0 }, { "semitones", 12 }, { "dryRun", true } } );
+		QVERIFY( preview.ok );
+		QVERIFY( !preview.data.value( "diff" ).toObject().value( "changes" ).toArray().isEmpty() );
+		QCOMPARE( bus.execute( "midi.getNotes", { { "track", 0 }, { "clip", 0 } } ).data, original );
+		QVERIFY( !bus.execute( "midi.transpose", { { "track", 0 }, { "clip", 0 }, { "semitones", 100000 } } ).ok );
+		QCOMPARE( bus.execute( "midi.getNotes", { { "track", 0 }, { "clip", 0 } } ).data, original );
+		QVERIFY( bus.execute( "midi.quantize", { { "track", 0 }, { "clip", 0 }, { "grid", 16 }, { "strength", 1.0 } } ).ok );
+		QVERIFY( bus.execute( "midi.transpose", { { "track", 0 }, { "clip", 0 }, { "keys", QJsonArray{ 60 } }, { "semitones", 2 } } ).ok );
+		const auto removed = bus.execute( "midi.removeNotes", { { "track", 0 }, { "clip", 0 },
+			{ "range", QJsonObject{ { "start", 48 }, { "end", 72 } } } } );
+		QVERIFY( removed.ok );
+		QCOMPARE( removed.data.value( "removed" ).toInt(), 1 );
+		QCOMPARE( removed.data.value( "noteCount" ).toInt(), 2 );
+		QVERIFY( !bus.execute( "midi.updateNote", { { "track", 0 }, { "clip", 0 }, { "note", 0 }, { "fields", QJsonObject{ { "typo", 1 } } } } ).ok );
+		QVERIFY( !bus.execute( "midi.getNotes", { { "track", 0 }, { "clip", 0 }, { "pageSize", 0 } } ).ok );
+		QVERIFY( bus.execute( "midi.removeNotes", { { "track", 0 }, { "clip", 0 } } ).ok );
+		QCOMPARE( bus.execute( "midi.getNotes", { { "track", 0 }, { "clip", 0 } } ).data.value( "total" ).toInt(), 0 );
+	}
+
+	void loadsNativeInstrumentPlugins()
+	{
+		const auto pluginDirectory = qEnvironmentVariable( "LMMS_AGENT_PLUGIN_TEST_PATH" );
+		if( pluginDirectory.isEmpty() ) { QSKIP( "Set LMMS_AGENT_PLUGIN_TEST_PATH to run native DLL integration." ); }
+		QDir::setSearchPaths( "plugins", { pluginDirectory } );
+		lmms::PluginFactory::instance()->discoverPlugins();
+		auto &bus = lmms::agent::CommandBus::instance();
+		QVERIFY( bus.execute( "track.create", { { "type", "instrument" } } ).ok );
+		const auto loaded = bus.execute( "instrument.load", { { "track", 0 }, { "plugin", "tripleoscillator" } } );
+		QVERIFY2( loaded.ok, qPrintable( loaded.errorMessage ) );
+		auto *track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "tripleoscillator" ) );
+		QVERIFY( !bus.execute( "instrument.load", { { "track", 0 }, { "plugin", "tripleoscillator" },
+			{ "subKey", QJsonObject{ { "attributes", QJsonObject{ { "id", "invalid" } } } } } } ).ok );
+		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "tripleoscillator" ) );
+		QTemporaryDir temporary;
+		QVERIFY( temporary.isValid() );
+		QFile wav( temporary.filePath( "sample.wav" ) );
+		QVERIFY( wav.open( QIODevice::WriteOnly ) );
+		const auto data = QByteArray::fromHex( "524946462800000057415645666d7420100000000100010044ac00008858010002001000646174610400000000000000" );
+		QCOMPARE( wav.write( data ), qint64( data.size() ) );
+		wav.close();
+		QVERIFY( bus.execute( "instrument.load", { { "track", 0 }, { "plugin", "audiofileprocessor" },
+			{ "path", wav.fileName() }, { "dryRun", true } } ).ok );
+		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "tripleoscillator" ) );
+		const auto sampled = bus.execute( "instrument.load", { { "track", 0 }, { "plugin", "audiofileprocessor" }, { "path", wav.fileName() } } );
+		QVERIFY2( sampled.ok, qPrintable( sampled.errorMessage ) );
+		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QDomDocument document;
+		auto root = document.createElement( "state" );
+		document.appendChild( root );
+		const auto state = track->instrument()->saveState( document, root );
+		QCOMPARE( QFileInfo( state.attribute( "src" ) ).fileName(), QString( "sample.wav" ) );
+		QVERIFY( bus.execute( "history.undo" ).ok );
+		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "tripleoscillator" ) );
+		QVERIFY( bus.execute( "history.redo" ).ok );
+		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
+		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "audiofileprocessor" ) );
+	}
+
+	void selectsPlaybackModesAndPreviewsAutomation()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		auto *song = lmms::Engine::getSong();
+		QVERIFY( bus.execute( "track.create", { { "type", "instrument" } } ).ok );
+		QVERIFY( bus.execute( "clip.create", { { "track", 0 }, { "position", 0 }, { "length", 192 } } ).ok );
+		QVERIFY( bus.execute( "track.create", { { "type", "automation" } } ).ok );
+		QVERIFY( bus.execute( "clip.create", { { "track", 1 }, { "position", 384 }, { "length", 192 } } ).ok );
+		QVERIFY( bus.execute( "automation.addTarget", { { "track", 1 }, { "clip", 0 }, { "target", "song/masterVolume" } } ).ok );
+		QVERIFY( bus.execute( "automation.putValue", { { "track", 1 }, { "clip", 0 }, { "pos", 0 }, { "value", 75 } } ).ok );
+		const auto depth = bus.execute( "history.status" ).data.value( "undoDepth" );
+		QVERIFY( bus.execute( "song.setPlayMode", { { "mode", "MidiClip" }, { "track", 0 }, { "clip", 0 } } ).ok );
+		QCOMPARE( song->playMode(), lmms::Song::PlayMode::MidiClip );
+		QVERIFY( bus.execute( "transport.play", { { "dryRun", true } } ).ok );
+		QVERIFY( !song->isPlaying() );
+		QVERIFY( bus.execute( "transport.play", { { "fromBar", 1 } } ).ok );
+		QVERIFY( song->isPlaying() );
+		QVERIFY( bus.execute( "transport.stop", { { "dryRun", true } } ).ok );
+		QVERIFY( song->isPlaying() );
+		QVERIFY( bus.execute( "transport.stop" ).ok );
+		QVERIFY( bus.execute( "transport.play", { { "mode", "AutomationClip" }, { "track", 1 }, { "clip", 0 }, { "ticks", 0 } } ).ok );
+		QCOMPARE( song->playMode(), lmms::Song::PlayMode::AutomationClip );
+		song->processNextBuffer();
+		QCOMPARE( song->masterVolume(), 75 );
+		QVERIFY( bus.execute( "transport.playSong" ).ok );
+		QCOMPARE( song->playMode(), lmms::Song::PlayMode::Song );
+		QVERIFY( bus.execute( "transport.stop" ).ok );
+		QVERIFY( bus.execute( "song.setPlayMode", { { "mode", "MidiClip" }, { "track", 0 }, { "clip", 0 } } ).ok );
+		QVERIFY( bus.execute( "clip.remove", { { "track", 0 }, { "clip", 0 } } ).ok );
+		QVERIFY( song->previewClip() == nullptr );
+		QCOMPARE( song->playMode(), lmms::Song::PlayMode::None );
+		QVERIFY( !bus.execute( "transport.play", { { "mode", "AutomationClip" }, { "track", 0 }, { "clip", 0 } } ).ok );
+		QCOMPARE( bus.execute( "history.status" ).data.value( "undoDepth" ).toInt(), depth.toInt() + 1 );
+	}
+
+	void addressesPatternTracksAndRestoresTheirContainer()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		QVERIFY( bus.beginBatch( "Pattern tracks" ) );
+		QVERIFY( bus.execute( "track.create", { { "parent", "pattern" }, { "name", "First" } } ).ok );
+		QVERIFY( bus.execute( "track.create", { { "parent", "pattern" }, { "name", "Second" }, { "index", 0 } } ).ok );
+		const auto list = bus.execute( "track.list", { { "parent", "pattern" } } );
+		QVERIFY( list.ok );
+		const auto tracks = list.data.value( "tracks" ).toArray();
+		QCOMPARE( tracks.size(), 2 );
+		QCOMPARE( tracks[0].toObject().value( "path" ).toString(), QString( "pattern/track:0" ) );
+		QCOMPARE( bus.execute( "track.get", { { "track", "pattern/track:0" } } ).data.value( "name" ).toString(), QString( "Second" ) );
+		QCOMPARE( bus.execute( "track.get", { { "track", "First" }, { "parent", "pattern" } } ).data.value( "index" ).toInt(), 1 );
+		QVERIFY( bus.endBatch( true ).ok );
+		QVERIFY( bus.execute( "history.undo" ).ok );
+		QCOMPARE( lmms::Engine::patternStore()->tracks().size(), std::size_t{ 0 } );
+		QVERIFY( bus.execute( "history.redo" ).ok );
+		QCOMPARE( bus.execute( "track.list", { { "parent", "pattern" } } ).data.value( "tracks" ).toArray(), tracks );
+		QVERIFY( bus.execute( "transport.play", { { "mode", "Pattern" }, { "pattern", 0 } } ).ok );
+		QCOMPARE( lmms::Engine::getSong()->playMode(), lmms::Song::PlayMode::Pattern );
+		QVERIFY( bus.execute( "transport.stop" ).ok );
+		QVERIFY( !bus.execute( "track.get", { { "track", "pattern/track:0" }, { "parent", "song" } } ).ok );
 	}
 };
 

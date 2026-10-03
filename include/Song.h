@@ -46,6 +46,8 @@ namespace lmms
 {
 
 class AutomationTrack;
+class AutomationClip;
+class Clip;
 class DataFile;
 class Keymap;
 class MidiClip;
@@ -208,6 +210,10 @@ public:
 		return m_playMode;
 	}
 
+	bool setPlayMode(PlayMode mode, const Clip *clip = nullptr);
+	const Clip *previewClip() const;
+	void stopPreviewOf(const Clip *clip);
+
 	const TimePos& getPlayPos(PlayMode pm) const
 	{
 		return getTimeline(pm).pos();
@@ -348,6 +354,7 @@ public slots:
 	void playAndRecord();
 	void playPattern();
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
+	void playAutomationClip(const lmms::AutomationClip *clip, bool loop = true);
 	void togglePause();
 	void stop();
 
@@ -458,6 +465,7 @@ private:
 	bar_t m_length;
 
 	const MidiClip* m_midiClipToPlay;
+	const AutomationClip* m_automationClipToPlay = nullptr;
 	bool m_loopMidiClip;
 
 	VstSyncController m_vstSyncController;

@@ -216,8 +216,13 @@ void TrackContainer::removeTrack( Track * _track )
 
 void TrackContainer::moveTrack(Track* track, int indexTo)
 {
-	m_tracks.erase(std::find(m_tracks.begin(), m_tracks.end(), track));
-	m_tracks.insert(m_tracks.begin() + indexTo, track);
+	{
+		QWriteLocker lockTracksAccess(&m_tracksMutex);
+		auto it = std::find(m_tracks.begin(), m_tracks.end(), track);
+		if (it == m_tracks.end() || indexTo < 0 || indexTo >= static_cast<int>(m_tracks.size())) { return; }
+		m_tracks.erase(it);
+		m_tracks.insert(m_tracks.begin() + indexTo, track);
+	}
 
 	emit trackMoved();
 }

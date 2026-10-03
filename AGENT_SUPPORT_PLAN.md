@@ -1,6 +1,6 @@
 # LMMS Agent 支持计划书
 
-> **文档状态**：v0.5（实施中；A0/A1/A2 已有实现，复核发现覆盖与行为缺口，见 §10.2；阶段二为可选启停的 HTTP MCP 服务器）
+> **文档状态**：v0.5（实施中；A0/A1 已补齐，A2 继续完善，验收记录见 §10.2；阶段二为可选启停的本机 HTTP MCP 服务器）
 > **编写日期**：2026-09-12（v0.5 修订：2026-10-03）
 > **适用代码库**：LMMS 1.3.0-alpha（本工作区，分支 `master`）
 > **勘察依据**：CodeGraph 符号级检索 + 源码核对（文中行号为编写时快照，可能随上游提交漂移）
@@ -236,8 +236,8 @@ public:
 
 ### 4.4 稳定寻址方案（LLM 与脚本共用）
 
-- 轨道：`track:<index>` 或 `track:"Lead Synth"`（名称允许、索引权威；编辑后由 `query.*` 刷新）；
-- Clip：`track:<i>/clip:<j>`；
+- 轨道参数接受容器内索引、唯一名称（如 `Lead Synth`），或查询返回的 `song/track:<i>` / `pattern/track:<i>` 路径；`parent` 默认 `song`，路径携带容器。名称重复时必须使用索引或路径；编辑后由 `query.*` 刷新。
+- Clip 参数接受轨道内索引；查询返回 `song/track:<i>/clip:<j>` 或 `pattern/track:<i>/clip:<j>` 路径。路径与索引随当前排序更新，不作为永久 ID。
 - 混音通道：`channel:<0|master>`；效果槽：`channel:<n>/fx:<k>` 或 `track:<i>/fx:<k>`；
 - 自动化目标（`AutomatableModel`）：**路径字符串**，如
   `song/track:3/instrument/volume`、`song/track:3/fx:0/wet`、`song/channel:2/volume`；
@@ -517,7 +517,7 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 | 子里程碑 | 内容 | 交付物 | 验收标准 | 预估 |
 |----------|------|--------|----------|------|
 | **A0 骨架与命令总线（已补齐并验证）** | CMake `WANT_AGENT` 开关与目录结构；`CommandDescriptor / CommandBus / CommandResult`；事务（checkpoint/失败回滚）与 `dryRun`；`history.*`；QTest 测试骨架 | 可注册并执行命令的骨架（无 UI） | 参数 schema 校验、结构化 diff、嵌套批次、批次内预览、主线程入口、history 状态/显式回滚均通过；开关 ON/OFF 编译测试通过 | 3~4 人日 |
-| **A1 核心创作 API（部分完成）** | `song.*`（基础）、`transport.*`（基础）、`track.*`、`instrument.*`（加载 + 轨道级参数）、`clip.*`、`midi.*`、`query.*`（songSummary/trackDetail/clipDetail/notes）、`history.*` | 建轨→写音符→查询的完整命令集 | 已有 8 小节鼓组流程测试；附录 C 的部分命令、参数和查询字段尚未实现，见下方复核记录 | 6~10 人日 |
+| **A1 核心创作 API（已补齐并验证）** | `song.*`、`transport.*`（四种播放模式）、`track.*`、`instrument.*`（加载 + 轨道级参数）、`clip.*`、`midi.*`、`query.*`、`history.*` | 建轨→编辑音符→查询→播放的命令集 | 轨道/Clip 属性与排序、Pattern 容器、音符编辑/筛选/分页、自动化预览和原生乐器 DLL 验证通过 | 6~10 人日 |
 | **A2 混音与自动化 API（基本覆盖，待补齐）** | `mixer.*`、`effect.*`（含参数枚举 L1，§4.5）、`model.*`（路径寻址读写）、`automation.*`、`query.mixerState/modelSearch` | 混音/效果/自动化命令集 | 已有 L1 参数与自动化值测试；效果子插件选择、目标域 scope 与自动化轨插入位置待补齐 | 5~8 人日 |
 | **A3 全量覆盖与 I/O** | `pattern.*`、`sample.*`、`scale.*`、`controller.*`、`import.*`、`export.*`、`config.*`、`song.load/save/clearProject`、`transport.setLoopRange/previewClip`、`midi.humanize` 等；§4.4 桥接项落地；覆盖率审计 | 附录 C 全量命令落地（覆盖率 ≥95%） | 每个命令有实现 + 测试或脚本示例；WAV/MIDI 导出冒烟通过 | 6~10 人日 |
 | **A4 工具层 + 脚本引擎** | `ToolRegistry`（命令 → MCP 工具定义）；`ScriptRunner`（IR/变量/循环/条件/随机）；内置脚本库；`compose.* / edit.* / arrange.* / mix.* / render.*` 高层命令；`agent.*` 元工具；无 GUI 回归 harness | MCP 工具定义 JSON + 可执行脚本 + 脚本库 + 回归脚本集 | 脚本单测（含失败回滚）；`four_on_floor` 一键生成；工具定义通过 schema 校验；harness 全绿 | 6~10 人日 |
@@ -545,6 +545,9 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 
 - **A0（2026-10-03）**：已补齐类型/必填项/嵌套参数校验、描述符参数说明与 `dryRun` schema、结构化 diff、主线程入口检查、嵌套批次、`history.status/rollbackBatch`。预览保留已有批次、播放位置/状态、修改标志、对象 ID 与原生 redo；快照捕获前关闭 journalling，避免序列化临时模型修改污染历史。恢复被上次提交删除但核心仍引用的 `Song.h/Song.cpp`，同步当前 MIDI 导出签名与 Qt 哈希保存行为。
 - **A0 验收**：MSVC Release / Qt 6.10.3 从更新后源码重新编译；`CommandBusTest/CoreCommandsTest/MixAutomationCommandsTest/A3CommandsTest/AutomatableModelTest/AutomationTrackTest/TimelineTest` 经 CTest **7/7 passed**。独立 `WANT_AGENT=OFF` 构建完成，工程中无 Agent 源文件或 Agent 测试目标，`AutomatableModelTest` **1/1 passed**。首个 A0 提交同时纳入此前未入库的 Agent 基础实现与测试；后续 A1、A2 补齐分别提交。
+- **A0 提交**：`3bdd18734dbca74d57f1a6b411ffa1a80c2aa8ef`，已推送 `master`。
+- **A1 补齐**：新增复核列出的 14 个创作命令；支持 `parent/index`、唯一名称和返回轨道路径；轨道详情返回 Clip/效果链与属性；新增自动化 Clip 创建、音符更新/删除/量化/移调、范围/键筛选与分页，`midi.addNotes` 返回当前索引。支持 Song/Pattern/MidiClip/AutomationClip 播放、无副作用的传输 dryRun、删除预览 Clip 时停止播放；`instrument.load` 校验并传递 `subKey`，加载受支持的本地 `path`；插件目录返回可选子插件键。`query.songSummary.detail` 接受 `compact`（默认）或 `full`。
+- **A1 验收**：相关七个测试目标重新编译并通过 CTest **7/7 passed**；`CoreCommandsTest` 新增属性/排序与批次撤销、Pattern 容器恢复、音符编辑及四种播放模式测试。额外编译 `lmms/tripleoscillator/audiofileprocessor`，通过原生 DLL 集成验证乐器加载、本地 WAV、dryRun、撤销/重做。Windows 原生插件引用 `lmms.exe` 的导出，因此将测试程序复制为独立构建目录下的 `lmms.exe`，设置 `LMMS_AGENT_PLUGIN_TEST_PATH` 后运行 `loadsNativeInstrumentPlugins`；默认 CTest 跳过这一依赖 DLL 的集成用例。
 
 ### 10.3 阶段二：可选 HTTP MCP 服务器（子里程碑 B0~B4）
 
