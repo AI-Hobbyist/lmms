@@ -22,6 +22,10 @@ if(WANT_AGENT)
 	)
 endif()
 
+if(WANT_AGENT_MCP)
+	list(APPEND LMMS_TESTS src/agent/mcp/McpServerLifecycleTest.cpp)
+endif()
+
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	# TODO CMake 3.20: Use cmake_path
 	get_filename_component(LMMS_TEST_NAME ${LMMS_TEST_SRC} NAME_WE)

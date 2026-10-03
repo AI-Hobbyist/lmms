@@ -104,6 +104,8 @@ OPTION(WANT_VST_32	"Include 32-bit Windows VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit Windows VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_AGENT	"Include Agent command API" ON)
+include(CMakeDependentOption)
+cmake_dependent_option(WANT_AGENT_MCP "Include local HTTP MCP server" ON "WANT_AGENT" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
@@ -280,6 +282,9 @@ endif()
 
 find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
+if(WANT_AGENT_MCP)
+	find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
+endif()
 
 message(STATUS "Using Qt version: ${Qt${QT_VERSION_MAJOR}_VERSION}")
 
@@ -297,6 +302,9 @@ set(QT_LIBRARIES
 	Qt${QT_VERSION_MAJOR}::Xml
 	Qt${QT_VERSION_MAJOR}::Svg
 )
+if(WANT_AGENT_MCP)
+	list(APPEND QT_LIBRARIES Qt${QT_VERSION_MAJOR}::Network)
+endif()
 
 IF(LMMS_BUILD_LINUX AND WANT_VST AND NOT WANT_QT6)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
@@ -732,6 +740,9 @@ FILE(REMOVE include/lmmsconfig.h)
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 IF(WANT_AGENT)
 	FILE(GLOB_RECURSE LMMS_AGENT_INCLUDES "${CMAKE_SOURCE_DIR}/include/agent/*.h")
+	IF(NOT WANT_AGENT_MCP)
+		LIST(FILTER LMMS_AGENT_INCLUDES EXCLUDE REGEX "/agent/mcp/")
+	ENDIF()
 	LIST(APPEND LMMS_INCLUDES ${LMMS_AGENT_INCLUDES})
 ENDIF()
 LIST(SORT LMMS_INCLUDES)

@@ -1,5 +1,6 @@
 #cmakedefine LMMS_BUILD_LINUX
 #cmakedefine WANT_AGENT
+#cmakedefine WANT_AGENT_MCP
 #cmakedefine LMMS_BUILD_WIN32
 #cmakedefine LMMS_BUILD_WIN64
 #cmakedefine LMMS_BUILD_APPLE

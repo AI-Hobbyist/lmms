@@ -40,6 +40,9 @@
 #ifdef WANT_AGENT
 #include "agent/ExportCommands.h"
 #endif
+#ifdef WANT_AGENT_MCP
+#include "agent/mcp/HttpMcpServer.h"
+#endif
 
 namespace lmms
 {
@@ -98,6 +101,9 @@ void Engine::init( bool renderOnly )
 
 void Engine::destroy()
 {
+#ifdef WANT_AGENT_MCP
+	agent::mcp::shutdownService();
+#endif
 #ifdef WANT_AGENT
 	agent::shutdownAudioExports();
 #endif

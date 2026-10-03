@@ -1,3 +1,7 @@
+if(WANT_AGENT_MCP)
+	list(APPEND LMMS_SRCS agent/mcp/HttpMcpServer.cpp)
+endif()
+
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
