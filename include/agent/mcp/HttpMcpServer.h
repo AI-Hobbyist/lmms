@@ -37,7 +37,7 @@ public:
 
 	explicit HttpMcpServer(QObject* parent = nullptr);
 	~HttpMcpServer() override;
-	bool start(int port = 0);
+	bool start(int port = 0, const QByteArray& token = {});
 	void stop();
 	bool isRunning() const;
 	State state() const;
@@ -57,5 +57,6 @@ private:
 
 LMMS_EXPORT HttpMcpServer& service();
 LMMS_EXPORT void shutdownService();
+LMMS_EXPORT bool applyConfiguration();
 }
 #endif

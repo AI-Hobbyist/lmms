@@ -15,8 +15,9 @@ class LMMS_EXPORT McpProtocol : public QObject
 public:
 	explicit McpProtocol(HttpMcpServer& server);
 	static QString version();
-private:
+	// Protocol seam: callers supply parsed HTTP; the transport enforces connection authorization.
 	void handle(const HttpRequest& request, HttpMcpServer::Reply reply);
+private:
 	void reset();
 	void drain();
 	struct Pending
@@ -30,6 +31,7 @@ private:
 	bool m_executing = false;
 	bool m_scheduled = false;
 	QString m_session;
+	QString m_exportTask;
 	bool m_initialized = false;
 };
 }

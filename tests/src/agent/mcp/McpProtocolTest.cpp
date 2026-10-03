@@ -12,6 +12,7 @@ class McpProtocolTest : public QObject
 	Q_OBJECT
 	HttpMcpServer server;
 	QByteArray session;
+	const QByteArray token = "test-only-token-0123456789";
 	QByteArray exchange(const QByteArray& body, QByteArray extra = {}, QByteArray method = "POST")
 	{
 		QTcpSocket socket;
@@ -19,7 +20,8 @@ class McpProtocolTest : public QObject
 		QTimer deadline; deadline.setSingleShot(true);
 		connect(&deadline, &QTimer::timeout, &loop, &QEventLoop::quit);
 		connect(&socket, &QTcpSocket::connected, &loop, [&] {
-			socket.write(method + " /mcp HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\n"
+			socket.write(method + " /mcp HTTP/1.1\r\nHost: localhost:" + QByteArray::number(server.port()) +
+				"\r\nAuthorization: Bearer " + token + "\r\nContent-Type: application/json\r\n"
 				"Accept: application/json, text/event-stream\r\n" +
 				(session.isEmpty() ? QByteArray() : "MCP-Session-Id: " + session + "\r\n") + extra +
 				"Content-Length: " + QByteArray::number(body.size()) + "\r\n\r\n" + body);
@@ -39,7 +41,7 @@ class McpProtocolTest : public QObject
 		return response;
 	}
 private slots:
-	void initTestCase() { new McpProtocol(server); QVERIFY(server.start()); }
+	void initTestCase() { new McpProtocol(server); QVERIFY(server.start(0, token)); }
 	void discoveryLifecycle()
 	{
 		const auto response = initialize();
@@ -77,7 +79,7 @@ private slots:
 	void stopInvalidatesSession()
 	{
 		initialize();
-		server.stop(); QVERIFY(server.start());
+		server.stop(); QVERIFY(server.start(0, token));
 		QVERIFY(exchange(R"({"jsonrpc":"2.0","id":1,"method":"ping"})").startsWith("HTTP/1.1 404"));
 	}
 };

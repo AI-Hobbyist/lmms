@@ -94,6 +94,9 @@ void Engine::init( bool renderOnly )
 
 	emit engine->initProgress(tr("Launching audio engine threads"));
 	s_audioEngine->startProcessing();
+#ifdef WANT_AGENT_MCP
+	if (!renderOnly) { agent::mcp::applyConfiguration(); }
+#endif
 }
 
 

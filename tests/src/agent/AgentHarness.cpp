@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 		if (!valid || duration < 1 || duration > 3600) { error << "--mcp requires --duration 1..3600 seconds.\n"; return 2; }
 		lmms::Engine::init(true);
 		auto& server = lmms::agent::mcp::service();
-		if (!server.start()) { error << server.errorString() << '\n'; lmms::Engine::destroy(); return 1; }
+		if (!server.start(0, qgetenv("LMMS_MCP_TOKEN"))) { error << server.errorString() << '\n'; lmms::Engine::destroy(); return 1; }
 		output << server.endpoint() << '\n'; output.flush();
 		QTimer::singleShot(duration * 1000, &application, &QCoreApplication::quit);
 		const int result = application.exec();

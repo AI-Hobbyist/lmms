@@ -6,13 +6,17 @@ import argparse
 import asyncio
 import subprocess
 import threading
+import os
+import secrets
+import httpx2
 
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
 async def discover(endpoint, execute=False):
-    async with streamable_http_client(endpoint) as (read, write):
+    async with httpx2.AsyncClient(headers={"Authorization": "Bearer " + os.environ["LMMS_MCP_TOKEN"]}) as client, \
+            streamable_http_client(endpoint, http_client=client) as (read, write):
         async with ClientSession(read, write, read_timeout_seconds=5) as session:
             initialized = await session.initialize()
             result = initialized.model_dump(by_alias=True, exclude_none=True)
@@ -77,6 +81,7 @@ def main():
     parser.add_argument("harness")
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
+    os.environ["LMMS_MCP_TOKEN"] = secrets.token_urlsafe(32)
     process = subprocess.Popen([args.harness, "--mcp", "--duration", "10"], stdout=subprocess.PIPE, text=True)
     try:
         endpoint = None

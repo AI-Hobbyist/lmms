@@ -59,6 +59,11 @@ McpProtocol::McpProtocol(HttpMcpServer& server) : QObject(&server)
 	server.setHandler([this](const HttpRequest& request, HttpMcpServer::Reply reply) { handle(request, std::move(reply)); });
 	connect(&server, &HttpMcpServer::stateChanged, this, [this, &server] {
 		if (!server.isRunning()) { reset(); }
+		if (server.state() == HttpMcpServer::State::Stopping && !m_exportTask.isEmpty())
+		{
+			CommandBus::instance().execute("export.cancel", {{"task", m_exportTask}});
+			m_exportTask.clear();
+		}
 	});
 }
 void McpProtocol::reset()
@@ -77,6 +82,12 @@ void McpProtocol::drain()
 	auto request = std::move(m_queue.front()); m_queue.pop_front();
 	m_executing = true;
 	const auto result = CommandBus::instance().execute(request.name, request.arguments);
+	if (result.ok && !request.arguments.value("dryRun").toBool())
+	{
+		auto task = result.data.value("task").toString();
+		if (task.isEmpty()) { task = result.data.value("lastResult").toObject().value("task").toString(); }
+		if (!task.isEmpty()) { m_exportTask = task; }
+	}
 	m_executing = false;
 	const auto value = result.toJson();
 	request.reply(success(request.id, {{"content", QJsonArray{QJsonObject{{"type", "text"},

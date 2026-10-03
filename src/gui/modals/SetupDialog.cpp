@@ -31,6 +31,13 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QScrollArea>
+#include "lmmsconfig.h"
+#ifdef WANT_AGENT_MCP
+#include <QSpinBox>
+#include <QClipboard>
+#include <QApplication>
+#include "agent/mcp/HttpMcpServer.h"
+#endif
 
 #include "AudioEngine.h"
 #include "embed.h"
@@ -372,6 +379,51 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	generalControlsLayout->addSpacing(10);
 
 	// General layout ordering.
+#ifdef WANT_AGENT_MCP
+		auto mcpBox = new QGroupBox(tr("Local HTTP MCP server"), generalControls);
+		auto mcpLayout = new QVBoxLayout(mcpBox);
+		auto mcpEnabled = new QCheckBox(tr("Enable HTTP MCP server"), mcpBox);
+		const auto* mcpConfig = ConfigManager::inst();
+		const auto configuredEnabled = mcpConfig->value("agentMcp", "enabled");
+		mcpEnabled->setChecked(configuredEnabled == "1" || configuredEnabled == "true");
+		mcpLayout->addWidget(mcpEnabled);
+		mcpLayout->addWidget(new QLabel(tr("Port (0 assigns an available port)"), mcpBox));
+		auto mcpPort = new QSpinBox(mcpBox);
+		mcpPort->setRange(0, 65535);
+		mcpPort->setValue(mcpConfig->value("agentMcp", "port").toInt());
+		mcpLayout->addWidget(mcpPort);
+		auto mcpTokenEnv = mcpConfig->value("agentMcp", "tokenEnv");
+		if (mcpTokenEnv.isEmpty()) { mcpTokenEnv = "LMMS_MCP_TOKEN"; }
+		auto mcpTokenHint = new QLabel(tr("Bearer token environment variable: %1").arg(mcpTokenEnv), mcpBox);
+		mcpTokenHint->setWordWrap(true); mcpLayout->addWidget(mcpTokenHint);
+		auto mcpStatus = new QLabel(mcpBox); mcpStatus->setWordWrap(true); mcpLayout->addWidget(mcpStatus);
+		auto mcpCopy = new QPushButton(tr("Copy connection address"), mcpBox); mcpLayout->addWidget(mcpCopy);
+		auto mcpApply = new QPushButton(tr("Apply server settings"), mcpBox); mcpLayout->addWidget(mcpApply);
+		auto& mcpServer = agent::mcp::service();
+		const auto refreshMcp = [mcpStatus, mcpCopy, &mcpServer] {
+			mcpStatus->setText(mcpServer.isRunning() ? tr("Running: %1").arg(mcpServer.endpoint()) :
+				mcpServer.errorString().isEmpty() ? tr("Stopped") : tr("Stopped: %1").arg(mcpServer.errorString()));
+			mcpCopy->setEnabled(mcpServer.isRunning());
+		};
+		connect(&mcpServer, &agent::mcp::HttpMcpServer::stateChanged, this, refreshMcp);
+		connect(mcpCopy, &QPushButton::clicked, this, [&mcpServer] { QApplication::clipboard()->setText(mcpServer.endpoint()); });
+		const auto applyMcp = [mcpEnabled, mcpPort] {
+			auto* config = ConfigManager::inst();
+			config->setValue("agentMcp", "enabled", mcpEnabled->isChecked() ? "true" : "false");
+			config->setValue("agentMcp", "port", QString::number(mcpPort->value()));
+			agent::mcp::applyConfiguration();
+			config->saveConfigFile();
+		};
+		connect(mcpApply, &QPushButton::clicked, this, applyMcp);
+		connect(this, &QDialog::accepted, this, [mcpEnabled, mcpPort, applyMcp] {
+			const auto* config = ConfigManager::inst();
+			const auto enabled = config->value("agentMcp", "enabled");
+			if ((enabled == "true" || enabled == "1") != mcpEnabled->isChecked() ||
+				config->value("agentMcp", "port").toInt() != mcpPort->value()) { applyMcp(); }
+		});
+		refreshMcp();
+		generalControlsLayout->addWidget(mcpBox);
+#endif
 	generalControlsLayout->addStretch();
 	generalControls->setLayout(generalControlsLayout);
 	generalScroll->setWidget(generalControls);
