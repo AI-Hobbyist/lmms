@@ -11,6 +11,7 @@
 
 #include "CoreCommands.h"
 #include "CommandSchema.h"
+#include "AudioEngine.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
@@ -306,6 +307,10 @@ CommandResult CommandBus::execute( const QString &name, const QJsonObject &argum
 	{
 		return CommandResult::failure( "wrong_thread", "Commands must execute on the main thread." );
 	}
+
+	// Keep temporary preview models inaccessible to rendering until rollback is complete.
+	const auto previewGuard = arguments.value( "dryRun" ).toBool() && Engine::audioEngine()
+		? Engine::audioEngine()->requestChangesGuard() : AudioEngine::RequestChangesGuard{};
 
 	const auto command = m_commands.constFind( name );
 	if( command == m_commands.cend() )

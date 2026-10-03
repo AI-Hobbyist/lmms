@@ -1,6 +1,6 @@
 # LMMS Agent 支持计划书
 
-> **文档状态**：v0.5（实施中；A0/A1 已补齐，A2 继续完善，验收记录见 §10.2；阶段二为可选启停的本机 HTTP MCP 服务器）
+> **文档状态**：v0.5（A0~A2 已补齐并验收，记录见 §10.2；阶段二为可选启停的本机 HTTP MCP 服务器）
 > **编写日期**：2026-09-12（v0.5 修订：2026-10-03）
 > **适用代码库**：LMMS 1.3.0-alpha（本工作区，分支 `master`）
 > **勘察依据**：CodeGraph 符号级检索 + 源码核对（文中行号为编写时快照，可能随上游提交漂移）
@@ -518,7 +518,7 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 |----------|------|--------|----------|------|
 | **A0 骨架与命令总线（已补齐并验证）** | CMake `WANT_AGENT` 开关与目录结构；`CommandDescriptor / CommandBus / CommandResult`；事务（checkpoint/失败回滚）与 `dryRun`；`history.*`；QTest 测试骨架 | 可注册并执行命令的骨架（无 UI） | 参数 schema 校验、结构化 diff、嵌套批次、批次内预览、主线程入口、history 状态/显式回滚均通过；开关 ON/OFF 编译测试通过 | 3~4 人日 |
 | **A1 核心创作 API（已补齐并验证）** | `song.*`、`transport.*`（四种播放模式）、`track.*`、`instrument.*`（加载 + 轨道级参数）、`clip.*`、`midi.*`、`query.*`、`history.*` | 建轨→编辑音符→查询→播放的命令集 | 轨道/Clip 属性与排序、Pattern 容器、音符编辑/筛选/分页、自动化预览和原生乐器 DLL 验证通过 | 6~10 人日 |
-| **A2 混音与自动化 API（基本覆盖，待补齐）** | `mixer.*`、`effect.*`（含参数枚举 L1，§4.5）、`model.*`（路径寻址读写）、`automation.*`、`query.mixerState/modelSearch` | 混音/效果/自动化命令集 | 已有 L1 参数与自动化值测试；效果子插件选择、目标域 scope 与自动化轨插入位置待补齐 | 5~8 人日 |
+| **A2 混音与自动化 API（已补齐并验证）** | `mixer.*`、`effect.*`（含参数枚举 L1，§4.5）、`model.*`（路径寻址读写）、`automation.*`、`query.mixerState/modelSearch` | 混音/效果/自动化命令集 | 子插件选择、目标域筛选、轨道插入、类型与范围校验、Pattern 寻址及原生插件恢复测试通过 | 5~8 人日 |
 | **A3 全量覆盖与 I/O** | `pattern.*`、`sample.*`、`scale.*`、`controller.*`、`import.*`、`export.*`、`config.*`、`song.load/save/clearProject`、`transport.setLoopRange/previewClip`、`midi.humanize` 等；§4.4 桥接项落地；覆盖率审计 | 附录 C 全量命令落地（覆盖率 ≥95%） | 每个命令有实现 + 测试或脚本示例；WAV/MIDI 导出冒烟通过 | 6~10 人日 |
 | **A4 工具层 + 脚本引擎** | `ToolRegistry`（命令 → MCP 工具定义）；`ScriptRunner`（IR/变量/循环/条件/随机）；内置脚本库；`compose.* / edit.* / arrange.* / mix.* / render.*` 高层命令；`agent.*` 元工具；无 GUI 回归 harness | MCP 工具定义 JSON + 可执行脚本 + 脚本库 + 回归脚本集 | 脚本单测（含失败回滚）；`four_on_floor` 一键生成；工具定义通过 schema 校验；harness 全绿 | 6~10 人日 |
 
@@ -548,6 +548,11 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 - **A0 提交**：`3bdd18734dbca74d57f1a6b411ffa1a80c2aa8ef`，已推送 `master`。
 - **A1 补齐**：新增复核列出的 14 个创作命令；支持 `parent/index`、唯一名称和返回轨道路径；轨道详情返回 Clip/效果链与属性；新增自动化 Clip 创建、音符更新/删除/量化/移调、范围/键筛选与分页，`midi.addNotes` 返回当前索引。支持 Song/Pattern/MidiClip/AutomationClip 播放、无副作用的传输 dryRun、删除预览 Clip 时停止播放；`instrument.load` 校验并传递 `subKey`，加载受支持的本地 `path`；插件目录返回可选子插件键。`query.songSummary.detail` 接受 `compact`（默认）或 `full`。
 - **A1 验收**：相关七个测试目标重新编译并通过 CTest **7/7 passed**；`CoreCommandsTest` 新增属性/排序与批次撤销、Pattern 容器恢复、音符编辑及四种播放模式测试。额外编译 `lmms/tripleoscillator/audiofileprocessor`，通过原生 DLL 集成验证乐器加载、本地 WAV、dryRun、撤销/重做。Windows 原生插件引用 `lmms.exe` 的导出，因此将测试程序复制为独立构建目录下的 `lmms.exe`，设置 `LMMS_AGENT_PLUGIN_TEST_PATH` 后运行 `loadsNativeInstrumentPlugins`；默认 CTest 跳过这一依赖 DLL 的集成用例。
+- **A1 提交**：`373757ad53d312bb84205e555113adff8102ae57`，已推送 `master`。
+- **A2 补齐**：`effect.add` 校验并传递目录返回的 `subKey`；子插件宿主缺少键时明确报错。`automation.createTrack` 复用建轨实现，支持 `index/name/parent`；`automation.listTargets.scope` 按 song/track/mixer/effect 四个域筛选，路径前缀筛选使用 `model.list(prefix)`。模型寻址包含 Song/Pattern 轨道静音、乐器参数、采样轨混音通道及效果链；布尔模型返回 JSON 布尔值，并接受布尔值或兼容的 0/1 写入。无界面分配混音通道时同步模型范围，避免将新通道夹回 0。效果排序与 L1 参数恢复使用音频修改锁，排序后通知视图。
+- **A2 收尾复核**：`mixer.setName` 支持附录的 `value` 与原有 `name`；单参数乐器命令保留 `parent`，音高使用原生 cents 和当前 pitchRange，组合设置先更新范围再设置音高；`transport.getPosition` 返回秒数。`automation.removeNodes` 支持 `range:{start,end}` 或原有 `start/end`，端点均包含，反向端点沿用原生归一化；自动化 Clip 的详情查询返回目标、节点与曲线。运行时注册检查直接读取附录 C，逐项检查全部 **92 个 A1/A2 命令**。
+- **A2 验收**：MSVC Release / Qt 6.10.3 重新编译相关七个测试目标，CTest **7/7 passed**；`WANT_AGENT=OFF` 重新构建，`AutomatableModelTest` **1/1 passed**。原生 `amplifier/ladspaeffect/CMT` 集成验证子插件键校验、L1 参数与效果排序、dryRun 和撤销/重做；真实乐器 DLL 集成测试同步通过，两组各 **3 passed、0 failed、0 skipped**（含初始化与清理）。默认 CTest 跳过原生 DLL 用例，由独立集成运行补足。
+- **预览与诊断收尾**：dryRun 从快照到回滚持续持有音频修改锁，防止渲染线程读取临时模型；精确播放位置断言在同一锁内比较，避免正常音频推进造成偶发失败。`CommandBusTest` 连续 **100 次通过**。CTest 保留终端输出并写入 `build/tests/*-results.txt`，补足 Windows 下 QtTest 输出不转发时的失败诊断；所有构建和测试按 AGENTS.md 使用前台 PowerShell 与 `build.log`。
 
 ### 10.3 阶段二：可选 HTTP MCP 服务器（子里程碑 B0~B4）
 
@@ -674,12 +679,14 @@ flowchart LR
 | `track.list` / `track.get` | 轨道列表/详情 | `parent?` / `track` | A1 |
 | `track.setName/setMuted/setSolo/setHeight/setColor` | 通用属性 | `track`,`value` | A1 |
 | `track.setMixerChannel` | 指定混音通道 | `track`,`channel` | A1 |
-| `instrument.load` | 加载乐器（`loadInstrument()`） | `track`,`plugin`,`subKey?`,`path?` | A1 |
+| `instrument.load` | 加载乐器（`loadInstrument()`） | `track`,`plugin`,`subKey?`（子插件宿主必填）、`path?` | A1 |
 | `instrument.getParams/setParam` | 乐器参数（§4.5） | `track`,`name`,`value` | A2 |
 | `instrument.setVolume/setPanning/setPitch/setPitchRange/setBaseNote` | 轨道级乐器参数 | `track`,`value` | A1 |
 | `instrument.loadPreset/savePreset` | 预设管理 | `track`,`path` | A3 |
 | `instrument.setMidiIn/Out` | MIDI 端口 | `track`,`port?`,`channel?` | A3 |
 | `instrument.setArpeggio/NoteStacking/Piano` | 轨道内建 MIDI 处理器 | `track`,`enabled`,`params` | A3 |
+
+`instrument.setPitch` 的 `value` 与组合参数 `pitch` 均以 cents 为单位（100 cents = 1 半音），受当前 `pitchRange` 限制；`pitchRange` 以半音为单位，范围 1～60。所有轨道级单参数命令均保留 `parent` 寻址。
 
 **clip / midi / sample**
 
@@ -711,7 +718,7 @@ flowchart LR
 | `pattern.list/get/rename` | 列表/详情/重命名 | — | A3 |
 | `pattern.placeInSong` | 歌曲中放置 pattern（`PatternTrack/PatternClip`） | `pattern`,`position`,`length?` | A3 |
 | `pattern.removeFromSong` | 移除歌曲中的 pattern 引用 | `track`,`clip` | A3 |
-| `automation.createTrack` | 建自动化轨 | `index?` | A2 |
+| `automation.createTrack` | 建自动化轨 | `index?`,`name?`,`parent?` | A2 |
 | `automation.addClip` | 建自动化 Clip（`AutomationClip`） | `track`,`position`,`length` | A2 |
 | `automation.addTarget` | 绑定目标模型（`addObject`，路径寻址） | `target` | A2 |
 | `automation.putValue` | 写节点（`putValue`） | `pos`,`value` | A2 |
@@ -720,6 +727,8 @@ flowchart LR
 | `automation.listTargets` | 可自动化目标枚举（路径+当前值） | `scope?`（track/mixer/effect/song） | A2 |
 | `model.getValue/setValue` | 任意 `AutomatableModel` 读写（路径） | `path`,`value` | A2 |
 | `model.list/search` | 模型枚举/按关键词搜索 | `prefix`/`keyword` | A2 |
+
+`automation.listTargets.scope`：`song` 为工程全局模型，`track` 为 Song/Pattern 轨道模型，`mixer` 为混音通道模型，`effect` 为两类容器中的效果槽模型；效果槽不重复归入 track/mixer。省略 scope 返回全部目标，路径前缀查询使用 `model.list(prefix)`。`automation.removeNodes` 使用包含两端的原生范围；MIDI 音符筛选范围则为起点包含、终点不包含。
 
 **mixer / effect / controller**
 
@@ -731,7 +740,7 @@ flowchart LR
 | `mixer.clearChannel` | 清空通道（客户端确认） | `channel` | A2 |
 | `mixer.getMaster` | 主通道状态 | — | A2 |
 | `effect.listAvailable` | 可用插件目录（`PluginFactory`） | `kind?(Effect/Instrument)` | A2 |
-| `effect.add` | 添加效果（`Effect::instantiate`） | `owner(channel/track)`,`plugin`,`subKey?`,`index?` | A2 |
+| `effect.add` | 添加效果（`Effect::instantiate`） | `owner(channel/track)`,`plugin`,`subKey?`（子插件宿主必填）、`index?` | A2 |
 | `effect.remove/move` | 删/移效果槽 | `owner`,`slot` | A2 |
 | `effect.setEnabled/setWetDry` | 开关/干湿比 | `value` | A2 |
 | `effect.getParams/setParam` | 参数枚举/设置（§4.5；L1 通道先落地，L2 增强随 A3~A4） | `owner`,`slot`,`name`,`value` | A2 |

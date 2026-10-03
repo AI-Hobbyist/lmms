@@ -77,16 +77,46 @@ private slots:
 		lmms::Engine::getSong()->stop();
 	}
 
-	void registersThePlannedA1Commands()
+	void registersThePlannedA1AndA2Commands()
 	{
 		QStringList names;
 		for( const auto &descriptor : lmms::agent::CommandBus::instance().descriptors() ) { names.append( descriptor.name ); }
-		for( const auto &name : { "song.setPlayMode", "track.clone", "track.move", "track.setHeight", "track.setColor",
-			"track.setMixerChannel", "clip.duplicate", "clip.setColor", "clip.setAutoResize", "clip.setStartTimeOffset",
-			"midi.updateNote", "midi.removeNotes", "midi.quantize", "midi.transpose" } )
+		QFile plan( QFINDTESTDATA( "../../../AGENT_SUPPORT_PLAN.md" ) );
+		QVERIFY( plan.open( QIODevice::ReadOnly ) );
+		int checked = 0;
+		for( auto line : QString::fromUtf8( plan.readAll() ).split( '\n' ) )
 		{
-			QVERIFY2( names.contains( name ), name );
+			line = line.trimmed();
+			if( !line.endsWith( "| A1 |" ) && !line.endsWith( "| A2 |" ) ) { continue; }
+			const auto column = line.split( '|' )[1].remove( '`' ).trimmed();
+			const auto prefix = column.section( '.', 0, 0 );
+			for( auto name : column.split( '/' ) )
+			{
+				name = name.trimmed();
+				if( !name.contains( '.' ) ) { name = prefix + '.' + name; }
+				QVERIFY2( names.contains( name ), qPrintable( name ) );
+				++checked;
+			}
 		}
+		QVERIFY2( checked >= 92, "The A1/A2 appendix must be included in the command audit." );
+	}
+
+	void writesInstrumentParametersInNativeUnitsAndPatternContainer()
+	{
+		auto &bus = lmms::agent::CommandBus::instance();
+		QVERIFY( bus.execute( "track.create", { { "parent", "pattern" } } ).ok );
+		QVERIFY( bus.execute( "instrument.setVolume", { { "parent", "pattern" }, { "track", 0 }, { "value", 123 } } ).ok );
+		QVERIFY( bus.execute( "instrument.setParameters", { { "parent", "pattern" }, { "track", 0 }, { "pitchRange", 2 }, { "pitch", 150 } } ).ok );
+		QCOMPARE( bus.execute( "model.getValue", { { "path", "pattern/track:0/instrument/pitch" } } ).data.value( "value" ).toDouble(), 150.0 );
+		QVERIFY( bus.execute( "instrument.setPitch", { { "parent", "pattern" }, { "track", 0 }, { "value", -200 } } ).ok );
+		QVERIFY( !bus.execute( "instrument.setPitch", { { "parent", "pattern" }, { "track", 0 }, { "value", 201 } } ).ok );
+		QCOMPARE( bus.execute( "model.getValue", { { "path", "pattern/track:0/instrument/pitch" } } ).data.value( "value" ).toDouble(), -200.0 );
+		QVERIFY( bus.execute( "instrument.setPitchRange", { { "parent", "pattern" }, { "track", 0 }, { "value", 1 } } ).ok );
+		QCOMPARE( bus.execute( "model.getValue", { { "path", "pattern/track:0/instrument/pitch" } } ).data.value( "value" ).toDouble(), -100.0 );
+		QVERIFY( !bus.execute( "instrument.setParameters", { { "track", "pattern/track:0" }, { "pitchRange", 2 }, { "pitch", 250 }, { "volume", 111 } } ).ok );
+		QCOMPARE( bus.execute( "model.getValue", { { "path", "pattern/track:0/instrument/volume" } } ).data.value( "value" ).toDouble(), 123.0 );
+		QVERIFY( bus.execute( "history.undo" ).ok );
+		QCOMPARE( bus.execute( "model.getValue", { { "path", "pattern/track:0/instrument/pitch" } } ).data.value( "value" ).toDouble(), -200.0 );
 	}
 
 	void createsEightBarDrumPatternAndQueriesIt()
@@ -340,6 +370,23 @@ private slots:
 		QVERIFY( bus.execute( "history.redo" ).ok );
 		track = dynamic_cast<lmms::InstrumentTrack *>(lmms::Engine::getSong()->tracks()[0]);
 		QCOMPARE( QString( track->instrument()->descriptor()->name ), QString( "audiofileprocessor" ) );
+		const auto setParameter = bus.execute( "instrument.setParam", { { "track", 0 }, { "name", "amp" }, { "value", 125 } } );
+		QVERIFY2( setParameter.ok, qPrintable( setParameter.errorMessage ) );
+		const auto amplitude = [&bus]()
+		{
+			const auto queried = bus.execute( "instrument.getParams", { { "track", 0 } } );
+			for( const auto &parameter : queried.data.value( "parameters" ).toArray() )
+			{
+				const auto object = parameter.toObject();
+				if( object.value( "name" ).toString() == "amp" ) { return object.value( "value" ).toDouble(); }
+			}
+			return -1.0;
+		};
+		QCOMPARE( amplitude(), 125.0 );
+		QVERIFY( bus.execute( "history.undo" ).ok );
+		QCOMPARE( amplitude(), 100.0 );
+		QVERIFY( bus.execute( "history.redo" ).ok );
+		QCOMPARE( amplitude(), 125.0 );
 	}
 
 	void selectsPlaybackModesAndPreviewsAutomation()

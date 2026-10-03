@@ -35,6 +35,7 @@
 #include "Mixer.h"
 #include "Note.h"
 #include "PatternStore.h"
+#include "Pitch.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "SampleClip.h"
@@ -854,24 +855,34 @@ std::vector<ModelAddress> addressableModels( Song *song )
 		{ "song/masterPitch", &song->masterPitchModel() }
 	};
 
-	const auto &tracks = song->tracks();
-	for( std::size_t trackIndex = 0; trackIndex < tracks.size(); ++trackIndex )
+	for( auto *container : { static_cast<TrackContainer *>( song ), static_cast<TrackContainer *>( Engine::patternStore() ) } )
 	{
-		auto *instrumentTrack = dynamic_cast<InstrumentTrack *>( tracks[trackIndex] );
-		if( instrumentTrack == nullptr )
+		const auto &tracks = container->tracks();
+		for( std::size_t trackIndex = 0; trackIndex < tracks.size(); ++trackIndex )
 		{
-			continue;
-		}
+			const auto path = trackPath( static_cast<int>( trackIndex ), tracks[trackIndex] );
+			models.push_back( { path + "/mute", tracks[trackIndex]->getMutedModel() } );
+			auto *instrumentTrack = dynamic_cast<InstrumentTrack *>( tracks[trackIndex] );
+			if( instrumentTrack == nullptr )
+			{
+				if( auto *sample = dynamic_cast<SampleTrack *>( tracks[trackIndex] ) )
+				{
+					models.push_back( { path + "/mixerChannel", sample->mixerChannelModel() } );
+					appendEffectModels( models, path, sample->audioBusHandle()->effects() );
+				}
+				continue;
+			}
 
-		const QString instrumentPath = trackPath( static_cast<int>( trackIndex ) ) + "/instrument";
-		models.push_back( { instrumentPath + "/volume", instrumentTrack->volumeModel() } );
-		models.push_back( { instrumentPath + "/panning", instrumentTrack->panningModel() } );
-		models.push_back( { instrumentPath + "/pitch", instrumentTrack->pitchModel() } );
-		models.push_back( { instrumentPath + "/pitchRange", instrumentTrack->pitchRangeModel() } );
-		models.push_back( { instrumentPath + "/baseNote", instrumentTrack->baseNoteModel() } );
-		models.push_back( { instrumentPath + "/mixerChannel", instrumentTrack->mixerChannelModel() } );
-		appendEffectModels( models, trackPath( static_cast<int>( trackIndex ) ),
-			instrumentTrack->audioBusHandle()->effects() );
+			const QString instrumentPath = path + "/instrument";
+			models.push_back( { instrumentPath + "/volume", instrumentTrack->volumeModel() } );
+			models.push_back( { instrumentPath + "/panning", instrumentTrack->panningModel() } );
+			models.push_back( { instrumentPath + "/pitch", instrumentTrack->pitchModel() } );
+			models.push_back( { instrumentPath + "/pitchRange", instrumentTrack->pitchRangeModel() } );
+			models.push_back( { instrumentPath + "/baseNote", instrumentTrack->baseNoteModel() } );
+			models.push_back( { instrumentPath + "/mixerChannel", instrumentTrack->mixerChannelModel() } );
+			appendEffectModels( models, path,
+				instrumentTrack->audioBusHandle()->effects() );
+		}
 	}
 
 	auto *mixer = Engine::mixer();
@@ -915,13 +926,14 @@ QString modelTypeName( const AutomatableModel *model )
 QJsonObject modelDetail( const ModelAddress &address )
 {
 	const auto *model = address.model;
+	const bool mixerChannel = address.path.endsWith( "/mixerChannel" ) && Engine::mixer();
 	return {
 		{ "path", address.path },
 		{ "name", model->fullDisplayName() },
 		{ "type", modelTypeName( model ) },
-		{ "value", model->value<float>() },
-		{ "min", model->minValue<float>() },
-		{ "max", model->maxValue<float>() },
+		{ "value", model->dynamicCast<BoolModel>() ? QJsonValue( model->value<bool>() ) : QJsonValue( model->value<float>() ) },
+		{ "min", mixerChannel ? 0.0f : model->minValue<float>() },
+		{ "max", mixerChannel ? static_cast<float>( Engine::mixer()->numChannels() - 1 ) : model->maxValue<float>() },
 		{ "step", model->step<float>() },
 		{ "center", model->centerValue() },
 		{ "automated", model->isAutomated() }
@@ -1366,8 +1378,7 @@ CommandResult executeModelSetValue( const QJsonObject &arguments )
 	QString path;
 	double value = 0.0;
 	QString error;
-	if( !readRequiredString( arguments, "path", path, error ) ||
-		!readRequiredNumber( arguments, "value", value, error ) )
+	if( !readRequiredString( arguments, "path", path, error ) )
 	{
 		return invalidArguments( error );
 	}
@@ -1377,6 +1388,16 @@ CommandResult executeModelSetValue( const QJsonObject &arguments )
 	if( !resolveModel( song, path, address, failure ) )
 	{
 		return failure;
+	}
+	if( arguments.value( "value" ).isBool() )
+	{
+		if( !address.model->dynamicCast<BoolModel>() ) { return invalidArguments( "Boolean values require a boolean model." ); }
+		value = arguments.value( "value" ).toBool() ? 1.0 : 0.0;
+	}
+	else if( !readRequiredNumber( arguments, "value", value, error ) ) { return invalidArguments( error ); }
+	if( address.path.endsWith( "/mixerChannel" ) && Engine::mixer() )
+	{
+		address.model->setRange( 0, Engine::mixer()->numChannels() - 1, 1 );
 	}
 	if( !validateModelValue( address.model, value, error ) )
 	{
@@ -1488,6 +1509,8 @@ bool resolveEffectOwner( Song *song, const QJsonObject &arguments, EffectOwner &
 	}
 
 	QString normalizedOwner = ownerArgument;
+	const bool patternOwner = normalizedOwner.startsWith( "pattern/", Qt::CaseInsensitive );
+	if( patternOwner ) { normalizedOwner = normalizedOwner.sliced( 8 ); }
 	if( normalizedOwner.startsWith( "song/", Qt::CaseInsensitive ) )
 	{
 		normalizedOwner = normalizedOwner.sliced( 5 );
@@ -1496,6 +1519,7 @@ bool resolveEffectOwner( Song *song, const QJsonObject &arguments, EffectOwner &
 	int index = -1;
 	if( parseOwnerIndex( normalizedOwner, "channel:", index ) )
 	{
+		if( patternOwner ) { failure = invalidArguments( "Mixer channels belong to song, not pattern." ); return false; }
 		auto *mixer = Engine::mixer();
 		if( mixer == nullptr )
 		{
@@ -1515,7 +1539,7 @@ bool resolveEffectOwner( Song *song, const QJsonObject &arguments, EffectOwner &
 
 	if( parseOwnerIndex( normalizedOwner, "track:", index ) )
 	{
-		const auto &tracks = song->tracks();
+		const auto &tracks = patternOwner ? Engine::patternStore()->tracks() : song->tracks();
 		if( index >= static_cast<int>( tracks.size() ) )
 		{
 			failure = CommandResult::failure( "track_not_found",
@@ -1525,13 +1549,13 @@ bool resolveEffectOwner( Song *song, const QJsonObject &arguments, EffectOwner &
 
 		if( auto *instrumentTrack = dynamic_cast<InstrumentTrack *>( tracks[index] ) )
 		{
-			owner.path = trackPath( index );
+			owner.path = trackPath( index, tracks[index] );
 			owner.effectChain = instrumentTrack->audioBusHandle()->effects();
 			return true;
 		}
 		if( auto *sampleTrack = dynamic_cast<SampleTrack *>( tracks[index] ) )
 		{
-			owner.path = trackPath( index );
+			owner.path = trackPath( index, tracks[index] );
 			owner.effectChain = sampleTrack->audioBusHandle()->effects();
 			return true;
 		}
@@ -1838,6 +1862,9 @@ CommandResult executeEffectListAvailable( const QJsonObject &arguments )
 
 
 
+bool readSubPluginKey( const Plugin::Descriptor *descriptor, const QJsonObject &arguments,
+	std::optional<Plugin::Descriptor::SubPluginFeatures::Key> &key, CommandResult &failure );
+
 CommandResult executeEffectAdd( const QJsonObject &arguments )
 {
 	auto *song = Engine::getSong();
@@ -1885,7 +1912,10 @@ CommandResult executeEffectAdd( const QJsonObject &arguments )
 			QStringLiteral( "'%1' is not an available effect plugin." ).arg( plugin ) );
 	}
 
-	auto *effect = Effect::instantiate( plugin, owner.effectChain, nullptr );
+	std::optional<Plugin::Descriptor::SubPluginFeatures::Key> subKey;
+	if( !readSubPluginKey( pluginInfo.descriptor, arguments, subKey, failure ) ) { return failure; }
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto *effect = Effect::instantiate( plugin, owner.effectChain, subKey ? &*subKey : nullptr );
 	if( effect == nullptr || !effect->isOkay() )
 	{
 		delete effect;
@@ -1902,6 +1932,7 @@ CommandResult executeEffectAdd( const QJsonObject &arguments )
 			owner.effectChain->moveUp( effect );
 			--slot;
 		}
+		emit owner.effectChain->dataChanged();
 	}
 	return CommandResult::success( effectDetail( owner, slot, effect ) );
 }
@@ -1968,6 +1999,7 @@ CommandResult executeEffectMove( const QJsonObject &arguments )
 		return invalidArguments( "'index' must identify an existing effect slot." );
 	}
 
+	auto guard = Engine::audioEngine()->requestChangesGuard();
 	while( slot > index )
 	{
 		owner.effectChain->moveUp( effect );
@@ -1978,6 +2010,7 @@ CommandResult executeEffectMove( const QJsonObject &arguments )
 		owner.effectChain->moveDown( effect );
 		++slot;
 	}
+	emit owner.effectChain->dataChanged();
 	return CommandResult::success( effectDetail( owner, slot, effect ) );
 }
 
@@ -2119,6 +2152,7 @@ CommandResult executeEffectSetParam( const QJsonObject &arguments )
 		return CommandResult::failure( "effect_parameter_not_found",
 			QStringLiteral( "Effect parameter '%1' does not exist." ).arg( name ) );
 	}
+	auto guard = Engine::audioEngine()->requestChangesGuard();
 	effect->controls()->restoreState( state );
 
 	auto data = effectDetail( owner, slot, effect );
@@ -2463,33 +2497,12 @@ void putAutomationValues( AutomationClip *automationClip, const std::vector<Auto
 
 
 
-CommandResult executeAutomationCreateTrack( const QJsonObject &arguments )
+CommandResult executeTrackCreate( const QJsonObject &arguments );
+
+CommandResult executeAutomationCreateTrack( QJsonObject arguments )
 {
-	auto *song = Engine::getSong();
-	if( song == nullptr )
-	{
-		return engineUnavailable();
-	}
-
-	bool hasName = false;
-	QString name;
-	QString error;
-	if( !readOptionalString( arguments, "name", hasName, name, error ) )
-	{
-		return invalidArguments( error );
-	}
-
-	auto *track = Track::create( Track::Type::Automation, song );
-	if( track == nullptr )
-	{
-		return CommandResult::failure( "track_creation_failed", "LMMS could not create an automation track." );
-	}
-	if( hasName )
-	{
-		track->setName( name );
-	}
-	const int trackIndex = indexOfTrack( song, track );
-	return CommandResult::success( trackDetail( song, track, trackIndex ) );
+	arguments.insert( "type", "automation" );
+	return executeTrackCreate( arguments );
 }
 
 
@@ -2714,8 +2727,13 @@ CommandResult executeAutomationRemoveNodes( const QJsonObject &arguments )
 	int start = 0;
 	int end = 0;
 	QString error;
-	if( !readAutomationPosition( arguments, "start", start, error ) ||
-		!readAutomationPosition( arguments, "end", end, error ) )
+	if( arguments.contains( "range" ) && ( arguments.contains( "start" ) || arguments.contains( "end" ) ) )
+	{
+		return invalidArguments( "Specify 'range' or 'start/end', not both." );
+	}
+	const auto range = arguments.contains( "range" ) ? arguments.value( "range" ).toObject() : arguments;
+	if( !readAutomationPosition( range, "start", start, error ) ||
+		!readAutomationPosition( range, "end", end, error ) )
 	{
 		return invalidArguments( error );
 	}
@@ -2795,12 +2813,23 @@ CommandResult executeAutomationSetTension( const QJsonObject &arguments )
 
 CommandResult executeAutomationListTargets( const QJsonObject &arguments )
 {
-	QJsonObject modelArguments;
-	if( arguments.contains( "scope" ) )
+	auto *song = Engine::getSong();
+	if( !song ) { return engineUnavailable(); }
+	const auto scope = arguments.value( "scope" ).toString();
+	QJsonArray models;
+	for( const auto &address : addressableModels( song ) )
 	{
-		modelArguments.insert( "prefix", arguments.value( "scope" ) );
+		const bool effect = address.path.contains( "/fx:" );
+		const bool mixer = address.path.startsWith( "song/channel:" );
+		const bool track = address.path.startsWith( "song/track:" ) || address.path.startsWith( "pattern/track:" );
+		if( scope.isEmpty() || ( scope == "effect" && effect ) ||
+			( scope == "mixer" && mixer && !effect ) || ( scope == "track" && track && !effect ) ||
+			( scope == "song" && !track && !mixer && !effect ) )
+		{
+			models.append( modelDetail( address ) );
+		}
 	}
-	return executeModelList( modelArguments );
+	return CommandResult::success( QJsonObject{ { "models", models } } );
 }
 
 
@@ -2813,6 +2842,7 @@ QJsonObject transportPosition( Song *song, Song::PlayMode mode )
 		{ "mode", playModeName( mode ) },
 		{ "ticks", position.getTicks() },
 		{ "bar", position.getBar() },
+		{ "seconds", song->getTimeline( mode ).getElapsedSeconds() },
 		{ "playing", song->isPlaying() },
 		{ "paused", song->isPaused() }
 	};
@@ -3539,6 +3569,7 @@ CommandResult executeTrackProperty( const QJsonObject &arguments, const QString 
 		if( auto *instrument = dynamic_cast<InstrumentTrack *>( track ) ) { model = instrument->mixerChannelModel(); }
 		if( auto *sample = dynamic_cast<SampleTrack *>( track ) ) { model = sample->mixerChannelModel(); }
 		if( !model ) { return CommandResult::failure( "wrong_track_type", "Only instrument and sample tracks have mixer channels." ); }
+		model->setRange( 0, Engine::mixer()->numChannels() - 1, 1 );
 		model->setValue( channel );
 	}
 	song->setModified();
@@ -3696,7 +3727,15 @@ CommandResult executeTrackSetSolo( const QJsonObject &arguments )
 bool readSubPluginKey( const Plugin::Descriptor *descriptor, const QJsonObject &arguments,
 	std::optional<Plugin::Descriptor::SubPluginFeatures::Key> &key, CommandResult &failure )
 {
-	if( !arguments.contains( "subKey" ) ) { return true; }
+	if( !arguments.contains( "subKey" ) )
+	{
+		if( descriptor->subPluginFeatures )
+		{
+			failure = invalidArguments( "This plugin requires subKey; select one from effect.listAvailable." );
+			return false;
+		}
+		return true;
+	}
 	if( !descriptor->subPluginFeatures )
 	{
 		failure = invalidArguments( "This plugin does not support subKey." );
@@ -3796,7 +3835,7 @@ CommandResult executeInstrumentLoad( const QJsonObject &arguments )
 
 
 
-bool validateInstrumentParameters( bool hasVolume, double volume, bool hasPanning, double panning,
+bool validateInstrumentParameters( InstrumentTrack *track, bool hasVolume, double volume, bool hasPanning, double panning,
 	bool hasPitch, double pitch, bool hasPitchRange, int pitchRange, bool hasBaseNote, int baseNote,
 	QString &error )
 {
@@ -3811,14 +3850,16 @@ bool validateInstrumentParameters( bool hasVolume, double volume, bool hasPannin
 			.arg( PanningLeft ).arg( PanningRight );
 		return false;
 	}
-	if( hasPitch && ( pitch < -60 || pitch > 60 ) )
-	{
-		error = "'pitch' must be between -60 and 60.";
-		return false;
-	}
 	if( hasPitchRange && ( pitchRange < 1 || pitchRange > 60 ) )
 	{
 		error = "'pitchRange' must be between 1 and 60.";
+		return false;
+	}
+	const int range = hasPitchRange ? pitchRange : track->pitchRangeModel()->value();
+	if( hasPitch && ( pitch < MinPitchDefault * range || pitch > MaxPitchDefault * range ) )
+	{
+		error = QStringLiteral( "'pitch' is measured in cents and must be between %1 and %2 for this pitch range." )
+			.arg( MinPitchDefault * range ).arg( MaxPitchDefault * range );
 		return false;
 	}
 	if( hasBaseNote && ( baseNote < 0 || baseNote >= NumKeys ) )
@@ -3864,7 +3905,7 @@ CommandResult executeInstrumentSetParameters( const QJsonObject &arguments )
 		!readOptionalNumber( arguments, "pitch", hasPitch, pitch, error ) ||
 		!readOptionalInteger( arguments, "pitchRange", hasPitchRange, pitchRange, error ) ||
 		!readOptionalInteger( arguments, "baseNote", hasBaseNote, baseNote, error ) ||
-		!validateInstrumentParameters( hasVolume, volume, hasPanning, panning, hasPitch, pitch,
+		!validateInstrumentParameters( track, hasVolume, volume, hasPanning, panning, hasPitch, pitch,
 			hasPitchRange, pitchRange, hasBaseNote, baseNote, error ) )
 	{
 		return invalidArguments( error );
@@ -3882,13 +3923,13 @@ CommandResult executeInstrumentSetParameters( const QJsonObject &arguments )
 	{
 		track->panningModel()->setValue( static_cast<float>( panning ) );
 	}
-	if( hasPitch )
-	{
-		track->pitchModel()->setValue( static_cast<float>( pitch ) );
-	}
 	if( hasPitchRange )
 	{
 		track->pitchRangeModel()->setValue( pitchRange );
+	}
+	if( hasPitch )
+	{
+		track->pitchModel()->setValue( static_cast<float>( pitch ) );
 	}
 	if( hasBaseNote )
 	{
@@ -3906,10 +3947,8 @@ CommandResult executeInstrumentSetParameters( const QJsonObject &arguments )
 
 CommandResult executeInstrumentSetSingleParameter( const QJsonObject &arguments, const char *parameter )
 {
-	QJsonObject combined{
-		{ "track", arguments.value( "track" ) },
-		{ argumentName( parameter ), arguments.value( "value" ) }
-	};
+	QJsonObject combined = arguments;
+	combined.insert( argumentName( parameter ), combined.take( "value" ) );
 	return executeInstrumentSetParameters( combined );
 }
 
@@ -4868,6 +4907,10 @@ CommandResult executeQueryClipDetail( const QJsonObject &arguments )
 	{
 		return failure;
 	}
+	if( auto *automation = dynamic_cast<AutomationClip *>( address.clip ) )
+	{
+		return CommandResult::success( automationClipDetail( song, address, automation ) );
+	}
 	return CommandResult::success( clipDetail( address ) );
 }
 
@@ -4973,11 +5016,11 @@ void registerDescriptor( CommandBus &commandBus, const QString &name, const QStr
 		} );
 		descriptor.argsSchema.insert( "properties", properties );
 	}
-	if( name == "track.setName" )
+	if( name == "track.setName" || name == "mixer.setName" )
 	{
 		properties.insert( "value", stringSchema() );
 		descriptor.argsSchema.insert( "properties", properties );
-		descriptor.argsSchema.insert( "required", QJsonArray{ "track" } );
+		descriptor.argsSchema.insert( "required", QJsonArray{ name == "track.setName" ? "track" : "channel" } );
 		descriptor.argsSchema.insert( "oneOf", QJsonArray{
 			objectSchema( {}, QJsonArray{ "name" } ), objectSchema( {}, QJsonArray{ "value" } )
 		} );
@@ -5149,7 +5192,7 @@ void registerCoreCommands( CommandBus &commandBus )
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetVolume );
 	registerDescriptor( commandBus, "instrument.setPanning", "Set an instrument-track panning value.", valueArguments,
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetPanning );
-	registerDescriptor( commandBus, "instrument.setPitch", "Set an instrument-track pitch value.", valueArguments,
+	registerDescriptor( commandBus, "instrument.setPitch", "Set instrument-track pitch in cents within its current pitch range.", valueArguments,
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetPitch );
 	registerDescriptor( commandBus, "instrument.setPitchRange", "Set an instrument-track pitch range.", integerValueArguments,
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetPitchRange );
@@ -5206,7 +5249,9 @@ void registerCoreCommands( CommandBus &commandBus )
 	registerDescriptor( commandBus, "effect.listAvailable", "List available effect plugins.", objectSchema(
 		QJsonObject{ { "kind", stringSchema() } } ), Mutability::ReadOnly, TxScope::None, executeEffectListAvailable );
 	registerDescriptor( commandBus, "effect.add", "Add an effect plugin to an effect chain.", objectSchema(
-		QJsonObject{ { "owner", stringSchema() }, { "plugin", stringSchema() }, { "index", integerSchema() } },
+		QJsonObject{ { "owner", stringSchema() }, { "plugin", stringSchema() }, { "index", integerSchema() },
+			{ "subKey", objectSchema( QJsonObject{ { "name", stringSchema() },
+				{ "attributes", QJsonObject{ { "type", "object" }, { "additionalProperties", stringSchema() } } } }, QJsonArray{ "attributes" } ) } },
 		QJsonArray{ "owner", "plugin" } ), Mutability::Mutating, TxScope::Single, executeEffectAdd );
 	registerDescriptor( commandBus, "effect.remove", "Remove an effect from an effect chain.", effectArguments,
 		Mutability::Destructive, TxScope::Single, executeEffectRemove );
@@ -5232,7 +5277,7 @@ void registerCoreCommands( CommandBus &commandBus )
 	registerDescriptor( commandBus, "model.getValue", "Return an addressable model value.",
 		modelPathArguments, Mutability::ReadOnly, TxScope::None, executeModelGetValue );
 	registerDescriptor( commandBus, "model.setValue", "Set an addressable model value.", objectSchema(
-		QJsonObject{ { "path", stringSchema() }, { "value", numberSchema() } }, QJsonArray{ "path", "value" } ),
+		QJsonObject{ { "path", stringSchema() }, { "value", QJsonObject{ { "anyOf", QJsonArray{ numberSchema(), booleanSchema() } } } } }, QJsonArray{ "path", "value" } ),
 		Mutability::Mutating, TxScope::Single, executeModelSetValue );
 	registerDescriptor( commandBus, "model.list", "List addressable models, optionally under a prefix.", objectSchema(
 		QJsonObject{ { "prefix", stringSchema() } } ), Mutability::ReadOnly, TxScope::None, executeModelList );
@@ -5243,7 +5288,9 @@ void registerCoreCommands( CommandBus &commandBus )
 		{ "track", integerSchema() }, { "clip", integerSchema() }
 	}, QJsonArray{ "track", "clip" } );
 	registerDescriptor( commandBus, "automation.createTrack", "Create an automation track.", objectSchema(
-		QJsonObject{ { "name", stringSchema() } } ), Mutability::Mutating, TxScope::Single, executeAutomationCreateTrack );
+		QJsonObject{ { "name", stringSchema() }, { "index", integerSchema() },
+			{ "parent", QJsonObject{ { "type", "string" }, { "enum", QJsonArray{ "song", "pattern" } } } } } ),
+		Mutability::Mutating, TxScope::Single, executeAutomationCreateTrack );
 	registerDescriptor( commandBus, "automation.addClip", "Create an automation clip on an automation track.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "position", integerSchema() },
 			{ "length", integerSchema() }, { "name", stringSchema() } },
@@ -5263,10 +5310,16 @@ void registerCoreCommands( CommandBus &commandBus )
 	registerDescriptor( commandBus, "automation.removeNode", "Remove the automation node at a tick position.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() }, { "pos", integerSchema() } },
 		QJsonArray{ "track", "clip", "pos" } ), Mutability::Destructive, TxScope::Single, executeAutomationRemoveNode );
-	registerDescriptor( commandBus, "automation.removeNodes", "Remove automation nodes in a tick range.", objectSchema(
-		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() },
-			{ "start", integerSchema() }, { "end", integerSchema() } },
-		QJsonArray{ "track", "clip", "start", "end" } ), Mutability::Destructive, TxScope::Single, executeAutomationRemoveNodes );
+	auto automationRangeSchema = rangeSchema;
+	automationRangeSchema.insert( "description", "Clip-local tick endpoints, both inclusive; reversed endpoints are normalized by LMMS." );
+	auto removeNodesArguments = objectSchema(
+		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() }, { "range", automationRangeSchema },
+			{ "start", integerSchema() }, { "end", integerSchema() } }, QJsonArray{ "track", "clip" } );
+	removeNodesArguments.insert( "oneOf", QJsonArray{
+		objectSchema( {}, QJsonArray{ "range" } ), objectSchema( {}, QJsonArray{ "start", "end" } )
+	} );
+	registerDescriptor( commandBus, "automation.removeNodes", "Remove automation nodes between inclusive tick endpoints.",
+		removeNodesArguments, Mutability::Destructive, TxScope::Single, executeAutomationRemoveNodes );
 	registerDescriptor( commandBus, "automation.setProgression", "Set an automation curve progression type.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() }, { "type", stringSchema() } },
 		QJsonArray{ "track", "clip", "type" } ), Mutability::Mutating, TxScope::Single, executeAutomationSetProgression );
@@ -5274,7 +5327,8 @@ void registerCoreCommands( CommandBus &commandBus )
 		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() }, { "value", numberSchema() } },
 		QJsonArray{ "track", "clip", "value" } ), Mutability::Mutating, TxScope::Single, executeAutomationSetTension );
 	registerDescriptor( commandBus, "automation.listTargets", "List addressable automation targets under an optional scope.",
-		objectSchema( QJsonObject{ { "scope", stringSchema() } } ),
+		objectSchema( QJsonObject{ { "scope", QJsonObject{ { "type", "string" }, { "enum", QJsonArray{ "track", "mixer", "effect", "song" } },
+			{ "description", "Model domain; effect includes slots on tracks and mixer channels. Omitted selects all domains." } } } } ),
 		Mutability::ReadOnly, TxScope::None, executeAutomationListTargets );
 
 	registerDescriptor( commandBus, "clip.create", "Create a MIDI, sample or automation clip matching the track type.", objectSchema(

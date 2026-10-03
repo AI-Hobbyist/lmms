@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "agent/CommandBus.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -315,6 +316,8 @@ private slots:
 
 	void previewsPreserveTransportAndModifiedState()
 	{
+		// Freeze normal audio progression while comparing exact transport positions.
+		const auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
 		auto &bus = lmms::agent::CommandBus::instance();
 		auto *song = lmms::Engine::getSong();
 		song->playSong();
