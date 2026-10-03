@@ -1004,6 +1004,141 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 
 
 
+void Song::saveProjectState( DataFile &dataFile )
+{
+	using gui::getGUI;
+
+	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
+	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
+	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
+	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+
+	saveState( dataFile, dataFile.content() );
+	Engine::mixer()->saveState( dataFile, dataFile.content() );
+	getTimeline( PlayMode::Song ).saveState( dataFile, dataFile.content() );
+	if( getGUI() != nullptr )
+	{
+		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );
+		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
+		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
+		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+	}
+
+	saveControllerStates( dataFile, dataFile.content() );
+	saveScaleStates( dataFile, dataFile.content() );
+	saveKeymapStates( dataFile, dataFile.content() );
+}
+
+
+
+
+void Song::restoreProjectState( DataFile &dataFile )
+{
+	using gui::getGUI;
+
+	QDomNode node;
+	clearProject();
+	clearErrors();
+	Engine::audioEngine()->requestChangeInModel();
+
+	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
+	m_timeSigModel.loadSettings( dataFile.head(), "timesig" );
+	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
+	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
+	getTimeline( PlayMode::Song ).setLoopEnabled( false );
+	PeakController::initGetControllerBySetting();
+
+	node = dataFile.content().firstChildElement( Engine::mixer()->nodeName() );
+	if( !node.isNull() )
+	{
+		Engine::mixer()->restoreState( node.toElement() );
+		if( getGUI() != nullptr )
+		{
+			getGUI()->mixerView()->refreshDisplay();
+		}
+	}
+
+	node = dataFile.content().firstChild();
+	QDomNodeList trackContainers = dataFile.content().elementsByTagName( "trackcontainer" );
+	m_nLoadingTrack = 0;
+	for( int index = 0, count = trackContainers.count(); index < count; ++index )
+	{
+		QDomNode trackNode = trackContainers.at( index ).firstChild();
+		while( !trackNode.isNull() )
+		{
+			if( trackNode.isElement() && trackNode.nodeName() == "track" )
+			{
+				++m_nLoadingTrack;
+				if( static_cast<Track::Type>( trackNode.toElement().attribute( "type" ).toInt() ) == Track::Type::Pattern )
+				{
+					count += trackNode.toElement().elementsByTagName( "patterntrack" ).at( 0 )
+						.toElement().firstChildElement().childNodes().count();
+				}
+			}
+			trackNode = trackNode.nextSibling();
+		}
+	}
+
+	while( !node.isNull() )
+	{
+		if( node.isElement() )
+		{
+			if( node.nodeName() == "trackcontainer" )
+			{
+				static_cast<JournallingObject *>( this )->restoreState( node.toElement() );
+			}
+			else if( node.nodeName() == "controllers" )
+			{
+				restoreControllerStates( node.toElement() );
+			}
+			else if( node.nodeName() == "scales" )
+			{
+				restoreScaleStates( node.toElement() );
+			}
+			else if( node.nodeName() == "keymaps" )
+			{
+				restoreKeymapStates( node.toElement() );
+			}
+			else if( node.nodeName() == getTimeline( PlayMode::Song ).nodeName() )
+			{
+				getTimeline( PlayMode::Song ).restoreState( node.toElement() );
+			}
+			else if( getGUI() != nullptr )
+			{
+				if( node.nodeName() == getGUI()->getControllerRackView()->nodeName() )
+				{
+					getGUI()->getControllerRackView()->restoreState( node.toElement() );
+				}
+				else if( node.nodeName() == getGUI()->pianoRoll()->nodeName() )
+				{
+					getGUI()->pianoRoll()->restoreState( node.toElement() );
+				}
+				else if( node.nodeName() == getGUI()->automationEditor()->m_editor->nodeName() )
+				{
+					getGUI()->automationEditor()->m_editor->restoreState( node.toElement() );
+				}
+				else if( node.nodeName() == getGUI()->getProjectNotes()->nodeName() )
+				{
+					getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+				}
+			}
+		}
+		node = node.nextSibling();
+	}
+
+	Engine::patternStore()->fixIncorrectPositions();
+	ControllerConnection::finalizeConnections();
+	m_controllers.erase( std::remove_if( m_controllers.begin(), m_controllers.end(),
+		[]( Controller *controller ) { return controller->type() == Controller::ControllerType::Dummy; } ),
+		m_controllers.end() );
+	AutomationClip::resolveAllIDs();
+	Engine::audioEngine()->doneChangeInModel();
+	updateLength();
+}
+
+
+
+
 // load given song
 void Song::loadProject( const QString & fileName )
 {
@@ -1133,6 +1268,10 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreKeymapStates(node.toElement());
 			}
+			else if (node.nodeName() == getTimeline(PlayMode::Song).nodeName())
+			{
+				getTimeline(PlayMode::Song).restoreState(node.toElement());
+			}
 			else if( getGUI() != nullptr )
 			{
 				if( node.nodeName() == getGUI()->getControllerRackView()->nodeName() )
@@ -1150,10 +1289,6 @@ void Song::loadProject( const QString & fileName )
 				else if( node.nodeName() == getGUI()->getProjectNotes()->nodeName() )
 				{
 					 getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
-				}
-				else if (node.nodeName() == getTimeline(PlayMode::Song).nodeName())
-				{
-					getTimeline(PlayMode::Song).restoreState(node.toElement());
 				}
 			}
 		}
@@ -1225,6 +1360,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
 
 	saveState( dataFile, dataFile.content() );
+	getTimeline(PlayMode::Song).saveState(dataFile, dataFile.content());
 
 	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
@@ -1233,7 +1369,6 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
 		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
 		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
-		getTimeline(PlayMode::Song).saveState(dataFile, dataFile.content());
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );

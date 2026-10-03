@@ -44,8 +44,10 @@ namespace lmms
 {
 
 class AutomationTrack;
+class DataFile;
 class Keymap;
 class MidiClip;
+class ProjectJournal;
 class Scale;
 
 namespace gui
@@ -308,6 +310,16 @@ public:
 		return m_tempoModel;
 	}
 
+	IntModel& masterVolumeModel()
+	{
+		return m_masterVolumeModel;
+	}
+
+	IntModel& masterPitchModel()
+	{
+		return m_masterPitchModel;
+	}
+
 	void exportProjectMidi(QString const & exportFileName) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
@@ -364,6 +376,8 @@ private slots:
 
 
 private:
+	friend class ProjectJournal;
+
 	Song();
 	Song( const Song & );
 	~Song() override;
@@ -401,6 +415,8 @@ private:
 	void setModified(bool value);
 
 	void setProjectFileName(QString const & projectFileName);
+	void saveProjectState( DataFile &dataFile );
+	void restoreProjectState( DataFile &dataFile );
 
 	AutomationTrack * m_globalAutomationTrack;
 
