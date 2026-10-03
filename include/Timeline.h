@@ -88,6 +88,15 @@ public:
 
 	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + frameOffset() / Engine::audioEngine()->outputSampleRate(); }
 
+	void restorePlaybackPosition(tick_t ticks, float frameOffset, double elapsedSeconds, TimePos playStart)
+	{
+		m_pos.setTicks(ticks);
+		m_frameOffset = frameOffset;
+		m_elapsedSeconds = elapsedSeconds - frameOffset / Engine::audioEngine()->outputSampleRate();
+		m_playStartPosition = playStart;
+		emit positionChanged();
+	}
+
 	auto nodeName() const -> QString override { return "timeline"; }
 
 signals:

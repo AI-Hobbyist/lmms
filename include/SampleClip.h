@@ -58,6 +58,8 @@ public:
 
 	const QString& sampleFile() const;
 	bool hasSampleFileLoaded(const QString & filename) const;
+	bool reversed() const;
+	void setReversed(bool reversed);
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

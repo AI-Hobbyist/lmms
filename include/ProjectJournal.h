@@ -28,6 +28,8 @@
 #include <QHash>
 #include <QStack>
 
+#include <vector>
+
 #include "LmmsTypes.h"
 #include "DataFile.h"
 
@@ -37,6 +39,7 @@ namespace lmms
 
 
 class JournallingObject;
+class Song;
 
 
 //! @warning many parts of this class may be rewritten soon
@@ -55,6 +58,13 @@ public:
 	bool canRedo() const;
 
 	void addJournalCheckPoint( JournallingObject *jo );
+	bool beginTransaction( Song *song );
+	bool commitTransaction();
+	bool rollbackTransaction();
+	bool hasActiveTransaction() const;
+	int undoDepth() const { return m_undoCheckPoints.size(); }
+	int redoDepth() const { return m_redoCheckPoints.size(); }
+	int transactionDepth() const { return static_cast<int>( m_transactions.size() ); }
 
 	bool isJournalling() const
 	{
@@ -63,7 +73,7 @@ public:
 
 	void setJournalling( const bool _on )
 	{
-		m_journalling = _on;
+		m_journalling = hasActiveTransaction() || m_restoringProject ? false : _on;
 	}
 
 	// alloc new ID and register object _obj to it
@@ -104,20 +114,33 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ),
+			bool initProjectSnapshot = false, bool initModified = false ) :
 			joID( initID ),
-			data( initData )
+			data( initData ),
+			projectSnapshot( initProjectSnapshot ),
+			modified( initModified )
 		{
 		}
 		jo_id_t joID;
 		DataFile data;
+		bool projectSnapshot;
+		bool modified;
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
+
+	struct Transaction
+	{
+		CheckPoint checkpoint;
+		bool journalling;
+	};
 
 	JoIdMap m_joIDs;
 
 	CheckPointStack m_undoCheckPoints;
 	CheckPointStack m_redoCheckPoints;
+	std::vector<Transaction> m_transactions;
+	bool m_restoringProject = false;
 
 	bool m_journalling;
 

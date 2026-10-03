@@ -68,6 +68,7 @@ public:
 	Note * noteAtStep( int _step );
 
 	void rearrangeAllNotes();
+	void updateNotes();
 	void clearNotes();
 
 	inline const NoteVector & notes() const
@@ -92,6 +93,12 @@ public:
 	{
 		return m_clipType;
 	}
+	int steps() const
+	{
+		return m_steps;
+	}
+	void setClipType( Type type );
+	void setSteps( int steps );
 
 
 	// next/previous track based on position in the containing track
@@ -142,7 +149,6 @@ protected slots:
 private:
 	TimePos beatClipLength() const;
 
-	void setType( Type _new_clip_type );
 	void checkType();
 
 	void resizeToFirstTrack();

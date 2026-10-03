@@ -138,6 +138,29 @@ bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 	return m_sample.sampleFile() == filename;
 }
 
+
+
+
+bool SampleClip::reversed() const
+{
+	return m_sample.reversed();
+}
+
+
+
+
+void SampleClip::setReversed(bool reversed)
+{
+	if( m_sample.reversed() == reversed )
+	{
+		return;
+	}
+
+	m_sample.setReversed( reversed );
+	emit wasReversed();
+	emit sampleChanged();
+}
+
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 {
 	{

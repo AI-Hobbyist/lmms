@@ -1,5 +1,3 @@
-include(CTest)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
@@ -13,6 +11,15 @@ set(LMMS_TESTS
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )
+
+if(WANT_AGENT)
+	list(APPEND LMMS_TESTS
+		src/agent/CommandBusTest.cpp
+		src/agent/CoreCommandsTest.cpp
+		src/agent/MixAutomationCommandsTest.cpp
+		src/agent/A3CommandsTest.cpp
+	)
+endif()
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	# TODO CMake 3.20: Use cmake_path

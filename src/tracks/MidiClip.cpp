@@ -259,6 +259,16 @@ void MidiClip::rearrangeAllNotes()
 
 
 
+void MidiClip::updateNotes()
+{
+	rearrangeAllNotes();
+	checkType();
+	updateLength();
+	emit dataChanged();
+}
+
+
+
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
@@ -403,13 +413,36 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 
 
 
-void MidiClip::setType( Type _new_clip_type )
+void MidiClip::setClipType( Type type )
 {
-	if( _new_clip_type == Type::BeatClip ||
-				_new_clip_type == Type::MelodyClip )
+	if( type != Type::BeatClip && type != Type::MelodyClip )
 	{
-		m_clipType = _new_clip_type;
+		return;
 	}
+
+	const auto noteType = type == Type::BeatClip ? Note::Type::Step : Note::Type::Regular;
+	for( auto *note : m_notes )
+	{
+		note->setType( noteType );
+	}
+	m_clipType = type;
+	updateLength();
+	emit dataChanged();
+}
+
+
+
+
+void MidiClip::setSteps( int steps )
+{
+	if( steps < 1 || m_steps == steps )
+	{
+		return;
+	}
+
+	m_steps = steps;
+	updateLength();
+	emit dataChanged();
 }
 
 
@@ -420,7 +453,7 @@ void MidiClip::checkType()
 	// If all notes are StepNotes, we have a BeatClip
 	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
 
-	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
+	m_clipType = beatClip ? Type::BeatClip : Type::MelodyClip;
 }
 
 

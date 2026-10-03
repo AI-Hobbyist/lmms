@@ -22,6 +22,8 @@ enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selec
 
 PROJECT(lmms)
 
+include(CTest)
+
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
@@ -101,6 +103,7 @@ OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_32	"Include 32-bit Windows VST support" ON)
 OPTION(WANT_VST_64	"Include 64-bit Windows VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
+OPTION(WANT_AGENT	"Include Agent command API" ON)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
@@ -727,6 +730,10 @@ endif()
 FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
+IF(WANT_AGENT)
+	FILE(GLOB_RECURSE LMMS_AGENT_INCLUDES "${CMAKE_SOURCE_DIR}/include/agent/*.h")
+	LIST(APPEND LMMS_INCLUDES ${LMMS_AGENT_INCLUDES})
+ENDIF()
 LIST(SORT LMMS_INCLUDES)
 
 # Get list of all committers from git history, ordered by number of commits.
