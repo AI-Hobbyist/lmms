@@ -35,6 +35,7 @@ namespace lmms
 
 
 class TrackContainer;
+class InstrumentTrack;
 
 
 class LMMS_EXPORT ImportFilter : public Plugin
@@ -49,9 +50,14 @@ public:
 	// available import-filters to try to import the file
 	static void import( const QString & _file_to_import,
 						TrackContainer* tc );
+	// Non-interactive entry point for command callers; reports errors without dialogs.
+		static bool tryImportFile(const QString& path, TrackContainer* tc, const QString& plugin,
+			InstrumentTrack* target = nullptr);
 
 
 protected:
+	bool interactive() const { return m_interactive; }
+		InstrumentTrack* targetTrack() const { return m_targetTrack; }
 	virtual bool tryImport( TrackContainer* tc ) = 0;
 
 	const QFile & file() const
@@ -108,6 +114,8 @@ protected:
 
 private:
 	QFile m_file;
+	bool m_interactive = true;
+		InstrumentTrack* m_targetTrack = nullptr;
 
 } ;
 

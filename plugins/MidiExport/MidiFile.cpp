@@ -59,7 +59,7 @@ MidiFile::MidiFile(const std::filesystem::path& file, std::size_t numTracks)
 	m_tracks.resize(numTracks);
 }
 
-void MidiFile::writeAllToStream()
+bool MidiFile::writeAllToStream()
 {
 	m_stream.write(reinterpret_cast<const char*>(m_header.m_buffer.data()), m_header.m_buffer.size());
 
@@ -67,6 +67,8 @@ void MidiFile::writeAllToStream()
 	{
 		m_stream.write(reinterpret_cast<const char*>(track.m_buffer.data()), track.m_buffer.size());
 	}
+	m_stream.flush();
+	return m_stream.good();
 }
 
 MidiFile::Section::Section()

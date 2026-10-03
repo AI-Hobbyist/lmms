@@ -31,6 +31,7 @@
 #include "TrackContainer.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
+#include "GuiApplication.h"
 
 
 namespace lmms
@@ -96,6 +97,7 @@ bool ImportFilter::openFile()
 {
 	if( m_file.open( QFile::ReadOnly ) == false )
 	{
+		if (!interactive() || gui::getGUI() == nullptr) { return false; }
 		QMessageBox::critical( nullptr,
 			TrackContainer::tr( "Couldn't open file" ),
 			TrackContainer::tr( "Couldn't open file %1 "
@@ -110,6 +112,26 @@ bool ImportFilter::openFile()
 		return false;
 	}
 	return true;
+}
+
+bool ImportFilter::tryImportFile(const QString& path, TrackContainer* tc, const QString& plugin, InstrumentTrack* target)
+{
+	auto filename = path.toUtf8();
+	unique_ptr<Plugin> instance(Plugin::instantiate(plugin, nullptr, filename.data()));
+	auto* filter = dynamic_cast<ImportFilter*>(instance.get());
+	if (!filter) { return false; }
+	filter->m_interactive = false;
+	filter->m_targetTrack = target;
+	struct JournallingGuard
+	{
+		ProjectJournal* journal;
+		bool previous;
+		~JournallingGuard() { journal->setJournalling(previous); }
+	};
+	auto* journal = Engine::projectJournal();
+	const JournallingGuard guard{journal, journal->isJournalling()};
+	journal->setJournalling(false);
+	return filter->tryImport(tc);
 }
 
 

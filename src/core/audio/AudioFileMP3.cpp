@@ -51,8 +51,17 @@ AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 
 AudioFileMP3::~AudioFileMP3()
 {
-	flushRemainingBuffers();
+	finalize();
 	tearDownEncoder();
+}
+
+void AudioFileMP3::finalize()
+{
+	if (m_lame && !m_finalized)
+	{
+		flushRemainingBuffers();
+		m_finalized = true;
+	}
 }
 
 void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const f_cnt_t _frames)
@@ -73,7 +82,7 @@ void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const f_cnt_t _frames)
 	std::vector<unsigned char> encodingBuffer(minimumBufferSize);
 
 	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(m_lame, &interleavedDataBuffer[0], _frames, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
-	assert (bytesWritten >= 0);
+	if (bytesWritten < 0) { reportWriteFailure(); return; }
 
 	writeData(&encodingBuffer[0], bytesWritten);
 }
@@ -84,7 +93,7 @@ void AudioFileMP3::flushRemainingBuffers()
 	std::vector<unsigned char> encodingBuffer(7200 * 4);
 
 	int bytesWritten = lame_encode_flush(m_lame, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
-	assert (bytesWritten >= 0);
+	if (bytesWritten < 0) { reportWriteFailure(); return; }
 
 	writeData(&encodingBuffer[0], bytesWritten);
 }
@@ -107,6 +116,7 @@ MPEG_mode mapToMPEG_mode(OutputSettings::StereoMode stereoMode)
 bool AudioFileMP3::initEncoder()
 {
 	m_lame = lame_init();
+	if (!m_lame) { return false; }
 
 	// Handle stereo/joint/mono settings
 	OutputSettings::StereoMode stereoMode = getOutputSettings().getStereoMode();
@@ -123,12 +133,12 @@ bool AudioFileMP3::initEncoder()
 	id3tag_init(m_lame);
 	id3tag_set_comment(m_lame, "Created with LMMS");
 
-	return lame_init_params(m_lame) != -1;
+	return lame_init_params(m_lame) >= 0;
 }
 
 void AudioFileMP3::tearDownEncoder()
 {
-	lame_close(m_lame);
+	if (m_lame) { lame_close(m_lame); m_lame = nullptr; }
 }
 
 } // namespace lmms

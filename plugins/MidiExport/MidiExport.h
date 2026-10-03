@@ -133,7 +133,7 @@ private:
 
 	//! Build a repeating clip from a normal one and write to MIDI track
 	void writePatternClip(Clip& clip, const QDomElement& clipElem,
-		std::uint8_t patternIdx, MidiFile::Track& midiTrack);
+		std::size_t patternIdx, MidiFile::Track& midiTrack);
 
 	//! Process a given pattern track
 	void processPatternTrack(Track& track);

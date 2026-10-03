@@ -1,4 +1,5 @@
 #include "agent/CommandBus.h"
+#include "agent/ExportCommands.h"
 
 #include <QCoreApplication>
 #include <QDomElement>
@@ -279,6 +280,7 @@ CommandBus::CommandBus()
 	registerCommand( rollbackCommand );
 
 	registerCoreCommands( *this );
+	registerExportCommands( *this );
 }
 
 
@@ -308,10 +310,6 @@ CommandResult CommandBus::execute( const QString &name, const QJsonObject &argum
 		return CommandResult::failure( "wrong_thread", "Commands must execute on the main thread." );
 	}
 
-	// Keep temporary preview models inaccessible to rendering until rollback is complete.
-	const auto previewGuard = arguments.value( "dryRun" ).toBool() && Engine::audioEngine()
-		? Engine::audioEngine()->requestChangesGuard() : AudioEngine::RequestChangesGuard{};
-
 	const auto command = m_commands.constFind( name );
 	if( command == m_commands.cend() )
 	{
@@ -328,6 +326,15 @@ CommandResult CommandBus::execute( const QString &name, const QJsonObject &argum
 	}
 	// Copy before calling a handler: registration during a handler must not invalidate the QHash iterator.
 	const auto descriptor = command.value();
+	const bool rendering = hasActiveAudioExport() || (Engine::getSong() && Engine::getSong()->isExporting());
+	if( rendering && descriptor.mutability != Mutability::ReadOnly && name != "export.cancel" )
+	{
+		return CommandResult::failure( "export_busy", "Finish or cancel the active audio export before editing the project." );
+	}
+	// Keep preview models inaccessible to rendering, and read models between render periods.
+	const auto previewGuard = Engine::audioEngine() &&
+		(arguments.value( "dryRun" ).toBool() || (rendering && descriptor.mutability == Mutability::ReadOnly && name != "export.status"))
+		? Engine::audioEngine()->requestChangesGuard() : AudioEngine::RequestChangesGuard{};
 	const bool dryRun = arguments.value( "dryRun" ).toBool();
 	const bool transactional = descriptor.mutability != Mutability::ReadOnly && descriptor.scope != TxScope::None;
 	const bool ownsBatch = transactional && ( dryRun || !isBatchActive() );
@@ -400,6 +407,7 @@ bool CommandBus::beginBatch( const QString &label )
 	{
 		return false;
 	}
+	if( hasActiveAudioExport() || Engine::getSong()->isExporting() ) { return false; }
 	if( !Engine::projectJournal()->beginTransaction( Engine::getSong() ) )
 	{
 		return false;

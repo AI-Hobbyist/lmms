@@ -35,6 +35,7 @@ namespace lmms
 
 
 class PeakControllerEffect;
+class Effect;
 
 using PeakControllerEffectVector = std::vector<PeakControllerEffect*>;
 
@@ -51,6 +52,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
+	Effect* effect() const;
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );

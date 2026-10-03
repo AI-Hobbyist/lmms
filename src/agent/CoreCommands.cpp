@@ -1,9 +1,13 @@
 #include "CoreCommands.h"
 
 #include <QColor>
+#include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFileInfo>
+#include <QFile>
+#include <QSaveFile>
+#include <QTemporaryFile>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QRegularExpression>
@@ -12,15 +16,24 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <utility>
 #include <vector>
 
 #include "Clip.h"
+#include "Controller.h"
+#include "ConfigManager.h"
+#include "ControllerConnection.h"
+#include "LfoController.h"
+#include "MidiController.h"
+#include "PeakController.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
 #include "DetuningHelper.h"
 #include "Engine.h"
+#include "ExportFilter.h"
+#include "ProjectJournal.h"
 #include "Editor.h"
 #include "AutomationClip.h"
 #include "AutomationNode.h"
@@ -29,18 +42,24 @@
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "Instrument.h"
+#include "ImportFilter.h"
 #include "InstrumentTrack.h"
 #include "MeterModel.h"
 #include "MidiClip.h"
 #include "Mixer.h"
 #include "Note.h"
 #include "PatternStore.h"
+#include "PatternTrack.h"
+#include "PatternClip.h"
 #include "Pitch.h"
+#include "Piano.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "SampleClip.h"
 #include "SampleFrame.h"
 #include "SampleTrack.h"
+#include "Scale.h"
+#include "Keymap.h"
 #include "Song.h"
 #include "TimePos.h"
 #include "Timeline.h"
@@ -841,6 +860,14 @@ void appendEffectModels( std::vector<ModelAddress> &models, const QString &owner
 		const QString effectPath = QStringLiteral( "%1/fx:%2" ).arg( ownerPath ).arg( slot );
 		models.push_back( { effectPath + "/enabled", effect->enabledModel() } );
 		models.push_back( { effectPath + "/wet", effect->wetDryModel() } );
+		if( auto *controls = effect->controls() )
+		{
+			const auto parameters = controls->parameterModels();
+			for( auto it = parameters.cbegin(); it != parameters.cend(); ++it )
+			{
+				if( it.value() ) { models.push_back( { effectPath + "/params/" + it.key(), it.value() } ); }
+			}
+		}
 	}
 }
 
@@ -880,6 +907,14 @@ std::vector<ModelAddress> addressableModels( Song *song )
 			models.push_back( { instrumentPath + "/pitchRange", instrumentTrack->pitchRangeModel() } );
 			models.push_back( { instrumentPath + "/baseNote", instrumentTrack->baseNoteModel() } );
 			models.push_back( { instrumentPath + "/mixerChannel", instrumentTrack->mixerChannelModel() } );
+			if( auto *instrument = instrumentTrack->instrument() )
+			{
+				const auto parameters = instrument->parameterModels();
+				for( auto it = parameters.cbegin(); it != parameters.cend(); ++it )
+				{
+					if( it.value() ) { models.push_back( { instrumentPath + "/params/" + it.key(), it.value() } ); }
+				}
+			}
 			appendEffectModels( models, path,
 				instrumentTrack->audioBusHandle()->effects() );
 		}
@@ -899,6 +934,17 @@ std::vector<ModelAddress> addressableModels( Song *song )
 		models.push_back( { channelPath + "/mute", &channel->m_muteModel } );
 		models.push_back( { channelPath + "/solo", &channel->m_soloModel } );
 		appendEffectModels( models, channelPath, &channel->m_fxChain );
+	}
+	for( std::size_t i = 0; i < song->controllers().size(); ++i )
+	{
+		if( auto *lfo = dynamic_cast<LfoController *>( song->controllers()[i] ) )
+		{
+			const auto parameters = lfo->parameterModels();
+			for( auto it = parameters.cbegin(); it != parameters.cend(); ++it )
+			{
+				models.push_back( { "song/controller:" + QString::number( i ) + "/" + it.key(), it.value() } );
+			}
+		}
 	}
 
 	return models;
@@ -2085,6 +2131,40 @@ QJsonObject serializedParameters( const QDomElement &element )
 	return { { "parameters", parameters } };
 }
 
+QJsonArray reflectedParameters( const QDomElement &state, const QMap<QString, AutomatableModel*> &models,
+	const QString &basePath )
+{
+	QJsonArray result;
+	for( const auto &entry : serializedParameters( state ).value( "parameters" ).toArray() )
+	{
+		if( !models.contains( entry.toObject().value( "name" ).toString() ) ) { result.append( entry ); }
+	}
+	for( auto it = models.cbegin(); it != models.cend(); ++it )
+	{
+		if( !it.value() ) { continue; }
+		auto detail = modelDetail( { basePath + "/params/" + it.key(), it.value() } );
+		detail.insert( "displayName", detail.value( "name" ) );
+		detail.insert( "name", it.key() );
+		detail.insert( "level", "L2" );
+		result.append( detail );
+	}
+	return result;
+}
+
+bool setReflectedParameter( AutomatableModel *model, const QJsonValue &value, QString &error )
+{
+	if( !value.isDouble() && !(value.isBool() && model->dynamicCast<BoolModel>()) )
+	{
+		error = "Native parameters require numeric values, or boolean values for boolean models.";
+		return false;
+	}
+	const double number = value.isBool() ? value.toBool() : value.toDouble();
+	if( !std::isfinite( number ) || !validateModelValue( model, number, error ) ) { return false; }
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	model->setValue( static_cast<float>( number ) );
+	return true;
+}
+
 
 
 
@@ -2110,7 +2190,7 @@ CommandResult executeEffectGetParams( const QJsonObject &arguments )
 	document.appendChild( root );
 	const auto state = effect->controls()->saveState( document, root );
 	auto data = effectDetail( owner, slot, effect );
-	data.insert( "parameters", serializedParameters( state ).value( "parameters" ) );
+	data.insert( "parameters", reflectedParameters( state, effect->controls()->parameterModels(), data.value( "path" ).toString() ) );
 	return CommandResult::success( data );
 }
 
@@ -2142,6 +2222,11 @@ CommandResult executeEffectSetParam( const QJsonObject &arguments )
 	{
 		return invalidArguments( error );
 	}
+	if( auto *model = effect->controls()->parameterModels().value( name ) )
+	{
+		if( !setReflectedParameter( model, value, error ) ) { return invalidArguments( error ); }
+		return executeEffectGetParams( arguments );
+	}
 
 	QDomDocument document;
 	auto root = document.createElement( "agent" );
@@ -2156,7 +2241,7 @@ CommandResult executeEffectSetParam( const QJsonObject &arguments )
 	effect->controls()->restoreState( state );
 
 	auto data = effectDetail( owner, slot, effect );
-	data.insert( "parameters", serializedParameters( state ).value( "parameters" ) );
+	data.insert( "parameters", reflectedParameters( state, effect->controls()->parameterModels(), data.value( "path" ).toString() ) );
 	return CommandResult::success( data );
 }
 
@@ -2187,7 +2272,8 @@ CommandResult executeInstrumentGetParams( const QJsonObject &arguments )
 	auto root = document.createElement( "agent" );
 	document.appendChild( root );
 	const auto state = track->instrument()->saveState( document, root );
-	auto data = serializedParameters( state );
+	QJsonObject data{ { "parameters", reflectedParameters( state, track->instrument()->parameterModels(),
+		trackPath( trackIndex, track ) + "/instrument" ) } };
 	data.insert( "path", trackPath( trackIndex, track ) );
 	data.insert( "plugin", track->instrumentName() );
 	return CommandResult::success( data );
@@ -2224,6 +2310,11 @@ CommandResult executeInstrumentSetParam( const QJsonObject &arguments )
 	{
 		return invalidArguments( error );
 	}
+	if( auto *model = track->instrument()->parameterModels().value( name ) )
+	{
+		if( !setReflectedParameter( model, value, error ) ) { return invalidArguments( error ); }
+		return executeInstrumentGetParams( arguments );
+	}
 
 	QDomDocument document;
 	auto root = document.createElement( "agent" );
@@ -2234,6 +2325,7 @@ CommandResult executeInstrumentSetParam( const QJsonObject &arguments )
 		return CommandResult::failure( "instrument_parameter_not_found",
 			QStringLiteral( "Instrument parameter '%1' does not exist." ).arg( name ) );
 	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	track->instrument()->restoreState( state );
 
 	auto data = serializedParameters( state );
@@ -2837,12 +2929,13 @@ CommandResult executeAutomationListTargets( const QJsonObject &arguments )
 
 QJsonObject transportPosition( Song *song, Song::PlayMode mode )
 {
-	const auto &position = song->getPlayPos( mode );
+	const auto timelineMode = mode == Song::PlayMode::None ? Song::PlayMode::Song : mode;
+	const auto &position = song->getPlayPos( timelineMode );
 	return {
 		{ "mode", playModeName( mode ) },
 		{ "ticks", position.getTicks() },
 		{ "bar", position.getBar() },
-		{ "seconds", song->getTimeline( mode ).getElapsedSeconds() },
+		{ "seconds", song->getTimeline( timelineMode ).getElapsedSeconds() },
 		{ "playing", song->isPlaying() },
 		{ "paused", song->isPaused() }
 	};
@@ -3080,6 +3173,16 @@ CommandResult executeSongSave( const QJsonObject &arguments )
 
 	DataFile dataFile( DataFile::Type::SongProject );
 	const QString savedPath = dataFile.nameWithExtension( path );
+	const QFileInfo destination( savedPath );
+	if( destination.isDir() || !destination.dir().exists() ) { return invalidArguments( "The save path requires an existing parent directory." ); }
+	if( destination.exists() && savedPath != song->projectFileName() && !arguments.value( "overwrite" ).toBool() )
+	{
+		return CommandResult::failure( "file_exists", "Specify overwrite:true to replace another project file." );
+	}
+	if( CommandBus::instance().batchDepth() != 0 && !arguments.value( "dryRun" ).toBool() )
+	{
+		return CommandResult::failure( "external_write_in_batch", "Save the project after the transaction has committed." );
+	}
 	if( arguments.value( "dryRun" ).toBool() )
 	{
 		return CommandResult::success( QJsonObject{
@@ -3518,6 +3621,19 @@ CommandResult executeTrackMove( const QJsonObject &arguments )
 		return invalidArguments( "'newIndex' must identify a position in the selected track container." );
 	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
+	if( auto *pattern = dynamic_cast<PatternTrack *>( track ) )
+	{
+		const auto &tracks = track->trackContainer()->tracks();
+		const int direction = destination > index ? 1 : -1;
+		for( int current = index; current != destination; )
+		{
+			current += direction;
+			if( auto *other = dynamic_cast<PatternTrack *>( tracks[current] ) )
+			{
+				PatternTrack::swapPatternTracks( pattern, other );
+			}
+		}
+	}
 	track->trackContainer()->moveTrack( track, destination );
 	song->setModified();
 	return CommandResult::success( trackDetail( song, track, destination ) );
@@ -3716,7 +3832,8 @@ CommandResult executeTrackSetSolo( const QJsonObject &arguments )
 
 	if( track->isSolo() != solo )
 	{
-		track->toggleSolo();
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
+		track->setSolo( solo );
 	}
 	return CommandResult::success( trackDetail( song, track, trackIndex ) );
 }
@@ -4655,6 +4772,10 @@ CommandResult executeMidiHumanize( const QJsonObject &arguments )
 	{
 		return invalidArguments( error );
 	}
+	NoteFilter filter;
+	if( !readNoteFilter( arguments, filter, error ) ) { return invalidArguments( error ); }
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	int changed = 0;
 
 	std::uint32_t state = static_cast<std::uint32_t>( seed );
 	const auto nextRandom = [&state]()
@@ -4673,6 +4794,8 @@ CommandResult executeMidiHumanize( const QJsonObject &arguments )
 
 	for( auto *note : midiClip->notes() )
 	{
+		if( !filter.matches( note ) ) { continue; }
+		++changed;
 		if( hasTiming )
 		{
 			const int maxPosition = MaxSongLength - note->length().getTicks();
@@ -4699,6 +4822,7 @@ CommandResult executeMidiHumanize( const QJsonObject &arguments )
 	return CommandResult::success( QJsonObject{
 		{ "path", clipPath( address.trackIndex, address.clipIndex, address.track ) },
 		{ "notes", static_cast<int>( midiClip->notes().size() ) },
+		{ "changed", changed },
 		{ "seed", seed }
 	} );
 }
@@ -4829,6 +4953,454 @@ CommandResult executeSampleGetInfo( const QJsonObject &arguments )
 }
 
 
+
+QJsonObject scaleDetail( Song *song, int index )
+{
+	const auto scale = song->getScale( index );
+	const auto keymap = song->getKeymap( index );
+	QJsonArray cents;
+	for( const auto &interval : scale->getIntervals() ) { cents.append( 1200.0 * std::log2( interval.getRatio() ) ); }
+	return { { "index", index }, { "root", ( keymap->getMiddleKey() % 12 + 12 ) % 12 },
+		{ "type", scale->getDescription() }, { "intervals", cents }, { "keymap", keymap->getDescription() } };
+}
+
+CommandResult executeScale( const QString &action, const QJsonObject &arguments )
+{
+	auto *song = Engine::getSong();
+	if( !song ) { return engineUnavailable(); }
+	const int index = arguments.value( "index" ).toInt();
+	if( index < 0 || index >= static_cast<int>( std::min( MaxScaleCount, MaxKeymapCount ) ) ) { return invalidArguments( "Scale index is outside the project scale/keymap slots." ); }
+	if( action == "get" ) { return CommandResult::success( scaleDetail( song, index ) ); }
+	if( action == "set" )
+	{
+		const int root = arguments.value( "root" ).toInt();
+		if( root < 0 || root > 11 ) { return invalidArguments( "Scale root must be a pitch class from 0 (C) to 11 (B)." ); }
+		const auto type = arguments.value( "type" ).toString().toLower();
+		std::vector<int> steps;
+		if( type == "major" ) { steps = { 0, 2, 4, 5, 7, 9, 11 }; }
+		else if( type == "minor" || type == "naturalminor" ) { steps = { 0, 2, 3, 5, 7, 8, 10 }; }
+		else if( type == "harmonicminor" ) { steps = { 0, 2, 3, 5, 7, 8, 11 }; }
+		else if( type == "pentatonic" ) { steps = { 0, 2, 4, 7, 9 }; }
+		else if( type == "chromatic" ) { steps = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; }
+		else if( type == "custom" )
+		{
+			for( const auto &step : arguments.value( "semitones" ).toArray() )
+			{
+				if( !step.isDouble() || step.toDouble() != step.toInt( -1 ) || step.toInt() < 0 || step.toInt() > 11 ) { return invalidArguments( "Custom semitones must be integers from 0 to 11." ); }
+				steps.push_back( step.toInt() );
+			}
+			std::sort( steps.begin(), steps.end() );
+			steps.erase( std::unique( steps.begin(), steps.end() ), steps.end() );
+			if( steps.empty() || steps.front() != 0 ) { return invalidArguments( "A custom scale must include the root (0)." ); }
+		}
+		else { return invalidArguments( "Unknown scale type." ); }
+		if( type != "custom" && arguments.contains( "semitones" ) ) { return invalidArguments( "'semitones' applies only to custom scales." ); }
+		std::vector<Interval> intervals;
+		std::vector<int> mapping( 12, -1 );
+		for( std::size_t i = 0; i < steps.size(); ++i ) { intervals.emplace_back( static_cast<float>( steps[i] * 100 ) ); mapping[steps[i]] = static_cast<int>( i ); }
+		intervals.emplace_back( 1200.f );
+		const int base = 60 + root;
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		song->setScale( index, std::make_shared<Scale>( type, std::move( intervals ) ) );
+		song->setKeymap( index, std::make_shared<Keymap>( type, std::move( mapping ), 0, NumKeys - 1, base, base,
+			static_cast<float>( 440.0 * std::pow( 2.0, ( base - 69 ) / 12.0 ) ) ) );
+		song->setModified();
+		return CommandResult::success( scaleDetail( song, index ) );
+	}
+	MidiClip *clip = nullptr;
+	ClipAddress address;
+	CommandResult failure;
+	if( !resolveMidiClip( song, arguments, clip, address, failure ) ) { return failure; }
+	NoteFilter filter;
+	QString error;
+	if( !readNoteFilter( arguments, filter, error ) ) { return invalidArguments( error ); }
+	const auto scale = song->getScale( index );
+	const auto keymap = song->getKeymap( index );
+	const auto &intervals = scale->getIntervals();
+	if( intervals.size() < 2 || std::abs( intervals.back().getRatio() - 2.f ) > 0.001f ) { return invalidArguments( "Note snapping requires a scale spanning one 12-semitone octave." ); }
+	std::vector<int> classes;
+	for( std::size_t i = 0; i + 1 < intervals.size(); ++i )
+	{
+		const auto semitones = 12.0 * std::log2( intervals[i].getRatio() );
+		if( std::abs( semitones - std::round( semitones ) ) > 0.001 ) { return invalidArguments( "Microtonal scales cannot be represented by integer MIDI note keys." ); }
+		classes.push_back( ( static_cast<int>( std::lround( semitones ) ) + keymap->getMiddleKey() ) % 12 );
+	}
+	int changed = 0;
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	for( auto *note : clip->notes() )
+	{
+		if( !filter.matches( note ) ) { continue; }
+		int nearest = note->key();
+		int distance = NumKeys;
+		for( int key = 0; key < NumKeys; ++key )
+		{
+			if( std::find( classes.begin(), classes.end(), key % 12 ) != classes.end() && std::abs( key - note->key() ) < distance )
+			{
+				nearest = key; distance = std::abs( key - note->key() );
+			}
+		}
+		if( nearest != note->key() ) { note->setKey( nearest ); ++changed; }
+	}
+	clip->updateNotes(); song->setModified();
+	return CommandResult::success( { { "changed", changed }, { "scale", scaleDetail( song, index ) } } );
+}
+
+CommandResult executeInstrumentExtended( const QString &action, const QJsonObject &arguments )
+{
+	auto *song = Engine::getSong();
+	if( !song ) { return engineUnavailable(); }
+	InstrumentTrack *track = nullptr;
+	int index = -1;
+	CommandResult failure;
+	if( !resolveInstrumentTrack( song, arguments, track, index, failure ) ) { return failure; }
+	if( action == "loadPreset" || action == "savePreset" )
+	{
+		const QString path = QFileInfo( arguments.value( "path" ).toString() ).absoluteFilePath();
+		if( arguments.value( "path" ).toString().isEmpty() ) { return invalidArguments( "A preset path is required." ); }
+		if( action == "loadPreset" )
+		{
+			if( !QFileInfo( path ).isFile() ) { return CommandResult::failure( "preset_file_not_found", "The preset does not exist." ); }
+			DataFile preset( path );
+			if( !preset.validate( QFileInfo( path ).suffix().toLower() ) || preset.content().firstChildElement( "instrumenttrack" ).isNull() )
+			{
+				return CommandResult::failure( "invalid_preset", "The file must contain an LMMS instrument preset." );
+			}
+			if( preset.hasLocalPlugins() ) { return CommandResult::failure( "unsafe_preset", "The preset contains local plugin paths." ); }
+			auto guard = Engine::audioEngine()->requestChangesGuard();
+			track->replaceInstrument( preset );
+			if( song->hasErrors() ) { return CommandResult::failure( "preset_load_failed", song->errorSummary() ); }
+		}
+		else
+		{
+			if( CommandBus::instance().isBatchActive() && !arguments.value( "dryRun" ).toBool() )
+			{
+				return CommandResult::failure( "external_write_in_batch", "Save presets after the project transaction has committed." );
+			}
+			DataFile preset( DataFile::Type::InstrumentTrackSettings );
+			const QString output = preset.nameWithExtension( path );
+			const QFileInfo destination( output );
+			if( destination.isDir() || !destination.dir().exists() ) { return invalidArguments( "The preset path requires an existing parent directory." ); }
+			if( destination.exists() && !arguments.value( "overwrite" ).toBool() )
+			{
+				return CommandResult::failure( "file_exists", "Specify overwrite:true to replace an existing preset." );
+			}
+			if( arguments.value( "dryRun" ).toBool() ) { return CommandResult::success( { { "wouldSave", output } } ); }
+			track->savePreset( preset, preset.content() );
+			preset.content().setAttribute( "muted", 0 );
+			preset.content().setAttribute( "solo", 0 );
+			preset.content().setAttribute( "mutedBeforeSolo", 0 );
+			if( !preset.writeFile( path ) ) { return CommandResult::failure( "preset_save_failed", "Could not write the preset." ); }
+			return CommandResult::success( { { "path", output } } );
+		}
+		return CommandResult::success( trackDetail( song, track, index ) );
+	}
+	if( action == "setMidiIn" || action == "setMidiOut" )
+	{
+		const bool input = action == "setMidiIn";
+		auto *port = track->midiPort();
+		const int channel = arguments.value( "channel" ).toInt( input ? port->inputChannel() : port->outputChannel() );
+		if( channel < 0 || channel > 16 ) { return invalidArguments( "MIDI channel must be between 0 and 16 (all channels)." ); }
+		const auto ports = input ? port->readablePorts() : port->writablePorts();
+		if( arguments.contains( "port" ) && !arguments.value( "port" ).toString().isEmpty() && !ports.contains( arguments.value( "port" ).toString() ) )
+		{
+			return CommandResult::failure( "midi_port_not_found", "The MIDI port is not available." );
+		}
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		if( input ) { port->setInputChannel( channel ); port->setReadable( arguments.value( "enabled" ).toBool( true ) ); }
+		else { port->setOutputChannel( channel ); port->setWritable( arguments.value( "enabled" ).toBool( true ) ); }
+		if( arguments.contains( "port" ) )
+		{
+			for( auto it = ports.cbegin(); it != ports.cend(); ++it )
+			{
+				const bool selected = it.key() == arguments.value( "port" ).toString();
+				if( input ) { port->subscribeReadablePort( it.key(), selected ); }
+				else { port->subscribeWritablePort( it.key(), selected ); }
+			}
+		}
+		song->setModified();
+		return CommandResult::success( { { "channel", channel }, { "enabled", input ? port->isReadable() : port->isWritable() } } );
+	}
+	if( action == "setPiano" )
+	{
+		const auto params = arguments.value( "params" ).toObject();
+		const int key = params.value( "key" ).toInt( 60 );
+		const int velocity = params.value( "velocity" ).toInt( 100 );
+		if( key < 0 || key >= NumKeys || velocity < 0 || velocity > 127 ) { return invalidArguments( "Piano key or MIDI velocity is outside its range." ); }
+		const bool enabled = arguments.value( "enabled" ).toBool();
+		if( !arguments.value( "dryRun" ).toBool() )
+		{
+			if( enabled ) { track->pianoModel()->handleKeyPress( key, velocity ); }
+			else if( params.contains( "key" ) ) { track->pianoModel()->handleKeyRelease( key ); }
+			else
+			{
+				for( int i = 0; i < NumKeys; ++i ) { if( track->pianoModel()->isKeyPressed( i ) ) { track->pianoModel()->handleKeyRelease( i ); } }
+			}
+		}
+		return CommandResult::success( { { "key", key }, { "enabled", enabled } } );
+	}
+	const auto models = action == "setArpeggio" ? track->arpeggio()->parameterModels() : track->noteStacking()->parameterModels();
+	auto params = arguments.value( "params" ).toObject();
+	if( params.contains( "enabled" ) ) { return invalidArguments( "Set enabled at the command level." ); }
+	params.insert( "enabled", arguments.value( "enabled" ) );
+	for( auto it = params.begin(); it != params.end(); ++it )
+	{
+		auto *model = models.value( it.key() );
+		QString error;
+		if( !model ) { return invalidArguments( "Unknown parameter: " + it.key() ); }
+		const auto value = it.value();
+		if( model->dynamicCast<BoolModel>() ? !value.isBool() : !value.isDouble() ) { return invalidArguments( "Incorrect parameter type: " + it.key() ); }
+		if( !validateModelValue( model, value.isBool() ? value.toBool() : value.toDouble(), error ) ) { return invalidArguments( error ); }
+	}
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	for( auto it = params.begin(); it != params.end(); ++it ) { models.value( it.key() )->setValue( it.value().isBool() ? it.value().toBool() : static_cast<float>( it.value().toDouble() ) ); }
+	QJsonArray result;
+	for( auto it = models.cbegin(); it != models.cend(); ++it ) { result.append( modelDetail( { it.key(), it.value() } ) ); }
+	song->setModified();
+	return CommandResult::success( { { "parameters", result } } );
+}
+
+QJsonObject patternDetail( PatternTrack *track )
+{
+	const int index = track->patternIndex();
+	QJsonArray clips;
+	for( auto *row : Engine::patternStore()->tracks() )
+	{
+		if( index < row->numOfClips() )
+		{
+			ClipAddress address;
+			address.track = row;
+			address.trackIndex = indexOfTrack( Engine::getSong(), row );
+			address.clip = row->getClips()[index];
+			address.clipIndex = index;
+			clips.append( clipDetail( address ) );
+		}
+	}
+	return { { "pattern", index }, { "name", track->name() },
+		{ "track", indexOfTrack( Engine::getSong(), track ) },
+		{ "bars", Engine::patternStore()->lengthOfPattern( index ) }, { "clips", clips } };
+}
+
+QJsonObject peakEffectAddress( PeakController *controller )
+{
+	for( const auto &model : addressableModels( Engine::getSong() ) )
+	{
+		const int separator = model.path.indexOf( "/fx:" );
+		if( separator < 0 ) { continue; }
+		const auto tail = model.path.mid( separator + 4 );
+		QJsonObject args{ { "owner", model.path.left( separator ) }, { "slot", tail.left( tail.indexOf( '/' ) ).toInt() } };
+		EffectOwner owner;
+		Effect *effect = nullptr;
+		int slot = -1;
+		CommandResult failure;
+		if( resolveEffect( Engine::getSong(), args, owner, effect, slot, failure ) && effect == controller->effect() ) { return args; }
+	}
+	return {};
+}
+
+QJsonObject controllerDetail( Controller *controller, int index )
+{
+	QJsonObject data{ { "controller", index }, { "name", controller->name() }, { "connections", controller->connectionCount() } };
+	QJsonArray parameters;
+	if( auto *lfo = dynamic_cast<LfoController *>( controller ) )
+	{
+		data.insert( "type", "LFO" );
+		const auto models = lfo->parameterModels();
+		for( auto it = models.cbegin(); it != models.cend(); ++it )
+		{
+			auto detail = modelDetail( { "song/controller:" + QString::number( index ) + "/" + it.key(), it.value() } );
+			detail.insert( "parameter", it.key() );
+			parameters.append( detail );
+		}
+	}
+	else if( auto *midi = dynamic_cast<MidiController *>( controller ) )
+	{
+		data.insert( "type", "MIDI" );
+		data.insert( "channel", midi->midiPort()->inputChannel() );
+		data.insert( "cc", midi->midiPort()->inputController() );
+		data.insert( "enabled", midi->midiPort()->isReadable() );
+	}
+	else if( auto *peak = dynamic_cast<PeakController *>( controller ) )
+	{
+		data.insert( "type", "Peak" );
+		const auto address = peakEffectAddress( peak );
+		data.insert( "effect", address );
+		if( !address.isEmpty() ) { data.insert( "effectParameters", executeEffectGetParams( address ).data ); }
+	}
+	data.insert( "parameters", parameters );
+	return data;
+}
+
+CommandResult executeController( const QString &action, const QJsonObject &arguments )
+{
+	auto *song = Engine::getSong();
+	if( !song ) { return engineUnavailable(); }
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	if( action == "list" )
+	{
+		QJsonArray controllers;
+		for( std::size_t i = 0; i < song->controllers().size(); ++i ) { controllers.append( controllerDetail( song->controllers()[i], static_cast<int>( i ) ) ); }
+		return CommandResult::success( { { "controllers", controllers } } );
+	}
+	if( action == "add" )
+	{
+		const auto type = arguments.value( "type" ).toString().toLower();
+		Controller *controller = nullptr;
+		if( type == "lfo" || type == "midi" )
+		{
+			controller = Controller::create( type == "lfo" ? Controller::ControllerType::Lfo : Controller::ControllerType::Midi, song );
+			song->addController( controller );
+		}
+		else if( type == "peak" )
+		{
+			const int count = static_cast<int>( song->controllers().size() );
+			const auto added = executeEffectAdd( { { "owner", arguments.value( "owner" ).toString( "channel:0" ) }, { "plugin", "peakcontrollereffect" } } );
+			if( !added.ok ) { return added; }
+			if( static_cast<int>( song->controllers().size() ) <= count ) { return CommandResult::failure( "controller_creation_failed", "The peak effect did not create a controller." ); }
+			controller = song->controllers().back();
+		}
+		else { return invalidArguments( "'type' must be LFO, MIDI or Peak." ); }
+		if( arguments.contains( "name" ) ) { controller->setName( arguments.value( "name" ).toString() ); }
+		return CommandResult::success( controllerDetail( controller, static_cast<int>( song->controllers().size() - 1 ) ) );
+	}
+	const int index = arguments.value( "controller" ).toInt( -1 );
+	if( index < 0 || index >= static_cast<int>( song->controllers().size() ) ) { return CommandResult::failure( "controller_not_found", "The requested controller does not exist." ); }
+	auto *controller = song->controllers()[index];
+	if( action == "remove" )
+	{
+		song->removeController( controller );
+		return CommandResult::success( { { "removed", index } } );
+	}
+	if( action == "connect" )
+	{
+		ModelAddress target;
+		CommandResult failure;
+		if( !resolveModel( song, arguments.value( "target" ).toString(), target, failure ) ) { return failure; }
+		if( controller->hasModel( target.model ) ) { return invalidArguments( "This connection would create a controller cycle." ); }
+		delete target.model->controllerConnection();
+		target.model->setControllerConnection( new ControllerConnection( controller ) );
+		song->setModified();
+		return CommandResult::success( { { "controller", index }, { "target", target.path } } );
+	}
+	const auto name = arguments.value( "name" ).toString();
+	const auto value = arguments.value( "value" );
+	if( name == "name" && value.isString() ) { controller->setName( value.toString() ); }
+	else if( auto *lfo = dynamic_cast<LfoController *>( controller ) )
+	{
+		auto *model = lfo->parameterModels().value( name );
+		QString error;
+		if( !model ) { return CommandResult::failure( "controller_parameter_not_found", "The LFO parameter does not exist." ); }
+		if( !value.isDouble() || !validateModelValue( model, value.toDouble(), error ) ) { return invalidArguments( error.isEmpty() ? "A numeric parameter value is required." : error ); }
+		model->setValue( static_cast<float>( value.toDouble() ) );
+	}
+	else if( auto *midi = dynamic_cast<MidiController *>( controller ) )
+	{
+		if( name == "enabled" && value.isBool() ) { midi->midiPort()->setReadable( value.toBool() ); }
+		else if( ( name == "channel" || name == "cc" ) && value.isDouble() && value.toDouble() == value.toInt( -1 ) &&
+			value.toInt() >= 0 && value.toInt() <= ( name == "channel" ? 16 : 127 ) )
+		{
+			if( name == "channel" ) { midi->midiPort()->setInputChannel( value.toInt() ); }
+			else { midi->midiPort()->setInputController( value.toInt() ); }
+		}
+		else { return invalidArguments( "MIDI parameters are channel (0..16), cc (0..127), enabled (boolean), and name (string)." ); }
+	}
+	else if( auto *peak = dynamic_cast<PeakController *>( controller ) )
+	{
+		auto args = peakEffectAddress( peak );
+		args.insert( "name", name );
+		args.insert( "value", value );
+		return executeEffectSetParam( args );
+	}
+	song->setModified();
+	return CommandResult::success( controllerDetail( controller, index ) );
+}
+
+PatternTrack *resolvePattern( const QJsonObject &arguments )
+{
+	return PatternTrack::findPatternTrack( arguments.value( "pattern" ).toInt( -1 ) );
+}
+
+CommandResult executePattern( const QString &action, const QJsonObject &arguments )
+{
+	auto *song = Engine::getSong();
+	if( !song || !Engine::patternStore() ) { return engineUnavailable(); }
+	auto *store = Engine::patternStore();
+	if( action == "list" )
+	{
+		QJsonArray patterns;
+		for( int i = 0; i < store->numOfPatterns(); ++i ) { patterns.append( patternDetail( PatternTrack::findPatternTrack( i ) ) ); }
+		return CommandResult::success( { { "patterns", patterns }, { "current", store->currentPattern() } } );
+	}
+	if( action == "create" )
+	{
+		const int count = store->numOfPatterns();
+		const int index = arguments.value( "index" ).toInt( count );
+		if( index < 0 || index > count ) { return invalidArguments( "'index' must be an insertion position in the pattern list." ); }
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		const int songIndex = index < count ? indexOfTrack( song, PatternTrack::findPatternTrack( index ) ) : -1;
+		auto *created = static_cast<PatternTrack *>( Track::create( Track::Type::Pattern, song ) );
+		for( int i = count; i > index; --i )
+		{
+			PatternTrack::swapPatternTracks( PatternTrack::findPatternTrack( i ), PatternTrack::findPatternTrack( i - 1 ) );
+		}
+		if( songIndex >= 0 ) { song->moveTrack( created, songIndex ); }
+		if( arguments.contains( "name" ) ) { created->setName( arguments.value( "name" ).toString() ); }
+		store->setCurrentPattern( index );
+		song->setModified();
+		return CommandResult::success( patternDetail( created ) );
+	}
+	auto *pattern = resolvePattern( arguments );
+	if( !pattern ) { return CommandResult::failure( "pattern_not_found", "The requested pattern does not exist." ); }
+	if( action == "get" ) { return CommandResult::success( patternDetail( pattern ) ); }
+	auto guard = Engine::audioEngine()->requestChangesGuard();
+	if( action == "remove" )
+	{
+		const int index = pattern->patternIndex();
+		if( song->isPlaying() ) { song->stop(); }
+		delete pattern;
+		song->setModified();
+		return CommandResult::success( { { "removed", index }, { "count", store->numOfPatterns() } } );
+	}
+	if( action == "rename" ) { pattern->setName( arguments.value( "name" ).toString() ); }
+	else if( action == "setLength" )
+	{
+		const int bars = arguments.value( "bars" ).toInt();
+		if( bars <= 0 || static_cast<long long>( bars ) * song->ticksPerBar() > MaxSongLength )
+		{
+			return invalidArguments( "'bars' must be positive and within the maximum song length." );
+		}
+		pattern->setExplicitLengthBars( bars );
+	}
+	else if( action == "placeInSong" )
+	{
+		const int position = arguments.value( "position" ).toInt();
+		const int length = arguments.value( "length" ).toInt( store->lengthOfPattern( pattern->patternIndex() ) * song->ticksPerBar() );
+		if( position < 0 || length <= 0 || static_cast<long long>( position ) + length > MaxSongLength )
+		{
+			return invalidArguments( "Pattern placement must fit within the maximum song length." );
+		}
+		auto *clip = pattern->createClip( TimePos( position ) );
+		clip->changeLength( TimePos( length ) );
+		song->setModified();
+		const auto &clips = pattern->getClips();
+		ClipAddress address;
+		address.track = pattern;
+		address.trackIndex = indexOfTrack( song, pattern );
+		address.clip = clip;
+		address.clipIndex = static_cast<int>( std::distance( clips.begin(), std::find( clips.begin(), clips.end(), clip ) ) );
+		return CommandResult::success( clipDetail( address ) );
+	}
+	song->setModified();
+	return CommandResult::success( patternDetail( pattern ) );
+}
+
+CommandResult executePatternRemoveFromSong( const QJsonObject &arguments )
+{
+	ClipAddress address;
+	CommandResult failure;
+	if( !resolveClip( Engine::getSong(), arguments, address, failure ) ) { return failure; }
+	if( !dynamic_cast<PatternClip *>( address.clip ) ) { return CommandResult::failure( "wrong_clip_type", "The clip must be a song pattern reference." ); }
+	return executeClipRemove( arguments );
+}
 
 CommandResult executeQuerySongSummary( const QJsonObject &arguments )
 {
@@ -5042,6 +5614,199 @@ void registerDescriptor( CommandBus &commandBus, const QString &name, const QStr
 void registerCoreCommands( CommandBus &commandBus )
 {
 	const auto noArguments = objectSchema();
+	registerDescriptor( commandBus, "export.midi", "Export the project through the native MIDI filter; overwrite requires explicit permission.",
+		objectSchema( { { "path", stringSchema() }, { "overwrite", booleanSchema() } }, { "path" } ),
+		Mutability::Destructive, TxScope::None, []( const QJsonObject &arguments ) {
+			auto *song = Engine::getSong();
+			if( !song ) { return engineUnavailable(); }
+			if( CommandBus::instance().batchDepth() != 0 )
+			{
+				return CommandResult::failure( "external_write_in_batch", "Export files after the project transaction has committed." );
+			}
+			const auto path = arguments.value( "path" ).toString();
+			const QFileInfo destination( path );
+			if( path.isEmpty() || destination.isDir() || !destination.dir().exists() )
+			{
+				return invalidArguments( "The export path must have an existing parent directory and identify a file." );
+			}
+			if( destination.exists() && !arguments.value( "overwrite" ).toBool() )
+			{
+				return CommandResult::failure( "file_exists", "Specify overwrite:true to replace an existing export file." );
+			}
+			const auto info = PluginFactory::instance()->pluginInfo( "midiexport" );
+			if( info.isNull() || !info.descriptor || info.descriptor->type != Plugin::Type::ExportFilter )
+			{
+				return CommandResult::failure( "export_plugin_not_found", "The native MIDI export plugin is unavailable." );
+			}
+			QJsonObject result{ { "path", destination.absoluteFilePath() }, { "format", "midi" } };
+			if( arguments.value( "dryRun" ).toBool() ) { return CommandResult::success( result ); }
+			std::unique_ptr<Plugin> plugin( Plugin::instantiate( "midiexport", nullptr, nullptr ) );
+			auto *filter = dynamic_cast<ExportFilter *>( plugin.get() );
+			if( !filter ) { return CommandResult::failure( "export_failed", "The native MIDI export filter could not be loaded." ); }
+			QTemporaryFile temporary( destination.absoluteFilePath() + ".XXXXXX" );
+			if( !temporary.open() ) { return CommandResult::failure( "export_failed", temporary.errorString() ); }
+			const auto temporaryPath = temporary.fileName();
+			temporary.close();
+			auto guard = Engine::audioEngine()->requestChangesGuard();
+			struct JournallingGuard
+			{
+				ProjectJournal *journal;
+				bool previous;
+				~JournallingGuard() { journal->setJournalling( previous ); }
+			};
+			auto *journal = Engine::projectJournal();
+			const JournallingGuard journalGuard{ journal, journal->isJournalling() };
+			journal->setJournalling( false );
+#ifdef Q_OS_WIN
+			const std::filesystem::path nativePath( temporaryPath.toStdWString() );
+#else
+			const std::filesystem::path nativePath( temporaryPath.toUtf8().constData() );
+#endif
+			if( !filter->tryExport( song->tracks(), Engine::patternStore()->tracks(), song->getTempo(), song->masterPitch(), nativePath ) )
+			{
+				return CommandResult::failure( "export_failed", "The native MIDI export filter failed." );
+			}
+			QFile rendered( temporaryPath );
+			if( !rendered.open( QIODevice::ReadOnly ) || rendered.size() < 14 || rendered.peek( 4 ) != "MThd" )
+			{
+				return CommandResult::failure( "export_failed", "The native export filter did not produce a valid MIDI header." );
+			}
+			QSaveFile output( destination.absoluteFilePath() );
+			if( !output.open( QIODevice::WriteOnly ) ) { return CommandResult::failure( "export_failed", output.errorString() ); }
+			while( !rendered.atEnd() )
+			{
+				const auto bytes = rendered.read( 65536 );
+				if( bytes.isEmpty() || output.write( bytes ) != bytes.size() )
+				{
+					return CommandResult::failure( "export_failed", "Failed to commit the rendered MIDI file." );
+				}
+			}
+			if( !output.commit() ) { return CommandResult::failure( "export_failed", output.errorString() ); }
+			result.insert( "bytes", rendered.size() );
+			return CommandResult::success( result );
+		} );
+	for( const auto &format : { QString( "midi" ), QString( "hydrogen" ) } )
+	{
+		auto properties = QJsonObject{ { "path", stringSchema() } };
+		if( format == "midi" ) { properties.insert( "track", integerSchema() ); properties.insert( "parent", stringSchema() ); }
+		registerDescriptor( commandBus, "import." + format, "Import a local " + format + " file without dialogs; changes form one undo step.",
+			objectSchema( properties, { "path" } ), Mutability::Mutating, TxScope::Single,
+			[format]( const QJsonObject &arguments ) {
+				auto *song = Engine::getSong();
+				if( !song ) { return engineUnavailable(); }
+				const QFileInfo source( arguments.value( "path" ).toString() );
+				if( !source.exists() || !source.isFile() || !source.isReadable() )
+				{
+					return CommandResult::failure( "import_file_not_found", "The requested import file is not readable." );
+				}
+				const auto plugin = format == "midi" ? QString( "midiimport" ) : QString( "hydrogenimport" );
+				const auto info = PluginFactory::instance()->pluginInfo( plugin.toUtf8().constData() );
+				if( info.isNull() || !info.descriptor || info.descriptor->type != Plugin::Type::ImportFilter )
+				{
+					return CommandResult::failure( "import_plugin_not_found", "The native import plugin is unavailable." );
+				}
+				CommandResult failure;
+				auto *container = resolveParent( song, arguments, failure );
+				if( !container ) { return failure; }
+				InstrumentTrack *target = nullptr;
+				if( arguments.contains( "track" ) )
+				{
+					Track *track = nullptr;
+					int index = -1;
+					if( !resolveTrack( song, arguments, track, index, failure ) ) { return failure; }
+					target = dynamic_cast<InstrumentTrack *>( track );
+					if( !target ) { return invalidArguments( "MIDI imports require an instrument target track." ); }
+				}
+				const int before = static_cast<int>( container->tracks().size() );
+				if( container != song || (target && target->trackContainer() != song) )
+				{
+					return invalidArguments( "Native MIDI file import requires Song tracks. Use MIDI note commands to populate Pattern rows." );
+				}
+				auto guard = Engine::audioEngine()->requestChangesGuard();
+				if( !ImportFilter::tryImportFile( source.absoluteFilePath(), container, plugin, target ) )
+				{
+					return CommandResult::failure( "import_failed", "The native import filter rejected the file; project edits were rolled back." );
+				}
+				song->setModified();
+				return CommandResult::success( { { "path", source.absoluteFilePath() }, { "format", format },
+					{ "addedTracks", static_cast<int>( container->tracks().size() ) - before },
+					{ "trackCount", static_cast<int>( song->tracks().size() ) } } );
+			} );
+	}
+	const auto configProperties = QJsonObject{ { "group", stringSchema() }, { "key", stringSchema() },
+		{ "value", stringSchema() } };
+	for( const auto &action : { QString( "get" ), QString( "set" ) } )
+	{
+		registerDescriptor( commandBus, "config." + action,
+			action == "get" ? "Read a local configuration string." :
+			"Set a local configuration string; settings may require restart. Not part of project undo.",
+			objectSchema( configProperties, action == "get" ? QJsonArray{ "group", "key" } :
+				QJsonArray{ "group", "key", "value" } ),
+			action == "get" ? Mutability::ReadOnly : Mutability::Mutating, TxScope::None,
+			[action]( const QJsonObject &arguments ) {
+				const auto group = arguments.value( "group" ).toString();
+				const auto key = arguments.value( "key" ).toString();
+				const QRegularExpression xmlName( "^[A-Za-z_][A-Za-z0-9_.-]*$" );
+				if( !xmlName.match( group ).hasMatch() || !xmlName.match( key ).hasMatch() )
+				{
+					return invalidArguments( "Configuration group and key must be valid XML names." );
+				}
+				if( group.compare( "agentMcp", Qt::CaseInsensitive ) == 0 )
+				{
+					return CommandResult::failure( "service_config_restricted", "Manage MCP connection settings locally." );
+				}
+				if( action == "set" && CommandBus::instance().batchDepth() != 0 )
+				{
+					return CommandResult::failure( "external_write_in_batch", "Configuration changes cannot be rolled back with project edits." );
+				}
+				auto *config = ConfigManager::inst();
+				const auto previous = config->value( group, key );
+				const auto value = action == "set" ? arguments.value( "value" ).toString() : previous;
+				if( action == "set" && !arguments.value( "dryRun" ).toBool() ) { config->setValue( group, key, value ); }
+				return CommandResult::success( { { "group", group }, { "key", key }, { "value", value },
+					{ "previous", previous }, { "restartMayBeRequired", action == "set" } } );
+			} );
+	}
+	registerDescriptor( commandBus, "import.sampleToTrack", "Create a sample clip from a local audio file, optionally on an existing sample track.",
+		objectSchema( { { "path", stringSchema() }, { "track", integerSchema() }, { "parent", stringSchema() },
+			{ "name", stringSchema() }, { "position", integerSchema() } }, { "path" } ),
+		Mutability::Mutating, TxScope::Single, []( const QJsonObject &arguments ) {
+			auto *song = Engine::getSong();
+			if( !song ) { return engineUnavailable(); }
+			const QFileInfo source( arguments.value( "path" ).toString() );
+			if( !source.exists() || !source.isFile() )
+			{
+				return CommandResult::failure( "sample_file_not_found", "The requested sample file does not exist." );
+			}
+			const int position = arguments.value( "position" ).toInt();
+			if( position < 0 || position > MaxSongLength ) { return invalidArguments( "Sample position is outside the song range." ); }
+			QJsonObject address{ { "parent", arguments.value( "parent" ).toString( "song" ) } };
+			if( arguments.contains( "track" ) )
+			{
+				address.insert( "track", arguments.value( "track" ) );
+				Track *track = nullptr;
+				int index = -1;
+				CommandResult failure;
+				if( !resolveTrack( song, address, track, index, failure ) ) { return failure; }
+				if( track->type() != Track::Type::Sample ) { return invalidArguments( "The selected track must be a sample track." ); }
+			}
+			else
+			{
+				QJsonObject create = address;
+				create.insert( "type", "sample" );
+				create.insert( "name", arguments.value( "name" ).toString( source.completeBaseName() ) );
+				const auto created = executeTrackCreate( create );
+				if( !created.ok ) { return created; }
+				address.insert( "track", created.data.value( "index" ) );
+			}
+			QJsonObject create = address;
+			create.insert( "position", position );
+			const auto clip = executeClipCreate( create );
+			if( !clip.ok ) { return clip; }
+			address.insert( "clip", clip.data.value( "index" ) );
+			address.insert( "path", source.absoluteFilePath() );
+			return executeSampleSetFile( address );
+		} );
 	const auto trackArguments = objectSchema( QJsonObject{ { "track", integerSchema() } }, QJsonArray{ "track" } );
 	const auto clipArguments = objectSchema( QJsonObject{
 		{ "track", integerSchema() },
@@ -5078,6 +5843,84 @@ void registerCoreCommands( CommandBus &commandBus )
 	noteQueryProperties.insert( "page", QJsonObject{ { "type", "integer" }, { "minimum", 0 }, { "description", "Zero-based page; defaults to zero." } } );
 	noteQueryProperties.insert( "pageSize", QJsonObject{ { "type", "integer" }, { "minimum", 1 }, { "maximum", 4096 }, { "description", "Notes per page; defaults to 256." } } );
 	const auto noteQueryArguments = objectSchema( noteQueryProperties, QJsonArray{ "track", "clip" } );
+	for( const auto &action : { "set", "get", "snapNotes" } )
+	{
+		const QString name = action;
+		QJsonObject properties{ { "index", integerSchema() } };
+		QJsonArray required;
+		if( name == "set" )
+		{
+			properties.insert( "root", integerSchema() ); properties.insert( "type", stringSchema() );
+			properties.insert( "semitones", QJsonObject{ { "type", "array" }, { "items", integerSchema() } } );
+			required = { "root", "type" };
+		}
+		else if( name == "snapNotes" ) { properties = noteFilterProperties; properties.insert( "index", integerSchema() ); required = { "track", "clip" }; }
+		registerDescriptor( commandBus, "scale." + name, "Project scale operation: " + name + ".", objectSchema( properties, required ),
+			name == "get" ? Mutability::ReadOnly : Mutability::Mutating, name == "get" ? TxScope::None : TxScope::Single,
+			[name]( const QJsonObject &args ) { return executeScale( name, args ); } );
+	}
+	for( const auto &action : { "loadPreset", "savePreset", "setMidiIn", "setMidiOut", "setArpeggio", "setNoteStacking", "setPiano" } )
+	{
+		const QString name = action;
+		QJsonObject properties{ { "track", integerSchema() } };
+		QJsonArray required{ "track" };
+		const bool preset = name.endsWith( "Preset" );
+		const bool midi = name == "setMidiIn" || name == "setMidiOut";
+		if( preset )
+		{
+			properties.insert( "path", stringSchema() ); required.append( "path" );
+			if( name == "savePreset" ) { properties.insert( "overwrite", booleanSchema() ); }
+		}
+		else if( midi )
+		{
+			properties.insert( "port", stringSchema() ); properties.insert( "channel", integerSchema() ); properties.insert( "enabled", booleanSchema() );
+		}
+		else
+		{
+			properties.insert( "enabled", booleanSchema() ); properties.insert( "params", QJsonObject{ { "type", "object" } } ); required.append( "enabled" );
+			if( name == "setPiano" )
+			{
+				auto pianoParams = objectSchema( { { "key", integerSchema() }, { "velocity", integerSchema() } } );
+				pianoParams.insert( "additionalProperties", false );
+				properties.insert( "params", pianoParams );
+			}
+		}
+		registerDescriptor( commandBus, "instrument." + name, "Instrument operation: " + name + ".", objectSchema( properties, required ),
+			Mutability::Mutating, name == "savePreset" || name == "setPiano" ? TxScope::None : TxScope::Single,
+			[name]( const QJsonObject &args ) { return executeInstrumentExtended( name, args ); } );
+	}
+
+	for( const auto &action : { "create", "remove", "setLength", "list", "get", "rename", "placeInSong" } )
+	{
+		const QString name = action;
+		QJsonObject properties{ { "pattern", integerSchema() }, { "index", integerSchema() },
+			{ "name", stringSchema() }, { "bars", integerSchema() }, { "position", integerSchema() }, { "length", integerSchema() } };
+		QJsonArray required;
+		if( name != "list" && name != "create" ) { required.append( "pattern" ); }
+		if( name == "rename" ) { required.append( "name" ); }
+		if( name == "setLength" ) { required.append( "bars" ); }
+		if( name == "placeInSong" ) { required.append( "position" ); }
+		const bool query = name == "list" || name == "get";
+		registerDescriptor( commandBus, "pattern." + name, "Pattern operation: " + name + ".", objectSchema( properties, required ),
+			query ? Mutability::ReadOnly : name == "remove" ? Mutability::Destructive : Mutability::Mutating,
+			query ? TxScope::None : TxScope::Single, [name]( const QJsonObject &args ) { return executePattern( name, args ); } );
+	}
+	registerDescriptor( commandBus, "pattern.removeFromSong", "Remove a song reference to a pattern.", clipArguments,
+		Mutability::Destructive, TxScope::Single, executePatternRemoveFromSong );
+	for( const auto &action : { "add", "remove", "connect", "list", "setParam" } )
+	{
+		const QString name = action;
+		QJsonArray required;
+		if( name == "add" ) { required.append( "type" ); }
+		else if( name != "list" ) { required.append( "controller" ); }
+		if( name == "connect" ) { required.append( "target" ); }
+		if( name == "setParam" ) { required.append( "name" ); required.append( "value" ); }
+		registerDescriptor( commandBus, "controller." + name, "Controller operation: " + name + ".", objectSchema(
+			{ { "controller", integerSchema() }, { "type", stringSchema() }, { "owner", stringSchema() },
+				{ "name", stringSchema() }, { "target", stringSchema() }, { "value", QJsonObject{} } }, required ),
+			name == "list" ? Mutability::ReadOnly : name == "remove" ? Mutability::Destructive : Mutability::Mutating,
+			name == "list" ? TxScope::None : TxScope::Single, [name]( const QJsonObject &args ) { return executeController( name, args ); } );
+	}
 
 	registerDescriptor( commandBus, "song.getInfo", "Return a compact summary of the current song.",
 		noArguments, Mutability::ReadOnly, TxScope::None, executeSongGetInfo );
@@ -5100,7 +5943,7 @@ void registerCoreCommands( CommandBus &commandBus )
 		QJsonObject{ { "path", stringSchema() }, { "promptSave", booleanSchema() } }, QJsonArray{ "path" } ),
 		Mutability::Destructive, TxScope::Single, executeSongLoad );
 	registerDescriptor( commandBus, "song.save", "Save the current project, optionally as a resource bundle.", objectSchema(
-		QJsonObject{ { "path", stringSchema() }, { "asBundle", booleanSchema() } } ),
+		QJsonObject{ { "path", stringSchema() }, { "asBundle", booleanSchema() }, { "overwrite", booleanSchema() } } ),
 		Mutability::Mutating, TxScope::None, executeSongSave );
 
 	const QJsonObject playbackProperties{
@@ -5198,9 +6041,9 @@ void registerCoreCommands( CommandBus &commandBus )
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetPitchRange );
 	registerDescriptor( commandBus, "instrument.setBaseNote", "Set an instrument-track base note.", integerValueArguments,
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetBaseNote );
-	registerDescriptor( commandBus, "instrument.getParams", "List L1 serialized parameters for an instrument plugin.",
+	registerDescriptor( commandBus, "instrument.getParams", "List native parameter metadata with serialized-state fallback.",
 		trackArguments, Mutability::ReadOnly, TxScope::None, executeInstrumentGetParams );
-	registerDescriptor( commandBus, "instrument.setParam", "Set one L1 serialized instrument parameter.", objectSchema(
+	registerDescriptor( commandBus, "instrument.setParam", "Set a native parameter with type/range validation, or a serialized parameter.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "name", stringSchema() }, { "value", QJsonObject{} } },
 		QJsonArray{ "track", "name", "value" } ),
 		Mutability::Mutating, TxScope::Single, executeInstrumentSetParam );
@@ -5411,6 +6254,7 @@ void registerCoreCommands( CommandBus &commandBus )
 		Mutability::Mutating, TxScope::Single, executeMidiSetClipType );
 	registerDescriptor( commandBus, "midi.humanize", "Apply deterministic timing, velocity, and detune variation to MIDI notes.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "clip", integerSchema() },
+			{ "range", noteFilterProperties.value( "range" ) }, { "keys", noteFilterProperties.value( "keys" ) },
 			{ "timing", integerSchema() }, { "velocity", integerSchema() },
 			{ "detune", numberSchema() }, { "seed", integerSchema() } },
 		QJsonArray{ "track", "clip" } ),

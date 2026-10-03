@@ -67,6 +67,10 @@ public:
 		return s_infoMap[this];
 	}
 
+	// Zero keeps the native length derived from the clips in the PatternStore.
+	int explicitLengthBars() const { return m_explicitLengthBars; }
+	void setExplicitLengthBars(int bars) { m_explicitLengthBars = bars; emit dataChanged(); }
+
 	bool automationDisabled( Track * _track )
 	{
 		return( m_disabledTracks.contains( _track ) );
@@ -89,6 +93,7 @@ protected:
 
 private:
 	QList<Track *> m_disabledTracks;
+	int m_explicitLengthBars = 0;
 
 	using infoMap = QMap<PatternTrack*, int>;
 	static infoMap s_infoMap;

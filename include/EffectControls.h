@@ -26,6 +26,7 @@
 #define LMMS_EFFECT_CONTROLS_H
 
 #include "Model.h"
+#include <QMap>
 #include "JournallingObject.h"
 #include "Effect.h"
 
@@ -55,6 +56,8 @@ public:
 
 	virtual int controlCount() = 0;
 	virtual gui::EffectControlDialog * createView() = 0;
+	// Optional native parameter reflection. Empty maps retain serialized-state access.
+	virtual QMap<QString, AutomatableModel*> parameterModels() { return {}; }
 
 
 	void setViewVisible( bool _visible )

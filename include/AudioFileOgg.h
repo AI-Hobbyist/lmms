@@ -46,6 +46,7 @@ public:
 			const QString & _file,
 			AudioEngine* audioEngine );
 	~AudioFileOgg() override;
+	void finalize() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -65,6 +66,8 @@ private:
 	ogg_stream_state m_oss;
 	ogg_packet m_packet;
 	ogg_page m_page;
+	bool m_initialized = false;
+	bool m_finalized = false;
 };
 
 } // namespace lmms

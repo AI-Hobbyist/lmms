@@ -30,6 +30,7 @@
 #include <QProgressDialog>
 
 #include <sstream>
+#include <memory>
 #include <unordered_map>
 
 #include "MidiImport.h"
@@ -93,7 +94,7 @@ bool MidiImport::tryImport(TrackContainer* tc)
 	if (!openFile()) { return false; }
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if (gui::getGUI() != nullptr && ConfigManager::inst()->sf2File().isEmpty())
+	if (interactive() && gui::getGUI() != nullptr && ConfigManager::inst()->sf2File().isEmpty())
 	{
 		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr("Setup incomplete"),
@@ -105,7 +106,7 @@ bool MidiImport::tryImport(TrackContainer* tc)
 				"settings dialog and try again."));
 	}
 #else
-	if (gui::getGUI() != nullptr)
+	if (interactive() && gui::getGUI() != nullptr)
 	{
 		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr("Setup incomplete"),
@@ -143,14 +144,14 @@ public:
 	AutomationClip* ap = nullptr;
 	TimePos lastPos = 0;
 
-	smfMidiCC& create(TrackContainer* tc, QString tn)
+		smfMidiCC& create(TrackContainer* tc, QString tn, bool interactive)
 	{
 		if (!at)
 		{
 			// Keep LMMS responsive, for now the import runs
 			// in the main thread. This should probably be
 			// removed if that ever changes.
-			qApp->processEvents();
+				if (interactive && gui::getGUI() != nullptr) { qApp->processEvents(); }
 			at = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, tc));
 		}
 		if (tn != "") { at->setName(tn); }
@@ -197,17 +198,20 @@ public:
 	QString trackName;
 	MidiPatch currentPatch;
 
-	smfMidiChannel* create(TrackContainer* tc, QString tn)
+		smfMidiChannel* create(TrackContainer* tc, QString tn, InstrumentTrack* target, bool interactive)
 	{
 		if (!it) {
 			// Keep LMMS responsive
-			qApp->processEvents();
-			it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+				if (interactive && gui::getGUI() != nullptr) { qApp->processEvents(); }
+				it = target ? target : dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+				if (target) { it_inst = target->instrument(); }
+				else
+				{
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument("sf2player");
 
-			if (it_inst)
+				if (it_inst && it_inst->childModel("bank") && it_inst->childModel("patch"))
 			{
 				isSF2 = true;
 				it_inst->loadFile(ConfigManager::inst()->sf2File());
@@ -226,8 +230,9 @@ public:
 #else
 			it_inst = it->loadInstrument("patman");
 #endif
+				}
 			trackName = tn;
-			if (trackName != "") { it->setName(tn); }
+				if (!target && trackName != "") { it->setName(tn); }
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
 			// Create a default pattern
@@ -275,20 +280,23 @@ bool MidiImport::readSMF(TrackContainer* tc)
 {
 	constexpr int MIDI_CC_COUNT = 128 + 1; // 0-127 (128) + pitch bend
 	constexpr int preTrackSteps = 2;
-	QProgressDialog pd(TrackContainer::tr("Importing MIDI-file..."),
-	TrackContainer::tr("Cancel"), 0, preTrackSteps, gui::getGUI()->mainWindow());
-	pd.setWindowTitle(TrackContainer::tr("Please wait..."));
-	pd.setWindowModality(Qt::WindowModal);
-	pd.setMinimumDuration(0);
-
-	pd.setValue(0);
+	std::unique_ptr<QProgressDialog> pd;
+	if (interactive() && gui::getGUI() != nullptr)
+	{
+		pd = std::make_unique<QProgressDialog>(TrackContainer::tr("Importing MIDI-file..."),
+			TrackContainer::tr("Cancel"), 0, preTrackSteps, gui::getGUI()->mainWindow());
+		pd->setWindowTitle(TrackContainer::tr("Please wait..."));
+		pd->setWindowModality(Qt::WindowModal);
+		pd->setMinimumDuration(0);
+		pd->setValue(0);
+	}
 
 	std::istringstream stream(readAllData().toStdString());
 	auto seq = new Alg_seq(stream, true);
+	if (seq->get_read_error() != alg_no_error) { delete seq; return false; }
 	seq->convert_to_beats();
 
-	pd.setMaximum(seq->tracks() + preTrackSteps);
-	pd.setValue(1);
+	if (pd) { pd->setMaximum(seq->tracks() + preTrackSteps); pd->setValue(1); }
 
 	// 128 CC + Pitch Bend
 	auto ccs = std::array<smfMidiCC, MIDI_CC_COUNT>{};
@@ -329,7 +337,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	timeSigNumeratorPat->updateLength();
 	timeSigDenominatorPat->updateLength();
 
-	pd.setValue(2);
+	if (pd) { pd->setValue(2); }
 
 	// Tempo stuff
 	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
@@ -376,7 +384,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
 		Alg_track* trk = seq->track(t);
-		pd.setValue(t + preTrackSteps);
+		if (pd) { pd->setValue(t + preTrackSteps); }
 
 		for (auto& cc : ccs) { cc.clear(); }
 
@@ -417,7 +425,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			{
 				// LMMS does not currently support specifying the channel of a single note
 				// To be safe, put the notes from different channels on separate tracks so that no information is lost
-				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName, targetTrack(), interactive());
 				auto noteEvt = static_cast<Alg_note*>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
@@ -431,7 +439,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_update())
 			{
-				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName, targetTrack(), interactive());
 
 				double time = evt->time*ticksPerBeat;
 				QString update(evt->get_attribute());
@@ -452,7 +460,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 						{
 							if (!pc.at)
 							{
-								pc.create(tc, trackName + " > " + objModel->displayName());
+								pc.create(tc, trackName + " > " + objModel->displayName(), interactive());
 							}
 							pc.putValue(time, objModel, prog);
 						}
@@ -539,7 +547,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 							{
 								if (ccs[ccid].at == nullptr)
 								{
-									ccs[ccid].create(tc, trackName + " > " + modelObject->displayName());
+									ccs[ccid].create(tc, trackName + " > " + modelObject->displayName(), interactive());
 								}
 								ccs[ccid].putValue(time, modelObject, cc);
 							}

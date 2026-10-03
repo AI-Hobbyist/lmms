@@ -24,6 +24,7 @@
 #include "PatternTrack.h"
 
 #include <QDomElement>
+#include <algorithm>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -156,6 +157,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 
 void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
+	_this.setAttribute("lengthbars", m_explicitLengthBars);
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getPatternEditor()->currentPattern() );*/
@@ -177,6 +179,7 @@ void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _th
 
 void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 {
+	m_explicitLengthBars = std::max(0, _this.attribute("lengthbars", "0").toInt());
 /*	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );

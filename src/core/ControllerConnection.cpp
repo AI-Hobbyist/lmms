@@ -126,8 +126,10 @@ void ControllerConnection::setController( Controller * _controller )
 				this, SIGNAL(valueChanged()), Qt::DirectConnection );
 	}
 
-	m_ownsController =
-		(_controller->type() == Controller::ControllerType::Midi);
+	// Rack controllers are owned by Song; only private MIDI connections own their controller.
+	const auto& rack = Engine::getSong()->controllers();
+	m_ownsController = _controller->type() == Controller::ControllerType::Midi
+		&& std::find(rack.begin(), rack.end(), _controller) == rack.end();
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection

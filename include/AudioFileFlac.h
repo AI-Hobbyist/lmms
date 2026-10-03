@@ -44,6 +44,7 @@ public:
 	);
 
 	~AudioFileFlac() override;
+	void finalize() override { finishEncoding(); }
 
 	static AudioFileDevice* getInst(QString const& outputFilename,
 			OutputSettings const& outputSettings,

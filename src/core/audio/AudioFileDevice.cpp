@@ -56,7 +56,7 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 						"file and try again!"
 								).arg( _file );
 
-		if (gui::getGUI() != nullptr)
+		if (outputSettings.interactiveErrors() && gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical( nullptr, title, message,
 						QMessageBox::Ok,
@@ -64,8 +64,8 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 		}
 		else
 		{
-			fprintf( stderr, "%s\n", message.toUtf8().constData() );
-			exit( EXIT_FAILURE );
+			qWarning("%s", message.toUtf8().constData());
+			if (outputSettings.interactiveErrors()) { exit(EXIT_FAILURE); }
 		}
 	}
 }
@@ -85,9 +85,12 @@ int AudioFileDevice::writeData( const void* data, int len )
 {
 	if( m_outputFile.isOpen() )
 	{
-		return m_outputFile.write( (const char *) data, len );
+		const auto written = m_outputFile.write( (const char *) data, len );
+		if (written != len) { reportWriteFailure(); }
+		return written;
 	}
 
+	reportWriteFailure();
 	return -1;
 }
 

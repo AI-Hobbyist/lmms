@@ -46,6 +46,7 @@ public:
 			const QString & _file,
 			AudioEngine* audioEngine );
 	~AudioFileMP3() override;
+	void finalize() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -66,7 +67,8 @@ private:
 	void tearDownEncoder();
 
 private:
-	lame_t m_lame;
+	lame_t m_lame = nullptr;
+	bool m_finalized = false;
 };
 
 } // namespace lmms

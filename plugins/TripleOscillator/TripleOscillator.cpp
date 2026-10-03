@@ -228,6 +228,26 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 
 
+QMap<QString, AutomatableModel*> TripleOscillator::parameterModels()
+{
+	QMap<QString, AutomatableModel*> result;
+	for (int i = 0; i < NUM_OF_OSCILLATORS; ++i)
+	{
+		const auto suffix = QString::number(i);
+		result.insert("vol" + suffix, &m_osc[i]->m_volumeModel);
+		result.insert("pan" + suffix, &m_osc[i]->m_panModel);
+		result.insert("coarse" + suffix, &m_osc[i]->m_coarseModel);
+		result.insert("finel" + suffix, &m_osc[i]->m_fineLeftModel);
+		result.insert("finer" + suffix, &m_osc[i]->m_fineRightModel);
+		result.insert("phoffset" + suffix, &m_osc[i]->m_phaseOffsetModel);
+		result.insert("stphdetun" + suffix, &m_osc[i]->m_stereoPhaseDetuningModel);
+		result.insert("wavetype" + suffix, &m_osc[i]->m_waveShapeModel);
+		result.insert("modalgo" + QString::number(i + 1), &m_osc[i]->m_modulationAlgoModel);
+		result.insert("useWaveTable" + QString::number(i + 1), &m_osc[i]->m_useWaveTableModel);
+	}
+	return result;
+}
+
 void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )

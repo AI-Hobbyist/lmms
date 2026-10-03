@@ -25,6 +25,8 @@
 #ifndef LMMS_PROJECT_RENDERER_H
 #define LMMS_PROJECT_RENDERER_H
 
+#include <atomic>
+
 #include "AudioFileDevice.h"
 #include "AudioEngine.h"
 #include "OutputSettings.h"
@@ -60,7 +62,9 @@ public:
 	} ;
 
 	ProjectRenderer(const OutputSettings& _os, ExportFileFormat _file_format, const QString& _out_file);
-	~ProjectRenderer() override = default;
+		~ProjectRenderer() override;
+		int progressPercent() const { return m_progress.load(); }
+		bool renderSucceeded() const { return m_succeeded.load(); }
 
 	bool isReady() const
 	{
@@ -90,8 +94,10 @@ private:
 
 	AudioFileDevice * m_fileDev;
 
-	volatile int m_progress;
-	volatile bool m_abort;
+		std::atomic_int m_progress;
+		std::atomic_bool m_abort;
+		std::atomic_bool m_succeeded{false};
+		bool m_deviceTransferred = false;
 
 } ;
 

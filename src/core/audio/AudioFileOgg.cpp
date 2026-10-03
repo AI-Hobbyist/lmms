@@ -74,19 +74,27 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 	}
 
 	vorbis_block_init(&m_vds, &m_vb);
-	successful = true;
+	m_initialized = true;
+	successful = outputFileOpened() && !hasWriteError();
 }
 
 AudioFileOgg::~AudioFileOgg()
 {
 	// writing 0 frames is how we flush any remaining data to the file
-	writeBuffer(nullptr, 0);
-
-	ogg_stream_clear(&m_oss);
-	vorbis_block_clear(&m_vb);
-	vorbis_dsp_clear(&m_vds);
-	vorbis_comment_clear(&m_vc);
+	finalize();
+	if (m_initialized)
+	{
+		ogg_stream_clear(&m_oss);
+		vorbis_block_clear(&m_vb);
+		vorbis_dsp_clear(&m_vds);
+		vorbis_comment_clear(&m_vc);
+	}
 	vorbis_info_clear(&m_vi);
+}
+
+void AudioFileOgg::finalize()
+{
+	if (m_initialized && !m_finalized) { writeBuffer(nullptr, 0); m_finalized = true; }
 }
 
 void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)

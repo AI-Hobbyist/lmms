@@ -132,6 +132,12 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 
 
 
+ProjectRenderer::~ProjectRenderer()
+{
+	// The audio engine owns the device after startProcessing transfers it.
+	if (!m_deviceTransferred) { delete m_fileDev; }
+}
+
 void ProjectRenderer::startProcessing()
 {
 
@@ -140,6 +146,8 @@ void ProjectRenderer::startProcessing()
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::audioEngine()->setAudioDevice(m_fileDev, false);
+		m_deviceTransferred = true;
+		Engine::getSong()->startExport();
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -155,7 +163,6 @@ void ProjectRenderer::run()
 {
 	PerfLogTimer perfLog("Project Render");
 
-	Engine::getSong()->startExport();
 	// Skip first empty buffer.
 	Engine::audioEngine()->renderNextPeriod();
 
@@ -169,12 +176,13 @@ void ProjectRenderer::run()
 	{
 		const auto buffer = Engine::audioEngine()->renderNextPeriod();
 		m_fileDev->writeBuffer(buffer.data(), buffer.size());
+		if (m_fileDev->hasWriteError()) { break; }
 
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)
 		{
 			m_progress = nprog;
-			emit progressChanged( m_progress );
+			emit progressChanged( m_progress.load() );
 		}
 	}
 
@@ -182,6 +190,8 @@ void ProjectRenderer::run()
 	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
+	m_fileDev->finalize();
+	m_succeeded = !m_abort.load() && !m_fileDev->hasWriteError();
 
 	perfLog.end();
 
@@ -219,8 +229,8 @@ void ProjectRenderer::updateConsoleProgress()
 
 	const auto activity = "|/-\\";
 	std::fill(buf.begin(), buf.end(), 0);
-	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
-							activity[rot] );
+	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress.load(),
+									activity[rot] );
 	rot = ( rot+1 ) % 4;
 
 	fprintf( stderr, "%s", buf.data() );

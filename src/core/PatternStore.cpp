@@ -83,6 +83,10 @@ void PatternStore::updateAfterTrackAdd()
 
 bar_t PatternStore::lengthOfPattern(int pattern) const
 {
+	if (auto* track = PatternTrack::findPatternTrack(pattern); track && track->explicitLengthBars() > 0)
+	{
+		return track->explicitLengthBars();
+	}
 	TimePos maxLength = TimePos::ticksPerBar();
 
 	const TrackList & tl = tracks();

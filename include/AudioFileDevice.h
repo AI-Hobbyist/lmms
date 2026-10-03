@@ -48,12 +48,15 @@ public:
 	}
 
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
+		bool hasWriteError() const { return m_writeFailed || m_outputFile.error() != QFileDevice::NoError; }
+		virtual void finalize() {}
 
 	//! Write `size` sample frames from `buf` into the output file.
 	virtual void writeBuffer(const SampleFrame* buf, const f_cnt_t frames) = 0;
 
 protected:
 	int writeData( const void* data, int len );
+		void reportWriteFailure() { m_writeFailed = true; }
 
 	inline bool outputFileOpened() const
 	{
@@ -71,6 +74,7 @@ private:
 
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
+		bool m_writeFailed = false;
 } ;
 
 using AudioFileDeviceInstantiaton

@@ -211,6 +211,19 @@ public:
 	}
 
 	bool setPlayMode(PlayMode mode, const Clip *clip = nullptr);
+	struct PlaybackState
+	{
+		PlayMode mode;
+		bool playing;
+		bool paused;
+		bool recording;
+		bool loopPreview;
+		const Clip* clip;
+	};
+	PlaybackState capturePlaybackState() const;
+	void restorePlaybackState(const PlaybackState& state);
+	bool exportLoop() const { return m_exportLoop; }
+	bool renderBetweenMarkers() const { return m_renderBetweenMarkers; }
 	const Clip *previewClip() const;
 	void stopPreviewOf(const Clip *clip);
 
@@ -287,6 +300,8 @@ public:
 	{
 		return m_modified;
 	}
+	// Restore the dirty flag after transient operations such as audio rendering.
+	void setModified(bool value);
 
 	QString nodeName() const override
 	{
@@ -422,8 +437,6 @@ private:
 
 	void processAutomations(const TrackList& tracks, TimePos timeStart, f_cnt_t frames);
 	void processMetronome(size_t bufferOffset);
-
-	void setModified(bool value);
 
 	void setProjectFileName(QString const & projectFileName);
 

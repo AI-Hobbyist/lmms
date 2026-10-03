@@ -107,7 +107,7 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 				buf[frame * channels() + chnl] = _ab[frame][chnl];
 			}
 		}
-		sf_writef_float( m_sf, buf, _frames );
+		if (sf_writef_float(m_sf, buf, _frames) != _frames) { reportWriteFailure(); }
 		delete[] buf;
 	}
 	else
@@ -115,7 +115,7 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 		auto buf = new int_sample_t[_frames * channels()];
 		convertToS16(_ab, _frames, buf, isBigEndian());
 
-		sf_writef_short( m_sf, buf, _frames );
+		if (sf_writef_short(m_sf, buf, _frames) != _frames) { reportWriteFailure(); }
 		delete[] buf;
 	}
 }
@@ -127,7 +127,8 @@ void AudioFileWave::finishEncoding()
 {
 	if( m_sf )
 	{
-		sf_close( m_sf );
+		if (sf_close(m_sf) != 0) { reportWriteFailure(); }
+		m_sf = nullptr;
 	}
 }
 

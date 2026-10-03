@@ -57,6 +57,7 @@ Track::Track(Type type, TrackContainer* tc)
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
+	connect(&m_soloModel, &AutomatableModel::dataChanged, this, &Track::toggleSolo, Qt::DirectConnection);
 }
 
 

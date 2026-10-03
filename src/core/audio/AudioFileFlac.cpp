@@ -65,20 +65,12 @@ bool AudioFileFlac::startEncoding()
 			m_sfinfo.format |= SF_FORMAT_PCM_16;
 	}
 
+	m_sf = sf_open_fd(outputFileHandle(), SFM_WRITE, &m_sfinfo, SF_FALSE);
+	if (!m_sf) { return false; }
 #ifdef LMMS_HAVE_SF_COMPLEVEL
 	double compression = getOutputSettings().getCompressionLevel();
 	sf_command(m_sf, SFC_SET_COMPRESSION_LEVEL, &compression, sizeof(double));
 #endif
-
-	m_sf = sf_open(
-#ifdef LMMS_BUILD_WIN32
-		outputFile().toLocal8Bit().constData(),
-#else
-		outputFile().toUtf8().constData(),
-#endif
-		SFM_WRITE,
-		&m_sfinfo
-	);
 
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
@@ -105,13 +97,13 @@ void AudioFileFlac::writeBuffer(const SampleFrame* _ab, f_cnt_t const frames)
 				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel]);
 			}
 		}
-		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
+		if (sf_writef_float(m_sf, buf.data(), frames) != frames) { reportWriteFailure(); }
 	}
 	else // integer PCM encoding
 	{
 		auto buf = std::vector<int_sample_t>(frames * channels());
 		convertToS16(_ab, frames, buf.data(), isBigEndian());
-		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
+		if (sf_writef_short(m_sf, buf.data(), frames) != frames) { reportWriteFailure(); }
 	}
 
 }
@@ -122,7 +114,8 @@ void AudioFileFlac::finishEncoding()
 	if (m_sf)
 	{
 		sf_write_sync(m_sf);
-		sf_close(m_sf);
+		if (sf_close(m_sf) != 0) { reportWriteFailure(); }
+		m_sf = nullptr;
 	}
 }
 

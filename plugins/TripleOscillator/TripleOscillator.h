@@ -119,6 +119,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 
 	QString nodeName() const override;
+	QMap<QString, AutomatableModel*> parameterModels() override;
 
 	float desiredReleaseTimeMs() const override
 	{

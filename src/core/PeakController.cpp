@@ -125,6 +125,11 @@ void PeakController::updateCoeffs()
 	m_coeffNeedsUpdate = true;
 }
 
+Effect* PeakController::effect() const
+{
+	return m_peakEffect;
+}
+
 
 void PeakController::handleDestroyedEffect()
 {

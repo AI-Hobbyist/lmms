@@ -4,6 +4,7 @@ set(LMMS_SRCS
 	agent/CommandBus.cpp
 	agent/CommandSchema.cpp
 	agent/CoreCommands.cpp
+	agent/ExportCommands.cpp
 
 	PARENT_SCOPE
 )

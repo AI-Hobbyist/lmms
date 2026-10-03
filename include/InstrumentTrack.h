@@ -208,6 +208,8 @@ public:
 	{
 		return m_arpeggio.m_arpEnabledModel.value();
 	}
+	InstrumentFunctionArpeggio* arpeggio() { return &m_arpeggio; }
+	InstrumentFunctionNoteStacking* noteStacking() { return &m_noteStacking; }
 
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( DataFile& dataFile );

@@ -26,6 +26,7 @@
 #define LMMS_INSTRUMENT_FUNCTIONS_H
 
 #include <array>
+#include <QMap>
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
@@ -60,6 +61,10 @@ private:
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );
+	QMap<QString, AutomatableModel*> parameterModels()
+	{
+		return {{"enabled", &m_chordsEnabledModel}, {"chord", &m_chordsModel}, {"range", &m_chordRangeModel}};
+	}
 	~InstrumentFunctionNoteStacking() override = default;
 
 	void processNote( NotePlayHandle* n );
@@ -187,6 +192,13 @@ public:
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
+	QMap<QString, AutomatableModel*> parameterModels()
+	{
+		return {{"enabled", &m_arpEnabledModel}, {"chord", &m_arpModel}, {"range", &m_arpRangeModel},
+			{"repeats", &m_arpRepeatsModel}, {"cycle", &m_arpCycleModel}, {"skip", &m_arpSkipModel},
+			{"miss", &m_arpMissModel}, {"time", &m_arpTimeModel}, {"gate", &m_arpGateModel},
+			{"direction", &m_arpDirectionModel}, {"mode", &m_arpModeModel}};
+	}
 	~InstrumentFunctionArpeggio() override = default;
 
 	void processNote( NotePlayHandle* n );

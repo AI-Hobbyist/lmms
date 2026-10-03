@@ -37,6 +37,10 @@
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 
+#ifdef WANT_AGENT
+#include "agent/ExportCommands.h"
+#endif
+
 namespace lmms
 {
 
@@ -94,6 +98,9 @@ void Engine::init( bool renderOnly )
 
 void Engine::destroy()
 {
+#ifdef WANT_AGENT
+	agent::shutdownAudioExports();
+#endif
 	s_projectJournal->stopAllJournalling();
 	s_audioEngine->stopProcessing();
 

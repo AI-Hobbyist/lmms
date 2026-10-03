@@ -27,6 +27,7 @@
 #define LMMS_INSTRUMENT_H
 
 #include <QString>
+#include <QMap>
 
 #include "Flags.h"
 #include "lmms_export.h"
@@ -74,6 +75,8 @@ public:
 	// --------------------------------------------------------------------
 
 	virtual bool hasNoteInput() const { return true; }
+	// Keys match saved parameter names; empty maps retain serialized-state access.
+	virtual QMap<QString, AutomatableModel*> parameterModels() { return {}; }
 
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its

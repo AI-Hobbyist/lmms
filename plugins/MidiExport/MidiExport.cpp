@@ -35,6 +35,8 @@
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "PatternTrack.h"
+#include "PatternStore.h"
+#include "Engine.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -164,11 +166,21 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	// Count number of instrument (and PatternStore) tracks
 	const auto numTracks = std::ranges::count_if(tracks, [](const Track* t) {
 		return t->type() == Track::Type::Instrument;
-	}) + patternStoreTracks.size();
+	}) + std::ranges::count_if(patternStoreTracks, [](const Track* t) {
+		return t->type() == Track::Type::Instrument;
+	});
+	if (numTracks > 65535) { return false; }
+	m_channel = 0;
+	m_plists.clear();
 
 	// Write header info
-	auto file = MidiFile(filePath, numTracks);
+	auto file = MidiFile(filePath, std::max<std::size_t>(1, numTracks));
 	file.m_header.writeToBuffer();
+	if (numTracks == 0)
+	{
+		file.m_tracks[0].addTempo(tempo, 0);
+		file.m_tracks[0].writeToBuffer();
+	}
 
 	// Iterate through "normal" tracks
 	std::size_t trackIdx = 0;
@@ -189,14 +201,14 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	for (Track* track : patternStoreTracks)
 	{
 		assert(track != nullptr);
-		processTrack(*track, file.m_tracks[trackIdx++], tempo, masterPitch, true);
+		if (track->type() == Track::Type::Instrument)
+		{
+			processTrack(*track, file.m_tracks[trackIdx++], tempo, masterPitch, true);
+		}
 	}
 
 	// Write all buffered data to stream
-	file.writeAllToStream();
-
-	// Always returns success... for now?
-	return true;
+	return file.writeAllToStream();
 }
 
 void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
@@ -210,7 +222,8 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 	// Note that this only works decently if the current bank is a GM 1~128 one
 	// (which would be needed as the default either way for successful import).
 	// Pattern tracks are always bank 128 (see MidiImport), patch 0.
-	auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{});
+	const auto* instrument = instTrack.instrument();
+	auto patch = instrument ? instrument->midiPatch().value_or(MidiPatch{}) : MidiPatch{};
 	if (patch.bank == 128)
 	{
 		// Drum track, so set its channel to 10
@@ -245,7 +258,7 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 		trackElem.attribute("volume", "100")) / 100.0;
 
 	// ---- Clips ---- //
-	std::uint8_t patternId = 0;
+	std::size_t patternId = 0;
 	for (QDomNode clipNode = root.firstChildElement("midiclip");
 		!clipNode.isNull();
 		clipNode = clipNode.nextSiblingElement("midiclip"))
@@ -280,11 +293,14 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 }
 
 void MidiExport::writePatternClip(Clip& clip, const QDomElement& clipElem,
-	std::uint8_t patternIdx, MidiFile::Track& midiTrack)
+	std::size_t patternIdx, MidiFile::Track& midiTrack)
 {
+	Q_UNUSED(clipElem)
 	// Workaround for nested PatternClips
 	tick_t pos = 0;
-	tick_t len = 12 * clipElem.attribute("steps", "1").toInt();
+	if (patternIdx >= m_plists.size()) { return; }
+	tick_t len = Engine::patternStore()->lengthOfPattern(static_cast<int>(patternIdx)) * TimePos::ticksPerBar();
+	if (len <= 0) { return; }
 
 	// Iterate through PatternClip pairs of current list
 	// TODO: This *may* need some corrections?

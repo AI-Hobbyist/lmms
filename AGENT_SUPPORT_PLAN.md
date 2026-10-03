@@ -1,7 +1,7 @@
 # LMMS Agent 支持计划书
 
-> **文档状态**：v0.5（A0~A2 已补齐并验收，记录见 §10.2；阶段二为可选启停的本机 HTTP MCP 服务器）
-> **编写日期**：2026-09-12（v0.5 修订：2026-10-03）
+> **文档状态**：v0.6（A0~A2 已补齐并验收，记录见 §10.2；阶段二仅保留可选启停的本机 HTTP MCP 服务器，范围精简见 §8.5）
+> **编写日期**：2026-09-12（v0.6 修订：2026-10-03）
 > **适用代码库**：LMMS 1.3.0-alpha（本工作区，分支 `master`）
 > **勘察依据**：CodeGraph 符号级检索 + 源码核对（文中行号为编写时快照，可能随上游提交漂移）
 > **目标一句话**：把 **LMMS 全部可操作 API** 封装成统一命令接口，供脚本调用，并通过**可选开启/关闭的 HTTP MCP 服务器**向外部 Agent 暴露工具；模型连接与会话编排由外部 MCP 客户端负责，LMMS 仅提供命令执行和服务管理。
@@ -170,7 +170,7 @@ CMake：阶段一 `WANT_AGENT` 开关的描述统一为 `Include Agent command A
 ### 4.1 设计原则
 
 1. **一切皆命令**：每个 API = 一个具名命令 + JSON 参数 + JSON 结果，纯数据、可序列化、可回放。
-2. **读改分离**：`query.*` 只读（LLM 上下文），其余为变更（带事务）。
+2. **读改分离**：描述符声明只读或变更；`query.*` 为只读查询，工程变更使用事务，播放与文件输出按各自副作用处理。
 3. **变更可撤销**：所有写命令经 `ProjectJournal` checkpoint 包裹；一个"批次"= 一次撤销单位。
 4. **可预览（dryRun）**：写命令支持 `dryRun:true`，返回"将发生什么"的结构化 diff。
 5. **稳定命名**：`域.动作`（如 `midi.addNotes`），命名一旦发布即冻结，供模型/脚本长期记忆。
@@ -187,7 +187,7 @@ enum class TxScope    { None, Single, Batch };               // 撤销粒度
 
 struct CommandDescriptor {
     QString      name;         // "midi.addNotes"
-    QString      summary;      // 一句话说明（进 system prompt 与帮助）
+    QString      summary;      // 一句话说明（MCP 工具描述与本地帮助）
     QJsonObject  argsSchema;   // JSON Schema（生成 MCP 工具定义 / 脚本校验 / 文档）
     Mutability   mutability;
     TxScope      scope;
@@ -228,13 +228,13 @@ public:
 | `history.*` | `ProjectJournal` | `history.undo` `history.redo` |
 | `export.*` | `ProjectRenderer`、`OutputSettings`、`MidiExport` | `export.audio` `export.midi` |
 | `import.*` | `MidiImport`、`HydrogenImport`、采样导入路径 | `import.midi` `import.sampleToTrack` |
-| `query.*` | 全模型只读摘要（供 LLM 上下文） | `query.songSummary` `query.trackDetail` |
+| `query.*` | 全模型只读摘要（供调用方查询） | `query.songSummary` `query.trackDetail` |
 | `config.*` | `ConfigManager` | `config.get` `config.set` |
 | `compose.*` / `edit.*` / `mix.*` | **高层组合命令**（内部即预置脚本，见 §5.3） | `compose.chordProgression` `edit.humanize` |
 
 完整命令清单见 [附录 C](#附录-c完整命令清单)。
 
-### 4.4 稳定寻址方案（LLM 与脚本共用）
+### 4.4 稳定寻址方案（外部客户端与脚本共用）
 
 - 轨道参数接受容器内索引、唯一名称（如 `Lead Synth`），或查询返回的 `song/track:<i>` / `pattern/track:<i>` 路径；`parent` 默认 `song`，路径携带容器。名称重复时必须使用索引或路径；编辑后由 `query.*` 刷新。
 - Clip 参数接受轨道内索引；查询返回 `song/track:<i>/clip:<j>` 或 `pattern/track:<i>/clip:<j>` 路径。路径与索引随当前排序更新，不作为永久 ID。
@@ -253,8 +253,8 @@ public:
 | 级别 | 方案 | 优点 | 缺点 | 采用阶段 |
 |------|------|------|------|----------|
 | L1 | **序列化通道**：临时 `QDomDocument` → `controls()->saveState(doc, elem)` → 遍历 XML 键值得到参数名/当前值；`setParam` 走 `loadSettings` 的等价流程 | 零侵入、对全部既有插件立即生效 | 无范围/类型/单位，值语义为原始值 | **A2**（随 `effect.*`/`instrument.*` 参数命令落地） |
-| L2 | 为 `EffectControls` 增加**可选接口**：`virtual QStringList paramNames()/AutomatableModel* paramAt(int)`；优先给自带效果与常用插件实现，未实现者回退 L1 | 有范围/类型/中心值（可做归一化与自动化） | 需逐个插件补实现 | A3~A4（覆盖审计阶段补齐常用插件） |
-| L3 | 长期：把参数元数据注册进 `Plugin::Descriptor`（name/range/default/unit），自动生成 UI、LLM schema 与文档 | 一次到位 | 上游工作量大 | 社区/后续版本 |
+| L2 | 为 `EffectControls` 与 `Instrument` 增加**可选接口**：`virtual QMap<QString, AutomatableModel*> parameterModels()`，键沿用原生存储名称；优先给自带效果与常用插件实现，未实现者回退 L1 | 有范围/类型/中心值、稳定模型路径，可校验与自动化 | 需逐个插件补实现 | A3~A4（覆盖审计阶段补齐常用插件） |
+| L3 | 长期：把参数元数据注册进 `Plugin::Descriptor`（name/range/default/unit），生成参数 schema 与文档 | 统一元数据 | 上游工作量大 | 社区/后续版本，不属 MCP 交付要求 |
 
 ### 4.6 事务与撤销语义
 
@@ -265,7 +265,7 @@ public:
 
 ### 4.7 命令示例
 
-工具调用（LLM → 系统）：
+命令调用（外部客户端或本地脚本 → 命令总线）：
 
 ```json
 { "name": "track.create",
@@ -308,7 +308,7 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 
 ### 5.3 高层编曲工具 = 预置脚本
 
-为提升 LLM 成功率与音乐性，提供"粗粒度"工具；**它们不重复实现**，而是执行内置脚本（§6），例如：
+为方便批量编曲，提供高层工具；**它们不重复实现**，而是执行内置脚本（§6），例如：
 
 | 工具 | 行为（脚本组合） |
 |------|------------------|
@@ -320,11 +320,11 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 | `edit.quantize` | 网格量化（复用 `PianoRoll` 量化值域 `Quantizations[]`，`include/Editor.h:35`） |
 | `arrange.duplicateSection` | 复制小节区间（含全部轨道裁剪/平移），生成 verse→chorus |
 | `mix.gainStaging` | 按目标峰值批量设置通道音量 + 预留 headroom |
-| `render.preview` | 渲染区间到临时 WAV 并播放（试听闭环） |
+| `render.preview` | 渲染区间到临时 WAV，返回文件路径与任务状态，由调用方播放 |
 
 ### 5.4 脚本入口与可选辅助工具
 
-`agent.runScript(script)` 与 `agent.diffPreview(commands)` 提供脚本执行和批量预览。MCP 工具目录统一使用 `tools/list`；`agent.listCommands/searchCommands/commandHelp` 仅作为可选本地辅助接口，不列为 MCP 首期必需工具。`agent.getContext` 可由现有 `query.*` 组合替代。
+`agent.runScript(script)` 提供脚本执行，使用 `dryRun:true` 返回批量预览。`agent.diffPreview(commands)` 可作为本地包装。MCP 工具目录统一使用 `tools/list`；`agent.listCommands/searchCommands/commandHelp` 仅作为可选本地辅助接口，不列为 MCP 首期必需工具。`agent.getContext` 可由现有 `query.*` 组合替代。
 
 ---
 
@@ -369,14 +369,14 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 - 数值表达式：`+ - * / %`、括号、比较与布尔运算（**内置极小子集实现，零依赖**）；变量 `$name`；
 - 音乐字面量：音符名 `"C4"`、时值 `"1/4"|"1/8t"`、位置 `"bar:3.2"`（第 3 小节第 2 拍）、`"step:7"`；
 - 随机与选择：`random(a,b)`、`pick([...])`、`shuffle([...])`（带 seed）；
-- （可选）如需更强表达式：仓库内已有 exprtk（`plugins/Xpressive/exprtk`，属 Xpressive 插件子模块）——若采用，建议先将其提升为公共 3rdparty 或仅复用其头；**默认方案仍为内置子集**，避免耦合。
+- 表达式仅实现上述内置子集；不引入 exprtk、通用脚本 VM 或额外语言绑定。
 
 ### 6.4 执行语义
 
 | 语义 | 规则 |
 |------|------|
 | 事务 | 整个脚本 = 一个批次（一次撤销单位）；`dryRun` 时不落盘、只返回 diff |
-| 错误 | 任一步失败 → 回滚批次并返回失败步号与错误详情（供 LLM 自愈重试） |
+| 错误 | 任一步失败 → 回滚批次并返回失败步号与错误详情，由调用方决定后续操作 |
 | 上限 | 总步数 ≤ 20000；单循环 ≤ 512；`midi.addNotes` 单次 ≤ 4096 音符 |
 | 诊断 | 记录执行错误、失败步号与必要耗时；长任务状态通过查询接口提供 |
 | 可复现 | 脚本与执行结果保留 `seed` 和 LMMS 版本 |
@@ -479,10 +479,15 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 | 资源/提示词/sampling/订阅、SSE 推送与断线续传 | 后续按需求增加 | 首期只需要 tools 和任务查询 |
 | `agent.listCommands/searchCommands/commandHelp` | 可选本地辅助，不重复暴露为 MCP 必需工具 | `tools/list` 已提供工具目录和参数说明 |
 | `agent.getContext` | 可选别名 | 已有 `query.songSummary/trackDetail/clipDetail` |
+| `agent.diffPreview` | 可选本地辅助 | MCP 调用使用命令或 `agent.runScript` 的 `dryRun`，无需另建预览协议 |
+| 提示词模板、对话记忆、模型上下文预算与自动纠错循环 | 移除 | 客户端负责模型与对话编排，服务只返回查询数据和错误 |
+| 临时音频自动播放、播放器界面与媒体推送通道 | 不纳入 MCP 服务 | 预览返回本机文件路径与任务状态，由客户端或用户选择播放 |
 | 编曲脚本与高层工具 | 保留 API 能力 | 属于音乐功能，不是额外联网设施 |
 | HTTP 端点、初始化、tools/list/call、结果/错误映射 | 保留 | MCP 客户端连接和调用所需 |
 | 参数校验、主线程队列、事务/撤销、任务查询/取消 | 保留 | 保证工程操作正确且可恢复 |
 | 本机绑定、Origin/Host 校验、轻量令牌 | 保留 | 本机 HTTP 连接的基本边界与保护 |
+
+MCP 首期暴露业务命令与 `agent.runScript`。本地帮助、上下文别名和独立 diff 包装可继续供脚本使用，但不作为 MCP 必需工具重复注册；工具目录以 `tools/list` 为准，预览沿用 `dryRun`，上下文沿用 `query.*`。这些精简只调整服务入口，不删除音乐编辑 API、脚本执行、事务或导出能力。
 
 ---
 
@@ -554,6 +559,16 @@ LMMS 负责参数校验、主线程执行、失败回滚、撤销和明确错误
 - **A2 验收**：MSVC Release / Qt 6.10.3 重新编译相关七个测试目标，CTest **7/7 passed**；`WANT_AGENT=OFF` 重新构建，`AutomatableModelTest` **1/1 passed**。原生 `amplifier/ladspaeffect/CMT` 集成验证子插件键校验、L1 参数与效果排序、dryRun 和撤销/重做；真实乐器 DLL 集成测试同步通过，两组各 **3 passed、0 failed、0 skipped**（含初始化与清理）。默认 CTest 跳过原生 DLL 用例，由独立集成运行补足。
 - **预览与诊断收尾**：dryRun 从快照到回滚持续持有音频修改锁，防止渲染线程读取临时模型；精确播放位置断言在同一锁内比较，避免正常音频推进造成偶发失败。`CommandBusTest` 连续 **100 次通过**。CTest 保留终端输出并写入 `build/tests/*-results.txt`，补足 Windows 下 QtTest 输出不转发时的失败诊断；所有构建和测试按 AGENTS.md 使用前台 PowerShell 与 `build.log`。
 
+**A3 验收记录（2026-10-04）**：
+
+- 已补 Pattern 创建/插入/删除/显式长度与歌曲引用、LFO/MIDI/Peak 控制器入口、乐器预设/MIDI 端口/琶音/和弦堆叠/琴键入口、工程音阶与音符吸附；Pattern 显式长度进入工程序列化，轨道排序同步 Pattern 列。控制器连接、删除、dryRun 和撤销恢复均已验证；真实预设加载、Peak 效果及其参数通过原生 DLL 集成用例。
+- 已补 `config.get/set`、`import.sampleToTrack`、`import.midi/hydrogen` 和 `export.midi`。配置值采用 `ConfigManager` 的字符串格式，修改不加入工程撤销、不允许在项目批次内执行，也不开放 `agentMcp` 连接配置。采样建轨和解码为一个可回滚事务；MIDI 导入可指定已有乐器轨道，各通道合入该轨道，原生全局速度/拍号自动化保留。
+- 原生导入增加无对话框入口；非交互 MIDI 导入不处理嵌套 GUI 事件。Hydrogen 修复无效乐器引用、空 Pattern 和首个 Pattern 重复创建；MIDI 导出过滤 PatternStore 的采样/自动化轨道，使用实际 Pattern 长度，处理未加载乐器和写文件失败。命令导出先生成临时文件，成功后提交；覆盖已有文件需 `overwrite:true`，不允许在项目批次内执行。
+- 已补 `export.audio/status/cancel`：复用原生渲染线程，临时输出成功后提交，取消/失败保留原文件；最多保留 64 个任务。任务期间拒绝工程修改，主线程在完成、取消和引擎关闭时回收线程并恢复音频设备、播放状态、时间线及循环设置。WAV/FLAC/OGG/MP3 均通过解码、实际音频及循环时长验证；编码器返回写入和封装错误，FLAC 使用文件句柄支持中文路径。
+- L2 已覆盖 TripleOscillator、AudioFileProcessor、Amplifier、Peak Controller，提供类型、范围、步长、中心值与 `.../params/<原生参数名>` 模型路径；可用于 `model.*`、自动化和控制器连接。未实现反射的插件及非模型文件参数保留 L1 通道。L2 拒绝错误类型、整数小数值和越界值。
+- 覆盖审计将附录 C 的 A1～A3 展开为 **136 个命令**：运行时注册逐项检查，测试源内 136/136 均有显式调用；这表示命令覆盖，不表示源码行覆盖。补充用例发现并修复停止状态的位置查询及依赖 GUI 的 solo 联动；验证工程保存/重载、选区 humanize seed 重现、覆盖控制和外部写入不泄漏到失败事务。原生 MIDI 文件导入支持 Song 主轨和其已有乐器目标；Pattern 行通过 `midi.*` 填充，拒绝把歌曲级 MIDI 导入到 Pattern 容器。
+- 最终 MSVC Release / Qt 6.10.3 重编译七组回归 **7/7 passed**；真实 DLL 的原生 A3 集成 **21 passed / 0 failed / 0 skipped**（含初始化与清理），A1 乐器插件及 A2 效果/LADSPA 集成各 **3 passed / 0 failed / 0 skipped**。`WANT_AGENT=OFF` 主程序构建通过，生成目标中无 Agent 源码与测试，`AutomatableModelTest` **1/1 passed**。A3 单独提交；A4 工具层和脚本验收另行实施。
+
 ### 10.3 阶段二：可选 HTTP MCP 服务器（子里程碑 B0~B4）
 
 | 子里程碑 | 内容 | 交付物 | 验收标准 | 预估 |
@@ -620,7 +635,7 @@ flowchart LR
 | 循环标记不在核心模型 | `transport.setLoopRange` 无法持久化 | 核心化改造（小改动、上游友好）或先经 `SongEditor` 桥接 |
 | 撤销粒度与批次冲突 | 一次撤销吃掉多步 | 批次 checkpoint + 深度标记；测试覆盖嵌套批次 |
 | 大工程上下文超限 | 模型看不到全貌 | `query.*` 分页 + 摘要化；只回传必要字段 |
-| 模型幻觉调用不存在命令 | 执行失败 | 严格 schema 校验 + 错误 hint 回传 + `agent.searchCommands` 自愈重试 |
+| 调用不存在的命令 | 执行失败 | 工具目录与 schema 来自命令注册表；返回明确错误，由客户端查询 `tools/list` 后修正 |
 | 长时间导出阻塞 | UI 卡顿 | 复用 `ProjectRenderer` 线程 + 进度轮询 + 取消 |
 | Qt5/Qt6 双版本 | 构建差异 | 只用两版共有 API；`Network` 组件两版一致；CI 覆盖 |
 | 音频线程与编辑竞争 | 崩溃/爆音 | 统一主线程 + `requestChangeInModel/doneChangeInModel` + 锁策略沿用现有代码 |
@@ -659,7 +674,7 @@ flowchart LR
 | `song.setPlayMode` | 播放模式（Song/Pattern/MidiClip/AutomationClip） | `mode` | A1 |
 | `song.clearProject` | 清空工程（客户端确认） | — | A3 |
 | `song.load` | 载入 `.mmp/.mpt` | `path`,`promptSave` | A3 |
-| `song.save` | 保存工程（含 bundle 选项） | `path?`,`asBundle?` | A3 |
+| `song.save` | 保存工程（含 bundle 选项）；另存覆盖需显式指定 | `path?`,`asBundle?`,`overwrite?` | A3 |
 | `transport.play` | 开始播放 | `mode?`,`fromBar?` | A1 |
 | `transport.stop` | 停止 | — | A1 |
 | `transport.togglePause` | 暂停/继续 | — | A1 |
@@ -682,9 +697,9 @@ flowchart LR
 | `instrument.load` | 加载乐器（`loadInstrument()`） | `track`,`plugin`,`subKey?`（子插件宿主必填）、`path?` | A1 |
 | `instrument.getParams/setParam` | 乐器参数（§4.5） | `track`,`name`,`value` | A2 |
 | `instrument.setVolume/setPanning/setPitch/setPitchRange/setBaseNote` | 轨道级乐器参数 | `track`,`value` | A1 |
-| `instrument.loadPreset/savePreset` | 预设管理 | `track`,`path` | A3 |
-| `instrument.setMidiIn/Out` | MIDI 端口 | `track`,`port?`,`channel?` | A3 |
-| `instrument.setArpeggio/NoteStacking/Piano` | 轨道内建 MIDI 处理器 | `track`,`enabled`,`params` | A3 |
+| `instrument.loadPreset/savePreset` | 预设管理；写入覆盖需显式指定 | `track`,`path`,`overwrite?` | A3 |
+| `instrument.setMidiIn/setMidiOut` | MIDI 端口 | `track`,`port?`,`channel?` | A3 |
+| `instrument.setArpeggio/setNoteStacking/setPiano` | 轨道内建 MIDI 处理器 | `track`,`enabled`,`params` | A3 |
 
 `instrument.setPitch` 的 `value` 与组合参数 `pitch` 均以 cents 为单位（100 cents = 1 半音），受当前 `pitchRange` 限制；`pitchRange` 以半音为单位，范围 1～60。所有轨道级单参数命令均保留 `parent` 寻址。
 
@@ -706,7 +721,7 @@ flowchart LR
 | `midi.humanize` | 时间/力度/微调抖动（seed） | `timing`,`velocity`,`detune`,`seed` | A3 |
 | `midi.setSteps/setClipType` | 步进/Clip 类型（Beat/Melody） | `steps`/`type` | A3 |
 | `sample.setFile` | 采样文件（`setSampleFile()`） | `track`,`clip`,`path` | A3 |
-| `sample.setReversed/setOffset` | 反转/帧偏移 | `value` | A3 |
+| `sample.setReversed/setOffset` | 反转/Clip 起始偏移（ticks，沿用原生 SampleClip） | `value` | A3 |
 | `sample.getInfo` | 采样信息（时长/采样率/峰值） | — | A3 |
 
 **pattern / automation / model**
@@ -758,13 +773,13 @@ flowchart LR
 | `history.status` | canUndo/canRedo/深度 | — | A1 |
 | `history.rollbackBatch` | 回滚当前批次 | — | A1 |
 | `export.audio` | 导出音频（`ProjectRenderer`：WAV/OGG/MP3/FLAC） | `path`,`format`,`quality`,`range?`,`loopCount?` | A3 |
-| `export.midi` | 导出 MIDI（复用 `plugins/MidiExport`） | `path` | A3 |
+| `export.midi` | 导出 MIDI（复用 `plugins/MidiExport`），文件输出不属于工程撤销 | `path`,`overwrite?` | A3 |
 | `export.status/cancel` | 进度/取消 | — | A3 |
 | `import.midi` | 导入 MIDI（复用 `plugins/MidiImport`） | `path`,`track?` | A3 |
 | `import.hydrogen` | 导入 Hydrogen 鼓机工程 | `path` | A3 |
 | `import.sampleToTrack` | 采样建轨/Clip | `path`,`track?` | A3 |
-| `config.get/set` | `ConfigManager` 读写 | `group`,`key`,`value` | A3 |
-| `query.songSummary` | LLM 上下文摘要（紧凑 JSON） | `detail?` | A1 |
+| `config.get/set` | `ConfigManager` 字符串读写；配置不属于工程撤销，部分设置需重启，MCP 连接配置不开放 | `group`,`key`,`value`（字符串） | A3 |
+| `query.songSummary` | 工程摘要（紧凑 JSON） | `detail?` | A1 |
 | `query.trackDetail` | 单轨详情（含 Clip/参数/效果） | `track` | A1 |
 | `query.clipDetail` | 单 Clip 详情（音符统计等） | `track`,`clip` | A1 |
 | `query.notes` | 音符分页查询 | `track`,`clip`,`page` | A1 |
@@ -786,7 +801,7 @@ flowchart LR
 | `arrange.duplicateSection` | 复制小节区间（全轨） | `fromBar`,`toBar`,`to` | A4 |
 | `arrange.insertBars/deleteBars` | 增删小节（全轨平移） | `bar`,`count` | A4 |
 | `mix.gainStaging` | 音量/headroom 批处理 | `targetPeak` | A4 |
-| `render.preview` | 渲染区间到临时 WAV 并播放；返回文件与任务信息供外部客户端展示 | `fromBar`,`toBar` | A4（MCP 试听/导出联调属 B4） |
+| `render.preview` | 渲染区间到临时 WAV，返回本机文件路径与任务信息，调用方自行播放 | `fromBar`,`toBar` | A4（MCP 试听/导出联调属 B4） |
 
 **agent（元工具）**
 
@@ -794,7 +809,7 @@ flowchart LR
 |------|------|
 | `agent.listCommands` / `agent.searchCommands` / `agent.commandHelp` | 可选本地辅助；MCP 已有 `tools/list`，不计为首期必需工具 |
 | `agent.runScript` | 执行脚本 IR（含 `dryRun`） |
-| `agent.diffPreview` | 预览一组命令的结构化 diff |
+| `agent.diffPreview` | 可选本地包装；预览一组命令的结构化 diff，MCP 使用 `agent.runScript(dryRun:true)` |
 | `agent.getContext` | 可选摘要别名，可由 `query.*` 替代 |
 
 ---

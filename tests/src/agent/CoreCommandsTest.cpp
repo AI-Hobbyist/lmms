@@ -77,7 +77,7 @@ private slots:
 		lmms::Engine::getSong()->stop();
 	}
 
-	void registersThePlannedA1AndA2Commands()
+	void registersThePlannedA1ThroughA3Commands()
 	{
 		QStringList names;
 		for( const auto &descriptor : lmms::agent::CommandBus::instance().descriptors() ) { names.append( descriptor.name ); }
@@ -87,7 +87,7 @@ private slots:
 		for( auto line : QString::fromUtf8( plan.readAll() ).split( '\n' ) )
 		{
 			line = line.trimmed();
-			if( !line.endsWith( "| A1 |" ) && !line.endsWith( "| A2 |" ) ) { continue; }
+			if( !line.endsWith( "| A1 |" ) && !line.endsWith( "| A2 |" ) && !line.endsWith( "| A3 |" ) ) { continue; }
 			const auto column = line.split( '|' )[1].remove( '`' ).trimmed();
 			const auto prefix = column.section( '.', 0, 0 );
 			for( auto name : column.split( '/' ) )
@@ -98,7 +98,7 @@ private slots:
 				++checked;
 			}
 		}
-		QVERIFY2( checked >= 92, "The A1/A2 appendix must be included in the command audit." );
+		QVERIFY2( checked >= 130, "The A1/A2/A3 appendix must be included in the command audit." );
 	}
 
 	void writesInstrumentParametersInNativeUnitsAndPatternContainer()

@@ -540,6 +540,25 @@ const Clip *Song::previewClip() const
 	return nullptr;
 }
 
+Song::PlaybackState Song::capturePlaybackState() const
+{
+	return {m_playMode, m_playing, m_paused, m_recording, m_loopMidiClip, previewClip()};
+}
+
+void Song::restorePlaybackState(const PlaybackState& state)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	m_playMode = state.mode;
+	m_playing = state.playing;
+	m_paused = state.paused;
+	m_recording = state.recording;
+	m_loopMidiClip = state.loopPreview;
+	m_midiClipToPlay = state.mode == PlayMode::MidiClip ? dynamic_cast<const MidiClip*>(state.clip) : nullptr;
+	m_automationClipToPlay = state.mode == PlayMode::AutomationClip ? dynamic_cast<const AutomationClip*>(state.clip) : nullptr;
+	m_vstSyncController.setPlaybackState(m_playing && !m_paused);
+	emit playbackStateChanged();
+}
+
 void Song::stopPreviewOf(const Clip *clip)
 {
 	if (clip && previewClip() == clip) { stop(); }

@@ -31,6 +31,7 @@
 #include "ControllerDialog.h"
 #include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
+#include <QMap>
 
 namespace lmms
 {
@@ -59,6 +60,11 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
+	QMap<QString, AutomatableModel*> parameterModels()
+	{
+		return {{"base", &m_baseModel}, {"speed", &m_speedModel}, {"amount", &m_amountModel},
+			{"phase", &m_phaseModel}, {"wave", &m_waveModel}, {"multiplier", &m_multiplierModel}};
+	}
 
 
 public slots:

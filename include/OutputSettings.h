@@ -80,6 +80,8 @@ public:
 
 
 	double getCompressionLevel() const{ return m_compressionLevel; }
+		bool interactiveErrors() const { return m_interactiveErrors; }
+		void setInteractiveErrors(bool interactive) { m_interactiveErrors = interactive; }
 	void setCompressionLevel(double level){
 		// legal range is 0.0 to 1.0.
 		m_compressionLevel = level;
@@ -91,6 +93,7 @@ private:
 	BitDepth m_bitDepth;
 	StereoMode m_stereoMode;
 	double m_compressionLevel;
+		bool m_interactiveErrors = true;
 };
 
 

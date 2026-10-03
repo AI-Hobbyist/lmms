@@ -74,6 +74,12 @@ public:
 	IntModel & loopModel() { return m_loopModel; }
 	BoolModel & stutterModel() { return m_stutterModel; }
 	ComboBoxModel & interpolationModel() { return m_interpolationModel; }
+	QMap<QString, AutomatableModel*> parameterModels() override
+	{
+		return {{"amp", &m_ampModel}, {"sframe", &m_startPointModel}, {"eframe", &m_endPointModel},
+			{"lframe", &m_loopPointModel}, {"reversed", &m_reverseModel}, {"looped", &m_loopModel},
+			{"stutter", &m_stutterModel}, {"interp", &m_interpolationModel}};
+	}
 
 
 public slots:

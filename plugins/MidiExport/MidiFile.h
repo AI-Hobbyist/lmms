@@ -235,7 +235,7 @@ public:
 	MidiFile(const std::filesystem::path& file, std::size_t numTracks);
 
 	//! Write all data (both header and tracks) to stream
-	void writeAllToStream();
+	bool writeAllToStream();
 
 private:
 	//! Write-only data stream
