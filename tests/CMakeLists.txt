@@ -23,7 +23,7 @@ if(WANT_AGENT)
 endif()
 
 if(WANT_AGENT_MCP)
-	list(APPEND LMMS_TESTS src/agent/mcp/McpServerLifecycleTest.cpp)
+	list(APPEND LMMS_TESTS src/agent/mcp/McpServerLifecycleTest.cpp src/agent/mcp/McpProtocolTest.cpp)
 endif()
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)

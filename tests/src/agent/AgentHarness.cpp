@@ -9,6 +9,11 @@
 #include "agent/ScriptRunner.h"
 #include "agent/ToolRegistry.h"
 #include "Engine.h"
+#include "lmmsconfig.h"
+#ifdef WANT_AGENT_MCP
+#include "agent/mcp/HttpMcpServer.h"
+#include <QTimer>
+#endif
 
 using namespace lmms::agent;
 int main(int argc, char** argv)
@@ -30,6 +35,22 @@ int main(int argc, char** argv)
 		const int index = args.indexOf(name);
 		return index >= 0 && index + 1 < args.size() ? args[index + 1] : QString();
 	};
+#ifdef WANT_AGENT_MCP
+	if (args.contains("--mcp"))
+	{
+		bool valid = true;
+		const int duration = option("--duration").toInt(&valid);
+		if (!valid || duration < 1 || duration > 3600) { error << "--mcp requires --duration 1..3600 seconds.\n"; return 2; }
+		lmms::Engine::init(true);
+		auto& server = lmms::agent::mcp::service();
+		if (!server.start()) { error << server.errorString() << '\n'; lmms::Engine::destroy(); return 1; }
+		output << server.endpoint() << '\n'; output.flush();
+		QTimer::singleShot(duration * 1000, &application, &QCoreApplication::quit);
+		const int result = application.exec();
+		lmms::Engine::destroy();
+		return result;
+	}
+#endif
 	QJsonObject script;
 	if (args.contains("--script"))
 	{

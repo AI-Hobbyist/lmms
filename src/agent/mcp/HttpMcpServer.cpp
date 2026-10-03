@@ -1,4 +1,5 @@
 #include "agent/mcp/HttpMcpServer.h"
+#include "agent/mcp/McpProtocol.h"
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QJsonDocument>
@@ -162,6 +163,15 @@ struct HttpMcpServer::Impl
 		client->dispatched = true;
 		client->timer->stop();
 		client->request.body = std::move(client->pending);
+		if (handler)
+		{
+			const unsigned int current = generation;
+			const QPointer<HttpMcpServer> guard(owner);
+			handler(client->request, [this, guard, current, client](HttpResponse response) {
+				if (guard && current == generation && state == State::Running) { send(client, std::move(response)); }
+			});
+			return;
+		}
 		if (client->request.path != "/mcp") { send(client, error(404, "Use the /mcp endpoint.")); return; }
 		if (client->request.method == "GET")
 		{
@@ -170,12 +180,7 @@ struct HttpMcpServer::Impl
 			send(client, response); return;
 		}
 		if (client->request.method != "POST") { send(client, error(405, "Use POST.")); return; }
-		if (!handler) { send(client, error(501, "MCP protocol handling is not connected.")); return; }
-		const unsigned int current = generation;
-		const QPointer<HttpMcpServer> guard(owner);
-		handler(client->request, [this, guard, current, client](HttpResponse response) {
-			if (guard && current == generation && state == State::Running) { send(client, std::move(response)); }
-		});
+		send(client, error(501, "MCP protocol handling is not connected."));
 	}
 	void stop()
 	{
@@ -219,7 +224,11 @@ int HttpMcpServer::connectionCount() const { return m_impl->clients.size(); }
 void HttpMcpServer::setHandler(Handler handler) { m_impl->handler = std::move(handler); }
 HttpMcpServer& service()
 {
-	if (!globalService) { globalService = std::make_unique<HttpMcpServer>(); }
+	if (!globalService)
+	{
+		globalService = std::make_unique<HttpMcpServer>();
+		new McpProtocol(*globalService);
+	}
 	return *globalService;
 }
 void shutdownService() { globalService.reset(); }

@@ -1,5 +1,5 @@
 if(WANT_AGENT_MCP)
-	list(APPEND LMMS_SRCS agent/mcp/HttpMcpServer.cpp)
+	list(APPEND LMMS_SRCS agent/mcp/HttpMcpServer.cpp agent/mcp/McpProtocol.cpp)
 endif()
 
 set(LMMS_SRCS
