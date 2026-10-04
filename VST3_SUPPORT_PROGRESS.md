@@ -13,7 +13,7 @@ official online sources and included in the build as authorized by the user.
 | S4 | PASS | Multi-root migration preserves uservst; supervised bundle/PE/Unicode discovery, exact identity/version candidates, cache/quarantine/cancellation and owned asynchronous jobs/settings/selector publication implemented. Final full Windows Release build PASS; 54/54 CTest PASS (100.26 s). Delivered in the commit containing this completion record. |
 | S5 | PASS | VeSTige / VstEffect 实际 VST3 加载、处理、参数、编辑器、状态、preset、clone、undo、命令、导出和旧 VST2 双架构回归通过；分类与 Sidebar / Effect Browser 仅传递身份键。清理后全量 Windows Release 编译 PASS，64/64 CTest PASS（213.21 s）。本完成记录随阶段提交推送。 |
 | S6 | REMOVED_BY_USER | User explicitly removed Carla isolation from this delivery on 2026-10-05. |
-| S7 | NOT_RUN | WaveShell and automated fault matrix. |
+| S7 | PASS_WITH_MANUAL_SKIPS | WaveShell 16.6（2 类）/16.7（725 类、14 乐器）与独立 SDK 完整类集合一致；Magma Mono/Stereo、Q10、Electric88 的双实例、主音频、MIDI、参数和 state/preset PASS。11 项自动故障测试 PASS；人工商业认证／听音／授权跳过。详见 VST3_SUPPORT_VALIDATION.md。 |
 | S8 | NOT_RUN | Release, dependency verification and ZIP. |
 
 
@@ -25,7 +25,7 @@ official online sources and included in the build as authorized by the user.
 - 撤回全局 Mixer / PDC、侧链及高级输入输出路由扩张，不增加宿主入口；S6 REMOVED_BY_USER。
 - 保留普通 MIDI 输入、主音频处理、参数、编辑器、工程 / 预设状态、VST2 兼容。
 - 人工听音、授权激活、主观 UI / DPI / 认证：SKIPPED_MANUAL。
-- S7、S8 待运行；各阶段完成后提交推送。
+- S7 自动验证已通过并记录商业人工验证范围；S8 待运行。各阶段完成后提交推送。
 
 ## 当前验证状态
 
