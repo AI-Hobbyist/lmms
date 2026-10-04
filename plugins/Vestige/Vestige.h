@@ -40,8 +40,11 @@ class QMdiSubWindow;
 class QPushButton;
 class QScrollArea;
 
+#include <memory>
+
 namespace lmms
 {
+namespace vsthost { struct CatalogEntry; }
 
 class FloatModel;
 class VstPlugin;
@@ -66,11 +69,13 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
+	QMap<QString, AutomatableModel*> parameterModels() override;
 
 	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
 	void loadFile(const QString& file, std::uint32_t shellId);
+	void loadFile(const QString& file, std::uint32_t shellId, const vsthost::CatalogEntry* selection);
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
@@ -91,6 +96,7 @@ private:
 
 	QString m_pluginDLL;
 	std::uint32_t m_shellId = 0;
+	std::unique_ptr<vsthost::CatalogEntry> m_nativeSelection;
 	gui::SubWindow* m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;

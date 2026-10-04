@@ -9,7 +9,7 @@
 
 namespace lmms::vsthost
 {
-struct Vst2ScanEntry { std::uint32_t id; std::string name; };
+struct Vst2ScanEntry { std::uint32_t id; std::string name; std::uint32_t flags = 0; };
 struct Vst2ScanResult
 {
 	Error error = Error::None;
@@ -58,15 +58,16 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config,
 			std::uint32_t count = 0;
 			if (result.error == Error::None && (!entries || entries->arguments.size() < 2 ||
 				!parse(entries->arguments[0], count) || !count || count > 4096 ||
-				(entries->arguments.size() != 2 + 2 * count && entries->arguments.size() != 4 + 2 * count) ||
+				(entries->arguments.size() != 2 + 2 * count && entries->arguments.size() != 4 + 2 * count && entries->arguments.size() != 4 + 3 * count) ||
 				(entries->arguments[1] != "0" && entries->arguments[1] != "1")))
 			{ result.error = Error::InvalidMessage; }
 			if (result.error == Error::None)
 			{
 				result.shell = entries->arguments[1] == "1";
-				if (entries->arguments.size() == 4 + 2 * count) {
-					const auto& vendor = entries->arguments[2 + 2 * count];
-					const auto& version = entries->arguments[3 + 2 * count];
+					const auto stride = entries->arguments.size() == 4 + 3 * count ? 3u : 2u;
+				if (entries->arguments.size() == 4 + stride * count) {
+					const auto& vendor = entries->arguments[2 + stride * count];
+					const auto& version = entries->arguments[3 + stride * count];
 					std::int32_t number = 0;
 					const auto parsed = std::from_chars(version.data(), version.data() + version.size(), number);
 					if (vendor.size() > 63 || vendor.find('\0') != std::string::npos ||
@@ -78,12 +79,15 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config,
 				for (std::uint32_t i = 0; result.error == Error::None && i < count; ++i)
 				{
 					std::uint32_t id = 0;
-					const auto& name = entries->arguments[3 + 2 * i];
+					const auto& name = entries->arguments[3 + stride * i];
 					if (name.empty() || name.size() > 63 || name.find('\0') != std::string::npos)
 					{ result.error = Error::InvalidMessage; break; }
-					if (!parse(entries->arguments[2 + 2 * i], id) || (result.shell && !id) || !seen.insert(id).second)
+					if (!parse(entries->arguments[2 + stride * i], id) || (result.shell && !id) || !seen.insert(id).second)
 					{ result.error = Error::InvalidMessage; break; }
-					result.entries.push_back({id, entries->arguments[3 + 2 * i]});
+					std::uint32_t flags = 0;
+						if (stride == 3 && !parse(entries->arguments[4 + stride * i], flags))
+						{ result.error = Error::InvalidMessage; break; }
+						result.entries.push_back({id, entries->arguments[3 + stride * i], flags});
 				}
 			}
 		}

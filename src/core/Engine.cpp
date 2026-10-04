@@ -121,7 +121,7 @@ void Engine::init( bool renderOnly )
 		helper("32/RemoteVstPlugin32.exe"), helper("RemoteVstPlugin64.exe"),
 		helper("32/RemoteVstHost32.exe"), helper("RemoteVstHost64.exe"),
 		QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/vst/catalog-v1.json",
-		"lmms-vst-catalog-2/" + ConfigManager::inst()->defaultVersion(), helper("RemoteCatalogIo.exe")});
+		"lmms-vst-catalog-3/" + ConfigManager::inst()->defaultVersion(), helper("RemoteCatalogIo.exe")});
 	if (!renderOnly) { refreshVstCatalog(); }
 #endif
 

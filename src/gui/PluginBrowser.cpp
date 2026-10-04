@@ -22,7 +22,13 @@
  *
  */
 
+#include "lmmsconfig.h"
 #include "PluginBrowser.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#include <QTimer>
+#include <QApplication>
+#endif
 
 #include <QHeaderView>
 #include <QLabel>
@@ -88,6 +94,17 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	// Add plugins to the tree
 	addPlugins();
+#ifdef LMMS_BUILD_WIN32
+	auto* timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, this, [this, published = std::uint64_t{0}]() mutable {
+		if (QApplication::mouseButtons() != Qt::NoButton) { return; }
+		for (auto* loader : findChildren<QThread*>()) { if (loader->isRunning()) { return; } }
+		if (const auto* jobs = Engine::vstCatalog(); jobs && jobs->snapshot().published != published)
+		{ published = jobs->snapshot().published; addPlugins(); updateRootVisibilities();
+			if (const auto* search = m_view->findChild<QLineEdit*>()) { onFilterChanged(search->text()); } }
+	});
+	timer->start(100);
+#endif
 
 	// Resize
 	m_descTree->header()->setSectionResizeMode( QHeaderView::ResizeToContents );
@@ -190,7 +207,10 @@ void PluginBrowser::addPlugins()
 			);
 
 			// Create a root node for this plugin and add the subplugins under it
-			const auto root = addRoot(desc->displayName);
+			const bool vst = QString::fromUtf8(desc->name) == "vestige";
+				if (vst) { addPlugin(Plugin::Descriptor::SubPluginFeatures::Key(desc, "VeSTige"), lmmsRoot); }
+				const auto root = addRoot(vst ? tr("VST Instruments") : QString::fromUtf8(desc->displayName));
+				if (vst) { root->setExpanded(true); }
 			for (const auto& key : subPluginKeys) { addPlugin(key, root); }
 		}
 		else
@@ -307,6 +327,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 
 void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
+	Engine::setDndPluginKey(&m_pluginKey);
 	TrackContainer* tc = Engine::getSong();
 	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 	auto ilt = new InstrumentLoaderThread(this, it, value);

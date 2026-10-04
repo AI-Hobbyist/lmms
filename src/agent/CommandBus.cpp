@@ -268,6 +268,24 @@ CommandResult CommandBus::execute( const QString &name, const QJsonObject &argum
 	{
 		return CommandResult::failure( "export_busy", "Finish or cancel the active audio export before editing the project." );
 	}
+	if (descriptor.preflight)
+	{
+		CommandResult checked;
+		try { checked = descriptor.preflight(arguments); }
+		catch (const std::exception& exception)
+		{ checked = CommandResult::failure("command_exception", QString::fromUtf8(exception.what())); }
+		catch (...)
+		{ checked = CommandResult::failure("command_exception", "Command validation threw an unknown exception."); }
+		if (!checked.ok)
+		{
+			if (isBatchActive())
+			{
+				const auto rollback = rollbackBatch();
+				if (!rollback.ok) { return rollback; }
+			}
+			return checked;
+		}
+	}
 	// Keep preview models inaccessible to rendering, and read models between render periods.
 	const auto previewGuard = Engine::audioEngine() &&
 		(arguments.value( "dryRun" ).toBool() || (rendering && descriptor.mutability == Mutability::ReadOnly && name != "export.status"))

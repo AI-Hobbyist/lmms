@@ -66,6 +66,7 @@ int wmain(int argc, wchar_t** argv)
 	AudioQueue audio(audioRegion.bytes());
 	std::vector<float> input(AudioQueue::MaxSamples), output(AudioQueue::MaxSamples);
 	std::vector<std::uint8_t> events(AudioQueue::MaxEventBytes);
+	std::vector<std::uint8_t> outputEvents(AudioQueue::MaxOutputEventBytes);
 	std::unique_ptr<Vst3Instance> instance;
 	std::unique_ptr<Vst3Module> module;
 	std::uint64_t sequence = 0;
@@ -80,9 +81,19 @@ int wmain(int argc, wchar_t** argv)
 		{ return AudioQueue::Result::Invalid; }
 		const auto in = std::span(input).first(claim.layout.frames * claim.layout.inputs);
 		const auto out = std::span(output).first(claim.layout.frames * claim.layout.outputs);
-		if (!instance->process(claim.layout.frames, in, out, std::span(events).first(claim.eventBytes), claim.header.sequence))
+		// Keep the old queue layout until the host drains it and publishes the new
+		// metadata. A native restart may already make further DSP calls unsafe.
+		if (instance->restartPending())
+		{
+			if (!instance->deferRestartEvents(std::span(events).first(claim.eventBytes), claim.layout.frames))
+			{ return AudioQueue::Result::Invalid; }
+			std::fill(out.begin(), out.end(), 0.f);
+		}
+		else if (!instance->process(claim.layout.frames, in, out, std::span(events).first(claim.eventBytes), claim.header.sequence, claim.collectOutput))
 		{ return AudioQueue::Result::Invalid; }
-		return audio.complete(claim, out);
+		std::uint32_t written = 0;
+		if (claim.collectOutput && !instance->blockMidiOutput(outputEvents, written)) { return AudioQueue::Result::Invalid; }
+		return audio.complete(claim, out, std::span(outputEvents).first(written));
 	};
 	for (;;)
 	{
@@ -90,7 +101,7 @@ int wmain(int argc, wchar_t** argv)
 		const auto received = channel.receive(frame);
 		if (received == Error::InvalidState)
 		{
-			try { if (instance) { instance->serviceControl(); } } catch (...) { return 9; }
+			try { if (instance) { instance->serviceControl(false); } } catch (...) { return 9; }
 			if (!paused && instance && processAudio() == AudioQueue::Result::Invalid) { return 8; }
 			MSG message{};
 			while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) { TranslateMessage(&message); DispatchMessageW(&message); }
@@ -103,7 +114,7 @@ int wmain(int argc, wchar_t** argv)
 		Error error = Error::None;
 		try
 		{
-			if (instance && frame.header.type != MessageType::Close) { instance->serviceControl(); }
+			if (instance && frame.header.type != MessageType::Close) { instance->serviceControl(false); }
 			if (!hello)
 			{
 				if (frame.header.type != MessageType::Hello || !frame.payload.empty()) { error = Error::InvalidMessage; }
@@ -139,11 +150,22 @@ int wmain(int argc, wchar_t** argv)
 				for (unsigned slot = 0; slot < AudioQueue::Slots; ++slot)
 				{ if (processAudio() == AudioQueue::Result::Invalid) { error = Error::ProcessingFailed; break; } }
 				paused = true;
+				if (error == Error::None && instance) { instance->serviceControl(); }
 			}
 			else if (frame.header.type == MessageType::Resume && frame.payload.empty()) { paused = false; }
-			else if (frame.header.type == MessageType::GetState && frame.payload.empty() && instance) { payload = instance->state(); }
+			else if (frame.header.type == MessageType::GetState && instance && (frame.payload.empty() || paused)) { payload = instance->state(frame.payload); }
 			else if (frame.header.type == MessageType::SetState && instance) { instance->restoreState(frame.payload); }
-			else if (frame.header.type == MessageType::Parameter && instance) { payload = instance->parameterControl(frame.payload); }
+			else if (frame.header.type == MessageType::Parameter && instance)
+			{
+				const bool metadata = (frame.payload.size() == 4 && get(frame.payload, 0, 4) == 1) ||
+					(frame.payload.size() == 20 && get(frame.payload, 0, 4) == 2);
+				if (metadata && !paused) { error = Error::InvalidState; }
+				else
+				{
+					if (metadata) { instance->serviceControl(); }
+					payload = instance->parameterControl(frame.payload);
+				}
+			}
 			else if (frame.header.type == MessageType::Midi && frame.payload.empty() && instance) { payload = instance->midiOutput(); }
 			else if (frame.header.type == MessageType::ShowEditor && frame.payload.empty() && instance)
 			{ payload.resize(8); put(payload, 0, reinterpret_cast<std::uintptr_t>(instance->showEditor()), 8); }

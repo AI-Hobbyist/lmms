@@ -16,7 +16,7 @@ int main()
 	check(!matches(decoded, source.session, 8, 10) && !matches(decoded, source.session, 9, 11), "stale generation/sequence");
 	check(!matches(decoded, source.session + 1, 9, 10), "other session");
 	check(decode(std::span(bytes).first(39), decoded) == Error::InvalidMessage, "truncated header");
-	bytes[4] = 2;
+	put(bytes, 4, ProtocolVersion + 1, 2);
 	check(decode(bytes, decoded) == Error::ProtocolMismatch, "protocol mismatch");
 	bytes = encode(source); bytes[36] = 1;
 	check(decode(bytes, decoded) == Error::InvalidMessage, "reserved bytes");

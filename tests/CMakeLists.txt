@@ -77,7 +77,8 @@ add_subdirectory(vsthost)
 
 if(TARGET VstEntryPoints)
 	set_target_properties(VstEntryPoints PROPERTIES OUTPUT_NAME lmms
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/vsthost/native/$<CONFIG>")
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/vsthost/native/$<CONFIG>"
+		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/vsthost/native/$<CONFIG>")
 	add_dependencies(VstEntryPoints vestige vsteffect vstbase Vst2CompatibilityTest)
 	if(TARGET RemoteVstHost64)
 		add_dependencies(VstEntryPoints RemoteVstHost64)

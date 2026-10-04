@@ -137,6 +137,19 @@ QString FileDialog::getOpenFileName(QWidget *parent,
 }
 
 
+void FileDialog::accept()
+{
+	const auto files = selectedFiles();
+	if (!m_directorySuffix.isEmpty() && files.size() == 1)
+	{
+		const QFileInfo selected(files.front());
+		if (selected.isDir() && selected.suffix().compare(m_directorySuffix, Qt::CaseInsensitive) == 0)
+		{ QDialog::accept(); return; }
+	}
+	QFileDialog::accept();
+}
+
+
 void FileDialog::clearSelection()
 {
 	auto view = findChild<QListView*>();

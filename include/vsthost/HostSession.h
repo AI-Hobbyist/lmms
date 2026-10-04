@@ -8,6 +8,8 @@
 #include <condition_variable>
 #include <deque>
 #include <future>
+#include <functional>
+#include <optional>
 #include <memory>
 #include <mutex>
 #include <bcrypt.h>
@@ -25,7 +27,8 @@ public:
 		std::vector<std::wstring> arguments;
 		DWORD startupMs = 30000;
 	};
-	struct Reply { Error error = Error::None; std::vector<std::uint8_t> payload; };
+	struct Reply { Error error = Error::None; std::vector<std::uint8_t> payload; std::vector<std::uint8_t> followupPayload; };
+	struct Followup { MessageType type; std::function<std::vector<std::uint8_t>()> prepare; };
 	explicit HostSession(std::uint32_t controlCapacity = ControlChannel::DefaultCapacity)
 		: m_capacity(controlCapacity)
 	{
@@ -78,8 +81,11 @@ public:
 	}
 	template<class Prepare> std::future<Reply> requestPrepared(MessageType type, Prepare prepare,
 		DWORD timeoutMs = 15000, bool pauseAudio = false)
+	{ return requestPreparedCompleted(type, std::move(prepare), [](Reply&) {}, timeoutMs, pauseAudio); }
+	template<class Prepare, class Complete> std::future<Reply> requestPreparedCompleted(MessageType type, Prepare prepare,
+		Complete complete, DWORD timeoutMs = 15000, bool pauseAudio = false)
 	{
-		return enqueue([this, type, prepare = std::move(prepare), timeoutMs, pauseAudio]() mutable
+		return enqueue([this, type, prepare = std::move(prepare), complete = std::move(complete), timeoutMs, pauseAudio]() mutable
 		{
 			if (state() != SessionState::Ready) { return Reply{Error::InvalidState, {}}; }
 			if (pauseAudio)
@@ -87,11 +93,13 @@ public:
 				if (!quiesce()) { return faultReply(Error::Timeout); }
 				const auto paused = exchange(MessageType::Pause, {}, timeoutMs, ProcessSupervisor::Stage::Control);
 				if (paused.error != Error::None) { return paused; }
+					if (!retirePausedAudio()) { return faultReply(Error::InvalidMessage); }
 			}
 			const auto payload = prepare();
 			const auto stage = type == MessageType::Scan ? ProcessSupervisor::Stage::Scan :
 				type == MessageType::Create ? ProcessSupervisor::Stage::Initialize : ProcessSupervisor::Stage::Control;
 			auto result = exchange(type, payload, timeoutMs, stage);
+			if (result.error == Error::None) { complete(result); }
 			if (pauseAudio && result.error == Error::None)
 			{
 				const auto resumed = exchange(MessageType::Resume, {}, timeoutMs, ProcessSupervisor::Stage::Control);
@@ -102,6 +110,82 @@ public:
 			return result;
 		});
 	}
+	// Synchronous control-owner publication while the dispatcher keeps audio
+	// quiescent. The callback may update the caller's model under its existing
+	// lock; it must not issue another session request or wait for audio.
+	template<class Prepare, class Publish> Reply requestPreparedPublished(MessageType type, Prepare prepare,
+		Publish publish, DWORD timeoutMs = 15000)
+	{
+		return requestPreparedFollowedPublished(type, std::move(prepare),
+			[](Reply&) -> std::optional<Followup> { return {}; }, std::move(publish), timeoutMs);
+	}
+	// A reply may require one follow-up request (for example refreshed metadata).
+	// Both exchanges share one pause/resume boundary. A read-only first request
+	// may defer quiescence until its reply actually requests a follow-up.
+	template<class Prepare, class Follow, class Publish> Reply requestPreparedFollowedPublished(MessageType type,
+		Prepare prepare, Follow follow, Publish publish, DWORD timeoutMs = 15000, bool pauseAudio = true)
+	{
+		std::promise<Reply*> prepared;
+		auto publication = prepared.get_future();
+		std::promise<void> published;
+		auto acknowledgement = published.get_future();
+		auto result = enqueue([&, type, timeoutMs, pauseAudio]() mutable
+		{
+			if (state() != SessionState::Ready) { return Reply{Error::InvalidState, {}}; }
+			bool paused = false;
+			const auto pause = [&]() -> Reply {
+				if (!quiesce()) { return faultReply(Error::Timeout); }
+				auto reply = exchange(MessageType::Pause, {}, timeoutMs, ProcessSupervisor::Stage::Control);
+				paused = reply.error == Error::None;
+				if (paused && !retirePausedAudio()) { return faultReply(Error::InvalidMessage); }
+				return reply;
+			};
+			if (pauseAudio)
+			{
+				const auto reply = pause(); if (reply.error != Error::None) { return reply; }
+			}
+			const auto payload = prepare();
+			const auto stage = type == MessageType::Scan ? ProcessSupervisor::Stage::Scan :
+				type == MessageType::Create ? ProcessSupervisor::Stage::Initialize : ProcessSupervisor::Stage::Control;
+			auto reply = exchange(type, payload, timeoutMs, stage);
+			if (reply.error != Error::None) { return reply; }
+			if (auto next = follow(reply); next && reply.error == Error::None)
+			{
+				if (!paused)
+				{
+					const auto barrier = pause(); if (barrier.error != Error::None) { return barrier; }
+				}
+				const auto nextPayload = next->prepare();
+				reply = exchange(next->type, nextPayload, timeoutMs, ProcessSupervisor::Stage::Control);
+			}
+			if (reply.error != Error::None) { return reply; }
+			prepared.set_value(&reply); acknowledgement.get();
+			if (paused && reply.error == Error::None)
+			{
+				const auto resumed = exchange(MessageType::Resume, {}, timeoutMs, ProcessSupervisor::Stage::Control);
+				if (resumed.error != Error::None) { return resumed; }
+				m_havePrevious = false; m_audioAllowed.store(true, std::memory_order_release);
+			}
+			return reply;
+		});
+		while (publication.wait_for(std::chrono::milliseconds(1)) != std::future_status::ready)
+		{
+			// Requests that fail before completion never enter publication.
+			if (result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) { return result.get(); }
+		}
+		try { publish(*publication.get()); published.set_value(); }
+		catch (...) { published.set_exception(std::current_exception()); }
+		return result.get();
+	}
+	// Include caller-side assembly in the session's audio admission barrier.
+	template<class Process> bool withAudio(Process process) noexcept
+	{
+		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
+		m_audioUsers.fetch_add(1, std::memory_order_acq_rel);
+		struct Exit { std::atomic<unsigned>& users; ~Exit() { users.fetch_sub(1, std::memory_order_release); } } exit{m_audioUsers};
+		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
+		return process();
+	}
 	// Exactly one audio producer. First block returns silence; later blocks consume
 	// only the preceding sequence. A missed deadline faults instead of using late audio.
 	bool process(AudioQueue::Layout layout, std::span<const float> input, std::span<float> output,
@@ -110,8 +194,12 @@ public:
 		return processPrepared(layout, input, output, [events] { return events; });
 	}
 	template<class Prepare> bool processPrepared(AudioQueue::Layout layout, std::span<const float> input,
-		std::span<float> output, Prepare prepare) noexcept
+		std::span<float> output, Prepare prepare, std::span<std::uint8_t> outputEvents = {},
+		std::uint32_t* outputEventBytes = nullptr) noexcept
 	{
+		// The audio owner supplies reusable storage; this path never allocates
+		// or waits. Feedback belongs to the same preceding sequence as audio.
+		if (outputEventBytes) { *outputEventBytes = 0; }
 		std::fill(output.begin(), output.end(), 0.0f);
 		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
 		m_audioUsers.fetch_add(1, std::memory_order_acq_rel);
@@ -121,11 +209,11 @@ public:
 		{ audioFault(Error::InvalidMessage); return false; }
 		if (m_havePrevious)
 		{
-			if (m_audio->receive(m_session, generation(), m_audioSequence - 1, output) != AudioQueue::Result::Ok)
+			if (m_audio->receive(m_session, generation(), m_audioSequence - 1, output, outputEvents, outputEventBytes) != AudioQueue::Result::Ok)
 			{ audioFault(Error::ProcessingFailed); return false; }
 		}
 		const Header header{MessageType::Process, m_session, generation(), m_audioSequence, 0};
-		if (m_audio->submit(header, layout, input, prepare()) != AudioQueue::Result::Ok)
+		if (m_audio->submit(header, layout, input, prepare(), outputEventBytes != nullptr) != AudioQueue::Result::Ok)
 		{
 			std::fill(output.begin(), output.end(), 0.0f);
 			audioFault(Error::ProcessingFailed); return false;
@@ -135,27 +223,31 @@ public:
 	}
 	// Renderer-only request. Audio callbacks use processPrepared and never wait.
 	template<class Prepare> std::future<Reply> renderOffline(AudioQueue::Layout layout,
-		std::vector<float> input, Prepare prepare, DWORD timeoutMs = 5000)
+		std::vector<float> input, Prepare prepare, DWORD timeoutMs = 5000, std::optional<MessageType> followup = {})
 	{
-		return enqueue([this, layout, input = std::move(input), prepare = std::move(prepare), timeoutMs]() mutable
+		return enqueue([this, layout, input = std::move(input), prepare = std::move(prepare), timeoutMs, followup]() mutable
 		{
 			if (state() != SessionState::Ready || !quiesce()) { return Reply{Error::InvalidState, {}}; }
 			auto barrier = exchange(MessageType::Pause, {}, timeoutMs, ProcessSupervisor::Stage::Control);
 			if (barrier.error != Error::None) { return barrier; }
-			barrier = exchange(MessageType::Resume, {}, timeoutMs, ProcessSupervisor::Stage::Control);
+			if (!retirePausedAudio()) { return faultReply(Error::InvalidMessage); }
+				barrier = exchange(MessageType::Resume, {}, timeoutMs, ProcessSupervisor::Stage::Control);
 			if (barrier.error != Error::None) { return barrier; }
 			if (!layout.frames || layout.frames > AudioQueue::MaxFrames || layout.outputs > AudioQueue::MaxChannels ||
 				m_audioSequence == UINT64_MAX) { return faultReply(Error::InvalidMessage); }
 			const auto sequence = m_audioSequence++;
 			const Header header{MessageType::Process, m_session, generation(), sequence, 0};
 			std::vector<float> output(layout.frames * layout.outputs);
+			const bool collectOutput = followup == MessageType::Midi;
+			std::array<std::uint8_t, AudioQueue::MaxOutputEventBytes> outputEvents{};
+			std::uint32_t outputEventBytes = 0;
 			m_havePrevious = false;
 			m_supervisor->arm(ProcessSupervisor::Stage::Audio, timeoutMs);
-			if (m_audio->submit(header, layout, input, prepare()) != AudioQueue::Result::Ok) { return faultReply(Error::InvalidMessage); }
+			if (m_audio->submit(header, layout, input, prepare(), collectOutput) != AudioQueue::Result::Ok) { return faultReply(Error::InvalidMessage); }
 			const auto deadline = GetTickCount64() + timeoutMs;
 			while (true)
 			{
-				const auto result = m_audio->receive(m_session, generation(), sequence, output);
+				const auto result = m_audio->receive(m_session, generation(), sequence, output, outputEvents, &outputEventBytes);
 				if (result == AudioQueue::Result::Ok) { break; }
 				if (result == AudioQueue::Result::Invalid) { return faultReply(Error::InvalidMessage); }
 				if (const auto error = m_supervisor->fault().error; error != Error::None) { return faultReply(error); }
@@ -165,6 +257,16 @@ public:
 			m_supervisor->disarm();
 			Reply reply; reply.payload.resize(output.size() * sizeof(float));
 			std::memcpy(reply.payload.data(), output.data(), reply.payload.size());
+			// Harvest renderer feedback in this same dispatcher transaction while
+			// realtime admission is still closed. A queued UI poll cannot steal it.
+			if (collectOutput)
+			{ reply.followupPayload.assign(outputEvents.begin(), outputEvents.begin() + outputEventBytes); }
+			else if (followup)
+			{
+				auto harvested = exchange(*followup, {}, timeoutMs, ProcessSupervisor::Stage::Control);
+				if (harvested.error != Error::None) { return harvested; }
+				reply.followupPayload = std::move(harvested.payload);
+			}
 			m_audioAllowed.store(true, std::memory_order_release); return reply;
 		});
 	}
@@ -188,6 +290,11 @@ private:
 		auto future = task.get_future();
 		{ std::lock_guard lock(m_tasksMutex); m_tasks.push_back(std::move(task)); }
 		m_tasksAvailable.notify_one(); return future;
+	}
+	bool retirePausedAudio() noexcept
+	{
+		if (!m_audio || !m_audio->discardCompleted(m_session, generation(), m_audioSequence)) { return false; }
+		m_havePrevious = false; return true;
 	}
 	bool quiesce() noexcept
 	{

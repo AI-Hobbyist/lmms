@@ -20,11 +20,12 @@ public:
 	static constexpr std::uint32_t MaxChannels = 32;
 	static constexpr std::uint32_t MaxSamples = MaxFrames * MaxChannels;
 	static constexpr std::uint32_t MaxEventBytes = 16384;
+	static constexpr std::uint32_t MaxOutputEventBytes = 32768;
 	static constexpr std::uint32_t MetadataBytes = 64;
-	static constexpr std::uint32_t SlotBytes = MetadataBytes + 8 * MaxSamples + MaxEventBytes;
+	static constexpr std::uint32_t SlotBytes = MetadataBytes + 8 * MaxSamples + MaxEventBytes + MaxOutputEventBytes;
 	static constexpr std::uint32_t StorageBytes = Slots * SlotBytes;
 	struct Layout { std::uint32_t frames, inputs, outputs; };
-	struct Claim { std::uint32_t slot; Header header; Layout layout; std::uint32_t eventBytes; };
+	struct Claim { std::uint32_t slot; Header header; Layout layout; std::uint32_t eventBytes; bool collectOutput = false; std::uint32_t outputEventBytes = 0; };
 	enum class Result { Ok, Empty, Full, Invalid };
 
 	explicit AudioQueue(std::span<std::uint8_t> memory) noexcept : m_memory(memory)
@@ -41,7 +42,7 @@ public:
 		return true;
 	}
 	Result submit(Header header, Layout layout, std::span<const float> input,
-		std::span<const std::uint8_t> events = {}) noexcept
+		std::span<const std::uint8_t> events = {}, bool collectOutput = false) noexcept
 	{
 		if (!valid() || !validLayout(layout) || input.size() != layout.frames * layout.inputs ||
 			events.size() > MaxEventBytes || header.type != MessageType::Process)
@@ -54,7 +55,7 @@ public:
 			const auto encoded = encode(header);
 			std::copy(encoded.begin(), encoded.end(), bytes.begin() + 4);
 			put(bytes, 44, layout.frames, 4); put(bytes, 48, layout.inputs, 4);
-			put(bytes, 52, layout.outputs, 4); put(bytes, 56, events.size(), 4); put(bytes, 60, 0, 4);
+			put(bytes, 52, layout.outputs, 4); put(bytes, 56, events.size(), 4); put(bytes, 60, collectOutput ? 1 : 0, 4);
 			writeSamples(bytes.subspan(MetadataBytes, input.size() * 4), input);
 			std::copy(events.begin(), events.end(), bytes.begin() + EventOffset);
 			InterlockedExchange(owner(i), Submitted);
@@ -89,30 +90,37 @@ public:
 		claim = parsed;
 		return Result::Ok;
 	}
-	Result complete(const Claim& claim, std::span<const float> output) noexcept
+	Result complete(const Claim& claim, std::span<const float> output,
+		std::span<const std::uint8_t> outputEvents = {}) noexcept
 	{
 		if (!valid() || claim.slot >= Slots || !validLayout(claim.layout) ||
-			output.size() != claim.layout.frames * claim.layout.outputs ||
+			output.size() != claim.layout.frames * claim.layout.outputs || outputEvents.size() > MaxOutputEventBytes ||
+			(!claim.collectOutput && !outputEvents.empty()) ||
 			InterlockedCompareExchange(owner(claim.slot), Processing, Processing) != Processing)
 		{ return Result::Invalid; }
 		Claim current{};
 		if (!readClaim(claim.slot, MessageType::Process, current) ||
 			!matches(current.header, claim.header.session, claim.header.generation, claim.header.sequence) ||
-			current.layout.frames != claim.layout.frames || current.layout.outputs != claim.layout.outputs)
+			current.layout.frames != claim.layout.frames || current.layout.outputs != claim.layout.outputs ||
+			current.collectOutput != claim.collectOutput)
 		{ return Result::Invalid; }
 		auto bytes = slot(claim.slot);
 		writeSamples(bytes.subspan(OutputOffset, output.size() * 4), output);
 		auto header = current.header;
 		header.type = MessageType::ProcessDone;
-		header.payloadBytes = static_cast<std::uint32_t>(output.size() * 4);
+		header.payloadBytes = static_cast<std::uint32_t>(output.size() * 4 + outputEvents.size());
+			put(bytes, 60, outputEvents.size(), 4);
+			std::copy(outputEvents.begin(), outputEvents.end(), bytes.begin() + OutputEventOffset);
 		const auto encoded = encode(header);
 		std::copy(encoded.begin(), encoded.end(), bytes.begin() + 4);
 		InterlockedExchange(owner(claim.slot), Ready);
 		return Result::Ok;
 	}
 	Result receive(std::uint64_t session, std::uint64_t generation, std::uint64_t sequence,
-		std::span<float> output) noexcept
+		std::span<float> output, std::span<std::uint8_t> outputEvents = {},
+		std::uint32_t* outputEventBytes = nullptr) noexcept
 	{
+		if (outputEventBytes) { *outputEventBytes = 0; }
 		if (!valid()) { return Result::Invalid; }
 		for (std::uint32_t i = 0; i < Slots; ++i)
 		{
@@ -125,17 +133,42 @@ public:
 			{ InterlockedExchange(owner(i), Free); continue; }
 			if (current.header.sequence != sequence) { continue; }
 			const auto samples = current.layout.frames * current.layout.outputs;
-			if (output.size() != samples) { InterlockedExchange(owner(i), Free); return Result::Invalid; }
+			if (output.size() != samples || (outputEventBytes && outputEvents.size() < current.outputEventBytes)) { InterlockedExchange(owner(i), Free); return Result::Invalid; }
 			readSamples(slot(i).subspan(OutputOffset, samples * 4), output);
+				if (outputEventBytes)
+				{
+					std::copy_n(slot(i).begin() + OutputEventOffset, current.outputEventBytes, outputEvents.begin());
+					*outputEventBytes = current.outputEventBytes;
+				}
 			InterlockedExchange(owner(i), Free);
 			return Result::Ok;
 		}
 		return Result::Empty;
 	}
+	// Host only, after its producer is quiescent and the helper has acknowledged
+	// Pause/drained submitted work. Validate completed frames before reclaiming
+	// their ownership words; never reinitialize a live shared mapping.
+	bool discardCompleted(std::uint64_t session, std::uint64_t generation, std::uint64_t nextSequence) noexcept
+	{
+		if (!valid()) { return false; }
+		for (std::uint32_t i = 0; i < Slots; ++i)
+		{
+			const auto ownership = InterlockedCompareExchange(owner(i), Free, Free);
+			if (ownership == Free) { continue; }
+			Claim current{};
+			if (ownership != Ready || !readClaim(i, MessageType::ProcessDone, current) ||
+				current.header.session != session || current.header.generation != generation ||
+				current.header.sequence >= nextSequence) { return false; }
+			InterlockedExchange(owner(i), Free);
+		}
+		return true;
+	}
+
 private:
 	enum : LONG { Free, Writing, Submitted, Processing, Ready };
 	static constexpr std::uint32_t OutputOffset = MetadataBytes + 4 * MaxSamples;
 	static constexpr std::uint32_t EventOffset = MetadataBytes + 8 * MaxSamples;
+	static constexpr std::uint32_t OutputEventOffset = EventOffset + MaxEventBytes;
 	std::span<std::uint8_t> m_memory;
 	std::span<std::uint8_t> slot(std::uint32_t i) noexcept { return m_memory.subspan(i * SlotBytes, SlotBytes); }
 	volatile LONG* owner(std::uint32_t i) noexcept { return reinterpret_cast<volatile LONG*>(m_memory.data() + i * SlotBytes); }
@@ -148,15 +181,18 @@ private:
 	{
 		auto bytes = slot(i);
 		Header header{};
-		if (decode(bytes.subspan(4, HeaderBytes), header) != Error::None || header.type != type || get(bytes, 60, 4) != 0)
+		if (decode(bytes.subspan(4, HeaderBytes), header) != Error::None || header.type != type)
 		{ return false; }
 		const Layout layout{static_cast<std::uint32_t>(get(bytes, 44, 4)),
 			static_cast<std::uint32_t>(get(bytes, 48, 4)), static_cast<std::uint32_t>(get(bytes, 52, 4))};
 		const auto eventBytes = static_cast<std::uint32_t>(get(bytes, 56, 4));
 		if (!validLayout(layout) || eventBytes > MaxEventBytes) { return false; }
-		const auto expected = type == MessageType::Process ? layout.frames * layout.inputs * 4 + eventBytes : layout.frames * layout.outputs * 4;
+		const auto resultBytes = static_cast<std::uint32_t>(get(bytes, 60, 4));
+		if (type == MessageType::Process ? resultBytes > 1 : resultBytes > MaxOutputEventBytes) { return false; }
+		const auto expected = type == MessageType::Process ? layout.frames * layout.inputs * 4 + eventBytes : layout.frames * layout.outputs * 4 + resultBytes;
 		if (header.payloadBytes != expected) { return false; }
-		claim = {i, header, layout, eventBytes};
+		claim = {i, header, layout, eventBytes, type == MessageType::Process && resultBytes != 0,
+			type == MessageType::ProcessDone ? resultBytes : 0};
 		return true;
 	}
 	static void writeSamples(std::span<std::uint8_t> bytes, std::span<const float> samples) noexcept

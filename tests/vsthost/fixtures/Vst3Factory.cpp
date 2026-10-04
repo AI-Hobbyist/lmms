@@ -12,6 +12,16 @@ FUnknown* createVst3NativeFixture(const TUID cid);
 #endif
 namespace
 {
+// Test-only milestone: cancellation must target the fault actually entered,
+// rather than guessing native process startup time from a fixed sleep.
+void signalFactoryFault()
+{
+	wchar_t name[512]{};
+	const auto length = GetEnvironmentVariableW(L"LMMS_VST3_FACTORY_FAULT_EVENT", name, 512);
+	if (!length || length >= 512) { return; }
+	if (const auto event = OpenEventW(EVENT_MODIFY_STATE, FALSE, name))
+	{ SetEvent(event); CloseHandle(event); }
+}
 const TUID ids[3] = {
 	INLINE_UID(0xf1020304, 0xabcdef01, 0x13572468, 0x98765432),
 	INLINE_UID(0x01000200, 0x76543210, 0xfedcba98, 0x24681357),
@@ -51,7 +61,7 @@ public:
 #elif VST3_FACTORY_FAULT == 5
 		RaiseException(0xe0000063, 0, 0, nullptr); return 0;
 #elif VST3_FACTORY_FAULT == 6
-		Sleep(INFINITE); return 0;
+		signalFactoryFault(); Sleep(INFINITE); return 0;
 #else
 		return 3;
 #endif
@@ -94,7 +104,7 @@ extern "C" __declspec(dllexport) bool PLUGIN_API InitDll() { return true; }
 extern "C" __declspec(dllexport) bool PLUGIN_API ExitDll()
 {
 #if VST3_FACTORY_FAULT == 7
-	Sleep(INFINITE);
+	signalFactoryFault(); Sleep(INFINITE);
 #elif VST3_FACTORY_FAULT == 8
 	RaiseException(0xe0000064, 0, 0, nullptr);
 #endif

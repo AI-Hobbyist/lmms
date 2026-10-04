@@ -61,6 +61,7 @@ private:
 	QSharedPointer<VstPlugin> m_plugin;
 	QMutex m_pluginMutex;
 	EffectKey m_key;
+	const bool m_nativeEffect;
 
 	VstEffectControls m_vstControls;
 

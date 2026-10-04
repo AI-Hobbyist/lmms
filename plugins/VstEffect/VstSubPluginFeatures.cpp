@@ -30,6 +30,7 @@
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "vsthost/VstCatalogSelection.h"
 #ifdef LMMS_BUILD_WIN32
 #include "vsthost/CatalogJobs.h"
 #endif
@@ -74,18 +75,7 @@ void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 	if (!report) { return; }
 	for (const auto& entry : report->entries)
 	{
-		EffectKey::AttributeMap attributes;
-		attributes["file"] = entry.locator.modulePath;
-		attributes["format"] = entry.identity.format == vsthost::Format::Vst3 ? "vst3" : "vst2";
-		if (entry.identity.format == vsthost::Format::Vst3) {
-			attributes["classid"] = QString::fromLatin1(QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex());
-		}
-		attributes["architecture"] = entry.identity.architecture == vsthost::Architecture::X86 ? "32" : "64";
-		attributes["identity"] = entry.identity.key();
-		attributes["version"] = entry.locator.version;
-		attributes["vendor"] = entry.vendor;
-		if (entry.shell) { attributes["shellid"] = QString::number(entry.identity.vst2Id); }
-		_kl.push_back(Key(_desc, entry.name, attributes));
+		if (!vsthost::isVstInstrument(entry)) { _kl.push_back(vsthost::vstCatalogKey(_desc, entry)); }
 	}
 #else
 	QStringList dlls;

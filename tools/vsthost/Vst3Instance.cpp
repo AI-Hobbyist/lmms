@@ -1,4 +1,5 @@
 #include "Vst3Instance.h"
+#include "vsthost/Vst3Commands.h"
 #include "Vst3StateStream.h"
 #include "vsthost/AudioQueue.h"
 #include "pluginterfaces/base/funknownimpl.h"
@@ -24,6 +25,19 @@ public:
 		std::fill_n(name, 128, char16{}); std::copy_n(u"LMMS", 4, name); return kResultOk;
 	}
 };
+std::string utf8(const String128& text)
+{
+	const auto end = std::find(std::begin(text), std::end(text), char16{});
+	if (end == std::end(text)) { throw std::runtime_error("Unterminated VST3 text"); }
+	const auto length = static_cast<int>(end - std::begin(text));
+	if (!length) { return std::string{}; }
+	const auto size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, reinterpret_cast<const wchar_t*>(text), length, nullptr, 0, nullptr, nullptr);
+	if (size <= 0) { throw std::runtime_error("Invalid VST3 text"); }
+	std::string value(size, '\0');
+	WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, reinterpret_cast<const wchar_t*>(text), length, value.data(), size, nullptr, nullptr);
+	return value;
+}
+
 void require(tresult result, const char* operation)
 {
 	if (result != kResultOk) { throw std::runtime_error(std::string(operation) + " failed (" + std::to_string(result) + ")"); }
@@ -114,8 +128,11 @@ void Vst3Instance::open(const std::filesystem::path& path, const std::array<std:
 		m_controllerParameters.resize(m_parameters.size());
 		for (std::size_t index = 0; index < m_parameters.size(); ++index) { m_parameterIndices.emplace(m_parameters[index].id, index); }
 		m_feedback.reserve(RealtimeMidiQueue::Capacity);
+		// Probe availability on the supervised native owner thread, without attaching a window.
+		auto view = owned(m_controller->createView(ViewType::kEditor));
+		m_hasEditor = view && view->isPlatformTypeSupported(kPlatformTypeHWND) == kResultOk;
 	}
-	m_midiFeedback.reserve(512);
+	m_midiFeedback.reserve(512); m_blockMidiFeedback.reserve(512);
 	m_inputChanges = std::make_unique<Vst3ParameterChanges>();
 	m_outputChanges = std::make_unique<Vst3ParameterChanges>();
 }
@@ -145,8 +162,8 @@ void Vst3Instance::close()
 	m_parameters.clear(); m_pendingParameters.clear(); m_parameterIndices.clear(); m_feedback.clear();
 	m_controllerParameters.clear();
 	m_inputChanges.reset(); m_outputChanges.reset();
-	m_midiFeedback.clear(); m_eventInputs.clear(); m_midiAssignments.clear();
-	m_restartFlags = 0;
+	m_midiFeedback.clear(); m_blockMidiFeedback.clear(); m_eventInputs.clear(); m_eventBuses.clear(); m_midiAssignments.clear();
+	m_restartFlags = 0; m_pendingRestart = 0; m_restartEventCount = 0; m_hasEditor = false;
 	m_inputs = {}; m_outputs = {}; m_processData = {}; m_maxFrames = 0; m_latency = 0;
 	require(failure, "VST3 close");
 }
@@ -166,6 +183,11 @@ void Vst3Instance::prepareBuses(BusDirection direction, Buffers& buffers)
 		require(m_processor->getBusArrangement(direction, index, arrangements[index]), "Get bus arrangement");
 		if (SpeakerArr::getChannelCount(arrangements[index]) != info.channelCount)
 		{ throw std::runtime_error("Inconsistent VST3 bus arrangement"); }
+		if (info.busType < kMain || info.busType > kAux || (info.flags & ~3u))
+		{ throw std::runtime_error("Invalid VST3 audio bus type/flags"); }
+		buffers.descriptors.push_back({0, static_cast<std::uint32_t>(direction), static_cast<std::uint32_t>(index),
+			static_cast<std::uint32_t>(info.channelCount), static_cast<std::uint32_t>(info.busType), info.flags,
+			buffers.channels, true, arrangements[index], utf8(info.name)});
 		buffers.buses[index].numChannels = info.channelCount;
 		buffers.channels += info.channelCount;
 	}
@@ -197,7 +219,7 @@ void Vst3Instance::setup(double rate, std::uint32_t frames, bool offline)
 	if (!m_componentInitialized || m_active || !std::isfinite(rate) || rate < 8000 || rate > 768000 ||
 		!frames || frames > AudioQueue::MaxFrames) { throw std::runtime_error("Invalid VST3 processing setup"); }
 	m_maxFrames = frames;
-	m_eventInputs.clear();
+	m_eventInputs.clear(); m_eventBuses.clear();
 	m_sampleSize = m_processor->canProcessSampleSize(kSample32) == kResultOk ? kSample32 : kSample64;
 	require(m_processor->canProcessSampleSize(m_sampleSize), "Negotiate sample size");
 	prepareBuses(kInput, m_inputs); prepareBuses(kOutput, m_outputs);
@@ -219,6 +241,15 @@ void Vst3Instance::setup(double rate, std::uint32_t frames, bool offline)
 			for (int32 index = 0; index < count; ++index)
 			{
 				BusInfo info{}; require(m_component->getBusInfo(media, direction, index, info), "Get bus activation metadata");
+				if (info.mediaType != media || info.direction != direction || info.busType < kMain || info.busType > kAux ||
+					(media == kEvent && (info.channelCount < 0 || info.channelCount > 16 || (info.flags & ~1u))))
+				{ throw std::runtime_error("Invalid VST3 bus activation metadata"); }
+				if (media == kEvent)
+				{
+					m_eventBuses.push_back({1, static_cast<std::uint32_t>(direction), static_cast<std::uint32_t>(index),
+						static_cast<std::uint32_t>(info.channelCount), static_cast<std::uint32_t>(info.busType), info.flags,
+						0, true, 0, utf8(info.name)});
+				}
 				if (media == kEvent && direction == kInput)
 				{
 					if (info.channelCount < 0 || info.channelCount > 16) { throw std::runtime_error("Invalid VST3 event bus channels"); }
@@ -271,11 +302,13 @@ void Vst3Instance::refreshMidiAssignments()
 	}
 }
 
-void Vst3Instance::serviceControl()
+void Vst3Instance::serviceControl(bool applyRestart)
 {
 	if (!m_handler) { return; }
-	const auto flags = m_handler->takeRestart();
-	m_restartFlags |= flags;
+	const auto reported = m_handler->takeRestart();
+	m_restartFlags |= reported; m_pendingRestart |= reported;
+	if (!applyRestart) { return; }
+	const auto flags = m_pendingRestart; m_pendingRestart = 0;
 	if (flags & kReloadComponent)
 	{
 		// Fully release the view/controller/processor/factory/module before opening
@@ -290,9 +323,11 @@ void Vst3Instance::serviceControl()
 		const bool visible = editor && IsWindowVisible(m_editor->window());
 		const auto reported = m_restartFlags;
 		auto feedback = std::move(m_feedback); auto midi = std::move(m_midiFeedback);
+		const auto restartEvents = m_restartEvents; const auto restartEventCount = m_restartEventCount;
 		close(); open(path, cid, handler);
 		restoreState(saved); setup(context.sampleRate, frames, offline); m_context = context;
 		m_restartFlags |= reported;
+		m_restartEvents = restartEvents; m_restartEventCount = restartEventCount;
 		m_feedback = std::move(feedback); m_midiFeedback = std::move(midi);
 		if (editor) { showEditor(); if (!visible) { hideEditor(); } }
 		return;
@@ -357,19 +392,32 @@ std::vector<std::uint8_t> Vst3Instance::metadata()
 {
 	if (!collectEdits()) { throw std::runtime_error("VST3 metadata callback barrier failed"); }
 	synchronizeController();
-	auto utf8 = [](const String128& text)
-	{
-		const auto end = std::find(std::begin(text), std::end(text), char16{});
-		if (end == std::end(text)) { throw std::runtime_error("Unterminated VST3 parameter title"); }
-		const auto length = static_cast<int>(end - std::begin(text));
-		if (!length) { return std::string{}; }
-		const auto size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, reinterpret_cast<const wchar_t*>(text), length, nullptr, 0, nullptr, nullptr);
-		if (size <= 0) { throw std::runtime_error("Invalid VST3 parameter title"); }
-		std::string value(size, '\0');
-		WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, reinterpret_cast<const wchar_t*>(text), length, value.data(), size, nullptr, nullptr);
-		return value;
-	};
+
 	Vst3Metadata info{inputChannels(), outputChannels(), static_cast<std::uint32_t>(m_sampleSize), m_latency, {}};
+	info.hasEditor = m_hasEditor;
+	info.buses = m_inputs.descriptors;
+	info.buses.insert(info.buses.end(), m_outputs.descriptors.begin(), m_outputs.descriptors.end());
+	info.buses.insert(info.buses.end(), m_eventBuses.begin(), m_eventBuses.end());
+	// Titles/type/flags may change without a channel-layout restart. Refresh
+	// them on the paused owner, never by querying native code on DAW audio.
+	for (auto& bus : info.buses)
+	{
+		BusInfo current{};
+		require(m_component->getBusInfo(static_cast<MediaType>(bus.media), static_cast<BusDirection>(bus.direction),
+			static_cast<int32>(bus.index), current), "Refresh bus metadata");
+		if (current.mediaType != static_cast<MediaType>(bus.media) || current.direction != static_cast<BusDirection>(bus.direction) ||
+			current.channelCount < 0 || static_cast<std::uint32_t>(current.channelCount) != bus.channels)
+		{ throw std::runtime_error("VST3 bus changed without prepared channel layout"); }
+		bus.type = static_cast<std::uint32_t>(current.busType); bus.flags = current.flags; bus.name = utf8(current.name);
+		if (bus.media == 0)
+		{
+			SpeakerArrangement arrangement = 0;
+			require(m_processor->getBusArrangement(static_cast<BusDirection>(bus.direction), static_cast<int32>(bus.index), arrangement),
+				"Refresh bus arrangement");
+			bus.arrangement = arrangement;
+		}
+	}
+
 	for (const auto& parameter : m_parameters)
 	{
 		info.parameters.push_back({parameter.id, static_cast<std::uint32_t>(parameter.flags), static_cast<std::uint32_t>(parameter.stepCount),
@@ -382,8 +430,10 @@ std::vector<std::uint8_t> Vst3Instance::metadata()
 }
 
 bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, std::span<float> output,
-	std::span<const std::uint8_t> events, std::uint64_t sequence)
+	std::span<const std::uint8_t> events, std::uint64_t sequence, bool collectOutput)
 {
+	m_blockMidiFeedback.clear();
+	auto& midiFeedback = collectOutput ? m_blockMidiFeedback : m_midiFeedback;
 	std::fill(output.begin(), output.end(), 0.0f);
 	if (!m_processing || frames > m_maxFrames || input.size() != static_cast<std::size_t>(frames) * m_inputs.channels ||
 		output.size() != static_cast<std::size_t>(frames) * m_outputs.channels) { return false; }
@@ -416,7 +466,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		if (!queue || queue->addPoint(0, pending.value, pointIndex) != kResultOk) { return false; }
 		pending.dirty = false;
 	}
-	if (!decodeVst3Events(events, frames, [&](const Vst3BlockEvent& wire)
+	const auto applyEvent = [&](const Vst3BlockEvent& wire)
 	{
 		if (wire.type == 0)
 		{
@@ -442,7 +492,15 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		else if (wire.type == 2) { event.type = Event::kNoteOffEvent; event.noteOff = {channel, pitch, static_cast<float>(wire.value), -1, 0}; }
 		else { event.type = Event::kPolyPressureEvent; event.polyPressure = {channel, pitch, static_cast<float>(wire.value), -1}; }
 		return m_inputEvents.addEvent(event) == kResultOk;
-	})) { return false; }
+	};
+	// Missed blocks cannot retain sample accuracy, so replay at the next safe
+	// block boundary, in arrival order and before newly arriving events.
+	for (std::size_t index = 0; index < m_restartEventCount; ++index)
+	{
+		const auto& event = m_restartEvents[index];
+		if ((frames || event.type == 0) && !applyEvent(event)) { return false; }
+	}
+	if (!decodeVst3Events(events, frames, applyEvent)) { return false; }
 	m_context.systemTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 	m_context.state |= ProcessContext::kSystemTimeValid;
 	for (std::uint32_t channel = 0; channel < m_inputs.channels; ++channel)
@@ -468,13 +526,13 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 	if (m_processor->process(m_processData) != kResultOk || m_inputChanges->failed() || m_outputChanges->failed() || m_outputEvents.failed()) { return false; }
 	for (int32 index = 0; index < m_outputEvents.getEventCount(); ++index)
 	{
-		Event event{}; if (m_outputEvents.getEvent(index, event) != kResultOk || m_midiFeedback.size() == 511) { return false; }
+		Event event{}; if (m_outputEvents.getEvent(index, event) != kResultOk || midiFeedback.size() >= 512) { return false; }
 		Vst3BlockEvent wire; wire.offset = event.sampleOffset; wire.bus = event.busIndex;
 		if (event.type == Event::kNoteOnEvent) { wire.type = 1; wire.channel = event.noteOn.channel; wire.id = event.noteOn.pitch; wire.value = event.noteOn.velocity; }
 		else if (event.type == Event::kNoteOffEvent) { wire.type = 2; wire.channel = event.noteOff.channel; wire.id = event.noteOff.pitch; wire.value = event.noteOff.velocity; }
 		else { wire.type = 3; wire.channel = event.polyPressure.channel; wire.id = event.polyPressure.pitch; wire.value = event.polyPressure.pressure; }
 		if (!validVst3Event(wire, frames)) { return false; }
-		m_midiFeedback.push_back({sequence, frames, wire});
+		midiFeedback.push_back({sequence, frames, wire});
 	}
 	// Remember the final point of each input automation curve. Controller
 	// setters belong to subsequent control work, never the native process call.
@@ -514,6 +572,8 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 			}
 		}
 	}
+	if (frames) { m_restartEventCount = 0; }
+	else { discardRestartParameters(); }
 	m_context.continousTimeSamples += frames;
 	if (m_context.state & ProcessContext::kPlaying)
 	{
@@ -525,9 +585,54 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 	return true;
 }
 
-std::vector<std::uint8_t> Vst3Instance::state()
+bool Vst3Instance::deferRestartEvents(std::span<const std::uint8_t> events, std::uint32_t frames)
+{
+	std::size_t count = 0;
+	// Validate the entire packet and capacity before changing the retained queue.
+	if (frames > m_maxFrames || !decodeVst3Events(events, frames, [&](const Vst3BlockEvent& event) {
+		if (++count > m_restartEvents.size() - m_restartEventCount) { return false; }
+		if (event.type == 0)
+		{
+			const auto found = m_parameterIndices.find(event.id);
+			return found != m_parameterIndices.end() && !(m_parameters[found->second].flags & ParameterInfo::kIsReadOnly);
+		}
+		return event.bus < m_eventInputs.size() && event.channel < static_cast<std::uint32_t>(m_eventInputs[event.bus]);
+	})) { return false; }
+	return decodeVst3Events(events, frames, [&](Vst3BlockEvent event) {
+		event.offset = 0; m_restartEvents[m_restartEventCount++] = event; return true;
+	});
+}
+
+void Vst3Instance::discardRestartParameters(std::optional<ParamID> id)
+{
+	std::size_t kept = 0;
+	for (std::size_t index = 0; index < m_restartEventCount; ++index)
+	{
+		const auto& event = m_restartEvents[index];
+		if (event.type != 0 || (id && event.id != *id)) { m_restartEvents[kept++] = event; }
+	}
+	m_restartEventCount = kept;
+}
+
+std::vector<std::uint8_t> Vst3Instance::state(std::span<const std::uint8_t> queuedParameters)
 {
 	if (!m_componentInitialized) { throw std::logic_error("VST3 instance is not initialized"); }
+	if (!queuedParameters.empty())
+	{
+		if (queuedParameters.size() < 8 || get(queuedParameters, 0, 4) != 1 || !decodeVst3Events(queuedParameters, m_maxFrames, [&](const auto& event) {
+			const auto found = m_parameterIndices.find(event.id);
+			return event.type == 0 && found != m_parameterIndices.end() &&
+				!(m_parameters[found->second].flags & ParameterInfo::kIsReadOnly);
+		})) { throw std::runtime_error("Invalid VST3 state parameter packet"); }
+		Vst3ComponentHandler::HostSetter hostSetter(m_handler);
+		decodeVst3Events(queuedParameters, m_maxFrames, [&](const auto& event) {
+			const auto index = m_parameterIndices.at(event.id);
+			discardRestartParameters(event.id);
+			require(m_controller->setParamNormalized(event.id, event.value), "Set state barrier parameter");
+			m_pendingParameters[index] = {event.value, true}; m_controllerParameters[index].dirty = false;
+			return true;
+		});
+	}
 	// State commands run after the helper audio barrier. Flush pending edits in
 	// a zero-sample block so saving never captures the processor's stale value.
 	if (m_processing && !process(0, {}, {})) { throw std::runtime_error("VST3 parameter state barrier failed"); }
@@ -566,6 +671,7 @@ void Vst3Instance::restoreState(std::span<const std::uint8_t> bytes)
 	if (!collectEdits()) { throw std::runtime_error("VST3 state callback barrier failed"); }
 	for (auto& parameter : m_pendingParameters) { parameter.dirty = false; }
 	for (auto& parameter : m_controllerParameters) { parameter.dirty = false; }
+	discardRestartParameters();
 	Vst3ComponentHandler::HostSetter stateSetter(m_handler);
 	auto component = owned(new Vst3StateStream({bytes.begin() + 16, bytes.begin() + 16 + componentSize}, false));
 	require(m_component->setState(component), "Set component state");
@@ -608,6 +714,18 @@ bool Vst3Instance::collectEdits()
 
 std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::uint8_t> command)
 {
+	// Reconfiguration runs behind the session's audio pause/drain barrier.
+	if (command.size() == 20 && get(command, 0, 4) == 2)
+	{
+		Vst3Setup configuration;
+		if (!decodeVst3Setup(command, configuration)) { throw std::runtime_error("Invalid VST3 reconfiguration"); }
+		if (!collectEdits()) { throw std::runtime_error("VST3 reconfiguration callback barrier failed"); }
+		synchronizeController();
+		if (m_processing) { require(m_processor->setProcessing(false), "Stop for setup change"); m_processing = false; }
+		if (m_active) { require(m_component->setActive(false), "Deactivate for setup change"); m_active = false; }
+		setup(configuration.sampleRate, configuration.maxFrames, configuration.offline);
+		return metadata();
+	}
 	// Four-byte selector 1 requests a refreshed SDK-free metadata snapshot.
 	if (command.size() == 4 && get(command, 0, 4) == 1) { return metadata(); }
 	if (!m_controller || (command.size() != 0 && command.size() != 12)) { throw std::runtime_error("Invalid VST3 parameter control"); }
@@ -622,6 +740,7 @@ std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::ui
 			(m_parameters[found->second].flags & ParameterInfo::kIsReadOnly)) { throw std::runtime_error("Invalid VST3 parameter setter"); }
 		Vst3ComponentHandler::HostSetter hostSetter(m_handler);
 		require(m_controller->setParamNormalized(id, value), "Set controller parameter");
+		discardRestartParameters(id);
 		m_pendingParameters[found->second] = {value, true};
 		m_controllerParameters[found->second].dirty = false;
 	}
@@ -642,6 +761,12 @@ HWND Vst3Instance::showEditor()
 	return m_editor->window();
 }
 void Vst3Instance::hideEditor() { if (m_editor) { m_editor->show(false); } }
+
+bool Vst3Instance::blockMidiOutput(std::span<std::uint8_t> storage, std::uint32_t& written) noexcept
+{
+	if (!encodeVst3OutputEvents(m_blockMidiFeedback, storage, written)) { return false; }
+	m_blockMidiFeedback.clear(); return true;
+}
 
 std::vector<std::uint8_t> Vst3Instance::midiOutput()
 {

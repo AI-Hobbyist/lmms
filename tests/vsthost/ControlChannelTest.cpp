@@ -61,7 +61,7 @@ int wmain(int argc, wchar_t** argv)
 	put(storage, 8 + 32, UINT32_MAX, 4);
 	check(helper.receive(frame) == Error::InvalidMessage, "untrusted length rejected before allocation");
 	check(host.send(request, payload) == Error::None, "version setup");
-	storage[8 + 4] = 2;
+	put(storage, 8 + 4, ProtocolVersion + 1, 2);
 	check(helper.receive(frame) == Error::ProtocolMismatch, "wrong version rejected");
 	check(helper.wait(frame, 10, [] { return true; }) == Error::Timeout, "bounded wait on living silent peer");
 	check(helper.wait(frame, 1000, [] { return false; }) == Error::Disconnected, "disconnect returns promptly");

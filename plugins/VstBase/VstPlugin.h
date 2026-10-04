@@ -32,6 +32,7 @@
 #include <QString>
 #include <QTimer>
 #include <cstdint>
+#include <memory>
 
 #include "Knob.h"
 #include "JournallingObject.h"
@@ -43,13 +44,22 @@ namespace lmms
 {
 
 class FloatModel;
+namespace vsthost { struct CatalogEntry; }
 
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin(const QString& plugin, std::uint32_t shellId = 0, const QString& embedMethod = {});
+	VstPlugin(const QString& plugin, std::uint32_t shellId = 0, const QString& embedMethod = {},
+			const vsthost::CatalogEntry* selection = nullptr);
+	bool failed() const;
+	bool isRunning();
+	bool process(const SampleFrame* input, SampleFrame* output);
+	bool process(const SampleFrame* input, SampleFrame* output, f_cnt_t frames);
+	bool processEffect(const SampleFrame* input, SampleFrame* output, f_cnt_t frames, float wet, float dry);
+	void processMidiEvent(const MidiEvent& event, f_cnt_t offset);
+	int isUIVisible();
 	std::uint32_t shellId() const noexcept { return m_shellId; }
 	struct ScanEntry { std::uint32_t id; QString name; };
 	struct ScanResult
@@ -60,16 +70,14 @@ public:
 	};
 	static ScanResult scanModule(const QString& path, unsigned timeoutMs = 15000);
 	void bindParameterModel(int index, FloatModel* model);
+	QString parameterStateKey(int index) const;
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
 
 	bool processMessage( const message & _m ) override;
 
-	inline bool hasEditor() const
-	{
-		return m_pluginWindowID != 0;
-	}
+	bool hasEditor() const;
 
 	/// Same as pluginWidget(), but can be overwritten in sub-classes to modify
 	/// behavior the UI. This is used in VstInstrumentPlugin to wrap the VST UI
@@ -165,6 +173,9 @@ public slots:
 	void handleClientEmbed();
 
 private:
+	struct Native;
+	std::unique_ptr<Native> m_native;
+	void refreshNativeParameters();
 	void loadChunk( const QByteArray & _chunk );
 	QByteArray saveChunk();
 
@@ -225,5 +236,6 @@ private:
 
 } // namespace gui
 } // namespace lmms
+
 
 #endif

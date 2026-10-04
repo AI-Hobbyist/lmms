@@ -52,6 +52,8 @@ struct LMMS_EXPORT CommandDescriptor
 	Mutability mutability = Mutability::ReadOnly;
 	TxScope scope = TxScope::None;
 	CommandHandler handler;
+	// Read-only model validation runs before creating a project snapshot.
+	CommandHandler preflight;
 };
 
 class LMMS_EXPORT CommandBus

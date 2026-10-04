@@ -53,6 +53,14 @@ public:
 	static QString openAudioFile(const QString& previousFile = "");
 	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
+	// Accept selected package directories instead of navigating into them.
+	void setAcceptedDirectorySuffix(const QString& suffix) { m_directorySuffix = suffix; }
+
+protected:
+	void accept() override;
+
+private:
+	QString m_directorySuffix;
 };
 
 

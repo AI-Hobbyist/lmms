@@ -540,6 +540,25 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
 	requestChangeInModel();
+	// A newly created instrument may be replaced before the next audio period.
+	// Remove its queued handles while their owning track is still alive, too.
+	for (auto* entry = m_newPlayHandles.first(), *previous = static_cast<LocklessListElement*>(nullptr); entry;)
+	{
+		auto* next = entry->next;
+		auto* handle = entry->value;
+		if ((handle->type() & types) && handle->isFromTrack(track))
+		{
+			if (previous) { previous->next = next; }
+			else { m_newPlayHandles.setFirst(next); }
+			handle->audioBusHandle()->removePlayHandle(handle);
+			if (handle->type() == PlayHandle::Type::NotePlayHandle)
+			{ NotePlayHandleManager::release(static_cast<NotePlayHandle*>(handle)); }
+			else { delete handle; }
+			m_newPlayHandles.free(entry);
+		}
+		else { previous = entry; }
+		entry = next;
+	}
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{

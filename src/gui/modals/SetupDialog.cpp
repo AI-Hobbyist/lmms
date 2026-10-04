@@ -53,6 +53,8 @@
 #include "vsthost/ScanRootsWidget.h"
 #ifdef LMMS_BUILD_WIN32
 #include "vsthost/CatalogJobs.h"
+#include "vsthost/VstCatalogSelection.h"
+#include <QTreeWidget>
 #include <QTimer>
 #include <algorithm>
 #endif
@@ -903,17 +905,32 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		refresh->setObjectName("vstCatalogRefresh"); force->setObjectName("vstCatalogForce"); cancel->setObjectName("vstCatalogCancel");
 		actions->addWidget(refresh); actions->addWidget(force); actions->addWidget(cancel); scanLayout->addLayout(actions);
 		auto* status = new QLabel(scanBox); status->setObjectName("vstCatalogStatus"); status->setWordWrap(true); scanLayout->addWidget(status);
-		auto update = [status, cancel, refresh, force, published = std::uint64_t{0}]() mutable {
+		auto* results = new QTreeWidget(scanBox); results->setObjectName("vstCatalogCategories");
+		results->setHeaderLabels({tr("Plugin"), tr("Format / architecture")}); results->setUniformRowHeights(true);
+		results->setMaximumHeight(180); scanLayout->addWidget(results);
+		auto update = [status, results, cancel, refresh, force, published = std::uint64_t{0}]() mutable {
 			const auto* jobs = Engine::vstCatalog();
 			refresh->setEnabled(jobs); force->setEnabled(jobs);
 			if (!jobs) { cancel->setEnabled(false); status->setText(tr("VST catalog is unavailable.")); return; }
 			const auto state = jobs->snapshot(); cancel->setEnabled(state.busy);
 			if (state.busy) { status->setText(tr("Scanning: %1 (%2/%3)").arg(state.path).arg(state.completed).arg(state.total)); }
 			else if (state.report) {
-				status->setText(tr("%1 plugins; %2 scan failures.%3").arg(state.report->entries.size()).arg(state.report->failures.size())
+				const auto instruments = std::count_if(state.report->entries.begin(), state.report->entries.end(), vsthost::isVstInstrument);
+				status->setText(tr("Instrument: %1; Effect: %2; scan failures: %3.%4").arg(instruments)
+					.arg(state.report->entries.size() - instruments).arg(state.report->failures.size())
 					.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : ""));
 				if (published != state.published) {
 					published = state.published; QStringList details;
+					results->setUpdatesEnabled(false); results->clear();
+					auto* instrumentGroup = new QTreeWidgetItem(results, {tr("Instrument")});
+					auto* effectGroup = new QTreeWidgetItem(results, {tr("Effect")});
+					for (const auto& entry : state.report->entries) {
+						auto* item = new QTreeWidgetItem(vsthost::isVstInstrument(entry) ? instrumentGroup : effectGroup,
+							{entry.name, QString("%1 / %2-bit").arg(entry.identity.format == vsthost::Format::Vst3 ? "VST3" : "VST2")
+								.arg(entry.identity.architecture == vsthost::Architecture::X86 ? 32 : 64)});
+						item->setToolTip(0, entry.vendor + '\n' + entry.locator.version + '\n' + entry.locator.modulePath);
+					}
+					results->setUpdatesEnabled(true);
 					for (std::size_t i = 0; i < std::min<std::size_t>(32, state.report->failures.size()); ++i) {
 						const auto& failure = state.report->failures[i];
 						details.append(tr("%1: %2 (error %3)").arg(failure.path, failure.operation).arg(static_cast<unsigned>(failure.error)));

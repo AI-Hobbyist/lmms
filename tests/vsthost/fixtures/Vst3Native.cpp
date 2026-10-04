@@ -4,6 +4,7 @@
 #include "pluginterfaces/base/ibstream.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include <cmath>
+#include <array>
 #include <algorithm>
 #include "pluginterfaces/vst/ivstevents.h"
 #include "pluginterfaces/vst/ivstprocesscontext.h"
@@ -16,6 +17,7 @@ namespace
 {
 uint32 requestedLatency = 0;
 bool requestedMono = false;
+bool requestedBusRename = false;
 const TUID ids[3] = {
 	INLINE_UID(0xf1020304, 0xabcdef01, 0x13572468, 0x98765432),
 	INLINE_UID(0x01000200, 0x76543210, 0xfedcba98, 0x24681357),
@@ -24,15 +26,36 @@ const TUID ids[3] = {
 class Processor final : public AudioEffect
 {
 public:
-	explicit Processor(bool sample64) : m_sample64(sample64), m_gain(sample64 ? 0.75 : 0.25) {}
+	explicit Processor(bool sample64) : m_sample64(sample64), m_gain(sample64 ? 0.75 : 0.25),
+		m_verifySetup(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_VERIFY_SETUP", nullptr, 0) != 0),
+		m_verifyBlocks(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_VERIFY_BLOCKS", nullptr, 0) != 0),
+		m_delayed(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_AUDIO_LATENCY", nullptr, 0) != 0),
+		m_multiBus(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MULTIBUS", nullptr, 0) != 0),
+		m_outputNotes(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_OUTPUT_NOTES", nullptr, 0) != 0),
+		m_secondMidiMain(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MIDI_SECOND_MAIN", nullptr, 0) != 0),
+		m_secondMidiOutput(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MIDI_SECOND_OUTPUT", nullptr, 0) != 0),
+		m_noMidi(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_NO_MIDI", nullptr, 0) != 0),
+		m_narrowMidi(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MIDI_NARROW", nullptr, 0) != 0),
+		m_auxMidiOnly(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MIDI_AUX_ONLY", nullptr, 0) != 0),
+			m_denseOutput(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", nullptr, 0) != 0),
+			m_denseOverflow(GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OVERFLOW", nullptr, 0) != 0)
+	{ if (m_delayed) { requestedLatency = 17; } }
 	tresult PLUGIN_API initialize(FUnknown* host) override
 	{
 		const auto result = AudioEffect::initialize(host);
 		if (result != kResultOk) { return result; }
 		addAudioInput(u"Main", SpeakerArr::kStereo);
 		addAudioOutput(u"Main", SpeakerArr::kStereo);
-		addEventInput(u"MIDI", 16);
+		if (m_multiBus)
+		{
+			addAudioInput(u"Sidechain", SpeakerArr::kMono, kAux);
+			addAudioOutput(u"Extra Stereo", SpeakerArr::kStereo, kAux);
+			addAudioOutput(u"Control Voltage", SpeakerArr::kMono, kAux, BusInfo::kDefaultActive | BusInfo::kIsControlVoltage);
+		}
+		if (m_secondMidiMain) { addEventInput(u"Auxiliary MIDI", 16, kAux); }
+		if (!m_noMidi) { addEventInput(u"MIDI", m_narrowMidi ? 2 : 16, m_auxMidiOnly ? kAux : kMain); }
 		addEventOutput(u"MIDI", 16);
+		if (m_secondMidiOutput) { addEventOutput(u"Auxiliary MIDI", 4, kAux); }
 		return kResultOk;
 	}
 	tresult PLUGIN_API getControllerClassId(TUID cid) override { std::memcpy(cid, ids[2], 16); return kResultOk; }
@@ -41,6 +64,8 @@ public:
 	{
 		const auto result = AudioEffect::getBusInfo(media, direction, index, info);
 		if (result == kResultOk && media == kAudio && requestedMono) { info.channelCount = 1; }
+		if (result == kResultOk && media == kAudio && requestedBusRename)
+		{ std::fill_n(info.name, 128, char16{}); std::copy_n(u"Renamed Main", 12, info.name); }
 		return result;
 	}
 	tresult PLUGIN_API getBusArrangement(BusDirection direction, int32 index, SpeakerArrangement& arrangement) override
@@ -59,11 +84,21 @@ public:
 	tresult PLUGIN_API setupProcessing(ProcessSetup& setup) override
 	{
 		if (m_active || canProcessSampleSize(setup.symbolicSampleSize) != kResultOk) { return kResultFalse; }
+		if (m_verifySetup)
+		{
+			const double rates[]{48000, 96000, 44100};
+			const int32 frames[]{512, 128, 256};
+			const int32 modes[]{kOffline, kRealtime, kOffline};
+			if (m_setupChecks >= 3 || setup.sampleRate != rates[m_setupChecks] ||
+				setup.maxSamplesPerBlock != frames[m_setupChecks] || setup.processMode != modes[m_setupChecks]) { return kResultFalse; }
+			++m_setupChecks;
+		}
 		const auto result = AudioEffect::setupProcessing(setup); m_setup = result == kResultOk; return result;
 	}
 	tresult PLUGIN_API setActive(TBool state) override
 	{
 		if ((state && !m_setup) || (!state && m_processing)) { return kResultFalse; }
+		if (state) { m_delaySamples = {}; m_delayPosition = 0; }
 		m_active = state; return AudioEffect::setActive(state);
 	}
 	tresult PLUGIN_API setProcessing(TBool state) override
@@ -99,9 +134,17 @@ public:
 			{ return kResultFalse; }
 			++m_contextChecks;
 		}
-		if (!m_processing || data.symbolicSampleSize != (m_sample64 ? kSample64 : kSample32) ||
-			data.numInputs != 1 || data.numOutputs != 1 || data.inputs[0].numChannels != (requestedMono ? 1 : 2) || data.outputs[0].numChannels != (requestedMono ? 1 : 2) ||
+		if (!m_processing || data.processMode != processSetup.processMode || data.symbolicSampleSize != (m_sample64 ? kSample64 : kSample32) ||
+			data.numInputs != (m_multiBus ? 2 : 1) || data.numOutputs != (m_multiBus ? 3 : 1) || data.inputs[0].numChannels != (requestedMono ? 1 : 2) || data.outputs[0].numChannels != (requestedMono ? 1 : 2) ||
 			data.numSamples < 0 || data.numSamples > processSetup.maxSamplesPerBlock) { return kResultFalse; }
+		if (m_multiBus && (data.inputs[1].numChannels != 1 || data.outputs[1].numChannels != 2 || data.outputs[2].numChannels != 1))
+		{ return kResultFalse; }
+		if (m_verifyBlocks && data.numSamples)
+		{
+			const int32 expected[]{1, 17, 65, processSetup.maxSamplesPerBlock - 1, processSetup.maxSamplesPerBlock};
+			if (m_blockChecks >= 5 || data.numSamples != expected[m_blockChecks]) { return kResultFalse; }
+			++m_blockChecks;
+		}
 		for (int32 frame = 0; frame < std::max(1, data.numSamples); ++frame)
 		{
 			if (data.inputParameterChanges)
@@ -126,19 +169,52 @@ public:
 						const double expectedPpq = data.processContext->projectTimeMusic + event.sampleOffset *
 							data.processContext->tempo / (60 * data.processContext->sampleRate);
 						if (std::abs(event.ppqPosition - expectedPpq) > 1e-12) { return kResultFalse; }
+					if (event.busIndex < 0 || event.busIndex >= getBusCount(kEvent, kInput) || m_noMidi) { return kResultFalse; }
 					if (event.sampleOffset != frame) { continue; }
-					if (event.type == Event::kNoteOnEvent) { m_note = event.noteOn.velocity; }
+					if (event.type == Event::kNoteOnEvent) { m_note = (m_secondMidiMain && event.busIndex == 0 ? 0.5 : 1.0) * event.noteOn.velocity; }
 					else if (event.type == Event::kNoteOffEvent) { m_note = 0; }
 					else if (event.type == Event::kPolyPressureEvent) { m_note = event.polyPressure.pressure; }
+					event.busIndex = 0;
 					if (data.outputEvents && data.outputEvents->addEvent(event) != kResultOk) { return kResultFalse; }
+					const auto channel = event.type == Event::kNoteOnEvent ? event.noteOn.channel :
+						event.type == Event::kNoteOffEvent ? event.noteOff.channel : event.polyPressure.channel;
+					if (m_secondMidiOutput && channel < 4)
+					{
+						event.busIndex = 1;
+						if (data.outputEvents && data.outputEvents->addEvent(event) != kResultOk) { return kResultFalse; }
+					}
 				}
 			}
 			if (frame >= data.numSamples) { continue; }
 				for (int32 channel = 0; channel < data.outputs[0].numChannels; ++channel)
 			{
-				if (m_sample64) { data.outputs[0].channelBuffers64[channel][frame] = data.inputs[0].channelBuffers64[channel][frame] * m_gain + m_note; }
-				else { data.outputs[0].channelBuffers32[channel][frame] = data.inputs[0].channelBuffers32[channel][frame] * static_cast<float>(m_gain) + static_cast<float>(m_note); }
+				const double incoming = m_sample64 ? data.inputs[0].channelBuffers64[channel][frame] * m_gain + m_note :
+					data.inputs[0].channelBuffers32[channel][frame] * static_cast<float>(m_gain) + static_cast<float>(m_note);
+				double outgoing = incoming;
+				if (m_delayed)
+				{ outgoing = m_delaySamples[m_delayPosition][channel]; m_delaySamples[m_delayPosition][channel] = incoming; }
+				if (m_sample64) { data.outputs[0].channelBuffers64[channel][frame] = outgoing; }
+				else { data.outputs[0].channelBuffers32[channel][frame] = static_cast<float>(outgoing); }
 			}
+			if (m_multiBus)
+			{
+				const auto sidechain = m_sample64 ? data.inputs[1].channelBuffers64[0][frame] : data.inputs[1].channelBuffers32[0][frame];
+				for (int32 channel = 0; channel < 2; ++channel)
+				{
+					const auto main = m_sample64 ? data.inputs[0].channelBuffers64[channel][frame] : data.inputs[0].channelBuffers32[channel][frame];
+					const auto extra = (main + sidechain * (channel == 0 ? 2 : -1)) * m_gain
+						+ (m_outputNotes ? m_note * (channel == 0 ? 2 : -1) : 0);
+					double outgoing = extra;
+					if (m_delayed)
+					{ outgoing = m_delaySamples[m_delayPosition][channel + 2]; m_delaySamples[m_delayPosition][channel + 2] = extra; }
+					if (m_sample64) { data.outputs[1].channelBuffers64[channel][frame] = outgoing; }
+					else { data.outputs[1].channelBuffers32[channel][frame] = static_cast<float>(outgoing); }
+				}
+				if (m_sample64) { data.outputs[2].channelBuffers64[0][frame] = 1.; }
+				else { data.outputs[2].channelBuffers32[0][frame] = 1.f; }
+				data.outputs[1].silenceFlags = data.outputs[2].silenceFlags = 0;
+			}
+			if (m_delayed && ++m_delayPosition == m_delaySamples.size()) { m_delayPosition = 0; }
 		}
 			if (data.numSamples && data.inputEvents && data.inputEvents->getEventCount())
 			{
@@ -146,12 +222,34 @@ public:
 				auto* output = data.outputParameterChanges->addParameterData(0xf0000101, index);
 				if (!output || output->addPoint(data.numSamples - 1, m_gain, point) != kResultOk) { return kResultFalse; }
 			}
+			if (m_denseOutput && data.numSamples && data.outputEvents)
+			{
+				for (int32 index = 0; index < (m_denseOverflow ? 513 : 512); ++index)
+				{
+					Event event{}; event.busIndex = m_secondMidiOutput ? index % 2 : 0; event.sampleOffset = index % data.numSamples;
+					event.type = Event::kNoteOnEvent;
+					event.noteOn = {int16(index / 128), int16(index % 128), 0, 0.5f, 0, -1};
+					// Overflow mode deliberately ignores the host's final rejected add.
+					data.outputEvents->addEvent(event);
+				}
+			}
 			data.outputs[0].silenceFlags = 0; return kResultOk;
 	}
 private:
 	bool m_sample64, m_setup = false, m_active = false, m_processing = false;
 	double m_gain, m_note = 0;
 	int32 m_contextChecks = 0;
+	bool m_verifySetup = false;
+	bool m_verifyBlocks = false;
+	unsigned m_blockChecks = 0;
+	unsigned m_setupChecks = 0;
+	bool m_delayed = false;
+	bool m_multiBus = false;
+	bool m_outputNotes = false;
+		bool m_secondMidiMain = false, m_secondMidiOutput = false, m_noMidi = false, m_auxMidiOnly = false, m_narrowMidi = false;
+	bool m_denseOutput = false, m_denseOverflow = false;
+		std::array<std::array<double, 4>, 17> m_delaySamples{};
+	std::size_t m_delayPosition = 0;
 };
 class View final : public EditorView
 {
@@ -159,7 +257,8 @@ public:
 	explicit View(EditController* controller) : EditorView(controller)
 	{ setRect({0, 0, 240, 120}); }
 	tresult PLUGIN_API isPlatformTypeSupported(FIDString type) override
-	{ return type && std::strcmp(type, kPlatformTypeHWND) == 0 ? kResultOk : kResultFalse; }
+	{ return GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_UNSUPPORTED_EDITOR", nullptr, 0) == 0 &&
+		type && std::strcmp(type, kPlatformTypeHWND) == 0 ? kResultOk : kResultFalse; }
 	tresult PLUGIN_API attached(void* parent, FIDString type) override
 	{
 		if (isPlatformTypeSupported(type) != kResultOk || !parent || m_child) { return kResultFalse; }
@@ -200,6 +299,10 @@ private:
 			ViewRect resize{0, 0, 317, 173};
 			return self->plugFrame && self->plugFrame->resizeView(self, &resize) == kResultOk ? 1 : 0;
 		}
+		if (message == WM_APP + 39)
+		{
+			return self->getController()->setParamNormalized(42, 0.125) == kResultOk ? 1 : 0;
+		}
 		return CallWindowProcW(self->m_original, window, message, wparam, lparam);
 	}
 	HWND m_child = nullptr;
@@ -215,7 +318,7 @@ public:
 	REFCOUNT_METHODS(EditController)
 	tresult PLUGIN_API getMidiControllerAssignment(int32 bus, int16 channel, CtrlNumber number, ParamID& id) override
 	{
-		if (bus == 0 && channel == 3 && (number == (m_learned ? 10 : 7) || number == 128 || number == 129))
+		if (bus == (GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_MIDI_SECOND_MAIN", nullptr, 0) ? 1 : 0) && channel == 3 && (number == (m_learned ? 10 : 7) || number == 128 || number == 129))
 		{ id = 0xf0000101; return kResultOk; }
 		return kResultFalse;
 	}
@@ -223,6 +326,7 @@ public:
 	{
 		const auto result = EditController::initialize(host);
 		if (result != kResultOk) { return result; }
+		m_reverse = GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_REVERSE_PARAMS", nullptr, 0) != 0;
 		parameters.addParameter(new Parameter(u"Gain", 0xf0000101, nullptr, 0.25));
 		parameters.addParameter(new Parameter(u"Bypass", 42, nullptr, 0, 1, ParameterInfo::kCanAutomate | ParameterInfo::kIsBypass));
 		return kResultOk;
@@ -240,10 +344,11 @@ public:
 	}
 	tresult PLUGIN_API setState(IBStream* stream) override { return setComponentState(stream); }
 	IPlugView* PLUGIN_API createView(FIDString type) override
-	{ return type && std::strcmp(type, ViewType::kEditor) == 0 ? new View(this) : nullptr; }
+	{ return GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_NO_EDITOR", nullptr, 0) == 0 &&
+		type && std::strcmp(type, ViewType::kEditor) == 0 ? new View(this) : nullptr; }
 	tresult PLUGIN_API getParameterInfo(int32 index, ParameterInfo& info) override
 	{
-		const auto result = EditController::getParameterInfo(m_changed ? 1 - index : index, info);
+		const auto result = EditController::getParameterInfo((m_changed != m_reverse) ? 1 - index : index, info);
 		if (result == kResultOk && m_changed && info.id == 0xf0000101)
 		{
 			std::fill_n(info.title, 128, char16{}); std::copy_n(u"Program Gain", 12, info.title);
@@ -269,6 +374,11 @@ public:
 					if (getComponentHandler()) { getComponentHandler()->restartComponent(kIoChanged); }
 				}
 				if (value == 0.0625 && getComponentHandler()) { getComponentHandler()->restartComponent(kReloadComponent); }
+			if (value == 0.03125)
+			{
+				requestedBusRename = true;
+				if (getComponentHandler()) { getComponentHandler()->restartComponent(kIoTitlesChanged); }
+			}
 			if (getComponentHandler()) { getComponentHandler()->restartComponent(kMidiCCAssignmentChanged); }
 		}
 		if (result == kResultOk && getComponentHandler())
@@ -282,6 +392,7 @@ public:
 private:
 	bool m_learned = false;
 	bool m_changed = false;
+	bool m_reverse = false;
 };
 }
 FUnknown* createVst3NativeFixture(const TUID cid)

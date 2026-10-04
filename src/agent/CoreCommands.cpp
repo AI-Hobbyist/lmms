@@ -67,6 +67,11 @@
 #include "agent/CommandBus.h"
 #include "panning.h"
 #include "volume.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#include "vsthost/Vst3Selection.h"
+#include <QCoreApplication>
+#endif
 
 namespace lmms::agent
 {
@@ -3846,7 +3851,7 @@ bool readSubPluginKey( const Plugin::Descriptor *descriptor, const QJsonObject &
 {
 	if( !arguments.contains( "subKey" ) )
 	{
-		if( descriptor->subPluginFeatures )
+		if( descriptor->subPluginFeatures && QString::fromUtf8(descriptor->name) != "vestige" )
 		{
 			failure = invalidArguments( "This plugin requires subKey; select one from effect.listAvailable." );
 			return false;
@@ -3881,7 +3886,7 @@ bool readSubPluginKey( const Plugin::Descriptor *descriptor, const QJsonObject &
 	return false;
 }
 
-CommandResult executeInstrumentLoad( const QJsonObject &arguments )
+CommandResult prepareAndLoadInstrument(const QJsonObject& arguments, bool validateOnly)
 {
 	auto *song = Engine::getSong();
 	if( song == nullptr )
@@ -3922,18 +3927,80 @@ CommandResult executeInstrumentLoad( const QJsonObject &arguments )
 	std::optional<Plugin::Descriptor::SubPluginFeatures::Key> subKey;
 	if( !readSubPluginKey( pluginInfo.descriptor, arguments, subKey, failure ) ) { return failure; }
 	QString path;
+	QDomDocument nativeDocument;
+	QDomElement nativeState;
+	const bool hasNativeSelection = arguments.contains("classid") || arguments.contains("architecture");
+	if (hasNativeSelection && (plugin != "vestige" || !arguments.contains("path")))
+	{ return invalidArguments("VST3 classid/architecture require vestige and a module path."); }
 	if( arguments.contains( "path" ) )
 	{
+		if (!arguments.value("path").isString()) { return invalidArguments("'path' must be a string."); }
 		const QFileInfo file( arguments.value( "path" ).toString() );
 		const auto suffix = file.suffix().toLower();
 		const bool supported = pluginInfo.descriptor->supportsFileType( suffix ) ||
 			( subKey && subKey->additionalFileExtensions().split( ',' ).contains( suffix ) );
-		if( !file.isFile() || !file.isReadable() || !supported )
+		const bool native = plugin == "vestige" && file.suffix().compare("vst3", Qt::CaseInsensitive) == 0;
+		if( (!file.isFile() && !(native && file.isDir())) || !file.isReadable() || !supported )
 		{
 			return invalidArguments( "'path' must be a readable local file supported by the instrument." );
 		}
 		path = file.absoluteFilePath();
+		if (hasNativeSelection && !native)
+		{ return invalidArguments("VST3 classid/architecture require a .vst3 module."); }
+		if (native)
+		{
+#ifdef LMMS_BUILD_WIN32
+			const auto cidValue = arguments.value("classid");
+			const auto architectureValue = arguments.value("architecture");
+			const auto cid = cidValue.toString().toLower();
+			const auto architecture = architectureValue.toString();
+			if (!cidValue.isString() || !QRegularExpression("^[0-9a-f]{32}$").match(cid).hasMatch() ||
+				!architectureValue.isString() || (architecture != "32" && architecture != "64"))
+			{ return invalidArguments("A VST3 module requires its raw classid (32 hex digits) and architecture ('32' or '64')."); }
+			const auto* jobs = Engine::vstCatalog();
+			const auto report = jobs ? jobs->snapshot().report : nullptr;
+			const vsthost::CatalogEntry* selected = nullptr;
+			if (report)
+			{
+				for (const auto& entry : report->entries)
+				{
+					const auto raw = QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex();
+					if (entry.identity.format != vsthost::Format::Vst3 || raw != cid.toLatin1() ||
+						(entry.identity.architecture == vsthost::Architecture::X86 ? "32" : "64") != architecture ||
+						vsthost::scanPathKey(entry.locator.modulePath) != vsthost::scanPathKey(path))
+					{ continue; }
+					if (selected) { return invalidArguments("The VST3 locator is ambiguous; refresh the catalog."); }
+					selected = &entry;
+				}
+			}
+			if (!selected) { return invalidArguments("The VST3 class, architecture and path must match a scanned catalog entry."); }
+			if (validateOnly)
+			{
+				const auto directories = QDir::searchPaths("plugins");
+				const auto directory = qEnvironmentVariableIsSet("LMMS_PLUGIN_DIR") ? qEnvironmentVariable("LMMS_PLUGIN_DIR") :
+					(directories.isEmpty() ? QCoreApplication::applicationDirPath() + "/plugins" : directories.front());
+				const auto helper = QDir(directory).absoluteFilePath(architecture == "32" ? "32/RemoteVstHost32.exe" : "RemoteVstHost64.exe");
+				const vsthost::CatalogIo io(QDir(directory).absoluteFilePath("RemoteCatalogIo.exe"), 15000, {});
+				QString selectionError;
+				if (!vsthost::validateVst3Selection(io, helper, path, *selected, selectionError))
+				{ return invalidArguments(selectionError); }
+			}
+			nativeState = nativeDocument.createElement("vestige"); nativeDocument.appendChild(nativeState);
+			nativeState.setAttribute("plugin", path);
+			nativeState.setAttribute("pluginname", selected->name);
+			nativeState.setAttribute("vendor", selected->vendor);
+			nativeState.setAttribute("format", "vst3");
+			nativeState.setAttribute("classid", cid);
+			nativeState.setAttribute("architecture", architecture);
+			nativeState.setAttribute("binarypath", selected->locator.binaryPath);
+			nativeState.setAttribute("version", selected->locator.version);
+			nativeState.setAttribute("fingerprint", QString::fromLatin1(selected->locator.fingerprint.toHex()));
+#else
+			return invalidArguments("Native VST3 commands are available on Windows.");
+#endif
+		}
 	}
+	if (validateOnly) { return CommandResult::success(); }
 	auto *instrument = track->loadInstrument( plugin, subKey ? &*subKey : nullptr );
 	if( instrument == nullptr || instrument->descriptor() != pluginInfo.descriptor )
 	{
@@ -3941,7 +4008,15 @@ CommandResult executeInstrumentLoad( const QJsonObject &arguments )
 			QStringLiteral( "LMMS could not load instrument '%1'." ).arg( plugin ) );
 	}
 
-	if( !path.isEmpty() ) { instrument->loadFile( path ); }
+	if (!nativeState.isNull())
+	{
+		instrument->restoreState(nativeState);
+		const auto loaded = instrument->saveState(nativeDocument, nativeState);
+		if (loaded.attribute("format") != "vst3" || loaded.attribute("classid") != nativeState.attribute("classid") ||
+			loaded.attribute("architecture") != nativeState.attribute("architecture") || !loaded.hasAttribute("vst3state"))
+		{ return CommandResult::failure("instrument_load_failed", "The selected VST3 instance could not be initialized."); }
+	}
+	else if( !path.isEmpty() ) { instrument->loadFile( path ); }
 	return CommandResult::success( QJsonObject{
 		{ "path", trackPath( trackIndex, track ) },
 		{ "plugin", plugin },
@@ -3951,6 +4026,11 @@ CommandResult executeInstrumentLoad( const QJsonObject &arguments )
 
 
 
+
+CommandResult executeInstrumentLoad(const QJsonObject& arguments)
+{
+	return prepareAndLoadInstrument(arguments, false);
+}
 
 bool validateInstrumentParameters( InstrumentTrack *track, bool hasVolume, double volume, bool hasPanning, double panning,
 	bool hasPitch, double pitch, bool hasPitchRange, int pitchRange, bool hasBaseNote, int baseNote,
@@ -5569,7 +5649,8 @@ CommandResult executeQueryNotes( const QJsonObject &arguments )
 
 
 void registerDescriptor( CommandBus &commandBus, const QString &name, const QString &summary,
-	const QJsonObject &schema, Mutability mutability, TxScope scope, CommandHandler handler )
+	const QJsonObject &schema, Mutability mutability, TxScope scope, CommandHandler handler,
+	CommandHandler preflight = {} )
 {
 	CommandDescriptor descriptor;
 	descriptor.name = name;
@@ -5606,6 +5687,7 @@ void registerDescriptor( CommandBus &commandBus, const QString &name, const QStr
 	descriptor.mutability = mutability;
 	descriptor.scope = scope;
 	descriptor.handler = std::move( handler );
+	descriptor.preflight = std::move(preflight);
 	commandBus.registerCommand( descriptor );
 }
 
@@ -6023,9 +6105,11 @@ void registerCoreCommands( CommandBus &commandBus )
 
 	registerDescriptor( commandBus, "instrument.load", "Load an instrument plugin onto an instrument track.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "plugin", stringSchema() }, { "path", stringSchema() },
+			{ "classid", stringSchema() }, { "architecture", stringSchema() },
 			{ "subKey", objectSchema( QJsonObject{ { "name", stringSchema() },
 				{ "attributes", QJsonObject{ { "type", "object" }, { "additionalProperties", stringSchema() } } } }, QJsonArray{ "attributes" } ) } },
-		QJsonArray{ "track", "plugin" } ), Mutability::Mutating, TxScope::Single, executeInstrumentLoad );
+		QJsonArray{ "track", "plugin" } ), Mutability::Mutating, TxScope::Single, executeInstrumentLoad,
+		[](const QJsonObject& arguments) { return prepareAndLoadInstrument(arguments, true); } );
 	registerDescriptor( commandBus, "instrument.setParameters", "Set one or more instrument-track parameters.", objectSchema(
 		QJsonObject{ { "track", integerSchema() }, { "volume", numberSchema() },
 			{ "panning", numberSchema() }, { "pitch", numberSchema() },

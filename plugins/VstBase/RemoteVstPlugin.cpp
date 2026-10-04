@@ -1146,9 +1146,33 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 	}
 	else { entries.emplace_back(static_cast<std::uint32_t>(m_plugin->uniqueID), pluginName()); }
 	message result(IdVstShellEntries); result.addInt(static_cast<int>(entries.size())).addInt(shell ? 1 : 0);
-	for (const auto& [id, name] : entries) { result.addString(std::to_string(id)).addString(name); }
-	const auto vendorVersion = pluginVersion();
-	result.addString(pluginVendorString()).addString(std::to_string(vendorVersion));
+	const auto vendorVersion = pluginVersion(); const auto vendor = pluginVendorString();
+	// Classify shell children inside the same supervised scan helper, never in the DAW.
+	using Entry = AEffect* (VST_CALL_CONV*)(audioMasterCallback);
+#ifndef NATIVE_LINUX_VST
+	auto entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "VSTPluginMain"));
+	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "VstPluginMain")); }
+	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "main")); }
+#else
+	auto entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "VSTPluginMain"));
+	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "VstPluginMain")); }
+	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "main")); }
+#endif
+	if (!entryPoint) { return false; }
+	if (shell) { pluginDispatch(effClose); m_plugin = nullptr; }
+	for (const auto& [id, name] : entries)
+	{
+		if (shell)
+		{
+			m_shellId = id; m_plugin = entryPoint(hostCallback);
+			if (!m_plugin || m_plugin->magic != kEffectMagic || static_cast<std::uint32_t>(m_plugin->uniqueID) != id) { return false; }
+			pluginDispatch(effOpen);
+		}
+		const auto flags = static_cast<std::uint32_t>(m_plugin->flags);
+		result.addString(std::to_string(id)).addString(name).addString(std::to_string(flags));
+		if (shell) { pluginDispatch(effClose); m_plugin = nullptr; }
+	}
+	result.addString(vendor).addString(std::to_string(vendorVersion));
 	sendMessage(result); return true;
 }
 

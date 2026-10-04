@@ -88,7 +88,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
-			knobFModel[i]->loadSettings(_this, paramStr.data());
+			knobFModel[i]->loadSettings(_this, m_effect->m_plugin->parameterStateKey(i));
 
 			if( !( knobFModel[ i ]->isAutomated() ||
 						knobFModel[ i ]->controllerConnection() ) )
@@ -122,6 +122,18 @@ void VstEffectControls::initializeParameterModels()
 	}
 }
 
+QMap<QString, AutomatableModel*> VstEffectControls::parameterModels()
+{
+	QMutexLocker locker(&m_effect->m_pluginMutex);
+	QMap<QString, AutomatableModel*> models;
+	if (m_effect->m_plugin && !knobFModel.empty())
+	{
+		for (int i = 0; i < static_cast<int>(knobFModel.size()); ++i)
+		{ models.insert(m_effect->m_plugin->parameterStateKey(i), knobFModel[i]); }
+	}
+	return models;
+}
+
 void VstEffectControls::setParameter( Model * action )
 {
 	int knobUNID = action->displayName().toInt();
@@ -149,7 +161,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
 					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
-					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
+					knobFModel[i]->saveSettings(_doc, _this, m_effect->m_plugin->parameterStateKey(i));
 				}
 			}
 		}
@@ -424,6 +436,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->setRowStretch( ( int( m_vi->paramCount / 10 ) + 1 ), 1 );
 	l->setColumnStretch( 10, 1 );
 
+
 	widget->setLayout(l);
 	widget->setAutoFillBackground(true);
 
@@ -521,25 +534,15 @@ ManageVSTEffectView::~ManageVSTEffectView()
 
 	m_vi2->knobFModel.clear();
 
-	if( m_vi2->m_scrollArea != nullptr )
-	{
-		delete m_vi2->m_scrollArea;
-		m_vi2->m_scrollArea = nullptr;
-	}
+	// The subwindow owns the scroll area/content. Deleting content before
+	// calling close() leaves SubWindow with no widget during visibility changes.
+	auto* window = m_vi2->m_subWindow;
+	auto* scrollArea = m_vi2->m_scrollArea;
+	m_vi2->m_subWindow = nullptr;
+	m_vi2->m_scrollArea = nullptr;
+	if (window) { delete window; }
+	else { delete scrollArea; }
 
-	if( m_vi2->m_subWindow != nullptr )
-	{
-		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
-		m_vi2->m_subWindow->close();
-
-		if( m_vi2->m_subWindow != nullptr )
-		{
-			delete m_vi2->m_subWindow;
-		}
-		m_vi2->m_subWindow = nullptr;
-	}
-	//delete m_vi2->m_subWindow;
-	//m_vi2->m_subWindow = NULL;
 }
 
 

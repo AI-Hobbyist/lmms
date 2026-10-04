@@ -174,6 +174,38 @@ private slots:
 		QCOMPARE( lmms::Engine::getSong()->tempoModel().value(), static_cast<float>( InitialTempo ) );
 	}
 
+	void preflightRejectsBeforeSnapshotAndRollsBackExistingBatch()
+	{
+		using namespace lmms::agent;
+		auto& bus = CommandBus::instance();
+		auto* journal = lmms::Engine::projectJournal();
+		auto descriptor = makeTempoCommand("test.preflightTempo", false);
+		descriptor.preflight = [](const QJsonObject& arguments)
+		{
+			if (arguments.value("bpm").toInt() == 140)
+			{ return CommandResult::failure("invalid_arguments", "Rejected by model validation."); }
+			return CommandResult::success();
+		};
+		QVERIFY(bus.registerCommand(descriptor));
+		const auto rejected = bus.execute(descriptor.name, {{"bpm", 140}});
+		QCOMPARE(rejected.errorCode, QString("invalid_arguments"));
+		QCOMPARE(lmms::Engine::getSong()->tempoModel().value(), static_cast<float>(InitialTempo));
+		QCOMPARE(journal->transactionDepth(), 0); QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.execute(descriptor.name, {{"bpm", 132}}).ok);
+		QCOMPARE(lmms::Engine::getSong()->tempoModel().value(), 132.0f);
+		QCOMPARE(journal->undoDepth(), 1);
+		QVERIFY(bus.execute("history.undo").ok);
+		QVERIFY(journal->canRedo());
+		QVERIFY(!bus.execute(descriptor.name, {{"bpm", 140}, {"dryRun", true}}).ok);
+		QVERIFY(journal->canRedo()); QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.beginBatch("prior edit"));
+		QVERIFY(bus.execute("test.setTempo", {{"bpm", 150}}).ok);
+		QVERIFY(!bus.execute(descriptor.name, {{"bpm", 140}}).ok);
+		QCOMPARE(bus.batchDepth(), 0); QCOMPARE(journal->transactionDepth(), 0);
+		QCOMPARE(lmms::Engine::getSong()->tempoModel().value(), static_cast<float>(InitialTempo));
+		QVERIFY(journal->canRedo()); QCOMPARE(journal->undoDepth(), 0);
+	}
+
 	void validatesArgumentsBeforeChangingTheProject()
 	{
 		auto &bus = lmms::agent::CommandBus::instance();

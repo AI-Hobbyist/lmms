@@ -33,8 +33,11 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <QTemporaryFile>
+#include <QSaveFile>
 #include <QTimerEvent>
 #include <QScopedValueRollback>
+#include <QPointer>
+#include <QTimer>
 #include <bit>
 #include <charconv>
 #include <cmath>
@@ -51,9 +54,14 @@
 #	include <windows.h>
 #	include <QLayout>
 #	include "vsthost/Vst2Scanner.h"
+#	include "vsthost/Vst3HostProxy.h"
+#	include "vsthost/Vst3Ports.h"
+#	include "vsthost/PluginCatalog.h"
+#	include "vsthost/Vst3Selection.h"
 #endif
 
 #include "AudioEngine.h"
+#include "AudioFileDevice.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "FontHelper.h"
@@ -63,6 +71,8 @@
 #include "PathUtil.h"
 #include "SimpleTextFloat.h"
 #include "Song.h"
+#include "MidiEvent.h"
+#include "SampleFrame.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
@@ -172,7 +182,35 @@ VstPlugin::ScanResult VstPlugin::scanModule(const QString& path, unsigned timeou
 	return result;
 }
 
-VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QString& embedMethod) :
+struct VstPlugin::Native
+{
+#ifdef LMMS_BUILD_WIN32
+	vsthost::Vst3HostProxy proxy;
+	vsthost::CatalogEntry entry;
+	std::vector<std::uint32_t> ids; // Stable model slots, never controller enumeration indices.
+	std::vector<float> input, output, dry;
+	std::atomic<std::uint32_t> audioLayout{0};
+	std::atomic<std::uint32_t> midiInputPort{UINT32_MAX};
+
+	QByteArray lastState;
+	QString preservedState;
+	bool preserveState = false;
+	bool visible = false;
+	std::int64_t continuous = 0;
+	void applyFeedback(VstPlugin& plugin, const vsthost::Vst3HostProxy::Feedback& feedback)
+	{
+		for (const auto& edit : feedback.edits)
+		{
+			const auto found = std::find(ids.begin(), ids.end(), edit.id);
+			if (found != ids.end())
+			{ plugin.applyParameterEdit(edit.phase == 3 ? 1 : edit.phase, int(found - ids.begin()), float(edit.value)); }
+		}
+		if (feedback.restart) { plugin.refreshNativeParameters(); }
+	}
+#endif
+};
+
+VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QString& embedMethod, const vsthost::CatalogEntry* selection) :
 	RemotePlugin(true),
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_shellId(shellId),
@@ -184,6 +222,48 @@ VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QStrin
 	m_currentProgram()
 {
 	setSplittedChannels( true );
+#ifdef LMMS_BUILD_WIN32
+	if (selection && selection->identity.format == vsthost::Format::Vst3)
+	{
+			m_native = std::make_unique<Native>(); m_native->entry = *selection;
+		m_native->entry.locator.modulePath = PathUtil::toAbsolute(selection->locator.modulePath);
+		if (!selection->locator.binaryPath.isEmpty())
+		{ m_native->entry.locator.binaryPath = PathUtil::toAbsolute(selection->locator.binaryPath); }
+		QString helper = selection->identity.architecture == vsthost::Architecture::X86
+			? "32/RemoteVstHost32.exe" : "RemoteVstHost64.exe";
+		auto executable = QFileInfo(QDir("plugins:"), helper).absoluteFilePath();
+		if (const auto* directory = std::getenv("LMMS_PLUGIN_DIR"))
+		{ executable = QFileInfo(QDir(directory), helper).absoluteFilePath(); }
+		auto ioDirectory = QFileInfo(executable).dir();
+		if (selection->identity.architecture == vsthost::Architecture::X86) { ioDirectory.cdUp(); }
+		const vsthost::CatalogIo io(ioDirectory.absoluteFilePath("RemoteCatalogIo.exe"), 15000, {});
+		QString selectionError;
+		if (!vsthost::validateVst3Selection(io, executable, m_plugin, m_native->entry, selectionError))
+		{
+			m_failed = true;
+			Engine::getSong()->collectError(tr("VST3 selection cannot be loaded: %1").arg(selectionError));
+			return;
+		}
+		const auto frames = Engine::audioEngine()->framesPerPeriod();
+		const vsthost::Vst3Create instance{selection->identity.cid,
+			double(Engine::audioEngine()->outputSampleRate()), static_cast<std::uint32_t>(frames),
+			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting(), m_plugin.toUtf8().toStdString()};
+		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000}, instance);
+		if (m_failed) { return; }
+		m_name = selection->name.isEmpty() ? QFileInfo(m_plugin).completeBaseName() : selection->name;
+		m_vendorString = selection->vendor; m_productString = m_name;
+		for (const auto& parameter : m_native->proxy.metadata().parameters) { m_native->ids.push_back(parameter.id); }
+		m_parameterCount = static_cast<int>(m_native->ids.size());
+		m_native->input.resize(vsthost::AudioQueue::MaxFrames * vsthost::AudioQueue::MaxChannels);
+		m_native->output.resize(vsthost::AudioQueue::MaxFrames * vsthost::AudioQueue::MaxChannels);
+			m_native->dry.resize(vsthost::AudioQueue::MaxFrames * vsthost::AudioQueue::MaxChannels);
+		refreshNativeParameters();
+		m_native->proxy.setMetadataPublication([this] { refreshNativeParameters(); });
+		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &VstPlugin::updateSampleRate);
+		m_idleTimer.start(50); connect(&m_idleTimer, &QTimer::timeout, this, &VstPlugin::idleUpdate);
+		return;
+	}
+#endif
 
 	auto pluginType = ExecutableType::Unknown;
 #ifdef LMMS_BUILD_LINUX
@@ -254,6 +334,183 @@ VstPlugin::~VstPlugin()
 	for (const auto index : m_parameterGestures)
 	{ if (auto model = m_parameterModels.value(index)) { model->restoreJournallingState(); } }
 	delete m_pluginWidget;
+}
+
+bool VstPlugin::failed() const
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return m_failed || m_native->proxy.error() != vsthost::Error::None; }
+#endif
+	return RemotePlugin::failed();
+}
+
+bool VstPlugin::isRunning()
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return m_native->proxy.running(); }
+#endif
+	return RemotePlugin::isRunning();
+}
+
+bool VstPlugin::hasEditor() const
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return !failed() && m_native->proxy.running() && m_native->proxy.metadata().hasEditor; }
+#endif
+	return m_pluginWindowID != 0;
+}
+
+int VstPlugin::isUIVisible()
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return m_native->visible ? 1 : 0; }
+#endif
+	return RemotePlugin::isUIVisible();
+}
+
+void VstPlugin::refreshNativeParameters()
+{
+#ifdef LMMS_BUILD_WIN32
+	if (!m_native) { return; }
+	const auto& metadata = m_native->proxy.metadata();
+	std::uint32_t midiInput = UINT32_MAX;
+	vsthost::resolveVst3EventPort(metadata, 0, vsthost::Vst3MidiPorts::Automatic, midiInput);
+	m_native->midiInputPort.store(midiInput, std::memory_order_release);
+	vsthost::Vst3StereoPort inputPort, outputPort;
+	vsthost::resolveVst3Port(metadata, 0, vsthost::Vst3AudioPorts::Automatic, 0, inputPort);
+	vsthost::resolveVst3Port(metadata, 1, vsthost::Vst3AudioPorts::Automatic, 0, outputPort);
+	m_native->audioLayout.store(metadata.inputs | (metadata.outputs << 8) |
+		(vsthost::encodeVst3Port(inputPort) << 16) | (vsthost::encodeVst3Port(outputPort) << 24), std::memory_order_release);
+	m_parameterDump.clear(); m_allParameterLabels.resize(m_native->ids.size()); m_allParameterDisplays.resize(m_native->ids.size());
+	for (std::size_t index = 0; index < m_native->ids.size(); ++index)
+	{
+		const auto found = std::find_if(metadata.parameters.begin(), metadata.parameters.end(),
+			[&](const auto& parameter) { return parameter.id == m_native->ids[index]; });
+		if (found == metadata.parameters.end()) { continue; }
+		m_parameterDump["param" + QString::number(index)] = QString::number(index) + ':' +
+			QString::fromUtf8(found->title).replace(':', ' ') + ':' + QString::number(found->value, 'g', 17);
+		m_allParameterLabels[index] = QString::fromUtf8(found->units);
+		m_allParameterDisplays[index] = QString::number(found->value, 'g', 6);
+	}
+#endif
+}
+
+bool VstPlugin::process(const SampleFrame* input, SampleFrame* output)
+{
+	return process(input, output, Engine::audioEngine()->framesPerPeriod());
+}
+
+bool VstPlugin::process(const SampleFrame* input, SampleFrame* output, f_cnt_t frames)
+{
+	return processEffect(input, output, frames, 1.0f, 0.0f);
+}
+
+bool VstPlugin::processEffect(const SampleFrame* input, SampleFrame* output, f_cnt_t frames, float wet, float dry)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		if (!output) { return false; }
+		if (!frames || frames > vsthost::AudioQueue::MaxFrames) { zeroSampleFrames(output, frames); return false; }
+		const auto offline = Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting();
+		std::vector<vsthost::Vst3OutputEvent> generated; // Populated only by the renderer.
+		// Consume unused plugin events with their audio block to keep queues bounded.
+		const auto receive = +[](void*, const vsthost::Vst3OutputEvent&,
+			const vsthost::Vst3Transport&, std::uint32_t) noexcept { return true; };
+		const auto render = [&] {
+			const auto layout = m_native->audioLayout.load(std::memory_order_acquire);
+			const auto inputs = layout & 255, outputs = (layout >> 8) & 255;
+			const auto mapping = layout >> 16;
+			const auto inputPort = vsthost::decodeVst3Port(mapping & 255), outputPort = vsthost::decodeVst3Port(mapping >> 8);
+			if (inputs > 64 || inputPort.offset > inputs || inputPort.channels > inputs - inputPort.offset) { return false; }
+			for (unsigned frame = 0; frame < frames; ++frame)
+			{
+				const auto left = input ? input[frame][0] : 0.f, right = input ? input[frame][1] : 0.f;
+				auto nativeInput = std::span(m_native->input).subspan(frame * inputs, inputs);
+				vsthost::writeVst3Port(nativeInput, inputPort, left, right);
+				vsthost::writeVst3Port(std::span(m_native->dry).subspan(frame * outputs, outputs), outputPort, left, right);
+			}
+			const auto* song = Engine::getSong();
+			vsthost::Vst3Transport transport;
+			transport.flags = (song->isPlaying() || song->isExporting() ? 1 : 0) | (song->isRecording() ? 2 : 0);
+			transport.tempo = Engine::getSong()->getTempo();
+			transport.numerator = Engine::getSong()->getTimeSigModel().getNumerator();
+			transport.denominator = Engine::getSong()->getTimeSigModel().getDenominator();
+			transport.samples = song->getFrames();
+			transport.music = double(song->getTicks()) / (DefaultTicksPerBar / 4);
+			const auto bar = double(transport.numerator) * 4 / transport.denominator;
+			transport.bar = std::floor(transport.music / bar) * bar;
+			transport.continuous = m_native->continuous;
+			const bool success = m_native->proxy.process({static_cast<std::uint32_t>(frames), inputs, outputs},
+				std::span(m_native->input).first(std::size_t(frames) * inputs),
+				std::span(m_native->output).first(std::size_t(frames) * outputs), transport,
+				offline,
+				std::span(m_native->dry).first(std::size_t(frames) * outputs), wet, dry, offline ? &generated : nullptr, offline ? nullptr : receive, nullptr);
+			for (unsigned frame = 0; frame < frames; ++frame)
+			{
+				const auto samples = success ? vsthost::readVst3Port(std::span(m_native->output).subspan(frame * outputs, outputs), outputPort) :
+					std::array<float, 2>{};
+				output[frame] = SampleFrame(samples[0], samples[1]);
+			}
+			return success;
+		};
+		const auto success = offline ? render() : m_native->proxy.withAudio(render);
+		if (!success)
+		{
+			zeroSampleFrames(output, frames);
+		}
+		m_native->continuous += frames;
+		return success;
+	}
+#endif
+	// Preserve the VST2 dry/wet path and its existing fixed-period bridge.
+	static thread_local auto original = std::array<SampleFrame, MAXIMUM_BUFFER_SIZE>();
+	if (!output || frames > MAXIMUM_BUFFER_SIZE) { return false; }
+	if (input) { std::copy_n(input, frames, original.begin()); }
+	else { std::fill_n(original.begin(), frames, SampleFrame{}); }
+	const auto processed = RemotePlugin::process(input, output);
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{ output[frame] = output[frame] * wet + original[frame] * dry; }
+	return processed;
+}
+
+void VstPlugin::processMidiEvent(const MidiEvent& event, f_cnt_t offset)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto selection = m_native->midiInputPort.load(std::memory_order_acquire);
+		const auto port = static_cast<std::uint32_t>(selection);
+		const auto channel = static_cast<std::uint32_t>(event.channel());
+		if (port == UINT32_MAX || channel >= (port >> 5)) { return; }
+		vsthost::Vst3BlockEvent translated{}; translated.bus = port & 31; translated.offset = offset; translated.channel = channel;
+		translated.id = static_cast<std::uint32_t>(event.key()); translated.value = event.velocity() / 127.0;
+		switch (event.type())
+		{
+		case MidiNoteOn: translated.type = event.velocity() ? 1 : 2; break;
+		case MidiNoteOff: translated.type = 2; break;
+		case MidiKeyPressure: translated.type = 3; break;
+		case MidiControlChange: translated.type = 4; translated.id = event.controllerNumber(); translated.value = event.controllerValue() / 127.0; break;
+		case MidiChannelPressure: translated.type = 4; translated.id = 128; translated.value = event.channelPressure() / 127.0; break;
+		case MidiPitchBend: translated.type = 4; translated.id = 129; translated.value = event.pitchBend() / 16383.0; break;
+		default: return;
+		}
+		m_native->proxy.postEvent(translated); return;
+	}
+#endif
+	RemotePlugin::processMidiEvent(event, offset);
+}
+
+QString VstPlugin::parameterStateKey(int index) const
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		if (index < 0 || static_cast<std::size_t>(index) >= m_native->ids.size()) { return {}; }
+		return QString("vst3param_%1").arg(m_native->ids[index], 8, 16, QLatin1Char('0'));
+	}
+#endif
+	return QString("param%1").arg(index);
 }
 
 void VstPlugin::bindParameterModel(int index, FloatModel* model)
@@ -332,6 +589,31 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto& identity = m_native->entry.identity;
+		const QByteArray cid(reinterpret_cast<const char*>(identity.cid.data()), identity.cid.size());
+		if (_this.attribute("format") != "vst3" || _this.attribute("classid").toLatin1().toLower() != cid.toHex())
+		{ Engine::getSong()->collectError(tr("VST3 state identity does not match the selected class.")); return; }
+		if (_this.hasAttribute("vst3state"))
+		{
+			m_native->preservedState = _this.attribute("vst3state");
+			m_native->preserveState = true;
+			constexpr qsizetype maximumEncoded = ((vsthost::MaxControlBytes + 2ull) / 3) * 4;
+			if (m_native->preservedState.size() > maximumEncoded)
+			{ Engine::getSong()->collectError(tr("VST3 project state exceeds the size limit. Original data is preserved.")); return; }
+			const auto state = QByteArray::fromBase64(m_native->preservedState.toLatin1(), QByteArray::AbortOnBase64DecodingErrors);
+			const auto bytes = std::span(reinterpret_cast<const std::uint8_t*>(state.constData()), std::size_t(state.size()));
+			if (!vsthost::validVst3State(bytes))
+			{ Engine::getSong()->collectError(tr("Invalid VST3 project state. Original data is preserved.")); return; }
+			loadChunk(state);
+			if (m_native->preserveState) { return; }
+		}
+		m_native->proxy.refreshMetadata();
+		return;
+	}
+#endif
 	if( _this.hasAttribute( "program" ) )
 	{
 		setProgram( _this.attribute( "program" ).toInt() );
@@ -363,6 +645,25 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto& entry = m_native->entry;
+		_this.setAttribute("format", "vst3");
+		_this.setAttribute("pluginname", m_name);
+		_this.setAttribute("vendor", m_vendorString);
+		_this.setAttribute("product", m_productString);
+		_this.setAttribute("classid", QString::fromLatin1(QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex()));
+		_this.setAttribute("architecture", entry.identity.architecture == vsthost::Architecture::X86 ? "32" : "64");
+		_this.setAttribute("modulepath", entry.locator.modulePath);
+		_this.setAttribute("binarypath", entry.locator.binaryPath);
+		_this.setAttribute("version", entry.locator.version);
+		_this.setAttribute("fingerprint", QString::fromLatin1(entry.locator.fingerprint.toHex()));
+		_this.setAttribute("guivisible", m_native->visible ? 1 : 0);
+		_this.setAttribute("vst3state", m_native->preserveState ? m_native->preservedState : QString::fromLatin1(saveChunk().toBase64()));
+		return;
+	}
+#endif
 	if (m_shellId) { _this.setAttribute("shellid", QString::number(m_shellId)); }
 	if ( m_embedMethod != "none" )
 	{
@@ -404,6 +705,9 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void VstPlugin::toggleUI()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { if (m_native->visible) { hideUI(); } else { showUI(); } return; }
+#endif
 	if ( m_embedMethod == "none" )
 	{
 		RemotePlugin::toggleUI();
@@ -419,6 +723,9 @@ void VstPlugin::toggleUI()
 
 void VstPlugin::setTempo( bpm_t _bpm )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return; }
+#endif
 	if (postVstTempo(static_cast<unsigned>(_bpm))) { return; }
 	lock();
 	sendMessage( message( IdVstSetTempo ).addInt( _bpm ) );
@@ -430,6 +737,18 @@ void VstPlugin::setTempo( bpm_t _bpm )
 
 void VstPlugin::updateSampleRate()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto result = m_native->proxy.configure({double(Engine::audioEngine()->outputSampleRate()),
+			static_cast<std::uint32_t>(Engine::audioEngine()->framesPerPeriod()),
+			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting() ||
+			dynamic_cast<AudioFileDevice*>(Engine::audioEngine()->audioDev()) != nullptr});
+		if (result == vsthost::Error::None) { refreshNativeParameters(); }
+		else { Engine::getSong()->collectError(tr("VST3 processing reconfiguration failed (error %1).").arg(static_cast<unsigned>(result))); }
+		return;
+	}
+#endif
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
 			addInt( Engine::audioEngine()->outputSampleRate() ) );
@@ -442,6 +761,9 @@ void VstPlugin::updateSampleRate()
 
 int VstPlugin::currentProgram()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return 0; }
+#endif
 	lock();
 	sendMessage( message( IdVstCurrentProgram ) );
 	waitForMessage( IdVstCurrentProgram, true );
@@ -454,6 +776,9 @@ int VstPlugin::currentProgram()
 
 const QMap<QString, QString> & VstPlugin::parameterDump()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { m_native->proxy.refreshMetadata(); refreshNativeParameters(); return m_parameterDump; }
+#endif
 	lock();
 	sendMessage( IdVstGetParameterDump );
 	waitForMessage( IdVstParameterDump, true );
@@ -467,6 +792,9 @@ const QMap<QString, QString> & VstPlugin::parameterDump()
 
 void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { for (const auto& value : _pdump) { setParam(value.section(':', 0, 0).toInt(), LocaleHelper::toFloat(value.section(':', 2, -1))); } return; }
+#endif
 	message m( IdVstSetParameterDump );
 	m.addInt( _pdump.size() );
 	for (const auto& str : _pdump)
@@ -658,6 +986,25 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		gui::FileDialog dialog(nullptr, tr("Open Preset"), "", tr("VST3 Plugin Preset (*.vstpreset)"));
+		dialog.setFileMode(gui::FileDialog::ExistingFile);
+		if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty())
+		{
+			QFile file(dialog.selectedFiles().front());
+			if (file.open(QIODevice::ReadOnly) && file.size() <= vsthost::MaxControlBytes + 65536)
+			{
+				const auto bytes = file.readAll();
+				if (m_native->proxy.restorePreset(std::span(reinterpret_cast<const std::uint8_t*>(bytes.constData()), std::size_t(bytes.size()))) != vsthost::Error::None)
+				{ Engine::getSong()->collectError(tr("Invalid VST3 preset or class identity.")); }
+				refreshNativeParameters();
+			}
+		}
+		return;
+	}
+#endif
 	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
 	ofd.setFileMode(gui::FileDialog::ExistingFiles);
 	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
@@ -675,6 +1022,9 @@ void VstPlugin::openPreset()
 
 void VstPlugin::setProgram( int index )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return; }
+#endif
 	lock();
 	sendMessage( message( IdVstSetProgram ).addInt( index ) );
 	waitForMessage( IdVstSetProgram, true );
@@ -686,6 +1036,9 @@ void VstPlugin::setProgram( int index )
 
 void VstPlugin::rotateProgram( int offset )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return; }
+#endif
 	lock();
 	sendMessage( message( IdVstRotateProgram ).addInt( offset ) );
 	waitForMessage( IdVstRotateProgram, true );
@@ -697,6 +1050,9 @@ void VstPlugin::rotateProgram( int offset )
 
 void VstPlugin::loadProgramNames()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { m_allProgramNames.clear(); return; }
+#endif
 	lock();
 	sendMessage( message( IdVstProgramNames ) );
 	waitForMessage( IdVstProgramNames, true );
@@ -708,6 +1064,9 @@ void VstPlugin::loadProgramNames()
 
 void VstPlugin::loadParameterLabels()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { refreshNativeParameters(); return; }
+#endif
 	lock();
 	sendMessage(message(IdVstLoadAllParameterLabels));
 	waitForMessage(IdVstLoadAllParameterLabels, true);
@@ -719,6 +1078,9 @@ void VstPlugin::loadParameterLabels()
 
 void VstPlugin::loadParameterDisplays()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { refreshNativeParameters(); return; }
+#endif
 	lock();
 	sendMessage(message(IdVstLoadAllParameterDisplays));
 	waitForMessage(IdVstLoadAllParameterDisplays, true);
@@ -730,6 +1092,9 @@ void VstPlugin::loadParameterDisplays()
 
 void VstPlugin::updateParameterLabel(int index)
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { refreshNativeParameters(); return; }
+#endif
 	lock();
 	sendMessage(message(IdVstUpdateParameterLabel).addInt(index));
 	waitForMessage(IdVstUpdateParameterLabel, true);
@@ -741,6 +1106,9 @@ void VstPlugin::updateParameterLabel(int index)
 
 void VstPlugin::updateParameterDisplay(int index)
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { refreshNativeParameters(); return; }
+#endif
 	lock();
 	sendMessage(message(IdVstUpdateParameterDisplay).addInt(index));
 	waitForMessage(IdVstUpdateParameterDisplay, true);
@@ -752,6 +1120,21 @@ void VstPlugin::updateParameterDisplay(int index)
 
 void VstPlugin::savePreset()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		gui::FileDialog dialog(nullptr, tr("Save Preset"), "", tr("VST3 Plugin Preset (*.vstpreset)"));
+		dialog.setAcceptMode(gui::FileDialog::AcceptSave); dialog.setDefaultSuffix("vstpreset");
+		if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty())
+		{
+			const auto preset = m_native->proxy.preset(); QSaveFile file(dialog.selectedFiles().front());
+			if (preset.error != vsthost::Error::None || !file.open(QIODevice::WriteOnly) ||
+				file.write(reinterpret_cast<const char*>(preset.payload.data()), preset.payload.size()) != qint64(preset.payload.size()) || !file.commit())
+			{ Engine::getSong()->collectError(tr("Could not save VST3 preset.")); }
+		}
+		return;
+	}
+#endif
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
@@ -790,6 +1173,18 @@ void VstPlugin::savePreset()
 
 void VstPlugin::setParam( int i, float f )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		if (applyingParameterEdit != this && i >= 0 && std::size_t(i) < m_native->ids.size())
+		{
+			if (QThread::currentThread() == thread())
+			{ m_native->applyFeedback(*this, m_native->proxy.setParameter(m_native->ids[i], f)); }
+			else { m_native->proxy.postEvent({0, 0, 0, 0, m_native->ids[i], f}); }
+		}
+		return;
+	}
+#endif
 	if (applyingParameterEdit == this) { return; }
 	if (postVstParameter(i, f)) { return; }
 	lock();
@@ -802,6 +1197,13 @@ void VstPlugin::setParam( int i, float f )
 
 void VstPlugin::idleUpdate()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		m_native->applyFeedback(*this, m_native->proxy.poll());
+		return;
+	}
+#endif
 	lock();
 	sendMessage( message( IdVstIdleUpdate ) );
 	unlock();
@@ -809,6 +1211,9 @@ void VstPlugin::idleUpdate()
 
 void VstPlugin::showUI()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { if (hasEditor() && m_embedMethod != "headless") { m_native->visible = m_native->proxy.showEditor().error == vsthost::Error::None; } return; }
+#endif
 	if ( m_embedMethod == "none" )
 	{
 		RemotePlugin::showUI();
@@ -824,6 +1229,9 @@ void VstPlugin::showUI()
 
 void VstPlugin::hideUI()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { m_native->proxy.hideEditor(); m_native->visible = false; return; }
+#endif
 	if ( m_embedMethod == "none" )
 	{
 		RemotePlugin::hideUI();
@@ -846,6 +1254,22 @@ void VstPlugin::handleClientEmbed()
 
 void VstPlugin::loadChunk( const QByteArray & _chunk )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto* begin = reinterpret_cast<const std::uint8_t*>(_chunk.constData());
+		const auto bytes = std::span(begin, std::size_t(_chunk.size()));
+		if (!vsthost::validVst3State(bytes))
+		{ Engine::getSong()->collectError(tr("Invalid VST3 state envelope. Current state is unchanged.")); return; }
+		// Retain the imported blob before calling native code: if restoration fails,
+		// a later save must not erase the project's only recoverable state.
+		m_native->lastState = _chunk;
+		m_native->preservedState = QString::fromLatin1(_chunk.toBase64()); m_native->preserveState = true;
+		if (m_native->proxy.restoreState({begin, begin + _chunk.size()}) != vsthost::Error::None)
+		{ Engine::getSong()->collectError(tr("VST3 state restoration failed. Original data is preserved.")); return; }
+		m_native->preserveState = false; refreshNativeParameters(); return;
+	}
+#endif
 	QTemporaryFile tf;
 	if( tf.open() )
 	{
@@ -868,6 +1292,16 @@ void VstPlugin::loadChunk( const QByteArray & _chunk )
 
 QByteArray VstPlugin::saveChunk()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto state = m_native->proxy.state();
+		if (state.error != vsthost::Error::None || !vsthost::validVst3State(state.payload))
+		{ Engine::getSong()->collectError(tr("VST3 state could not be saved. Previous state is preserved.")); return m_native->lastState; }
+		m_native->lastState = QByteArray(reinterpret_cast<const char*>(state.payload.data()), state.payload.size());
+		return m_native->lastState;
+	}
+#endif
 	QByteArray a;
 	QTemporaryFile tf;
 	if( tf.open() )
@@ -900,6 +1334,9 @@ void VstPlugin::toggleEditorVisibility( int visible )
 
 void VstPlugin::createUI( QWidget * parent )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return; }
+#endif
 	if ( m_pluginWidget ) {
 		qWarning() << "VstPlugin::createUI called twice";
 		m_pluginWidget->setParent( parent );
@@ -989,6 +1426,9 @@ bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 
 QString VstPlugin::embedMethod() const
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_native) { return m_embedMethod == "headless" ? "headless" : "none"; }
+#endif
 	return m_embedMethod;
 }
 

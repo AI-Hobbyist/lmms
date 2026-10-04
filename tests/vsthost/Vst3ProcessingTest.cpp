@@ -35,10 +35,24 @@ int wmain(int argc, wchar_t** argv)
 		CHECK(get(created.payload, 16, 4) == 2);
 			CHECK(get(created.payload, 20, 4) == 0xf0000101 && get(created.payload, 24, 4) == 42);
 			std::vector<std::uint8_t> metadataCommand(4); put(metadataCommand, 0, 1, 4);
-			const auto initialMetadata = session.request(MessageType::Parameter, metadataCommand, 3000).get();
+			const auto initialMetadata = session.request(MessageType::Parameter, metadataCommand, 3000, true).get();
 			Vst3Metadata metadata;
 			CHECK(initialMetadata.error == Error::None && decodeVst3Metadata(initialMetadata.payload, metadata));
 			CHECK(metadata.inputs == 2 && metadata.outputs == 2 && metadata.sampleSize == index && metadata.latency == 0);
+		CHECK(metadata.hasEditor);
+		CHECK(metadata.buses.size() == 4);
+		for (unsigned busIndex = 0; busIndex < 4; ++busIndex)
+		{
+			const auto& bus = metadata.buses[busIndex];
+			CHECK(bus.media == busIndex / 2 && bus.direction == busIndex % 2 && bus.index == 0 && bus.active);
+			CHECK(bus.channelOffset == 0 && bus.type == 0 && bus.name == (busIndex < 2 ? "Main" : "MIDI"));
+			CHECK(bus.channels == (busIndex < 2 ? 2u : 16u));
+		}
+
+		auto badMetadata = initialMetadata.payload; put(badMetadata, 24, 2, 4);
+		Vst3Metadata rejectedMetadata; CHECK(!decodeVst3Metadata(badMetadata, rejectedMetadata));
+		for (unsigned length = 0; length < 28; ++length)
+		{ CHECK(!decodeVst3Metadata(std::span(initialMetadata.payload).first(length), rejectedMetadata)); }
 			CHECK(metadata.parameters.size() == 2 && metadata.parameters[0].title == "Gain" && metadata.parameters[0].id == 0xf0000101);
 		CHECK(peer.request(MessageType::Create, command, 5000).get().error == Error::None);
 		const auto state = session.request(MessageType::GetState, {}, 3000, true).get();
@@ -182,7 +196,7 @@ int wmain(int argc, wchar_t** argv)
 			{ CHECK(eventSamples[frame * 2] == (frame < 7 ? 0.875f : 0.5f)); }
 			put(parameter, 4, std::bit_cast<std::uint64_t>(0.25), 8);
 			CHECK(session.request(MessageType::Parameter, parameter, 3000).get().error == Error::None);
-			const auto refreshed = session.request(MessageType::Parameter, metadataCommand, 3000).get();
+			const auto refreshed = session.request(MessageType::Parameter, metadataCommand, 3000, true).get();
 			CHECK(refreshed.error == Error::None && decodeVst3Metadata(refreshed.payload, metadata));
 			CHECK(metadata.latency == 17 && metadata.parameters.size() == 2);
 			CHECK(metadata.parameters[0].id == 42 && metadata.parameters[1].id == 0xf0000101);
@@ -200,7 +214,7 @@ int wmain(int argc, wchar_t** argv)
 			CHECK(session.renderOffline({64, 2, 2}, std::vector<float>(128, 1), [&] { return stoppedPacket; }, 3000).get().error == Error::None);
 			put(parameter, 4, std::bit_cast<std::uint64_t>(0.125), 8);
 			CHECK(session.request(MessageType::Parameter, parameter, 3000).get().error == Error::None);
-			const auto monoMetadata = session.request(MessageType::Parameter, metadataCommand, 3000).get();
+			const auto monoMetadata = session.request(MessageType::Parameter, metadataCommand, 3000, true).get();
 			CHECK(monoMetadata.error == Error::None && decodeVst3Metadata(monoMetadata.payload, metadata));
 			CHECK(metadata.inputs == 1 && metadata.outputs == 1);
 			const auto mono = session.renderOffline({64, 1, 1}, std::vector<float>(64, 1), [] { return std::span<const std::uint8_t>{}; }, 3000).get();
@@ -212,7 +226,7 @@ int wmain(int argc, wchar_t** argv)
 			const auto originalPid = session.pid();
 			put(parameter, 4, std::bit_cast<std::uint64_t>(0.0625), 8);
 			CHECK(session.request(MessageType::Parameter, parameter, 3000).get().error == Error::None);
-			const auto reloadMetadata = session.request(MessageType::Parameter, metadataCommand, 3000).get();
+			const auto reloadMetadata = session.request(MessageType::Parameter, metadataCommand, 3000, true).get();
 			CHECK(reloadMetadata.error == Error::None && decodeVst3Metadata(reloadMetadata.payload, metadata));
 			CHECK(metadata.inputs == 2 && metadata.outputs == 2 && metadata.latency == 0 && metadata.parameters[0].title == "Gain");
 			CHECK(session.pid() == originalPid); // DLL reload, same supervised helper.
@@ -262,6 +276,116 @@ int wmain(int argc, wchar_t** argv)
 			CHECK(!decodeVst3OutputEvents(badOutput, [&](const auto&) { ++badOutputMutations; return true; }));
 			CHECK(badOutputMutations == 0);
 			CHECK(peer.close().get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", L"1");
+			HostSession dense;
+			CHECK(dense.open({helper, {}, 5000}).get().error == Error::None);
+			std::vector<std::uint8_t> denseCreate;
+			CHECK(encodeVst3Create({scanned.classes[index].cid, 48000, 512, true, path}, denseCreate));
+			CHECK(dense.request(MessageType::Create, denseCreate, 5000).get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", nullptr);
+			// Leave a full batch for the control consumer before enabling collection.
+			CHECK(dense.renderOffline({64, 2, 2}, std::vector<float>(128, 1),
+				[] { return std::span<const std::uint8_t>{}; }, 3000).get().error == Error::None);
+			for (unsigned block = 0; block < 48; ++block)
+			{
+				const unsigned frames = block % 2 ? 127 : 512;
+				const auto rendered = dense.renderOffline({frames, 2, 2}, std::vector<float>(frames * 2, 1),
+					[] { return std::span<const std::uint8_t>{}; }, 3000, MessageType::Midi).get();
+				CHECK(rendered.error == Error::None && rendered.followupPayload.size() == 8 + 512 * 48);
+				unsigned count = 0;
+				CHECK(decodeVst3OutputEvents(rendered.followupPayload, [&](const Vst3OutputEvent& event) {
+					const auto ordinal = count++;
+					return event.sequence == block + 1 && event.frames == frames && event.event.type == 1 &&
+						event.event.offset == ordinal % frames && event.event.bus == 0 &&
+						event.event.channel == ordinal / 128 && event.event.id == ordinal % 128 && event.event.value == 0.5;
+				}));
+				CHECK(count == 512);
+				const auto later = dense.request(MessageType::Midi, {}, 3000).get();
+				CHECK(later.error == Error::None && later.payload.size() == (block ? 8u : 8u + 512u * 48u));
+				if (!block)
+				{
+					unsigned oldCount = 0;
+					CHECK(decodeVst3OutputEvents(later.payload, [&](const Vst3OutputEvent& event) {
+						const auto ordinal = oldCount++;
+						return event.sequence == 0 && event.frames == 64 && event.event.offset == ordinal % 64 &&
+							event.event.channel == ordinal / 128 && event.event.id == ordinal % 128;
+					}));
+					CHECK(oldCount == 512);
+					CHECK(dense.request(MessageType::Midi, {}, 3000).get().payload.size() == 8);
+				}
+			}
+			CHECK(dense.close().get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", L"1");
+			CHECK(dense.open({helper, {}, 5000}).get().error == Error::None);
+			CHECK(encodeVst3Create({scanned.classes[index].cid, 48000, 512, false, path}, denseCreate));
+			CHECK(dense.request(MessageType::Create, denseCreate, 5000).get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", nullptr);
+			// Reuse caller storage while receiving the preceding audio quantum.
+			std::array<float, 1024> realtimeInput{}, realtimeOutput{};
+			realtimeInput.fill(1);
+			std::array<std::uint8_t, AudioQueue::MaxOutputEventBytes> realtimeFeedback{};
+			for (unsigned block = 0; block <= 48; ++block)
+			{
+				std::uint32_t bytes = 0;
+				CHECK(dense.processPrepared({512, 2, 2}, realtimeInput, realtimeOutput,
+					[] { return std::span<const std::uint8_t>{}; }, realtimeFeedback, block ? &bytes : nullptr));
+				if (!block)
+				{
+					CHECK(bytes == 0);
+					for (const auto sample : realtimeOutput) { CHECK(sample == 0); }
+				}
+				else if (block == 1)
+				{
+					// First result was submitted without collection. Its retained
+					// control batch must not consume the next collecting slot.
+					CHECK(bytes == 0);
+					const auto old = dense.request(MessageType::Midi, {}, 3000).get();
+					CHECK(old.error == Error::None && old.payload.size() == 8 + 512 * 48);
+					unsigned oldCount = 0;
+					CHECK(decodeVst3OutputEvents(old.payload, [&](const Vst3OutputEvent& event) {
+						const auto ordinal = oldCount++;
+						return event.sequence == 0 && event.frames == 512 && event.event.offset == ordinal &&
+							event.event.channel == ordinal / 128 && event.event.id == ordinal % 128;
+					}));
+					CHECK(oldCount == 512);
+					for (const auto sample : realtimeOutput) { CHECK(sample == (index ? 0.75f : 0.25f)); }
+				}
+				else
+				{
+					CHECK(bytes == 8 + 512 * 48);
+					unsigned count = 0;
+					CHECK(decodeVst3OutputEvents(std::span(realtimeFeedback).first(bytes), [&](const Vst3OutputEvent& event) {
+						const auto ordinal = count++;
+						return event.sequence == block - 1 && event.frames == 512 && event.event.type == 1 &&
+							event.event.offset == ordinal && event.event.bus == 0 && event.event.channel == ordinal / 128 &&
+							event.event.id == ordinal % 128 && event.event.value == 0.5;
+					}));
+					CHECK(count == 512);
+					for (const auto sample : realtimeOutput) { CHECK(sample == (index ? 0.75f : 0.25f)); }
+				}
+				// Test-only pacing; processPrepared itself must not wait.
+				Sleep(20);
+			}
+			const auto realtimeLater = dense.request(MessageType::Midi, {}, 3000).get();
+			CHECK(realtimeLater.error == Error::None && realtimeLater.payload.size() == 8);
+			CHECK(dense.close().get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", L"1");
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OVERFLOW", L"1");
+			CHECK(encodeVst3Create({scanned.classes[index].cid, 48000, 512, true, path}, denseCreate));
+			CHECK(dense.open({helper, {}, 5000}).get().error == Error::None);
+			CHECK(dense.request(MessageType::Create, denseCreate, 5000).get().error == Error::None);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OUTPUT", nullptr);
+			SetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_DENSE_OVERFLOW", nullptr);
+			CHECK(dense.renderOffline({64, 2, 2}, std::vector<float>(128, 1),
+				[] { return std::span<const std::uint8_t>{}; }, 3000, MessageType::Midi).get().error != Error::None);
+			CHECK(dense.close().get().error == Error::None);
+			CHECK(dense.open({helper, {}, 5000}).get().error == Error::None);
+			CHECK(dense.request(MessageType::Create, denseCreate, 5000).get().error == Error::None);
+			const auto recovered = dense.renderOffline({64, 2, 2}, std::vector<float>(128, 1),
+				[] { return std::span<const std::uint8_t>{}; }, 3000, MessageType::Midi).get();
+			CHECK(recovered.error == Error::None && recovered.followupPayload.size() == 8);
+			CHECK(dense.close().get().error == Error::None);
+
 	}
 	CHECK(GetModuleHandleW(plugin.filename().c_str()) == nullptr);
 	HostSession rejected;

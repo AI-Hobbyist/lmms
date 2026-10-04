@@ -1,6 +1,7 @@
 #ifndef LMMS_VSTHOST_VST3_OUTPUT_EVENTS_H
 #define LMMS_VSTHOST_VST3_OUTPUT_EVENTS_H
 #include "vsthost/Vst3BlockEvents.h"
+#include <algorithm>
 #include <vector>
 
 namespace lmms::vsthost
@@ -13,15 +14,18 @@ struct Vst3OutputEvent
 };
 // Control polling may collect several audio blocks. Carry each original block's
 // sequence and size so offsets never silently become relative to the latest block.
-inline bool encodeVst3OutputEvents(std::span<const Vst3OutputEvent> events, std::vector<std::uint8_t>& bytes)
+inline bool encodeVst3OutputEvents(std::span<const Vst3OutputEvent> events, std::span<std::uint8_t> storage,
+	std::uint32_t& written) noexcept
 {
-	if (events.size() > 512) { return false; }
+	written = 0;
+	if (events.size() > 512 || storage.size() < 8 + events.size() * 48) { return false; }
 	for (const auto& output : events)
 	{
 		if (!output.frames || output.frames > 4096 || output.event.type < 1 || output.event.type > 3 ||
 			!validVst3Event(output.event, output.frames)) { return false; }
 	}
-	bytes.assign(8 + events.size() * 48, 0);
+	auto bytes = storage.first(8 + events.size() * 48);
+	std::fill(bytes.begin(), bytes.end(), 0);
 	put(bytes, 0, 1, 4); put(bytes, 4, events.size(), 4);
 	std::uint32_t offset = 8;
 	for (const auto& output : events)
@@ -33,7 +37,14 @@ inline bool encodeVst3OutputEvents(std::span<const Vst3OutputEvent> events, std:
 		put(bytes, offset + 32, event.id, 4); put(bytes, offset + 40, std::bit_cast<std::uint64_t>(event.value), 8);
 		offset += 48;
 	}
-	return true;
+	written = static_cast<std::uint32_t>(bytes.size()); return true;
+}
+inline bool encodeVst3OutputEvents(std::span<const Vst3OutputEvent> events, std::vector<std::uint8_t>& bytes)
+{
+	if (events.size() > 512) { return false; }
+	bytes.resize(8 + events.size() * 48);
+	std::uint32_t written = 0;
+	return encodeVst3OutputEvents(events, std::span(bytes), written);
 }
 template<class Consumer> bool decodeVst3OutputEvents(std::span<const std::uint8_t> bytes, Consumer consume)
 {

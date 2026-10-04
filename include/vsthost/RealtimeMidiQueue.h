@@ -30,6 +30,11 @@ public:
 		}
 		return false;
 	}
+	// Control barriers may snapshot the reservation boundary and wait for cells
+	// below it to publish. readPosition requires exclusive consumer ownership;
+	// producers after writePosition remain queued for the next audio block.
+	std::uint64_t writePosition() const noexcept { return m_write.load(std::memory_order_acquire); }
+	std::uint64_t readPosition() const noexcept { return m_read; }
 	bool pop(Event& event) noexcept
 	{
 		auto& cell = m_cells[m_read & (Capacity - 1)];

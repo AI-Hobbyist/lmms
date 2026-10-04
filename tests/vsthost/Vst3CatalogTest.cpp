@@ -5,6 +5,35 @@
 using namespace lmms::vsthost;
 #define CHECK(condition) do { if (!(condition)) { std::cerr << "FAIL " << __LINE__ << ": " << #condition << '\n'; return 1; } } while (false)
 
+namespace
+{
+struct FaultSignal
+{
+	explicit FaultSignal(unsigned fault)
+	{
+		const auto length = GetEnvironmentVariableW(variable, nullptr, 0);
+		if (length)
+		{
+			previous.resize(length);
+			previous.resize(GetEnvironmentVariableW(variable, previous.data(), length));
+		}
+		const auto name = L"Local\\LMMS-Vst3FactoryFault-" + std::to_wstring(GetCurrentProcessId()) + L"-"
+			+ std::to_wstring(GetTickCount64()) + L"-" + std::to_wstring(fault);
+		event = CreateEventW(nullptr, TRUE, FALSE, name.c_str());
+		if (event) { installed = SetEnvironmentVariableW(variable, name.c_str()) != FALSE; }
+	}
+	~FaultSignal()
+	{
+		if (installed) { SetEnvironmentVariableW(variable, previous.empty() ? nullptr : previous.c_str()); }
+		if (event) { CloseHandle(event); }
+	}
+	static constexpr const wchar_t* variable = L"LMMS_VST3_FACTORY_FAULT_EVENT";
+	HANDLE event = nullptr;
+	bool installed = false;
+	std::wstring previous;
+};
+}
+
 int wmain(int argc, wchar_t** argv)
 {
 	if (argc != 3 && argc != 4) { return 2; }
@@ -66,12 +95,16 @@ int wmain(int argc, wchar_t** argv)
 	for (const auto fault : {6, 7})
 	{
 		std::stop_source cancellation;
+		FaultSignal signal(fault); CHECK(signal.event && signal.installed);
 		auto pending = std::async(std::launch::async, [&]
 		{
 			return scanVst3(helper, (root / (L"Vst3FactoryFault" + std::to_wstring(fault) + L".vst3")).wstring(),
 				30000, cancellation.get_token());
 		});
-		CHECK(pending.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout);
+		const auto entered = WaitForSingleObject(signal.event, 10000);
+		if (entered != WAIT_OBJECT_0) { cancellation.request_stop(); pending.wait(); }
+		CHECK(entered == WAIT_OBJECT_0);
+		CHECK(pending.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout);
 		const auto start = GetTickCount64(); cancellation.request_stop();
 		CHECK(pending.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
 		const auto cancelled = pending.get();

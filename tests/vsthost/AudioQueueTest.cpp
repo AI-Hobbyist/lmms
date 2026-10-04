@@ -21,7 +21,7 @@ int worker(const wchar_t* name)
 	if (ok)
 	{
 		for (auto& value : audio) { value *= 0.25f; }
-		ok = queue.complete(claim, audio) == AudioQueue::Result::Ok;
+		ok = claim.collectOutput && queue.complete(claim, audio, events) == AudioQueue::Result::Ok;
 	}
 	UnmapViewOfFile(memory); CloseHandle(mapping);
 	return ok ? 0 : 4;
@@ -38,7 +38,7 @@ bool crossProcess(const wchar_t* executable)
 	const std::array<float, 8> input{1, 2, 3, 4, 5, 6, 7, 8};
 	const std::array<std::uint8_t, 3> events{0x90, 60, 127};
 	std::array<float, 8> output{};
-	bool ok = queue.initialize() && queue.submit({MessageType::Process, 31, 4, 1, 0}, {4, 2, 2}, input, events) == AudioQueue::Result::Ok;
+	bool ok = queue.initialize() && queue.submit({MessageType::Process, 31, 4, 1, 0}, {4, 2, 2}, input, events, true) == AudioQueue::Result::Ok;
 	std::wstring command = L"\"" + std::wstring(executable) + L"\" --worker \"" + name + L"\"";
 	STARTUPINFOW startup{}; startup.cb = sizeof(startup);
 	PROCESS_INFORMATION process{};
@@ -48,7 +48,10 @@ bool crossProcess(const wchar_t* executable)
 		DWORD exitCode = 1;
 		if (waited != WAIT_OBJECT_0) { TerminateProcess(process.hProcess, 5); WaitForSingleObject(process.hProcess, 5000); }
 		GetExitCodeProcess(process.hProcess, &exitCode);
-		ok = waited == WAIT_OBJECT_0 && exitCode == 0 && queue.receive(31, 4, 1, output) == AudioQueue::Result::Ok;
+		std::array<std::uint8_t, 3> feedback{}; std::uint32_t feedbackBytes = 0;
+			ok = waited == WAIT_OBJECT_0 && exitCode == 0 &&
+				queue.receive(31, 4, 1, output, feedback, &feedbackBytes) == AudioQueue::Result::Ok &&
+				feedbackBytes == events.size() && feedback == events;
 		for (std::size_t i = 0; i < output.size(); ++i) { ok = ok && output[i] == input[i] * 0.25f; }
 		CloseHandle(process.hThread); CloseHandle(process.hProcess);
 	}
@@ -100,6 +103,60 @@ int wmain(int argc, wchar_t** argv)
 	check(queue.submit(request, {4, 2, 2}, input) == R::Ok, "malformed setup");
 	put(memory, 44, UINT32_MAX, 4);
 	check(queue.claim(claim, worker, events) == R::Invalid, "untrusted shared layout rejected");
+	for (unsigned cycle = 0; cycle < 50; ++cycle)
+	{
+		for (std::uint64_t i = 0; i < AudioQueue::Slots; ++i)
+		{
+			request.sequence = cycle * AudioQueue::Slots + i;
+			check(queue.submit(request, {4, 2, 2}, input) == R::Ok, "paused completion cycle submit");
+			check(!queue.discardCompleted(11, 2, request.sequence + 1), "submitted work cannot be reclaimed");
+			check(queue.claim(claim, worker, events) == R::Ok, "paused completion cycle claim");
+			check(!queue.discardCompleted(11, 2, request.sequence + 1), "processing work cannot be reclaimed");
+			check(queue.complete(claim, output) == R::Ok, "paused completion cycle complete");
+		}
+		check(!queue.discardCompleted(12, 2, request.sequence + 1), "foreign session completion rejected");
+		check(!queue.discardCompleted(11, 3, request.sequence + 1), "foreign generation completion rejected");
+		check(!queue.discardCompleted(11, 2, 0), "future completion rejected");
+		check(queue.discardCompleted(11, 2, request.sequence + 1), "completed paused queue reclaimed without consuming audio");
+	}
+	request.sequence += 1;
+	check(queue.submit(request, {4, 2, 2}, input) == R::Ok && queue.claim(claim, worker, events) == R::Ok &&
+		queue.complete(claim, output) == R::Ok, "malformed completion retirement setup");
+	put(memory, 44, UINT32_MAX, 4);
+	check(!queue.discardCompleted(11, 2, request.sequence + 1), "malformed completed layout rejected during retirement");
+	check(queue.initialize(), "reset isolated malformed test queue");
+	std::vector<std::uint8_t> feedback(AudioQueue::MaxOutputEventBytes, 0x5a), received(feedback.size());
+	std::uint32_t receivedBytes = 0;
+	check(queue.submit(request, {4, 2, 2}, input, midi, true) == R::Ok, "feedback request");
+	check(queue.claim(claim, worker, events) == R::Ok && claim.collectOutput, "feedback claim");
+	check(queue.complete(claim, output, feedback) == R::Ok, "maximum feedback completion");
+	check(queue.receive(11, 2, request.sequence, result, received, &receivedBytes) == R::Ok &&
+		receivedBytes == feedback.size() && received == feedback && result == output, "atomic audio and feedback result");
+	check(queue.receive(11, 2, request.sequence, result, received, &receivedBytes) == R::Empty &&
+		receivedBytes == 0, "feedback consumed once");
+	check(queue.submit(request, {4, 2, 2}, input, {}, true) == R::Ok &&
+		queue.claim(claim, worker, events) == R::Ok, "oversized feedback setup");
+	feedback.push_back(0);
+	check(queue.complete(claim, output, feedback) == R::Invalid, "oversized feedback rejected");
+	feedback.pop_back();
+	check(queue.complete(claim, output, feedback) == R::Ok, "valid feedback after rejection");
+	check(queue.receive(11, 2, request.sequence, result, std::span(received).first(1), &receivedBytes) == R::Invalid,
+		"short feedback destination rejected");
+	check(queue.submit(request, {4, 2, 2}, input) == R::Ok && queue.claim(claim, worker, events) == R::Ok,
+		"noncollecting feedback setup");
+	check(queue.complete(claim, output, feedback) == R::Invalid && queue.complete(claim, output) == R::Ok,
+		"unsolicited feedback rejected");
+	check(queue.receive(11, 2, request.sequence, result) == R::Ok, "legacy audio consumer retained");
+	check(queue.submit(request, {4, 2, 2}, input, {}, true) == R::Ok &&
+		queue.claim(claim, worker, events) == R::Ok && queue.complete(claim, output, feedback) == R::Ok,
+		"corrupt feedback length setup");
+	put(memory, 60, AudioQueue::MaxOutputEventBytes + 1, 4); result.fill(73);
+	check(queue.receive(11, 2, request.sequence, result, received, &receivedBytes) == R::Invalid &&
+		std::all_of(result.begin(), result.end(), [](float value) { return value == 73; }),
+		"untrusted feedback length rejected before audio mutation");
+	check(queue.submit(request, {4, 2, 2}, input) == R::Ok, "corrupt request flags setup");
+	put(memory, 60, 2, 4);
+	check(queue.claim(claim, worker, events) == R::Invalid, "unknown feedback flags rejected");
 	std::array<wchar_t, 32768> executable{};
 	check(GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size())) != 0, "test executable path");
 	check(crossProcess(executable.data()), "shared mapping between same-ABI processes");

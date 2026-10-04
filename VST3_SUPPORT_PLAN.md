@@ -4,6 +4,16 @@
 
 本次交付是可执行的实施计划，不是已经实现的 VST3 功能。本次只提交本文件，不提交根目录 `vst3sdk/`，不修改宿主代码，不执行商业插件。下文新增类型、目录、CMake 开关和测试名称均为拟实施接口；不能当作当前可调用功能。
 
+## 2026-10-05 用户范围调整（优先于下文原始计划）
+
+用户最终明确：VeSTige 是 VST2 / VST3 Instrument 官方入口；VstEffect 是 VST2 / VST3 Effect 官方入口。保留多路径 VST 扫描、WaveShell 和 multi-class VST3；删除 S6、额外宿主入口、不必要的 Mixer / 高级路由扩张。
+
+- S5 的本次完成判据收敛为两个生产插件实际扫描／选择／加载 VST3，乐器 MIDI 输入与播放、效果器音频处理、参数／编辑器、工程／预设保存恢复、旧 VST2 兼容，以及 Windows x86/x64 helper 隔离。预览、命令、clone、undo 和导出继续验证现有实现。
+- 撤回本轮全局 Mixer / PDC、侧链、额外输出连接、可选端口界面与路由撤销历史修改；仅自动连接基本主音频及 MIDI 输入。高级 MIDI 输出目的地及完整 program/unit 管理不纳入本次范围。
+- S6 Carla 全隔离从交付范围删除；R4/R7 中 Carla 的分支以及 S7 对 S6 的依赖同步删除。原始 Carla 设计与测试文字保留为历史参考，不能据此要求继续实施或阻塞交付。
+- S7 WaveShell／故障检查及 S8 Windows Release／ZIP 保留。只构建 Windows，人工部分记录 SKIPPED_MANUAL。
+- 阶段仍须在其调整后的自动验收通过后提交推送，并记录真实完成状态。
+
 ## 1. 目标与完成边界
 
 | 编号 | 必须实现的行为 | 对应阶段 |
@@ -185,12 +195,12 @@ Carla 至少将整个 native 宿主移出 DAW，并强制每个内部 VST 走独
 | S2：VST2 与 shell | `plugins/VstBase/`、Vestige、VstEffect 兼容适配 | 保留现有行为，补 shell 全枚举／指定子 ID、旧状态、GUI 自动化回传。x86/x64 shell fixture 与普通 VST2 回归通过。依赖 S1。 |
 | S3：VST3 adapter | `tools/vsthost/` 的 VST3 scanner／adapter、CMake、本地 SDK 引用 | factory 全类、生命周期、基础 bus、处理、事件、参数、状态、native editor；双架构 SDK fixture 通过。依赖 S1。 |
 | S4：多目录与目录项 | ConfigManager、SetupDialog、PathUtil、VstSubPluginFeatures、新 PluginCatalog | 单目录迁移、多目录扫描、bundle、重复类／版本候选、缓存／取消；旧 `uservst:` 在列表重排后仍正确解析。依赖 S2/S3 的身份契约。 |
-| S5：LMMS 全入口与路由 | Vestige／VstEffect、FileBrowser、EffectSelectDialog、InstrumentTrackWindow、InstrumentTrack、CoreCommands、ProjectSnapshot、EffectChain／Mixer 路由 | 乐器／效果器统一选择；bundle 命令校验；工程／预设／撤销；multi-out、sidechain、MIDI、动态延迟补偿与 offline 时间线。导出、预览和命令路径通过同一代理。依赖 S2～S4。 |
-| S6：Carla 全隔离 | CarlaBase／CarlaRack／CarlaPatchbay、Carla native bridge、专用宿主及构建 | 外部 Rack/Patchbay，内部每个 VST 独立 bridge；保持路由／状态；真实 Carla 后端的 VST2/VST3、x86/x64 和故障测试。依赖 S1/S5。 |
-| S7：WaveShell 与故障矩阵 | 自动测试 runner、SDK fixture／inspector、测试报告 | 本地 Waves 类集合与 inspector 一致；可授权类实例、状态、参数、路由和故障测完；失败／跳过有原因与范围。自动故障矩阵全部通过。依赖 S2～S6。 |
+| S5：VeSTige／VstEffect VST3 可用性 | 两个生产插件、共有宿主及现有入口／工程路径 | 两个插件实际加载与处理 VST3；乐器 MIDI／播放、效果处理、参数／编辑器、工程／preset／clone／undo、预览／命令／导出、旧 VST2 与双架构回归。高级 MIDI 目的地、轨道侧链和完整 program/unit 延后。依赖 S2～S4。 |
+| S6：已由用户删除 | 不实施 Carla 隔离改造 | REMOVED_BY_USER；不作为 S7/S8 的依赖或交付判据。 |
+| S7：WaveShell 与故障矩阵 | 自动测试 runner、SDK fixture／inspector、测试报告 | 本地 Waves 类集合与 inspector 一致；可授权类实例、状态、参数、路由和故障测完；失败／跳过有原因与范围。自动故障矩阵全部通过。依赖 S2～S5；S6 已删除。 |
 | S8：Release 与 ZIP | 根 CMake、打包规则、桥接依赖清单 | 全量 Release、两种 helper、现有与新增测试、干净 PATH 启动／渲染、ZIP 内容及依赖检查；生成 SHA256、版本和已跳过项报告。依赖 S7。 |
 
-按阶段提交，每个阶段先通过其可自动执行的完成判据，再进入依赖阶段；不因人工听音或 UI 观感等待。关键路径为 S0→S1→S3→S5→S6/S7→S8。估时需在 S0 fixture 与 Carla 实际 bridge 能力核实后给出，不用未经验证的工期承诺掩盖路由和跨位数工作。
+按阶段提交，每个阶段先通过其可自动执行的完成判据，再进入依赖阶段；不因人工听音或 UI 观感等待。关键路径为 S0→S1→S3→S5→S7→S8。估时需在 S0 fixture 与 Carla 实际 bridge 能力核实后给出，不用未经验证的工期承诺掩盖路由和跨位数工作。
 
 ## 8. 自动测试与人工跳过规则
 
@@ -265,3 +275,5 @@ Invoke-LoggedNative ctest @('--test-dir','build/release','-C','Release','--outpu
 - [ ] Release 全量构建、自动测试、干净环境运行、ZIP 依赖／许可检查通过；所有人工项按用户要求注明跳过。
 
 本表是后续实现验收表，当前保持未勾选。计划书完成与推送不代表上述功能已经实现。
+
+用户补充：扫描结果区分 Instrument / Effect，VST Instrument 集成现有乐器 Sidebar，Effect 集成现有 Effect Browser。仅发现／选择层传递身份键，实际实例化、宿主、路由及生命周期统一委托给 VeSTige / VstEffect；禁止第三种加载路径。S8 完成后必须在计划书记录最终保留／撤回清单和真实验收结果。

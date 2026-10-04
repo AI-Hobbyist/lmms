@@ -44,7 +44,7 @@ int wmain(int argc, wchar_t** argv)
 	std::vector<LegacyCommand> entries;
 	check(decodeLegacy(reply.payload, entries) == Error::None, "shell enumeration decodes");
 	const auto found = std::find_if(entries.begin(), entries.end(), [](const auto& item) { return item.id == IdVstShellEntries; });
-		check(found != entries.end() && found->arguments == std::vector<std::string>{"2", "1", "4043440900", "Shell Alpha", "16777728", "Shell Beta", "LMMS tests", "1"}, "all child IDs preserved unsigned including high bit and embedded zero bytes, with module metadata");
+		check(found != entries.end() && found->arguments == std::vector<std::string>{"2", "1", "4043440900", "Shell Alpha", "49", "16777728", "Shell Beta", "49", "LMMS tests", "1"}, "all child IDs preserved unsigned including high bit and embedded zero bytes, with module metadata");
 	check(!loadedInParent(L"Vst2Shell.dll"), "scanner never loads native module in parent");
 	check(scanner.close().get().error == Error::None, "scanner closes");
 	const auto catalog = scanVst2(config, shell, 1500);

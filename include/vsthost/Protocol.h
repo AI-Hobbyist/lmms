@@ -24,7 +24,7 @@ enum class MessageType : std::uint16_t
 
 // Wire encoding is little endian. Never memcpy a native C++ struct into IPC.
 constexpr std::uint32_t ProtocolMagic = 0x48564d4c;
-constexpr std::uint16_t ProtocolVersion = 1;
+constexpr std::uint16_t ProtocolVersion = 2;
 constexpr std::uint32_t MaxControlBytes = 16 * 1024 * 1024;
 constexpr std::uint32_t HeaderBytes = 40;
 

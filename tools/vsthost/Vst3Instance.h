@@ -16,6 +16,7 @@
 #include "public.sdk/source/vst/hosting/hostclasses.h"
 #include <array>
 #include <span>
+#include <optional>
 #include <unordered_map>
 
 namespace lmms::vsthost
@@ -34,15 +35,18 @@ public:
 	void close();
 	void setup(double rate, std::uint32_t frames, bool offline = false);
 	bool process(std::uint32_t frames, std::span<const float> input, std::span<float> output,
-		std::span<const std::uint8_t> events = {}, std::uint64_t sequence = 0);
+		std::span<const std::uint8_t> events = {}, std::uint64_t sequence = 0, bool collectOutput = false);
 	std::vector<std::uint8_t> midiOutput();
-	std::vector<std::uint8_t> state();
+	bool blockMidiOutput(std::span<std::uint8_t> storage, std::uint32_t& written) noexcept;
+	std::vector<std::uint8_t> state(std::span<const std::uint8_t> queuedParameters = {});
 	void restoreState(std::span<const std::uint8_t> bytes);
 	std::vector<std::uint8_t> parameterControl(std::span<const std::uint8_t> command);
 	HWND showEditor();
 	void hideEditor();
-	// Call between native audio blocks on the helper's owner/control thread.
-	void serviceControl();
+	// Collect between blocks; apply only behind the host pause/drain barrier.
+	void serviceControl(bool applyRestart = true);
+	bool deferRestartEvents(std::span<const std::uint8_t> events, std::uint32_t frames);
+	bool restartPending() const noexcept { return m_pendingRestart != 0; }
 	Steinberg::Vst::IEditController* controller() const noexcept { return m_controller.get(); }
 	std::uint32_t inputChannels() const noexcept { return m_inputs.channels; }
 	std::uint32_t outputChannels() const noexcept { return m_outputs.channels; }
@@ -54,6 +58,7 @@ private:
 	{
 		std::uint32_t channels = 0;
 		std::vector<Steinberg::Vst::AudioBusBuffers> buses;
+		std::vector<Vst3BusInfo> descriptors;
 		std::vector<float> samples32;
 		std::vector<double> samples64;
 		std::vector<float*> pointers32;
@@ -64,6 +69,7 @@ private:
 	void synchronizeController();
 	void refreshMidiAssignments();
 	void refreshParameters();
+	void discardRestartParameters(std::optional<Steinberg::Vst::ParamID> id = {});
 	std::vector<std::uint8_t> metadata();
 	std::unique_ptr<Vst3Module> m_module;
 	std::filesystem::path m_path;
@@ -82,8 +88,14 @@ private:
 	std::unordered_map<Steinberg::Vst::ParamID, std::size_t> m_parameterIndices;
 	std::vector<Vst3ParameterFeedback> m_feedback;
 	Vst3EventList m_inputEvents, m_outputEvents;
-	std::vector<Vst3OutputEvent> m_midiFeedback;
+	std::array<Vst3BlockEvent, 512> m_restartEvents{};
+	std::size_t m_restartEventCount = 0;
+	// MIDI 1 identities: bus, channel, pitch. Cleanup uses ordinary audio blocks
+	// so it never assumes that a zero-sample parameter flush processes notes.
+	// Retained control feedback and current audio completion never share capacity.
+	std::vector<Vst3OutputEvent> m_midiFeedback, m_blockMidiFeedback;
 	std::vector<Steinberg::int32> m_eventInputs;
+	std::vector<Vst3BusInfo> m_eventBuses;
 	struct MidiAssignment { Steinberg::Vst::ParamID id = 0; bool assigned = false; };
 	std::vector<MidiAssignment> m_midiAssignments;
 	Steinberg::IPtr<Steinberg::Vst::ConnectionProxy> m_componentConnection, m_controllerConnection;
@@ -93,9 +105,10 @@ private:
 	Steinberg::Vst::ProcessContext m_context{};
 	Steinberg::int32 m_sampleSize = Steinberg::Vst::kSample32;
 	std::uint32_t m_maxFrames = 0, m_latency = 0;
-	std::uint32_t m_restartFlags = 0;
+	std::uint32_t m_restartFlags = 0, m_pendingRestart = 0;
 	bool m_componentInitialized = false, m_controllerInitialized = false;
 	bool m_handlerInstalled = false, m_active = false, m_processing = false;
+	bool m_hasEditor = false;
 };
 } // namespace lmms::vsthost
 #endif

@@ -297,6 +297,7 @@ CatalogReport PluginCatalog::scan(const std::vector<ScanRoot>& roots, Options op
 					CatalogEntry entry; entry.identity = {module.format, module.architecture, {}, info.id, scanPathKey(module.path)};
 					entry.locator = {module.path, module.binary, QString::fromStdString(scan.version), module.fingerprint};
 					entry.name = QString::fromUtf8(info.name); entry.shell = scan.shell;
+					entry.flags = info.flags; entry.category = (info.flags & 256) ? "Instrument" : "Effect";
 					entry.vendor = QString::fromUtf8(scan.vendor);
 					module.entries.push_back(std::move(entry));
 				}

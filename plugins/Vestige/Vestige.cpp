@@ -25,6 +25,8 @@
 #include "Vestige.h"
 
 #include <QDomElement>
+#include <QCoreApplication>
+#include <QThread>
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QInputDialog>
@@ -55,10 +57,34 @@
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "VstPlugin.h"
+#include "vsthost/PluginCatalog.h"
+#include "vsthost/VstCatalogSelection.h"
+#include "vsthost/CatalogLocatorCodec.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#endif
+#include <QRegularExpression>
 
 namespace lmms
 {
 
+
+class VestigeCatalogFeatures final : public Plugin::Descriptor::SubPluginFeatures
+{
+public:
+	VestigeCatalogFeatures() : SubPluginFeatures(Plugin::Type::Instrument) { }
+	void listSubPluginKeys(const Plugin::Descriptor* descriptor, KeyList& keys) const override
+	{
+#ifdef LMMS_BUILD_WIN32
+		if (const auto* jobs = Engine::vstCatalog())
+		{ if (const auto report = jobs->snapshot().report)
+			{ for (const auto& entry : report->entries)
+				{ if (vsthost::isVstInstrument(entry)) { keys.push_back(vsthost::vstCatalogKey(descriptor, entry)); } }
+			}
+		}
+#endif
+	}
+};
 
 extern "C"
 {
@@ -74,7 +100,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 #if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_CYGWIN)
-	"dll",
+	"dll,vst3",
 #elif defined(LMMS_BUILD_LINUX)
 #	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
 		"dll,so",
@@ -82,7 +108,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 		"so",
 #	endif
 #endif
-	nullptr,
+	new VestigeCatalogFeatures,
 } ;
 
 }
@@ -125,7 +151,7 @@ public:
 	void createUI( QWidget *parent ) override
 	{
 		Q_UNUSED(parent);
-		if ( !hasEditor() ) {
+		if (!hasEditor() || !gui::getGUI() || embedMethod() == "headless") {
 			return;
 		}
 		if ( embedMethod() != "none" ) {
@@ -199,7 +225,27 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 	const auto shellId = _this.hasAttribute("shellid") ? _this.attribute("shellid").toUInt(&validId) : 0;
 	if (!validId || (_this.hasAttribute("shellid") && !shellId))
 	{ collectErrorForUI(tr("Invalid VST2 shell identity.")); return; }
-	loadFile(plugin, shellId);
+	vsthost::CatalogEntry selected;
+	const bool native = _this.attribute("format") == "vst3";
+	if (native)
+	{
+		const auto cid = _this.attribute("classid");
+		const auto architecture = _this.attribute("architecture");
+		if (!QRegularExpression("^[0-9A-Fa-f]{32}$").match(cid).hasMatch() ||
+			(architecture != "32" && architecture != "64") || shellId)
+		{ collectErrorForUI(tr("Invalid VST3 class identity or architecture.")); return; }
+		const auto raw = QByteArray::fromHex(cid.toLatin1());
+		std::memcpy(selected.identity.cid.data(), raw.constData(), 16);
+		selected.identity.architecture = architecture == "32" ? vsthost::Architecture::X86 : vsthost::Architecture::X64;
+		selected.name = _this.attribute("pluginname");
+		selected.vendor = _this.attribute("vendor");
+		QByteArray fingerprint;
+		if (_this.hasAttribute("fingerprint") &&
+			!vsthost::decodeCatalogFingerprint(_this.attribute("fingerprint"), fingerprint))
+		{ collectErrorForUI(tr("Invalid VST3 module fingerprint.")); return; }
+		selected.locator = {plugin, _this.attribute("binarypath"), _this.attribute("version"), fingerprint};
+	}
+	loadFile(plugin, shellId, native ? &selected : nullptr);
 	m_pluginMutex.lock();
 	if( m_plugin != nullptr )
 	{
@@ -226,7 +272,7 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
-			knobFModel[i]->loadSettings(_this, paramStr.data());
+			knobFModel[i]->loadSettings(_this, m_plugin->parameterStateKey(i));
 
 			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
 			{
@@ -241,6 +287,18 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 
 
 
+
+QMap<QString, AutomatableModel*> VestigeInstrument::parameterModels()
+{
+	QMutexLocker locker(&m_pluginMutex);
+	QMap<QString, AutomatableModel*> models;
+	if (m_plugin && knobFModel != nullptr)
+	{
+		for (int i = 0; i < paramCount; ++i)
+		{ models.insert(m_plugin->parameterStateKey(i), knobFModel[i]); }
+	}
+	return models;
+}
 
 void VestigeInstrument::setParameter( Model * action )
 {
@@ -264,7 +322,8 @@ void VestigeInstrument::handleConfigChange(QString cls, QString attr, QString va
 void VestigeInstrument::reloadPlugin()
 {
 	closePlugin();
-	loadFile(m_pluginDLL, m_shellId);
+	const auto selection = m_nativeSelection ? std::make_unique<vsthost::CatalogEntry>(*m_nativeSelection) : nullptr;
+	loadFile(m_pluginDLL, m_shellId, selection.get());
 }
 
 
@@ -285,7 +344,7 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
 					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
-					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
+					knobFModel[i]->saveSettings(_doc, _this, m_plugin->parameterStateKey(i));
 				}
 
 /*				QDomElement me = _doc.createElement( paramStr );
@@ -332,10 +391,48 @@ void VestigeInstrument::loadFile( const QString & _file )
 	loadFile(_file, 0);
 }
 
-void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId)
+void VestigeInstrument::loadFile(const QString& file, std::uint32_t shellId)
+{
+	loadFile(file, shellId, nullptr);
+}
+
+void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId, const vsthost::CatalogEntry* selection)
 {
 #ifdef LMMS_BUILD_WIN32
-	if (!shellId)
+	vsthost::CatalogEntry selected;
+	if (!selection && QFileInfo(_file).suffix().compare("vst3", Qt::CaseInsensitive) == 0)
+	{
+		std::vector<vsthost::CatalogEntry> candidates;
+		const auto* jobs = Engine::vstCatalog();
+		const auto report = jobs ? jobs->snapshot().report : nullptr;
+		if (report)
+		{
+			for (const auto& entry : report->entries)
+			{
+				if (entry.identity.format == vsthost::Format::Vst3 &&
+					vsthost::scanPathKey(PathUtil::toAbsolute(entry.locator.modulePath)) ==
+					vsthost::scanPathKey(PathUtil::toAbsolute(_file)))
+				{ candidates.push_back(entry); }
+			}
+		}
+		if (candidates.empty())
+		{ collectErrorForUI(tr("Scan the VST3 module before selecting its class: %1").arg(_file)); return; }
+		if (candidates.size() > 1)
+		{
+			if (!gui::getGUI())
+			{ collectErrorForUI(tr("VST3 module requires a saved ClassID and architecture selection.")); return; }
+			QStringList names;
+			for (const auto& entry : candidates)
+			{ names.append(entry.name + " [" + entry.identity.key() + "]"); }
+			bool accepted = false;
+			const auto choice = QInputDialog::getItem(nullptr, tr("Select VST3 class"), tr("Plugin"), names, 0, false, &accepted);
+			if (!accepted) { return; }
+			selected = candidates[names.indexOf(choice)];
+		}
+		else { selected = candidates.front(); }
+		selection = &selected;
+	}
+	if (!selection && !shellId)
 	{
 		const auto scan = VstPlugin::scanModule(_file);
 		if (!scan.error.isEmpty()) { collectErrorForUI(scan.error); return; }
@@ -367,7 +464,9 @@ void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId)
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == PathUtil::toShortestRelative( _file ) && m_shellId == shellId)
+			m_pluginDLL == PathUtil::toShortestRelative( _file ) && m_shellId == shellId &&
+			((!selection && !m_nativeSelection) || (selection && m_nativeSelection &&
+				selection->identity == m_nativeSelection->identity && selection->locator == m_nativeSelection->locator)))
 		return;
 
 	if ( m_plugin != nullptr )
@@ -376,6 +475,7 @@ void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId)
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	m_shellId = shellId;
+	m_nativeSelection = selection ? std::make_unique<vsthost::CatalogEntry>(*selection) : nullptr;
 	gui::TextFloat * tf = nullptr;
 	if( gui::getGUI() != nullptr )
 	{
@@ -386,7 +486,7 @@ void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId)
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin(m_pluginDLL, m_shellId);
+	m_plugin = new VstInstrumentPlugin(m_pluginDLL, m_shellId, {}, m_nativeSelection.get());
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -701,7 +801,8 @@ void VestigeInstrumentView::openPlugin()
 	// set filters
 	QStringList types;
 #if defined(LMMS_BUILD_WIN32)
-	types << tr("VST2 files (*.dll)");
+	ofd.setAcceptedDirectorySuffix("vst3");
+	types << tr("VST files (*.dll *.vst3)") << tr("VST3 files (*.vst3)") << tr("VST2 files (*.dll)");
 #elif defined(LMMS_BUILD_LINUX)
 #	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
 		types << tr("All VST files (*.dll *.so)")
@@ -1045,6 +1146,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	l->setRowStretch( ( int( m_vi->paramCount / 10) + 1), 1 );
 	l->setColumnStretch( 10, 1 );
 
+
 	widget->setLayout(l);
 	widget->setAutoFillBackground(true);
 
@@ -1133,19 +1235,14 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 		m_vi->knobFModel = nullptr;
 	}
 
-	if (m_vi->m_scrollArea != nullptr) {
-		delete m_vi->m_scrollArea;
-		m_vi->m_scrollArea = nullptr;
-	}
-
-	if ( m_vi->m_subWindow != nullptr ) {
-		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
-		m_vi->m_subWindow->close();
-
-		if ( m_vi->m_subWindow != nullptr )
-			delete m_vi->m_subWindow;
-		m_vi->m_subWindow = nullptr;
-	}
+	// The subwindow owns the scroll area/content. Destroy that owner first;
+	// closing an emptied SubWindow dereferences its already deleted widget.
+	auto* window = m_vi->m_subWindow;
+	auto* scrollArea = m_vi->m_scrollArea;
+	m_vi->m_subWindow = nullptr;
+	m_vi->m_scrollArea = nullptr;
+	if (window) { delete window; }
+	else { delete scrollArea; }
 
 	m_vi->p_subWindow = nullptr;
 }
@@ -1222,9 +1319,19 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
+Q_DECL_EXPORT Plugin * lmms_plugin_main(Model* m, void* data)
 {
-	return new VestigeInstrument( static_cast<InstrumentTrack *>( m ) );
+	auto* instrument = new VestigeInstrument(static_cast<InstrumentTrack*>(m));
+	const auto* key = static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data);
+	if (key && key->attributes.contains("file"))
+	{
+		QDomDocument document; auto state = document.createElement("vestige");
+		for (auto it = key->attributes.cbegin(); it != key->attributes.cend(); ++it) { state.setAttribute(it.key(), it.value()); }
+		state.setAttribute("plugin", key->attributes.value("file")); state.setAttribute("pluginname", key->name);
+		if (QThread::currentThread() == QCoreApplication::instance()->thread()) { instrument->loadSettings(state); }
+		else { QMetaObject::invokeMethod(instrument, [instrument, state] { instrument->loadSettings(state); }, Qt::QueuedConnection); }
+	}
+	return instrument;
 }
 
 
