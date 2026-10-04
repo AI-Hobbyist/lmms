@@ -21,10 +21,10 @@
 | R1 | 保留现有 VST2 工程、乐器、效果器、参数、预设和编辑器行为 | S0、S2、S5 |
 | R2 | 用本地 VST3 SDK 实现 VST3 乐器和效果器的扫描、加载、处理、编辑与恢复 | S3、S5 |
 | R3 | 同一模块的全部音频类可选择；正确支持 WaveShell 的多个子插件、多个版本和多个实例 | S2、S3、S7 |
-| R4 | 所有 VST 原生代码只在子进程运行，包括扫描、预览、工程恢复、命令调用、离线导出及 Carla 间接加载 | S1～S6 |
+| R4 | 两个官方入口的 VST 原生代码只在子进程运行，包括扫描、预览、工程恢复、命令调用及离线导出；Carla 分支已删除 | S1～S5 |
 | R5 | Windows x64 LMMS 能加载 x86 和 x64 插件；依据实际 PE 架构选择 helper | S1、S2、S3、S8 |
 | R6 | VST 扫描设置支持多个目录、增删、排序、启停和递归；旧配置、旧工程不失效 | S4、S5 |
-| R7 | 插件崩溃或挂起不能使 DAW 因等待插件而退出或永久卡住；失败实例可诊断、重新加载 | S1、S6、S7 |
+| R7 | 两个官方入口的插件崩溃或挂起不能使 DAW 因等待插件而退出或永久卡住；失败实例可诊断、重新加载 | S1、S7 |
 | R8 | Release 全量编译、自动测试和 ZIP 打包；人工验收按用户要求默认跳过并注明 | S7、S8 |
 
 “完整支持 WaveShell”以本计划的类枚举、身份、处理、状态、参数、界面和故障测试为判据，不以“能打开一个 Waves 插件”代替。商业许可证状态单独记录；发现文件不等于插件可用。进程隔离降低第三方原生代码故障对 DAW 的影响，不是操作系统权限安全边界，也不能保证 LMMS 自身不存在缺陷。
@@ -204,7 +204,7 @@ Carla 至少将整个 native 宿主移出 DAW，并强制每个内部 VST 走独
 
 ## 8. 自动测试与人工跳过规则
 
-拟新增 CTest 测试组 `VstHostProtocol`、`VstHostFaults`、`Vst2Compatibility`、`Vst2Shell`、`Vst3Lifecycle`、`Vst3Catalog`、`Vst3Processing`、`Vst3StateAutomation`、`VstPathsMigration`、`VstEntryPoints`、`CarlaIsolation`、`WaveShellInventory`。名称尚未实现。
+拟新增 CTest 测试组 `VstHostProtocol`、`VstHostFaults`、`Vst2Compatibility`、`Vst2Shell`、`Vst3Lifecycle`、`Vst3Catalog`、`Vst3Processing`、`Vst3StateAutomation`、`VstPathsMigration`、`VstEntryPoints`、`CarlaIsolation`、`WaveShellInventory`。此处为初始拟定名称；最终实际测试与删除范围见第 10 节。
 
 | 测试组 | 必须验证的情况与判据 |
 | --- | --- |
@@ -228,7 +228,7 @@ SDK validator 用于验证 fixture／插件接口合规，不能代替本宿主�
 - 用户要求所有人工验收默认跳过并继续；听音、主观 UI、实机体验、许可证手动激活、官方认证请求均记录 `SKIPPED_MANUAL`、原因与未覆盖范围，不等待人工签字。
 - 可以自动执行的构建、fixture、超时、恢复、音频时序、进程清理和旧工程检查不因这一规则跳过。真实插件需人工授权时记录环境／人工状态，继续无授权 fixture 与其余模块。
 - 本地前一版 Release 使用 DummyCarla，不能拿其通过记录证明真实 Carla 隔离完成。实施阶段须安排可运行的 Carla 自动 fixture 环境；若不可得，应明确未覆盖 R4 的该分支，不能以跳过代替已完成。
-- 当前计划中的实现测试全部 `NOT_RUN`；本次仅进行了代码／SDK／样本静态核实。已有旧版编译结果不是新增 VST3 功能通过证据。
+- 初始计划时实现测试为 `NOT_RUN`；以下原始测试矩阵保留供历史追溯。当前完成结果及删减范围以第 10 节和验证记录为准。
 
 ## 9. 构建、打包与发布操作约束
 
@@ -264,16 +264,39 @@ Invoke-LoggedNative ctest @('--test-dir','build/release','-C','Release','--outpu
 
 提交范围仅本计划；之后实现阶段按实际源码变化提交，SDK 引用与本机路径由配置提供。当前 `vst3sdk/`、构建产物及其他未跟踪文件不得随本计划提交。
 
-## 10. 实施最终检查表
+## 10. S8 完成后的最终范围与完成状态（2026-10-05）
 
-- [ ] 所有登记入口在运行时都只通过代理加载，DAW 无第三方 VST module／factory／controller／GUI 调用。
-- [ ] 普通 VST2、VST2 shell、VST3 全类、双架构和旧工程回归通过。
-- [ ] WaveShell 类集合、精确 CID、版本绑定、多实例、state／automation／bus／GUI 结果可追溯；授权／ARA 限制有单独记录。
-- [ ] 多目录迁移不改变旧 `uservst:` 根，缓存、取消、失败和重复候选正确。
-- [ ] 音频不受无期限 IPC 阻塞，桥与插件延迟真正进入路由补偿，导出时序／尾音正确。
-- [ ] 真实 Carla Rack/Patchbay 外部宿主与内部每 VST bridge 完成，并有自动故障证据。
-- [ ] Release 全量构建、自动测试、干净环境运行、ZIP 依赖／许可检查通过；所有人工项按用户要求注明跳过。
+本节为最终交付范围，优先于前文原始设计中的 Carla／高级路由／全局 PDC 等历史要求；撤回项不再作为未完成任务。S0～S5、S7、S8 自动验收已完成并按阶段提交推送，S6 为 REMOVED_BY_USER。人工部分按指示 SKIPPED_MANUAL，不等待审核。
 
-本表是后续实现验收表，当前保持未勾选。计划书完成与推送不代表上述功能已经实现。
+### 保留的实现
 
-用户补充：扫描结果区分 Instrument / Effect，VST Instrument 集成现有乐器 Sidebar，Effect 集成现有 Effect Browser。仅发现／选择层传递身份键，实际实例化、宿主、路由及生命周期统一委托给 VeSTige / VstEffect；禁止第三种加载路径。S8 完成后必须在计划书记录最终保留／撤回清单和真实验收结果。
+- **VeSTige = VST2 / VST3 Instrument 官方入口；VstEffect = VST2 / VST3 Effect 官方入口。** 生产 VstPlugin 内部复用公共受监督 helper；扫描、工程／preset、预览、命令、clone、undo、offline 等现有操作仍委托这两个入口。
+- 多路径 VST 扫描、旧路径迁移、异步目录发布、缓存／隔离名单／取消、PE 架构识别、Unicode／bundle、多版本／指纹定位。
+- VST2 shell／WaveShell 子 ID、multi-class VST3 原始 CID／版本选择，同类多实例独立状态；Windows x64 DAW + x86/x64 helpers。
+- 扫描结果 Instrument / Effect 分类；VST Instrument 放入现有 Instrument Sidebar，Effect 放入现有 Effect Browser。分类与浏览器只是发现／选择层，传递身份键；没有第三种实例化、宿主、路由或生命周期路径。
+- 基本主音频、普通 MIDI 输入、参数／ParamID 自动化、native editor、状态／VST3 preset、工程恢复、旧 VST2 兼容、隔离／超时／故障清理。
+- AudioEngine 原有句柄清理函数保留 19 行缺陷修复：清理尚未进入首个音频周期的句柄，避免轨道恢复／克隆后的导出访问失效对象；不新增路由或生命周期。
+
+### 砍掉／撤回的过度修改
+
+- S6 Carla Rack/Patchbay 全隔离及其对后续阶段的依赖；既有 DummyCarla 基线不是 S6 完成证明。
+- 额外宿主入口和第三种 VST 加载路径。
+- 本轮全局 Mixer／PDC、AudioBusHandle／EffectChain／Song 相关扩张、侧链、高级输入输出路由、额外输出连接、路由 UI 和路由撤销历史。
+- 高级 MIDI 输出目的地／转发网络、公开高级端口界面和完整 program／unit 管理；与这些扩张对应的 GUI／路由测试。
+- 非 Windows 构建和 x86 DAW；商业安装包／采样库／整份 SDK 分发。
+
+撤回前差异保留于本机 `build/vst-s5/scope-rollback-backup/` 供审计，不纳入生产构建或 ZIP。
+
+### 最终验收
+
+- [x] 生产发现／选择只通过 VeSTige / VstEffect；受测 VST 模块仅在对应 helper 内加载，目录刷新不创建生产实例。
+- [x] 普通 VST2、VST2 shell、VST3 multi-class、旧工程、两种 helper、状态／参数／编辑器及现有入口回归通过。
+- [x] 多目录迁移、缓存／取消／重复候选保持旧 `uservst:` 行为。
+- [x] WaveShell 16.6 的 2 类、16.7 的 725 类（14 Instrument、711 Effect）与独立 SDK 集合一致；基础多实例／参数／state／preset 自动验证通过。
+- [x] Windows Release 全量编译；64/64 CTest PASS（180.92 s），其中 faults 11 项（42.30 s）。
+- [x] 最终 ZIP 解压后只用 Windows 系统 PATH 启动及渲染通过；VeSTige x86/x64 产生非零音频，VstEffect x86/x64 符合约 0.25 的增益，真实 WaveShell Element／Q10 主音频验证通过。
+- [x] 182 个 PE、依赖／架构／SHA256／许可、四个 VST2/VST3 helpers 检查通过；包内无商业插件、SDK 源码、测试工具或 Debug 运行库。
+
+Electric88 **可能需要配套采样库**；按用户指示排除该项验收，不列为未完成。商业插件及其所需资源由用户本机安装。本报告不等同于所有商业类的完整认证；人工听音、激活／认证和主观 UI／DPI 审核统一 SKIPPED_MANUAL。
+
+发布版本 `1.3.0-alpha.2.35+8099048`，生产二进制源提交 `8099048cc`。最终 ZIP：`build/vst-s8/lmms-1.3.0-alpha.2.35-vst3-win64-release.zip`，SHA256：`db45f3325f427ba49cd11622f6911c4121df0d30304fa94c940f59dc34dbd970`。阶段与日志详见 `VST3_SUPPORT_PROGRESS.md` 和 `VST3_SUPPORT_VALIDATION.md`。S8 打包脚本及完成记录随本阶段提交推送。
