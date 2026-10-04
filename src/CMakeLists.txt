@@ -201,6 +201,9 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 target_link_libraries(lmmsobjs
 	${LMMS_REQUIRED_LIBS}
 )
+if(LMMS_BUILD_WIN32)
+	target_link_libraries(lmmsobjs bcrypt)
+endif()
 target_static_libraries(lmmsobjs ringbuffer)
 
 set_target_properties(lmms PROPERTIES

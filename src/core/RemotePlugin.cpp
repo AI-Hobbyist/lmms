@@ -72,6 +72,10 @@ HANDLE getRemotePluginJob()
 
 #endif // LMMS_BUILD_WIN32
 
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/LegacyHostBridge.h"
+#endif
+
 namespace lmms
 {
 
@@ -130,10 +134,16 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin() :
+RemotePlugin::RemotePlugin() : RemotePlugin(false) { }
+
+RemotePlugin::RemotePlugin(bool supervisedVst) :
 	QObject(),
 #ifdef SYNC_WITH_SHM_FIFO
+#ifdef LMMS_BUILD_WIN32
+	RemotePluginBase(supervisedVst ? nullptr : new shmFifo(), supervisedVst ? nullptr : new shmFifo()),
+#else
 	RemotePluginBase( new shmFifo(), new shmFifo() ),
+#endif
 #else
 	RemotePluginBase(),
 #endif
@@ -144,6 +154,9 @@ RemotePlugin::RemotePlugin() :
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
+#ifndef LMMS_BUILD_WIN32
+	(void)supervisedVst;
+#endif
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
 	sa.sun_family = AF_LOCAL;
@@ -190,6 +203,9 @@ RemotePlugin::~RemotePlugin()
 {
 	m_watcher.stop();
 	m_watcher.wait();
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { m_vstBridge->send(IdQuit); m_vstBridge = nullptr; return; }
+#endif
 
 	if( m_failed == false )
 	{
@@ -219,6 +235,58 @@ RemotePlugin::~RemotePlugin()
 
 
 
+
+bool RemotePlugin::isRunning()
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { return m_vstBridge->running(); }
+#endif
+#ifdef DEBUG_REMOTE_PLUGIN
+	return true;
+#else
+	return m_process.state() != QProcess::NotRunning;
+#endif
+}
+
+bool RemotePlugin::failed() const
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { return m_failed || m_vstBridge->error() != vsthost::Error::None; }
+#endif
+	return m_failed;
+}
+
+bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QString& embedMethod)
+{
+#ifdef LMMS_BUILD_WIN32
+	QString executable = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+	if (const auto* path = std::getenv("LMMS_PLUGIN_DIR")) { executable = QFileInfo(QDir(path), pluginExecutable).absoluteFilePath(); }
+	if (!executable.endsWith(".exe", Qt::CaseInsensitive)) { executable += ".exe"; }
+	auto bridge = std::make_unique<vsthost::LegacyHostBridge>([this](const message& reply) { processMessage(reply); });
+	m_vstBridge = bridge.get(); setMessageTransport(std::move(bridge));
+	m_failed = !m_vstBridge->open({executable.toStdWString(), {embedMethod.toStdWString()}, 30000});
+	if (!m_failed) { sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey())); }
+	return failed();
+#else
+	return init(pluginExecutable, false, {embedMethod});
+#endif
+}
+
+bool RemotePlugin::postVstParameter(int index, float value) noexcept
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { m_vstBridge->parameter(static_cast<unsigned>(index), value); return true; }
+#endif
+	return false;
+}
+
+bool RemotePlugin::postVstTempo(unsigned value) noexcept
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { m_vstBridge->tempo(value); return true; }
+#endif
+	return false;
+}
 
 bool RemotePlugin::init(const QString &pluginExecutable,
 							bool waitForInitDoneMsg , QStringList extraArgs)
@@ -330,6 +398,14 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 {
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge)
+	{
+		return m_vstBridge->process(frames, static_cast<unsigned>(m_inputCount.load()), static_cast<unsigned>(m_outputCount.load()),
+			reinterpret_cast<const float*>(_in_buf), reinterpret_cast<float*>(_out_buf),
+			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting());
+	}
+#endif
 
 	if( m_failed || !isRunning() )
 	{
@@ -447,8 +523,16 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 
 
 void RemotePlugin::processMidiEvent( const MidiEvent & _e,
-							const f_cnt_t _offset )
+								const f_cnt_t _offset )
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge)
+	{
+		m_vstBridge->midi({static_cast<std::uint32_t>(_e.type()), static_cast<std::uint32_t>(_e.channel()),
+			static_cast<std::uint32_t>(_e.param(0)), static_cast<std::uint32_t>(_e.param(1)), static_cast<std::uint32_t>(_offset)});
+		return;
+	}
+#endif
 	message m( IdMidiEvent );
 	m.addInt( _e.type() );
 	m.addInt( _e.channel() );
@@ -479,6 +563,9 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstBridge) { return; }
+#endif
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	try
 	{

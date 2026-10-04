@@ -35,6 +35,7 @@
 
 namespace lmms
 {
+	namespace vsthost { class LegacyHostBridge; }
 
 class MidiEvent;
 class RemotePlugin;
@@ -72,18 +73,15 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 	Q_OBJECT
 public:
 	RemotePlugin();
+	explicit RemotePlugin(bool supervisedVst);
 	~RemotePlugin() override;
 
-	inline bool isRunning()
-	{
-#ifdef DEBUG_REMOTE_PLUGIN
-		return true;
-#else
-		return m_process.state() != QProcess::NotRunning;
-#endif // DEBUG_REMOTE_PLUGIN
-	}
+	bool isRunning();
 
 	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
+	bool initSupervisedVst(const QString& pluginExecutable, const QString& embedMethod);
+	bool postVstParameter(int index, float value) noexcept;
+	bool postVstTempo(unsigned value) noexcept;
 
 	inline void waitForHostInfoGotten()
 	{
@@ -127,10 +125,7 @@ public:
 		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
 	}
 
-	inline bool failed() const
-	{
-		return m_failed;
-	}
+	bool failed() const;
 
 	inline void lock()
 	{
@@ -170,8 +165,11 @@ private:
 	SharedMemory<float[]> m_audioBuffer;
 	std::size_t m_audioBufferSize;
 
-	int m_inputCount;
-	int m_outputCount;
+	std::atomic<int> m_inputCount;
+	std::atomic<int> m_outputCount;
+#ifdef LMMS_BUILD_WIN32
+	vsthost::LegacyHostBridge* m_vstBridge = nullptr; // Owned by RemotePluginBase's transport.
+#endif
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;

@@ -94,6 +94,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cmath>
 
 #include <aeffectx.h>
 
@@ -175,6 +176,7 @@ public:
 #else
 	RemoteVstPlugin( const char * socketPath );
 #endif
+	explicit RemoteVstPlugin(std::unique_ptr<MessageTransport> transport);
 	virtual ~RemoteVstPlugin();
 
 	virtual bool processMessage( const message & _m );
@@ -226,6 +228,11 @@ public:
 	void setBPM( const bpm_t _bpm )
 	{
 		m_bpm = _bpm;
+	}
+	bool setRealtimeParameter(unsigned index, float value)
+	{
+		if (!m_plugin || index >= static_cast<unsigned>(m_plugin->numParams) || !std::isfinite(value)) { return false; }
+		m_plugin->setParameter(m_plugin, static_cast<int32_t>(index), value); return true;
 	}
 
 	// determine VST-version the plugin uses
@@ -537,6 +544,31 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 
 
+
+
+RemoteVstPlugin::RemoteVstPlugin(std::unique_ptr<MessageTransport> transport) :
+	RemotePluginClient(std::move(transport)),
+	m_libInst( nullptr ),
+	m_plugin( nullptr ),
+	m_windowID( 0 ),
+	m_windowWidth( 0 ),
+	m_windowHeight( 0 ),
+	m_initialized( false ),
+	m_resumed( false ),
+	m_processing( false ),
+	m_messageList(),
+	m_shouldGiveIdle( false ),
+	m_inputs( nullptr ),
+	m_outputs( nullptr ),
+	m_shmValid( false ),
+	m_midiEvents(),
+	m_bpm( 0 ),
+	m_currentSamplePos( 0 ),
+	m_currentProgram(-1)
+{
+	__plugin = this;
+	m_midiEvents.reserve(1024);
+}
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
@@ -2475,6 +2507,10 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 } // namespace lmms
 
 
+#ifdef LMMS_BUILD_WIN32
+#include "RemoteVstSession.h"
+#endif
+
 int main( int _argc, char * * _argv )
 {
 	using lmms::RemoteVstPlugin;
@@ -2547,6 +2583,9 @@ int main( int _argc, char * * _argv )
 		int embedMethodIndex = 2;
 	#endif
 		std::string embedMethod = _argv[embedMethodIndex];
+#ifdef LMMS_BUILD_WIN32
+		if (_argc > 2 && std::string(_argv[2]) == "--host-session") { embedMethod = _argv[1]; }
+#endif
 
 		if ( embedMethod == "none" )
 		{
@@ -2587,6 +2626,19 @@ int main( int _argc, char * * _argv )
 	}
 #endif
 	
+#ifdef LMMS_BUILD_WIN32
+	if (_argc > 2 && std::string(_argv[2]) == "--host-session")
+	{
+		// New invocation starts with the embed method; no legacy FIFO keys.
+		const std::string embed = _argv[1];
+		HEADLESS = embed == "headless";
+		EMBED = EMBED_WIN32 = embed == "win32";
+		EMBED_X11 = false;
+		const auto result = lmms::runVstSession(_argc, _argv, 2);
+		OleUninitialize();
+		return result;
+	}
+#endif
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO

@@ -134,6 +134,36 @@ parallel latency comparisons belong to S5/S7, not this existing behavior baselin
 
 ## Results
 
+## S1 Windows transport implementation
+
+RemotePlugin installs LegacyHostBridge for VST2; other remote clients retain their
+existing transport. A session owns two named mappings and a per-instance Windows Job.
+The helper starts suspended, joins the Job, then resumes. A separate watchdog enforces
+control deadlines and consumes atomic audio-failure notifications. Restart increments
+generation after stopping the old Job and quiescing the audio producer.
+
+Control commands use an explicit u32 command count, then command ID, argument count,
+and length-prefixed UTF-8 arguments. The complete packet is checked before allocation.
+The control dispatcher owns request sequences and state pause/resume barriers. Native
+VST calls and HWND message handling remain in RemoteVstPlugin32/64.
+
+Audio uses three preallocated slots, up to 4096 frames, 32 channels and 16384 event
+bytes. Ownership uses aligned Windows Interlocked words. One live callback submits
+the current block and consumes only the preceding block; startup returns silence.
+A missing result faults the instance immediately instead of waiting or replaying
+late audio. MIDI ingress is a bounded 512-cell concurrent-producer queue. Parameters
+and tempo use atomic publication. Audio records contain five little-endian u32 fields:
+MIDI type/channel/data1/data2/sampleOffset; parameter type 256/channel zero/index/
+float32 bits/offset zero; tempo type 257/channel zero/BPM/reserved zero/offset zero.
+Offline rendering waits on the control dispatcher with an audio deadline and returns
+the current block. Realtime rendering never invokes that waiting path.
+
+S1 establishes transport isolation, deadlines and known-sample compatibility. Route
+compensation for the live one-block delay, full offline timeline/tails, additional
+bus routing and removal of control waits under LMMS model mutation locks remain S5.
+Carla remains S6. The component/native fault tests do not establish the continuously
+scheduled mixed 16-instance S7 matrix.
+
 Allowed values: PASS, FAIL, SKIPPED_MANUAL, BLOCKED_ENVIRONMENT, NOT_RUN.
 Listening, subjective GUI/DPI/focus checks, manual license activation and certification are
 SKIPPED_MANUAL by user instruction. ARA and non-Windows builds are outside this task's scope.

@@ -125,6 +125,7 @@ enum class ExecutableType
 };
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
+	RemotePlugin(true),
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( (gui::getGUI() != nullptr)
@@ -209,7 +210,11 @@ VstPlugin::~VstPlugin()
 
 void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 {
+#ifdef LMMS_BUILD_WIN32
+	initSupervisedVst(remoteVstPluginExecutable, m_embedMethod);
+#else
 	init( remoteVstPluginExecutable, false, {m_embedMethod} );
+#endif
 
 	waitForHostInfoGotten();
 	if( failed() )
@@ -329,6 +334,7 @@ void VstPlugin::toggleUI()
 
 void VstPlugin::setTempo( bpm_t _bpm )
 {
+	if (postVstTempo(static_cast<unsigned>(_bpm))) { return; }
 	lock();
 	sendMessage( message( IdVstSetTempo ).addInt( _bpm ) );
 	unlock();
@@ -664,6 +670,7 @@ void VstPlugin::savePreset()
 
 void VstPlugin::setParam( int i, float f )
 {
+	if (postVstParameter(i, f)) { return; }
 	lock();
 	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
 	//waitForMessage( IdVstSetParameter, true );

@@ -19,7 +19,7 @@ enum class Error : std::uint32_t
 enum class MessageType : std::uint16_t
 {
 	Hello = 1, Create, Close, Process, ProcessDone, Parameter, Midi, GetState,
-	SetState, ShowEditor, HideEditor, Scan, ScanResult, Fault
+	SetState, ShowEditor, HideEditor, Scan, ScanResult, Fault, Pause, Resume
 };
 
 // Wire encoding is little endian. Never memcpy a native C++ struct into IPC.
@@ -67,7 +67,7 @@ inline Error decode(std::span<const std::uint8_t> bytes, Header& header)
 	if (get(bytes, 4, 2) != ProtocolVersion) { return Error::ProtocolMismatch; }
 	const auto type = get(bytes, 6, 2);
 	const auto size = get(bytes, 32, 4);
-	if (type < 1 || type > static_cast<unsigned>(MessageType::Fault) || size > MaxControlBytes)
+	if (type < 1 || type > static_cast<unsigned>(MessageType::Resume) || size > MaxControlBytes)
 	{ return Error::InvalidMessage; }
 	header = {static_cast<MessageType>(type), get(bytes, 8, 8), get(bytes, 16, 8), get(bytes, 24, 8),
 		static_cast<std::uint32_t>(size)};

@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <memory>
 
 #include "lmmsconfig.h"
 
@@ -416,6 +417,7 @@ public:
 		}
 
 		int id;
+		std::size_t argumentCount() const noexcept { return data.size(); }
 
 	private:
 		std::vector<std::string> data;
@@ -429,6 +431,18 @@ public:
 #else
 	RemotePluginBase();
 #endif
+	// Control-thread transport seam. Audio must use the preallocated host queue.
+	class MessageTransport
+	{
+	public:
+		virtual ~MessageTransport() = default;
+		virtual int send(const message&) = 0;
+		virtual message receive() = 0;
+		virtual bool pending() const = 0;
+		virtual bool invalid() const = 0;
+		virtual void invalidate() = 0;
+	};
+	explicit RemotePluginBase(std::unique_ptr<MessageTransport> transport);
 	virtual ~RemotePluginBase();
 
 #ifdef SYNC_WITH_SHM_FIFO
@@ -446,8 +460,9 @@ public:
 
 	inline bool isInvalid() const
 	{
+		if (m_transport) { return m_transport->invalid(); }
 #ifdef SYNC_WITH_SHM_FIFO
-		return m_in->isInvalid() || m_out->isInvalid();
+		return !m_in || !m_out || m_in->isInvalid() || m_out->isInvalid();
 #else
 		return m_invalid;
 #endif
@@ -501,6 +516,7 @@ public:
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	inline bool messagesLeft()
 	{
+		if (m_transport) { return m_transport->pending(); }
 #ifdef SYNC_WITH_SHM_FIFO
 		return m_in->messagesLeft();
 #else
@@ -534,6 +550,7 @@ public:
 
 
 protected:
+	void setMessageTransport(std::unique_ptr<MessageTransport> transport) { m_transport = std::move(transport); }
 #ifdef SYNC_WITH_SHM_FIFO
 	inline const shmFifo * in() const
 	{
@@ -548,6 +565,7 @@ protected:
 
 	inline void invalidate()
 	{
+		if (m_transport) { m_transport->invalidate(); return; }
 #ifdef SYNC_WITH_SHM_FIFO
 		m_in->invalidate();
 		m_out->invalidate();
@@ -564,6 +582,7 @@ protected:
 
 
 private:
+	std::unique_ptr<MessageTransport> m_transport;
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	static int & waitDepthCounter()
 	{
