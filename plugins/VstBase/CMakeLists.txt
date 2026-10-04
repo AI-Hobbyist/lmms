@@ -1,3 +1,7 @@
+if(WIN32 AND WANT_VST3)
+	include("${LMMS_SOURCE_DIR}/cmake/modules/NativeVstHosts.cmake")
+endif()
+
 if(NOT LMMS_HAVE_VST)
 	RETURN()
 ENDIF()
