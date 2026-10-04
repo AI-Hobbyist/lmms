@@ -28,6 +28,7 @@
 
 
 #include <QMutex>
+#include <cstdint>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -69,6 +70,7 @@ public:
 	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
+	void loadFile(const QString& file, std::uint32_t shellId);
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
@@ -81,12 +83,14 @@ protected slots:
 
 private:
 	void closePlugin();
+	void initializeParameterModels();
 
 
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
+	std::uint32_t m_shellId = 0;
 	gui::SubWindow* m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;

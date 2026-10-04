@@ -34,6 +34,10 @@
 #include <QLocale>
 #include <QTemporaryFile>
 #include <QTimerEvent>
+#include <QScopedValueRollback>
+#include <bit>
+#include <charconv>
+#include <cmath>
 
 #if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
@@ -46,6 +50,7 @@
 #ifdef LMMS_BUILD_WIN32
 #	include <windows.h>
 #	include <QLayout>
+#	include "vsthost/Vst2Scanner.h"
 #endif
 
 #include "AudioEngine.h"
@@ -85,8 +90,8 @@ class FileInfo
 public:
 	FileInfo(QString filePath)
 		: m_file(filePath)
-	{
-		m_file.open(QFile::ReadOnly);
+		{
+			if (!m_file.open(QFile::ReadOnly) || m_file.size() < 64) { throw std::runtime_error("Truncated PE file"); }
 		m_map = m_file.map(0, m_file.size());
 		if (m_map == nullptr) {
 			throw std::runtime_error("Cannot map file");
@@ -99,13 +104,15 @@ public:
 
 	MachineType machineType()
 	{
-		int32_t peOffset = qFromLittleEndian(* reinterpret_cast<int32_t*>(m_map + 0x3C));
+		if (m_map[0] != 'M' || m_map[1] != 'Z') { throw std::runtime_error("Invalid DOS signature"); }
+		const auto peOffset = qFromLittleEndian<std::uint32_t>(m_map + 0x3C);
+		if (peOffset > static_cast<std::uint64_t>(m_file.size() - 6)) { throw std::runtime_error("Invalid PE header offset"); }
 		uchar* peSignature = m_map + peOffset;
 		if (memcmp(peSignature, "PE\0\0", 4)) {
 			throw std::runtime_error("Invalid PE file");
 		}
 		uchar * coffHeader = peSignature + 4;
-		uint16_t machineType = qFromLittleEndian(* reinterpret_cast<uint16_t*>(coffHeader));
+		uint16_t machineType = qFromLittleEndian<std::uint16_t>(coffHeader);
 		return static_cast<MachineType>(machineType);
 	}
 
@@ -119,16 +126,58 @@ private:
 namespace lmms
 {
 
+namespace { thread_local VstPlugin* applyingParameterEdit = nullptr; }
+
 enum class ExecutableType
 {
 	Unknown, Win32, Win64, Linux64,
 };
 
-VstPlugin::VstPlugin( const QString & _plugin ) :
+VstPlugin::ScanResult VstPlugin::scanModule(const QString& path, unsigned timeoutMs)
+{
+	ScanResult result;
+#ifdef LMMS_BUILD_WIN32
+	const auto absolute = PathUtil::toAbsolute(path);
+	QString helper;
+	try
+	{
+		PE::FileInfo info(absolute);
+		switch (info.machineType())
+		{
+		case PE::MachineType::amd64: helper = REMOTE_VST_PLUGIN_FILEPATH_64; break;
+		case PE::MachineType::i386: helper = REMOTE_VST_PLUGIN_FILEPATH_32; break;
+		default: result.error = tr("Unsupported or invalid VST2 PE module: %1").arg(path); return result;
+		}
+	}
+	catch (const std::runtime_error& error)
+	{ result.error = QString::fromUtf8(error.what()); return result; }
+	auto executable = QFileInfo(QDir("plugins:"), helper).absoluteFilePath();
+	if (const auto* directory = std::getenv("LMMS_PLUGIN_DIR"))
+	{ executable = QFileInfo(QDir(directory), helper).absoluteFilePath(); }
+	if (!executable.endsWith(".exe", Qt::CaseInsensitive)) { executable += ".exe"; }
+	const auto scan = vsthost::scanVst2({executable.toStdWString(), {L"headless"}, timeoutMs},
+		absolute.toUtf8().toStdString(), timeoutMs);
+	if (scan.error != vsthost::Error::None)
+	{
+		result.error = tr("VST2 scan failed for %1 (error %2, stage %3, native code %4).")
+			.arg(path).arg(static_cast<unsigned>(scan.error)).arg(static_cast<unsigned>(scan.fault.stage))
+			.arg(scan.fault.nativeCode, 0, 16);
+		return result;
+	}
+	result.shell = scan.shell;
+	for (const auto& entry : scan.entries) { result.entries.push_back({entry.id, QString::fromUtf8(entry.name)}); }
+#else
+	result.error = tr("VST2 discovery is currently implemented for Windows.");
+#endif
+	return result;
+}
+
+VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QString& embedMethod) :
 	RemotePlugin(true),
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
+	m_shellId(shellId),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( (gui::getGUI() != nullptr)
+	m_embedMethod( !embedMethod.isEmpty() ? embedMethod : (gui::getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
@@ -191,8 +240,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
-	// update once per second
-	m_idleTimer.start( 1000 );
+	// Poll native GUI edits without pausing the audio pipeline.
+	m_idleTimer.start( 50 );
 	connect( &m_idleTimer, SIGNAL( timeout() ),
 				this, SLOT( idleUpdate() ) );
 }
@@ -202,7 +251,40 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
+	for (const auto index : m_parameterGestures)
+	{ if (auto model = m_parameterModels.value(index)) { model->restoreJournallingState(); } }
 	delete m_pluginWidget;
+}
+
+void VstPlugin::bindParameterModel(int index, FloatModel* model)
+{
+	if (m_parameterGestures.remove(index))
+	{ if (auto previous = m_parameterModels.value(index)) { previous->restoreJournallingState(); } }
+	m_parameterModels[index] = model;
+}
+
+void VstPlugin::applyParameterEdit(unsigned phase, int index, float value)
+{
+	auto model = m_parameterModels.value(index);
+	if (phase == 0)
+	{
+		if (model && !m_parameterGestures.contains(index))
+		{ model->addJournalCheckPoint(); model->saveJournallingState(false); m_parameterGestures.insert(index); }
+		emit parameterEditBegan(index);
+	}
+	else if (phase == 1)
+	{
+		// Only suppress echoes for this proxy on this thread. Linked models for
+		// other instances and automation on the audio thread keep sending normally.
+		QScopedValueRollback<VstPlugin*> applyingEdit(applyingParameterEdit, this);
+		if (model) { model->setValue(value); }
+		emit parameterEdited(index, value);
+	}
+	else
+	{
+		if (m_parameterGestures.remove(index) && model) { model->restoreJournallingState(); }
+		emit parameterEditEnded(index);
+	}
 }
 
 
@@ -236,7 +318,9 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		default: break;
 	}
 	sendMessage( message( IdVstSetLanguage ).addInt( static_cast<int>(hlang) ) );
-	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
+	message load(IdVstLoadPlugin); load.addString(QSTR_TO_STDSTR(m_plugin));
+	if (m_shellId) { load.addString(std::to_string(m_shellId)); }
+	sendMessage(load);
 
 	waitForInitDone();
 
@@ -279,6 +363,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	if (m_shellId) { _this.setAttribute("shellid", QString::number(m_shellId)); }
 	if ( m_embedMethod != "none" )
 	{
 		if( pluginWidget() != nullptr )
@@ -409,6 +494,41 @@ QWidget *VstPlugin::pluginWidget()
 
 bool VstPlugin::processMessage( const message & _m )
 {
+	if (_m.id == IdVstParameterEdits)
+	{
+		auto parse = [&_m](unsigned argument, std::uint32_t& value)
+		{
+			const auto text = _m.getString(argument);
+			const auto parsed = std::from_chars(text.data(), text.data() + text.size(), value);
+			return parsed.ec == std::errc{} && parsed.ptr == text.data() + text.size();
+		};
+		struct Edit { unsigned phase; int index; float value; };
+		std::vector<Edit> edits;
+		std::uint32_t count = 0;
+		if (!_m.argumentCount() || !parse(0, count) || count > 512 || _m.argumentCount() != 1 + 3 * count)
+		{ m_failed = true; return false; }
+		for (unsigned i = 0; i < count; ++i)
+		{
+			std::uint32_t phase = 0, index = 0, bits = 0;
+			if (!parse(1 + 3 * i, phase) || !parse(2 + 3 * i, index) || !parse(3 + 3 * i, bits) ||
+				phase > 2 || index >= static_cast<unsigned>(m_parameterCount))
+			{ m_failed = true; return false; }
+			const auto value = std::bit_cast<float>(bits);
+			if (!std::isfinite(value) || value < 0 || value > 1) { m_failed = true; return false; }
+			edits.push_back({phase, static_cast<int>(index), value});
+		}
+		QMetaObject::invokeMethod(this, [this, edits = std::move(edits)]
+		{
+			for (const auto& edit : edits) { applyParameterEdit(edit.phase, edit.index, edit.value); }
+		}, Qt::QueuedConnection);
+		return true;
+	}
+	if (_m.id == IdVstParameterCount)
+	{
+		m_parameterCount = _m.getInt();
+		if (m_parameterCount < 0 || m_parameterCount > 65536) { m_failed = true; return false; }
+		return true;
+	}
 	switch( _m.id )
 	{
 	case IdVstPluginWindowID:
@@ -670,6 +790,7 @@ void VstPlugin::savePreset()
 
 void VstPlugin::setParam( int i, float f )
 {
+	if (applyingParameterEdit == this) { return; }
 	if (postVstParameter(i, f)) { return; }
 	lock();
 	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );

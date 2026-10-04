@@ -95,6 +95,10 @@
 #include <vector>
 #include <cassert>
 #include <cmath>
+#include <charconv>
+#include <unordered_set>
+#include <bit>
+#include "vsthost/RealtimeMidiQueue.h"
 
 #include <aeffectx.h>
 
@@ -182,6 +186,7 @@ public:
 	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
+	bool scanPlugin(const std::string& path);
 	void initEditor();
 	void showEditor();
 	void hideEditor();
@@ -232,7 +237,17 @@ public:
 	bool setRealtimeParameter(unsigned index, float value)
 	{
 		if (!m_plugin || index >= static_cast<unsigned>(m_plugin->numParams) || !std::isfinite(value)) { return false; }
+		HostParameterChange change;
 		m_plugin->setParameter(m_plugin, static_cast<int32_t>(index), value); return true;
+	}
+	bool queueParameterEdit(unsigned phase, int index, float value) noexcept
+	{
+		if (m_hostParameterDepth) { return true; }
+		if (!m_plugin || index < 0 || index >= m_plugin->numParams || !std::isfinite(value) || value < 0 || value > 1)
+		{ return false; }
+		if (!m_parameterEdits.push({0, {phase, static_cast<unsigned>(index), std::bit_cast<std::uint32_t>(value), 0, 0}}))
+		{ m_editOverflow.store(true, std::memory_order_release); return false; }
+		return true;
 	}
 
 	// determine VST-version the plugin uses
@@ -397,6 +412,14 @@ public:
 #endif
 
 private:
+	inline static thread_local unsigned m_hostParameterDepth = 0;
+	struct HostParameterChange
+	{
+		HostParameterChange() { ++m_hostParameterDepth; }
+		~HostParameterChange() { --m_hostParameterDepth; }
+	};
+	vsthost::RealtimeMidiQueue m_parameterEdits;
+	std::atomic<bool> m_editOverflow{false};
 	enum class GuiThreadMessage
 	{
 		None,
@@ -451,6 +474,7 @@ private:
 #endif
 
 	AEffect * m_plugin;
+	std::uint32_t m_shellId = 0;
 #ifndef NATIVE_LINUX_VST
 	HWND m_window = nullptr;
 #else
@@ -645,9 +669,17 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 
 	switch( _m.id )
 	{
-		case IdVstLoadPlugin:
-			init( _m.getString() );
-			break;
+			case IdVstLoadPlugin:
+				if (_m.argumentCount() == 2)
+				{
+					const auto id = _m.getString(1);
+					const auto parsed = std::from_chars(id.data(), id.data() + id.size(), m_shellId);
+					if (parsed.ec != std::errc{} || parsed.ptr != id.data() + id.size() || !m_shellId) { return false; }
+				}
+				init( _m.getString() );
+				break;
+			case IdVstScanPlugin:
+				return scanPlugin(_m.getString());
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -703,10 +735,13 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( IdSavePresetFile );
 			break;
 
-		case IdVstSetParameter:
-			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
-			//sendMessage( IdVstSetParameter );
-			break;
+			case IdVstSetParameter:
+			{
+				HostParameterChange change;
+				m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
+				//sendMessage( IdVstSetParameter );
+				break;
+			}
 
 		case IdVstLoadAllParameterDisplays:
 			loadAllParameterDisplays();
@@ -724,9 +759,21 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			updateParameterLabel(_m.getInt());
 			break;
 
-		case IdVstIdleUpdate:
-		{
-			int newCurrentProgram = pluginDispatch( effGetProgram );
+			case IdVstIdleUpdate:
+			{
+				if (m_editOverflow.load(std::memory_order_acquire)) { return false; }
+				std::vector<vsthost::RealtimeMidiQueue::Event> edits;
+				vsthost::RealtimeMidiQueue::Event event{};
+				for (unsigned i = 0; i < vsthost::RealtimeMidiQueue::Capacity && m_parameterEdits.pop(event); ++i)
+				{ edits.push_back(event); }
+				if (!edits.empty())
+				{
+					message reply(IdVstParameterEdits); reply.addInt(static_cast<int>(edits.size()));
+					for (const auto& edit : edits)
+					{ for (unsigned i = 0; i < 3; ++i) { reply.addString(std::to_string(edit.values[i])); } }
+					sendMessage(reply);
+				}
+				int newCurrentProgram = pluginDispatch( effGetProgram );
 			if( newCurrentProgram != m_currentProgram )
 			{
 				m_currentProgram = newCurrentProgram;
@@ -767,6 +814,10 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 		sendMessage( IdVstFailedLoadingPlugin );
 		return;
 	}
+	// VST2 shell category/opcodes are absent in the compatibility SDK header.
+	// Their ABI values are effGetPlugCategory=35, kPlugCategShell=10.
+	if (pluginDispatch(35) == 10 || (m_shellId && static_cast<std::uint32_t>(m_plugin->uniqueID) != m_shellId))
+	{ sendMessage(IdVstFailedLoadingPlugin); return; }
 
 	updateInOutCount();
 	updateBufferSize();
@@ -1000,6 +1051,7 @@ void RemoteVstPlugin::destroyEditor()
 
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
+	if (m_libInst || m_plugin) { return false; }
 #ifndef NATIVE_LINUX_VST
 	if ((m_libInst = LoadLibraryW(toWString(_plugin_file).get())) == nullptr)
 	{
@@ -1069,6 +1121,33 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	pluginDispatch( effOpen );
 
 	return true;
+}
+
+bool RemoteVstPlugin::scanPlugin(const std::string& path)
+{
+	if (m_libInst || m_plugin || !load(path)) { return false; }
+	std::vector<std::pair<std::uint32_t, std::string>> entries;
+	const bool shell = pluginDispatch(35) == 10;
+	if (shell)
+	{
+		std::unordered_set<std::uint32_t> seen;
+		// A malicious/nonterminating shell is bounded by count and the independent
+		// parent's scan deadline. Duplicate IDs do not silently truncate a catalog.
+		for (unsigned index = 0; index <= 4096; ++index)
+		{
+			char name[64]{};
+			const auto id = static_cast<std::uint32_t>(pluginDispatch(70, 0, 0, name));
+			name[63] = 0;
+			if (!id) { break; }
+			if (index == 4096 || !seen.insert(id).second) { return false; }
+			entries.emplace_back(id, name);
+		}
+		if (entries.empty()) { return false; }
+	}
+	else { entries.emplace_back(static_cast<std::uint32_t>(m_plugin->uniqueID), pluginName()); }
+	message result(IdVstShellEntries); result.addInt(static_cast<int>(entries.size())).addInt(shell ? 1 : 0);
+	for (const auto& [id, name] : entries) { result.addString(std::to_string(id)).addString(name); }
+	sendMessage(result); return true;
 }
 
 
@@ -1356,6 +1435,7 @@ void RemoteVstPlugin::getParameterDump()
 
 void RemoteVstPlugin::setParameterDump( const message & _m )
 {
+	HostParameterChange change;
 	const int n = _m.getInt( 0 );
 	const int params = ( n > m_plugin->numParams ) ?
 					m_plugin->numParams : n;
@@ -1863,7 +1943,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 	{
 		case audioMasterAutomate:
 			SHOW_CALLBACK( "amc: audioMasterAutomate\n" );
-			// index, value, returns 0
+			if (__plugin) { __plugin->queueParameterEdit(1, _index, _opt); }
 			return 0;
 
 		case audioMasterVersion:
@@ -1874,7 +1954,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK( "amc: audioMasterCurrentId\n" );
 			// returns the unique id of a plug that's currently
 			// loading
-			return 0;
+			return __plugin ? static_cast<intptr_t>(static_cast<std::int32_t>(__plugin->m_shellId)) : 0;
 
 		case audioMasterIdle:
 			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
@@ -2200,19 +2280,15 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 #endif
 			return 0;
 
-#if kVstVersion > 2
 		case audioMasterBeginEdit:
 			SHOW_CALLBACK( "amc: audioMasterBeginEdit\n" );
-			// begin of automation session (when mouse down),
-			// parameter index in <index>
-			return 0;
+			return __plugin && __plugin->queueParameterEdit(0, _index, 0);
 
 		case audioMasterEndEdit:
 			SHOW_CALLBACK( "amc: audioMasterEndEdit\n" );
-			// end of automation session (when mouse up),
-			// parameter index in <index>
-			return 0;
+			return __plugin && __plugin->queueParameterEdit(2, _index, 0);
 
+#if kVstVersion > 2
 		case audioMasterOpenFileSelector:
 			SHOW_CALLBACK( "amc: audioMasterOpenFileSelector\n" );
 			// open a fileselector window with VstFileSelect*

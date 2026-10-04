@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QDropEvent>
 #include <QGridLayout>
+#include <QInputDialog>
 #include <QMdiArea>
 #include <QMenu>
 #include <QPainter>
@@ -177,11 +178,6 @@ VestigeInstrument::~VestigeInstrument()
 		p_subWindow = nullptr;
 	}
 
-	if (knobFModel != nullptr) {
-		delete []knobFModel;
-		knobFModel = nullptr;
-	}
-
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::Type::NotePlayHandle
 				| PlayHandle::Type::InstrumentPlayHandle );
@@ -199,7 +195,11 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 		return;
 	}
 
-	loadFile( plugin );
+	bool validId = true;
+	const auto shellId = _this.hasAttribute("shellid") ? _this.attribute("shellid").toUInt(&validId) : 0;
+	if (!validId || (_this.hasAttribute("shellid") && !shellId))
+	{ collectErrorForUI(tr("Invalid VST2 shell identity.")); return; }
+	loadFile(plugin, shellId);
 	m_pluginMutex.lock();
 	if( m_plugin != nullptr )
 	{
@@ -220,14 +220,12 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
 		auto paramStr = std::array<char, 35>{};
-		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
-			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings(_this, paramStr.data());
 
 			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
@@ -236,8 +234,6 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-			connect( knobFModel[i], &FloatModel::dataChanged, this,
-				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 	}
 	m_pluginMutex.unlock();
@@ -268,7 +264,7 @@ void VestigeInstrument::handleConfigChange(QString cls, QString attr, QString va
 void VestigeInstrument::reloadPlugin()
 {
 	closePlugin();
-	loadFile( m_pluginDLL );
+	loadFile(m_pluginDLL, m_shellId);
 }
 
 
@@ -333,6 +329,34 @@ QString VestigeInstrument::nodeName( void ) const
 
 void VestigeInstrument::loadFile( const QString & _file )
 {
+	loadFile(_file, 0);
+}
+
+void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (!shellId)
+	{
+		const auto scan = VstPlugin::scanModule(_file);
+		if (!scan.error.isEmpty()) { collectErrorForUI(scan.error); return; }
+		if (scan.shell)
+		{
+			if (scan.entries.size() == 1) { shellId = scan.entries.front().id; }
+			else
+			{
+				if (!gui::getGUI())
+				{ collectErrorForUI(tr("VST2 shell %1 requires a saved shellid selection.").arg(_file)); return; }
+				QStringList names;
+				for (const auto& entry : scan.entries) { names.append(tr("%1 [%2]").arg(entry.name).arg(entry.id)); }
+				bool accepted = false;
+				const auto selected = QInputDialog::getItem(nullptr, tr("Select VST2 shell plugin"),
+					tr("Plugin"), names, 0, false, &accepted);
+				if (!accepted) { return; }
+				shellId = scan.entries[names.indexOf(selected)].id;
+			}
+		}
+	}
+#endif
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != nullptr &&
 			instrumentTrack()->name() == m_plugin->name() ) ||
@@ -343,7 +367,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == PathUtil::toShortestRelative( _file ))
+			m_pluginDLL == PathUtil::toShortestRelative( _file ) && m_shellId == shellId)
 		return;
 
 	if ( m_plugin != nullptr )
@@ -351,6 +375,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
+	m_shellId = shellId;
 	gui::TextFloat * tf = nullptr;
 	if( gui::getGUI() != nullptr )
 	{
@@ -361,7 +386,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
+	m_plugin = new VstInstrumentPlugin(m_pluginDLL, m_shellId);
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -372,6 +397,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
+	initializeParameterModels();
 	if ( !(instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode()))
 	{
 		m_plugin->createUI(nullptr);
@@ -425,6 +451,22 @@ bool VestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 
 
 
+
+void VestigeInstrument::initializeParameterModels()
+{
+	if (!m_plugin || knobFModel) { return; }
+	const auto& dump = m_plugin->parameterDump();
+	paramCount = dump.size();
+	knobFModel = new FloatModel*[paramCount];
+	for (int i = 0; i < paramCount; ++i)
+	{
+		const auto value = LocaleHelper::toFloat(dump.value(QString("param%1").arg(i)).section(':', 2));
+		knobFModel[i] = new FloatModel(value, 0.0f, 1.0f, 0.0f, this, QString::number(i));
+		m_plugin->bindParameterModel(i, knobFModel[i]);
+		connect(knobFModel[i], &FloatModel::dataChanged, this,
+			[this, i] { setParameter(knobFModel[i]); }, Qt::DirectConnection);
+	}
+}
 
 void VestigeInstrument::closePlugin( void )
 {
@@ -982,8 +1024,6 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
-		connect( model, &FloatModel::dataChanged, this,
-			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		knob->setModel(model);
 	}
 	m_vi->m_plugin->loadParameterLabels();

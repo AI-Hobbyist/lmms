@@ -46,11 +46,19 @@ inline bool validVstCommand(const vsthost::LegacyCommand& command, bool initiali
 	const auto id = command.id;
 	for (const auto& argument : command.arguments)
 	{ if (argument.find('\0') != std::string::npos) { return false; } }
-	if (!initialized && id != IdVstLoadPlugin && id != IdSyncKey && id != IdSampleRateInformation &&
+	if (!initialized && id != IdVstLoadPlugin && id != IdVstScanPlugin && id != IdSyncKey && id != IdSampleRateInformation &&
 		id != IdBufferSizeInformation && id != IdVstSetLanguage && id != IdVstSetTempo) { return false; }
 	switch (id)
 	{
-		case IdVstLoadPlugin: return !initialized && count == 1 && !command.arguments[0].empty();
+			case IdVstLoadPlugin:
+			{
+				if (initialized || (count != 1 && count != 2) || command.arguments[0].empty()) { return false; }
+				if (count == 1) { return true; }
+				std::uint32_t shellId = 0; const auto& text = command.arguments[1];
+				const auto parsed = std::from_chars(text.data(), text.data() + text.size(), shellId);
+				return parsed.ec == std::errc{} && parsed.ptr == text.data() + text.size() && shellId != 0;
+			}
+			case IdVstScanPlugin: return !initialized && count == 1 && !command.arguments[0].empty();
 		case IdSyncKey: case IdSampleRateInformation: case IdBufferSizeInformation:
 		case IdVstSetLanguage: case IdVstSetTempo: case IdVstSetProgram: case IdVstRotateProgram:
 		case IdVstUpdateParameterDisplay: case IdVstUpdateParameterLabel:
@@ -168,14 +176,15 @@ inline int runVstSession(int argc, char** argv, int position)
 						if (!validVstCommand(command, plugin->isInitialized())) { error = Error::InvalidMessage; break; }
 						RemotePluginBase::message message(static_cast<int>(command.id));
 						for (const auto& argument : command.arguments) { message.addString(argument); }
-						plugin->processMessage(message);
+							if (!plugin->processMessage(message)) { error = Error::LoadFailed; break; }
 						if (command.id == IdVstLoadPlugin && !plugin->isInitialized()) { error = Error::LoadFailed; break; }
 					}
 				}
 				if (error == Error::None)
 				{ error = replies->failed ? Error::InvalidMessage : encodeLegacy(replies->messages, payload, capacity); }
 			}
-			const bool close = frame.header.type == MessageType::Close;
+				const bool close = frame.header.type == MessageType::Close;
+				if (frame.header.type == MessageType::Scan) { frame.header.type = MessageType::ScanResult; }
 			if (error != Error::None)
 			{ frame.header.type = MessageType::Fault; payload.resize(4); put(payload, 0, static_cast<unsigned>(error), 4); }
 			frame.header.payloadBytes = static_cast<std::uint32_t>(payload.size());

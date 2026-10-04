@@ -30,6 +30,8 @@
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
 #include "Effect.h"
+#include "VstPlugin.h"
+#include <QDebug>
 
 namespace lmms
 {
@@ -56,18 +58,28 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 														KeyList & _kl ) const
 {
-	auto dlls = new QStringList();
-	const QString path = QString("");
-	addPluginsFromDir(dlls, path );
+	QStringList dlls;
+	addPluginsFromDir(&dlls, {});
 	// TODO: eval m_type
-	for( QStringList::ConstIterator it = dlls->begin();
-							it != dlls->end(); ++it )
+	for (const auto& file : dlls)
 	{
 		EffectKey::AttributeMap am;
-		am["file"] = *it;
-		_kl.push_back( Key( _desc, QFileInfo( *it ).baseName(), am ) );
+		am["file"] = file;
+#ifdef LMMS_BUILD_WIN32
+		const auto scan = VstPlugin::scanModule(QDir(ConfigManager::inst()->vstDir()).absoluteFilePath(file));
+		if (!scan.error.isEmpty()) { qWarning().noquote() << scan.error; continue; }
+		if (scan.shell)
+		{
+			for (const auto& entry : scan.entries)
+			{
+				am["shellid"] = QString::number(entry.id);
+				_kl.push_back(Key(_desc, entry.name, am));
+			}
+			continue;
+		}
+#endif
+		_kl.push_back(Key(_desc, QFileInfo(file).baseName(), am));
 	}
-	delete dlls;
 }
 
 void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString path ) const

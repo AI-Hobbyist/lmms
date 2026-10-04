@@ -8,7 +8,7 @@ official online sources and included in the build as authorized by the user.
 | --- | --- | --- |
 | S0 | PASS | Contract, call graph, frozen legacy project and entry inventory recorded. Windows x86/x64 protocol, proxy, MIDI, editor, native DLL project/command/snapshot/preview/export baseline PASS. Runtime Carla baseline unavailable with DummyCarla; gap recorded for S6. |
 | S1 | PASS | Production VstPlugin/RemotePlugin migrated on Windows; dual-ABI supervised native helper, bounded control and preallocated realtime path. Full Release build and 41/41 CTest PASS (51.54 s). Stage delivered in the commit containing this completion record. |
-| S2 | NOT_RUN | VST2 shell and compatibility migration. |
+| S2 | PASS | Supervised shell full enumeration/selection, persistent unsigned shellid, production effect/instrument selection and GUI model feedback. Full Windows Release build PASS; 43/43 CTest PASS (52.14 s). Delivered in the commit containing this completion record. |
 | S3 | NOT_RUN | VST3 adapter and dual-ABI SDK fixtures. |
 | S4 | NOT_RUN | Catalog, scan roots and migration. |
 | S5 | NOT_RUN | Unified entries, buses, latency and offline timeline. |
@@ -134,3 +134,90 @@ Manual review stays SKIPPED_MANUAL by user instruction. S1 does not claim VST2 s
 VST3, route latency compensation, full offline timeline/tails, additional buses,
 real Carla or the continuously scheduled mixed 16-instance matrix; those remain in
 S2-S7. Earlier IN_PROGRESS paragraphs are historical checkpoints, superseded here.
+
+S1 committed and pushed to origin/master as 755b287ef; local HEAD and origin/master
+matched 755b287ef3fdcf2357720cafde38a9a23d4d5423 after the push. S2 is IN_PROGRESS;
+S3-S8 remain NOT_RUN. This next checkpoint will be included with the S2 stage commit.
+
+## S2 native shell checkpoint (uncommitted)
+
+RemoteVstPlugin accepts an optional unsigned decimal shell ID and publishes its raw
+32-bit value through audioMasterCurrentId before invoking the module entry. The scan
+command calls effOpen/category/effShellGetNextPlugin without editor/audio initialization.
+It returns all IDs/names; empty/nonterminating/duplicate enumeration fails explicitly.
+HostSession scan/create requests report Scan/Initialize fault stages. Separate shell
+fixtures preserve the frozen S0 source and inject enumeration crash/hang/duplicates.
+
+Vst2Shell and Vst2ShellCrossABI: 2/2 PASS, 1.84 s. Covers full enumeration, high-bit ID
+0xf1020304 and ID 0x01000200, independent child PIDs and distinct known-gain audio,
+invalid/unknown IDs, parent module exclusion, scanner cleanup and bounded scan failures.
+The initial selected-ID test failed because the callback patch was misplaced; corrected
+audioMasterCurrentId and restored audioMasterSizeWindow before this successful run.
+Evidence: `build/vst-s0/s2-shell-build.log`, `s2-shell-tests.log`.
+
+DAW proxy/instrument/effect adapters now carry shellid through constructor/key/XML/reload;
+their build and added native compatibility tests are still pending at this checkpoint.
+PE probing now validates DOS signature, minimum length and PE header bounds. S2 still
+requires production scan/selection integration, shell project/preset/GUI coverage,
+GUI parameter edit/automation feedback and the full ordinary VST2 regression before
+its stage commit. No S2 completion or VST3 success is claimed.
+
+S2 proxy checkpoint: Release lmms.exe, vstbase/vestige/vsteffect, both helpers and the
+native proxy/entry/fault tests built successfully. Vst2CompatibilityTest now exercises
+both shell IDs on x86/x64, persists unsigned shellid and chunk, recreates the selected
+child and restores its parameter state, and rejects four malformed PE shapes in the
+parent without loading native code. Selected regression: 10/10 CTest PASS, 36.25 s,
+including shell, ordinary compatibility, native entry paths, realtime bridge/resource
+recovery and both native fault suites. Evidence: `build/vst-s0/s2-proxy-build.log` and
+`s2-proxy-tests.log`. Production scan/selection and GUI edit feedback remain pending;
+S2 is still IN_PROGRESS, uncommitted. No build/test session remains running here.
+
+## S2 completion — 2026-10-04
+
+Status: **PASS / COMPLETE**. Windows x64 DAW and both x86/x64 native helpers built.
+The final full Release CTest run passed **43/43**, 52.14 seconds. The VST2 compatibility
+executable reports 11 PASS, 0 FAIL, 0 SKIP; actual DLL entry tests report 8 PASS,
+0 FAIL, 0 SKIP. S0/S1 remain complete; S3–S8 still require their implementations.
+
+Delivered behavior:
+- Disposable supervised scanning performs entry/open/category/all-child enumeration
+  and close in the helper, never loads the third-party module in the DAW, and fails
+  on crashes, hangs, duplicate IDs or malformed responses. PE architecture probing
+  validates signatures and bounds. Results explicitly distinguish shell/ordinary
+  modules; shell IDs preserve all unsigned 32 bits.
+- Selected child ID is available through audioMasterCurrentId before native entry.
+  Independent Alpha/Beta fixtures prove distinct output for each ID on both ABIs.
+  Unsupported IDs and root-shell audio initialization are rejected.
+- Effect discovery returns every shell child, using the existing file key plus
+  shellid. Vestige file loading offers a child selection; a single-child shell is
+  selected by its actual ID. Ambiguous headless loads require a saved selection.
+  XML, effect keys, preset restore, reload, clone, snapshot undo/redo and project
+  reopen preserve the chosen identity. Ordinary VST2 keys and old state remain valid.
+- Native begin/perform/end callbacks publish to the bounded preallocated queue.
+  Control polling transfers batches to the proxy's Qt thread; bound instrument and
+  effect models exist before opening parameter controls. A gesture creates one
+  undo checkpoint, parameter values update without an echo to the same native
+  instance, and undo/redo still propagate to it. Host setters suppress deliberate
+  plugin echoes. Pending GUI tasks are scoped to the proxy lifetime.
+- Both ABI editor fixtures perform actual native-window edits and verify the model,
+  gesture signals, exact parameter value, undo/redo and echo suppression. Existing
+  ordinary VST2 audio/MIDI/chunk/program/editor and native entry/fault/resource
+  regressions pass. Instrument parameter-array cleanup was corrected while adding
+  models at load time.
+
+Evidence (generated under build/vst-s0, not committed): s2-scanner-build.log,
+s2-scanner-tests.log, s2-gui-build-retry.log, s2-gui-helper-fix-build.log,
+s2-gui-feedback-tests.log, s2-full-release-build-retry.log,
+s2-shell-entry-build.log, s2-shell-entry-tests.log,
+**s2-full-release-tests-final.log**, s2-compatibility-results.txt and
+s2-entry-results.txt. Failed diagnostic attempts are retained separately: exported
+thread-local state was moved into the implementation file; an obsolete undefined
+kVstVersion preprocessor guard was removed from begin/end edit; the native shell
+effect test now selects the actual catalog key rather than reconstructing it.
+
+**Manual review SKIPPED as requested:** subjective listening, DPI/focus judgment,
+commercial UI appearance and human licensing/activation review. These are not
+reported as automated passes and do not delay later stages. S4 still owns cached,
+cancellable multi-root discovery; S5 owns removal of control waits under model locks,
+full routing and PDC; S6/S7 own real Carla/Waves and the mixed-instance fault matrix;
+S8 owns final packaging. No VST3 or real Carla success is claimed by S2.

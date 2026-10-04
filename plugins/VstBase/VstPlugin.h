@@ -28,8 +28,10 @@
 #include <QMap>
 #include <QPointer>
 #include <QSize>
+#include <QSet>
 #include <QString>
 #include <QTimer>
+#include <cstdint>
 
 #include "Knob.h"
 #include "JournallingObject.h"
@@ -40,12 +42,24 @@
 namespace lmms
 {
 
+class FloatModel;
+
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin(const QString& plugin, std::uint32_t shellId = 0, const QString& embedMethod = {});
+	std::uint32_t shellId() const noexcept { return m_shellId; }
+	struct ScanEntry { std::uint32_t id; QString name; };
+	struct ScanResult
+	{
+		QString error;
+		bool shell = false;
+		std::vector<ScanEntry> entries;
+	};
+	static ScanResult scanModule(const QString& path, unsigned timeoutMs = 15000);
+	void bindParameterModel(int index, FloatModel* model);
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
@@ -124,6 +138,11 @@ public:
 
 	QString embedMethod() const;
 
+signals:
+	void parameterEditBegan(int index);
+	void parameterEdited(int index, float value);
+	void parameterEditEnded(int index);
+
 public slots:
 	void setTempo( lmms::bpm_t _bpm );
 	void updateSampleRate();
@@ -150,8 +169,13 @@ private:
 	QByteArray saveChunk();
 
 	void toggleEditorVisibility(int visible = -1);
+	void applyParameterEdit(unsigned phase, int index, float value);
+	int m_parameterCount = 0;
+	QMap<int, QPointer<FloatModel>> m_parameterModels;
+	QSet<int> m_parameterGestures;
 
 	QString m_plugin;
+	const std::uint32_t m_shellId;
 	QPointer<QWidget> m_pluginWidget;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;

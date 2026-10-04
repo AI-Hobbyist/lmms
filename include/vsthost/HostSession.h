@@ -80,7 +80,9 @@ public:
 				if (paused.error != Error::None) { return paused; }
 			}
 			const auto payload = prepare();
-			auto result = exchange(type, payload, timeoutMs, ProcessSupervisor::Stage::Control);
+			const auto stage = type == MessageType::Scan ? ProcessSupervisor::Stage::Scan :
+				type == MessageType::Create ? ProcessSupervisor::Stage::Initialize : ProcessSupervisor::Stage::Control;
+			auto result = exchange(type, payload, timeoutMs, stage);
 			if (pauseAudio && result.error == Error::None)
 			{
 				const auto resumed = exchange(MessageType::Resume, {}, timeoutMs, ProcessSupervisor::Stage::Control);

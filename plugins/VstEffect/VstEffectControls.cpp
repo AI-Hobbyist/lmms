@@ -82,14 +82,12 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
 		auto paramStr = std::array<char, 35>{};
-		knobFModel.resize(paramCount);
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 
-			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings(_this, paramStr.data());
 
 			if( !( knobFModel[ i ]->isAutomated() ||
@@ -99,8 +97,6 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-			connect( knobFModel[i], &FloatModel::dataChanged, this,
-				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 
 	}
@@ -109,6 +105,22 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 
 
+
+void VstEffectControls::initializeParameterModels()
+{
+	if (!m_effect->m_plugin || !knobFModel.empty()) { return; }
+	const auto& dump = m_effect->m_plugin->parameterDump();
+	paramCount = dump.size();
+	knobFModel.resize(paramCount);
+	for (int i = 0; i < paramCount; ++i)
+	{
+		const auto value = LocaleHelper::toFloat(dump.value(QString("param%1").arg(i)).section(':', 2));
+		knobFModel[i] = new FloatModel(value, 0.0f, 1.0f, 0.0f, this, QString::number(i));
+		m_effect->m_plugin->bindParameterModel(i, knobFModel[i]);
+		connect(knobFModel[i], &FloatModel::dataChanged, this,
+			[this, i] { setParameter(knobFModel[i]); }, Qt::DirectConnection);
+	}
+}
 
 void VstEffectControls::setParameter( Model * action )
 {
@@ -391,8 +403,6 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
-		connect( model, &FloatModel::dataChanged, this,
-			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		knob->setModel(model);
 	}
 	m_effect->m_plugin->loadParameterLabels();

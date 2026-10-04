@@ -31,10 +31,11 @@ class VstEntryPoints : public QObject
 	Q_OBJECT
 	QString m_fixtureRoot;
 	QString m_fixture;
-	std::set<DWORD> fixtureProcesses(const char* entry)
+	QTemporaryDir m_fixtureDirectory;
+	std::set<DWORD> fixtureProcesses(const char* entry, const wchar_t* moduleName = L"Vst2Baseline.dll")
 	{
 		std::set<DWORD> result;
-		if (GetModuleHandleW(L"Vst2Baseline.dll"))
+		if (GetModuleHandleW(moduleName))
 		{
 			QTest::qFail("Third-party fixture was loaded in the DAW process", __FILE__, __LINE__);
 			return result;
@@ -50,7 +51,7 @@ class VstEntryPoints : public QObject
 			MODULEENTRY32W module{}; module.dwSize = sizeof(module);
 			if (Module32FirstW(modules, &module)) do
 			{
-				if (QString::fromWCharArray(module.szModule) == "Vst2Baseline.dll")
+				if (_wcsicmp(module.szModule, moduleName) == 0)
 				{
 					result.insert(process.th32ProcessID);
 					qInfo() << "entry" << entry << "DAW PID" << GetCurrentProcessId()
@@ -76,8 +77,21 @@ class VstEntryPoints : public QObject
 private slots:
 	void initTestCase()
 	{
-		m_fixtureRoot = qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT");
-		QVERIFY(!m_fixtureRoot.isEmpty());
+			const auto sourceRoot = qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT");
+			QVERIFY(!sourceRoot.isEmpty());
+			QVERIFY(m_fixtureDirectory.isValid());
+			m_fixtureRoot = m_fixtureDirectory.path();
+			// This suite covers production entry paths. Fault DLLs have their own
+			// deadline suites and must not turn every effect-list query into a fault scan.
+			for (const auto* architecture : {"x86", "x64"})
+			{
+				const auto relative = QString(architecture) + "/fixtures/Release/";
+				QVERIFY(QDir().mkpath(m_fixtureRoot + '/' + relative));
+				for (const auto* fixture : {"Vst2Baseline.dll", "Vst2Shell.dll"})
+				{
+					QVERIFY(QFile::copy(sourceRoot + '/' + relative + fixture, m_fixtureRoot + '/' + relative + fixture));
+				}
+			}
 		QDir::setSearchPaths("plugins", {qEnvironmentVariable("LMMS_NATIVE_PLUGIN_DIR")});
 		lmms::ConfigManager::inst()->setVSTDir(m_fixtureRoot + '/');
 		lmms::NotePlayHandleManager::init();
@@ -142,7 +156,17 @@ private slots:
 		lmms::Plugin::Descriptor::SubPluginFeatures::KeyList keys;
 		const auto* descriptor = lmms::PluginFactory::instance()->pluginInfo("vsteffect").descriptor;
 		descriptor->subPluginFeatures->listSubPluginKeys(descriptor, keys);
-		qInfo() << "effect registry root" << lmms::ConfigManager::inst()->vstDir() << "keys" << keys.size();
+			qInfo() << "effect registry root" << lmms::ConfigManager::inst()->vstDir() << "keys" << keys.size();
+			int shellEntries = 0;
+			for (const auto& key : keys)
+			{
+				if (!key.attributes.value("file").endsWith("Vst2Shell.dll")) { continue; }
+				++shellEntries;
+				const auto id = key.attributes.value("shellid").toUInt();
+				QVERIFY(id == UINT32_C(0xf1020304) || id == UINT32_C(0x01000200));
+				QCOMPARE(key.name, id == UINT32_C(0xf1020304) ? QString("Shell Alpha") : QString("Shell Beta"));
+			}
+			QCOMPARE(shellEntries, 4);
 		QJsonObject subKey;
 		for (const auto& key : keys)
 		{
@@ -209,7 +233,64 @@ private slots:
 		lmms::Engine::getSong()->clearProject();
 		QVERIFY(fixtureProcesses("offline cleanup").empty());
 	}
-	void previews_data() { entries_data(); }
+		void shellState_data() { entries_data(); }
+		void shellState()
+		{
+			QFETCH(QString, architecture);
+			const auto relative = architecture + "/fixtures/Release/Vst2Shell.dll";
+			const auto path = QDir(m_fixtureRoot).absoluteFilePath(relative);
+			for (const auto id : {UINT32_C(0xf1020304), UINT32_C(0x01000200)})
+			{
+				lmms::Engine::getSong()->clearProject();
+				QVERIFY(command("track.create", {{"type", "instrument"}}).ok);
+				QVERIFY(command("instrument.load", {{"track", 0}, {"plugin", "vestige"}}).ok);
+				QDomDocument preset; auto state = preset.createElement("vestige"); preset.appendChild(state);
+				state.setAttribute("plugin", path); state.setAttribute("shellid", QString::number(id));
+				track()->instrument()->restoreState(state);
+				QVERIFY(fixtureProcesses("selected shell instrument", L"Vst2Shell.dll").size() == 1);
+				QVERIFY(command("track.clone", {{"track", 0}}).ok);
+				QVERIFY(fixtureProcesses("selected shell clone", L"Vst2Shell.dll").size() == 2);
+				lmms::Plugin::Descriptor::SubPluginFeatures::KeyList keys;
+				const auto* descriptor = lmms::PluginFactory::instance()->pluginInfo("vsteffect").descriptor;
+				descriptor->subPluginFeatures->listSubPluginKeys(descriptor, keys);
+				QJsonObject subKey;
+				for (const auto& key : keys)
+				{
+					if (QDir::fromNativeSeparators(key.attributes.value("file")) != relative ||
+						key.attributes.value("shellid").toUInt() != id) { continue; }
+					QJsonObject attributes;
+					for (auto it = key.attributes.begin(); it != key.attributes.end(); ++it) { attributes.insert(it.key(), it.value()); }
+					subKey = {{"name", key.name}, {"attributes", attributes}};
+				}
+				QVERIFY(!subKey.isEmpty());
+				QVERIFY(command("effect.add", {{"owner", "track:0"}, {"plugin", "vsteffect"}, {"subKey", subKey}}).ok);
+				QVERIFY(fixtureProcesses("selected shell effect", L"Vst2Shell.dll").size() == 3);
+				QVERIFY(command("history.undo").ok);
+				QVERIFY(fixtureProcesses("shell effect undo", L"Vst2Shell.dll").size() == 2);
+				QVERIFY(command("history.redo").ok);
+				QVERIFY(fixtureProcesses("shell effect redo", L"Vst2Shell.dll").size() == 3);
+				QTemporaryDir temporary; QVERIFY(temporary.isValid());
+				const auto project = temporary.filePath("shell.mmp");
+				QVERIFY(lmms::Engine::getSong()->saveProjectFile(project));
+				QFile file(project); QVERIFY(file.open(QIODevice::ReadOnly));
+				QVERIFY(file.readAll().contains("shellid=\"" + QByteArray::number(id) + "\"")); file.close();
+				lmms::Engine::getSong()->clearProject();
+				QVERIFY(fixtureProcesses("shell project cleared", L"Vst2Shell.dll").empty());
+				lmms::Engine::getSong()->loadProject(project);
+				QCOMPARE(lmms::Engine::getSong()->tracks().size(), std::size_t(2));
+				QVERIFY(fixtureProcesses("shell project reopened", L"Vst2Shell.dll").size() == 3);
+				for (auto* loaded : lmms::Engine::getSong()->tracks())
+				{
+					auto* instrument = dynamic_cast<lmms::InstrumentTrack*>(loaded); QVERIFY(instrument);
+					QDomDocument saved; auto root = saved.createElement("preset"); saved.appendChild(root);
+					const auto actual = instrument->instrument()->saveState(saved, root);
+					QCOMPARE(actual.attribute("shellid").toUInt(), id);
+				}
+				lmms::Engine::getSong()->clearProject();
+				QVERIFY(fixtureProcesses("shell project cleanup", L"Vst2Shell.dll").empty());
+			}
+		}
+		void previews_data() { entries_data(); }
 	void previews()
 	{
 		QFETCH(QString, architecture);

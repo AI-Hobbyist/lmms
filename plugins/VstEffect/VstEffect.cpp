@@ -117,7 +117,11 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
+	bool validId = true;
+	const auto shellId = m_key.attributes.contains("shellid") ? m_key.attributes["shellid"].toUInt(&validId) : 0;
+	if (!validId || (m_key.attributes.contains("shellid") && !shellId))
+	{ delete tf; collectErrorForUI(VstPlugin::tr("Invalid VST2 shell identity.")); return false; }
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin, shellId));
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
@@ -129,6 +133,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	delete tf;
 
 	m_key.attributes["file"] = plugin;
+	m_vstControls.initializeParameterModels();
 	return true;
 }
 
