@@ -39,6 +39,8 @@
 namespace lmms
 {
 
+namespace vsthost { struct ScanRoot; }
+
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -256,6 +258,8 @@ public:
 
 	void setWorkingDir(const QString & workingDir);
 	void setVSTDir(const QString & vstDir);
+	std::vector<vsthost::ScanRoot> vstScanRoots(QString* error = nullptr) const;
+	bool setVstScanRoots(const std::vector<vsthost::ScanRoot>& roots, QString* error = nullptr);
 	void setLADSPADir(const QString & ladspaDir);
 	void setSF2Dir(const QString & sf2Dir);
 	void setSF2File(const QString & sf2File);

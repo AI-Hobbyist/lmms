@@ -94,6 +94,8 @@ protected slots:
 	bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
+	void rebuildModel();
+	void refreshVstKeys();
 	EffectKeyList m_effectKeys;
 	EffectKey m_currentSelection;
 

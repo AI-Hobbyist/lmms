@@ -45,11 +45,12 @@ public:
 	void listSubPluginKeys( const Plugin::Descriptor * _desc,
 											KeyList & _kl ) const override;
 private:
+#ifndef LMMS_BUILD_WIN32
 	void addPluginsFromDir(QStringList* filenames,  QString path) const;
+#endif
 } ;
 
 
 } // namespace lmms
 
 #endif
-

@@ -10,7 +10,7 @@ official online sources and included in the build as authorized by the user.
 | S1 | PASS | Production VstPlugin/RemotePlugin migrated on Windows; dual-ABI supervised native helper, bounded control and preallocated realtime path. Full Release build and 41/41 CTest PASS (51.54 s). Stage delivered in the commit containing this completion record. |
 | S2 | PASS | Supervised shell full enumeration/selection, persistent unsigned shellid, production effect/instrument selection and GUI model feedback. Full Windows Release build PASS; 43/43 CTest PASS (52.14 s). Delivered in the commit containing this completion record. |
 | S3 | PASS | Windows x64/Win32 native adapter and scanner integrated. Exact factory CIDs, Unicode bundles, lifecycle, float32/float64, state, ParamID, native editor, transport/events, feedback and MIDI/parameter/latency/I/O/reload restart paths verified. Full Windows Release build PASS; 49/49 CTest PASS (110.41 s), including 50 editor lifetimes per ABI. Delivered in the commit containing this completion record. |
-| S4 | NOT_RUN | Catalog, scan roots and migration. |
+| S4 | PASS | Multi-root migration preserves uservst; supervised bundle/PE/Unicode discovery, exact identity/version candidates, cache/quarantine/cancellation and owned asynchronous jobs/settings/selector publication implemented. Final full Windows Release build PASS; 54/54 CTest PASS (100.26 s). Delivered in the commit containing this completion record. |
 | S5 | NOT_RUN | Unified entries, buses, latency and offline timeline. |
 | S6 | NOT_RUN | Real Carla backend and per-node bridges. |
 | S7 | NOT_RUN | WaveShell and automated fault matrix. |
@@ -43,7 +43,7 @@ it cannot demonstrate real Carla isolation.
 Manual listening, subjective UI, DPI/focus experience, manual activation and certification:
 SKIPPED_MANUAL by user instruction; continue automated work. ARA shell excluded by plan.
 S0 committed and pushed to origin/master as fa520bea1. S1 completion evidence follows
-the chronological checkpoints below. S0-S3 are complete; S4-S8 remain unfinished.
+the chronological checkpoints below. S0-S4 are complete; S5-S8 remain unfinished.
 Earlier IN_PROGRESS checkpoints below are chronological history, superseded by the
 latest completion record.
 
@@ -489,3 +489,317 @@ parent integration. Completion here does not claim those later stages passed.
 Manual listening, subjective UI/DPI/focus checks, manual activation and
 certification remain SKIPPED_MANUAL by user instruction. Continue S4; the overall
 goal remains ACTIVE until S8 and its final status/artifact records are complete.
+
+### S4 checkpoint: scan-root migration and cancellable scanners
+
+S3 completion was committed and pushed to origin/master as b7f2e58dc.
+S4 is IN_PROGRESS and uncommitted; its full-stage acceptance has not passed.
+
+ScanRoots.h provides version-1 bounded JSON (256 roots, 1 MiB configuration,
+32767-character paths), absolute-path syntax normalization, Windows case-aware
+path deduplication, strict format/boolean validation and first-entry option/order
+preservation. Empty lists are explicit and retained. Migration adds the legacy
+root and existing Windows VST3 standard roots, removing duplicate paths. Invalid
+JSON returns an error/empty result and is preserved for diagnosis rather than
+being silently overwritten or replaced with an implicit scan list.
+
+ConfigManager stores vst.scanroots independently from paths.vstdir. Only a missing
+scanroots key triggers first migration. Reordering, changing flags, removing
+roots, save/reload and an unavailable old directory do not replace the uservst:
+compatibility root. The old missing-directory fallback no longer relocates an
+explicitly configured legacy root. Generated configuration stays in temporary
+test directories, not the user's real configuration.
+
+HostSession now has permanent cancellation for disposable sessions. A stop
+callback only publishes cancellation and wakes the dispatcher; native handles
+and Job cleanup remain owned by the dispatcher. Its existing bounded receive
+predicate exits promptly, and queued requests reject the cancelled session.
+Both scanners accept a stop_token, clear entries on cancellation and report a
+cancelled flag separately from normal scan faults. Already-cancelled VST3 scans
+return without starting a helper. Tests cancel native scan/ExitDll hangs and a
+VST2 shell scan hang, require return within 2 seconds with a non-timeout error,
+check the original fault stage, then successfully scan another module. Native
+catalog handle counts stay within the explicit bound.
+
+Verified: migration Release build PASS; VstPathsMigrationTest 6 PASS, 0 FAIL,
+0 SKIP internally. Dual-ABI native/legacy scan cancellation plus HostSession,
+processing/editor and migration regression: 12/12 CTest PASS (41.74 s).
+Evidence under build/vst-s4/: paths-migration-build.log,
+paths-migration-tests.log, cancellable-scan-final-build.log,
+cancellable-scan-final-tests.log. No compilation/test process remains running.
+
+Next S4 work: PluginCatalog multi-root/bundle discovery and PE helper choice,
+identity/locator/version candidates, fingerprints, atomic cache and separate
+failure records, job lifecycle/cancellation/concurrent refresh, then settings
+list and VstSubPluginFeatures integration. Existing live instances must remain
+independent of catalog refresh. S5-S8 remain NOT_RUN; manual review remains
+SKIPPED_MANUAL. Goal remains ACTIVE until all stages and final release/status
+artifacts are complete.
+
+### S4 checkpoint: catalog discovery, cache and live-instance isolation
+
+S4 remains IN_PROGRESS and uncommitted. S0-S3 remain PASS and pushed; no S4
+completion commit is claimed. S5-S8 remain NOT_RUN. The overall goal is ACTIVE.
+
+PluginCatalog now discovers enabled ordered roots, excludes backup trees, treats
+VST3 bundles atomically, reads actual bounded PE headers and chooses the matching
+Win32/x64 helper. Bundle contents roots and overlapping roots do not duplicate
+modules. Windows final paths are resolved through native file handles: Qt's
+canonicalFilePath alone did not resolve the tested junction aliases. Directory
+file IDs prevent junction cycles. Discovery and catalog capacity are bounded.
+
+Entries separate exact format/architecture/raw CID identity from module/binary
+locator, version and SHA256 content fingerprint. VST2 shell identities retain
+unsigned IDs and module origin to avoid colliding with another shell. All audio
+factory classes and all location/version candidates are retained; controller-only
+classes are excluded. Parent module handles remain absent.
+
+The bounded versioned cache validates host version, schema, paths, metadata,
+architecture, raw identities and duplicate records. Binary and bundle-resource
+changes invalidate fingerprints. Successful cache publication uses QSaveFile
+under a short QLockFile; separate failure records quarantine unchanged failed
+modules. Forced refresh retries quarantined modules. Malformed or stale caches
+fall back to supervised scans with a diagnostic. Cancellation clears the report
+and preserves prior cache files. Concurrent scans publish complete files, and
+native faults do not stop remaining modules.
+
+PluginCatalogTest covers Unicode paths, missing/disabled/nonrecursive roots,
+backup exclusion, junction aliases/cycles, dual-ABI bundles, repeated classes at
+different versions/locations, colliding shell origins, wrong/missing helpers,
+bad PE, cache hits/invalidation/schema rejection, native crash/quarantine/retry,
+native hang cancellation and parallel scans. A separate live native fixture
+continues rendering exact 0.25-gain audio during a hung scan, after scan crashes,
+after cancellation and after parallel refresh. Its PID and generation stay fixed.
+The first live test used an enumeration-only fixture; that test setup was fixed
+to use Vst3Native, with no weakening of the live-instance assertions.
+
+Verified: catalog Release build PASS; relevant regression 11/11 CTest PASS
+(21.01 s). Full Windows Release build also PASS, compiling the catalog into
+lmmsobjs and relinking LMMS and plugins. Evidence in build/vst-s4/:
+catalog-live-build-final.log, catalog-live-regressions-final.log and
+catalog-root-release-build.log. Failed intermediate attempts are retained as
+diagnostics, not counted as acceptance.
+
+Final full-root regression from these sources: 51/51 CTest PASS (78.03 s),
+including both native helper ABIs, all VST2 legacy entry/state/audio faults,
+LMMS commands, migration and the new live-instance catalog test. Evidence:
+build/vst-s4/catalog-root-release-tests.log. All foreground build/test actions
+finished with exit code zero; no compilation/test process remains running.
+
+Remaining S4 work: asynchronous catalog publication/lifecycle, settings list
+controls and VstSubPluginFeatures integration. Filesystem discovery, PE reading
+and fingerprinting still run synchronously in the caller's control worker;
+potentially blocked UNC/filesystem calls need bounded isolation before claiming
+fully cancellable scanning. Windows path comparison precision and VST2 catalog
+vendor/version metadata still need review. Active instances hold no catalog
+ownership and are not restarted by refresh. Manual review remains SKIPPED_MANUAL
+by user instruction; automatic checks and implementation gaps are not skipped.
+
+### S4 checkpoint: multi-root settings draft and asynchronous scan jobs
+
+S4 remains IN_PROGRESS and uncommitted. S0-S3 remain PASS and pushed as recorded
+above. S5-S8 remain NOT_RUN; overall goal remains ACTIVE. The previous goal turn
+was progress: it implemented/tested discovery, cache and live-instance isolation.
+
+SetupDialog now contains a scan-directory table with add, browse, direct path
+editing, remove, up/down ordering, enabled/recursive flags and independent VST2/
+VST3 checkboxes. The older-project VST directory remains a separate field.
+ScanRootsWidget owns a draft and never probes directory existence while displaying
+or validating it. Missing and UNC paths can be entered directly. Validation uses
+the same bounded normalization/schema as ConfigManager. OK commits only a changed
+valid draft; a validation error keeps the dialog open before other settings are
+written. Cancel discards the draft. Opening unchanged invalid configuration shows
+its error and does not silently replace it with an empty list. The UI supports an
+explicit empty list and first-row duplicate priority, without changing uservst:.
+
+CatalogJobs provides one control worker, a replaceable latest pending request,
+per-request cancellation, generation-filtered progress and immutable shared
+published reports. Refresh/cancel do not join or wait for a scan on the requesting
+thread. Superseded and cancelled completions cannot publish, including the window
+between cancellation intent and stop callbacks running. Cancellation preserves
+the previous report. Executor exceptions become diagnostics and the worker can
+continue. Destruction cancels current work and joins the owned thread; it has no
+detached callbacks or worker references to destroyed owners.
+
+Tests exercise real keyboard/delegate path edits, table operations/options,
+invalid paths/formats, Unicode/UNC syntax, duplicate priority, empty lists and
+256-root capacity. The first keyboard test observed the table before Qt's queued
+delegate commit; it now waits for the actual model update before validating.
+QtTest result files are explicitly retained because Windows GUI test stdout can
+be absent. CatalogJobs tests prove pending-request replacement, stale-result/
+progress rejection, nonwaiting refresh, cancel/retained snapshots, exception
+recovery and cooperative destructor cancellation.
+
+PluginCatalogTest now also drives CatalogJobs with the real native scanners:
+publish a successful report, start a hanging factory scan, cancel it within the
+2-second bound, retain the same published report and byte-identical cache, then
+successfully refresh again. The separate live plugin retains its PID/generation
+and exact audio throughout. Windows Release builds for LMMS and all changed/new
+targets PASS; latest related CTest 13/13 PASS (21.64 s). Evidence under
+build/vst-s4/: settings-widget-build.log, settings-widget-keyboard-build.log,
+catalog-jobs-native-build-final.log, catalog-jobs-native-tests-final.log.
+QtTest detail: build/tests/vsthost/{ScanRootsWidget,CatalogJobs}-results.txt.
+Earlier failed intermediate test attempts are diagnostics, not acceptance.
+
+Remaining before S4 completion: make filesystem discovery/PE/fingerprint reads
+bounded/cancellable through process isolation, connect owned catalog jobs to the
+application lifecycle and settings refresh/status/cancel controls, and replace
+the legacy recursive VstSubPluginFeatures enumeration with published catalog
+entries. The current default executor still uses synchronous filesystem calls;
+its destructor bound is not proven for blocked UNC I/O, so it is not yet claimed
+as fully cancellable scanning. VST2 vendor/version metadata and Windows Unicode
+path comparison precision also remain to verify. Manual review remains
+SKIPPED_MANUAL. No build/test process remains running.
+
+### S4 checkpoint: supervised filesystem worker
+
+S4 remains IN_PROGRESS and uncommitted. S0-S3 remain PASS and pushed; S5-S8
+remain NOT_RUN. The overall goal remains ACTIVE. This checkpoint supersedes
+the earlier unbounded-filesystem limitation; application/selector integration
+is still required before committing and pushing S4.
+
+All catalog filesystem operations now run in RemoteCatalogIo, a disposable
+QtCore-only Windows process under the existing suspended-launch/Job supervisor.
+Directory traversal, junction resolution, PE inspection, bundle fingerprinting,
+cache reads and cache publication no longer execute in the DAW scan thread.
+Each request has a bounded deadline, bounded JSON framing and a fresh worker.
+Cancellation wakes the owning HostSession and terminates its Job, including a
+worker blocked inside a filesystem operation. The worker never loads VST code.
+Its QtCore DLL is copied alongside it during the build and included in install
+rules; complete clean-PATH package verification remains an S8 requirement.
+
+The parent validates discovered module/failure records, PE reply field types
+and publication diagnostics before using them. A failed post-scan fingerprint
+read retains its timeout/crash cause instead of being misreported as a replaced
+module. Remaining roots continue after filesystem failure. Cache files retain
+QSaveFile atomic replacement and bounded locking in the worker. Success and
+quarantine files are independently atomic, not one cross-file transaction;
+cancellation during publication may occur after one file has committed. The
+previous report remains published on cancellation. Tests claiming unchanged
+cache specifically cancel discovery before publication. JSON transport is
+limited to MaxControlBytes (16 MiB); oversized cache requests/replies produce
+a diagnostic rather than publishing partial records.
+
+CatalogIoTest uses a test-only build of the worker to signal the exact start
+of a blocked operation and then inject timeout/crash/invalid responses. The
+production executable has no fixture trigger. Tests cover PE, fingerprint,
+cache read/write deadlines; raw Windows crash classification; cancellation
+before a 30-second deadline; continuing to a good root after three distinct
+faults; retaining report/cache on discovery cancellation; refreshing again;
+bounded destruction while discovery is blocked; and 50 worker lifetimes with
+bounded parent handle count. The synthetic hook simulates a blocked syscall;
+it does not claim an unavailable real UNC server was exercised.
+
+Windows Release LMMS and all affected/new targets build PASS. Initial migration
+regression 4/4 PASS (16.52 s); initial fault test PASS (2.82 s). The expanded
+fault test including 50 worker lifetimes PASS (6.25 s) in the final root CTest
+run. Build evidence: build/vst-s4/filesystem-worker-build-final.log. Final test
+evidence is recorded below after the entire suite finishes. Earlier failed
+build log diagnosed a missing ControlChannel wait liveness argument; fixed
+and rebuilt successfully. Final Windows Release root CTest: 54/54 PASS
+(116.04 s), archived at build/vst-s4/filesystem-worker-tests-final.log.
+No build/test process remains running at this checkpoint.
+
+Remaining S4 work: owned application catalog lifecycle, refresh/status/cancel
+settings controls, published catalog consumption in VstSubPluginFeatures,
+Windows Unicode path comparison precision and VST2 vendor/version metadata.
+Manual review remains SKIPPED_MANUAL by user instruction. Automatic checks
+and implementation gaps remain required.
+
+### S4 checkpoint: Engine ownership, settings actions and live selection
+
+The preceding goal turn made progress: supervised filesystem I/O was implemented
+and verified by 54/54 root CTest PASS. This turn connects that service to the
+application. S4 remains IN_PROGRESS; S0-S3 remain PASS/pushed and S5-S8 NOT_RUN.
+The overall goal remains ACTIVE. Current Git HEAD is 3e3337eca (the separate
+SVS documentation commit), above the S3 implementation commit b7f2e58dc. That
+unrelated work is preserved; no S4 commit or push is claimed at this checkpoint.
+
+Engine owns one CatalogJobs service. It resolves installed helper locations from
+the registered plugin directory or LMMS_PLUGIN_DIR override and keeps cache
+storage under the application CacheLocation. Interactive startup queues a
+refresh; render-only startup creates the service without an unrelated scan.
+Explicit refresh validates saved roots, supports forced rescanning and rejects
+invalid configuration without advancing the request generation. Engine::destroy
+cancels/joins and resets the service before destroying configuration/application
+owners. Active audio instances do not reference the service. Building the main
+LMMS target also builds the catalog filesystem worker.
+
+SetupDialog provides refresh of saved directories, forced rescan including failed
+plugins, cancellation and polled progress/result status. These explicit actions
+use saved configuration, so editing or cancelling a settings draft does not
+silently alter the scan roots. Accepting a changed valid draft queues refresh
+after configuration is saved. Error details are generated only when the published
+generation changes and bounded to 32 failures plus an additional-failure count.
+The timer/connections are owned by the dialog and do not retain a destroyed UI.
+
+On Windows, VstSubPluginFeatures no longer recursively enumerates directories or
+starts native scans on a selector call. It reads the immutable published report.
+Each VST2/shell entry and each VST3 factory audio class becomes an independent
+key, carrying an absolute locator, stable identity, architecture, vendor/version,
+and either unsigned shell ID or exact hexadecimal raw CID. Description widgets
+show architecture/vendor/version. VST3 keys are prepared for the native LMMS
+instance dispatch in S5; this checkpoint does not claim VST3 keys can already be
+instantiated through the existing VST2-only VstEffect facade.
+
+EffectSelectDialog polls the published generation and updates only VST entries
+when it changes; it retains its search/type filters and an unchanged selected
+key. Other plugin catalogs are not rescanned on each publication. The open
+selector can lose/recover entries when an explicit empty root list is published
+and then restored, without reopening the dialog or blocking on directory scans.
+
+The production native-DLL VstEntryPoints test now initializes controlled saved
+roots and awaits actual asynchronous publication. It tests invalid configuration
+rejection, live selector removal/reappearance, six VST2/shell entries, and two
+factory VST3 class keys with byte-exact CID/identity and matching metadata. Both
+ABI entry regressions force a catalog refresh while live instrument instances
+exist and verify their exact helper PID set is unchanged. Existing shell IDs,
+project/uservst paths, clone, undo/redo, preview and export regressions still pass.
+Shutdown verifies the owned catalog service has been reset. QStandardPaths test
+mode avoids writing these catalog fixtures into the ordinary application cache.
+
+Windows Release affected-target builds PASS, including LMMS, vestige, vsteffect,
+vstbase and the native entry test. Related CTest 7/7 PASS (45.88 s) before the
+additional VST3 class-key assertions; the expanded VstEntryPoints regression
+then PASS (22.40 s, CTest elapsed 22.48 s). Evidence under build/vst-s4/:
+application-catalog-build.log, application-catalog-test-build.log,
+application-catalog-tests.log, application-catalog-build-final.log,
+application-catalog-class-keys-tests.log. No build/test process remains running.
+The earlier full 54/54 result predates application integration; final stage-wide
+rebuild/test acceptance is still required rather than treating it as fresh proof.
+
+Remaining S4 acceptance: Windows Unicode path comparison precision, VST2 catalog
+vendor/version metadata, final full Windows Release rebuild/regression, and the
+stage commit/push. Manual subjective UI/listening/activation remains
+SKIPPED_MANUAL. Automatic implementation/checks are not skipped.
+
+S4 Windows path/metadata acceptance checkpoint (2026-10-04, uncommitted):
+VST2 scan replies now carry bounded vendor and signed numeric vendor-version,
+while accepting the older entry-only reply. Catalog entries and cache round trips
+preserve these fields. Both native shell helpers and catalog metadata regressions
+PASS; five focused CTest tests PASS (17.30 s). The application cache host identity
+is bumped to lmms-vst-catalog-2 to invalidate experimental older metadata records.
+Real distinct Straße/STRASSE directory roots both survive discovery and retain
+same-CID location candidates. Logs: path-metadata-build.log and
+path-metadata-tests.log under build/vst-s4/.
+
+Full Windows Release build PASS, then full CTest 53/54 PASS (98.77 s). The new
+Windows ordinal comparison regression correctly rejected unverified NLS uppercase
+as a canonical path key. That automatic failure is not skipped. The revised key
+accepts an uppercase candidate only when CompareStringOrdinal confirms equality;
+otherwise it falls back to verified one-UTF-16-unit mappings without expansions.
+The test compares case, sharp-s/ss, ligatures, canonical accent spellings, Greek,
+Cyrillic, fullwidth, zero-width and supplementary characters against Windows.
+Rebuild and final regression are running; S4 remains IN_PROGRESS until they pass.
+The failed-run log is preserved as path-comparison-failure-tests.log.
+
+S4 COMPLETE (2026-10-04): final full Windows Release build PASS; final 54/54
+CTest PASS (100.26 s), including the repaired Windows ordinal path comparison.
+Qt migration results: 7 PASS, 0 FAIL, 0 SKIP. Settings/selector publication,
+metadata cache round trips, native x86/x64 shell and VST3 class inventories,
+filesystem/process faults, cancellation/live-instance isolation and old uservst
+project entries all pass. Evidence: build/vst-s4/final-stage-build.log,
+final-stage-tests.log and build/tests/VstPathsMigrationTest-results.txt.
+Manual listening, subjective UI/DPI/focus, activation/certification remain
+SKIPPED_MANUAL by user instruction. S5-S8 are not complete; the overall goal
+remains active. No build/test process remains running.

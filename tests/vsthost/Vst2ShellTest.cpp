@@ -44,16 +44,18 @@ int wmain(int argc, wchar_t** argv)
 	std::vector<LegacyCommand> entries;
 	check(decodeLegacy(reply.payload, entries) == Error::None, "shell enumeration decodes");
 	const auto found = std::find_if(entries.begin(), entries.end(), [](const auto& item) { return item.id == IdVstShellEntries; });
-	check(found != entries.end() && found->arguments == std::vector<std::string>{"2", "1", "4043440900", "Shell Alpha", "16777728", "Shell Beta"}, "all child IDs preserved unsigned including high bit and embedded zero bytes");
+		check(found != entries.end() && found->arguments == std::vector<std::string>{"2", "1", "4043440900", "Shell Alpha", "16777728", "Shell Beta", "LMMS tests", "1"}, "all child IDs preserved unsigned including high bit and embedded zero bytes, with module metadata");
 	check(!loadedInParent(L"Vst2Shell.dll"), "scanner never loads native module in parent");
 	check(scanner.close().get().error == Error::None, "scanner closes");
 	const auto catalog = scanVst2(config, shell, 1500);
 	check(catalog.error == Error::None && catalog.shell && catalog.entries.size() == 2 &&
 		catalog.entries[0].id == 0xf1020304u && catalog.entries[1].id == 0x01000200u,
-		"production scanner preserves all selected identities");
+			"production scanner preserves all selected identities");
+		check(catalog.vendor == "LMMS tests" && catalog.version == "1", "shell module vendor/version metadata");
 	const auto ordinary = scanVst2(config, utf8(fixtures / L"Vst2Baseline.dll"), 1500);
 	check(ordinary.error == Error::None && !ordinary.shell && ordinary.entries.size() == 1,
-		"production scanner distinguishes ordinary module");
+			"production scanner distinguishes ordinary module");
+		check(ordinary.vendor == "LMMS tests" && ordinary.version == "1", "ordinary module vendor/version metadata");
 	HostSession alpha, beta;
 	check(alpha.open(config).get().error == Error::None && beta.open(config).get().error == Error::None, "independent child sessions");
 	for (auto* session : {&alpha, &beta})
@@ -92,6 +94,19 @@ int wmain(int argc, wchar_t** argv)
 		if (std::wstring_view(mode) == L"Crash") { check(scanner.fault().nativeCode == 0xe0000053u, "scan exception diagnosis"); }
 		scanner.close().get();
 	}
-	std::cout << "VST2 shell: " << failures << " failures\n";
+		std::stop_source cancellation;
+		auto pending = std::async(std::launch::async, [&]
+		{
+			return scanVst2(config, utf8(fixtures / L"Vst2ShellHang.dll"), 30000, cancellation.get_token());
+		});
+		check(pending.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout, "scan is still pending before cancellation");
+		const auto cancelStart = GetTickCount64(); cancellation.request_stop();
+		check(pending.wait_for(std::chrono::seconds(2)) == std::future_status::ready, "scan cancellation wakes dispatcher");
+		const auto cancelled = pending.get();
+		check(cancelled.cancelled && cancelled.error != Error::None && cancelled.error != Error::Timeout &&
+			cancelled.entries.empty() && GetTickCount64() - cancelStart < 2000, "cancelled scan discards entries without waiting for scan timeout");
+		check(cancelled.fault.stage == ProcessSupervisor::Stage::Scan, "cancelled scan preserves its stage");
+		check(scanVst2(config, shell, 1500).error == Error::None, "scanning recovers after cancellation");
+		std::cout << "VST2 shell: " << failures << " failures\n";
 	return failures ? 1 : 0;
 }

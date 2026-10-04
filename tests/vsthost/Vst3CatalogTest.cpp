@@ -62,6 +62,31 @@ int wmain(int argc, wchar_t** argv)
 	}
 	CHECK(scanVst3(helper, (root / L"absent.vst3").wstring()).error == Error::LoadFailed);
 	CHECK(scanVst3(helper, L"").error == Error::InvalidMessage);
+	DWORD handlesBefore = 0; CHECK(GetProcessHandleCount(GetCurrentProcess(), &handlesBefore));
+	for (const auto fault : {6, 7})
+	{
+		std::stop_source cancellation;
+		auto pending = std::async(std::launch::async, [&]
+		{
+			return scanVst3(helper, (root / (L"Vst3FactoryFault" + std::to_wstring(fault) + L".vst3")).wstring(),
+				30000, cancellation.get_token());
+		});
+		CHECK(pending.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout);
+		const auto start = GetTickCount64(); cancellation.request_stop();
+		CHECK(pending.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
+		const auto cancelled = pending.get();
+		CHECK(cancelled.cancelled && cancelled.error != Error::None && cancelled.classes.empty());
+		CHECK(cancelled.error != Error::Timeout);
+		CHECK(cancelled.fault.stage == (fault == 6 ? ProcessSupervisor::Stage::Scan : ProcessSupervisor::Stage::Shutdown));
+		CHECK(GetTickCount64() - start < 2000);
+		const auto recovered = scanVst3(helper, (root / L"Vst3Factory.vst3").wstring());
+		CHECK(recovered.error == Error::None && recovered.classes.size() == 3);
+	}
+	DWORD handlesAfter = 0; CHECK(GetProcessHandleCount(GetCurrentProcess(), &handlesAfter));
+	CHECK(handlesAfter <= handlesBefore + 4);
+	std::stop_source alreadyCancelled; alreadyCancelled.request_stop();
+	const auto rejected = scanVst3(helper, (root / L"Vst3Factory.vst3").wstring(), 30000, alreadyCancelled.get_token());
+	CHECK(rejected.cancelled && rejected.error != Error::None && rejected.classes.empty());
 	std::cout << "PASS VST3 factory, raw CIDs, Unicode bundle, malformed catalog, supervised faults and recovery\n";
 	return 0;
 }

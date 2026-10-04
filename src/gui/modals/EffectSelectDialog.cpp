@@ -28,6 +28,12 @@
 #include "EffectChain.h"
 #include "embed.h"
 #include "PluginFactory.h"
+#include "Engine.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#include <QTimer>
+#endif
+#include <QSignalBlocker>
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -46,6 +52,47 @@
 
 namespace lmms::gui
 {
+
+void EffectSelectDialog::rebuildModel()
+{
+	m_sourceModel.clear();
+	m_sourceModel.setHorizontalHeaderLabels({tr("Name"), tr("Type")});
+	int row = 0;
+	for (const auto& key : m_effectKeys)
+	{
+		const bool subPlugin = key.desc->subPluginFeatures;
+		m_sourceModel.setItem(row, 0, new QStandardItem(subPlugin ? key.displayName() : key.desc->displayName));
+		m_sourceModel.setItem(row, 1, new QStandardItem(subPlugin ? key.desc->displayName : "LMMS"));
+		++row;
+	}
+}
+
+void EffectSelectDialog::refreshVstKeys()
+{
+	const auto selected = m_currentSelection;
+	const QSignalBlocker blocker(m_pluginList->selectionModel());
+	m_pluginList->selectionModel()->clear();
+	for (auto it = m_effectKeys.begin(); it != m_effectKeys.end();)
+	{
+		if (QString::fromUtf8(it->desc->name) == "vsteffect") { it = m_effectKeys.erase(it); }
+		else { ++it; }
+	}
+	for (const auto* descriptor : getPluginFactory()->descriptors(Plugin::Type::Effect))
+	{
+		if (QString::fromUtf8(descriptor->name) == "vsteffect" && descriptor->subPluginFeatures)
+		{ descriptor->subPluginFeatures->listSubPluginKeys(descriptor, m_effectKeys); }
+	}
+	m_currentSelection = {}; rebuildModel();
+	QModelIndex next = m_model.index(0, 0);
+	for (int row = 0; row < m_effectKeys.size(); ++row)
+	{
+		const auto& key = m_effectKeys[row];
+		if (key.desc == selected.desc && key.name == selected.name && key.attributes == selected.attributes)
+		{ const auto candidate = m_model.mapFromSource(m_sourceModel.index(row, 0)); if (candidate.isValid()) { next = candidate; } break; }
+	}
+	m_pluginList->selectionModel()->setCurrentIndex(next, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	rowChanged(next, {});
+}
 
 EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	QDialog(parent),
@@ -77,28 +124,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	}
 	m_effectKeys += subPluginEffectKeys;
 
-	// Fill the source model
-	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
-	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Type")));
-	int row = 0;
-	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
-	{
-		QString name;
-		QString type;
-		if (it->desc->subPluginFeatures)
-		{
-			name = it->displayName();
-			type = it->desc->displayName;
-		}
-		else
-		{
-			name = it->desc->displayName;
-			type = "LMMS";
-		}
-		m_sourceModel.setItem(row, 0, new QStandardItem(name));
-		m_sourceModel.setItem(row, 1, new QStandardItem(type));
-		++row;
-	}
+	rebuildModel();
 
 	// Setup filtering
 	m_model.setSourceModel(&m_sourceModel);
@@ -189,6 +215,17 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	installEventFilter(this);
 
 	updateSelection();
+#ifdef LMMS_BUILD_WIN32
+	auto* timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, this, [this, published = Engine::vstCatalog() ? Engine::vstCatalog()->snapshot().published : 0ULL]() mutable {
+		if (const auto* jobs = Engine::vstCatalog()) {
+			const auto state = jobs->snapshot();
+			if (state.published != published) { published = state.published; refreshVstKeys(); }
+		}
+	});
+	timer->start(100);
+	if (const auto* jobs = Engine::vstCatalog(); jobs && !jobs->snapshot().requested) { Engine::refreshVstCatalog(); }
+#endif
 	show();
 }
 

@@ -26,6 +26,12 @@
 
 // Native LMMS DLLs import lmms.exe. This test's output name is lmms.exe so
 // imports resolve to the same Engine/CommandBus as the test, not a second copy.
+#include "vsthost/CatalogJobs.h"
+#include "EffectSelectDialog.h"
+#include <QTableView>
+#include <QLineEdit>
+#include <QStandardPaths>
+
 class VstEntryPoints : public QObject
 {
 	Q_OBJECT
@@ -93,16 +99,76 @@ private slots:
 				}
 			}
 		QDir::setSearchPaths("plugins", {qEnvironmentVariable("LMMS_NATIVE_PLUGIN_DIR")});
-		lmms::ConfigManager::inst()->setVSTDir(m_fixtureRoot + '/');
-		lmms::NotePlayHandleManager::init();
+			lmms::ConfigManager::inst()->setVSTDir(m_fixtureRoot + '/');
+			QStandardPaths::setTestModeEnabled(true);
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2"}}}));
+			lmms::NotePlayHandleManager::init();
 		lmms::Engine::init(true);
 		lmms::ConfigManager::inst()->setVSTDir(m_fixtureRoot + '/');
 		QVERIFY(!lmms::PluginFactory::instance()->pluginInfo("vestige").isNull());
-		QVERIFY(!lmms::PluginFactory::instance()->pluginInfo("vsteffect").isNull());
-	}
+			QVERIFY(!lmms::PluginFactory::instance()->pluginInfo("vsteffect").isNull());
+			QVERIFY(lmms::Engine::refreshVstCatalog());
+			QTRY_VERIFY_WITH_TIMEOUT(!lmms::Engine::vstCatalog()->snapshot().busy, 10000);
+			const auto report = lmms::Engine::vstCatalog()->snapshot().report;
+			QVERIFY(report); QCOMPARE(report->entries.size(), std::size_t{6}); QVERIFY(report->failures.empty());
+		}
+		void catalogPublicationAndSelector()
+		{
+			auto* jobs = lmms::Engine::vstCatalog(); QVERIFY(jobs);
+			const auto requested = jobs->snapshot().requested;
+			lmms::ConfigManager::inst()->setValue("vst", "scanroots", "{invalid");
+			QString error; QVERIFY(!lmms::Engine::refreshVstCatalog(&error)); QVERIFY(!error.isEmpty());
+			QCOMPARE(jobs->snapshot().requested, requested);
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2"}}}));
+			lmms::gui::EffectSelectDialog selector(nullptr);
+			auto* table = selector.findChild<QTableView*>(); QVERIFY(table);
+			auto* search = selector.findChild<QLineEdit*>(); QVERIFY(search);
+			search->setText("^Shell Alpha$");
+			QCOMPARE(table->model()->rowCount(), 2);
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({}));
+			QVERIFY(lmms::Engine::refreshVstCatalog());
+			QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 10000);
+			QTRY_COMPARE_WITH_TIMEOUT(table->model()->rowCount(), 0, 3000);
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2"}}}));
+			QVERIFY(lmms::Engine::refreshVstCatalog());
+			QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 10000);
+			QTRY_COMPARE_WITH_TIMEOUT(table->model()->rowCount(), 2, 3000);
+			const auto factory = QDir(qEnvironmentVariable("LMMS_PLUGIN_DIR")).absoluteFilePath("../vst-host/x64/Release/Vst3Factory.vst3");
+			QVERIFY(QFile::copy(factory, m_fixtureRoot + "/Vst3Factory.vst3"));
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2", "vst3"}}}));
+			QVERIFY(lmms::Engine::refreshVstCatalog());
+			QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 10000);
+			const auto report = jobs->snapshot().report; QVERIFY(report);
+			QCOMPARE(report->entries.size(), std::size_t{8}); QVERIFY(report->failures.empty());
+			lmms::Plugin::Descriptor::SubPluginFeatures::KeyList keys;
+			const auto* descriptor = lmms::PluginFactory::instance()->pluginInfo("vsteffect").descriptor;
+			descriptor->subPluginFeatures->listSubPluginKeys(descriptor, keys);
+			QCOMPARE(keys.size(), 8);
+			int classes = 0;
+			for (const auto& key : keys) {
+				if (key.attributes.value("format") != "vst3") { continue; }
+				++classes; const auto cid = QByteArray::fromHex(key.attributes.value("classid").toLatin1());
+				QCOMPARE(cid.size(), 16); QCOMPARE(key.attributes.value("architecture"), QString("64"));
+				bool exact = false;
+				for (const auto& entry : report->entries) {
+					if (entry.identity.format == lmms::vsthost::Format::Vst3 &&
+						cid == QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16)) {
+						exact = key.name == entry.name && key.attributes.value("identity") == entry.identity.key() &&
+							key.attributes.value("version") == entry.locator.version && key.attributes.value("vendor") == entry.vendor;
+					}
+				}
+				QVERIFY(exact);
+			}
+			QCOMPARE(classes, 2);
+			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2"}}}));
+			QVERIFY(lmms::Engine::refreshVstCatalog()); QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 10000);
+			QVERIFY(fixtureProcesses("catalog-only scans leave no native instance").empty());
+			selector.close();
+		}
 	void cleanupTestCase()
 	{
-		lmms::Engine::destroy();
+			lmms::Engine::destroy();
+			QVERIFY(lmms::Engine::vstCatalog() == nullptr);
 		QVERIFY(fixtureProcesses("DAW shutdown").empty());
 		lmms::NotePlayHandleManager::free();
 	}
@@ -151,7 +217,11 @@ private slots:
 		QVERIFY(command("history.undo").ok);
 		QVERIFY(fixtureProcesses("snapshot undo clone").size() == 1);
 		QVERIFY(command("history.redo").ok);
-		QVERIFY(fixtureProcesses("snapshot redo clone").size() == 2);
+			QVERIFY(fixtureProcesses("snapshot redo clone").size() == 2);
+			const auto playingHelpers = fixtureProcesses("before catalog refresh");
+			QVERIFY(lmms::Engine::refreshVstCatalog(nullptr, true));
+			QTRY_VERIFY_WITH_TIMEOUT(!lmms::Engine::vstCatalog()->snapshot().busy, 10000);
+			QVERIFY(fixtureProcesses("live instances survive catalog refresh") == playingHelpers);
 
 		lmms::Plugin::Descriptor::SubPluginFeatures::KeyList keys;
 		const auto* descriptor = lmms::PluginFactory::instance()->pluginInfo("vsteffect").descriptor;
@@ -256,7 +326,7 @@ private slots:
 				QJsonObject subKey;
 				for (const auto& key : keys)
 				{
-					if (QDir::fromNativeSeparators(key.attributes.value("file")) != relative ||
+						if (QDir::fromNativeSeparators(key.attributes.value("file")) != path ||
 						key.attributes.value("shellid").toUInt() != id) { continue; }
 					QJsonObject attributes;
 					for (auto it = key.attributes.begin(); it != key.attributes.end(); ++it) { attributes.insert(it.key(), it.value()); }

@@ -44,6 +44,7 @@ public:
 				}
 				if (task.valid()) { task(); }
 				observeFaults();
+				if (m_cancelled.load(std::memory_order_acquire)) { closeImpl(); }
 			}
 			closeImpl();
 		});
@@ -58,6 +59,14 @@ public:
 	}
 	HostSession(const HostSession&) = delete;
 	HostSession& operator=(const HostSession&) = delete;
+	// Permanently cancel this disposable session. The dispatcher breaks its
+	// bounded receive wait and closes the Job; callers never touch native handles.
+	void cancel() noexcept
+	{
+		m_cancelled.store(true, std::memory_order_release);
+		m_audioAllowed.store(false, std::memory_order_release);
+		m_tasksAvailable.notify_all();
+	}
 	std::future<Reply> open(Configuration configuration)
 	{ return enqueue([this, configuration = std::move(configuration)] { return openImpl(configuration); }); }
 	std::future<Reply> close()

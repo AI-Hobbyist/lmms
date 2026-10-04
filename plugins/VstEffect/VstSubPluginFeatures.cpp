@@ -29,6 +29,10 @@
 
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
+#include "Engine.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#endif
 #include "Effect.h"
 #include "VstPlugin.h"
 #include <QDebug>
@@ -50,6 +54,11 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 {
 	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
 	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"], _parent );
+	if (_key->attributes.contains("architecture")) {
+		new QLabel(QWidget::tr("Architecture: %1-bit").arg(_key->attributes["architecture"]), _parent);
+		new QLabel(QWidget::tr("Vendor: %1").arg(_key->attributes["vendor"]), _parent);
+		new QLabel(QWidget::tr("Version: %1").arg(_key->attributes["version"]), _parent);
+	}
 }
 
 
@@ -58,6 +67,27 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 														KeyList & _kl ) const
 {
+#ifdef LMMS_BUILD_WIN32
+	const auto* jobs = Engine::vstCatalog();
+	if (!jobs) { return; }
+	const auto report = jobs->snapshot().report;
+	if (!report) { return; }
+	for (const auto& entry : report->entries)
+	{
+		EffectKey::AttributeMap attributes;
+		attributes["file"] = entry.locator.modulePath;
+		attributes["format"] = entry.identity.format == vsthost::Format::Vst3 ? "vst3" : "vst2";
+		if (entry.identity.format == vsthost::Format::Vst3) {
+			attributes["classid"] = QString::fromLatin1(QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex());
+		}
+		attributes["architecture"] = entry.identity.architecture == vsthost::Architecture::X86 ? "32" : "64";
+		attributes["identity"] = entry.identity.key();
+		attributes["version"] = entry.locator.version;
+		attributes["vendor"] = entry.vendor;
+		if (entry.shell) { attributes["shellid"] = QString::number(entry.identity.vst2Id); }
+		_kl.push_back(Key(_desc, entry.name, attributes));
+	}
+#else
 	QStringList dlls;
 	addPluginsFromDir(&dlls, {});
 	// TODO: eval m_type
@@ -80,8 +110,10 @@ void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 #endif
 		_kl.push_back(Key(_desc, QFileInfo(file).baseName(), am));
 	}
+#endif
 }
 
+#ifndef LMMS_BUILD_WIN32
 void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString path ) const
 {
 	QStringList dirs = QDir ( ConfigManager::inst()->vstDir() + path ).
@@ -108,6 +140,7 @@ void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString pa
 		filenames->append( fName );
 	}
 }
+#endif
 
 
 } // namespace lmms

@@ -36,6 +36,13 @@
 #include "Song.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#include <QCoreApplication>
+#include <QDir>
+#include <QStandardPaths>
+#include <memory>
+#endif
 
 #ifdef WANT_AGENT
 #include "agent/ExportCommands.h"
@@ -58,6 +65,19 @@ Lv2Manager * Engine::s_lv2Manager = nullptr;
 #endif
 Ladspa2LMMS * Engine::s_ladspaManager = nullptr;
 void* Engine::s_dndPluginKey = nullptr;
+#ifdef LMMS_BUILD_WIN32
+namespace { std::unique_ptr<vsthost::CatalogJobs> catalogJobs; }
+vsthost::CatalogJobs* Engine::vstCatalog() { return catalogJobs.get(); }
+bool Engine::refreshVstCatalog(QString* error, bool force)
+{
+	if (error) { error->clear(); }
+	if (!catalogJobs) { if (error) { *error = tr("VST catalog is unavailable."); } return false; }
+	QString configurationError;
+	auto roots = ConfigManager::inst()->vstScanRoots(&configurationError);
+	if (!configurationError.isEmpty()) { if (error) { *error = configurationError; } return false; }
+	catalogJobs->refresh(std::move(roots), {force}); return true;
+}
+#endif
 
 
 
@@ -92,6 +112,19 @@ void Engine::init( bool renderOnly )
 
 	PresetPreviewPlayHandle::init();
 
+#ifdef LMMS_BUILD_WIN32
+	const auto directories = QDir::searchPaths("plugins");
+	const auto pluginDirectory = qEnvironmentVariableIsSet("LMMS_PLUGIN_DIR") ? qEnvironmentVariable("LMMS_PLUGIN_DIR") :
+		(directories.isEmpty() ? QCoreApplication::applicationDirPath() + "/plugins" : directories.front());
+	const auto helper = [&](const QString& name) { return QDir::cleanPath(pluginDirectory + "/" + name); };
+	catalogJobs = std::make_unique<vsthost::CatalogJobs>(vsthost::PluginCatalog::Configuration{
+		helper("32/RemoteVstPlugin32.exe"), helper("RemoteVstPlugin64.exe"),
+		helper("32/RemoteVstHost32.exe"), helper("RemoteVstHost64.exe"),
+		QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/vst/catalog-v1.json",
+		"lmms-vst-catalog-2/" + ConfigManager::inst()->defaultVersion(), helper("RemoteCatalogIo.exe")});
+	if (!renderOnly) { refreshVstCatalog(); }
+#endif
+
 	emit engine->initProgress(tr("Launching audio engine threads"));
 	s_audioEngine->startProcessing();
 #ifdef WANT_AGENT_MCP
@@ -104,6 +137,10 @@ void Engine::init( bool renderOnly )
 
 void Engine::destroy()
 {
+#ifdef LMMS_BUILD_WIN32
+	// Cancel and join control work before any configuration/application owner dies.
+	catalogJobs.reset();
+#endif
 #ifdef WANT_AGENT_MCP
 	agent::mcp::shutdownService();
 #endif

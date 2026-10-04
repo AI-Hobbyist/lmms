@@ -50,6 +50,12 @@
 #include "TabBar.h"
 #include "TabButton.h"
 #include "TimeLineWidget.h"
+#include "vsthost/ScanRootsWidget.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#include <QTimer>
+#include <algorithm>
+#endif
 
 
 // Platform-specific audio-interface classes.
@@ -878,10 +884,56 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(setWorkingDir(const QString&)),
 		SLOT(openWorkingDir()),
 		m_workingDirLineEdit);
-	addPathEntry(tr("VST plugins directory"), m_vstDir,
+	addPathEntry(tr("VST directory for older projects"), m_vstDir,
 		SLOT(setVSTDir(const QString&)),
 		SLOT(openVSTDir()),
 		m_vstDirLineEdit);
+	{
+		auto* scanBox = new QGroupBox(tr("VST scan directories"), pathSelectors);
+		auto* scanLayout = new QVBoxLayout(scanBox);
+		QString scanError;
+		const auto roots = ConfigManager::inst()->vstScanRoots(&scanError);
+		m_vstScanRoots = new ScanRootsWidget(roots, scanError, scanBox);
+		scanLayout->addWidget(m_vstScanRoots); pathSelectorsLayout->addWidget(scanBox);
+#ifdef LMMS_BUILD_WIN32
+		auto* actions = new QHBoxLayout;
+		auto* refresh = new QPushButton(tr("Refresh saved directories"), scanBox);
+		auto* force = new QPushButton(tr("Rescan including failed plugins"), scanBox);
+		auto* cancel = new QPushButton(tr("Cancel scan"), scanBox);
+		refresh->setObjectName("vstCatalogRefresh"); force->setObjectName("vstCatalogForce"); cancel->setObjectName("vstCatalogCancel");
+		actions->addWidget(refresh); actions->addWidget(force); actions->addWidget(cancel); scanLayout->addLayout(actions);
+		auto* status = new QLabel(scanBox); status->setObjectName("vstCatalogStatus"); status->setWordWrap(true); scanLayout->addWidget(status);
+		auto update = [status, cancel, refresh, force, published = std::uint64_t{0}]() mutable {
+			const auto* jobs = Engine::vstCatalog();
+			refresh->setEnabled(jobs); force->setEnabled(jobs);
+			if (!jobs) { cancel->setEnabled(false); status->setText(tr("VST catalog is unavailable.")); return; }
+			const auto state = jobs->snapshot(); cancel->setEnabled(state.busy);
+			if (state.busy) { status->setText(tr("Scanning: %1 (%2/%3)").arg(state.path).arg(state.completed).arg(state.total)); }
+			else if (state.report) {
+				status->setText(tr("%1 plugins; %2 scan failures.%3").arg(state.report->entries.size()).arg(state.report->failures.size())
+					.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : ""));
+				if (published != state.published) {
+					published = state.published; QStringList details;
+					for (std::size_t i = 0; i < std::min<std::size_t>(32, state.report->failures.size()); ++i) {
+						const auto& failure = state.report->failures[i];
+						details.append(tr("%1: %2 (error %3)").arg(failure.path, failure.operation).arg(static_cast<unsigned>(failure.error)));
+					}
+					if (state.report->failures.size() > 32) { details.append(tr("%1 additional failures.").arg(state.report->failures.size() - 32)); }
+					if (!state.report->cacheError.isEmpty()) { details.append(state.report->cacheError); }
+					status->setToolTip(details.join('\n'));
+				}
+			} else { status->setText(state.cancelled ? tr("Scan cancelled.") : tr("No scan completed.")); }
+		};
+		auto start = [this, update](bool forced) mutable {
+			QString error; if (!Engine::refreshVstCatalog(&error, forced)) { m_vstScanRoots->showError(error); }
+			update();
+		};
+		connect(refresh, &QPushButton::clicked, this, [start]() mutable { start(false); });
+		connect(force, &QPushButton::clicked, this, [start]() mutable { start(true); });
+		connect(cancel, &QPushButton::clicked, this, [update]() mutable { if (auto* jobs = Engine::vstCatalog()) { jobs->cancel(); } update(); });
+		auto* timer = new QTimer(scanBox); connect(timer, &QTimer::timeout, this, update); timer->start(100); update();
+#endif
+	}
 	addPathEntry(tr("LADSPA plugins directories"), m_ladspaDir,
 		SLOT(setLADSPADir(const QString&)),
 		SLOT(openLADSPADir()),
@@ -1008,6 +1060,12 @@ SetupDialog::~SetupDialog()
 
 void SetupDialog::accept()
 {
+	if (m_vstScanRoots && m_vstScanRoots->changed())
+	{
+		std::vector<vsthost::ScanRoot> roots; QString error;
+		if (!m_vstScanRoots->roots(roots, error) || !ConfigManager::inst()->setVstScanRoots(roots, &error))
+		{ m_vstScanRoots->showError(error); return; }
+	}
 	/* Hide dialog before setting values. This prevents an obscure bug
 	where non-embedded VST windows would steal focus and prevent LMMS
 	from taking mouse input, rendering the application unusable. */
@@ -1100,6 +1158,9 @@ void SetupDialog::accept()
 		it.value()->saveSettings();
 	}
 	ConfigManager::inst()->saveConfigFile();
+#ifdef LMMS_BUILD_WIN32
+	if (m_vstScanRoots && m_vstScanRoots->changed()) { Engine::refreshVstCatalog(); }
+#endif
 }
 
 

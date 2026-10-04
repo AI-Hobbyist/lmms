@@ -1147,6 +1147,8 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 	else { entries.emplace_back(static_cast<std::uint32_t>(m_plugin->uniqueID), pluginName()); }
 	message result(IdVstShellEntries); result.addInt(static_cast<int>(entries.size())).addInt(shell ? 1 : 0);
 	for (const auto& [id, name] : entries) { result.addString(std::to_string(id)).addString(name); }
+	const auto vendorVersion = pluginVersion();
+	result.addString(pluginVendorString()).addString(std::to_string(vendorVersion));
 	sendMessage(result); return true;
 }
 

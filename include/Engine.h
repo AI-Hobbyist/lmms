@@ -41,6 +41,9 @@ class PatternStore;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
+#ifdef LMMS_BUILD_WIN32
+namespace vsthost { class CatalogJobs; }
+#endif
 
 namespace gui
 {
@@ -54,6 +57,12 @@ class LMMS_EXPORT Engine : public QObject
 public:
 	static void init( bool renderOnly );
 	static void destroy();
+#ifdef LMMS_BUILD_WIN32
+	// GUI/control-thread access. Owned until Engine::destroy; no audio instance
+	// depends on this service or its published catalog.
+	static vsthost::CatalogJobs* vstCatalog();
+	static bool refreshVstCatalog(QString* error = nullptr, bool force = false);
+#endif
 
 	// core
 	static AudioEngine *audioEngine()

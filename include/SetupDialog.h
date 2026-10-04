@@ -46,6 +46,7 @@ namespace lmms::gui
 
 
 class TabBar;
+class ScanRootsWidget;
 
 class SetupDialog : public QDialog
 {
@@ -212,6 +213,7 @@ private:
 
 	QLineEdit * m_workingDirLineEdit;
 	QLineEdit * m_vstDirLineEdit;
+	ScanRootsWidget* m_vstScanRoots = nullptr;
 	QLineEdit * m_themeDirLineEdit;
 	QLineEdit * m_ladspaDirLineEdit;
 	QLineEdit * m_gigDirLineEdit;

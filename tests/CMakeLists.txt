@@ -8,6 +8,7 @@ set(LMMS_TESTS
 	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
+	vsthost/VstPathsMigrationTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )
@@ -78,6 +79,9 @@ if(TARGET VstEntryPoints)
 	set_target_properties(VstEntryPoints PROPERTIES OUTPUT_NAME lmms
 		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/vsthost/native/$<CONFIG>")
 	add_dependencies(VstEntryPoints vestige vsteffect vstbase Vst2CompatibilityTest)
+	if(TARGET RemoteVstHost64)
+		add_dependencies(VstEntryPoints RemoteVstHost64)
+	endif()
 	set_tests_properties(VstEntryPoints PROPERTIES TIMEOUT 120 LABELS "vsthost;baseline"
 		ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins;LMMS_NATIVE_PLUGIN_DIR=$<TARGET_FILE_DIR:vestige>;LMMS_VST_FIXTURE_ROOT=${CMAKE_BINARY_DIR}/vst-s0")
 endif()

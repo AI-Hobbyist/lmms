@@ -44,6 +44,21 @@ ENDIF()
 
 LIST(APPEND LMMS_SRCS ${LMMS_COMMON_SRCS})
 
+IF(WIN32)
+	LIST(APPEND LMMS_SRCS vsthost/PluginCatalog.cpp vsthost/CatalogJobs.cpp vsthost/CatalogIo.cpp)
+	add_executable(RemoteCatalogIo ../tools/vstcatalog/RemoteCatalogIo.cpp vsthost/CatalogFilesystem.cpp)
+	target_compile_features(RemoteCatalogIo PRIVATE cxx_std_20)
+	target_compile_definitions(RemoteCatalogIo PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
+	target_include_directories(RemoteCatalogIo PRIVATE "${CMAKE_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/vsthost"
+		"${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+	target_link_libraries(RemoteCatalogIo PRIVATE Qt6::Core)
+	set_target_properties(RemoteCatalogIo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins/$<0:unused>")
+	add_custom_command(TARGET RemoteCatalogIo POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+		"$<TARGET_FILE:Qt6::Core>" "$<TARGET_FILE_DIR:RemoteCatalogIo>" VERBATIM)
+	install(TARGETS RemoteCatalogIo RUNTIME DESTINATION "${PLUGIN_DIR}")
+	install(FILES "$<TARGET_FILE:Qt6::Core>" DESTINATION "${PLUGIN_DIR}")
+ENDIF()
+
 IF(WANT_QT6)
 	QT6_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
 ELSE()
@@ -124,6 +139,9 @@ ADD_EXECUTABLE(lmms
 	core/main.cpp
 	"${WINRC}"
 )
+IF(WIN32)
+	add_dependencies(lmms RemoteCatalogIo)
+ENDIF()
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
