@@ -21,8 +21,9 @@
 
 namespace lmms::vsthost
 {
-// Single native instance, used only on the helper's owner thread. Destruction
-// occurs before module unloading; the process supervisor bounds native calls.
+// Single native instance. The helper serializes DSP and control mutations;
+// native GUI dispatch stays on its main thread without blocking DSP. Destruction
+// occurs after DSP joins and before module unloading; native calls are bounded.
 class Vst3Instance
 {
 public:

@@ -290,6 +290,13 @@ private:
 	static LRESULT CALLBACK procedure(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
 	{
 		auto* self = reinterpret_cast<View*>(GetWindowLongPtrW(window, GWLP_USERDATA));
+			if (message == WM_APP + 40)
+			{
+				SetPropW(window, L"LMMSFixtureGuiBusy", reinterpret_cast<HANDLE>(1));
+				Sleep(350);
+				RemovePropW(window, L"LMMSFixtureGuiBusy");
+				return 1;
+			}
 		if (message == WM_APP + 38)
 		{
 			self->getController()->beginEdit(0xf0000101);

@@ -19,7 +19,7 @@ int wmain(int argc, wchar_t** argv)
 	for (unsigned cycle = 0; cycle < 50; ++cycle)
 	{
 		HostSession session;
-		CHECK(session.open({helper, {}, 5000}).get().error == Error::None);
+		CHECK(session.open({helper, {}, 5000, 100}).get().error == Error::None);
 		std::vector<std::uint8_t> command;
 		CHECK(encodeVst3Create({scan.classes[cycle % 2].cid, cycle % 2 ? 44100.0 : 48000.0,
 			cycle % 2 ? 64u : 512u, true, path}, command));
@@ -45,6 +45,23 @@ int wmain(int argc, wchar_t** argv)
 		const auto audio = session.renderOffline({32, 2, 2}, std::vector<float>(64, 1), [] { return std::span<const std::uint8_t>{}; }, 3000).get();
 		CHECK(audio.error == Error::None && audio.payload.size() == 256);
 		float sample = 0; std::memcpy(&sample, audio.payload.data(), 4); CHECK(sample == 0.625f);
+		if (cycle == 0)
+		{
+			// A slow native GUI handler must not consume the realtime DSP deadline.
+			CHECK(PostMessageW(child, WM_APP + 40, 0, 0));
+			const auto readyDeadline = GetTickCount64() + 1000;
+			while (!GetPropW(child, L"LMMSFixtureGuiBusy") && GetTickCount64() < readyDeadline) { Sleep(1); }
+			CHECK(GetPropW(child, L"LMMSFixtureGuiBusy"));
+			std::vector<float> input(64, 1), output(64);
+			const auto start = GetTickCount64();
+			CHECK(session.process({32, 2, 2}, input, output));
+			CHECK(session.process({32, 2, 2}, input, output));
+			CHECK(output.front() == 0.625f);
+			CHECK(session.process({32, 2, 2}, input, output));
+			CHECK(output.front() == 0.625f && GetTickCount64() - start < 250);
+			CHECK(GetPropW(child, L"LMMSFixtureGuiBusy"));
+			CHECK(session.error() == Error::None);
+		}
 		CHECK(session.close().get().error == Error::None);
 		CHECK(!IsWindow(window) && !IsWindow(child));
 	}

@@ -429,7 +429,7 @@ bool VstPlugin::processEffect(const SampleFrame* input, SampleFrame* output, f_c
 			const auto inputs = layout & 255, outputs = (layout >> 8) & 255;
 			const auto mapping = layout >> 16;
 			const auto inputPort = vsthost::decodeVst3Port(mapping & 255), outputPort = vsthost::decodeVst3Port(mapping >> 8);
-			if (inputs > 64 || inputPort.offset > inputs || inputPort.channels > inputs - inputPort.offset) { return false; }
+				if (inputs > vsthost::AudioQueue::MaxChannels || inputPort.offset > inputs || inputPort.channels > inputs - inputPort.offset) { return false; }
 			for (unsigned frame = 0; frame < frames; ++frame)
 			{
 				const auto left = input ? input[frame][0] : 0.f, right = input ? input[frame][1] : 0.f;

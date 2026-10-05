@@ -7,6 +7,8 @@
 #include "vsthost/Vst3Commands.h"
 #include <charconv>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <windows.h>
 
 using namespace lmms::vsthost;
@@ -95,19 +97,42 @@ int wmain(int argc, wchar_t** argv)
 		if (claim.collectOutput && !instance->blockMidiOutput(outputEvents, written)) { return AudioQueue::Result::Invalid; }
 		return audio.complete(claim, out, std::span(outputEvents).first(written));
 	};
+	// Native window dispatch can block on database/library work. Keep DSP on a
+	// dedicated thread within this same supervised instance; control mutations
+	// still serialize with DSP and the existing Pause/Resume drain barrier.
+	std::mutex instanceMutex;
+	std::atomic<bool> audioFailed{false};
+	std::jthread audioThread([&](std::stop_token stop)
+	{
+		while (!stop.stop_requested())
+		{
+			try
+			{
+				std::lock_guard lock(instanceMutex);
+				if (!paused && instance)
+				{
+					instance->serviceControl(false);
+					if (processAudio() == AudioQueue::Result::Invalid)
+					{ audioFailed.store(true); return; }
+				}
+			}
+			catch (...) { audioFailed.store(true); return; }
+			Sleep(1);
+		}
+	});
 	for (;;)
 	{
+		if (audioFailed.load()) { return 8; }
 		ControlChannel::Frame frame;
 		const auto received = channel.receive(frame);
 		if (received == Error::InvalidState)
 		{
-			try { if (instance) { instance->serviceControl(false); } } catch (...) { return 9; }
-			if (!paused && instance && processAudio() == AudioQueue::Result::Invalid) { return 8; }
 			MSG message{};
 			while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) { TranslateMessage(&message); DispatchMessageW(&message); }
 			Sleep(1); continue;
 		}
 		if (received != Error::None) { return 4; }
+		std::lock_guard lock(instanceMutex);
 		if (!matches(frame.header, session, generation, sequence + 1)) { return 5; }
 		sequence = frame.header.sequence;
 		std::vector<std::uint8_t> payload;
