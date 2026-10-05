@@ -37,6 +37,8 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "SVSTrack.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -367,7 +369,7 @@ void TrackContainerView::clearAllTracks()
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
+		QString( "svsvoice,presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( static_cast<int>(Track::Type::Instrument) ).
@@ -390,6 +392,15 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString value = StringPairDrag::decodeValue( _de );
+	if (type == "svsvoice")
+	{
+		if (m_tc == Engine::patternStore()) { _de->ignore(); return; }
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, m_tc));
+		const auto split = value.lastIndexOf('/');
+		track->bindVoice(value.left(split), value.mid(split + 1));
+		_de->accept();
+		return;
+	}
 	if( type == "instrument" )
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));

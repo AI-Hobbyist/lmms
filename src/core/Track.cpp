@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "SVSTrack.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleTrack.h"
@@ -92,6 +93,9 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
 		case Type::Pattern: t = new class PatternTrack( tc ); break;
 		case Type::Sample: t = new class SampleTrack( tc ); break;
+		case Type::SVS:
+			if (tc != Engine::patternStore()) { t = new SVSTrack(tc); }
+			break;
 //		case Type::Event:
 //		case Type::Video:
 		case Type::Automation: t = new class AutomationTrack( tc ); break;

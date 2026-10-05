@@ -80,6 +80,7 @@ public:
 		Video,
 		Automation,
 		HiddenAutomation,
+		SVS,
 		Count
 	} ;
 

@@ -51,7 +51,8 @@ public:
 		NotePlayHandle = 0x01,
 		InstrumentPlayHandle = 0x02,
 		SamplePlayHandle = 0x04,
-		PresetPreviewHandle = 0x08
+		PresetPreviewHandle = 0x08,
+		SVSPlayHandle = 0x10
 	} ;
 	using Types = Flags<Type>;
 

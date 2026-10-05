@@ -365,6 +365,7 @@ QString trackTypeName( Track::Type type )
 	case Track::Type::Video: return "video";
 	case Track::Type::Automation: return "automation";
 	case Track::Type::HiddenAutomation: return "hiddenAutomation";
+	case Track::Type::SVS: return "svs";
 	case Track::Type::Count: return "unknown";
 	}
 	return "unknown";

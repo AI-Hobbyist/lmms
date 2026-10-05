@@ -11,6 +11,7 @@ set(LMMS_TESTS
 	vsthost/VstPathsMigrationTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
+	svs/SVSIntegrationTest.cpp
 )
 
 if(WIN32 AND LMMS_HAVE_VST)
@@ -58,6 +59,11 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
 	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)
 endforeach()
+
+add_dependencies(SVSIntegrationTest SVSExample)
+target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
+set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
+ ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;QT_QPA_PLATFORM=offscreen")
 
 if(TARGET Vst2CompatibilityTest)
 	# Compile the existing proxy into the test executable so Engine's static

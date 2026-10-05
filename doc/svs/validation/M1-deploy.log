@@ -1,0 +1,79 @@
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/SDL2.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/fftw3f.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/samplerate.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/sndfile.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/portaudio.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/libmp3lame.DLL
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/vorbisenc.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/vorbisfile.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/vorbis.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/ogg.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/lilv-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/FLAC.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/opus.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/mpg123.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/serd-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/sord-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/sratom-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/Release/zix-0.dll
+D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe 64 bit, release executable
+Adding in plugin type generic for module: Qt6Gui
+Adding in plugin type iconengines for module: Qt6Gui
+Adding in plugin type imageformats for module: Qt6Gui
+Adding Qt6Pdf for qpdf.dll from plugin type: imageformats
+Adding in plugin type networkinformation for module: Qt6Network
+Adding in plugin type platforminputcontexts for module: Qt6Gui
+Skipping plugin qtvirtualkeyboardplugin.dll due to disabled dependencies (Qt6Qml Qt6Quick).
+Adding in plugin type platforms for module: Qt6Gui
+Adding in plugin type styles for module: Qt6Widgets
+Adding in plugin type tls for module: Qt6Network
+Skipping plugin qopensslbackend.dll. Use -force-openssl or specify -openssl-root if you want to use it.
+Performing additional pass of finding Qt plugins due to updated Qt module list: Qt6Core Qt6Gui Qt6Network Qt6Pdf Qt6Svg Qt6Widgets Qt6Xml
+Adding in plugin type generic for module: Qt6Gui
+Adding in plugin type iconengines for module: Qt6Gui
+Adding in plugin type imageformats for module: Qt6Gui
+Adding in plugin type networkinformation for module: Qt6Network
+Adding in plugin type platforminputcontexts for module: Qt6Gui
+Skipping plugin qtvirtualkeyboardplugin.dll due to disabled dependencies (Qt6Qml Qt6Quick).
+Adding in plugin type platforms for module: Qt6Gui
+Adding in plugin type styles for module: Qt6Widgets
+Adding in plugin type tls for module: Qt6Network
+Skipping plugin qopensslbackend.dll. Use -force-openssl or specify -openssl-root if you want to use it.
+Direct dependencies: Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6Widgets Qt6Xml
+All dependencies   : Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6Widgets Qt6Xml
+To be deployed     : Qt6Core Qt6Gui Qt6Network Qt6Pdf Qt6Svg Qt6Widgets Qt6Xml
+Warning: Cannot find any version of the dxcompiler.dll and dxil.dll.
+Warning: Cannot find Visual Studio installation directory, VCINSTALLDIR is not set.
+Updating icuuc.dll.
+Updating Qt6Core.dll.
+Updating Qt6Gui.dll.
+Updating Qt6Network.dll.
+Updating Qt6Pdf.dll.
+Updating Qt6Svg.dll.
+Updating Qt6Widgets.dll.
+Updating Qt6Xml.dll.
+Updating D3Dcompiler_47.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/generic.
+Updating qtuiotouchplugin.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/iconengines.
+Updating qsvgicon.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/imageformats.
+Updating qgif.dll.
+Updating qicns.dll.
+Updating qico.dll.
+Updating qjpeg.dll.
+Updating qpdf.dll.
+Updating qsvg.dll.
+Updating qtga.dll.
+Updating qtiff.dll.
+Updating qwbmp.dll.
+Updating qwebp.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/networkinformation.
+Updating qnetworklistmanager.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/platforms.
+Updating qwindows.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/styles.
+Updating qmodernwindowsstyle.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/Release/tls.
+Updating qcertonlybackend.dll.
+Updating qschannelbackend.dll.

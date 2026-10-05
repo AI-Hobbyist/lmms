@@ -32,6 +32,8 @@ ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(tracks)
+ADD_SUBDIRECTORY(core/svs)
+ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/plugins/SVSExample" "${CMAKE_BINARY_DIR}/SVSExample")
 IF(WANT_AGENT)
 	ADD_SUBDIRECTORY(agent)
 	IF(WANT_QT6)
@@ -125,6 +127,7 @@ IF(LMMS_BUILD_LINUX)
 ENDIF()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+list(FILTER LMMS_INCLUDES EXCLUDE REGEX "/SVS(Clip|Track|Views)\\.h$")
 ADD_LIBRARY(lmmsobjs OBJECT
 	${LMMS_SRCS}
 	${LMMS_INCLUDES}
@@ -216,9 +219,11 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${EXTRA_LIBRARIES}
 )
 
+target_link_libraries(lmmssvs PRIVATE ${LMMS_REQUIRED_LIBS})
 target_link_libraries(lmmsobjs
 	${LMMS_REQUIRED_LIBS}
 )
+target_static_libraries(lmmsobjs lmmssvs)
 if(LMMS_BUILD_WIN32)
 	target_link_libraries(lmmsobjs bcrypt)
 endif()

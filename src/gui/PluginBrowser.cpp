@@ -42,6 +42,8 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "SVSTrack.h"
+#include "SVSModel.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
@@ -190,6 +192,15 @@ void PluginBrowser::addPlugins()
 	// Add a root node to the tree for native LMMS plugins
 	const auto lmmsRoot = addRoot("LMMS");
 	lmmsRoot->setExpanded(true);
+	static const PixmapLoader svsLogo("sample_track");
+	static Plugin::Descriptor svsDescriptor{"svs", "Singing Voice Synthesis", "Native singing voice synthesis", "LMMS", 1, Plugin::Type::SVS, &svsLogo, "", nullptr};
+	const auto svsRoot = addRoot("Singing Voice Synthesis");
+	svsRoot->setExpanded(true);
+	for (const auto& voice : svs::Registry::instance().voices())
+	{
+		PluginDescWidget::PluginKey key(&svsDescriptor, voice.name, {{"pluginId", voice.pluginId}, {"voiceId", voice.id}, {"avatar", voice.avatar}});
+		addPlugin(key, svsRoot);
+	}
 
 	// Add all of the descriptors to the tree
 	for (const auto desc : descs)
@@ -236,6 +247,11 @@ PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 	setToolTip(_pk.desc->subPluginFeatures
 		? _pk.description()
 		: tr(_pk.desc->description));
+	if (_pk.desc->type == Plugin::Type::SVS)
+	{
+		QPixmap avatar(_pk.attributes.value("avatar"));
+		if (!avatar.isNull()) { m_logo = avatar; }
+	}
 }
 
 
@@ -243,6 +259,7 @@ PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 
 QString PluginDescWidget::name() const
 {
+	if (m_pluginKey.desc->type == Plugin::Type::SVS) { return m_pluginKey.name; }
 	return m_pluginKey.displayName();
 }
 
@@ -274,7 +291,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 	}
 
 	p.setFont( f );
-	p.drawText( 10 + logo_size.width(), 15, m_pluginKey.displayName());
+	p.drawText( 10 + logo_size.width(), 15, name());
 }
 
 
@@ -304,6 +321,11 @@ void PluginDescWidget::leaveEvent( QEvent * _e )
 
 void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
+	if (m_pluginKey.desc->type == Plugin::Type::SVS)
+	{
+		if (_me->button() == Qt::LeftButton) { new StringPairDrag("svsvoice", m_pluginKey.attributes.value("pluginId") + "/" + m_pluginKey.attributes.value("voiceId"), m_logo, this); }
+		return;
+	}
 	Engine::setDndPluginKey(&m_pluginKey);
 	if ( _me->button() == Qt::LeftButton )
 	{
@@ -317,6 +339,15 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 {
 	QMenu contextMenu(this);
+	if (m_pluginKey.desc->type == Plugin::Type::SVS)
+	{
+		contextMenu.addAction(tr("Send to new SVS track"), [this] {
+			auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+			track->bindVoice(m_pluginKey.attributes.value("pluginId"), m_pluginKey.attributes.value("voiceId"));
+		});
+		contextMenu.exec(e->globalPos());
+		return;
+	}
 	contextMenu.addAction(
 		tr("Send to new instrument track"),
 		[=, this]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
