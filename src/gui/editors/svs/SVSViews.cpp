@@ -46,39 +46,59 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QSlider>
+#include <QFrame>
+#include <QFileInfo>
+#include <QFormLayout>
+#include <algorithm>
 #include <memory>
 #include <cmath>
 namespace lmms::gui {
 namespace {
 // Global base values are declared by the selected engine/voice, never named here.
 class SVSGlobalControls final : public QWidget {
- struct Row {QWidget* body;QLabel* label;QSlider* slider;QDoubleSpinBox* value;svs::Parameter parameter;};
+ struct Row {QWidget* body;QLabel* label;QWidget* editor;QSlider* slider;svs::Parameter parameter;};
  QMap<QString,Row> m_rows;QVBoxLayout* m_layout;bool m_refreshing=false;
- std::function<void(const svs::Parameter&,double)> m_setter;
+ std::function<void(const svs::Parameter&,const QJsonValue&)> m_setter;
+ std::function<void()> m_endGesture;
+ void finishGesture() {if(m_endGesture) {auto finish=std::move(m_endGesture);m_endGesture={};finish();}}
+ bool eventFilter(QObject* target,QEvent* event) override {if(event->type()==QEvent::UngrabMouse||event->type()==QEvent::Hide||event->type()==QEvent::WindowDeactivate) finishGesture();return QWidget::eventFilter(target,event);}
  static double sliderValue(const svs::Parameter& p,int position) {
   const double t=position/10000.;const auto raw=p.scale=="log"&&p.minimum>0?p.minimum*std::pow(p.maximum/p.minimum,t):p.minimum+(p.maximum-p.minimum)*t;
   return std::clamp(p.minimum+std::round((raw-p.minimum)/p.step)*p.step,p.minimum,p.maximum);
  }
 public:
+ std::function<std::function<void()>(const svs::Parameter&)> beginGesture;
+ ~SVSGlobalControls() override {finishGesture();}
  explicit SVSGlobalControls(QWidget* parent):QWidget(parent),m_layout(new QVBoxLayout(this)) {setObjectName("svsGlobalControls");m_layout->setContentsMargins(0,0,0,0);}
- void refresh(const QVector<svs::Parameter>& parameters,const QJsonObject& trackValues,const QJsonObject& clipValues,const QJsonObject& context,std::function<void(const svs::Parameter&,double)> setter) {
+ void refresh(const QVector<svs::Parameter>& parameters,const QJsonObject& trackValues,const QJsonObject& clipValues,const QJsonObject& globals,const QJsonObject& context,std::function<void(const svs::Parameter&,const QJsonValue&)> setter) {
   m_refreshing=true;m_setter=std::move(setter);QSet<QString> present;int order=0;
   auto sorted=parameters;std::stable_sort(sorted.begin(),sorted.end(),[](const auto& a,const auto& b){return a.group==b.group?a.order<b.order:a.group<b.group;});
   for(const auto& p:sorted) {
-   if((p.scope!="track"&&p.scope!="clip")||(p.type!="float"&&p.type!="int")||!p.isVisible(context)) continue;
+   if(!svs::globalParameter(p)||!p.writable||!p.isVisible(context)) continue;
    const auto key=p.scope+"."+p.id;present.insert(key);
+   if(m_rows.contains(key)&&m_rows[key].parameter.type!=p.type) {delete m_rows[key].body;m_rows.remove(key);}
    if(!m_rows.contains(key)) {
-    auto* body=new QWidget(this);auto* layout=new QVBoxLayout(body);layout->setContentsMargins(0,6,0,6);auto* label=new QLabel(body);layout->addWidget(label);auto* line=new QHBoxLayout;layout->addLayout(line);
-    auto* slider=new QSlider(Qt::Horizontal,body);slider->setRange(0,10000);slider->setTracking(false);slider->setObjectName("svsGlobalSlider."+key);line->addWidget(slider,1);
-    auto* value=new QDoubleSpinBox(body);value->setKeyboardTracking(false);value->setObjectName("svsGlobalValue."+key);value->setMaximumWidth(100);line->addWidget(value);
-    m_rows.insert(key,{body,label,slider,value,p});
-    connect(slider,&QSlider::valueChanged,this,[this,key](int position){if(m_refreshing) return;const auto p=m_rows[key].parameter;const double absolute=sliderValue(p,position);{QSignalBlocker block(m_rows[key].value);m_rows[key].value->setValue(absolute-p.defaultValue.toDouble());}if(m_setter) m_setter(p,absolute);});
-    connect(value,qOverload<double>(&QDoubleSpinBox::valueChanged),this,[this,key](double offset){if(m_refreshing) return;const auto p=m_rows[key].parameter;if(m_setter) m_setter(p,std::clamp(p.defaultValue.toDouble()+offset,p.minimum,p.maximum));});
+    auto* body=new QWidget(this);auto* layout=new QVBoxLayout(body);layout->setContentsMargins(0,6,0,6);auto* label=new QLabel(body);layout->addWidget(label);auto* line=new QHBoxLayout;layout->addLayout(line);QWidget* editor=nullptr;QSlider* slider=nullptr;
+    if(p.type=="float"||p.type=="int") {
+     slider=new QSlider(Qt::Horizontal,body);slider->setRange(0,10000);slider->setTracking(true);slider->setObjectName("svsGlobalSlider."+key);line->addWidget(slider,1);
+     slider->installEventFilter(this);connect(slider,&QSlider::sliderPressed,this,[this,key]{finishGesture();if(beginGesture) m_endGesture=beginGesture(m_rows[key].parameter);});connect(slider,&QSlider::sliderReleased,this,[this]{finishGesture();});
+     auto* value=new QDoubleSpinBox(body);value->setKeyboardTracking(false);value->setObjectName("svsGlobalValue."+key);value->setMaximumWidth(100);line->addWidget(value);editor=value;
+     connect(slider,&QSlider::valueChanged,this,[this,key](int position){if(m_refreshing) return;const auto p=m_rows[key].parameter;const double absolute=sliderValue(p,position);{QSignalBlocker block(m_rows[key].editor);static_cast<QDoubleSpinBox*>(m_rows[key].editor)->setValue(absolute-p.defaultValue.toDouble());}if(m_setter) {auto setter=m_setter;setter(p,absolute);}});
+     connect(value,qOverload<double>(&QDoubleSpinBox::valueChanged),this,[this,key](double offset){if(m_refreshing) return;const auto p=m_rows[key].parameter;if(m_setter) {auto setter=m_setter;setter(p,std::clamp(p.defaultValue.toDouble()+offset,p.minimum,p.maximum));}});
+    }else if(p.type=="bool") {
+     auto* value=new QCheckBox(body);value->setObjectName("svsGlobalValue."+key);line->addWidget(value);editor=value;connect(value,&QCheckBox::clicked,this,[this,key](bool checked){if(!m_refreshing&&m_setter) {auto setter=m_setter;setter(m_rows[key].parameter,checked);}});
+    }else {
+     auto* value=new QComboBox(body);value->setObjectName("svsGlobalValue."+key);line->addWidget(value);editor=value;connect(value,qOverload<int>(&QComboBox::activated),this,[this,key,value](int index){if(!m_refreshing&&m_setter) {auto setter=m_setter;setter(m_rows[key].parameter,value->itemData(index).toString());}});
+    }
+    m_rows.insert(key,{body,label,editor,slider,p});
    }
-   auto& row=m_rows[key];row.parameter=p;row.label->setText(p.name);row.body->setVisible(true);row.body->setEnabled(p.enabled&&p.writable);row.body->setToolTip(p.disabledReason);m_layout->removeWidget(row.body);m_layout->insertWidget(order++,row.body);
-   const auto values=p.scope=="track"?trackValues:clipValues;const auto absolute=values.value(p.id).toDouble(p.defaultValue.toDouble());const auto base=p.defaultValue.toDouble();
-   QSignalBlocker sliderBlock(row.slider),valueBlock(row.value);auto precision=[](double number){auto text=QString::number(number,'f',6);while(text.endsWith('0')) text.chop(1);return std::max(0,int(text.size()-text.indexOf('.')-1));};row.value->setDecimals(p.type=="int"?0:std::max({precision(p.step),precision(base),precision(p.minimum),precision(p.maximum)}));row.value->setRange(p.minimum-base,p.maximum-base);row.value->setSingleStep(p.step);row.value->setSuffix(p.unit.isEmpty()?QString{}:" "+p.unit);row.value->setValue(absolute-base);
-   const double fraction=p.maximum==p.minimum?0:p.scale=="log"&&p.minimum>0?std::log(std::clamp(absolute,p.minimum,p.maximum)/p.minimum)/std::log(p.maximum/p.minimum):(absolute-p.minimum)/(p.maximum-p.minimum);row.slider->setValue(int(std::round(fraction*10000)));
+   auto& row=m_rows[key];row.parameter=p;row.label->setText(p.name);row.body->setVisible(true);row.body->setEnabled(p.enabled);row.body->setToolTip(p.disabledReason);m_layout->removeWidget(row.body);m_layout->insertWidget(order++,row.body);
+   const auto base=svs::parameterBase(p,trackValues,clipValues,globals);QSignalBlocker block(row.editor);
+   if(auto* value=qobject_cast<QDoubleSpinBox*>(row.editor)) {
+    const double absolute=base.toDouble(),neutral=p.defaultValue.toDouble();auto precision=[](double number){auto text=QString::number(number,'f',6);while(text.endsWith('0')) text.chop(1);return std::max(0,int(text.size()-text.indexOf('.')-1));};value->setDecimals(p.type=="int"?0:std::max({precision(p.step),precision(neutral),precision(p.minimum),precision(p.maximum)}));value->setRange(p.minimum-neutral,p.maximum-neutral);value->setSingleStep(p.step);value->setSuffix(p.unit.isEmpty()?QString{}:" "+p.unit);value->setValue(absolute-neutral);
+    QSignalBlocker sliderBlock(row.slider);const double fraction=p.maximum==p.minimum?0:p.scale=="log"&&p.minimum>0?std::log(std::clamp(absolute,p.minimum,p.maximum)/p.minimum)/std::log(p.maximum/p.minimum):(absolute-p.minimum)/(p.maximum-p.minimum);row.slider->setValue(int(std::round(fraction*10000)));
+   }else if(auto* value=qobject_cast<QCheckBox*>(row.editor)) value->setChecked(base.toBool());
+   else if(auto* value=qobject_cast<QComboBox*>(row.editor)) {value->clear();for(const auto& choice:p.choices) {const auto item=choice.toObject();value->addItem(item["name"].toString(item["id"].toString()),item["id"].toString());}value->setCurrentIndex(value->findData(base.toString()));}
   }
   for(auto i=m_rows.begin();i!=m_rows.end();++i) if(!present.contains(i.key())) i->body->hide();m_refreshing=false;
  }
@@ -108,20 +128,32 @@ protected:
 };
 }
 
+QDialog* createSVSPluginSettings(SVSTrack* track,QWidget* parent) {
+ auto* dialog=new QDialog(parent);dialog->setObjectName("svsPluginSettings");dialog->setWindowTitle(QObject::tr("SVS plugin settings"));dialog->resize(480,420);
+ auto* layout=new QVBoxLayout(dialog);auto* tabs=new QTabWidget(dialog);layout->addWidget(tabs);auto* page=new QWidget(tabs);auto* form=new QFormLayout(page);tabs->addTab(page,QObject::tr("Voice"));
+ auto* speakers=new QComboBox(page);speakers->setObjectName("svsPluginSpeaker");speakers->addItem(QObject::tr("Select speaker"));const auto voices=svs::Registry::instance().voices();for(const auto& voice:voices) speakers->addItem(voice.name,voice.pluginId+"\n"+voice.id);form->addRow(QObject::tr("Speaker"),speakers);
+ QObject::connect(speakers,qOverload<int>(&QComboBox::activated),dialog,[track,voices](int index){if(index<=0||index>voices.size()) return;track->addJournalCheckPoint();track->saveJournallingState(false);track->bindVoice(voices[index-1].pluginId,voices[index-1].id);track->restoreVoiceName();track->restoreJournallingState();});
+ auto* avatar=new QLineEdit(page);avatar->setObjectName("svsPluginAvatarPath");auto* portrait=new QLineEdit(page);portrait->setObjectName("svsPluginPortraitPath");
+ auto addPath=[&](const QString& title,QLineEdit* field,const QString& key){auto* row=new QWidget(page);auto* line=new QHBoxLayout(row);line->setContentsMargins(0,0,0,0);line->addWidget(field,1);auto* browse=new QPushButton(QObject::tr("Browse"),row);line->addWidget(browse);form->addRow(title,row);auto submit=[track,field,key]{auto settings=track->portraitSettings();settings[key]=field->text();track->setPortraitSettings(settings);};QObject::connect(field,&QLineEdit::editingFinished,dialog,submit);QObject::connect(browse,&QPushButton::clicked,dialog,[dialog,field,submit]{const auto path=QFileDialog::getOpenFileName(dialog,QObject::tr("Choose image"),field->text(),QObject::tr("Images (*.png *.jpg *.jpeg *.webp *.svg *.bmp)"));if(!path.isEmpty()) {field->setText(path);submit();}});};
+ addPath(QObject::tr("Avatar"),avatar,"avatarPath");addPath(QObject::tr("Portrait"),portrait,"portraitPath");
+ auto* visible=new QCheckBox(QObject::tr("Show portrait"),page);visible->setObjectName("svsPluginPortraitVisible");form->addRow(visible);QObject::connect(visible,&QCheckBox::clicked,dialog,[track](bool value){auto settings=track->portraitSettings();settings["visible"]=value;track->setPortraitSettings(settings);});
+ auto* transparency=new QSpinBox(page);transparency->setObjectName("svsPluginPortraitTransparency");transparency->setRange(0,100);transparency->setSuffix("%");form->addRow(QObject::tr("Portrait transparency"),transparency);QObject::connect(transparency,qOverload<int>(&QSpinBox::valueChanged),dialog,[track](int value){auto settings=track->portraitSettings();settings["transparency"]=value;track->setPortraitSettings(settings);});
+ auto* reset=new QPushButton(QObject::tr("Use voice images"),page);form->addRow(reset);QObject::connect(reset,&QPushButton::clicked,dialog,[track]{auto settings=track->portraitSettings();settings.remove("avatarPath");settings.remove("portraitPath");track->setPortraitSettings(settings);});
+ tabs->addTab(new EffectRackView(track->audioBusHandle()->effects(),tabs),QObject::tr("Effects"));
+ auto refresh=[track,dialog,speakers,avatar,portrait,visible,transparency]{dialog->setEnabled(!track->readOnly());QSignalBlocker s(speakers),a(avatar),p(portrait),v(visible),t(transparency);speakers->setCurrentIndex(std::max(0,speakers->findData(track->pluginId()+"\n"+track->voiceId())));if(!avatar->hasFocus()) avatar->setText(track->avatarPath());if(!portrait->hasFocus()) portrait->setText(track->portraitPath());visible->setChecked(track->portraitSettings()["visible"].toBool(true));transparency->setValue(track->portraitSettings()["transparency"].toInt(70));};
+ QObject::connect(track,&Track::dataChanged,dialog,refresh);QObject::connect(track,&QObject::destroyed,dialog,&QObject::deleteLater);refresh();return dialog;
+}
+
 SVSTrackView::SVSTrackView(SVSTrack* track,TrackContainerView* container):TrackView(track,container) {
  auto* label=new TrackLabelButton(this,getTrackSettingsWidget()); label->setObjectName("svsTrackAvatar");
  auto* avatar=new SVSImageLoader(label);
  avatar->changed=[label,avatar]{const auto image=avatar->image(); label->setIcon(image.isNull()?embed::getIconPixmap("svs_track"):QPixmap::fromImage(image)); label->setToolTip(avatar->diagnostic());};
- auto refresh=[label,track,avatar]{avatar->request(track->voice().package,track->voice().avatar,label->iconSize()*label->devicePixelRatioF());}; refresh(); connect(track,&Track::dataChanged,this,refresh);
- auto* voices=new QComboBox(getTrackSettingsWidget()); voices->setObjectName("svsVoiceSelector"); voices->addItem(tr("Select voice"));
- for(const auto& voice:svs::Registry::instance().voices()) voices->addItem(voice.name,voice.pluginId+"/"+voice.id);
- auto refreshVoice=[voices,track] { auto value=track->pluginId()+"/"+track->voiceId(); voices->setCurrentIndex(std::max(0,voices->findData(value))); }; refreshVoice(); connect(track,&Track::dataChanged,this,refreshVoice);
- connect(voices,qOverload<int>(&QComboBox::activated),this,[track,voices](int index){ auto value=voices->itemData(index).toString(); if(value.isEmpty()) return; auto split=value.lastIndexOf('/'); track->bindVoice(value.left(split),value.mid(split+1)); });
+ auto refresh=[label,track,avatar]{const auto path=track->avatarPath();avatar->request(track->portraitSettings().contains("avatarPath")?QFileInfo(path).absolutePath():track->voice().package,path,label->iconSize()*label->devicePixelRatioF());}; refresh(); connect(track,&Track::dataChanged,this,refresh);
  auto* volume=new VolumeKnob(KnobType::Small17,tr("VOL"),getTrackSettingsWidget(),Knob::LabelRendering::LegacyFixedFontSize,tr("Track volume")); volume->setModel(track->volumeModel());
  auto* pan=new Knob(KnobType::Small17,tr("PAN"),getTrackSettingsWidget(),Knob::LabelRendering::LegacyFixedFontSize,tr("Panning")); pan->setModel(track->panningModel());
  auto* mix=new MixerChannelLcdSpinBox(2,getTrackSettingsWidget(),tr("Mixer channel"),this); mix->setModel(track->mixerChannelModel());
- auto* layout=new QHBoxLayout(getTrackSettingsWidget()); layout->setContentsMargins(0,0,0,0); layout->setSpacing(1); layout->addWidget(label); layout->addWidget(voices); layout->addWidget(mix); layout->addWidget(volume); layout->addWidget(pan);
- connect(label,&QToolButton::clicked,this,[this,track]{ auto* dialog=new QDialog(this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->setWindowTitle(tr("SVS voice and effects")); auto* body=new QVBoxLayout(dialog); auto* restore=new QPushButton(tr("Restore voice name"),dialog); body->addWidget(restore); connect(restore,&QPushButton::clicked,track,&SVSTrack::restoreVoiceName); body->addWidget(new EffectRackView(track->audioBusHandle()->effects(),dialog)); dialog->show(); });
+ auto* layout=new QHBoxLayout(getTrackSettingsWidget()); layout->setContentsMargins(0,0,0,0); layout->setSpacing(1); layout->addWidget(label); layout->addWidget(mix); layout->addWidget(volume); layout->addWidget(pan);
+ auto* pluginSettings=createSVSPluginSettings(track,this);connect(label,&QToolButton::clicked,pluginSettings,[pluginSettings]{pluginSettings->show();pluginSettings->raise();pluginSettings->activateWindow();});
  setAcceptDrops(true);
 }
 void SVSTrackView::dragEnterEvent(QDragEnterEvent* event) { if(!StringPairDrag::processDragEnterEvent(event,"svsvoice")) TrackView::dragEnterEvent(event); }
@@ -161,8 +193,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* parameterBody=new QWidget(splitter); parameterBody->setObjectName("svsParameterArea");
  auto* parameterLayout=new QVBoxLayout(parameterBody);parameterLayout->setContentsMargins(0,0,0,0);parameterLayout->setSpacing(0);
  auto* parameterCanvas=new SVSCanvas(clip,parameterBody);parameterCanvas->setThemeColors(m_colors);svs::Parameter emptyParameter;parameterCanvas->setParameterLane(emptyParameter);parameterCanvas->setParameterActive(false);parameterCanvas->setMinimumHeight(80);parameterLayout->addWidget(parameterCanvas,1);
- auto* parameterScroll=new QScrollArea(parameterBody);parameterScroll->setObjectName("svsParameterTabs");parameterScroll->setWidgetResizable(true);parameterScroll->setFrameShape(QFrame::NoFrame);parameterScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);parameterScroll->setFixedHeight(44);
- auto* tabBody=new QWidget(parameterScroll);auto* parameterTabs=new QHBoxLayout(tabBody);parameterTabs->setContentsMargins(8,2,8,2);parameterTabs->setSpacing(6);parameterTabs->addStretch();parameterTabs->addStretch();parameterScroll->setWidget(tabBody);parameterLayout->addWidget(parameterScroll);
+ auto* parameterScroll=new QScrollArea(parameterBody);parameterScroll->setObjectName("svsParameterTabs");parameterScroll->setWidgetResizable(true);parameterScroll->setFrameShape(QFrame::NoFrame);parameterScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);parameterScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);parameterScroll->setFixedHeight(52);
+ auto* tabBody=new QWidget(parameterScroll);auto* parameterTabs=new QHBoxLayout(tabBody);parameterTabs->setContentsMargins(8,2,8,2);parameterTabs->setSpacing(6);parameterTabs->addStretch();auto* resultDivider=new QFrame(tabBody);resultDivider->setObjectName("svsReadOnlyDivider");resultDivider->setFrameShape(QFrame::VLine);resultDivider->setFrameShadow(QFrame::Plain);parameterTabs->addWidget(resultDivider);auto* resultLabel=new QLabel(tr("Read-only"),tabBody);resultLabel->setObjectName("svsReadOnlyLabel");parameterTabs->addWidget(resultLabel);parameterTabs->addStretch();parameterScroll->setWidget(tabBody);parameterLayout->addWidget(parameterScroll);
  splitter->setSizes({440,180});
  const auto storedSizes=clip->editorState()["areaSizes"].toArray();if(storedSizes.size()==2) splitter->setSizes({storedSizes[0].toInt(440),storedSizes[1].toInt(180)});
  connect(splitter,&QSplitter::splitterMoved,this,[clip,splitter]{auto state=clip->editorState();QJsonArray sizes;for(auto size:splitter->sizes()) sizes.append(size);state["areaSizes"]=sizes;clip->setEditorState(state);});
@@ -216,6 +248,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  const auto voices=svs::Registry::instance().voices();singer->addItem(tr("Select singer"),QString{});for(const auto& voice:voices) singer->addItem(voice.name,voice.pluginId+"\n"+voice.id);
  connect(singer,qOverload<int>(&QComboBox::activated),this,[track,voices](int index){if(index>0&&index<=voices.size()) track->bindVoice(voices[index-1].pluginId,voices[index-1].id);});
  auto* globalControls=new SVSGlobalControls(sidebar);sidebarLayout->addWidget(globalControls);sidebarLayout->addStretch();
+ globalControls->beginGesture=[clip=QPointer<SVSClip>(clip),track=QPointer<SVSTrack>(track)](const svs::Parameter& p)->std::function<void()>{if(!clip||!track) return {};if(p.scope=="track") {track->addJournalCheckPoint();track->saveJournallingState(false);return [track]{if(track) track->restoreJournallingState();};}clip->addJournalCheckPoint();clip->saveJournallingState(false);return [clip]{if(clip) clip->restoreJournallingState();};};
  auto* side=new QDialog(this);side->setObjectName("svsEditorSettings");side->setWindowTitle(tr("SVS editor settings"));auto* controls=new QVBoxLayout(side);
  auto* settings=new QToolButton(this);settings->setText(tr("Settings"));settings->setObjectName("svsEditorSettingsButton");toolbar->addWidget(settings);connect(settings,&QToolButton::clicked,side,[side]{side->show();side->raise();});
  auto* properties=new QToolButton(this); properties->setText(tr("Properties")); properties->setCheckable(true); properties->setChecked(true); toolbar->addWidget(properties); connect(properties,&QToolButton::toggled,sidebarScroll,&QWidget::setVisible);
@@ -228,7 +261,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
   const auto settings=track->portraitSettings(); {QSignalBlocker v(portraitVisible),s(transparency),n(transparencyValue); portraitVisible->setChecked(settings["visible"].toBool(true)); transparency->setValue(settings["transparency"].toInt(70)); transparencyValue->setValue(transparency->value());}
   canvas->setPortrait(portrait->image(),portraitVisible->isChecked(),transparency->value(),{settings["x"].toDouble(1),settings["y"].toDouble(1)}); portraitDiagnostic->setText(portrait->diagnostic()); portraitDiagnostic->setVisible(!portrait->diagnostic().isEmpty());
  };
- portrait->changed=applyPortrait; auto refreshPortrait=[track=QPointer<SVSTrack>(track),canvas,portrait,applyPortrait]{if(!track) return; portrait->request(track->voice().package,track->voice().portrait,canvas->portraitTargetSize()); applyPortrait();};
+ portrait->changed=applyPortrait; auto refreshPortrait=[track=QPointer<SVSTrack>(track),canvas,portrait,applyPortrait]{if(!track) return;const auto path=track->portraitPath();portrait->request(track->portraitSettings().contains("portraitPath")?QFileInfo(path).absolutePath():track->voice().package,path,canvas->portraitTargetSize()); applyPortrait();};
  connect(track,&Track::dataChanged,this,refreshPortrait); connect(canvas,&SVSCanvas::portraitSizeChanged,this,refreshPortrait); refreshPortrait();
  connect(portraitVisible,&QCheckBox::toggled,this,[track](bool visible){auto settings=track->portraitSettings(); settings["visible"]=visible; track->setPortraitSettings(settings);});
  auto setTransparency=[track](int value){auto settings=track->portraitSettings(); settings["transparency"]=value; track->setPortraitSettings(settings);}; connect(transparency,&QSlider::valueChanged,this,setTransparency); connect(transparencyValue,qOverload<int>(&QSpinBox::valueChanged),this,setTransparency);
@@ -248,11 +281,11 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto refreshPhoneme=[clip,track,strip,phonemePanel]{ auto context=track->parameters(); for(auto i=clip->parameters().begin();i!=clip->parameters().end();++i) context[i.key()]=i.value(); phonemePanel->refresh(track->capabilities().parameters,"phoneme",{strip->selectedParameters()},context,[strip](const QString& id,const QJsonValue& value){strip->setSelectedParameter(id,value);}); phonemePanel->setEnabled(strip->selectedPhoneme()>=0&&track->capabilities().original["phonemes"].toObject()["attributesEditable"].toBool()); };
  connect(strip,&SVSResultStrip::selectionChanged,this,refreshPhoneme); connect(clip,&Clip::dataChanged,this,refreshPhoneme); connect(track,&Track::dataChanged,this,refreshPhoneme); refreshPhoneme();
  auto* feedbackPanel=new SVSParameterPanel(tabs); tabs->addTab(feedbackPanel,tr("Result"));
- auto refresh=[this,clip,track,canvas,lanes,parameterCanvas,tabBody,parameterTabs,selectedParameter,updateParameterDisplay,singer,globalControls,language,diagnostics,trackPanel,clipPanel,notePanel,feedbackPanel]{
+ auto refresh=[this,clip,track,canvas,lanes,parameterCanvas,tabBody,parameterTabs,selectedParameter,updateParameterDisplay,resultDivider,resultLabel,singer,globalControls,language,diagnostics,trackPanel,clipPanel,notePanel,feedbackPanel]{
   auto context=track->parameters(); for(const auto& p:track->capabilities().parameters) if(p.scope=="track"&&!context.contains(p.id)) context[p.id]=p.defaultValue;
   for(auto i=clip->parameters().begin();i!=clip->parameters().end();++i) context[i.key()]=i.value();
   singer->setCurrentIndex(std::max(0,singer->findData(track->pluginId()+"\n"+track->voiceId())));singer->setEnabled(!track->readOnly());
-  globalControls->refresh(track->capabilities().parameters,track->parameters(),clip->parameters(),context,[track,clip](const svs::Parameter& p,double value){if(p.scope=="track") track->setParameter(p.id,value);else clip->setParameter(p.id,value);});globalControls->setEnabled(!clip->readOnly()&&!track->readOnly());
+  globalControls->refresh(track->capabilities().parameters,track->parameters(),clip->parameters(),clip->globalParameters(),context,[clip,selectedParameter,updateParameterDisplay](const svs::Parameter& p,const QJsonValue& value){if(!clip->setGlobalParameter(p.id,value)) return;*selectedParameter="input:"+p.id;auto state=clip->editorState();state["selectedParameter"]=*selectedParameter;auto lanes=state["lanes"].toObject();auto lane=lanes[*selectedParameter].toObject();lane["visible"]=true;lanes[*selectedParameter]=lane;state["lanes"]=lanes;clip->setEditorState(state);updateParameterDisplay();});globalControls->setEnabled(!clip->readOnly()&&!track->readOnly());
   trackPanel->refresh(track->capabilities().parameters,"track",{track->parameters()},context,[track](const QString& id,const QJsonValue& value){track->setParameter(id,value);});
   clipPanel->refresh(track->capabilities().parameters,"clip",{clip->parameters()},context,[clip](const QString& id,const QJsonValue& value){clip->setParameter(id,value);});
   QVector<QJsonObject> selected; QStringList selectedIds; for(const auto& note:clip->notes()) if(canvas->selectedNotes().contains(note.id)) { selected<<note.parameters; selectedIds<<note.id; }
@@ -264,11 +297,11 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
   for(auto& lane:*lanes) lane.available=false;
   QStringList available;
   auto configureLane=[&](const svs::Parameter& parameter,bool feedback) {
-   if(!parameter.curve||parameter.type=="string") return;
+   if((!parameter.curve&&!svs::globalParameter(parameter))||parameter.type=="string") return;
    const auto key=(feedback?"feedback:":"input:")+parameter.id;
    if(!lanes->contains(key)) {
     auto* tab=new SVSParameterTab(tabBody);tab->setObjectName("svsParameterTab."+key);tab->setCheckable(true);tab->setAutoRaise(true);tab->setToolButtonStyle(Qt::ToolButtonTextOnly);tab->setFocusPolicy(Qt::NoFocus);
-    parameterTabs->insertWidget(parameterTabs->count()-1,tab);lanes->insert(key,{tab,parameter,feedback});
+    parameterTabs->insertWidget(feedback||!parameter.writable?parameterTabs->count()-1:parameterTabs->indexOf(resultDivider),tab);lanes->insert(key,{tab,parameter,feedback});
     connect(tab,&QToolButton::clicked,this,[clip,key,selectedParameter,updateParameterDisplay,parameterCanvas]{
      parameterCanvas->cancelOperation();*selectedParameter=key;
      auto state=clip->editorState();auto states=state["lanes"].toObject();auto settings=states[key].toObject();settings["visible"]=true;states[key]=settings;state["lanes"]=states;state["selectedParameter"]=*selectedParameter;clip->setEditorState(state);updateParameterDisplay();parameterCanvas->setFocus();
@@ -281,13 +314,15 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
    auto& lane=(*lanes)[key];lane.parameter=parameter;lane.feedback=feedback;lane.available=parameter.isVisible(context);
    lane.tab->setText((feedback?tr("Result: "):QString{})+parameter.name);
    const QColor declared(parameter.color);lane.tab->curveColor=declared.isValid()?declared:palette().highlight().color();
-   lane.tab->setToolTip((feedback?tr("Read-only result. "):QString{})+tr("Left click: edit curve; right click: show/hide overlay.")+"\n"+parameter.disabledReason);
+   lane.tab->setToolTip((feedback||!parameter.writable?tr("Read-only result. "):parameter.curve?QString{}:tr("Base value: adjust the sidebar control. "))+tr("Left click: select; right click: show/hide overlay.")+"\n"+parameter.disabledReason);
+   parameterTabs->removeWidget(lane.tab);parameterTabs->insertWidget(feedback||!parameter.writable?parameterTabs->count()-1:parameterTabs->indexOf(resultDivider),lane.tab);
    if(lane.available) available.append(key);
   };
   for(const auto& parameter:track->capabilities().parameters) configureLane(parameter,false);
   for(const auto& parameter:track->capabilities().feedbackParameters) configureLane(parameter,true);
   // Select a declared curve on first opening; retain unavailable selections for voice restoration.
   if(!clip->editorState().contains("selectedParameter")&&!available.isEmpty()) { *selectedParameter=available.first();auto state=clip->editorState();state["selectedParameter"]=*selectedParameter;clip->setEditorState(state); }
+  bool readOnly=false;for(const auto& lane:*lanes) if(lane.available&&(lane.feedback||!lane.parameter.writable)) readOnly=true;resultDivider->setVisible(readOnly);resultLabel->setVisible(readOnly);
   updateParameterDisplay();
 
  };

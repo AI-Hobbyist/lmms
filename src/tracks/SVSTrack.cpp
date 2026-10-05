@@ -48,6 +48,11 @@ void SVSTrack::restoreVoiceName() { addJournalCheckPoint(); m_customName=false; 
 void SVSTrack::bindVoice(const QString& plugin,const QString& voice) {
  if(readOnly()) return;
  addJournalCheckPoint(); m_pluginId=plugin; m_voiceId=voice; m_voice={}; for(const auto& v:svs::Registry::instance().voices()) if(v.pluginId==plugin&&v.id==voice) { m_voice=v; break; }
+ // Local developer fixtures are opt-in configuration, never SDK/package resources.
+ if(plugin=="org.lmms.svs.example") for(const auto& key:{QString("avatarPath"),QString("portraitPath")}) {
+  const auto path=ConfigManager::inst()->value("svs","test"+key.left(1).toUpper()+key.mid(1));
+  if(!m_portraitSettings.contains(key)&&!path.isEmpty()) m_portraitSettings[key]=path;
+ }
  ++m_capabilityRequest;
  m_capabilities={}; m_capabilitiesReady=false; m_dictionaries.clear(); m_capabilityDiagnostics.clear(); refreshCapabilities();
  if(!m_customName) Track::setName(m_voice.name.isEmpty()?"SVS":m_voice.name); m_bus.setName(name());
@@ -126,7 +131,7 @@ bool SVSTrack::play(const TimePos& start,f_cnt_t frames,f_cnt_t offset,int clipN
 void SVSTrack::setPortraitSettings(const QJsonObject& input) {
  if(readOnly()) return;
  auto settings=input; settings["visible"]=input["visible"].toBool(true); settings["transparency"]=std::clamp(input["transparency"].toInt(70),0,100); settings["x"]=std::clamp(input["x"].toDouble(1),0.,1.); settings["y"]=std::clamp(input["y"].toDouble(1),0.,1.);
- if(settings==m_portraitSettings) return; m_portraitSettings=settings; emit dataChanged(); Engine::getSong()->setModified();
+ if(settings==m_portraitSettings) return; addJournalCheckPoint();m_portraitSettings=settings; emit dataChanged(); Engine::getSong()->setModified();
 }
 void SVSTrack::saveTrackSpecificSettings(QDomDocument& doc,QDomElement& node,bool) {
  if(readOnly()) {svs::copyXml(doc,node,m_original);return;}

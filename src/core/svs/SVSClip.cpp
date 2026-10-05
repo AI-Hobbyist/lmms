@@ -55,6 +55,18 @@ bool SVSClip::setParameter(const QString& id,const QJsonValue& value) {
  if(m_parameters.value(id)==value) return true;
  addJournalCheckPoint(); m_parameters[id]=value; static_cast<SVSTrack*>(getTrack())->refreshCapabilities({{"clipParameters",m_parameters}}); invalidate(); synthesize(); Engine::getSong()->setModified(); return true;
 }
+QJsonValue SVSClip::parameterBase(const svs::Parameter& p) const {
+ return svs::parameterBase(p,static_cast<const SVSTrack*>(getTrack())->parameters(),m_parameters,m_globalParameters);
+}
+bool SVSClip::setGlobalParameter(const QString& id,const QJsonValue& value) {
+ auto* track=static_cast<SVSTrack*>(getTrack());
+ const svs::Parameter* p=nullptr;for(const auto& parameter:track->capabilities().parameters) if(parameter.id==id) p=&parameter;
+ if(readOnly()||!p||!svs::globalParameter(*p)||!p->writable||!p->enabled||!p->accepts(value)) return false;
+ if(p->scope=="track") return track->setParameter(id,value);
+ if(p->scope=="clip") return setParameter(id,value);
+ if(m_globalParameters.value(id)==value) return true;
+ addJournalCheckPoint();m_globalParameters[id]=value;invalidate();synthesize();Engine::getSong()->setModified();return true;
+}
 bool SVSClip::importDictionary(const QByteArray& bytes,QString& error) {
  if(readOnly()) {error=migrationDiagnostic();return false;}
  svs::Dictionary dictionary;
@@ -107,6 +119,7 @@ svs::Input SVSClip::captureInput(uint32_t rate) const {
  for(const auto& note:m_notes) input.duration=std::max(input.duration,(note.tick+note.duration)*input.secondsPerTick);
  double contentEnd=-int(startTimeOffset())+int(length());for(const auto& note:m_notes) contentEnd=std::max(contentEnd,note.tick+note.duration);
  input.document={{"clipId",m_id},{"voiceId",track->voiceId()},{"pluginId",track->pluginId()},{"position",int(startPosition())},{"contentOffset",-int(startTimeOffset())},{"tempo",tempo->baseTempo},{"tempoSource",tempo->toJson()},{"contentEndTick",contentEnd}};
+ if(!m_globalParameters.isEmpty()) input.document["globalParameters"]=m_globalParameters;
  input.document["trackParameters"]=track->parameters(); input.document["clipParameters"]=m_parameters;
  input.document["curves"]=svs::curvesToJson(m_curves); input.document["secondsPerTick"]=input.secondsPerTick;
  input.document["language"]=track->language(); input.document["capabilities"]=track->capabilities().original;
@@ -140,6 +153,7 @@ void SVSClip::saveSettings(QDomDocument& doc,QDomElement& node) {
  if(!m_original.isNull()) { auto attrs=m_original.attributes(); for(int i=0;i<attrs.count();++i) node.setAttribute(attrs.item(i).nodeName(),attrs.item(i).nodeValue()); for(auto child=m_original.firstChild();!child.isNull();child=child.nextSibling()) if(child.nodeName()!="notes") node.appendChild(doc.importNode(child,true)); }
  node.setAttribute("schemaVersion",1); node.setAttribute("id",m_id); node.setAttribute("pos",node.parentNode().nodeName()=="clipboard"?-1:int(startPosition())); node.setAttribute("len",int(length())); node.setAttribute("off",int(startTimeOffset())); node.setAttribute("muted",isMuted()); node.setAttribute("name",name()); node.setAttribute("autoresize",getAutoResize()); if(color()) node.setAttribute("color",color()->name());
  node.setAttribute("cacheKey",m_cacheKey);node.setAttribute("cacheInputHash",m_cacheInputHash);node.setAttribute("cacheSampleRate",m_cacheRate);
+ node.setAttribute("globalParameters",QString::fromUtf8(QJsonDocument(m_globalParameters).toJson(QJsonDocument::Compact)));
  node.setAttribute("parameters",QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact))); node.setAttribute("projectDictionaries",QString::fromUtf8(QJsonDocument(m_projectDictionaryData).toJson(QJsonDocument::Compact)));
  auto curves=m_unparsedCurves; const auto known=svs::curvesToJson(m_curves); for(auto i=known.begin();i!=known.end();++i) curves[i.key()]=i.value();
  node.setAttribute("curves",QString::fromUtf8(QJsonDocument(curves).toJson(QJsonDocument::Compact))); node.setAttribute("editorState",QString::fromUtf8(QJsonDocument(m_editorState).toJson(QJsonDocument::Compact)));
@@ -151,6 +165,7 @@ void SVSClip::loadSettings(const QDomElement& node) {
  m_original=node.cloneNode(true).toElement(); m_original.removeAttribute("newEntity"); m_notes.clear(); m_id=node.attribute("id",m_id); if(node.attribute("pos").toInt()>=0) movePosition(node.attribute("pos").toInt()); changeLength(std::max(1,node.attribute("len").toInt())); setStartTimeOffset(node.attribute("off").toInt()); setMuted(node.attribute("muted").toInt()); setName(node.attribute("name","SVS")); setAutoResize(node.attribute("autoresize","1").toInt()); if(node.hasAttribute("color")) setColor(QColor(node.attribute("color")));
  m_cacheKey=node.attribute("cacheKey");m_cacheInputHash=node.attribute("cacheInputHash");m_cacheRate=node.attribute("cacheSampleRate").toUInt();
  for(const auto& field:QStringList{"pos","len","off"}) if(node.hasAttribute(field)) {bool valid=false;const auto value=node.attribute(field).toInt(&valid);if(!valid||(field=="len"&&value<=0)) m_migrationDiagnostic="Invalid SVS "+field+"; original node preserved";}
+ svs::jsonObjectAttribute(node,"globalParameters",m_globalParameters,m_migrationDiagnostic);
  svs::jsonObjectAttribute(node,"parameters",m_parameters,m_migrationDiagnostic); svs::jsonArrayAttribute(node,"projectDictionaries",m_projectDictionaryData,m_migrationDiagnostic); svs::jsonObjectAttribute(node,"editorState",m_editorState,m_migrationDiagnostic);
  QJsonObject curves; svs::jsonObjectAttribute(node,"curves",curves,m_migrationDiagnostic); m_curves.clear(); m_unparsedCurves={}; for(auto i=curves.begin();i!=curves.end();++i) {svs::Curve curve;QString error;if(i.value().isObject()&&svs::Curve::fromJson(i.value().toObject(),curve,error)) m_curves[i.key()]=curve;else m_unparsedCurves[i.key()]=i.value();}
  const auto& capabilities=static_cast<SVSTrack*>(getTrack())->capabilities(); for(auto i=m_unparsedCurves.begin();i!=m_unparsedCurves.end();++i) if(i.key()=="svs.pitch"||capabilities.parameter(i.key(),"clip")) m_migrationDiagnostic="Invalid SVS curve "+i.key()+"; original node preserved";

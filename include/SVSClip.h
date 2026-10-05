@@ -40,6 +40,9 @@ public:
  QString id() const { return m_id; }
  const QJsonObject& parameters() const { return m_parameters; }
  bool setParameter(const QString&,const QJsonValue&);
+ const QJsonObject& globalParameters() const {return m_globalParameters;}
+ QJsonValue parameterBase(const svs::Parameter&) const;
+ bool setGlobalParameter(const QString&,const QJsonValue&);
  bool setNoteParameter(const QStringList& noteIds,const QString& id,const QJsonValue& value,bool phoneme=false);
  bool importDictionary(const QByteArray&,QString& error);
  const QJsonArray& projectDictionaryData() const { return m_projectDictionaryData; }
@@ -55,7 +58,7 @@ private:
  QVector<svs::Note> m_notes;
  svs::Curves m_curves;
  QJsonObject m_editorState;
- QJsonObject m_parameters;
+ QJsonObject m_parameters,m_globalParameters;
  QJsonArray m_projectDictionaryData;
  QDomElement m_original;
  std::atomic<uint64_t> m_revision{1};

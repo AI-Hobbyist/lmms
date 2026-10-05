@@ -5,6 +5,13 @@
 #include <numeric>
 
 namespace lmms::svs {
+Curve withParameterBase(const Curve& source,const Parameter& p,const QJsonValue& base) {
+ auto curve=source;if(p.type!="float"&&p.type!="int") return curve;
+ const double offset=base.toDouble()-p.defaultValue.toDouble();
+ for(auto& point:curve.evaluator.points) point.value=std::clamp(point.value+offset,p.minimum,p.maximum);
+ return curve;
+}
+
 std::optional<QJsonValue> Curve::valueAt(double tick) const {
  const auto sample=evaluator.evaluate(tick); if(!sample.covered) return {};
  if(type=="enum") return QString::fromStdString(sample.valueId?*sample.valueId:std::string{});

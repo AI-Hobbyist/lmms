@@ -6,11 +6,13 @@
 #include <QPointer>
 #include <QColor>
 #include <QMap>
+class QDialog;
 namespace lmms { class SVSTrack; class SVSClip;
 namespace gui {
 class MainWindow;
 class SubWindow;
 class SVSPianoRoll;
+QDialog* createSVSPluginSettings(SVSTrack*,QWidget* parent=nullptr);
 class SVSTrackView : public TrackView {
  Q_OBJECT
 public:

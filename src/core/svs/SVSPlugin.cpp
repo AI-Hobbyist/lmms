@@ -117,6 +117,20 @@ std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error,co
   document["capabilities"]=queried.object();
  }
  if(!Capabilities::parse(document["capabilities"].toObject(),cap,error)) { d.api.destroy_session(session); return {}; }
+ // Send effective values through the existing ABI; cache/source data stay unshifted.
+ auto effectiveCurves=document["curves"].toObject();const auto globals=document["globalParameters"].toObject();
+ for(const auto& p:cap.parameters) {
+  if(!globalParameter(p)) continue;
+  const auto base=parameterBase(p,document["trackParameters"].toObject(),document["clipParameters"].toObject(),globals);
+  if(effectiveCurves.contains(p.id)&&(p.type=="float"||p.type=="int")) {Curve curve;QString reason;if(!Curve::fromJson(effectiveCurves[p.id].toObject(),curve,reason,&p)) {error=reason;d.api.destroy_session(session);return {};}effectiveCurves[p.id]=withParameterBase(curve,p,base).toJson();}
+  if(p.scope=="note"&&globals.contains(p.id)) for(size_t index=0;index<strings.size();++index) {
+   auto values=input.notes[int(index)].parameters;
+   if(p.type=="float"||p.type=="int") {const auto original=values.value(p.id).toDouble(p.defaultValue.toDouble());values[p.id]=std::clamp(original+base.toDouble()-p.defaultValue.toDouble(),p.minimum,p.maximum);}else values[p.id]=base;
+   // Preserve changes made for other parameters in this same snapshot.
+   auto prepared=QJsonDocument::fromJson(strings[index].parameters).object();prepared[p.id]=values[p.id];strings[index].parameters=QJsonDocument(prepared).toJson(QJsonDocument::Compact);notes[index].parameters_json=strings[index].parameters.constData();
+  }
+ }
+ document["curves"]=effectiveCurves;
  if(cap.pitchInput=="offset") {
   auto curves=document["curves"].toObject(); Curve reference; if(!Curve::fromJson(cap.original["pitch"].toObject()["referencePitch"].toObject(),reference,error)) {d.api.destroy_session(session);return {};}
   if(curves.contains("svs.pitch")) {Curve absolute,offset; if(!Curve::fromJson(curves["svs.pitch"].toObject(),absolute,error)||!absolutePitchToOffset(absolute,reference,offset,error)) {d.api.destroy_session(session);return {};} curves["svs.pitch"]=offset.toJson();}

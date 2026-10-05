@@ -111,6 +111,8 @@ private:
  void paintParameterOverlays(QPainter&);
  void beginCurveStroke(const QPointF&);
  void paintPitch(QPainter&);
+ double parameterOffset() const;
+ double m_operationOffset=0;
  double curveMinimum() const;
  double curveMaximum() const;
  double curveNumber(const QJsonValue&) const;

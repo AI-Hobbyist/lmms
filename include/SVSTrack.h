@@ -24,6 +24,8 @@ public:
  void bindVoice(const QString&,const QString&);
  void restoreVoiceName();
  const svs::Voice& voice() const { return m_voice; }
+ QString avatarPath() const { return m_portraitSettings.value("avatarPath").toString(m_voice.avatar); }
+ QString portraitPath() const { return m_portraitSettings.value("portraitPath").toString(m_voice.portrait); }
  FloatModel* volumeModel() { return &m_volume; }
  FloatModel* panningModel() { return &m_pan; }
  IntModel* mixerChannelModel() { return &m_mix; }

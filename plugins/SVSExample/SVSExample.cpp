@@ -158,10 +158,10 @@ svs_status renderImpl(svs_session handle,svs_result* out) {
    double phonemeGain=std::clamp(n.phonemes["parameters"]["example.phonemeGain"].numeric(1),0.,2.);
    if(full&&!segments.empty()) { bool covered=false; for(const auto& segment:segments) { const auto begin=segmentBegin(s,n,segment),finish=segmentEnd(s,n,segment); if(seconds>=begin&&seconds<finish) { covered=true; phonemeGain=segment["parameters"]["example.phonemeGain"].numeric(phonemeGain); break; } } if(!covered) phonemeGain=0; }
    const double power=full?curveValue(s,"example.power",tick,n.power*100)/100*(curveValue(s,"example.soft",tick,n.soft?1:0)!=0?.5:1)*phonemeGain:1;
-   const auto currentTension=full?std::clamp(curveValue(s,"example.tension",tick,.25)+tension-.25,0.,1.):tension;
+   const auto currentTension=full?curveValue(s,"example.tension",tick,tension):tension;
    const bool advanced=curveIdValue(s,"example.mode",tick,s.input["trackParameters"]["example.mode"].text("basic"))=="advanced";
-   const auto currentBreath=full&&advanced?std::clamp(curveValue(s,"example.breath",tick,.1)+breath-.1,0.,1.):0;
-   const auto currentGender=full?std::clamp(curveValue(s,"example.gender",tick,0)+gender,-1.,1.):gender;
+   const auto currentBreath=full&&advanced?curveValue(s,"example.breath",tick,breath):0;
+   const auto currentGender=full?curveValue(s,"example.gender",tick,gender):gender;
    float value=float(0.15*gain*power*envelope*(std::sin(phase)+(0.1+currentTension*.6)*(1+currentGender*.2)*std::sin(2*phase)+currentBreath*.15*std::sin(2*pi*7133*t)*std::sin(2*pi*7919*t)));
    s.audio[f*2]+=value; s.audio[f*2+1]+=value; phase=std::fmod(phase+2*pi*frequency/s.rate,2*pi);
   }

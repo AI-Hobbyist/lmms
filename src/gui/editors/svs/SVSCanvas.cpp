@@ -63,7 +63,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip)
   if(horizontal||vertical) { setScroll(m_scrollTick+horizontal,m_topPitch+vertical); updateOperation(m_pointer,QApplication::keyboardModifiers()); }
  });
  connect(clip,&Clip::dataChanged,this,[this]{
-  if(m_transaction->active()&&m_clip&&(m_clip->notes()!=m_transaction->originalNotes||m_clip->curves()!=m_transaction->originalCurves)) cancelOperation();
+  if(m_transaction->active()&&m_clip&&(m_clip->notes()!=m_transaction->originalNotes||m_clip->curves()!=m_transaction->originalCurves||parameterOffset()!=m_operationOffset)) cancelOperation();
   QSet<QString> valid; if(m_clip) for(const auto& note:m_clip->notes()) if(m_selected.contains(note.id)) valid.insert(note.id);
   if(m_action==Action::None&&valid!=m_selected) { m_selected=valid; emit selectionChanged(); } update();
  });
@@ -79,6 +79,7 @@ double SVSCanvas::tickAt(double x) const { return m_scrollTick+(x-KeyboardWidth)
 double SVSCanvas::pitchAt(double y) const { return m_topPitch-(y-TimelineHeight)/m_rowHeight; }
 QPointF SVSCanvas::curvePointAt(double tick,double value) const {
  if(!m_parameter) return pointAt(tick,value)+QPointF(0,m_rowHeight*.5);
+ value=std::clamp(value+parameterOffset(),curveMinimum(),curveMaximum());
  const auto minimum=curveMinimum(),maximum=curveMaximum();
  const auto normalized=m_parameter->scale=="log"&&minimum>0?(std::log(std::max(minimum,value))-std::log(minimum))/(std::log(maximum)-std::log(minimum)):(value-minimum)/std::max(1e-12,maximum-minimum);
  return {pointAt(tick,0).x(),TimelineHeight+3+(1-normalized)*std::max(1.,double(height()-TimelineHeight-6))};
@@ -86,6 +87,10 @@ QPointF SVSCanvas::curvePointAt(double tick,double value) const {
 void SVSCanvas::setParameterLane(const svs::Parameter& parameter,bool feedback) {
  if(m_parameter&&m_feedback==feedback&&m_parameter->id==parameter.id&&m_parameter->type==parameter.type&&m_parameter->minimum==parameter.minimum&&m_parameter->maximum==parameter.maximum&&m_parameter->step==parameter.step&&m_parameter->scale==parameter.scale&&m_parameter->interpolation==parameter.interpolation&&m_parameter->choices==parameter.choices&&m_parameter->writable==parameter.writable&&m_parameter->enabled==parameter.enabled) { m_parameter=parameter; update(); return; }
  cancelOperation(); m_selectedAnchors.clear(); m_parameter=parameter; m_feedback=feedback; m_curveId=parameter.id; setObjectName("svsParameterLane."+parameter.id+(feedback?".feedback":".input")); setMinimumHeight(80); update();
+}
+double SVSCanvas::parameterOffset() const {
+ if(!m_clip||!m_parameter||m_feedback||(m_parameter->type!="float"&&m_parameter->type!="int")) return 0;
+ return m_clip->parameterBase(*m_parameter).toDouble()-m_parameter->defaultValue.toDouble();
 }
 double SVSCanvas::curveMinimum() const { return !m_parameter?0:m_parameter->type=="enum"||m_parameter->type=="bool"?0:m_parameter->minimum; }
 double SVSCanvas::curveMaximum() const { return !m_parameter?127:m_parameter->type=="enum"?std::max(0,int(m_parameter->choices.size())-1):m_parameter->type=="bool"?1:m_parameter->maximum; }
@@ -105,8 +110,8 @@ QJsonValue SVSCanvas::curveValue(double value) const {
 double SVSCanvas::curveValueAtY(double y) const {
  if(!m_parameter) return std::clamp(pitchAt(y)+.5,0.,127.);
  const auto normalized=std::clamp(1-(y-TimelineHeight-3)/std::max(1.,double(height()-TimelineHeight-6)),0.,1.);
- if(m_parameter->scale=="log"&&curveMinimum()>0) return std::exp(std::log(curveMinimum())+normalized*(std::log(curveMaximum())-std::log(curveMinimum())));
- return curveMinimum()+normalized*(curveMaximum()-curveMinimum());
+ const auto value=m_parameter->scale=="log"&&curveMinimum()>0?std::exp(std::log(curveMinimum())+normalized*(std::log(curveMaximum())-std::log(curveMinimum()))):curveMinimum()+normalized*(curveMaximum()-curveMinimum());
+ return std::clamp(value-parameterOffset(),curveMinimum(),curveMaximum());
 }
 bool SVSCanvas::curveEditable() const {
  if(!m_clip||m_feedback||(m_parameter&&!m_parameterActive)) return false;
@@ -122,6 +127,7 @@ svs::Curve SVSCanvas::parameterCurve(const svs::Parameter& parameter,bool feedba
  } else {
   const auto& curves=m_transaction->active()?m_transaction->curves:m_clip->curves();
   if(curves.contains(parameter.id)) return curves[parameter.id];
+  const auto base=parameter.type=="float"||parameter.type=="int"?parameter.defaultValue:m_clip->parameterBase(parameter);curve.insert(0,base);curve.insert(std::max(int(m_clip->length()),int(std::ceil(tickAt(width())))),base);
  }
  return curve;
 }
@@ -134,7 +140,7 @@ svs::Curve SVSCanvas::pitchCurve() const {
 void SVSCanvas::paintParameterOverlays(QPainter& painter) {
  if(!m_clip||!m_parameter) return;
  for(const auto& entry:m_parameterOverlays) {
-  const auto& parameter=entry.first; const auto curve=parameterCurve(parameter,entry.second);
+  const auto& parameter=entry.first; auto curve=parameterCurve(parameter,entry.second);if(!entry.second) curve=svs::withParameterBase(curve,parameter,m_clip->parameterBase(parameter));
   const double minimum=parameter.type=="enum"||parameter.type=="bool"?0:parameter.minimum;
   const double maximum=parameter.type=="enum"?std::max(0,int(parameter.choices.size())-1):parameter.type=="bool"?1:parameter.maximum;
   QPainterPath path; bool connected=false;
@@ -151,13 +157,13 @@ void SVSCanvas::paintParameterOverlays(QPainter& painter) {
 }
 void SVSCanvas::paintPitch(QPainter& painter) {
  if(!m_clip||(m_parameter&&!m_parameterActive)) return;
- const auto curve=pitchCurve(); QPainterPath path; bool connected=false;
+ const auto curve=pitchCurve();const auto displayed=m_parameter&&!m_feedback?svs::withParameterBase(curve,*m_parameter,m_clip->parameterBase(*m_parameter)):curve; QPainterPath path; bool connected=false;
  const double from=std::max(0.,tickAt(KeyboardWidth)),to=tickAt(width());
  // The visible interval alone determines rendering cost, independent of song length.
  for(double tick=from;tick<=to;tick+=1/m_pixelsPerTick) {
-  const auto value=curve.valueAt(tick);
+  const auto value=displayed.valueAt(tick);
   if(!value) { connected=false; continue; }
-  auto point=curvePointAt(tick,curveNumber(*value)); if(connected) path.lineTo(point); else path.moveTo(point); connected=true;
+  auto point=curvePointAt(tick,curveNumber(*value)-parameterOffset()); if(connected) path.lineTo(point); else path.moveTo(point); connected=true;
  }
  const QColor declared(m_parameter?m_parameter->color:QString{}); painter.setPen(QPen(declared.isValid()?declared:color("userPitchColor",QPalette::Highlight),2)); painter.drawPath(path);
  if(effectiveTool()==Tool::Anchor) {
@@ -294,6 +300,7 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event) {
  if(event->position().x()<KeyboardWidth) return;
  if((m_parameter||m_tool!=Tool::Notes)) {
   if(!curveEditable()) return;
+  m_operationOffset=parameterOffset();
   m_initialAnchors=m_selectedAnchors; m_initialSelection=m_selected; m_begin=event->position(); m_beginTick=tickAt(m_begin.x()); m_beginPitch=curveValueAtY(m_begin.y());
   if(effectiveTool()==Tool::Anchor) {
    const auto curve=pitchCurve(); bool hit=false;

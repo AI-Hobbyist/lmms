@@ -404,3 +404,13 @@ Release 构建与 Windows 原生完整回归通过（52 passed/0 failed/0 skippe
 PASS：分离的 SVS 钢琴窗关闭后直接回嵌同一窗口并保持可见，复用现有窗口恢复逻辑，覆盖 show/hide/detached 设置。默认侧栏仅有歌手选择，支持的 track/clip 数值基础项由引擎+声库能力动态提供；滑块/数值相对声库默认值调节，保留曲线数据并进入合成。示例引擎验证基础值与已有曲线叠加。详细属性、立绘和语言等保留在 Settings 中。
 
 Release 构建及 Windows 原生完整回归 53 passed/0 failed/0 skipped；实际窗口截图、开发版三项二进制更新和哈希核对完成，测试窗口关闭。仅修改 SVS 视图、示例引擎的必要参数组合及测试，不改普通钢琴窗/窗口框架，不使用 offscreen 或 Computer Use。见 doc/svs/SVS-global-sidebar.md。用户最终人工布局/操作验收 MANUAL/PENDING。
+
+## 22. 用户验收修正：参数同步、曲线相对联动与滚动（2026-10-05）
+
+PASS：侧栏从有效引擎声明补齐 Power、Soft、Mode 等可调项，数值实时调节让对应曲线及叠加线按相对默认值整体位移；原始曲线保持独立，继续画线/锚点反算扣除偏移，一次滑块拖动一次撤销。note 全局基础设置持久化且应用于新音符。只读结果在底部参数栏与可调输入有明确竖线/文字分界，按钮超宽可横向滚动。宿主在插件提交前组合有效值，替代第 21 节示例引擎自行叠加的实现，公开 C ABI 不变。
+
+## 23. 用户验收修正：测试用 SVS 原生插件界面（2026-10-05）
+
+PASS：轨道头像/名称按钮打开 LMMS 原生 Qt Widgets 插件设置窗口，提供说话人、头像/立绘路径及文件浏览、显隐、透明度与效果链。移除轨道行说话人选择；插件界面选择说话人后轨道名跟随其名称。图片路径和透明度保存在工程。SVSExample 的本机开发配置默认使用用户指定 avatar.png/character.png，未写入插件、SDK 或 Release 默认资源，不构成独立运行依赖。
+
+第 22/23 节 Release 编译及 Windows 原生完整回归 55 passed/0 failed/0 skipped；两张实窗截图已检查，开发版二进制更新并核对哈希，测试窗口关闭。仅修改 SVS 模块与必要测试，未修改普通钢琴窗或相邻系统，未使用 offscreen 或 Computer Use。证据及行为细节见 doc/svs/SVS-parameter-sync-and-plugin-settings.md。用户最终人工验收 MANUAL/PENDING。

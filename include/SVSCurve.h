@@ -22,6 +22,7 @@ public:
  static bool fromJson(const QJsonObject&,Curve&,QString& error,const Parameter* descriptor=nullptr);
  bool operator==(const Curve& other) const { return toJson()==other.toJson(); }
 };
+Curve withParameterBase(const Curve&,const Parameter&,const QJsonValue& base);
 using Curves=QMap<QString,Curve>;
 QJsonObject curvesToJson(const Curves&);
 Curves curvesFromJson(const QJsonObject&,QStringList* diagnostics=nullptr);

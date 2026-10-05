@@ -20,6 +20,16 @@ struct Parameter {
  bool isVisible(const QJsonObject& context) const;
 };
 
+// A single base-value lookup for the editor and the synthesis snapshot.
+inline QJsonValue parameterBase(const Parameter& p,const QJsonObject& track,const QJsonObject& clip,const QJsonObject& globals) {
+ const auto values=p.scope=="track"?track:p.scope=="clip"?clip:globals;
+ const auto value=values.value(p.id);return p.accepts(value)?value:p.defaultValue;
+}
+inline bool globalParameter(const Parameter& p) {
+ const bool numeric=p.type=="float"||p.type=="int";
+ return (p.scope=="track"||p.scope=="clip"||p.scope=="note")&&(p.curve?(numeric||p.type=="bool"||p.type=="enum"):numeric&&(p.scope=="track"||p.scope=="clip"));
+}
+
 struct Capabilities {
  QVector<Parameter> parameters, feedbackParameters;
  QStringList languages, phonemeSet;
