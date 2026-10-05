@@ -1,0 +1,23 @@
+Persisted User environment: QT_ROOT=C:\Qt\6.10.3\msvc2022_64
+Persisted User environment: QTDIR=C:\Qt\6.10.3\msvc2022_64
+Persisted User environment: Qt6_DIR=C:\Qt\6.10.3\msvc2022_64/lib/cmake/Qt6
+Persisted User environment: WINDOWS_SDK_ROOT=D:\Windows Kits\10
+Persisted User environment: WindowsSdkDir=D:\Windows Kits\10\
+Persisted User environment: WindowsSDKVersion=10.0.26100.0\
+Persisted User environment: SVSSDK_ROOT=D:\UserData\Desktop\Project\lmms\build\svs-sdk-final-install
+Persisted User environment: SVSSDK_SOURCE=D:\UserData\Desktop\Project\lmms\sdk\svs
+Persisted User environment: SVSSDK_INCLUDE_DIR=D:\UserData\Desktop\Project\lmms\build\svs-sdk-final-install/include/svs
+Persisted User environment: VCPKG_ROOT=D:\UserData\Desktop\Project\vcpkg
+Persisted User environment: CMAKE_PREFIX_PATH=C:\Qt\6.10.3\msvc2022_64;D:\UserData\Desktop\Project\lmms\build\svs-sdk-final-install
+Persisted User environment: LMMS_CMAKE_COMMAND=D:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin/cmake.exe
+Persisted User environment: LMMS_CTEST_COMMAND=D:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin/ctest.exe
+Persisted User environment: LMMS_CMAKE_GENERATOR=Visual Studio 18 2026
+Persisted User environment: LMMS_CMAKE_PLATFORM=x64
+Persisted User environment: LMMS_VSDEVCMD=D:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat
+Persisted User environment: LMMS_CMAKE_TOOLCHAIN_FILE=D:\UserData\Desktop\Project\vcpkg\scripts\buildsystems\vcpkg.cmake
+Persisted User environment: LMMS_BUILD_TOOLS_PATH=D:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Qt\6.10.3\msvc2022_64/bin;D:\Windows Kits\10/bin/10.0.26100.0/x64
+Persisted User environment: LMMS_ENV_SCRIPT=D:\UserData\Desktop\Project\lmms\buildtools\Enter-LmmsEnvironment.ps1
+User PATH extended by 3 build-tool directories; existing entries retained.
+PowerShell current-user all-hosts profile configured: D:\UserData\Documents\PowerShell\profile.ps1
+Process refreshed; cmake command resolves to: D:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
+Scope: persistent current-user environment, shared by every agent under this account. Machine scope is unchanged (not elevated).

@@ -32,6 +32,7 @@
    if ($buildExitCode -ne 0) { exit$buildExitCode }
 
 ## SDKS
+- Before Windows configure/build/test/package commands, dot-source `./buildtools/Enter-LmmsEnvironment.ps1` in that PowerShell session. It refreshes the shared persistent SDK/tool variables for agents whose parent app was already running. Use `cmake`/`ctest` from PATH and `$env:QTDIR`, `$env:SVSSDK_ROOT`, `$env:LMMS_CMAKE_TOOLCHAIN_FILE`, `$env:LMMS_CMAKE_GENERATOR`, `$env:LMMS_CMAKE_PLATFORM` instead of repeating local paths; retain the foreground logging/exit-code pipeline above.
 - **Qt6:** `C:\Qt\6.10.3`
 - **Windows SDK:** `D:\Windows Kits\10`
 - **Libjack DLLs:**

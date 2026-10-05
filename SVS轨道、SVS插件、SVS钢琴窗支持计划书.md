@@ -376,3 +376,7 @@ if ($buildExitCode -ne 0) {
 用户验收安排（2026-10-05）：M5 及最终自动回归完成后，用户先进行人工验收；TuneLab 钢琴窗布局/操作差异由用户指导修复。人工观感项按 MANUAL/PENDING 保留，不阻塞 M4/M5。实机测试按需打开开发版 LMMS/TuneLab，使用结束立即关闭，原安装版不打开。
 
 最新执行约束（2026-10-05）：计划书实施期间暂不使用 Computer Use；仅运行自动验证。M5 完成后用户人工验收，再按用户指出的钢琴窗差异修复。
+
+## 17. M5 后人工验收修正：窗口承载（2026-10-05）
+
+PASS：SVS 钢琴窗默认嵌入 LMMS 工作区，可通过现有标题栏分离，并沿用普通钢琴窗的回嵌/全局分离行为；重复打开复用编辑器，片段删除清理窗口。只修改 SVS 视图，不改普通钢琴窗或窗口框架。实际 GuiApplication/offscreen 双击入口专项通过，完整 SVS 回归 50 passed/0 failed/0 skipped；开发目录已更新。见 `doc/svs/SVS-window-integration.md`。未使用 Computer Use；后续布局和操作差异等待用户验收。

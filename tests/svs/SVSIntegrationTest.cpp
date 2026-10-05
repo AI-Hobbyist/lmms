@@ -20,6 +20,10 @@
 #include "SVSTrack.h"
 #include "SVSClip.h"
 #include "SVSViews.h"
+#include "MainWindow.h"
+#include "SubWindow.h"
+#include "GuiApplication.h"
+#include <QDialog>
 #include "SVSCanvas.h"
 #include "SVSCurve.h"
 #include "SVSResultStrip.h"
@@ -76,14 +80,59 @@ private:
 class SVSIntegrationTest : public QObject {
  Q_OBJECT
  QTemporaryDir m_configuration;
+ std::unique_ptr<gui::GuiApplication> m_guiApplication;
  static QVector<float> wavePCM(const QString& path) {
   QFile file(path);if(!file.open(QIODevice::ReadOnly)) return {};const auto bytes=file.readAll();QVector<float> samples;
   for(qint64 offset=12;offset+8<=bytes.size();) {const auto size=qFromLittleEndian<quint32>(bytes.constData()+offset+4);if(offset+8+size>bytes.size()) break;if(bytes.mid(offset,4)=="data") {for(qint64 at=offset+8;at+4<=offset+8+size;at+=4) samples.push_back(std::bit_cast<float>(qFromLittleEndian<quint32>(bytes.constData()+at)));break;}offset+=8+size+(size&1);}return samples;
  }
 private slots:
- void initTestCase() { QVERIFY(m_configuration.isValid()); ConfigManager::inst()->loadConfigFile(m_configuration.filePath("svs-test-config.xml")); Engine::init(true); bool available=false; Engine::audioEngine()->setAudioDevice(new SVSManualAudioDevice(available,Engine::audioEngine()),false); }
+ void initTestCase() {
+  QVERIFY(m_configuration.isValid());ConfigManager::inst()->loadConfigFile(m_configuration.filePath("svs-test-config.xml"));
+  if(qEnvironmentVariableIsSet("SVS_EMBEDDED_GUI_TEST")) {
+   ConfigManager::inst()->setWorkingDir(m_configuration.path()+"/");
+   ConfigManager::inst()->setValue("app","configured","1");
+   ConfigManager::inst()->setValue("audioengine","audiodev",AudioDummy::name());
+   m_guiApplication=std::make_unique<gui::GuiApplication>();
+  }else Engine::init(true);
+  bool available=false;Engine::audioEngine()->setAudioDevice(new SVSManualAudioDevice(available,Engine::audioEngine()),false);
+ }
  void init() { Engine::projectJournal()->clearJournal(); }
- void cleanupTestCase() { Engine::destroy(); }
+ void cleanupTestCase() { if(m_guiApplication) {delete static_cast<QWidget*>(m_guiApplication->mainWindow());m_guiApplication.reset();}else Engine::destroy(); }
+ void embeddedWindowLifecycle() {
+  if(!m_guiApplication) {
+   auto environment=QProcessEnvironment::systemEnvironment();environment.insert("SVS_EMBEDDED_GUI_TEST","1");
+   const auto report=m_configuration.filePath("embedded-window-child.txt");QProcess process;process.setProcessEnvironment(environment);
+   process.start(QCoreApplication::applicationFilePath(),{"embeddedWindowLifecycle","-o",report+",txt","-o","-,txt"});
+   QVERIFY(process.waitForStarted(5000));QVERIFY(process.waitForFinished(30000));QFile result(report);QVERIFY(result.open(QIODevice::ReadOnly));
+   const auto output=result.readAll()+process.readAllStandardOutput()+process.readAllStandardError();QVERIFY2(process.exitStatus()==QProcess::NormalExit&&process.exitCode()==0,output.constData());QVERIFY(output.contains("3 passed, 0 failed"));return;
+  }
+  const auto previous=ConfigManager::inst()->value("ui","detachbehavior","show");
+  auto restore=qScopeGuard([&]{ConfigManager::inst()->setValue("ui","detachbehavior",previous);});
+  ConfigManager::inst()->setValue("ui","detachbehavior","show");
+  auto* mainWindow=m_guiApplication->mainWindow();mainWindow->resize(1400,1000);mainWindow->show();
+  const auto existingWindows=mainWindow->workspace()->subWindowList().size();
+  auto* track=new SVSTrack(Engine::getSong());auto* clip=static_cast<SVSClip*>(track->createClip(TimePos(0)));
+  QTRY_VERIFY(!mainWindow->findChildren<gui::SVSClipView*>().isEmpty());auto* view=mainWindow->findChild<gui::SVSClipView*>();
+  QTest::mouseDClick(view,Qt::LeftButton);QCoreApplication::processEvents();
+  QPointer<gui::SVSPianoRoll> editor=mainWindow->workspace()->findChild<gui::SVSPianoRoll*>();QVERIFY(editor);
+  auto* frame=qobject_cast<gui::SubWindow*>(editor->parentWidget());QVERIFY(frame);
+  QPointer<gui::SubWindow> lifetime=frame;
+  QCOMPARE(frame->mdiArea(),mainWindow->workspace());QVERIFY(!editor->isWindow());QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());
+  QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);
+  auto* canvas=editor->findChild<gui::SVSCanvas*>();QVERIFY(canvas);
+  svs::Note note;note.id="embedded-note";note.tick=12;note.duration=12;note.pitch=60;clip->setNotes({note});
+  QTest::mouseClick(canvas,Qt::LeftButton,Qt::NoModifier,canvas->noteRect(note).center().toPoint());QVERIFY(canvas->selectedNotes().contains(note.id));
+  frame->detach();QCoreApplication::processEvents();
+  QVERIFY(frame->isDetached());QVERIFY(editor->isWindow());QVERIFY(editor->isVisible());
+  QTest::mouseDClick(view,Qt::LeftButton);QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);QVERIFY(frame->isDetached());
+  editor->close();QCoreApplication::processEvents();
+  QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(!editor->isWindow());
+  QCOMPARE(editor->findChild<gui::SVSCanvas*>(),canvas);QVERIFY(canvas->selectedNotes().contains(note.id));
+  frame->close();QVERIFY(!frame->isVisible());QTest::mouseDClick(view,Qt::LeftButton);QVERIFY(frame->isVisible());
+  frame->detach();delete track;
+  QTRY_VERIFY(editor.isNull());QTRY_VERIFY(lifetime.isNull());
+  QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows);
+ }
  void sdkResourcesAndServices() {
   const auto voice=svs::Registry::instance().voices().first();auto plugin=svs::Registry::instance().plugin(voice.pluginId);QString mime,error;
   for(const auto& id:QStringList{"avatar.svg","portrait.svg","avatar-lite.svg","portrait-lite.svg"}) {const auto bytes=plugin->resource(id,mime,error);QVERIFY2(error.isEmpty(),qPrintable(error));QVERIFY(bytes.contains("<svg"));QCOMPARE(mime,QString("image/svg+xml"));}

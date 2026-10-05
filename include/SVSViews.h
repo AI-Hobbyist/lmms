@@ -2,12 +2,15 @@
 #define LMMS_SVS_VIEWS_H
 #include "TrackView.h"
 #include "ClipView.h"
-#include <QDialog>
+#include <QWidget>
 #include <QPointer>
 #include <QColor>
 #include <QMap>
 namespace lmms { class SVSTrack; class SVSClip;
 namespace gui {
+class MainWindow;
+class SubWindow;
+class SVSPianoRoll;
 class SVSTrackView : public TrackView {
  Q_OBJECT
 public:
@@ -23,10 +26,12 @@ public:
 protected:
  void paintEvent(QPaintEvent*) override;
  void mouseDoubleClickEvent(QMouseEvent*) override;
-private: SVSClip* m_clip;
+private:
+ SVSClip* m_clip;
+ QPointer<SVSPianoRoll> m_editor;
 };
 class SVSCanvas;
-class SVSPianoRoll : public QDialog {
+class SVSPianoRoll : public QWidget {
  Q_OBJECT
  Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setbackgroundColor)
  Q_PROPERTY(QColor gridLineColor READ gridLineColor WRITE setgridLineColor)
@@ -43,6 +48,7 @@ class SVSPianoRoll : public QDialog {
  Q_PROPERTY(QColor errorColor READ errorColor WRITE seterrorColor)
 public:
  explicit SVSPianoRoll(SVSClip*,QWidget* parent=nullptr);
+ void openIn(MainWindow*);
  QColor backgroundColor() const { return m_colors.value(QStringLiteral("backgroundColor")); }
  void setbackgroundColor(const QColor& value) { setThemeColor(QStringLiteral("backgroundColor"),value); }
  QColor gridLineColor() const { return m_colors.value(QStringLiteral("gridLineColor")); }
@@ -75,6 +81,7 @@ private:
  void setThemeColor(const QString&,const QColor&);
  QMap<QString,QColor> m_colors;
  SVSCanvas* m_canvas=nullptr;
+ QPointer<SubWindow> m_subWindow;
  bool m_polishingTheme=false;
 };
 }

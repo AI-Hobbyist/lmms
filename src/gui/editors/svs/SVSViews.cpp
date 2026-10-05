@@ -15,6 +15,10 @@
 #include "embed.h"
 #include "Engine.h"
 #include "Song.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "SubWindow.h"
+#include <QDialog>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QComboBox>
@@ -67,13 +71,28 @@ void SVSClipView::paintEvent(QPaintEvent*) {
  for(const auto& note:m_clip->notes()) { double x=(note.tick+int(m_clip->startTimeOffset()))/int(m_clip->length())*width(); double w=note.duration/int(m_clip->length())*width(); double y=height()-5-(note.pitch-36)/60*(height()-10); p.fillRect(QRectF(x,y,std::max(1.,w),2),palette().highlight().color()); }
  p.setPen(palette().text().color()); p.drawText(3,12,m_clip->name()); p.drawText(3,height()-3,m_clip->status());
 }
-void SVSClipView::mouseDoubleClickEvent(QMouseEvent*) { auto* editor=new SVSPianoRoll(m_clip,this); editor->setAttribute(Qt::WA_DeleteOnClose); editor->show(); }
-SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QDialog(parent) {
+void SVSClipView::mouseDoubleClickEvent(QMouseEvent*) {
+ if(!getGUI()) return;
+ if(!m_editor) m_editor=new SVSPianoRoll(m_clip);
+ m_editor->openIn(getGUI()->mainWindow());
+}
+void SVSPianoRoll::openIn(MainWindow* mainWindow) {
+ if(!m_subWindow) {
+  m_subWindow=mainWindow->addWindowedWidget(this,Qt::WindowTitleHint|Qt::WindowSystemMenuHint|Qt::WindowMinMaxButtonsHint);
+  m_subWindow->resize(size()+QSize(2*m_subWindow->frameWidth(),m_subWindow->titleBarHeight()+m_subWindow->frameWidth()));
+ }
+ m_subWindow->show();
+ mainWindow->workspace()->setActiveSubWindow(m_subWindow);
+ if(m_subWindow->isDetached()) {raise();activateWindow();}
+ else m_subWindow->raise();
+}
+SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
+ setWindowIcon(embed::getIconPixmap("piano"));
  setWindowTitle(tr("SVS Piano Roll — LMMS")); resize(1100,740); auto* layout=new QVBoxLayout(this); auto* toolbar=new QHBoxLayout; layout->addLayout(toolbar);
  auto* play=new QPushButton(tr("Play"),this); toolbar->addWidget(play); connect(play,&QPushButton::clicked,Engine::getSong(),&Song::playSong);
  auto* stop=new QPushButton(tr("Stop"),this); toolbar->addWidget(stop); connect(stop,&QPushButton::clicked,Engine::getSong(),&Song::stop);
  auto* render=new QPushButton(tr("Synthesize"),this); toolbar->addWidget(render); connect(render,&QPushButton::clicked,clip,&SVSClip::synthesize);
- auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status,render]{status->setText(clip->status());render->setEnabled(!clip->readOnly());}); render->setEnabled(!clip->readOnly()); connect(clip,&QObject::destroyed,this,&QDialog::close);
+ auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status,render]{status->setText(clip->status());render->setEnabled(!clip->readOnly());}); render->setEnabled(!clip->readOnly()); connect(clip,&QObject::destroyed,this,[this]{if(m_subWindow) deleteLater();else close();});
  auto* body=new QHBoxLayout; layout->addLayout(body,1);
  auto* outerGrid=new QGridLayout; body->addLayout(outerGrid,1); auto* splitter=new QSplitter(Qt::Vertical,this); splitter->setObjectName("svsEditorAreas"); outerGrid->addWidget(splitter,0,0);
  auto* noteArea=new QWidget(splitter); auto* grid=new QGridLayout(noteArea); grid->setContentsMargins(0,0,0,0); auto* canvas=new SVSCanvas(clip,noteArea); m_canvas=canvas; canvas->setThemeColors(m_colors); grid->addWidget(canvas,0,0);
@@ -178,7 +197,7 @@ void SVSPianoRoll::setThemeColor(const QString& name,const QColor& value) {
  for(auto* strip:findChildren<SVSResultStrip*>()) strip->setThemeColors(m_colors);
 }
 void SVSPianoRoll::changeEvent(QEvent* event) {
- QDialog::changeEvent(event);
+ QWidget::changeEvent(event);
  if(event->type()==QEvent::StyleChange&&!m_polishingTheme) {
   m_polishingTheme=true;
   m_colors.clear();
