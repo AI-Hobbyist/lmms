@@ -1,0 +1,1845 @@
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\concrt140.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    MSVCP140.dll
+    VCRUNTIME140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        4000 .data
+        5000 .pdata
+       17000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       37000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\fftw3f.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        7000 .pdata
+       27000 .rdata
+        2000 .reloc
+        1000 .rsrc
+      135000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\FLAC.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    ogg.dll
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        3000 .pdata
+        C000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       2E000 .text
+        3000 _RDATA
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\icuuc.dll
+
+File Type: DLL
+
+  Summary
+
+        7000 .rdata
+        1000 .rsrc
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\libmp3lame.DLL
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+       2E000 .data
+        3000 .pdata
+       13000 .rdata
+        1000 .reloc
+        D000 .rsrc
+       3A000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\lilv-0.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    serd-0.dll
+    sord-0.dll
+    sratom-0.dll
+    zix-0.dll
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+        8000 .rdata
+        1000 .reloc
+        E000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\lmms.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Image has the following dependencies:
+
+    Qt6Widgets.dll
+    Qt6Xml.dll
+    Qt6Svg.dll
+    Qt6Gui.dll
+    Qt6Network.dll
+    Qt6Core.dll
+    SDL2.dll
+    fftw3f.dll
+    samplerate.dll
+    sndfile.dll
+    portaudio.dll
+    WINMM.dll
+    libmp3lame.DLL
+    vorbisenc.dll
+    vorbisfile.dll
+    vorbis.dll
+    ogg.dll
+    lilv-0.dll
+    bcrypt.dll
+    KERNEL32.dll
+    USER32.dll
+    GDI32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    MSVCP140_ATOMIC_WAIT.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+    SHELL32.dll
+
+  Summary
+
+      679000 .data
+       24000 .pdata
+      132000 .rdata
+        A000 .reloc
+       CA000 .rsrc
+      31A000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\mpg123.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    SHLWAPI.dll
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+       1B000 .rdata
+        1000 .reloc
+        1000 .rodata
+        1000 .rsrc
+       2F000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\msvcp140_1.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        2000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        2000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\msvcp140_2.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        3000 .data
+        3000 .pdata
+        D000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       2D000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\msvcp140_atomic_wait.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    MSVCP140.dll
+    VCRUNTIME140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    ADVAPI32.dll
+    api-ms-win-core-synch-l1-2-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        9000 .data
+        1000 .pdata
+        5000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        4000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\msvcp140_codecvt_ids.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        1000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\msvcp140.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        4000 .data
+        5000 .pdata
+       2F000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       62000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\ogg.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        4000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        4000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\opus.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        3000 .pdata
+       16000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       56000 .text
+        1000 _RDATA
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\portaudio.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    WINMM.dll
+    ole32.dll
+    SETUPAPI.dll
+    KERNEL32.dll
+    USER32.dll
+    ADVAPI32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+        7000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       1F000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Core.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    api-ms-win-core-synch-l1-2-0.dll
+    MPR.dll
+    USERENV.dll
+    ADVAPI32.dll
+    AUTHZ.dll
+    KERNEL32.dll
+    NETAPI32.dll
+    ntdll.dll
+    ole32.dll
+    SHELL32.dll
+    USER32.dll
+    VERSION.dll
+    WINMM.dll
+    WS2_32.dll
+    icuuc.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    OLEAUT32.dll
+
+  Summary
+
+       13000 .data
+       27000 .pdata
+        C000 .qtmimed
+      5AE000 .rdata
+        4000 .reloc
+        1000 .rsrc
+      3D2000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Gui.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    d3d11.dll
+    dxgi.dll
+    d3d12.dll
+    GDI32.dll
+    ole32.dll
+    SHELL32.dll
+    USER32.dll
+    UxTheme.dll
+    DWrite.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    MSVCP140_2.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+
+  Summary
+
+       31000 .data
+       5B000 .pdata
+      1F5000 .rdata
+        7000 .reloc
+        1000 .rsrc
+      69D000 .text
+        1000 _RDATA
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Network.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Core.dll
+    ADVAPI32.dll
+    DNSAPI.dll
+    IPHLPAPI.DLL
+    Secur32.dll
+    WINHTTP.dll
+    WS2_32.dll
+    KERNEL32.dll
+    ole32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+
+  Summary
+
+        A000 .data
+       12000 .pdata
+       83000 .rdata
+        3000 .reloc
+        1000 .rsrc
+      110000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Pdf.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    GDI32.dll
+    USER32.dll
+    Qt6Gui.dll
+    Qt6Network.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+
+  Image has the following delay load dependencies:
+
+    WINMM.dll
+
+  Summary
+
+       1B000 .data
+        1000 .didat
+       23000 .pdata
+      23C000 .rdata
+        4000 .reloc
+        1000 .rsrc
+      2CD000 .text
+        1000 _RDATA
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Svg.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        2000 .data
+        6000 .pdata
+       2C000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       65000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Test.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+
+  Summary
+
+        2000 .data
+        3000 .pdata
+       1A000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       3D000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Widgets.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    dwmapi.dll
+    UxTheme.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    USER32.dll
+    GDI32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+
+  Summary
+
+       17000 .data
+       3C000 .pdata
+      1E0000 .rdata
+        C000 .reloc
+        1000 .rsrc
+      406000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\Qt6Xml.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Core.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+        C000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       17000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\samplerate.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+      167000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        6000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\SDL2.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    KERNEL32.dll
+    USER32.dll
+    GDI32.dll
+    WINMM.dll
+    IMM32.dll
+    ole32.dll
+    OLEAUT32.dll
+    VERSION.dll
+    ADVAPI32.dll
+    SETUPAPI.dll
+    SHELL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+
+  Summary
+
+       1D000 .data
+       11000 .pdata
+       55000 .rdata
+        2000 .reloc
+        1000 .rsrc
+      114000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\serd-0.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        4000 .rdata
+        1000 .reloc
+        E000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\sndfile.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    vorbisenc.dll
+    FLAC.dll
+    opus.dll
+    mpg123.dll
+    libmp3lame.DLL
+    vorbis.dll
+    ogg.dll
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+
+  Summary
+
+        8000 .data
+        6000 .pdata
+       18000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       66000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\sord-0.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    zix-0.dll
+    serd-0.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        2000 .rdata
+        1000 .reloc
+        5000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\sratom-0.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    serd-0.dll
+    sord-0.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        3000 .rdata
+        1000 .reloc
+        6000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\SVSIntegrationTest.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Image has the following dependencies:
+
+    Qt6Widgets.dll
+    Qt6Xml.dll
+    Qt6Svg.dll
+    Qt6Network.dll
+    Qt6Test.dll
+    Qt6Gui.dll
+    SDL2.dll
+    fftw3f.dll
+    samplerate.dll
+    sndfile.dll
+    portaudio.dll
+    WINMM.dll
+    libmp3lame.DLL
+    vorbisenc.dll
+    vorbisfile.dll
+    vorbis.dll
+    ogg.dll
+    lilv-0.dll
+    bcrypt.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    USER32.dll
+    GDI32.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    MSVCP140_ATOMIC_WAIT.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+
+  Summary
+
+      67A000 .data
+       25000 .pdata
+      146000 .rdata
+        A000 .reloc
+        1000 .rsrc
+      375000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vccorlib140.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    KERNEL32.dll
+    VCRUNTIME140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    MSVCP140.dll
+    ole32.dll
+    OLEAUT32.dll
+    api-ms-win-core-winrt-string-l1-1-0.dll
+    api-ms-win-core-winrt-error-l1-1-0.dll
+    api-ms-win-core-winrt-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+
+  Summary
+
+        B000 .data
+        2000 .pdata
+       19000 .rdata
+        2000 .reloc
+        1000 .rsrc
+       29000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vcruntime140_1.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    VCRUNTIME140.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        4000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vcruntime140_threads.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    VCRUNTIME140.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        2000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        3000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vcruntime140.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+        6000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       1E000 .text
+        1000 _RDATA
+        1000 fothk
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vorbis.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    ogg.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+       92000 .rdata
+        2000 .reloc
+        1000 .rsrc
+       1A000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vorbisenc.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    vorbis.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+       83000 .rdata
+        2000 .reloc
+        1000 .rsrc
+        5000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\vorbisfile.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    vorbis.dll
+    ogg.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        2000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        6000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\zix-0.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        3000 .rdata
+        1000 .reloc
+        8000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\generic\qtuiotouchplugin.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Network.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        6000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        F000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\iconengines\qsvgicon.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Svg.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        4000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        9000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qgif.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        5000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qicns.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        4000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        6000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qico.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        4000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        4000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qjpeg.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        4000 .pdata
+        1000 .qtmetad
+       1D000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       69000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qpdf.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Pdf.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        4000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        3000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qsvg.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Svg.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        3000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qtga.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        3000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qtiff.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        3000 .pdata
+        1000 .qtmetad
+       2B000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       3B000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qwbmp.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        3000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\imageformats\qwebp.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        4000 .data
+        5000 .pdata
+        1000 .qtmetad
+       13000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       6E000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\networkinformation\qnetworklistmanager.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    OLEAUT32.dll
+    Qt6Network.dll
+    Qt6Core.dll
+    ole32.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        2000 .data
+        1000 .pdata
+        1000 .qtmetad
+        6000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        7000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\platforms\qoffscreen.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Gui.dll
+    Qt6Core.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        B000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        C000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\platforms\qwindows.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    ADVAPI32.dll
+    dwmapi.dll
+    GDI32.dll
+    IMM32.dll
+    ole32.dll
+    OLEAUT32.dll
+    SETUPAPI.dll
+    SHELL32.dll
+    SHLWAPI.dll
+    USER32.dll
+    WINMM.dll
+    WTSAPI32.dll
+    api-ms-win-shcore-scaling-l1-1-1.dll
+    COMDLG32.dll
+    d3d9.dll
+    api-ms-win-core-winrt-string-l1-1-0.dll
+    api-ms-win-core-winrt-l1-1-0.dll
+    UIAutomationCore.DLL
+    Qt6Gui.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    VCRUNTIME140_1.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+
+  Summary
+
+        7000 .data
+        6000 .pdata
+        1000 .qtmetad
+       49000 .rdata
+        2000 .reloc
+        1000 .rsrc
+       9C000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\plugins\Qt6Core.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    api-ms-win-core-synch-l1-2-0.dll
+    MPR.dll
+    USERENV.dll
+    ADVAPI32.dll
+    AUTHZ.dll
+    KERNEL32.dll
+    NETAPI32.dll
+    ntdll.dll
+    ole32.dll
+    SHELL32.dll
+    USER32.dll
+    VERSION.dll
+    WINMM.dll
+    WS2_32.dll
+    icuuc.dll
+    MSVCP140.dll
+    MSVCP140_1.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-environment-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-utility-l1-1-0.dll
+    api-ms-win-crt-time-l1-1-0.dll
+    api-ms-win-crt-filesystem-l1-1-0.dll
+    OLEAUT32.dll
+
+  Summary
+
+       13000 .data
+       27000 .pdata
+        C000 .qtmimed
+      5AE000 .rdata
+        4000 .reloc
+        1000 .rsrc
+      3D2000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\plugins\RemoteCatalogIo.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Image has the following dependencies:
+
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-stdio-l1-1-0.dll
+    api-ms-win-crt-locale-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        8000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        E000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\styles\qmodernwindowsstyle.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    GDI32.dll
+    USER32.dll
+    UxTheme.dll
+    Qt6Widgets.dll
+    Qt6Gui.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        F000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       23000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\svs\SVSExample\SVSExample.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    api-ms-win-crt-convert-l1-1-0.dll
+    api-ms-win-crt-math-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        2000 .pdata
+        9000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       17000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\tls\qcertonlybackend.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    Qt6Network.dll
+    Qt6Core.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+    KERNEL32.dll
+
+  Summary
+
+        1000 .data
+        1000 .pdata
+        1000 .qtmetad
+        6000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        F000 .text
+Microsoft (R) COFF/PE Dumper Version 14.51.36260.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Temp\User\lmms-svs-final-20261005\svs-lmms-clean-install\tls\qschannelbackend.dll
+
+File Type: DLL
+
+  Image has the following dependencies:
+
+    CRYPT32.dll
+    Secur32.dll
+    bcrypt.dll
+    ncrypt.dll
+    Qt6Network.dll
+    Qt6Core.dll
+    KERNEL32.dll
+    MSVCP140.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    api-ms-win-crt-string-l1-1-0.dll
+    api-ms-win-crt-runtime-l1-1-0.dll
+    api-ms-win-crt-heap-l1-1-0.dll
+
+  Summary
+
+        2000 .data
+        2000 .pdata
+        1000 .qtmetad
+        E000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       2C000 .text
+PASS native PE and import audit: 60 binaries; no CLR header, .NET or TuneLab imports.
+PASS native CLI WAV: rate=44100 channels=2 bits=32 dataBytes=23283712 sampled=90952 energy=92.4817129045352

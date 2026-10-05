@@ -1,0 +1,2 @@
+PASS voice=minimal sampleRate=32000 energy=340.795 ownership/cancel/origin
+PASS ABI 1.0 voices=1 SDK-only conformance

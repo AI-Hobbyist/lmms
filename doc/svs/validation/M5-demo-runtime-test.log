@@ -1,0 +1,26 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : SVSIntegrationTest::initTestCase()
+QDEBUG : SVSIntegrationTest::releaseDemonstrationRuntime() SVS: SVSExample engine initialized
+QWARN  : SVSIntegrationTest::releaseDemonstrationRuntime() QFontDatabase: Cannot find font directory C:/Qt/6.10.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QINFO  : SVSIntegrationTest::releaseDemonstrationRuntime() Distributed demo: edit/portrait/synthesis/playback/save/reopen/export PASS; samples= 4224000 energy= 4372.47
+PASS   : SVSIntegrationTest::releaseDemonstrationRuntime()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 10579ms
+********* Finished testing of SVSIntegrationTest *********

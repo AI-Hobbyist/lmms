@@ -1,7 +1,7 @@
 # SVS轨道 / SVS插件 / SVS钢琴窗支持计划书
 
 日期：2026-10-03  
-状态：执行中；M0→M4 已通过该阶段自动验证，M5 尚未完成。
+状态：M0→M5 已通过既定自动验收；人工布局/操作/观感验收 MANUAL/PENDING。
 目标项目：当前 LMMS 工作区；行为参考 `tl_ref`，界面融入 LMMS Qt Widgets 与主题 CSS。
 
 ## 1. 目标与交付边界
@@ -369,7 +369,7 @@ if ($buildExitCode -ne 0) {
 | M2 | PASS | 五类参数/四作用域、受约束资源 ID、Schema 校验、控件 ID/焦点保留、多选三态、只读回显、条件显隐、异步声明重查及持久化已接通；三语言字典/候选/覆盖优先级/诊断及插件解析已验证。完整→精简→完整声库切换保留输入，缺失能力拒绝编辑，Gain 实际 PCM 能量按比例变化。Release 编译及 6 个 QtTest 槽通过；证据 `doc/svs/M2-capabilities.md`、`doc/svs/validation/M2-build.log`、`M2-test.log`、`M2-QtTest.txt`。音符/音素选择和候选菜单等完整交互在 M3 接入，听感验收 MANUAL/PENDING 不阻塞。 |
 | M3 | PASS | 独立编辑器及工具切换、连续音高/参数曲线、歌词/读音/延音链、音素/波形条、异步头像/立绘、持久化与主题回退完成；实际插件输入及 PCM、相对音高显式基准转换、单次撤销与操作门禁通过。Release 编译及 21 个 QtTest 槽通过；100%/150%/200% offscreen 主题/立绘检查通过。证据 `doc/svs/M3-editor-progress.md`、`doc/svs/validation/M3-final-build.log`、`M3-final-test.log`、`M3-final-QtTest.txt`。真实系统 IME、桌面主题/DPI 观感 MANUAL/PENDING，不阻塞 M4。 |
 | M4 | PASS | 调度/真实取消及并发预算、旧结果门禁、有界缓存/缺插件有效缓存、tempo 自动化快照/时间映射、播放循环/跳转、迁移与未知数据、复制/切片、导出等待/定位失败/显式忽略/取消、连续分轨冻结快照及运行中混音/tempo/删除轨道中止清理通过。Release 主程序/示例/集成测试和 A3/MCP 入口构建通过；完整 QtTest 44 passed / 0 failed / 0 skipped，SVS CTest 连续五次通过，A3/MCP 两项通过。证据 `doc/svs/M4-lifecycle-progress.md`、`doc/svs/validation/M4-final-entry-build.log`、`M4-final-callback-test.log`、`M4-final-callback-QtTest.txt`、`M4-final-entry-test.log`。初次单次超时及有界复验实情记录于实施记录；人工项 MANUAL/PENDING，不阻塞 M5。 |
-| M5 | PENDING | SDK 外部构建、演示工程、最终回归与独立性验证待执行 |
+| M5 | PASS | 公开 C/C++ SDK 1.1 可选尾部、最小 C11/完整 C++ 示例、文档/工具、独立安装与最终源码 ZIP 完成。无 tl_ref 干净 LMMS 构建通过；最终 SVS 49 passed/0 failed/0 skipped，A3/MCP 三个入口全部通过。演示冷缓存预览 p95=3.1433ms、GUI最长4.3868ms，预算/缓存未越界。最终原生验证 ZIP 工作区外解压后实际编辑/立绘/合成/播放/保存重开/导出专项通过，主程序 CLI WAV 有效；60个二进制无 CLR/.NET/TuneLab 导入。见 `doc/svs/M5-release-progress.md`、`doc/svs/M5-performance.md`。人工桌面/IME/听感/TuneLab差异及物理无.NET目标机 MANUAL/PENDING。 |
 
 参考图已读取，实际布局按“布局和功能.png”、视觉按“配色和风格.png”及 LMMS 主题。已有 Song/VST 未提交修改保留，不纳入 SVS 里程碑提交。
 

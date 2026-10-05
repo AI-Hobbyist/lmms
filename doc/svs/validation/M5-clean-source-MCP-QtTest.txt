@@ -1,0 +1,8 @@
+********* Start testing of McpExportLifecycleTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : McpExportLifecycleTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : McpExportLifecycleTest::initTestCase()
+PASS   : McpExportLifecycleTest::cancelsOwnedRenderButPreservesLocalRender()
+PASS   : McpExportLifecycleTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 742ms
+********* Finished testing of McpExportLifecycleTest *********

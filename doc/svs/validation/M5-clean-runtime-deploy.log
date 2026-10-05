@@ -1,0 +1,80 @@
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/SDL2.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/fftw3f.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/samplerate.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/sndfile.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/portaudio.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/libmp3lame.DLL
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/vorbisenc.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/vorbisfile.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/vorbis.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/ogg.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/lilv-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/FLAC.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/opus.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/mpg123.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/serd-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/sord-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/sratom-0.dll
+Adding local dependencyD:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/zix-0.dll
+D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-install\lmms.exe 64 bit, release executable
+Adding in plugin type generic for module: Qt6Gui
+Adding in plugin type iconengines for module: Qt6Gui
+Adding in plugin type imageformats for module: Qt6Gui
+Adding Qt6Pdf for qpdf.dll from plugin type: imageformats
+Adding in plugin type networkinformation for module: Qt6Network
+Adding in plugin type platforminputcontexts for module: Qt6Gui
+Skipping plugin qtvirtualkeyboardplugin.dll due to disabled dependencies (Qt6Qml Qt6Quick).
+Adding in plugin type platforms for module: Qt6Gui
+Adding in plugin type styles for module: Qt6Widgets
+Adding in plugin type tls for module: Qt6Network
+Skipping plugin qopensslbackend.dll. Use -force-openssl or specify -openssl-root if you want to use it.
+Performing additional pass of finding Qt plugins due to updated Qt module list: Qt6Core Qt6Gui Qt6Network Qt6Pdf Qt6Svg Qt6Test Qt6Widgets Qt6Xml
+Adding in plugin type generic for module: Qt6Gui
+Adding in plugin type iconengines for module: Qt6Gui
+Adding in plugin type imageformats for module: Qt6Gui
+Adding in plugin type networkinformation for module: Qt6Network
+Adding in plugin type platforminputcontexts for module: Qt6Gui
+Warning: Cannot find any version of the dxcompiler.dll and dxil.dll.
+Warning: Cannot find Visual Studio installation directory, VCINSTALLDIR is not set.
+Skipping plugin qtvirtualkeyboardplugin.dll due to disabled dependencies (Qt6Qml Qt6Quick).
+Adding in plugin type platforms for module: Qt6Gui
+Adding in plugin type styles for module: Qt6Widgets
+Adding in plugin type tls for module: Qt6Network
+Skipping plugin qopensslbackend.dll. Use -force-openssl or specify -openssl-root if you want to use it.
+Direct dependencies: Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6Test Qt6Widgets Qt6Xml
+All dependencies   : Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6Test Qt6Widgets Qt6Xml
+To be deployed     : Qt6Core Qt6Gui Qt6Network Qt6Pdf Qt6Svg Qt6Test Qt6Widgets Qt6Xml
+Updating icuuc.dll.
+Updating Qt6Core.dll.
+Updating Qt6Gui.dll.
+Updating Qt6Network.dll.
+Updating Qt6Pdf.dll.
+Updating Qt6Svg.dll.
+Updating Qt6Test.dll.
+Updating Qt6Widgets.dll.
+Updating Qt6Xml.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/generic.
+Updating qtuiotouchplugin.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/iconengines.
+Updating qsvgicon.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/imageformats.
+Updating qgif.dll.
+Updating qicns.dll.
+Updating qico.dll.
+Updating qjpeg.dll.
+Updating qpdf.dll.
+Updating qsvg.dll.
+Updating qtga.dll.
+Updating qtiff.dll.
+Updating qwbmp.dll.
+Updating qwebp.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/networkinformation.
+Updating qnetworklistmanager.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/platforms.
+Updating qwindows.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/styles.
+Updating qmodernwindowsstyle.dll.
+Creating directory D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-install/tls.
+Updating qcertonlybackend.dll.
+Updating qschannelbackend.dll.
+Native SVS validation distribution deployed (main, runtime, data, SVSExample, SDK, QtTest helper).

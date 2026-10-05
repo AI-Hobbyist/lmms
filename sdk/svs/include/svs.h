@@ -18,11 +18,32 @@
 extern "C" {
 #endif
 #define SVS_ABI_MAJOR 1u
-#define SVS_ABI_MINOR 0u
+#define SVS_ABI_MINOR 1u
 typedef void* svs_engine;
 typedef void* svs_session;
+typedef void* svs_resource;
 typedef int32_t svs_status;
 enum { SVS_OK=0, SVS_BAD_ABI=1, SVS_INVALID_INPUT=2, SVS_CANCELLED=3, SVS_FAILED=4, SVS_UNSUPPORTED=5 };
+/* Feature bits describe optional ABI functions, not a voice's editable capabilities. */
+#define SVS_FEATURE_PRONUNCIATION UINT64_C(1)
+#define SVS_FEATURE_RESOURCES UINT64_C(2)
+#define SVS_FEATURE_RANGES UINT64_C(4)
+#define SVS_FEATURE_HOST_BUFFERS UINT64_C(8)
+typedef struct svs_buffer {
+    uint32_t size;
+    void* data;
+    uint64_t byte_count;
+    void* owner;
+} svs_buffer;
+enum { SVS_BUFFER_RESOURCE=0, SVS_BUFFER_AUDIO=1 };
+/* Descriptor strings remain valid until close_resource; SHA-256 is lowercase hex. */
+typedef struct svs_resource_info {
+    uint32_t size;
+    const char* id;
+    const char* content_type;
+    uint64_t byte_count;
+    const char* sha256;
+} svs_resource_info;
 typedef struct svs_note {
     uint32_t size;
     const char* id;
@@ -61,6 +82,11 @@ typedef struct svs_host {
     void (SVS_CALL *log)(void*, int32_t, const char*);
     /* Completion delivery must enqueue; never call GUI from a worker. */
     void (SVS_CALL *progress)(void*, uint64_t, double, const char*);
+    /* Optional 1.1 tail. Buffers must return to this host's release_buffer. */
+    svs_status (SVS_CALL *allocate_buffer)(void*, uint32_t kind, uint64_t bytes, svs_buffer*);
+    void (SVS_CALL *release_buffer)(void*, svs_buffer*);
+    /* Host copies the UTF-8 diagnostic and enqueues delivery before returning. */
+    void (SVS_CALL *completed)(void*, uint64_t request_id, svs_status, const char* diagnostic_json);
 } svs_host;
 typedef struct svs_api {
     uint32_t size, major, minor;
@@ -80,7 +106,15 @@ typedef struct svs_api {
     void (SVS_CALL *release_result)(svs_session, svs_result*);
     /* Optional tail: UTF-8 JSON request/result. Returned text uses release_string. */
     svs_status (SVS_CALL *pronunciation)(svs_engine, const char* voice_id, const char* request_json, const char** result_json);
+    /* Resource IDs come from the catalog/manifest; these functions never accept paths. */
+    svs_status (SVS_CALL *open_resource)(svs_engine, const char* id, svs_resource*, svs_resource_info*);
+    svs_status (SVS_CALL *read_resource)(svs_engine, svs_resource, uint64_t offset, void* destination, uint64_t capacity, uint64_t* bytes_read);
+    void (SVS_CALL *close_resource)(svs_engine, svs_resource);
+    /* Plugin-owned UTF-8 JSON: {"ranges":[{"id":"...","startTick":0,"endTick":48}]}. */
+    svs_status (SVS_CALL *query_ranges)(svs_session, const char** result_json);
 } svs_api;
+/* Check the complete field before inspecting an optional pointer or host service. */
+#define SVS_HAS_FIELD(value, type, field) ((value).size >= offsetof(type, field) + sizeof((value).field))
 /* Required prefix excludes optional tail functions. */
 #define SVS_API_REQUIRED_SIZE ((uint32_t)offsetof(svs_api, pronunciation))
 typedef svs_status (SVS_CALL *svs_get_api_fn)(uint32_t, uint32_t, uint32_t, svs_api*);

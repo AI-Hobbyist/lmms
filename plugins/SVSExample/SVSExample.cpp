@@ -18,8 +18,12 @@
 #include <thread>
 namespace {
 std::string decimal(double value) { std::ostringstream stream; stream.imbue(std::locale::classic()); stream<<std::setprecision(17)<<value; return stream.str(); }
-struct Note { double start, duration, pitch, power=1; bool soft=false; std::string lyric, id; example::Json phonemes; bool continuation=false; double phraseStart=0,phraseEnd=0,tick=0,durationTicks=0; };
-struct Session { std::vector<Note> notes; std::vector<float> audio; example::Json input; std::map<std::string,svs_sdk::Curve> curves; std::string voice,feedback; uint32_t rate=48000; double duration=0,secondsPerTick=0,originTick=0;svs_sdk::TempoMap tempo; std::atomic<bool> cancelled{false}; };
+struct Note { double start, duration, pitch, power=1; bool soft=false; std::string lyric, id; example::Json phonemes; bool continuation=false; double phraseStart=0,phraseEnd=0,tick=0,durationTicks=0; std::string label; };
+struct Engine { svs_host host{}; };
+struct Session { std::vector<Note> notes; std::vector<float> audio; example::Json input; std::map<std::string,svs_sdk::Curve> curves; std::string voice,feedback,clipId,error; uint32_t rate=48000; double duration=0,secondsPerTick=0,originTick=0;svs_sdk::TempoMap tempo; std::atomic<bool> cancelled{false}; svs_host host{};svs_buffer buffer{};uint64_t request=0;
+ void releaseBuffer() {if(buffer.data&&host.release_buffer) host.release_buffer(host.context,&buffer);buffer={};}
+ ~Session() {releaseBuffer();}
+};
 double localSeconds(const Session& s,double tick) {return s.tempo.empty()?tick*s.secondsPerTick:s.tempo.secondsAt(s.originTick+tick)-s.tempo.secondsAt(s.originTick);}
 double localTick(const Session& s,double seconds) {return s.tempo.empty()?seconds/s.secondsPerTick:s.tempo.tickAt(s.tempo.secondsAt(s.originTick)+seconds)-s.originTick;}
 double segmentBegin(const Session& s,const Note& note,const example::Json& segment) {return localSeconds(s,note.tick+segment["startTick"].numeric(0));}
@@ -79,10 +83,10 @@ double effectivePitch(const Session& session,double tick,double fallback) {
 }
 svs_status ownedString(const char* value,const char** out) { if(!out||!value) return SVS_INVALID_INPUT; const auto size=std::strlen(value)+1; auto* text=new(std::nothrow) char[size]; if(!text) return SVS_FAILED; std::memcpy(text,value,size); *out=text; return SVS_OK; }
 svs_status ownedString(const std::string& value,const char** out) { return ownedString(value.c_str(),out); }
-svs_status SVS_CALL create(const svs_host*, svs_engine* e) { if(!e) return SVS_INVALID_INPUT; *e=new(std::nothrow) int(0); return *e?SVS_OK:SVS_FAILED; }
-void SVS_CALL destroy(svs_engine e) { delete static_cast<int*>(e); }
+svs_status SVS_CALL create(const svs_host* host, svs_engine* e) { if(!e) return SVS_INVALID_INPUT;auto* engine=new(std::nothrow) Engine;if(!engine) return SVS_FAILED;if(host&&host->size>=offsetof(svs_host,allocate_buffer)) {std::memcpy(&engine->host,host,std::min(size_t(host->size),sizeof(svs_host)));if(!SVS_HAS_FIELD(engine->host,svs_host,allocate_buffer)) engine->host.allocate_buffer=nullptr;if(!SVS_HAS_FIELD(engine->host,svs_host,release_buffer)) engine->host.release_buffer=nullptr;if(!SVS_HAS_FIELD(engine->host,svs_host,completed)) engine->host.completed=nullptr;}*e=engine;if(engine->host.log) engine->host.log(engine->host.context,0,"SVSExample engine initialized");return SVS_OK; }
+void SVS_CALL destroy(svs_engine e) { delete static_cast<Engine*>(e); }
 svs_status SVS_CALL catalog(svs_engine, const char** s) {
- return ownedString(R"({"voices":[{"id":"full","name":"SVS Example","description":"Deterministic multilingual SDK demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["zh","ja","en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar.svg","portrait":"portrait.svg","range":[36,84]},{"id":"minimal","name":"SVS Example Lite","description":"Restricted capability demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar.svg","portrait":"portrait.svg"}]})",s);
+ return ownedString(R"({"voices":[{"id":"full","name":"SVS Example","description":"Deterministic multilingual SDK demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["zh","ja","en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar.svg","portrait":"portrait.svg","range":[36,84]},{"id":"minimal","name":"SVS Example Lite","description":"Restricted capability demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar-lite.svg","portrait":"portrait-lite.svg"}]})",s);
 }
 svs_status SVS_CALL capabilities(svs_engine,const char* voice,const char*,const char** s) { if(!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT; return ownedString(std::strcmp(voice,"full")==0?fullSchema:minimalSchema,s); }
 void SVS_CALL releaseString(svs_engine,const char* text) { delete[] text; }
@@ -96,12 +100,12 @@ svs_status SVS_CALL pronunciation(svs_engine,const char* voice,const char* reque
   json+="],\"diagnostic\":"+example::quote(valid?"":"Unknown text; original retained")+"}"; return ownedString(json,out);
  } catch(...) { return SVS_INVALID_INPUT; }
 }
-svs_status SVS_CALL createSession(svs_engine,const char* voice,svs_session* s) { if(!s||!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT; try { auto session=std::make_unique<Session>(); session->voice=voice; *s=session.release(); return SVS_OK; } catch(...) { return SVS_FAILED; } }
+svs_status SVS_CALL createSession(svs_engine engine,const char* voice,svs_session* s) { if(!engine||!s||!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT; try { auto session=std::make_unique<Session>(); session->voice=voice;session->host=static_cast<Engine*>(engine)->host; *s=session.release(); return SVS_OK; } catch(...) { return SVS_FAILED; } }
 void SVS_CALL destroySession(svs_session s) { delete static_cast<Session*>(s); }
 svs_status SVS_CALL submit(svs_session handle,const svs_snapshot* in) {
  if(!handle||!in||in->size<sizeof(svs_snapshot)||in->sample_rate<8000||in->sample_rate>192000||in->note_count>100000||!std::isfinite(in->duration_seconds)||in->duration_seconds<0||in->duration_seconds>600||(in->note_count&&!in->notes)) return SVS_INVALID_INPUT;
- auto& s=*static_cast<Session*>(handle); s.notes.clear(); s.rate=in->sample_rate; s.duration=in->duration_seconds; s.cancelled=false;
- try { s.input=example::Reader(in->input_json).read(); for(uint32_t i=0;i<in->note_count;++i) { const auto& n=in->notes[i]; if(n.size<sizeof(svs_note)||!std::isfinite(n.start_seconds)||!std::isfinite(n.duration_seconds)||!std::isfinite(n.tick)||!std::isfinite(n.duration_tick)||!std::isfinite(n.pitch)||n.duration_seconds<=0||n.duration_seconds>600||n.duration_tick<=0||std::abs(n.start_seconds)>600||n.pitch<0||n.pitch>127) return SVS_INVALID_INPUT; auto params=example::Reader(n.parameters_json).read(); s.notes.push_back({n.start_seconds,n.duration_seconds,n.pitch,std::clamp(params["example.power"].numeric(100),0.,200.)/100,params["example.soft"].boolean,n.lyric?n.lyric:"",n.id?n.id:"",example::Reader(n.phonemes_json).read()});s.notes.back().tick=n.tick;s.notes.back().durationTicks=n.duration_tick; } } catch(...) { return SVS_FAILED; }
+ auto& s=*static_cast<Session*>(handle);if(!in->voice_id||s.voice!=in->voice_id) return SVS_INVALID_INPUT;s.releaseBuffer();s.clipId=in->clip_id?in->clip_id:"";s.request=in->request_id;s.error.clear(); s.notes.clear(); s.rate=in->sample_rate; s.duration=in->duration_seconds; s.cancelled=false;
+ try { s.input=example::Reader(in->input_json).read(); for(uint32_t i=0;i<in->note_count;++i) { const auto& n=in->notes[i]; if(n.size<sizeof(svs_note)||!std::isfinite(n.start_seconds)||!std::isfinite(n.duration_seconds)||!std::isfinite(n.tick)||!std::isfinite(n.duration_tick)||!std::isfinite(n.pitch)||n.duration_seconds<=0||n.duration_seconds>600||n.duration_tick<=0||std::abs(n.start_seconds)>600||n.pitch<0||n.pitch>127) return SVS_INVALID_INPUT; auto params=example::Reader(n.parameters_json).read(); s.notes.push_back({n.start_seconds,n.duration_seconds,n.pitch,std::clamp(params["example.power"].numeric(100),0.,200.)/100,params["example.soft"].boolean,n.lyric?n.lyric:"",n.id?n.id:"",example::Reader(n.phonemes_json).read()});s.notes.back().tick=n.tick;s.notes.back().durationTicks=n.duration_tick;s.notes.back().label=params["example.label"].text(); } } catch(...) { return SVS_FAILED; }
  try {
   if(!readCurves(s)) return SVS_INVALID_INPUT;
   const auto phonemeSchema=example::Reader(fullSchema).read();
@@ -123,7 +127,7 @@ svs_status SVS_CALL submit(svs_session handle,const svs_snapshot* in) {
  for(size_t i=s.notes.size();i>1;--i) if(s.notes[i-1].continuation) s.notes[i-2].phraseEnd=s.notes[i-1].phraseEnd;
  return SVS_OK;
 }
-svs_status SVS_CALL render(svs_session handle,svs_result* out) {
+svs_status renderImpl(svs_session handle,svs_result* out) {
  if(!handle||!out||out->size<sizeof(svs_result)) return SVS_INVALID_INPUT;
  auto& s=*static_cast<Session*>(handle);
  try {
@@ -138,7 +142,8 @@ svs_status SVS_CALL render(svs_session handle,svs_result* out) {
  const double tension=full?std::clamp(parameters["example.tension"].numeric(.25),0.,1.):.25;
  const double breath=full?std::clamp(parameters["example.breath"].numeric(.1),0.,1.):0;
  const double gender=full?std::clamp(parameters["example.gender"].numeric(0),-1.,1.):0;
- double phase=0; for(const auto& n:s.notes) {
+ double phase=0;size_t completedNotes=0; for(const auto& n:s.notes) {
+  if(s.host.progress) s.host.progress(s.host.context,s.request,double(completedNotes++)/std::max(size_t(1),s.notes.size()),"Synthesis");
   if(!n.continuation) phase=0;
   const auto& segments=n.phonemes["segments"].array;
   const double start=full&&!segments.empty()?std::min(n.start,segmentBegin(s,n,segments.front())):n.start;
@@ -161,9 +166,11 @@ svs_status SVS_CALL render(svs_session handle,svs_result* out) {
    s.audio[f*2]+=value; s.audio[f*2+1]+=value; phase=std::fmod(phase+2*pi*frequency/s.rate,2*pi);
   }
  }
- std::string pitch="[",phonemes="["; bool firstPitch=true,firstPhoneme=true;
+ std::string pitch="[",phonemes="[",labels="["; bool firstPitch=true,firstPhoneme=true,firstLabel=true;
  for(const auto& note:s.notes) {
   if(full) {
+   if(!firstLabel) labels+=','; firstLabel=false;
+   labels+="{\"noteId\":"+example::quote(note.id)+",\"value\":"+example::quote(note.label)+"}";
    const double step=s.secondsPerTick>0?4*s.secondsPerTick:note.duration;
    for(double seconds=note.start;seconds<note.start+note.duration;seconds+=step) {
     if(!firstPitch) pitch+=','; firstPitch=false;
@@ -180,17 +187,36 @@ svs_status SVS_CALL render(svs_session handle,svs_result* out) {
   for(size_t i=0;i<symbols.size();++i) { if(!firstPhoneme) phonemes+=','; firstPhoneme=false; phonemes+="{\"noteId\":"+example::quote(note.id)+",\"symbol\":"+example::quote(symbols[i].text())+",\"startSeconds\":"+decimal(note.start+double(i)*note.duration/symbols.size())+",\"durationSeconds\":"+decimal(note.duration/symbols.size())+"}"; }
  }
  double energy=0; for(float value:s.audio) energy+=value*value;
- s.feedback="{\"pitch\":"+pitch+"],\"phonemes\":"+phonemes+"],\"parameters\":"+(full?"{\"example.energy\":"+decimal(energy)+"}":"{}")+"}";
+ s.feedback="{\"pitch\":"+pitch+"],\"phonemes\":"+phonemes+"],\"labels\":"+labels+"],\"parameters\":"+(full?"{\"example.energy\":"+decimal(energy)+"}":"{}")+"}";
  const double globalOrigin=s.tempo.empty()?s.originTick*s.secondsPerTick:s.tempo.secondsAt(s.originTick);
- *out={sizeof(svs_result),s.rate,2,static_cast<uint64_t>(s.audio.size()/2),globalOrigin+audioStart,s.audio.data(),s.feedback.c_str(),"{}",nullptr}; return SVS_OK;
+ const float* audio=s.audio.data();
+ if(!s.audio.empty()&&s.host.allocate_buffer&&s.host.release_buffer) {s.buffer.size=sizeof(svs_buffer);if(s.host.allocate_buffer(s.host.context,SVS_BUFFER_AUDIO,uint64_t(s.audio.size())*sizeof(float),&s.buffer)!=SVS_OK||!s.buffer.data||s.buffer.byte_count<uint64_t(s.audio.size())*sizeof(float)) {s.releaseBuffer();return SVS_FAILED;}std::memcpy(s.buffer.data,s.audio.data(),s.audio.size()*sizeof(float));audio=static_cast<const float*>(s.buffer.data);}
+ *out={sizeof(svs_result),s.rate,2,static_cast<uint64_t>(s.audio.size()/2),globalOrigin+audioStart,audio,s.feedback.c_str(),"{}",nullptr}; return SVS_OK;
  } catch(...) { return SVS_FAILED; }
 }
 void SVS_CALL cancel(svs_session h) { if(h) static_cast<Session*>(h)->cancelled=true; }
-void SVS_CALL releaseResult(svs_session,svs_result*) {}
+svs_status SVS_CALL render(svs_session handle,svs_result* out) {
+ const auto status=renderImpl(handle,out);if(!handle) return status;auto& session=*static_cast<Session*>(handle);
+ if(status!=SVS_OK) {try {session.error="{\"code\":"+std::to_string(status)+",\"message\":"+example::quote(status==SVS_CANCELLED?"Cancelled":"SVSExample synthesis failed")+",\"clipId\":"+example::quote(session.clipId)+",\"requestId\":"+std::to_string(session.request)+"}";if(out&&out->size>=sizeof(svs_result)) out->error_json=session.error.c_str();} catch(...) {return SVS_FAILED;}}
+ if(session.host.progress&&status==SVS_OK) session.host.progress(session.host.context,session.request,1.,"Ready");
+ if(session.host.completed) session.host.completed(session.host.context,session.request,status,status==SVS_OK?"{}":session.error.c_str());return status;
+}
+void SVS_CALL releaseResult(svs_session handle,svs_result* result) {if(handle) static_cast<Session*>(handle)->releaseBuffer();if(result) *result={sizeof(svs_result)};}
+struct Resource {const char* id;const char* bytes;const char* hash;};
+svs_status SVS_CALL openResource(svs_engine engine,const char* id,svs_resource* out,svs_resource_info* info) {
+ if(!engine||!id||!out||!info||info->size<sizeof(svs_resource_info)) return SVS_INVALID_INPUT;
+ static const Resource resources[]={{"avatar.svg",avatarResource,avatarHash},{"portrait.svg",portraitResource,portraitHash},{"avatar-lite.svg",liteAvatarResource,liteAvatarHash},{"portrait-lite.svg",litePortraitResource,litePortraitHash}};
+ for(const auto& resource:resources) if(!std::strcmp(id,resource.id)) {auto* handle=new(std::nothrow) Resource(resource);if(!handle) return SVS_FAILED;*out=handle;*info={sizeof(svs_resource_info),resource.id,"image/svg+xml",uint64_t(std::strlen(resource.bytes)),resource.hash};return SVS_OK;}*out=nullptr;return SVS_UNSUPPORTED;
+}
+svs_status SVS_CALL readResource(svs_engine engine,svs_resource handle,uint64_t offset,void* destination,uint64_t capacity,uint64_t* read) {
+ if(!engine||!handle||!read||(!destination&&capacity)) return SVS_INVALID_INPUT;const auto& resource=*static_cast<Resource*>(handle);const auto size=uint64_t(std::strlen(resource.bytes));if(offset>size) return SVS_INVALID_INPUT;*read=std::min(capacity,size-offset);if(*read) std::memcpy(destination,resource.bytes+offset,size_t(*read));return SVS_OK;
+}
+void SVS_CALL closeResource(svs_engine,svs_resource handle) {delete static_cast<Resource*>(handle);}
+svs_status SVS_CALL queryRanges(svs_session handle,const char** out) {if(!handle) return SVS_INVALID_INPUT;try {const auto& session=*static_cast<Session*>(handle);double begin=0,end=session.secondsPerTick>0?localTick(session,session.duration):0;for(const auto& note:session.notes) {begin=std::min(begin,note.tick);end=std::max(end,note.tick+note.durationTicks);}return ownedString("{\"ranges\":[{\"id\":\"clip\",\"startTick\":"+decimal(begin)+",\"endTick\":"+decimal(end)+"}]}",out);}catch(...) {return SVS_FAILED;}}
 }
 extern "C" SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major,uint32_t,uint32_t size,svs_api* out) {
  if(major!=SVS_ABI_MAJOR||!out||size<SVS_API_REQUIRED_SIZE) return SVS_BAD_ABI;
  const auto copied=std::min(size,uint32_t(sizeof(svs_api)));
- const svs_api api{copied,SVS_ABI_MAJOR,SVS_ABI_MINOR,0,create,destroy,catalog,capabilities,releaseString,createSession,destroySession,submit,render,cancel,releaseResult,pronunciation};
+ const svs_api api{copied,SVS_ABI_MAJOR,SVS_ABI_MINOR,SVS_FEATURE_PRONUNCIATION|SVS_FEATURE_RESOURCES|SVS_FEATURE_RANGES|SVS_FEATURE_HOST_BUFFERS,create,destroy,catalog,capabilities,releaseString,createSession,destroySession,submit,render,cancel,releaseResult,pronunciation,openResource,readResource,closeResource,queryRanges};
  std::memcpy(out,&api,copied); return SVS_OK;
 }

@@ -1,2 +1,10 @@
 static const char fullSchema[] = R"svs_schema(@SVS_FULL_SCHEMA@)svs_schema";
 static const char minimalSchema[] = R"svs_schema(@SVS_MINIMAL_SCHEMA@)svs_schema";
+static const char avatarResource[] = R"svs_svg(@SVS_avatar@)svs_svg";
+static const char portraitResource[] = R"svs_svg(@SVS_portrait@)svs_svg";
+static const char liteAvatarResource[] = R"svs_svg(@SVS_avatar_lite@)svs_svg";
+static const char litePortraitResource[] = R"svs_svg(@SVS_portrait_lite@)svs_svg";
+static const char avatarHash[] = "@SVS_avatar_HASH@";
+static const char portraitHash[] = "@SVS_portrait_HASH@";
+static const char liteAvatarHash[] = "@SVS_avatar_lite_HASH@";
+static const char litePortraitHash[] = "@SVS_portrait_lite_HASH@";

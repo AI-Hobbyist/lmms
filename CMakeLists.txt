@@ -852,6 +852,7 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
+ADD_SUBDIRECTORY(sdk/svs)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
@@ -882,7 +883,7 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf "${TMP}"
 			COMMAND mkdir -p "${TMP}"
 			COMMAND cp CMakeLists.txt LICENSE.txt INSTALL.txt README.md "${TMP}"
-			COMMAND cp -r buildtools cmake data doc include plugins src "${TMP}"
+			COMMAND cp -r buildtools cmake data doc include plugins sdk src "${TMP}"
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")

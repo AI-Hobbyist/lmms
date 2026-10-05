@@ -1,0 +1,1 @@
+{"id":"org.lmms.svs.minimal.c","version":"0.1.0","category":"Singing Voice Synthesis","apiMajor":1,"apiMinor":0,"platform":"@SVS_PLATFORM@","architecture":"@SVS_ARCHITECTURE@","entry":"SVSMinimal@CMAKE_SHARED_MODULE_SUFFIX@","author":"LMMS SVS contributors","resources":[]}

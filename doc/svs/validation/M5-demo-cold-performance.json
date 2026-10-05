@@ -1,0 +1,14 @@
+{
+    "budget": 2,
+    "coldCache": true,
+    "dataset": "4 tracks x 16 clips x 64 notes; one 4096-anchor curve",
+    "diskCacheBytes": 92447844,
+    "guiLongestBlockMs": 4.3868,
+    "memoryCacheBytes": 95258928,
+    "peakActive": 1,
+    "previewP95Ms": 3.1433,
+    "previewSamples": 120,
+    "samplesDuringSynthesis": 120,
+    "scope": "Deterministic example and native host only; not a real model benchmark",
+    "synthesisAndInteractionMs": 4355
+}

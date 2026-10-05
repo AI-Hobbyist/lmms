@@ -1,0 +1,482 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/3rdparty/CMakeLists.txt
+  ringbuffer.cpp
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/3rdparty/weakjack/CMakeLists.txt
+  weak_libjack.c
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/core/svs/CMakeLists.txt
+  SVSPlugin.cpp
+  SVSCapabilities.cpp
+  SVSCurve.cpp
+  SVSWaveform.cpp
+  SVSCache.cpp
+  SVSExportSnapshot.cpp
+  SVSTempoSnapshot.cpp
+  SVSTempoSource.cpp
+  SVSSynthesisScheduler.cpp
+  SVSClip.cpp
+  SVSTrack.cpp
+  SVSViews.cpp
+  SVSParameterPanel.cpp
+  SVSCanvas.cpp
+  SVSLyricEditor.cpp
+  SVSImageLoader.cpp
+  SVSResultStrip.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/AudioAlsa.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/AudioAlsaSetupWidget.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/AudioPulseAudio.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/AudioSndio.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/MidiAlsaRaw.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/MidiAlsaSeq.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/MidiApple.h: note: No relevant classes found. No output generated.
+  AutoMoc: D:/Temp/User/lmms-svs-clean-source-20261005/include/MidiSndio.h: note: No relevant classes found. No output generated.
+  Generating qrc_scripts.cpp
+  Generating lmms.qrc
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  Generating qrc_lmms.cpp
+  AudioBuffer.cpp
+  AudioBusHandle.cpp
+  AudioEngine.cpp
+  AudioEngineProfiler.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\AudioEngineProfiler.cpp(74,19): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+  AudioEngineWorkerThread.cpp
+  AudioResampler.cpp
+  AutomatableModel.cpp
+  AutomationClip.cpp
+  AutomationNode.cpp
+  BandLimitedWave.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\BandLimitedWave.cpp(85,16): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\BandLimitedWave.cpp(127,16): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\BandLimitedWave.cpp(168,16): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\BandLimitedWave.cpp(211,17): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+  base64.cpp
+  BufferManager.cpp
+  Clipboard.cpp
+  ComboBoxModel.cpp
+  ConfigManager.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\ConfigManager.cpp(762,18): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+  Controller.cpp
+  ControllerConnection.cpp
+  DataFile.cpp
+  DrumSynth.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\DrumSynth.cpp(201,8): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+  Effect.cpp
+  正在生成代码...
+  正在编译...
+  EffectChain.cpp
+  Engine.cpp
+  EnvelopeAndLfoParameters.cpp
+  fft_helpers.cpp
+  Mixer.cpp
+  ImportFilter.cpp
+  InlineAutomation.cpp
+  Instrument.cpp
+  InstrumentFunctions.cpp
+  InstrumentPlayHandle.cpp
+  InstrumentSoundShaping.cpp
+  JournallingObject.cpp
+  Keymap.cpp
+  Ladspa2LMMS.cpp
+  LadspaControl.cpp
+  LadspaManager.cpp
+  LfoController.cpp
+  LinkedModelGroups.cpp
+  LocklessAllocator.cpp
+  MeterModel.cpp
+  正在生成代码...
+  正在编译...
+  Metronome.cpp
+  MicroTimer.cpp
+  Microtuner.cpp
+  MixHelpers.cpp
+  Model.cpp
+  ModelVisitor.cpp
+  Note.cpp
+  NotePlayHandle.cpp
+  Oscillator.cpp
+  PathUtil.cpp
+  PatternClip.cpp
+  PatternStore.cpp
+  PeakController.cpp
+  PerfLog.cpp
+  Piano.cpp
+  PlayHandle.cpp
+  Plugin.cpp
+  PluginIssue.cpp
+  PluginFactory.cpp
+  PresetPreviewPlayHandle.cpp
+  正在生成代码...
+  正在编译...
+  ProjectJournal.cpp
+  ProjectRenderer.cpp
+  ProjectVersion.cpp
+  RemotePlugin.cpp
+  RenderManager.cpp
+  RingBuffer.cpp
+  Sample.cpp
+  SampleBuffer.cpp
+  SampleClip.cpp
+  SampleDecoder.cpp
+  SamplePlayHandle.cpp
+  SampleRecordHandle.cpp
+  Scale.cpp
+  LmmsSemaphore.cpp
+  SerializingObject.cpp
+  Song.cpp
+  TempoSyncKnobModel.cpp
+  ThreadPool.cpp
+  Timeline.cpp
+  TimePos.cpp
+  正在生成代码...
+  正在编译...
+  ToolPlugin.cpp
+  Track.cpp
+  TrackContainer.cpp
+  UpgradeExtendedNoteRange.cpp
+  Clip.cpp
+  ValueBuffer.cpp
+  VstSyncController.cpp
+  StepRecorder.cpp
+  AudioAlsa.cpp
+  AudioDevice.cpp
+  AudioFileDevice.cpp
+  AudioFileMP3.cpp
+  AudioFileOgg.cpp
+  AudioFileFlac.cpp
+  AudioFileWave.cpp
+  AudioJack.cpp
+  AudioSndio.cpp
+  AudioPortAudio.cpp
+  AudioPulseAudio.cpp
+  AudioSampleRecorder.cpp
+  正在生成代码...
+  正在编译...
+  AudioSdl.cpp
+  Lv2Basics.cpp
+  Lv2ControlBase.cpp
+  Lv2Evbuf.cpp
+  Lv2Features.cpp
+  Lv2Ports.cpp
+  Lv2Proc.cpp
+  Lv2Manager.cpp
+  Lv2Options.cpp
+  Lv2SubPluginFeatures.cpp
+  Lv2UridCache.cpp
+  Lv2UridMap.cpp
+  Lv2Worker.cpp
+  MidiAlsaRaw.cpp
+  MidiAlsaSeq.cpp
+  MidiClient.cpp
+  MidiController.cpp
+  MidiEventToByteSeq.cpp
+  MidiJack.cpp
+  MidiSndio.cpp
+  正在生成代码...
+  正在编译...
+  MidiApple.cpp
+  MidiPort.cpp
+  MidiWinMM.cpp
+  ActionGroup.cpp
+  AudioAlsaSetupWidget.cpp
+  AudioDeviceSetupWidget.cpp
+  AutomatableModelView.cpp
+  ControlLayout.cpp
+  ControllerDialog.cpp
+  ControllerRackView.cpp
+  ControllerView.cpp
+  Controls.cpp
+  EffectControlDialog.cpp
+  EffectRackView.cpp
+  EffectView.cpp
+  embed.cpp
+  FileBrowser.cpp
+  FileRevealer.cpp
+  FileSearchJob.cpp
+  GuiApplication.cpp
+  正在生成代码...
+  正在编译...
+  LadspaControlView.cpp
+  LfoControllerDialog.cpp
+  LinkedModelGroupViews.cpp
+  LmmsPalette.cpp
+  LmmsStyle.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\gui\LmmsStyle.cpp(140,11): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+D:\Temp\User\lmms-svs-clean-source-20261005\src\gui\LmmsStyle.cpp(149,14): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.vcxproj]
+  Lv2ViewBase.cpp
+  MainApplication.cpp
+  MainWindow.cpp
+  MicrotunerConfig.cpp
+  MidiCCRackView.cpp
+  MidiSetupWidget.cpp
+  MixerChannelView.cpp
+  MixerView.cpp
+  ModelView.cpp
+  PeakControllerDialog.cpp
+  PluginBrowser.cpp
+  ProjectNotes.cpp
+  RowTableView.cpp
+  SampleTrackWindow.cpp
+  SampleThumbnail.cpp
+  正在生成代码...
+  正在编译...
+  SendButtonIndicator.cpp
+  SideBar.cpp
+  SideBarWidget.cpp
+  StringPairDrag.cpp
+  SubWindow.cpp
+  ToolPluginView.cpp
+  AutomationClipView.cpp
+  ClipView.cpp
+  MidiClipView.cpp
+  PatternClipView.cpp
+  SampleClipView.cpp
+  AutomationEditor.cpp
+  Editor.cpp
+  PatternEditor.cpp
+  PianoRoll.cpp
+  PositionLine.cpp
+  Rubberband.cpp
+  SongEditor.cpp
+  StepRecorderWidget.cpp
+  TimeLineWidget.cpp
+  正在生成代码...
+  正在编译...
+  TrackContainerView.cpp
+  EnvelopeAndLfoView.cpp
+  EnvelopeGraph.cpp
+  InstrumentFunctionViews.cpp
+  InstrumentMidiIOView.cpp
+  InstrumentTuningView.cpp
+  InstrumentSoundShapingView.cpp
+  InstrumentTrackWindow.cpp
+  InstrumentView.cpp
+  LfoGraph.cpp
+  PianoView.cpp
+  MidiPortMenu.cpp
+  RecentProjectsMenu.cpp
+  TemplatesMenu.cpp
+  AboutDialog.cpp
+  ColorChooser.cpp
+  ControllerConnectionDialog.cpp
+  EffectSelectDialog.cpp
+  ExportProjectDialog.cpp
+  FileDialog.cpp
+  正在生成代码...
+  正在编译...
+  RenameDialog.cpp
+  SetupDialog.cpp
+  VersionedSaveDialog.cpp
+  AutomationTrackView.cpp
+  FadeButton.cpp
+  InstrumentTrackView.cpp
+  PatternTrackView.cpp
+  SampleTrackView.cpp
+  TrackContentWidget.cpp
+  TrackLabelButton.cpp
+  TrackOperationsWidget.cpp
+  TrackRenameLineEdit.cpp
+  TrackGrip.cpp
+  TrackView.cpp
+  AutomatableButton.cpp
+  AutomatableSlider.cpp
+  BarModelEditor.cpp
+  CPULoadWidget.cpp
+  CaptionMenu.cpp
+  ComboBox.cpp
+  正在生成代码...
+  正在编译...
+  Draggable.cpp
+  Fader.cpp
+  FloatModelEditorBase.cpp
+  Graph.cpp
+  GroupBox.cpp
+  Knob.cpp
+  LcdFloatSpinBox.cpp
+  LcdSpinBox.cpp
+  LcdWidget.cpp
+  LedCheckBox.cpp
+  LeftRightNav.cpp
+  MeterDialog.cpp
+  MixerChannelLcdSpinBox.cpp
+  NStateButton.cpp
+  Oscilloscope.cpp
+  PeakIndicator.cpp
+  PixmapButton.cpp
+  SimpleTextFloat.cpp
+  TabBar.cpp
+  TabWidget.cpp
+  正在生成代码...
+  正在编译...
+  TempoSyncBarModelEditor.cpp
+  TempoSyncKnob.cpp
+  TextFloat.cpp
+  TimeDisplayWidget.cpp
+  ToolButton.cpp
+  AutomationTrack.cpp
+  InstrumentTrack.cpp
+  MidiClip.cpp
+  PatternTrack.cpp
+  SampleTrack.cpp
+  HttpMcpServer.cpp
+  McpProtocol.cpp
+  CommandBus.cpp
+  CommandSchema.cpp
+  CoreCommands.cpp
+  ExportCommands.cpp
+  ToolRegistry.cpp
+  ScriptExpression.cpp
+  ProjectSnapshot.cpp
+  ScriptRunner.cpp
+  正在生成代码...
+  正在编译...
+  HighLevelCommands.cpp
+  qrc_scripts.cpp
+  RemotePluginBase.cpp
+  SharedMemory.cpp
+  SystemSemaphore.cpp
+  PluginCatalog.cpp
+  CatalogJobs.cpp
+  CatalogIo.cpp
+  qrc_lmms.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  RemoteCatalogIo.cpp
+  CatalogFilesystem.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  main.cpp
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\main.cpp(449,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmms.vcxproj]
+D:\Temp\User\lmms-svs-clean-source-20261005\src\core\main.cpp(465,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmms.vcxproj]
+  mocs_compilation_Release.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\lmms.exe
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\SDL2.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\SDL2.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\fftw3f.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\fftw3f.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\samplerate.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\samplerate.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sndfile.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\sndfile.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbisenc.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\vorbisenc.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbis.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\vorbis.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\ogg.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\ogg.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\FLAC.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\FLAC.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\opus.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\opus.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\mpg123.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\mpg123.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\libmp3lame.DLL -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\libmp3lame.DLL done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\portaudio.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\portaudio.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbisfile.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\vorbisfile.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\lilv-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\lilv-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\serd-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\serd-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sord-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\sord-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\zix-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\zix-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sratom-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\Release\sratom-0.dll done
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+  Automatic MOC and UIC for target SVSExample
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/3rdparty/CMakeLists.txt
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/plugins/SVSExample/CMakeLists.txt
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  SVSExample.cpp
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_scripts.cpp
+  Generating lmms.qrc
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  Generating qrc_lmms.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+  qrc_lmms.cpp
+  qrc_scripts.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/SVSExample/Release/SVSExample.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/SVSExample/Release/SVSExample.exp
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\svs\SVSExample\SVSExample.dll
+  Automatic MOC for target SVSIntegrationTest
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/tests/CMakeLists.txt
+  SVSIntegrationTest.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\SVSIntegrationTest.exe
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\SDL2.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\SDL2.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\fftw3f.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\fftw3f.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\samplerate.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\samplerate.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sndfile.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\sndfile.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbisenc.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\vorbisenc.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbis.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\vorbis.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\ogg.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\ogg.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\FLAC.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\FLAC.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\opus.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\opus.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\mpg123.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\mpg123.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\libmp3lame.DLL -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\libmp3lame.DLL done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\portaudio.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\portaudio.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\vorbisfile.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\vorbisfile.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\lilv-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\lilv-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\serd-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\serd-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sord-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\sord-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\zix-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\zix-0.dll done
+  D:\UserData\Desktop\Project\lmms\build\vcpkg_installed\x64-windows\bin\sratom-0.dll -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\sratom-0.dll done
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/3rdparty/CMakeLists.txt
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_scripts.cpp
+  Generating lmms.qrc
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  Generating qrc_lmms.cpp
+  qrc_lmms.cpp
+  qrc_scripts.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target A3CommandsTest
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/tests/CMakeLists.txt
+  A3CommandsTest.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/A3CommandsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/A3CommandsTest.exp
+  A3CommandsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\A3CommandsTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/3rdparty/CMakeLists.txt
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_scripts.cpp
+  Generating lmms.qrc
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/src/CMakeLists.txt
+  Generating qrc_lmms.cpp
+  qrc_lmms.cpp
+  qrc_scripts.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target McpExportLifecycleTest
+  Building Custom Rule D:/Temp/User/lmms-svs-clean-source-20261005/tests/CMakeLists.txt
+  McpExportLifecycleTest.cpp
+  mocs_compilation_Release.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/McpExportLifecycleTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-lmms-clean-build/tests/Release/McpExportLifecycleTest.exp
+  McpExportLifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-lmms-clean-build\tests\Release\McpExportLifecycleTest.exe

@@ -1,0 +1,7 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/build/svs-sdk-install/share/svs-sdk/tools/CMakeLists.txt
+  SVSConformance.cpp
+  SVSConformance.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-consumer-tools\Release\SVSConformance.exe
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/build/svs-sdk-install/share/svs-sdk/tools/CMakeLists.txt
