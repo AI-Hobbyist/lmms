@@ -1,5 +1,6 @@
 #include "SVSModel.h"
 #include "SVSCapabilities.h"
+#include "SVSCurve.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -63,19 +64,26 @@ std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error) {
  for(const auto& n:input.notes) { strings.push_back({n.id.toUtf8(),n.lyric.toUtf8(),n.language.toUtf8(),n.pronunciation.toUtf8(),QJsonDocument(n.phonemes).toJson(QJsonDocument::Compact),QJsonDocument(n.parameters).toJson(QJsonDocument::Compact)}); auto& s=strings.back(); notes.push_back({sizeof(svs_note),s.id.constData(),n.tick,n.duration,n.tick*input.secondsPerTick,n.duration*input.secondsPerTick,n.pitch,s.lyric.constData(),s.language.constData(),s.pronunciation.constData(),s.phonemes.constData(),s.parameters.constData()}); }
  auto document=input.document; Capabilities cap;
  if(!Capabilities::parse(document["capabilities"].toObject(),cap,error)) { d.api.destroy_session(session); return {}; }
+ if(cap.pitchInput=="offset") {
+  auto curves=document["curves"].toObject(); Curve reference; if(!Curve::fromJson(cap.original["pitch"].toObject()["referencePitch"].toObject(),reference,error)) {d.api.destroy_session(session);return {};}
+  if(curves.contains("svs.pitch")) {Curve absolute,offset; if(!Curve::fromJson(curves["svs.pitch"].toObject(),absolute,error)||!absolutePitchToOffset(absolute,reference,offset,error)) {d.api.destroy_session(session);return {};} curves["svs.pitch"]=offset.toJson();}
+  curves["svs.referencePitch"]=reference.toJson(); document["curves"]=curves;
+ }
  QVector<Dictionary> voiceDictionaries,projectDictionaries;
  for(const auto& item:document["voiceDictionaries"].toArray()) { auto value=item.toObject(); Dictionary dictionary; dictionary.id=value["id"].toString(); dictionary.version=value["version"].toString(); dictionary.hash=value["hash"].toString(); dictionary.language=value["language"].toString(); dictionary.phonemeSet=value["phonemeSet"].toString(); dictionary.entries=value["entries"].toObject(); voiceDictionaries.push_back(dictionary); }
  QJsonArray dictionaryDiagnostics;
  for(const auto& item:document["projectDictionaries"].toArray()) { Dictionary dictionary; QString diagnostic; if(Dictionary::parse(QJsonDocument(item.toObject()).toJson(QJsonDocument::Compact),cap.phonemeSet,dictionary,diagnostic)&&dictionary.phonemeSet==cap.phonemeSetId&&cap.languages.contains(dictionary.language)) projectDictionaries.push_back(dictionary); else dictionaryDiagnostics.append(QJsonObject{{"dictionaryId",item.toObject()["id"]},{"message",diagnostic.isEmpty()?QString("Dictionary language/phoneme set incompatible with voice"):diagnostic}}); }
  QVector<Note> ordered=input.notes; std::stable_sort(ordered.begin(),ordered.end(),[](const Note& a,const Note& b){return a.tick<b.tick;});
- QJsonObject pronunciations;
+ QJsonObject pronunciations; Pronunciation previousResult;
  for(int i=0;i<ordered.size();++i) {
-  const auto& note=ordered[i]; auto resolved=resolvePronunciation(note,cap,voiceDictionaries,projectDictionaries,document["language"].toString(cap.defaultLanguage),i?&ordered[i-1]:nullptr); auto value=resolved.toJson();
+  const auto& note=ordered[i]; auto resolved=resolvePronunciation(note,cap,voiceDictionaries,projectDictionaries,document["language"].toString(cap.defaultLanguage),i?&ordered[i-1]:nullptr,i?&previousResult:nullptr); auto value=resolved.toJson();
   if(!resolved.generated&&resolved.source!="continuation"&&!note.phonemes.contains("symbols")&&cap.languages.contains(note.language.isEmpty()?document["language"].toString():note.language)&&d.api.pronunciation) {
    auto request=QJsonDocument(QJsonObject{{"lyric",note.lyric},{"pronunciation",note.pronunciation},{"language",note.language.isEmpty()?document["language"].toString():note.language}}).toJson(QJsonDocument::Compact); const char* text=nullptr;
    if(d.api.pronunciation(d.engine,voice.constData(),request.constData(),&text)==SVS_OK&&text) { auto parsed=QJsonDocument::fromJson(text).object(); d.api.release_string(d.engine,text); if(!parsed.isEmpty()) { value=parsed; if(!note.pronunciation.isEmpty()) value["source"]="manualPronunciation"; } }
   }
+  if(!value.contains("phonemeSet")) value["phonemeSet"]=cap.phonemeSetId;
   pronunciations[note.id]=value;
+  previousResult=resolved; previousResult.generated=value["generated"].toBool(); previousResult.continuation=value["continuation"].toBool(); previousResult.text=value["text"].toString(); previousResult.diagnostic=value["diagnostic"].toString(); previousResult.phonemes.clear(); for(const auto& symbol:value["phonemes"].toArray()) previousResult.phonemes<<symbol.toString();
  }
  document["pronunciations"]=pronunciations;
  auto id=input.clipId.toUtf8(); auto json=QJsonDocument(document).toJson(QJsonDocument::Compact);
@@ -86,6 +94,7 @@ std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error) {
  if(status==SVS_OK&&result.size>=sizeof(result)&&result.channels==2&&result.sample_rate>=8000&&result.sample_rate<=192000&&result.frame_count<=16*1024*1024&&(!result.frame_count||result.audio)) {
   audio=std::make_shared<Audio>(); audio->rate=result.sample_rate; audio->revision=input.revision; if(result.frame_count) audio->samples.assign(result.audio,result.audio+result.frame_count*2); audio->feedback=QJsonDocument::fromJson(result.feedback_json?result.feedback_json:"{}").object(); audio->feedback["pronunciations"]=pronunciations; audio->feedback["dictionaryDiagnostics"]=dictionaryDiagnostics;
   for(float sample:audio->samples) if(!std::isfinite(sample)) { error="Non-finite SVS audio"; audio.reset(); break; }
+  if(audio) audio->waveform.build(audio->samples);
  } else error=QString("SVS synthesis failed (%1)").arg(status);
  d.api.release_result(session,&result); d.api.destroy_session(session); return audio;
 }

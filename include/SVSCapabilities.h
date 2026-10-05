@@ -51,7 +51,8 @@ public:
 };
 
 Pronunciation resolvePronunciation(const Note&, const Capabilities&, const QVector<Dictionary>& voice,
- const QVector<Dictionary>& project, const QString& language, const Note* previous = nullptr);
+ const QVector<Dictionary>& project, const QString& language, const Note* previous = nullptr,
+ const Pronunciation* previousResult = nullptr);
 
 }
 #endif

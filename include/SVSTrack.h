@@ -35,6 +35,8 @@ public:
  bool setParameter(const QString&, const QJsonValue&);
  bool setLanguage(const QString&);
  void refreshCapabilities(const QJsonObject& context = {});
+ const QJsonObject& portraitSettings() const { return m_portraitSettings; }
+ void setPortraitSettings(const QJsonObject&);
 private:
  FloatModel m_volume,m_pan;
  IntModel m_mix;
@@ -45,6 +47,7 @@ private:
  svs::Capabilities m_capabilities;
  QVector<svs::Dictionary> m_dictionaries;
  QJsonObject m_parameters;
+ QJsonObject m_portraitSettings;
  QString m_language;
  QStringList m_capabilityDiagnostics;
  uint64_t m_capabilityRequest=0;

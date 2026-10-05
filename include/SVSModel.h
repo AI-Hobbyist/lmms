@@ -8,15 +8,17 @@
 #include <memory>
 #include <vector>
 #include "svs.h"
+#include "SVSWaveform.h"
 namespace lmms::svs {
 struct Note {
  QString id, lyric="la", language, pronunciation;
  double tick=0, duration=48, pitch=60;
  QJsonObject parameters;
  QJsonObject phonemes;
+ bool operator==(const Note&) const = default;
 };
 struct Voice { QString pluginId,id,name,version,language,defaultLyric,avatar,portrait,package; QJsonObject metadata; };
-struct Audio { std::vector<float> samples; uint32_t rate=48000; uint64_t revision=0; QJsonObject feedback; };
+struct Audio { std::vector<float> samples; Waveform waveform; uint32_t rate=48000; uint64_t revision=0; QJsonObject feedback; };
 struct Input { QString clipId,voiceId; uint64_t generation=0,revision=0,request=0; QVector<Note> notes; double secondsPerTick=0,duration=0; uint32_t rate=48000; QJsonObject document; };
 class Plugin {
 public:

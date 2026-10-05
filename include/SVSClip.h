@@ -2,6 +2,7 @@
 #define LMMS_SVS_CLIP_H
 #include "Clip.h"
 #include "SVSModel.h"
+#include "SVSCurve.h"
 #include <atomic>
 #include <QPointer>
 #include <QDomElement>
@@ -19,6 +20,10 @@ public:
  void loadSettings(const QDomElement&) override;
  void setNotes(const QVector<svs::Note>&);
  const QVector<svs::Note>& notes() const { return m_notes; }
+ const svs::Curves& curves() const { return m_curves; }
+ void setEditorData(const QVector<svs::Note>&,const svs::Curves&);
+ const QJsonObject& editorState() const { return m_editorState; }
+ void setEditorState(const QJsonObject&);
  void synthesize();
  void invalidate();
  std::shared_ptr<const svs::Audio> audio() const;
@@ -32,6 +37,8 @@ public:
 private:
  QString m_id,m_status="Dirty";
  QVector<svs::Note> m_notes;
+ svs::Curves m_curves;
+ QJsonObject m_editorState;
  QJsonObject m_parameters;
  QJsonArray m_projectDictionaryData;
  QDomElement m_original;

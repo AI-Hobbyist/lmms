@@ -1,0 +1,13 @@
+JO-ID 8414437 already in use by svsclip!
+JO-ID 8402316 already in use by svstrack!
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : SVSIntegrationTest::initTestCase()
+QWARN  : SVSIntegrationTest::canvasThemeProperties() QFontDatabase: Cannot find font directory C:/Qt/6.10.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+PASS   : SVSIntegrationTest::canvasThemeProperties()
+PASS   : SVSIntegrationTest::portraitResourcesAndPreferences()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted, 598ms
+********* Finished testing of SVSIntegrationTest *********

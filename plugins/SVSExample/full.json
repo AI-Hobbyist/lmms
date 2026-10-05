@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "languages": ["zh", "ja", "en"], "defaultLanguage": "en", "noteLanguage": true,
  "parameters": [
-  {"id":"example.mode","name":"Mode","group":"Voice","order":0,"scope":"track","type":"enum","default":"basic","choices":[{"id":"basic","name":"Basic"},{"id":"advanced","name":"Advanced"}]},
+  {"id":"example.mode","name":"Mode","group":"Voice","order":0,"scope":"track","type":"enum","default":"basic","curve":true,"interpolation":"step","choices":[{"id":"basic","name":"Basic"},{"id":"advanced","name":"Advanced"}]},
   {"id":"example.gain","name":"Gain","group":"Voice","order":1,"scope":"track","type":"float","default":1,"min":0.01,"max":2,"step":0.01,"scale":"log","unit":"ratio"},
   {"id":"example.breath","name":"Breath","group":"Expression","order":2,"scope":"clip","type":"float","default":0.1,"min":0,"max":1,"step":0.01,"curve":true,"interpolation":"hermite","visibleWhen":{"example.mode":"advanced"}},
   {"id":"example.tension","name":"Tension","group":"Expression","order":3,"scope":"clip","type":"float","default":0.25,"min":0,"max":1,"step":0.01,"curve":true,"interpolation":"linear"},

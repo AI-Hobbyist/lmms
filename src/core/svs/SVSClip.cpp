@@ -21,7 +21,20 @@ SVSClip::SVSClip(Track* track):Clip(track),m_id(QUuid::createUuid().toString(QUu
 SVSClip::~SVSClip() { ++m_revision; ++m_generation; }
 void SVSClip::invalidate() { ++m_revision; std::atomic_store(&m_audio,std::shared_ptr<const svs::Audio>{}); m_status="Dirty"; emit dataChanged(); }
 std::shared_ptr<const svs::Audio> SVSClip::audio() const { auto result=std::atomic_load(&m_audio); return result&&result->revision==m_revision.load()?result:nullptr; }
-void SVSClip::setNotes(const QVector<svs::Note>& notes) { addJournalCheckPoint(); m_notes=notes; static_cast<SVSTrack*>(getTrack())->refreshCapabilities({{"clipParameters",m_parameters},{"noteCount",notes.size()}}); invalidate(); synthesize(); Engine::getSong()->setModified(); }
+void SVSClip::setNotes(const QVector<svs::Note>& notes) { setEditorData(notes,m_curves); }
+void SVSClip::setEditorData(const QVector<svs::Note>& notes,const svs::Curves& curves) {
+ if(notes==m_notes&&curves==m_curves) return;
+ addJournalCheckPoint(); m_notes=notes; m_curves=curves;
+ if(getAutoResize()) {
+  double end=TimePos::ticksPerBar();
+  for(const auto& note:notes) end=std::max(end,note.tick+note.duration+int(startTimeOffset()));
+  const auto bars=std::ceil(end/TimePos::ticksPerBar());
+  changeLength(TimePos(int(bars)*TimePos::ticksPerBar()));
+ }
+ static_cast<SVSTrack*>(getTrack())->refreshCapabilities({{"clipParameters",m_parameters},{"noteCount",notes.size()}});
+ invalidate(); synthesize(); Engine::getSong()->setModified();
+}
+void SVSClip::setEditorState(const QJsonObject& state) { if(state!=m_editorState) { m_editorState=state; Engine::getSong()->setModified(); } }
 bool SVSClip::setParameter(const QString& id,const QJsonValue& value) {
  const auto* descriptor=static_cast<SVSTrack*>(getTrack())->capabilities().parameter(id,"clip");
  if(!descriptor||!descriptor->writable||!descriptor->enabled||!descriptor->accepts(value)) return false;
@@ -55,6 +68,7 @@ void SVSClip::synthesize() {
  for(const auto& note:m_notes) input.duration=std::max(input.duration,(note.tick+note.duration)*input.secondsPerTick);
  input.document={{"clipId",m_id},{"voiceId",track->voiceId()},{"pluginId",track->pluginId()},{"position",int(startPosition())},{"contentOffset",-int(startTimeOffset())},{"tempo",Engine::getSong()->getTempo()}};
  input.document["trackParameters"]=track->parameters(); input.document["clipParameters"]=m_parameters;
+ input.document["curves"]=svs::curvesToJson(m_curves); input.document["secondsPerTick"]=input.secondsPerTick;
  input.document["language"]=track->language(); input.document["capabilities"]=track->capabilities().original;
  input.document["projectDictionaries"]=m_projectDictionaryData;
  QJsonArray dictionaries; for(const auto& dictionary:track->dictionaries()) dictionaries.append(QJsonObject{{"id",dictionary.id},{"version",dictionary.version},{"hash",dictionary.hash},{"language",dictionary.language},{"phonemeSet",dictionary.phonemeSet},{"entries",dictionary.entries}});
@@ -75,12 +89,14 @@ void SVSClip::saveSettings(QDomDocument& doc,QDomElement& node) {
  if(!m_original.isNull()) { auto attrs=m_original.attributes(); for(int i=0;i<attrs.count();++i) node.setAttribute(attrs.item(i).nodeName(),attrs.item(i).nodeValue()); for(auto child=m_original.firstChild();!child.isNull();child=child.nextSibling()) if(child.nodeName()!="notes") node.appendChild(doc.importNode(child,true)); }
  node.setAttribute("schemaVersion",1); node.setAttribute("id",m_id); node.setAttribute("pos",node.parentNode().nodeName()=="clipboard"?-1:int(startPosition())); node.setAttribute("len",int(length())); node.setAttribute("off",int(startTimeOffset())); node.setAttribute("muted",isMuted()); node.setAttribute("name",name()); node.setAttribute("autoresize",getAutoResize()); if(color()) node.setAttribute("color",color()->name());
  node.setAttribute("parameters",QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact))); node.setAttribute("projectDictionaries",QString::fromUtf8(QJsonDocument(m_projectDictionaryData).toJson(QJsonDocument::Compact)));
+ node.setAttribute("curves",QString::fromUtf8(QJsonDocument(svs::curvesToJson(m_curves)).toJson(QJsonDocument::Compact))); node.setAttribute("editorState",QString::fromUtf8(QJsonDocument(m_editorState).toJson(QJsonDocument::Compact)));
  auto notes=doc.createElement("notes"); node.appendChild(notes);
  for(const auto& n:m_notes) { auto note=doc.createElement("note"); notes.appendChild(note); note.setAttribute("id",n.id); note.setAttribute("tick",QString::number(n.tick,'g',17)); note.setAttribute("duration",QString::number(n.duration,'g',17)); note.setAttribute("pitch",QString::number(n.pitch,'g',17)); note.setAttribute("lyric",n.lyric); note.setAttribute("language",n.language); note.setAttribute("pronunciation",n.pronunciation); note.setAttribute("parameters",QString::fromUtf8(QJsonDocument(n.parameters).toJson(QJsonDocument::Compact))); note.setAttribute("phonemes",QString::fromUtf8(QJsonDocument(n.phonemes).toJson(QJsonDocument::Compact))); }
 }
 void SVSClip::loadSettings(const QDomElement& node) {
  m_original=node.cloneNode(true).toElement(); m_notes.clear(); m_id=node.attribute("id",m_id); if(node.attribute("pos").toInt()>=0) movePosition(node.attribute("pos").toInt()); changeLength(std::max(1,node.attribute("len").toInt())); setStartTimeOffset(node.attribute("off").toInt()); setMuted(node.attribute("muted").toInt()); setName(node.attribute("name","SVS")); setAutoResize(node.attribute("autoresize","1").toInt()); if(node.hasAttribute("color")) setColor(QColor(node.attribute("color")));
  m_parameters=QJsonDocument::fromJson(node.attribute("parameters").toUtf8()).object(); m_projectDictionaryData=QJsonDocument::fromJson(node.attribute("projectDictionaries").toUtf8()).array();
+ m_curves=svs::curvesFromJson(QJsonDocument::fromJson(node.attribute("curves").toUtf8()).object()); m_editorState=QJsonDocument::fromJson(node.attribute("editorState").toUtf8()).object();
  for(auto n=node.firstChildElement("notes").firstChildElement("note");!n.isNull();n=n.nextSiblingElement("note")) { svs::Note note; note.id=n.attribute("id",QUuid::createUuid().toString(QUuid::WithoutBraces)); note.tick=n.attribute("tick").toDouble(); note.duration=n.attribute("duration","48").toDouble(); note.pitch=n.attribute("pitch","60").toDouble(); note.lyric=n.attribute("lyric","la"); note.language=n.attribute("language"); note.pronunciation=n.attribute("pronunciation"); note.parameters=QJsonDocument::fromJson(n.attribute("parameters").toUtf8()).object(); note.phonemes=QJsonDocument::fromJson(n.attribute("phonemes").toUtf8()).object(); m_notes.push_back(note); }
  ++m_generation; invalidate(); QTimer::singleShot(0,this,&SVSClip::synthesize);
 }

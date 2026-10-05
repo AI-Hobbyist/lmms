@@ -1,6 +1,9 @@
 # Independent native SVS module; no TuneLab/.NET/reference-source dependencies.
-add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSClip.cpp ../../tracks/SVSTrack.cpp ../../gui/editors/svs/SVSViews.cpp ../../gui/editors/svs/SVSParameterPanel.cpp
-  "${CMAKE_SOURCE_DIR}/include/SVSClip.h" "${CMAKE_SOURCE_DIR}/include/SVSTrack.h" "${CMAKE_SOURCE_DIR}/include/SVSViews.h")
+add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWaveform.cpp SVSClip.cpp ../../tracks/SVSTrack.cpp ../../gui/editors/svs/SVSViews.cpp ../../gui/editors/svs/SVSParameterPanel.cpp ../../gui/editors/svs/SVSCanvas.cpp
+  ../../gui/editors/svs/SVSLyricEditor.cpp
+  ../../gui/editors/svs/SVSImageLoader.cpp
+  ../../gui/editors/svs/SVSResultStrip.cpp "${CMAKE_SOURCE_DIR}/include/SVSResultStrip.h"
+  "${CMAKE_SOURCE_DIR}/include/SVSClip.h" "${CMAKE_SOURCE_DIR}/include/SVSTrack.h" "${CMAKE_SOURCE_DIR}/include/SVSViews.h" "${CMAKE_SOURCE_DIR}/include/SVSCanvas.h")
 target_compile_features(lmmssvs PUBLIC cxx_std_20)
 target_compile_definitions(lmmssvs PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
 target_include_directories(lmmssvs PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svs/include" "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/src")

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 project(SVSExample LANGUAGES CXX)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS full.json minimal.json)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/full.json" SVS_FULL_SCHEMA)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/minimal.json" SVS_MINIMAL_SCHEMA)
 configure_file(Schemas.h.in "${CMAKE_CURRENT_BINARY_DIR}/Schemas.h" @ONLY)

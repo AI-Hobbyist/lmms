@@ -1198,6 +1198,28 @@ lmms--gui--BarModelEditor {
 
 /* palette information  */
 
+/* Native SVS editor follows this theme's piano and palette colors. */
+lmms--gui--SVSPianoRoll {
+	qproperty-backgroundColor: #141616;
+	qproperty-gridLineColor: #292929;
+	qproperty-noteColor: #0bd556;
+	qproperty-selectedNoteColor: #064d79;
+	qproperty-lyricColor: #ffffff;
+	qproperty-pronunciationColor: #d1d8e4;
+	qproperty-userPitchColor: #42a065;
+	qproperty-synthesizedPitchColor: #b0c8e0;
+	qproperty-waveformColor: #078f3a;
+	qproperty-phonemeColor: #d1d8e4;
+	qproperty-invalidColor: #8173fe;
+	qproperty-renderingColor: #42a065;
+	qproperty-errorColor: #9b1313;
+}
+
+QWidget#svsVoicePanel {
+	background-color: palette(window);
+	color: palette(window-text);
+}
+
 lmms--gui--LmmsPalette {
 	qproperty-background: #262b30;
 	qproperty-windowText: #1de276;

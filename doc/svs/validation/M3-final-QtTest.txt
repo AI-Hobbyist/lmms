@@ -1,0 +1,30 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : SVSIntegrationTest::initTestCase()
+QWARN  : SVSIntegrationTest::finalEditorInteractionGates() QFontDatabase: Cannot find font directory C:/Qt/6.10.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QWARN  : SVSIntegrationTest::finalEditorInteractionGates() This plugin does not support raise()
+PASS   : SVSIntegrationTest::finalEditorInteractionGates()
+PASS   : SVSIntegrationTest::relativePitchUsesDeclaredReference()
+PASS   : SVSIntegrationTest::continuationChainAndNavigation()
+PASS   : SVSIntegrationTest::noteSplitReparsesPhonemes()
+PASS   : SVSIntegrationTest::portraitResourcesAndPreferences()
+PASS   : SVSIntegrationTest::batchLyricsAndPronunciation()
+PASS   : SVSIntegrationTest::continuousCurves()
+PASS   : SVSIntegrationTest::waveformPyramid()
+PASS   : SVSIntegrationTest::phonemeBoundariesAndAttributes()
+PASS   : SVSIntegrationTest::canvasThemeProperties()
+PASS   : SVSIntegrationTest::curveRangeTransactions()
+PASS   : SVSIntegrationTest::pitchDrawingAndPluginEvaluation()
+PASS   : SVSIntegrationTest::curveUndoAndSelectionMove()
+PASS   : SVSIntegrationTest::noteTransactionsAndInlineLyrics()
+PASS   : SVSIntegrationTest::parameterLaneDrawingAndPersistence()
+QWARN  : SVSIntegrationTest::parameterPanelStateAndFocus() This plugin does not support propagateSizeHints()
+PASS   : SVSIntegrationTest::parameterPanelStateAndFocus()
+PASS   : SVSIntegrationTest::capabilitiesAndDictionaries()
+PASS   : SVSIntegrationTest::verticalSlice()
+PASS   : SVSIntegrationTest::renderedParametersAndPersistence()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 21 passed, 0 failed, 0 skipped, 0 blacklisted, 2422ms
+********* Finished testing of SVSIntegrationTest *********

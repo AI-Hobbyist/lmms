@@ -1,4 +1,5 @@
 #include "SVSCapabilities.h"
+#include "SVSCurve.h"
 #include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QSet>
@@ -103,6 +104,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
  parsed.pitchInput = pitch["input"].toString("none"); parsed.pitchUnit = pitch["unit"].toString();
  if (!QStringList{"none", "absolute", "offset"}.contains(parsed.pitchInput)
   || (parsed.pitchInput != "none" && parsed.pitchUnit != "semitone")) { error = "Unsupported pitch mode/unit"; return false; }
+ if(parsed.pitchInput=="offset") {Curve reference; if(!Curve::fromJson(pitch["referencePitch"].toObject(),reference,error)||reference.mode!="absolute"||reference.type!="float"||reference.unit!="semitone"||reference.evaluator.points.empty()) {error="Offset pitch requires a valid declared absolute referencePitch curve: "+error;return false;}}
  const auto pronunciation = object["pronunciation"].toObject();
  parsed.parser = pronunciation["parser"].toString(); parsed.continuation = pronunciation["continuation"].toString();
  parsed.phonemeSetId = pronunciation["phonemeSet"].toString();
@@ -162,7 +164,7 @@ QJsonObject Pronunciation::toJson() const
 }
 
 Pronunciation resolvePronunciation(const Note& note, const Capabilities& cap, const QVector<Dictionary>& voice,
- const QVector<Dictionary>& project, const QString& defaultLanguage, const Note* previous)
+ const QVector<Dictionary>& project, const QString& defaultLanguage, const Note* previous, const Pronunciation* previousResult)
 {
  Pronunciation result; result.text = note.lyric;
  const auto language = note.language.isEmpty() ? defaultLanguage : note.language;
@@ -179,8 +181,11 @@ Pronunciation resolvePronunciation(const Note& note, const Capabilities& cap, co
  }
  if (!cap.continuation.isEmpty() && note.lyric == cap.continuation && note.pronunciation.isEmpty()) {
   result.source = "continuation";
-  if (!previous || previous->tick + previous->duration < note.tick || previous->lyric == cap.continuation) result.diagnostic = "Continuation requires an adjacent source note";
-  else { result.continuation = true; result.generated = true; }
+  const bool markerSource=previous&&previous->lyric==cap.continuation&&previous->pronunciation.isEmpty()&&!previous->phonemes.contains("symbols");
+  if (!previous || std::abs(previous->tick + previous->duration-note.tick)>1e-6
+   || (markerSource&&(!previousResult||!previousResult->continuation))
+   || (previousResult&&(!previousResult->generated||!previousResult->diagnostic.isEmpty()))) result.diagnostic = "Continuation requires an adjacent resolved source note";
+  else { result.continuation = true; result.generated = true; if(previousResult) {result.text=previousResult->text; result.phonemes=previousResult->phonemes; result.phonemeSet=previousResult->phonemeSet;} }
   return result;
  }
  auto lookup = [&](const QVector<Dictionary>& dictionaries, const QString& source) {

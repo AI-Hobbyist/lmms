@@ -1,6 +1,7 @@
 #include "SVSTrack.h"
 #include "SVSClip.h"
 #include "SVSViews.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "AudioEngine.h"
 #include "Mixer.h"
@@ -10,6 +11,7 @@
 #include "volume.h"
 #include "panning.h"
 #include <cmath>
+#include <algorithm>
 #include <QFile>
 #include <QDir>
 #include <QJsonDocument>
@@ -35,6 +37,7 @@ private: SVSTrack* m_track; std::shared_ptr<const svs::Audio> m_audio; double m_
 }
 SVSTrack::SVSTrack(TrackContainer* tc):Track(Type::SVS,tc),m_volume(DefaultVolume,MinVolume,MaxVolume,0.1f,this,"Volume"),m_pan(DefaultPanning,PanningLeft,PanningRight,1,this,"Panning"),m_mix(0,0,Engine::mixer()->numChannels()-1,this,"Mixer channel"),m_bus("SVS",true,&m_volume,&m_pan,&m_mutedModel) {
  Track::setName("SVS"); m_pan.setCenterValue(DefaultPanning); connect(&m_mix,&IntModel::dataChanged,this,[this]{m_bus.setNextMixerChannel(m_mix.value());});
+ m_portraitSettings={{"visible",ConfigManager::inst()->value("svs","portraitVisible","1")!="0"},{"transparency",std::clamp(ConfigManager::inst()->value("svs","portraitTransparency","70").toInt(),0,100)},{"x",1.},{"y",1.}};
 }
 SVSTrack::~SVSTrack() { Engine::audioEngine()->removePlayHandlesOfTypes(this,PlayHandle::Type::SVSPlayHandle); }
 void SVSTrack::setName(const QString& name) { m_customName=true; Track::setName(name); m_bus.setName(name); }
@@ -105,12 +108,18 @@ bool SVSTrack::play(const TimePos& start,f_cnt_t frames,f_cnt_t offset,int clipN
   played=Engine::audioEngine()->addPlayHandle(new SVSPlaybackHandle(this,std::move(audio),sampleStart,bounded,offset))||played;
  } unlock(); return played;
 }
+void SVSTrack::setPortraitSettings(const QJsonObject& input) {
+ auto settings=input; settings["visible"]=input["visible"].toBool(true); settings["transparency"]=std::clamp(input["transparency"].toInt(70),0,100); settings["x"]=std::clamp(input["x"].toDouble(1),0.,1.); settings["y"]=std::clamp(input["y"].toDouble(1),0.,1.);
+ if(settings==m_portraitSettings) return; m_portraitSettings=settings; emit dataChanged(); Engine::getSong()->setModified();
+}
 void SVSTrack::saveTrackSpecificSettings(QDomDocument& doc,QDomElement& node,bool) {
  if(!m_original.isNull()) { auto attrs=m_original.attributes(); for(int i=0;i<attrs.count();++i) node.setAttribute(attrs.item(i).nodeName(),attrs.item(i).nodeValue()); }
  node.setAttribute("schemaVersion",1); node.setAttribute("pluginId",m_pluginId); node.setAttribute("voiceId",m_voiceId); node.setAttribute("voiceVersion",m_voice.version); node.setAttribute("language",m_voice.language); node.setAttribute("nameMode",m_customName?"custom":"followVoice"); m_volume.saveSettings(doc,node,"vol"); m_pan.saveSettings(doc,node,"pan"); m_mix.saveSettings(doc,node,"mixch"); m_bus.effects()->saveState(doc,node);
  node.setAttribute("language",m_language); node.setAttribute("parameters",QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact)));
+ node.setAttribute("portraitSettings",QString::fromUtf8(QJsonDocument(m_portraitSettings).toJson(QJsonDocument::Compact)));
 }
 void SVSTrack::loadTrackSpecificSettings(const QDomElement& node) {
+ if(node.hasAttribute("portraitSettings")) setPortraitSettings(QJsonDocument::fromJson(node.attribute("portraitSettings").toUtf8()).object());
  m_original=node.cloneNode(true).toElement(); m_parameters=QJsonDocument::fromJson(node.attribute("parameters").toUtf8()).object(); m_language=node.attribute("language"); m_customName=node.attribute("nameMode")=="custom"; bindVoice(node.attribute("pluginId"),node.attribute("voiceId")); m_volume.loadSettings(node,"vol"); m_pan.loadSettings(node,"pan"); m_mix.loadSettings(node,"mixch"); m_bus.effects()->clear(); auto effects=node.firstChildElement(m_bus.effects()->nodeName()); if(!effects.isNull()) m_bus.effects()->restoreState(effects);
 }
 }
