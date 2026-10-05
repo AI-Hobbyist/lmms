@@ -380,3 +380,9 @@ if ($buildExitCode -ne 0) {
 ## 17. M5 后人工验收修正：窗口承载（2026-10-05）
 
 PASS：SVS 钢琴窗默认嵌入 LMMS 工作区，可通过现有标题栏分离，并沿用普通钢琴窗的回嵌/全局分离行为；重复打开复用编辑器，片段删除清理窗口。只修改 SVS 视图，不改普通钢琴窗或窗口框架。实际 GuiApplication/offscreen 双击入口专项通过，完整 SVS 回归 50 passed/0 failed/0 skipped；开发目录已更新。见 `doc/svs/SVS-window-integration.md`。未使用 Computer Use；后续布局和操作差异等待用户验收。
+
+## 18. 用户验收修正：TuneLab 风格共享参数栏（2026-10-05）
+
+参数栏改为一张共享曲线图及底部横向参数按钮，移除每参数独立高度控件；左键选中/保持编辑，右键显隐其他曲线。插件提供参数名称、颜色、值范围与尺度；旧插件无颜色时沿用主题回退，没有宿主内置参数配色/范围表。保留动态声明、只读反馈、曲线编辑/撤销、同步视口与按 ID 持久化，不修改其他编辑区或普通钢琴窗。Windows 原生 Qt 完整回归 50 passed/0 failed/0 skipped；真实窗口截图验证通过，开发目录已更新。详见 doc/svs/SVS-parameter-layout.md。
+
+后续 GUI 测试禁用 offscreen，字体/布局使用实窗截图。当前布局开发不使用 Computer Use；仅在之后对比 TuneLab 钢琴窗实际操作逻辑时使用。规则已写入 AGENTS.md。用户最终人工布局/操作验收 MANUAL/PENDING，不扩大本次范围。

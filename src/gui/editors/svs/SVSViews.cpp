@@ -47,6 +47,32 @@
 #include <memory>
 #include <cmath>
 namespace lmms::gui {
+namespace {
+// TuneLab parameter tabs: left click edits, right click toggles an overlay.
+class SVSParameterTab final : public QToolButton {
+public:
+ using QToolButton::QToolButton;
+ std::function<void()> toggleVisibility;
+ QColor curveColor;
+ void displayState(bool editing,bool visible) {
+  setChecked(editing);
+  QPixmap image(16,16);image.fill(Qt::transparent);QPainter painter(&image);
+  const auto tint=editing||visible?curveColor:palette().color(QPalette::Disabled,QPalette::Text);
+  painter.setPen(QPen(tint,1.2));painter.drawEllipse(QRectF(1,4,14,8));painter.setBrush(tint);painter.drawEllipse(QPointF(8,8),2,2);
+  setIcon(QIcon(image));update();
+ }
+protected:
+ void mousePressEvent(QMouseEvent* event) override {
+  if(event->button()==Qt::RightButton) {if(toggleVisibility) toggleVisibility();event->accept();return;}
+  QToolButton::mousePressEvent(event);
+ }
+ void paintEvent(QPaintEvent* event) override {
+  QToolButton::paintEvent(event);
+  if(isChecked()) {QPainter painter(this);painter.setPen(QPen(curveColor,2));painter.drawLine(3,height()-2,width()-3,height()-2);}
+ }
+};
+}
+
 SVSTrackView::SVSTrackView(SVSTrack* track,TrackContainerView* container):TrackView(track,container) {
  auto* label=new TrackLabelButton(this,getTrackSettingsWidget()); label->setObjectName("svsTrackAvatar");
  auto* avatar=new SVSImageLoader(label);
@@ -96,11 +122,31 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* body=new QHBoxLayout; layout->addLayout(body,1);
  auto* outerGrid=new QGridLayout; body->addLayout(outerGrid,1); auto* splitter=new QSplitter(Qt::Vertical,this); splitter->setObjectName("svsEditorAreas"); outerGrid->addWidget(splitter,0,0);
  auto* noteArea=new QWidget(splitter); auto* grid=new QGridLayout(noteArea); grid->setContentsMargins(0,0,0,0); auto* canvas=new SVSCanvas(clip,noteArea); m_canvas=canvas; canvas->setThemeColors(m_colors); grid->addWidget(canvas,0,0);
- auto* parameterScroll=new QScrollArea(splitter); parameterScroll->setObjectName("svsParameterArea"); parameterScroll->setWidgetResizable(true); parameterScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); auto* parameterBody=new QWidget(parameterScroll); auto* parameterLayout=new QVBoxLayout(parameterBody); parameterLayout->setContentsMargins(0,0,0,0); parameterLayout->setSpacing(2); parameterScroll->setWidget(parameterBody); splitter->setSizes({440,180});
- const auto storedSizes=clip->editorState()["areaSizes"].toArray(); if(storedSizes.size()==2) splitter->setSizes({storedSizes[0].toInt(440),storedSizes[1].toInt(180)});
- connect(splitter,&QSplitter::splitterMoved,this,[clip,splitter]{auto state=clip->editorState(); QJsonArray sizes; for(auto size:splitter->sizes()) sizes.append(size); state["areaSizes"]=sizes; clip->setEditorState(state);});
- struct Lane { QWidget* frame; SVSCanvas* canvas; QCheckBox* visible; QSpinBox* height; };
+ auto* parameterBody=new QWidget(splitter); parameterBody->setObjectName("svsParameterArea");
+ auto* parameterLayout=new QVBoxLayout(parameterBody);parameterLayout->setContentsMargins(0,0,0,0);parameterLayout->setSpacing(0);
+ auto* parameterCanvas=new SVSCanvas(clip,parameterBody);parameterCanvas->setThemeColors(m_colors);svs::Parameter emptyParameter;parameterCanvas->setParameterLane(emptyParameter);parameterCanvas->setParameterActive(false);parameterCanvas->setMinimumHeight(80);parameterLayout->addWidget(parameterCanvas,1);
+ auto* parameterScroll=new QScrollArea(parameterBody);parameterScroll->setObjectName("svsParameterTabs");parameterScroll->setWidgetResizable(true);parameterScroll->setFrameShape(QFrame::NoFrame);parameterScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);parameterScroll->setFixedHeight(44);
+ auto* tabBody=new QWidget(parameterScroll);auto* parameterTabs=new QHBoxLayout(tabBody);parameterTabs->setContentsMargins(8,2,8,2);parameterTabs->setSpacing(6);parameterTabs->addStretch();parameterScroll->setWidget(tabBody);parameterLayout->addWidget(parameterScroll);
+ splitter->setSizes({440,180});
+ const auto storedSizes=clip->editorState()["areaSizes"].toArray();if(storedSizes.size()==2) splitter->setSizes({storedSizes[0].toInt(440),storedSizes[1].toInt(180)});
+ connect(splitter,&QSplitter::splitterMoved,this,[clip,splitter]{auto state=clip->editorState();QJsonArray sizes;for(auto size:splitter->sizes()) sizes.append(size);state["areaSizes"]=sizes;clip->setEditorState(state);});
+ struct Lane { SVSParameterTab* tab; svs::Parameter parameter; bool feedback; bool available=false; };
  auto lanes=std::make_shared<QMap<QString,Lane>>();
+ auto selectedParameter=std::make_shared<QString>(clip->editorState()["selectedParameter"].toString());
+ auto updateParameterDisplay=[clip,parameterCanvas,lanes,selectedParameter]{
+  QVector<QPair<svs::Parameter,bool>> overlays;bool active=false;
+  const auto states=clip->editorState()["lanes"].toObject();
+  for(auto i=lanes->begin();i!=lanes->end();++i) {
+   auto& lane=i.value();const bool selected=lane.available&&i.key()==*selectedParameter;const bool visible=states[i.key()].toObject()["visible"].toBool(true);
+   lane.tab->displayState(selected,visible);lane.tab->setVisible(lane.available);
+   if(selected) {parameterCanvas->setParameterLane(lane.parameter,lane.feedback);active=true;}
+   else if(lane.available&&visible) overlays.append({lane.parameter,lane.feedback});
+  }
+  parameterCanvas->setParameterActive(active);parameterCanvas->setParameterOverlays(overlays);
+ };
+ connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,parameterCanvas]{if(parameterCanvas->horizontalZoom()!=canvas->horizontalZoom()) parameterCanvas->setZoom(canvas->horizontalZoom(),parameterCanvas->verticalZoom());if(parameterCanvas->scrollTick()!=canvas->scrollTick()) parameterCanvas->setScroll(canvas->scrollTick(),parameterCanvas->topPitch());});
+ connect(parameterCanvas,&SVSCanvas::viewportChanged,this,[canvas,parameterCanvas]{if(canvas->horizontalZoom()!=parameterCanvas->horizontalZoom()) canvas->setZoom(parameterCanvas->horizontalZoom(),canvas->verticalZoom());if(canvas->scrollTick()!=parameterCanvas->scrollTick()) canvas->setScroll(parameterCanvas->scrollTick(),canvas->topPitch());});
+ parameterCanvas->setZoom(canvas->horizontalZoom(),parameterCanvas->verticalZoom());parameterCanvas->setScroll(canvas->scrollTick(),parameterCanvas->topPitch());
  auto* strip=new SVSResultStrip(clip,noteArea); strip->setThemeColors(m_colors); grid->addWidget(strip,1,0); connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,strip]{strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom());}); strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom()); connect(strip,&SVSResultStrip::scrollRequested,this,[canvas](double tick){canvas->setScroll(tick,canvas->topPitch());});
  auto* horizontal=new QScrollBar(Qt::Horizontal,this); horizontal->setObjectName("svsHorizontalScroll"); outerGrid->addWidget(horizontal,1,0);
  auto* vertical=new QScrollBar(Qt::Vertical,this); vertical->setObjectName("svsVerticalScroll"); vertical->setRange(0,12700); grid->addWidget(vertical,0,1);
@@ -113,7 +159,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* lyrics=new QToolButton(this); lyrics->setObjectName("svsBatchLyricsButton"); lyrics->setText(tr("Lyrics")); toolbar->addWidget(lyrics); connect(lyrics,&QToolButton::clicked,this,[canvas]{if(canvas->batchLyricsRequested) canvas->batchLyricsRequested();});
  const QStringList toolNames{tr("Notes"),tr("Freehand"),tr("Anchor"),tr("Line"),tr("Smooth"),tr("Erase")};
  for(int i=0;i<toolNames.size();++i) { auto* button=new QToolButton(this); button->setObjectName(QString("svsTool%1").arg(i)); button->setText(toolNames[i]); button->setCheckable(true); button->setChecked(i==0); tools->addButton(button,i); toolbar->addWidget(button); }
- connect(tools,&QButtonGroup::idClicked,this,[canvas,lanes,strip](int id){strip->cancelOperation(); canvas->setTool(static_cast<SVSCanvas::Tool>(id)); for(const auto& lane:*lanes) lane.canvas->setTool(static_cast<SVSCanvas::Tool>(id));});
+ connect(tools,&QButtonGroup::idClicked,this,[canvas,parameterCanvas,strip](int id){strip->cancelOperation();canvas->setTool(static_cast<SVSCanvas::Tool>(id));parameterCanvas->setTool(static_cast<SVSCanvas::Tool>(id));});
  auto* quantization=new QComboBox(this); quantization->setObjectName("svsQuantization");
  for(int divisor:{1,2,4,8,16,32,64}) quantization->addItem(QString("1/%1").arg(divisor),double(TimePos::ticksPerBar())/divisor);
  quantization->setCurrentIndex(std::max(0,quantization->findData(clip->editorState()["quantization"].toDouble(12)))); toolbar->addWidget(quantization);
@@ -154,7 +200,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto refreshPhoneme=[clip,track,strip,phonemePanel]{ auto context=track->parameters(); for(auto i=clip->parameters().begin();i!=clip->parameters().end();++i) context[i.key()]=i.value(); phonemePanel->refresh(track->capabilities().parameters,"phoneme",{strip->selectedParameters()},context,[strip](const QString& id,const QJsonValue& value){strip->setSelectedParameter(id,value);}); phonemePanel->setEnabled(strip->selectedPhoneme()>=0&&track->capabilities().original["phonemes"].toObject()["attributesEditable"].toBool()); };
  connect(strip,&SVSResultStrip::selectionChanged,this,refreshPhoneme); connect(clip,&Clip::dataChanged,this,refreshPhoneme); connect(track,&Track::dataChanged,this,refreshPhoneme); refreshPhoneme();
  auto* feedbackPanel=new SVSParameterPanel(tabs); tabs->addTab(feedbackPanel,tr("Result"));
- auto refresh=[this,clip,track,canvas,lanes,parameterBody,parameterLayout,language,diagnostics,trackPanel,clipPanel,notePanel,feedbackPanel]{
+ auto refresh=[this,clip,track,canvas,lanes,parameterCanvas,tabBody,parameterTabs,selectedParameter,updateParameterDisplay,language,diagnostics,trackPanel,clipPanel,notePanel,feedbackPanel]{
   auto context=track->parameters(); for(const auto& p:track->capabilities().parameters) if(p.scope=="track"&&!context.contains(p.id)) context[p.id]=p.defaultValue;
   for(auto i=clip->parameters().begin();i!=clip->parameters().end();++i) context[i.key()]=i.value();
   trackPanel->refresh(track->capabilities().parameters,"track",{track->parameters()},context,[track](const QString& id,const QJsonValue& value){track->setParameter(id,value);});
@@ -165,27 +211,35 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
   QStringList current; for(int i=0;i<language->count();++i) current<<language->itemData(i).toString();
   if(current!=track->capabilities().languages) { language->clear(); for(const auto& value:track->capabilities().languages) { auto label=QLocale(value).nativeLanguageName(); language->addItem(label.isEmpty()?value:label,value); } }
   language->setCurrentIndex(language->findData(track->language())); diagnostics->setText(track->capabilityDiagnostics().join('\n'));
-  QSet<QString> shown;
+  for(auto& lane:*lanes) lane.available=false;
+  QStringList available;
   auto configureLane=[&](const svs::Parameter& parameter,bool feedback) {
    if(!parameter.curve||parameter.type=="string") return;
    const auto key=(feedback?"feedback:":"input:")+parameter.id;
    if(!lanes->contains(key)) {
-    auto* frame=new QWidget(parameterBody); frame->setObjectName("svsParameterTrack."+key); auto* box=new QVBoxLayout(frame); box->setContentsMargins(0,0,0,0); auto* header=new QHBoxLayout; box->addLayout(header);
-    auto* visible=new QCheckBox(frame); visible->setObjectName("svsParameterVisible."+key); auto* height=new QSpinBox(frame); height->setObjectName("svsParameterHeight."+key); height->setRange(80,320); height->setSuffix(tr(" px")); header->addWidget(visible,1); header->addWidget(height);
-    auto* lane=new SVSCanvas(clip,frame); lane->setParameterLane(parameter,feedback); lane->setThemeColors(m_colors); lane->setTool(canvas->tool()); box->addWidget(lane); parameterLayout->addWidget(frame); lanes->insert(key,{frame,lane,visible,height});
-    connect(visible,&QCheckBox::toggled,this,[clip,lane,key](bool value){lane->setVisible(value); auto state=clip->editorState(); auto states=state["lanes"].toObject(); auto settings=states[key].toObject(); settings["visible"]=value; states[key]=settings; state["lanes"]=states; clip->setEditorState(state);});
-    connect(height,qOverload<int>(&QSpinBox::valueChanged),this,[clip,lane,key](int value){lane->setFixedHeight(value); auto state=clip->editorState(); auto states=state["lanes"].toObject(); auto settings=states[key].toObject(); settings["height"]=value; states[key]=settings; state["lanes"]=states; clip->setEditorState(state);});
-    connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,lane]{if(lane->horizontalZoom()!=canvas->horizontalZoom()) lane->setZoom(canvas->horizontalZoom(),lane->verticalZoom()); if(lane->scrollTick()!=canvas->scrollTick()) lane->setScroll(canvas->scrollTick(),lane->topPitch());});
-    connect(lane,&SVSCanvas::viewportChanged,this,[canvas,lane]{if(canvas->horizontalZoom()!=lane->horizontalZoom()) canvas->setZoom(lane->horizontalZoom(),canvas->verticalZoom()); if(canvas->scrollTick()!=lane->scrollTick()) canvas->setScroll(lane->scrollTick(),canvas->topPitch());});
+    auto* tab=new SVSParameterTab(tabBody);tab->setObjectName("svsParameterTab."+key);tab->setCheckable(true);tab->setAutoRaise(true);tab->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);tab->setFocusPolicy(Qt::NoFocus);
+    parameterTabs->insertWidget(parameterTabs->count()-1,tab);lanes->insert(key,{tab,parameter,feedback});
+    connect(tab,&QToolButton::clicked,this,[clip,key,selectedParameter,updateParameterDisplay,parameterCanvas]{
+     parameterCanvas->cancelOperation();*selectedParameter=key;
+     auto state=clip->editorState();auto states=state["lanes"].toObject();auto settings=states[key].toObject();settings["visible"]=true;states[key]=settings;state["lanes"]=states;state["selectedParameter"]=*selectedParameter;clip->setEditorState(state);updateParameterDisplay();parameterCanvas->setFocus();
+    });
+    tab->toggleVisibility=[clip,key,selectedParameter,updateParameterDisplay]{
+     if(*selectedParameter==key) return;
+     auto state=clip->editorState();auto states=state["lanes"].toObject();auto settings=states[key].toObject();settings["visible"]=!settings["visible"].toBool(true);states[key]=settings;state["lanes"]=states;clip->setEditorState(state);updateParameterDisplay();
+    };
    }
-   auto lane=lanes->value(key); lane.canvas->setParameterLane(parameter,feedback); lane.visible->setText((feedback?tr("Result: "):QString{})+parameter.name); lane.frame->setToolTip(parameter.disabledReason);
-   const auto settings=clip->editorState()["lanes"].toObject()[key].toObject(); { QSignalBlocker v(lane.visible),h(lane.height); lane.visible->setChecked(settings["visible"].toBool(true)); lane.height->setValue(settings["height"].toInt(110)); }
-   lane.canvas->setFixedHeight(lane.height->value()); lane.canvas->setVisible(lane.visible->isChecked()); lane.frame->setVisible(parameter.isVisible(context));
-   shown.insert(key);
+   auto& lane=(*lanes)[key];lane.parameter=parameter;lane.feedback=feedback;lane.available=parameter.isVisible(context);
+   lane.tab->setText((feedback?tr("Result: "):QString{})+parameter.name);
+   const QColor declared(parameter.color);lane.tab->curveColor=declared.isValid()?declared:palette().highlight().color();
+   lane.tab->setToolTip((feedback?tr("Read-only result. "):QString{})+tr("Left click: edit curve; right click: show/hide overlay.")+"\n"+parameter.disabledReason);
+   if(lane.available) available.append(key);
   };
   for(const auto& parameter:track->capabilities().parameters) configureLane(parameter,false);
   for(const auto& parameter:track->capabilities().feedbackParameters) configureLane(parameter,true);
-  for(auto i=lanes->begin();i!=lanes->end();++i) if(!shown.contains(i.key())) i->frame->hide();
+  // Select a declared curve on first opening; retain unavailable selections for voice restoration.
+  if(!clip->editorState().contains("selectedParameter")&&!available.isEmpty()) { *selectedParameter=available.first();auto state=clip->editorState();state["selectedParameter"]=*selectedParameter;clip->setEditorState(state); }
+  updateParameterDisplay();
+
  };
  connect(clip,&Clip::dataChanged,this,refresh); connect(track,&Track::dataChanged,this,refresh); connect(canvas,&SVSCanvas::selectionChanged,this,refresh); refresh();
  auto migrationState=[clip,track,canvas,strip,parameterBody,tabs,lyrics,language,import]{const bool editable=!clip->readOnly();canvas->setEnabled(editable);strip->setEnabled(editable);parameterBody->setEnabled(editable);tabs->setEnabled(editable);lyrics->setEnabled(editable);language->setEnabled(!track->readOnly());import->setEnabled(editable);};

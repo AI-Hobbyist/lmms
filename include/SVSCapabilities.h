@@ -8,7 +8,7 @@
 namespace lmms::svs {
 
 struct Parameter {
- QString id, name, translationKey, group, type, scope, unit, scale, interpolation, disabledReason;
+ QString id, name, translationKey, group, type, scope, unit, scale, interpolation, disabledReason, color;
  int order = 0;
  QJsonValue defaultValue;
  double minimum = 0, maximum = 1, step = 0.01;

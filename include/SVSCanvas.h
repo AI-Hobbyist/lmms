@@ -48,6 +48,8 @@ public:
  void setPortrait(const QImage& image,bool visible,int transparency,QPointF position={1,1});
  QSize portraitTargetSize() const;
  void setParameterLane(const svs::Parameter&,bool feedback=false);
+ void setParameterOverlays(const QVector<QPair<svs::Parameter,bool>>& overlays) { m_parameterOverlays=overlays; update(); }
+ void setParameterActive(bool active) { if(m_parameterActive!=active) cancelOperation(); m_parameterActive=active; update(); }
  QString curveId() const { return m_curveId; }
  bool isParameterLane() const { return m_parameter.has_value(); }
  std::function<void()> batchLyricsRequested;
@@ -94,6 +96,8 @@ private:
  QString m_curveId="svs.pitch";
  std::optional<svs::Parameter> m_parameter;
  bool m_feedback=false;
+ bool m_parameterActive=true;
+ QVector<QPair<svs::Parameter,bool>> m_parameterOverlays;
  const QVector<svs::Note>& displayedNotes() const;
  QColor color(const QString&,QPalette::ColorRole) const;
  double snap(double,Qt::KeyboardModifiers) const;
@@ -103,6 +107,8 @@ private:
  void finishLyric(bool commit,int navigate=0);
  void rememberViewport();
  svs::Curve pitchCurve() const;
+ svs::Curve parameterCurve(const svs::Parameter&,bool feedback) const;
+ void paintParameterOverlays(QPainter&);
  void beginCurveStroke(const QPointF&);
  void paintPitch(QPainter&);
  double curveMinimum() const;

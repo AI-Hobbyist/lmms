@@ -3,6 +3,7 @@
 #include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QSet>
+#include <QRegularExpression>
 #include <cmath>
 
 namespace lmms::svs {
@@ -56,6 +57,8 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
    p.group = value["group"].toString(); p.order = value["order"].toInt(); p.type = value["type"].toString();
    p.scope = value["scope"].toString(); p.unit = value["unit"].toString(); p.scale = value["scale"].toString("linear");
    p.interpolation = value["interpolation"].toString("step"); p.defaultValue = value["default"];
+   p.color = value["color"].toString();
+   if(value.contains("color") && (!value["color"].isString() || !QRegularExpression("^#[0-9a-fA-F]{6}$").match(p.color).hasMatch())) { error="Invalid parameter color: "+p.id; return false; }
    p.minimum = value["min"].toDouble(); p.maximum = value["max"].toDouble(1); p.step = value["step"].toDouble(p.type=="int"?1:0.01);
    p.writable = writable && value["writable"].toBool(true); p.curve = value["curve"].toBool();
    p.visible = value["visible"].toBool(true); p.enabled = value["enabled"].toBool(true);

@@ -5,6 +5,9 @@
 #include <QComboBox>
 #include <QLayout>
 #include <QSpinBox>
+#include <QScreen>
+#include <QScrollArea>
+#include <QToolButton>
 #include "SVSParameterPanel.h"
 #include <QDomDocument>
 #include <QFileInfo>
@@ -119,15 +122,25 @@ private slots:
   QPointer<gui::SubWindow> lifetime=frame;
   QCOMPARE(frame->mdiArea(),mainWindow->workspace());QVERIFY(!editor->isWindow());QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());
   QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);
-  auto* canvas=editor->findChild<gui::SVSCanvas*>();QVERIFY(canvas);
+  auto* canvas=editor->findChild<gui::SVSCanvas*>("svsNoteCanvas");QVERIFY(canvas);
   svs::Note note;note.id="embedded-note";note.tick=12;note.duration=12;note.pitch=60;clip->setNotes({note});
   QTest::mouseClick(canvas,Qt::LeftButton,Qt::NoModifier,canvas->noteRect(note).center().toPoint());QVERIFY(canvas->selectedNotes().contains(note.id));
   frame->detach();QCoreApplication::processEvents();
   QVERIFY(frame->isDetached());QVERIFY(editor->isWindow());QVERIFY(editor->isVisible());
+  if(qEnvironmentVariableIsSet("SVS_PARAMETER_WINDOW_CAPTURE")) {
+   QCOMPARE(QGuiApplication::platformName(),QString("windows"));
+   const auto voice=svs::Registry::instance().voices().first();track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+   svs::Curve tension;tension.id="example.tension";tension.type="float";tension.interpolation="linear";tension.evaluator.interpolation=svs_sdk::Interpolation::Linear;tension.insert(0,.15);tension.insert(160,.85);tension.insert(320,.4);
+   svs::Curve gender;gender.id="example.gender";gender.type="float";gender.interpolation="linear";gender.evaluator.interpolation=svs_sdk::Interpolation::Linear;gender.insert(0,-.75);gender.insert(160,.5);gender.insert(320,-.25);
+   clip->setEditorData(clip->notes(),{{tension.id,tension},{gender.id,gender}});QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+   auto* tab=editor->findChild<QToolButton*>("svsParameterTab.input:example.tension");QVERIFY(tab);QTest::mouseClick(tab,Qt::LeftButton);canvas->setScroll(0,64);QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);
+   const auto available=editor->screen()->availableGeometry();editor->move(available.topLeft()+QPoint(20,20));editor->resize(std::min(1100,available.width()-40),std::min(740,available.height()-80));editor->raise();editor->activateWindow();QVERIFY(QTest::qWaitForWindowExposed(editor));QTest::qWait(300);
+   const auto capture=editor->screen()->grabWindow(editor->winId());QVERIFY(!capture.isNull());QVERIFY(capture.save("doc/svs/validation/SVS-parameter-layout-native-window.png"));
+  }
   QTest::mouseDClick(view,Qt::LeftButton);QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);QVERIFY(frame->isDetached());
   editor->close();QCoreApplication::processEvents();
   QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(!editor->isWindow());
-  QCOMPARE(editor->findChild<gui::SVSCanvas*>(),canvas);QVERIFY(canvas->selectedNotes().contains(note.id));
+  QCOMPARE(editor->findChild<gui::SVSCanvas*>("svsNoteCanvas"),canvas);QVERIFY(canvas->selectedNotes().contains(note.id));
   frame->close();QVERIFY(!frame->isVisible());QTest::mouseDClick(view,Qt::LeftButton);QVERIFY(frame->isVisible());
   frame->detach();delete track;
   QTRY_VERIFY(editor.isNull());QTRY_VERIFY(lifetime.isNull());
@@ -565,8 +578,8 @@ private slots:
  void canvasThemeProperties() {
   QImage placeholder("data:/themes/default/svs_track.svg"); QVERIFY(!placeholder.isNull()); QCOMPARE(placeholder.size(),QSize(24,24));
   auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong())); auto* clip=static_cast<SVSClip*>(track->createClip(0));
-  gui::SVSPianoRoll editor(clip); auto* canvas=editor.findChild<gui::SVSCanvas*>(); QVERIFY(canvas);
-  auto renderColor=[canvas]{ canvas->window()->layout()->activate(); QImage image(canvas->size(),QImage::Format_ARGB32); image.fill(Qt::transparent); canvas->render(&image); return image.pixelColor(image.width()-5,image.height()-5); };
+  gui::SVSPianoRoll editor(clip); auto* canvas=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas"); QVERIFY(canvas);
+  auto renderColor=[canvas,&editor]{ editor.show();QCoreApplication::processEvents();canvas->window()->layout()->activate(); QImage image(canvas->size(),QImage::Format_ARGB32); image.fill(Qt::transparent); canvas->render(&image); return image.pixelColor(image.width()-5,image.height()-5); };
   editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #132435; qproperty-noteColor: #456789; }"); editor.ensurePolished();
   QCOMPARE(editor.backgroundColor(),QColor("#132435")); QCOMPARE(editor.noteColor(),QColor("#456789")); QCOMPARE(renderColor(),QColor("#132435"));
   editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #abcdef; }"); editor.ensurePolished(); QCOMPARE(renderColor(),QColor("#abcdef"));
@@ -638,18 +651,30 @@ private slots:
   QVERIFY(int(clip->length())>=480); delete track;
  }
  void parameterLaneDrawingAndPersistence() {
-  const auto& voice=svs::Registry::instance().voices()[0]; auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong())); track->bindVoice(voice.pluginId,"full"); QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000); auto* clip=static_cast<SVSClip*>(track->createClip(0));
-  svs::Note note; note.id="lane-note"; clip->setNotes({note}); gui::SVSPianoRoll editor(clip);
-  auto* main=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas"); QVERIFY(main);
-  auto* tension=editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.tension.input"); QVERIFY(tension); tension->resize(900,110); tension->setTool(gui::SVSCanvas::Tool::Line);
-  QTest::mousePress(tension,Qt::LeftButton,Qt::NoModifier,tension->curvePointAt(0,.2).toPoint()); QVERIFY(clip->curves().isEmpty()); QTest::mouseRelease(tension,Qt::LeftButton,Qt::NoModifier,tension->curvePointAt(300.25,.8).toPoint()); QVERIFY(clip->curves().contains("example.tension")); auto value=clip->curves()["example.tension"].valueAt(150); QVERIFY(value); QVERIFY(std::abs(value->toDouble()-.5)<.02);
-  auto* soft=editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.soft.input"); QVERIFY(soft); soft->resize(900,110); soft->setTool(gui::SVSCanvas::Tool::Freehand); QTest::mousePress(soft,Qt::LeftButton,Qt::NoModifier,soft->curvePointAt(0,0).toPoint()); QTest::mouseRelease(soft,Qt::LeftButton,Qt::NoModifier,soft->curvePointAt(300,1).toPoint()); QCOMPARE(clip->curves()["example.soft"].type,QString("bool")); QCOMPARE(clip->curves()["example.soft"].valueAt(150)->toBool(),false); QCOMPARE(clip->curves()["example.soft"].valueAt(300)->toBool(),true);
-  auto* mode=editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.mode.input"); QVERIFY(mode); mode->resize(900,110); mode->setTool(gui::SVSCanvas::Tool::Line); QTest::mousePress(mode,Qt::LeftButton,Qt::NoModifier,mode->curvePointAt(0,0).toPoint()); QTest::mouseRelease(mode,Qt::LeftButton,Qt::NoModifier,mode->curvePointAt(300,1).toPoint()); QCOMPARE(clip->curves()["example.mode"].valueAt(150)->toString(),QString("basic")); QCOMPARE(clip->curves()["example.mode"].valueAt(300)->toString(),QString("advanced"));
-  auto* result=editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.energy.feedback"); QVERIFY(result); const auto before=clip->curves(); result->setTool(gui::SVSCanvas::Tool::Freehand); QTest::mousePress(result,Qt::LeftButton,Qt::NoModifier,QPoint(100,50)); QTest::mouseRelease(result,Qt::LeftButton,Qt::NoModifier,QPoint(200,70)); QCOMPARE(clip->curves(),before);
-  const auto topPitch=main->topPitch(); main->setScroll(84,topPitch); QCOMPARE(tension->scrollTick(),84.); tension->setZoom(1.5,1); QCOMPARE(main->horizontalZoom(),1.5); QCOMPARE(main->topPitch(),topPitch); QCOMPARE(clip->editorState()["topPitch"].toDouble(),topPitch);
-  auto* visible=editor.findChild<QCheckBox*>("svsParameterVisible.input:example.tension"); auto* height=editor.findChild<QSpinBox*>("svsParameterHeight.input:example.tension"); QVERIFY(visible&&height); visible->setChecked(false); height->setValue(160); QCOMPARE(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool(),false); QCOMPARE(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["height"].toInt(),160);
-  track->bindVoice(voice.pluginId,"minimal"); QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000); QVERIFY(tension->parentWidget()->isHidden()); QCOMPARE(clip->curves(),before); track->bindVoice(voice.pluginId,"full"); QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000); QCOMPARE(editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.tension.input"),tension); QVERIFY(!visible->isChecked()); QCOMPARE(height->value(),160);
-  QDomDocument doc; auto root=doc.createElement("test"); doc.appendChild(root); track->saveState(doc,root); auto* restored=static_cast<SVSTrack*>(Track::create(root.firstChildElement(),Engine::getSong())); auto* saved=static_cast<SVSClip*>(restored->getClip(0)); QCOMPARE(saved->editorState(),clip->editorState()); QCOMPARE(saved->curves(),before); delete restored; delete track;
+  const auto& voice=svs::Registry::instance().voices()[0];auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong()));track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));
+  svs::Note note;note.id="lane-note";clip->setNotes({note});gui::SVSPianoRoll editor(clip);QFile theme("data/themes/default/style.css");QVERIFY(theme.open(QIODevice::ReadOnly));editor.setStyleSheet(QString::fromUtf8(theme.readAll()));editor.resize(1200,850);editor.show();QCoreApplication::processEvents();
+  auto* main=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");QVERIFY(main);
+  auto* tabStrip=editor.findChild<QScrollArea*>("svsParameterTabs");QVERIFY(tabStrip);QCOMPARE(tabStrip->verticalScrollBarPolicy(),Qt::ScrollBarAlwaysOff);
+  QCOMPARE(editor.findChildren<gui::SVSCanvas*>().size(),2);QVERIFY(editor.findChildren<QSpinBox*>(QRegularExpression("svsParameterHeight.*")).isEmpty());
+  auto select=[&](const QString& key)->gui::SVSCanvas* {auto* tab=editor.findChild<QToolButton*>("svsParameterTab."+key);if(!tab) return nullptr;QTest::mouseClick(tab,Qt::LeftButton);return editor.findChild<gui::SVSCanvas*>("svsParameterLane."+key.mid(key.indexOf(':')+1)+(key.startsWith("feedback:")?".feedback":".input"));};
+  auto* tension=select("input:example.tension");QVERIFY(tension);tension->resize(900,160);tension->setTool(gui::SVSCanvas::Tool::Line);
+  QVERIFY(tabStrip->mapTo(&editor,QPoint()).y()>=tension->mapTo(&editor,QPoint()).y()+tension->height());
+  QTest::mousePress(tension,Qt::LeftButton,Qt::NoModifier,tension->curvePointAt(0,.2).toPoint());QVERIFY(clip->curves().isEmpty());QTest::mouseRelease(tension,Qt::LeftButton,Qt::NoModifier,tension->curvePointAt(300.25,.8).toPoint());QVERIFY(clip->curves().contains("example.tension"));auto value=clip->curves()["example.tension"].valueAt(150);QVERIFY(value);QVERIFY(std::abs(value->toDouble()-.5)<.02);
+  auto* soft=select("input:example.soft");QCOMPARE(soft,tension);soft->resize(900,160);soft->setTool(gui::SVSCanvas::Tool::Freehand);QTest::mousePress(soft,Qt::LeftButton,Qt::NoModifier,soft->curvePointAt(0,0).toPoint());QTest::mouseRelease(soft,Qt::LeftButton,Qt::NoModifier,soft->curvePointAt(300,1).toPoint());QCOMPARE(clip->curves()["example.soft"].type,QString("bool"));QCOMPARE(clip->curves()["example.soft"].valueAt(150)->toBool(),false);QCOMPARE(clip->curves()["example.soft"].valueAt(300)->toBool(),true);
+  auto* mode=select("input:example.mode");QCOMPARE(mode,tension);mode->resize(900,160);mode->setTool(gui::SVSCanvas::Tool::Line);QTest::mousePress(mode,Qt::LeftButton,Qt::NoModifier,mode->curvePointAt(0,0).toPoint());QTest::mouseRelease(mode,Qt::LeftButton,Qt::NoModifier,mode->curvePointAt(300,1).toPoint());QCOMPARE(clip->curves()["example.mode"].valueAt(150)->toString(),QString("basic"));QCOMPARE(clip->curves()["example.mode"].valueAt(300)->toString(),QString("advanced"));
+  auto* result=select("feedback:example.energy");QCOMPARE(result,tension);const auto before=clip->curves();result->setTool(gui::SVSCanvas::Tool::Freehand);QTest::mousePress(result,Qt::LeftButton,Qt::NoModifier,QPoint(100,50));QTest::mouseRelease(result,Qt::LeftButton,Qt::NoModifier,QPoint(200,70));QCOMPARE(clip->curves(),before);
+  const auto topPitch=main->topPitch();main->setScroll(84,topPitch);QCOMPARE(tension->scrollTick(),84.);tension->setZoom(1.5,1);QCOMPARE(main->horizontalZoom(),1.5);QCOMPARE(main->topPitch(),topPitch);
+  auto* tab=editor.findChild<QToolButton*>("svsParameterTab.input:example.tension");QVERIFY(tab);QTest::mouseClick(tab,Qt::RightButton);QCOMPARE(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool(),false);
+  QTest::mouseClick(tab,Qt::LeftButton);QVERIFY(tab->isChecked());QCOMPARE(clip->editorState()["selectedParameter"].toString(),QString("input:example.tension"));QTest::mouseClick(tab,Qt::RightButton);QVERIFY(tab->isChecked());QTest::mouseClick(tab,Qt::LeftButton);QVERIFY(tab->isChecked());QVERIFY(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool());
+  // Plugin RGB reaches both active curve and overlay pixels, with each own range.
+  tension->resize(900,160);tension->setScroll(0,72);tension->setTool(gui::SVSCanvas::Tool::Line);const auto image=tension->grab().toImage();
+  auto nearColor=[&](QPoint point,QColor expected){for(int y=point.y()-2;y<=point.y()+2;++y) for(int x=point.x()-2;x<=point.x()+2;++x) if(image.rect().contains(x,y)&&image.pixelColor(x,y)==expected) return true;return false;};
+  QVERIFY(nearColor(tension->curvePointAt(150,.5).toPoint(),QColor("#AFD867")));QVERIFY(nearColor(tension->curvePointAt(100,0).toPoint(),QColor("#83B9EB")));
+  auto* gender=select("input:example.gender");QVERIFY(gender);QCOMPARE(gender->curvePointAt(10,-1).y(),gender->curvePointAt(10,1).y()+gender->height()-30.); // 24px ruler + 6px inset
+  track->bindVoice(voice.pluginId,"minimal");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(tab->isHidden());QCOMPARE(clip->curves(),before);track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(!tab->isHidden());QCOMPARE(editor.findChildren<gui::SVSCanvas*>().size(),2);
+  QDomDocument doc;auto root=doc.createElement("test");doc.appendChild(root);track->saveState(doc,root);auto* restored=static_cast<SVSTrack*>(Track::create(root.firstChildElement(),Engine::getSong()));auto* saved=static_cast<SVSClip*>(restored->getClip(0));QCOMPARE(saved->editorState(),clip->editorState());QCOMPARE(saved->curves(),before);
+  QTRY_VERIFY_WITH_TIMEOUT(restored->capabilitiesReady(),10000);gui::SVSPianoRoll reopened(saved);auto* restoredTab=reopened.findChild<QToolButton*>("svsParameterTab.input:example.gender");QVERIFY(restoredTab);QVERIFY(restoredTab->isChecked());
+  delete restored;delete track;
  }
  void parameterPanelStateAndFocus() {
   const auto& voice=svs::Registry::instance().voices()[0]; auto plugin=svs::Registry::instance().plugin(voice.pluginId);
@@ -671,6 +696,8 @@ private slots:
   QString error; svs::Capabilities full, minimal;
   QVERIFY2(svs::Capabilities::parse(plugin->capabilities("full",{},error),full,error),qPrintable(error));
   QVERIFY2(svs::Capabilities::parse(plugin->capabilities("minimal",{},error),minimal,error),qPrintable(error));
+  QCOMPARE(full.parameter("example.tension","clip")->color,QString("#AFD867"));
+  auto colored=full.original;auto colorParameters=colored["parameters"].toArray();auto badColor=colorParameters[0].toObject();badColor["color"]="red";colorParameters[0]=badColor;colored["parameters"]=colorParameters;svs::Capabilities colorInvalid;QVERIFY(!svs::Capabilities::parse(colored,colorInvalid,error));
   QCOMPARE(full.languages.size(),3); QCOMPARE(minimal.languages.size(),1); QVERIFY(full.phonemeTiming); QVERIFY(!minimal.phonemeTiming);
   auto gain=full.parameter("example.gain","track"); QVERIFY(gain); QVERIFY(gain->accepts(1)); QVERIFY(!gain->accepts(0));
   auto mode=full.parameter("example.mode","track"); QVERIFY(mode); QVERIFY(mode->accepts("advanced")); QVERIFY(!mode->accepts(1));

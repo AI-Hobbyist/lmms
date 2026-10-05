@@ -79,7 +79,7 @@ QPointF SVSCanvas::curvePointAt(double tick,double value) const {
 }
 void SVSCanvas::setParameterLane(const svs::Parameter& parameter,bool feedback) {
  if(m_parameter&&m_feedback==feedback&&m_parameter->id==parameter.id&&m_parameter->type==parameter.type&&m_parameter->minimum==parameter.minimum&&m_parameter->maximum==parameter.maximum&&m_parameter->step==parameter.step&&m_parameter->scale==parameter.scale&&m_parameter->interpolation==parameter.interpolation&&m_parameter->choices==parameter.choices&&m_parameter->writable==parameter.writable&&m_parameter->enabled==parameter.enabled) { m_parameter=parameter; update(); return; }
- cancelOperation(); m_parameter=parameter; m_feedback=feedback; m_curveId=parameter.id; setObjectName("svsParameterLane."+parameter.id+(feedback?".feedback":".input")); setMinimumHeight(80); update();
+ cancelOperation(); m_selectedAnchors.clear(); m_parameter=parameter; m_feedback=feedback; m_curveId=parameter.id; setObjectName("svsParameterLane."+parameter.id+(feedback?".feedback":".input")); setMinimumHeight(80); update();
 }
 double SVSCanvas::curveMinimum() const { return !m_parameter?0:m_parameter->type=="enum"||m_parameter->type=="bool"?0:m_parameter->minimum; }
 double SVSCanvas::curveMaximum() const { return !m_parameter?127:m_parameter->type=="enum"?std::max(0,int(m_parameter->choices.size())-1):m_parameter->type=="bool"?1:m_parameter->maximum; }
@@ -103,23 +103,48 @@ double SVSCanvas::curveValueAtY(double y) const {
  return curveMinimum()+normalized*(curveMaximum()-curveMinimum());
 }
 bool SVSCanvas::curveEditable() const {
- if(!m_clip||m_feedback) return false;
+ if(!m_clip||m_feedback||(m_parameter&&!m_parameterActive)) return false;
  const auto* track=static_cast<SVSTrack*>(m_clip->getTrack());
  if(!m_parameter) return track->capabilities().pitchInput=="absolute"||track->capabilities().pitchInput=="offset";
  const auto* parameter=track->capabilities().parameter(m_parameter->id,m_parameter->scope); return m_parameter->writable&&m_parameter->enabled&&parameter&&parameter->curve&&parameter->writable&&parameter->enabled;
 }
-svs::Curve SVSCanvas::pitchCurve() const {
- if(m_parameter&&m_feedback) {
-  svs::Curve curve; curve.id=m_curveId; curve.type=m_parameter->type; curve.interpolation=m_parameter->interpolation; curve.evaluator.interpolation=curve.interpolation=="step"?svs_sdk::Interpolation::Step:curve.interpolation=="hermite"?svs_sdk::Interpolation::Hermite:svs_sdk::Interpolation::Linear;
-  if(const auto audio=m_clip->audio()) { QString error; if(svs::Curve::fromJson(audio->feedback["curves"].toObject()[m_curveId].toObject(),curve,error,&*m_parameter)) return curve; const auto value=audio->feedback["parameters"].toObject()[m_curveId]; if(m_parameter->accepts(value)) { curve.insert(0,value); curve.insert(int(m_clip->length()),value); } }
-  return curve;
+svs::Curve SVSCanvas::parameterCurve(const svs::Parameter& parameter,bool feedback) const {
+ svs::Curve curve; curve.id=parameter.id; curve.type=parameter.type; curve.unit=parameter.unit; curve.interpolation=parameter.interpolation;
+ curve.evaluator.interpolation=curve.interpolation=="step"?svs_sdk::Interpolation::Step:curve.interpolation=="hermite"?svs_sdk::Interpolation::Hermite:svs_sdk::Interpolation::Linear;
+ if(feedback) {
+  if(const auto audio=m_clip->audio()) { QString error; if(svs::Curve::fromJson(audio->feedback["curves"].toObject()[parameter.id].toObject(),curve,error,&parameter)) return curve; const auto value=audio->feedback["parameters"].toObject()[parameter.id]; if(parameter.accepts(value)) {curve.insert(0,value);curve.insert(int(m_clip->length()),value);} }
+ } else {
+  const auto& curves=m_transaction->active()?m_transaction->curves:m_clip->curves();
+  if(curves.contains(parameter.id)) return curves[parameter.id];
  }
+ return curve;
+}
+svs::Curve SVSCanvas::pitchCurve() const {
+ if(m_parameter) return parameterCurve(*m_parameter,m_feedback);
  const auto& curves=m_transaction->active()?m_transaction->curves:m_clip->curves();
  if(curves.contains(m_curveId)) return curves[m_curveId];
- svs::Curve curve; curve.id=m_curveId; curve.unit=m_parameter?m_parameter->unit:"semitone"; curve.mode=m_parameter?QString{}:"absolute"; curve.type=m_parameter?m_parameter->type:"float"; curve.interpolation=m_parameter?m_parameter->interpolation:"hermite"; curve.evaluator.interpolation=curve.interpolation=="step"?svs_sdk::Interpolation::Step:curve.interpolation=="hermite"?svs_sdk::Interpolation::Hermite:svs_sdk::Interpolation::Linear; return curve;
+ svs::Curve curve; curve.id=m_curveId; curve.unit="semitone"; curve.mode="absolute"; curve.type="float"; curve.interpolation="hermite"; curve.evaluator.interpolation=svs_sdk::Interpolation::Hermite; return curve;
+}
+void SVSCanvas::paintParameterOverlays(QPainter& painter) {
+ if(!m_clip||!m_parameter) return;
+ for(const auto& entry:m_parameterOverlays) {
+  const auto& parameter=entry.first; const auto curve=parameterCurve(parameter,entry.second);
+  const double minimum=parameter.type=="enum"||parameter.type=="bool"?0:parameter.minimum;
+  const double maximum=parameter.type=="enum"?std::max(0,int(parameter.choices.size())-1):parameter.type=="bool"?1:parameter.maximum;
+  QPainterPath path; bool connected=false;
+  for(double tick=std::max(0.,tickAt(KeyboardWidth));tick<=tickAt(width());tick+=1/m_pixelsPerTick) {
+   const auto value=curve.valueAt(tick); if(!value) {connected=false;continue;}
+   double number=value->isBool()?(value->toBool()?1:0):value->toDouble();
+   if(parameter.type=="enum") for(int i=0;i<parameter.choices.size();++i) if(parameter.choices[i].toObject()["id"]==*value) {number=i;break;}
+   const auto normalized=parameter.scale=="log"&&minimum>0?(std::log(std::max(minimum,number))-std::log(minimum))/std::max(1e-12,std::log(maximum)-std::log(minimum)):(number-minimum)/std::max(1e-12,maximum-minimum);
+   const QPointF point(pointAt(tick,0).x(),TimelineHeight+3+(1-normalized)*std::max(1.,double(height()-TimelineHeight-6)));
+   if(connected) path.lineTo(point);else path.moveTo(point);connected=true;
+  }
+  const QColor declared(parameter.color);painter.setPen(QPen(declared.isValid()?declared:color("userPitchColor",QPalette::Highlight),1));painter.drawPath(path);
+ }
 }
 void SVSCanvas::paintPitch(QPainter& painter) {
- if(!m_clip) return;
+ if(!m_clip||(m_parameter&&!m_parameterActive)) return;
  const auto curve=pitchCurve(); QPainterPath path; bool connected=false;
  const double from=std::max(0.,tickAt(KeyboardWidth)),to=tickAt(width());
  // The visible interval alone determines rendering cost, independent of song length.
@@ -128,7 +153,7 @@ void SVSCanvas::paintPitch(QPainter& painter) {
   if(!value) { connected=false; continue; }
   auto point=curvePointAt(tick,curveNumber(*value)); if(connected) path.lineTo(point); else path.moveTo(point); connected=true;
  }
- painter.setPen(QPen(color("userPitchColor",QPalette::Highlight),2)); painter.drawPath(path);
+ const QColor declared(m_parameter?m_parameter->color:QString{}); painter.setPen(QPen(declared.isValid()?declared:color("userPitchColor",QPalette::Highlight),2)); painter.drawPath(path);
  if(effectiveTool()==Tool::Anchor) {
   for(const auto& anchor:curve.evaluator.points) {
    auto point=curvePointAt(anchor.tick,curve.type=="enum"?curveNumber(QString::fromStdString(anchor.valueId)):anchor.value); if(!rect().contains(point.toPoint())) continue;
@@ -210,6 +235,7 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   }
  }
  if(m_action==Action::Frame) { painter.setPen(color("selectedNoteColor",QPalette::Highlight)); auto fill=color("selectedNoteColor",QPalette::Highlight); fill.setAlpha(40); painter.fillRect(m_frame,fill); painter.drawRect(m_frame); }
+ paintParameterOverlays(painter);
  paintPitch(painter);
  if(m_action==Action::CurveFrame) { painter.setPen(color("selectedNoteColor",QPalette::Highlight)); painter.drawRect(m_frame); }
  painter.restore();
@@ -217,8 +243,10 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
  painter.fillRect(QRect(0,TimelineHeight,KeyboardWidth,height()-TimelineHeight),palette().window());
  if(m_parameter) {
   painter.setPen(palette().windowText().color());
+  if(m_parameterActive) {
   painter.drawText(QRect(2,TimelineHeight,KeyboardWidth-4,20),Qt::AlignLeft,QString::number(curveMaximum(),'g',4));
   painter.drawText(QRect(2,height()-22,KeyboardWidth-4,20),Qt::AlignLeft,QString::number(curveMinimum(),'g',4));
+  }
  } else for(int row=0;row<(height()-TimelineHeight)/m_rowHeight+2;++row) {
   const int pitch=int(std::floor(m_topPitch))-row; if(pitch<0||pitch>127) continue; const int key=(pitch%12+12)%12;
   const bool black=key==1||key==3||key==6||key==8||key==10; const auto y=TimelineHeight+(m_topPitch-pitch)*m_rowHeight;

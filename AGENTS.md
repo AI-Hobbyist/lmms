@@ -31,6 +31,12 @@
    $buildExitCode =$LASTEXITCODE
    if ($buildExitCode -ne 0) { exit$buildExitCode }
 
+## Native Windows GUI validation
+
+- User requirement: GUI tests must use the native Windows Qt platform; do not use `QT_QPA_PLATFORM=offscreen`, including in child test processes. Use real application window screenshots for visual/font/layout acceptance. QWidget render images may support numerical pixel assertions, but do not replace real-window screenshots.
+- Computer Use is reserved for later comparison of TuneLab piano-roll operation semantics; do not use it for current layout/font/screenshot development. Native Qt tests may capture their real windows directly.
+- Test only the development LMMS installation with its configured theme; do not open the original installed LMMS. Close Computer Use test windows when finished and reopen only when needed.
+
 ## SDKS
 - Before Windows configure/build/test/package commands, dot-source `./buildtools/Enter-LmmsEnvironment.ps1` in that PowerShell session. It refreshes the shared persistent SDK/tool variables for agents whose parent app was already running. Use `cmake`/`ctest` from PATH and `$env:QTDIR`, `$env:SVSSDK_ROOT`, `$env:LMMS_CMAKE_TOOLCHAIN_FILE`, `$env:LMMS_CMAKE_GENERATOR`, `$env:LMMS_CMAKE_PLATFORM` instead of repeating local paths; retain the foreground logging/exit-code pipeline above.
 - **Qt6:** `C:\Qt\6.10.3`
