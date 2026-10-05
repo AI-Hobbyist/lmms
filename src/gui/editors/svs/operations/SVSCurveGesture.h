@@ -7,14 +7,19 @@ namespace lmms::gui {
 // A stroke edits one content-time interval. The original curve is immutable.
 class SVSCurveGesture {
 public:
- enum class Kind { Freehand,Line,Smooth,Erase };
+ enum class Kind { Freehand,Line,Smooth,Erase,Reset };
  svs::Curve original,preview;
  void begin(const svs::Curve& curve,double tick,const QJsonValue& value,Kind kind) {
-  original=preview=curve; m_tick=m_last=tick; m_value=value; m_kind=kind;
+  original=preview=curve; m_tick=m_last=m_first=m_end=tick; m_value=value; m_kind=kind;
   m_stroke=curve; m_stroke.evaluator.points.clear(); m_stroke.evaluator.gaps.clear(); m_stroke.insert(tick,value);
  }
  void update(double tick,const QJsonValue& value) {
   preview=original;
+  if(m_kind==Kind::Reset) {
+   m_first=std::min(m_first,tick); m_end=std::max(m_end,tick);
+   auto source=m_stroke; source.evaluator.points.clear(); source.insert(0,m_value); source.insert(m_end-m_first,m_value);
+   preview.replaceRange(m_first,m_end,source); return;
+  }
   const auto start=std::min(m_tick,tick),end=std::max(m_tick,tick);
   if(m_kind==Kind::Erase) { preview.erase(start,end); return; }
   if(m_kind==Kind::Freehand) {
@@ -35,7 +40,7 @@ public:
  }
 private:
  Kind m_kind=Kind::Freehand;
- double m_tick=0,m_last=0;
+ double m_tick=0,m_last=0,m_first=0,m_end=0;
  QJsonValue m_value;
  svs::Curve m_stroke;
 };

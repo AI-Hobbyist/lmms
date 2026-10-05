@@ -86,7 +86,7 @@ QPointF SVSCanvas::curvePointAt(double tick,double value) const {
 }
 void SVSCanvas::setParameterLane(const svs::Parameter& parameter,bool feedback) {
  if(m_parameter&&m_feedback==feedback&&m_parameter->id==parameter.id&&m_parameter->type==parameter.type&&m_parameter->minimum==parameter.minimum&&m_parameter->maximum==parameter.maximum&&m_parameter->step==parameter.step&&m_parameter->scale==parameter.scale&&m_parameter->interpolation==parameter.interpolation&&m_parameter->choices==parameter.choices&&m_parameter->writable==parameter.writable&&m_parameter->enabled==parameter.enabled) { m_parameter=parameter; update(); return; }
- cancelOperation(); m_selectedAnchors.clear(); m_parameter=parameter; m_feedback=feedback; m_curveId=parameter.id; setObjectName("svsParameterLane."+parameter.id+(feedback?".feedback":".input")); setMinimumHeight(80); update();
+ cancelOperation(); m_selectedAnchors.clear(); m_parameter=parameter; m_feedback=feedback; m_curveId=parameter.id; setObjectName("svsParameterLane."+parameter.id+(feedback?".feedback":".input")); setToolTip(tr("Left drag: edit curve. Right drag: reset to baseline. Shift+right click: curve menu.")); setMinimumHeight(80); update();
 }
 double SVSCanvas::parameterOffset() const {
  if(!m_clip||!m_parameter||m_feedback||(m_parameter->type!="float"&&m_parameter->type!="int")) return 0;
@@ -120,7 +120,7 @@ bool SVSCanvas::curveEditable() const {
  const auto* parameter=track->capabilities().parameter(m_parameter->id,m_parameter->scope); return m_parameter->writable&&m_parameter->enabled&&parameter&&parameter->curve&&parameter->writable&&parameter->enabled;
 }
 svs::Curve SVSCanvas::parameterCurve(const svs::Parameter& parameter,bool feedback) const {
- svs::Curve curve; curve.id=parameter.id; curve.type=parameter.type; curve.unit=parameter.unit; curve.interpolation=parameter.interpolation;
+ svs::Curve curve; curve.id=parameter.id; curve.scope=parameter.scope; curve.type=parameter.type; curve.unit=parameter.unit; curve.interpolation=parameter.interpolation;
  curve.evaluator.interpolation=curve.interpolation=="step"?svs_sdk::Interpolation::Step:curve.interpolation=="hermite"?svs_sdk::Interpolation::Hermite:svs_sdk::Interpolation::Linear;
  if(feedback) {
   if(const auto audio=m_clip->audio()) { QString error; if(svs::Curve::fromJson(audio->feedback["curves"].toObject()[parameter.id].toObject(),curve,error,&parameter)) return curve; const auto value=audio->feedback["parameters"].toObject()[parameter.id]; if(parameter.accepts(value)) {curve.insert(0,value);curve.insert(int(m_clip->length()),value);} }
@@ -165,7 +165,9 @@ void SVSCanvas::paintPitch(QPainter& painter) {
   if(!value) { connected=false; continue; }
   auto point=curvePointAt(tick,curveNumber(*value)-parameterOffset()); if(connected) path.lineTo(point); else path.moveTo(point); connected=true;
  }
- const QColor declared(m_parameter?m_parameter->color:QString{}); painter.setPen(QPen(declared.isValid()?declared:color("userPitchColor",QPalette::Highlight),2)); painter.drawPath(path);
+ const QColor declared(m_parameter?m_parameter->color:QString{}); auto curveColor=declared.isValid()?declared:color("userPitchColor",QPalette::Highlight);
+ if(!m_parameter&&noteTool()) curveColor.setAlphaF(.5);
+ painter.setPen(QPen(curveColor,2)); painter.drawPath(path);
  if(effectiveTool()==Tool::Anchor) {
   for(const auto& anchor:curve.evaluator.points) {
    auto point=curvePointAt(anchor.tick,curve.type=="enum"?curveNumber(QString::fromStdString(anchor.valueId)):anchor.value); if(!rect().contains(point.toPoint())) continue;
@@ -192,7 +194,8 @@ void SVSCanvas::paintPitch(QPainter& painter) {
 }
 void SVSCanvas::beginCurveStroke(const QPointF& point) {
  m_transaction->begin();
- const auto kind=m_tool==Tool::Freehand?SVSCurveGesture::Kind::Freehand:m_tool==Tool::Line?SVSCurveGesture::Kind::Line:m_tool==Tool::Smooth?SVSCurveGesture::Kind::Smooth:SVSCurveGesture::Kind::Erase;
+ const auto tool=effectiveTool();
+ const auto kind=tool==Tool::Freehand?SVSCurveGesture::Kind::Freehand:tool==Tool::Line?SVSCurveGesture::Kind::Line:tool==Tool::Smooth?SVSCurveGesture::Kind::Smooth:SVSCurveGesture::Kind::Erase;
  m_curveGesture->begin(pitchCurve(),std::max(0.,tickAt(point.x())),curveValue(curveValueAtY(point.y())),kind);
  m_action=Action::CurveStroke; updateOperation(point,Qt::NoModifier);
 }
@@ -208,7 +211,7 @@ QString SVSCanvas::hitNote(const QPointF& point) const {
 }
 void SVSCanvas::setTool(Tool value) {
  if(m_tool==value) return; cancelOperation(); finishLyric(true); m_tool=value;
- setCursor(value==Tool::Notes?Qt::ArrowCursor:value==Tool::Erase?Qt::ForbiddenCursor:Qt::CrossCursor); emit toolChanged(); update();
+ setCursor(noteTool()?(value==Tool::Pencil?Qt::CrossCursor:Qt::ArrowCursor):value==Tool::Erase?Qt::ForbiddenCursor:Qt::CrossCursor); emit toolChanged(); update();
 }
 void SVSCanvas::setQuantization(double value) { m_quantization=std::max(0.,value); rememberViewport(); update(); }
 void SVSCanvas::setZoom(double horizontal,double vertical) {
@@ -260,7 +263,9 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
     }
     painter.restore();
    }
-   painter.fillRect(rectangle.adjusted(0,1,-1,-1),m_selected.contains(note.id)?color("selectedNoteColor",QPalette::Highlight).lighter(125):color("noteColor",QPalette::Highlight));
+   auto noteColor=m_selected.contains(note.id)?color("selectedNoteColor",QPalette::Highlight).lighter(125):color("noteColor",QPalette::Highlight);
+   if(!noteTool()) noteColor.setAlphaF(.5);
+   painter.fillRect(rectangle.adjusted(0,1,-1,-1),noteColor);
    const auto namedLyric=noteLabel(int(std::floor(note.pitch)))+" · "+note.lyric;
    const auto label=allNoteLabels&&fontMetrics().horizontalAdvance(namedLyric)<=rectangle.width()-6?namedLyric:note.lyric;
    painter.setPen(color("lyricColor",QPalette::HighlightedText)); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter|Qt::AlignLeft,fontMetrics().elidedText(label,Qt::ElideRight,int(rectangle.width()-6)));
@@ -295,10 +300,17 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
 void SVSCanvas::mousePressEvent(QMouseEvent* event) {
  if(!m_clip) return; setFocus(); m_pointer=event->position();
  if(event->button()==Qt::MiddleButton) { cancelOperation(); m_action=Action::Pan; m_begin=event->position(); m_panTick=m_scrollTick; m_panPitch=m_topPitch; grabMouse(); m_mouseCaptured=true; return; }
+ if(event->button()==Qt::RightButton&&m_parameter&&!event->modifiers().testFlag(Qt::ShiftModifier)&&event->position().x()>=KeyboardWidth&&event->position().y()>=TimelineHeight) {
+  cancelOperation(); finishLyric(true); if(!curveEditable()) return;
+  m_initialAnchors=m_selectedAnchors; m_initialSelection=m_selected; m_operationOffset=parameterOffset();
+  m_transaction->begin(); m_curveGesture->begin(pitchCurve(),std::max(0.,tickAt(event->position().x())),m_parameter->defaultValue,SVSCurveGesture::Kind::Reset);
+  m_action=Action::CurveReset; updateOperation(event->position(),event->modifiers());
+  grabMouse(); m_mouseCaptured=true; m_autoScroll->start(); return;
+ }
  if(event->button()!=Qt::LeftButton) return;
  finishLyric(true); if(event->position().y()<TimelineHeight&&event->position().x()>=KeyboardWidth) { Engine::getSong()->getTimeline(Song::PlayMode::Song).setTicks(std::max(0,int(snap(tickAt(event->position().x()),event->modifiers())+int(m_clip->startPosition())+int(m_clip->startTimeOffset())))); update(); return; }
  if(event->position().x()<KeyboardWidth) return;
- if((m_parameter||m_tool!=Tool::Notes)) {
+ if(m_parameter||!noteTool()) {
   if(!curveEditable()) return;
   m_operationOffset=parameterOffset();
   m_initialAnchors=m_selectedAnchors; m_initialSelection=m_selected; m_begin=event->position(); m_beginTick=tickAt(m_begin.x()); m_beginPitch=curveValueAtY(m_begin.y());
@@ -319,6 +331,7 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event) {
  }
  m_begin=event->position(); m_beginTick=snap(tickAt(m_begin.x()),event->modifiers()); m_beginPitch=std::ceil(pitchAt(m_begin.y())); m_initialSelection=m_selected;
  m_hitId=hitNote(event->position());
+ if(m_hitId.isEmpty()&&m_tool==Tool::Pencil&&!event->modifiers().testFlag(Qt::ControlModifier)) { beginNote(event->position(),event->modifiers()); return; }
  if(m_hitId.isEmpty()) { m_beginTick=tickAt(m_begin.x()); m_beginPitch=pitchAt(m_begin.y()); if(!event->modifiers().testFlag(Qt::ControlModifier)) m_selected.clear(); m_action=Action::Frame; m_frame=QRectF(m_begin,m_begin); }
  else {
   if(event->modifiers().testFlag(Qt::ControlModifier)) { if(m_selected.contains(m_hitId)) { m_selected.remove(m_hitId); emit selectionChanged(); update(); return; } m_selected.insert(m_hitId); }
@@ -340,7 +353,7 @@ void SVSCanvas::updateOperation(const QPointF& point,Qt::KeyboardModifiers modif
   const auto curve=pitchCurve(); for(const auto& anchor:curve.evaluator.points) if(m_frame.contains(curvePointAt(anchor.tick,curve.type=="enum"?curveNumber(QString::fromStdString(anchor.valueId)):anchor.value))) m_selectedAnchors.insert(anchor.tick);
   update(); return;
  }
- if(m_action==Action::CurveStroke) {
+ if(m_action==Action::CurveStroke||m_action==Action::CurveReset) {
   m_curveGesture->update(std::max(0.,tickAt(point.x())),curveValue(curveValueAtY(point.y())));
   m_transaction->curves[m_curveId]=m_curveGesture->preview; update(); return;
  }
@@ -401,7 +414,7 @@ void SVSCanvas::updateOperation(const QPointF& point,Qt::KeyboardModifiers modif
 }
 void SVSCanvas::mouseMoveEvent(QMouseEvent* event) {
  m_pointer=event->position(); if(m_action!=Action::None) updateOperation(event->position(),event->modifiers());
- else if((!m_parameter&&m_tool==Tool::Notes)) { const auto id=hitNote(event->position()); bool edge=false; for(const auto& note:displayedNotes()) if(note.id==id) { auto r=noteRect(note); auto margin=std::min(5.,r.width()/3); edge=event->position().x()-r.left()<margin||r.right()-event->position().x()<margin; } setCursor(edge?Qt::SizeHorCursor:Qt::ArrowCursor); }
+ else if(!m_parameter&&noteTool()) { const auto id=hitNote(event->position()); bool edge=false; for(const auto& note:displayedNotes()) if(note.id==id) { auto r=noteRect(note); auto margin=std::min(5.,r.width()/3); edge=event->position().x()-r.left()<margin||r.right()-event->position().x()<margin; } setCursor(edge?Qt::SizeHorCursor:m_tool==Tool::Pencil?Qt::CrossCursor:Qt::ArrowCursor); }
 }
 void SVSCanvas::commitOperation() {
  m_finishing=true; m_action=Action::None; m_autoScroll->stop(); if(m_mouseCaptured) { m_mouseCaptured=false; releaseMouse(); }
@@ -412,19 +425,25 @@ void SVSCanvas::cancelOperation() {
  m_action=Action::None; m_autoScroll->stop(); if(m_mouseCaptured) { m_mouseCaptured=false; releaseMouse(); }
  m_transaction->cancel(); if(active) { m_selected=m_initialSelection; m_selectedAnchors=m_initialAnchors; } m_frame={}; m_finishing=false; update(); if(active) emit selectionChanged();
 }
-void SVSCanvas::mouseReleaseEvent(QMouseEvent* event) { if(event->button()==Qt::LeftButton||event->button()==Qt::MiddleButton) { if(m_action!=Action::None) { updateOperation(event->position(),event->modifiers()); commitOperation(); } } }
+void SVSCanvas::mouseReleaseEvent(QMouseEvent* event) {
+ const bool release=m_action==Action::CurveReset?event->button()==Qt::RightButton:m_action==Action::Pan?event->button()==Qt::MiddleButton:event->button()==Qt::LeftButton;
+ if(release&&m_action!=Action::None) { updateOperation(event->position(),event->modifiers()); commitOperation(); }
+}
 void SVSCanvas::mouseDoubleClickEvent(QMouseEvent* event) {
  if(m_clip&&event->button()==Qt::LeftButton&&effectiveTool()==Tool::Anchor&&event->position().x()>=KeyboardWidth&&event->position().y()>=TimelineHeight) {
   if(!curveEditable()) return;
   cancelOperation(); const auto tick=std::max(0.,tickAt(event->position().x())); auto curves=m_clip->curves(); auto curve=pitchCurve(); curve.insert(tick,curveValue(curveValueAtY(event->position().y()))); curves[m_curveId]=curve; m_clip->setEditorData(m_clip->notes(),curves); m_selectedAnchors={tick}; update(); return;
  }
- if(!m_clip||event->button()!=Qt::LeftButton||(m_parameter||m_tool!=Tool::Notes)||event->position().x()<KeyboardWidth||event->position().y()<TimelineHeight) return;
+ if(!m_clip||event->button()!=Qt::LeftButton||m_parameter||!noteTool()||event->position().x()<KeyboardWidth||event->position().y()<TimelineHeight) return;
  cancelOperation(); const auto hit=hitNote(event->position()); if(!hit.isEmpty()) { beginLyric(hit); return; }
+ beginNote(event->position(),event->modifiers());
+}
+void SVSCanvas::beginNote(const QPointF& point,Qt::KeyboardModifiers modifiers) {
  m_initialSelection=m_selected; m_transaction->begin(); svs::Note note;
- note.id=QUuid::createUuid().toString(QUuid::WithoutBraces); note.tick=std::max(0.,snap(tickAt(event->position().x()),event->modifiers())); note.pitch=std::clamp(std::ceil(pitchAt(event->position().y())),0.,127.); note.duration=std::max(1.,m_quantization);
+ note.id=QUuid::createUuid().toString(QUuid::WithoutBraces); note.tick=std::max(0.,snap(tickAt(point.x()),modifiers)); note.pitch=std::clamp(std::ceil(pitchAt(point.y())),0.,127.); note.duration=std::max(1.,m_quantization);
  const auto* track=static_cast<SVSTrack*>(m_clip->getTrack()); if(!track->voice().defaultLyric.isEmpty()) note.lyric=track->voice().defaultLyric;
  m_createdNote=note; m_transaction->notes.push_back(note); m_selected={note.id}; m_action=Action::CreateTail;
- m_begin=event->position(); m_pointer=m_begin; m_beginTick=note.tick; m_beginPitch=note.pitch; grabMouse(); m_mouseCaptured=true; m_autoScroll->start(); emit selectionChanged(); update();
+ m_begin=point; m_pointer=m_begin; m_beginTick=note.tick; m_beginPitch=note.pitch; grabMouse(); m_mouseCaptured=true; m_autoScroll->start(); emit selectionChanged(); update();
 }
 void SVSCanvas::beginLyric(const QString& id) {
  if(!m_clip) return; cancelOperation(); finishLyric(true);
@@ -476,7 +495,7 @@ bool SVSCanvas::event(QEvent* event) {
  return QWidget::event(event);
 }
 void SVSCanvas::copySelection() {
- if(m_clip&&(m_parameter||m_tool!=Tool::Notes)) {
+ if(m_clip&&(m_parameter||!noteTool())) {
   if(m_selectedAnchors.isEmpty()) return;
   const auto from=*std::min_element(m_selectedAnchors.begin(),m_selectedAnchors.end()),to=*std::max_element(m_selectedAnchors.begin(),m_selectedAnchors.end());
   auto* mime=new QMimeData; mime->setData(CurveMime,QJsonDocument(QJsonObject{{"curve",pitchCurve().slice(from,to).toJson()},{"length",to-from}}).toJson(QJsonDocument::Compact)); QApplication::clipboard()->setMimeData(mime); return;
@@ -505,7 +524,7 @@ void SVSCanvas::pasteSelection(double tick) {
 }
 void SVSCanvas::deleteSelection() {
  if(!m_clip) return;
- if((m_parameter||m_tool!=Tool::Notes)) { if(!curveEditable()) return; auto curve=pitchCurve(); auto& points=curve.evaluator.points; points.erase(std::remove_if(points.begin(),points.end(),[this](const auto& point){return m_selectedAnchors.contains(point.tick);}),points.end()); auto curves=m_clip->curves(); curves[m_curveId]=curve; m_clip->setEditorData(m_clip->notes(),curves); m_selectedAnchors.clear(); update(); return; }
+ if(m_parameter||!noteTool()) { if(!curveEditable()) return; auto curve=pitchCurve(); auto& points=curve.evaluator.points; points.erase(std::remove_if(points.begin(),points.end(),[this](const auto& point){return m_selectedAnchors.contains(point.tick);}),points.end()); auto curves=m_clip->curves(); curves[m_curveId]=curve; m_clip->setEditorData(m_clip->notes(),curves); m_selectedAnchors.clear(); update(); return; }
  auto notes=m_clip->notes(); notes.erase(std::remove_if(notes.begin(),notes.end(),[this](const auto& note){return m_selected.contains(note.id);}),notes.end()); m_clip->setNotes(notes); m_selected.clear(); emit selectionChanged(); update();
 }
 void SVSCanvas::transpose(int semitones) {
@@ -520,13 +539,17 @@ void SVSCanvas::splitSelection(double tick) {
 }
 void SVSCanvas::keyPressEvent(QKeyEvent* event) {
  if(!m_clip) return;
+ if(event->modifiers()==Qt::NoModifier&&event->key()>=Qt::Key_1&&event->key()<=Qt::Key_5) {
+  const Tool tools[]{Tool::Notes,Tool::Pencil,Tool::Freehand,Tool::Anchor,Tool::Smooth};
+  setTool(tools[event->key()-Qt::Key_1]); event->accept(); return;
+ }
  if(event->key()==Qt::Key_Escape) { cancelOperation(); return; }
  if(event->matches(QKeySequence::Undo)) { cancelOperation(); Engine::projectJournal()->undo(); return; }
  if(event->matches(QKeySequence::Redo)|| (event->key()==Qt::Key_Z&&event->modifiers().testFlag(Qt::ControlModifier)&&event->modifiers().testFlag(Qt::ShiftModifier))) { cancelOperation(); Engine::projectJournal()->redo(); return; }
  if(event->matches(QKeySequence::Copy)) { copySelection(); return; }
  if(event->matches(QKeySequence::Cut)) { copySelection(); deleteSelection(); return; }
  if(event->matches(QKeySequence::Paste)) { const auto local=Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks()-int(m_clip->startPosition())-int(m_clip->startTimeOffset()); pasteSelection(local); return; }
- if(event->matches(QKeySequence::SelectAll)) { if((!m_parameter&&m_tool==Tool::Notes)) for(const auto& note:m_clip->notes()) m_selected.insert(note.id); else for(const auto& point:pitchCurve().evaluator.points) m_selectedAnchors.insert(point.tick); emit selectionChanged(); update(); return; }
+ if(event->matches(QKeySequence::SelectAll)) { if(!m_parameter&&noteTool()) for(const auto& note:m_clip->notes()) m_selected.insert(note.id); else for(const auto& point:pitchCurve().evaluator.points) m_selectedAnchors.insert(point.tick); emit selectionChanged(); update(); return; }
  if(event->key()==Qt::Key_Delete||event->key()==Qt::Key_Backspace) { deleteSelection(); return; }
  if(event->key()==Qt::Key_Up||event->key()==Qt::Key_Down) { transpose((event->key()==Qt::Key_Up?1:-1)*(event->modifiers().testFlag(Qt::ShiftModifier)?12:1)); return; }
  QWidget::keyPressEvent(event);
@@ -548,7 +571,9 @@ void SVSCanvas::setPronunciation(const QString& id,const QString& reading) {
  if(!m_clip) return; auto notes=m_clip->notes(); for(auto& note:notes) if(note.id==id) note.pronunciation=reading; m_clip->setNotes(notes);
 }
 void SVSCanvas::contextMenuEvent(QContextMenuEvent* event) {
- if(m_clip&&(m_parameter||m_tool!=Tool::Notes)) {
+ // Right dragging parameters resets them; it must never open a blocking menu.
+ if((m_parameter&&event->reason()==QContextMenuEvent::Mouse&&!event->modifiers().testFlag(Qt::ShiftModifier))||(!m_parameter&&m_tool==Tool::Freehand)) { event->accept(); return; }
+ if(m_clip&&(m_parameter||!noteTool())) {
   QMenu menu(this); menu.addAction(tr("Copy curve selection"),this,&SVSCanvas::copySelection); menu.addAction(tr("Paste curve here"),this,[this,event]{pasteSelection(tickAt(event->pos().x()));}); menu.addAction(tr("Delete selected anchors"),this,&SVSCanvas::deleteSelection);
   auto operation=[this](bool connect){if(!curveEditable()||m_selectedAnchors.size()<2) return; const auto from=*std::min_element(m_selectedAnchors.begin(),m_selectedAnchors.end()),to=*std::max_element(m_selectedAnchors.begin(),m_selectedAnchors.end()); auto curve=pitchCurve(); if(connect) curve.connect(from,to); else curve.erase(from,to); auto curves=m_clip->curves(); curves[m_curveId]=curve; m_clip->setEditorData(m_clip->notes(),curves);};
   menu.addAction(tr("Connect selection"),this,[operation]{operation(true);}); menu.addAction(tr("Disconnect selection"),this,[operation]{operation(false);});
@@ -582,6 +607,6 @@ void SVSCanvas::contextMenuEvent(QContextMenuEvent* event) {
    }
   }
  }
- menu.addAction(tr("Batch lyrics"),this,[this]{if(batchLyricsRequested) batchLyricsRequested();}); menu.exec(event->globalPos());
+ menu.addAction(tr("Input lyrics"),this,[this]{if(batchLyricsRequested) batchLyricsRequested();}); menu.exec(event->globalPos());
 }
 }

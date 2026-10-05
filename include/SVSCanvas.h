@@ -17,7 +17,7 @@ class SVSCurveGesture;
 class SVSCanvas : public QWidget {
  Q_OBJECT
 public:
- enum class Tool { Notes,Freehand,Anchor,Line,Smooth,Erase };
+ enum class Tool { Notes,Pencil,Freehand,Anchor,Smooth,Line,Erase };
  explicit SVSCanvas(SVSClip*,QWidget* parent=nullptr);
  ~SVSCanvas() override;
  QRectF noteRect(const svs::Note&) const;
@@ -71,7 +71,7 @@ protected:
  bool event(QEvent*) override;
  bool eventFilter(QObject*,QEvent*) override;
 private:
- enum class Action { None,Frame,Move,LeftEdge,RightEdge,Pan,CreateTail,CurveStroke,CurveFrame,CurveMove,TangentIn,TangentOut };
+ enum class Action { None,Frame,Move,LeftEdge,RightEdge,Pan,CreateTail,CurveStroke,CurveReset,CurveFrame,CurveMove,TangentIn,TangentOut };
  QPointer<SVSClip> m_clip;
  std::unique_ptr<SVSEditTransaction> m_transaction;
  std::unique_ptr<SVSCurveGesture> m_curveGesture;
@@ -110,6 +110,7 @@ private:
  svs::Curve parameterCurve(const svs::Parameter&,bool feedback) const;
  void paintParameterOverlays(QPainter&);
  void beginCurveStroke(const QPointF&);
+ void beginNote(const QPointF&,Qt::KeyboardModifiers);
  void paintPitch(QPainter&);
  double parameterOffset() const;
  double m_operationOffset=0;
@@ -119,7 +120,8 @@ private:
  QJsonValue curveValue(double) const;
  double curveValueAtY(double) const;
  bool curveEditable() const;
- Tool effectiveTool() const { return m_parameter&&m_tool==Tool::Notes?Tool::Anchor:m_tool; }
+ bool noteTool() const { return m_tool==Tool::Notes||m_tool==Tool::Pencil; }
+ Tool effectiveTool() const { return m_parameter&&noteTool()?Tool::Freehand:m_tool; }
 };
 }
 #endif

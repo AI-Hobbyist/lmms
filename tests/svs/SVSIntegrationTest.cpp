@@ -72,6 +72,7 @@
 #include "DataFile.h"
 #include <QElapsedTimer>
 #include <QMouseEvent>
+#include <QContextMenuEvent>
 #include <QStandardPaths>
 using namespace lmms;
 // Export restores and starts the previous device. These tests advance audio
@@ -660,6 +661,51 @@ private slots:
   canvas.beginLyric(note.id); lyric->setText("cancelled"); QTest::keyClick(lyric,Qt::Key_Escape); QCOMPARE(clip->notes()[0].lyric,QString("edited"));
   canvas.copySelection(); canvas.pasteSelection(384); QCOMPARE(clip->notes().size(),2); QCOMPARE(clip->notes()[1].tick,384.); QCOMPARE(clip->notes()[1].pitch,note.pitch); QVERIFY(clip->notes()[1].id!=note.id);
   QVERIFY(int(clip->length())>=480); delete track;
+ }
+ void optimizedTuneLabNoteAndToolSemantics() {
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));gui::SVSPianoRoll editor(clip);auto* canvas=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");QVERIFY(canvas);canvas->resize(900,500);canvas->setScroll(0,72);canvas->setQuantization(12);
+  QCOMPARE(canvas->tool(),gui::SVSCanvas::Tool::Pencil);QVERIFY(editor.findChild<QToolButton*>("svsTool1")->isChecked());
+  auto* journal=Engine::projectJournal();const bool previous=journal->isJournalling();auto restore=qScopeGuard([&]{journal->setJournalling(previous);});journal->setJournalling(true);clip->setJournalling(true);const auto depth=journal->undoDepth();
+  auto position=canvas->pointAt(24,64)+QPointF(0,12),end=canvas->pointAt(120,64)+QPointF(0,12);
+  QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,position.toPoint());QTest::mouseMove(canvas,end.toPoint());QVERIFY(clip->notes().isEmpty());QCOMPARE(journal->undoDepth(),depth);
+  QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,end.toPoint());QCOMPARE(clip->notes().size(),1);QCOMPARE(clip->notes()[0].tick,24.);QCOMPARE(clip->notes()[0].duration,96.);QCOMPARE(journal->undoDepth(),depth+1);
+  auto note=clip->notes()[0];auto body=canvas->noteRect(note).center().toPoint();QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,body);QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,body+QPoint(48,0));QCOMPARE(clip->notes()[0].tick,48.);QCOMPARE(clip->notes()[0].duration,96.);
+  note=clip->notes()[0];auto edge=QPoint(int(canvas->noteRect(note).right()-1),int(canvas->noteRect(note).center().y()));QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,edge);QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,edge+QPoint(48,0));QCOMPARE(clip->notes()[0].tick,48.);QCOMPARE(clip->notes()[0].duration,120.);
+  for(int delta:{-48,48}) {
+   note=clip->notes()[0];const auto tail=note.tick+note.duration;const auto resizeDepth=journal->undoDepth();edge=QPoint(int(canvas->noteRect(note).left()+1),int(canvas->noteRect(note).center().y()));
+   QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,edge);QTest::mouseMove(canvas,edge+QPoint(delta,0));QCOMPARE(clip->notes()[0],note);
+   QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,edge+QPoint(delta,0));QCOMPARE(clip->notes()[0].tick,note.tick+delta/2.);QCOMPARE(clip->notes()[0].tick+clip->notes()[0].duration,tail);QCOMPARE(journal->undoDepth(),resizeDepth+1);
+   QTest::keyClick(canvas,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes()[0],note);QTest::keyClick(canvas,Qt::Key_Z,Qt::ControlModifier|Qt::ShiftModifier);QCOMPARE(clip->notes()[0].tick,note.tick+delta/2.);
+  }
+  const auto before=clip->notes();position=canvas->pointAt(192,65)+QPointF(0,12);QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,position.toPoint());QTest::keyClick(canvas,Qt::Key_3);QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,position.toPoint()+QPoint(72,0));QCOMPARE(clip->notes(),before);QCOMPARE(canvas->tool(),gui::SVSCanvas::Tool::Freehand);
+  const gui::SVSCanvas::Tool tools[]{gui::SVSCanvas::Tool::Notes,gui::SVSCanvas::Tool::Pencil,gui::SVSCanvas::Tool::Freehand,gui::SVSCanvas::Tool::Anchor,gui::SVSCanvas::Tool::Smooth};
+  for(int i=0;i<5;++i) {QTest::keyClick(canvas,Qt::Key_1+i);QCOMPARE(canvas->tool(),tools[i]);QVERIFY(editor.findChild<QToolButton*>(QString("svsTool%1").arg(i))->isChecked());for(auto* lane:editor.findChildren<gui::SVSCanvas*>()) QCOMPARE(lane->tool(),tools[i]);}
+  QTest::keyClick(canvas,Qt::Key_1);QTest::mouseDClick(canvas,Qt::LeftButton,Qt::NoModifier,canvas->noteRect(clip->notes()[0]).center().toPoint());auto* lyric=canvas->findChild<QLineEdit*>("svsInlineLyric");QVERIFY(lyric->isVisibleTo(canvas));lyric->setText(QString::fromUtf8("你好"));QTest::keyClick(lyric,Qt::Key_Return);QCOMPARE(clip->notes()[0].lyric,QString::fromUtf8("你好"));QCOMPARE(clip->notes().size(),1);
+  QTest::mouseClick(editor.findChild<QToolButton*>("svsTool1"),Qt::LeftButton);canvas->beginLyric(note.id);QTest::keyClick(lyric,Qt::Key_3);QCOMPARE(canvas->tool(),gui::SVSCanvas::Tool::Pencil);QTest::keyClick(lyric,Qt::Key_Escape);
+  auto second=clip->notes()[0];second.id="batch-second";second.tick=240;second.lyric="a";clip->setNotes({second,clip->notes()[0]});QTest::keyClick(canvas,Qt::Key_A,Qt::ControlModifier);
+  gui::SVSLyricEditor lyrics(clip,canvas->selectedNotes());lyrics.findChild<QPlainTextEdit*>("svsBatchLyricText")->setPlainText(QString::fromUtf8("你好"));lyrics.accept();QCOMPARE(clip->notes()[0].lyric,QString::fromUtf8("好"));QCOMPARE(clip->notes()[1].lyric,QString::fromUtf8("你"));
+  auto* visible=editor.findChild<QToolButton*>("svsParameterAreaVisible");QVERIFY(visible);visible->click();QVERIFY(!clip->editorState()["parameterAreaVisible"].toBool());visible->click();QVERIFY(clip->editorState()["parameterAreaVisible"].toBool());
+ }
+ void optimizedTuneLabParameterResetSemantics() {
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="reset-note";note.duration=384;clip->setNotes({note});
+  const auto* declaration=track->capabilities().parameter("example.tension","clip");QVERIFY(declaration);const auto parameter=*declaration;
+  gui::SVSCanvas lane(clip);lane.resize(900,200);lane.setParameterLane(parameter);lane.setTool(gui::SVSCanvas::Tool::Pencil);
+  auto start=lane.curvePointAt(0,.2).toPoint(),end=lane.curvePointAt(300,.8).toPoint();QTest::mousePress(&lane,Qt::LeftButton,Qt::NoModifier,start);QTest::mouseMove(&lane,lane.curvePointAt(100,.7).toPoint());QTest::mouseRelease(&lane,Qt::LeftButton,Qt::NoModifier,end);
+  QVERIFY(clip->curves().contains(parameter.id));const auto original=clip->curves();QVERIFY(original[parameter.id].valueAt(100)->toDouble()>.6);
+  auto* journal=Engine::projectJournal();const bool previous=journal->isJournalling();auto restore=qScopeGuard([&]{journal->setJournalling(previous);});journal->setJournalling(true);clip->setJournalling(true);const auto depth=journal->undoDepth();
+  const auto click=lane.curvePointAt(120,.9).toPoint();QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,click);const auto single=clip->curves();QCOMPARE(single[parameter.id].valueAt(120),std::optional<QJsonValue>(parameter.defaultValue));QCOMPARE(single[parameter.id].valueAt(100),original[parameter.id].valueAt(100));QCOMPARE(single[parameter.id].valueAt(140),original[parameter.id].valueAt(140));QCOMPARE(journal->undoDepth(),depth+1);
+  QTest::keyClick(&lane,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->curves(),original);
+  QTest::mousePress(&lane,Qt::RightButton,Qt::NoModifier,lane.curvePointAt(80,.9).toPoint());QTest::mouseMove(&lane,lane.curvePointAt(160,.1).toPoint());QTest::mouseMove(&lane,lane.curvePointAt(60,.4).toPoint());QCOMPARE(clip->curves(),original);QTest::mouseRelease(&lane,Qt::RightButton,Qt::NoModifier,lane.curvePointAt(120,.7).toPoint());
+  const auto reset=clip->curves();for(double tick:{60.,80.,100.,120.,140.,160.}) QCOMPARE(reset[parameter.id].valueAt(tick),std::optional<QJsonValue>(parameter.defaultValue));for(double tick:{20.,50.,170.,280.}) QVERIFY(std::abs(reset[parameter.id].valueAt(tick)->toDouble()-original[parameter.id].valueAt(tick)->toDouble())<1e-8);QCOMPARE(clip->notes(),QVector<svs::Note>{note});QCOMPARE(journal->undoDepth(),depth+1);
+  QTest::keyClick(&lane,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->curves(),original);QTest::keyClick(&lane,Qt::Key_Z,Qt::ControlModifier|Qt::ShiftModifier);QCOMPARE(clip->curves(),reset);
+  QTest::mousePress(&lane,Qt::RightButton,Qt::NoModifier,lane.curvePointAt(200,.9).toPoint());QTest::mouseMove(&lane,lane.curvePointAt(240,.1).toPoint());QTest::keyClick(&lane,Qt::Key_Escape);QTest::mouseRelease(&lane,Qt::RightButton,Qt::NoModifier,end);QCOMPARE(clip->curves(),reset);
+  lane.setTool(gui::SVSCanvas::Tool::Notes);QTest::mousePress(&lane,Qt::LeftButton,Qt::NoModifier,lane.curvePointAt(180,.3).toPoint());QTest::mouseRelease(&lane,Qt::LeftButton,Qt::NoModifier,lane.curvePointAt(260,.5).toPoint());QVERIFY(clip->curves()!=reset);
+  const auto before=clip->curves();lane.setParameterLane(parameter,true);QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,click);QCOMPARE(clip->curves(),before);
+  QContextMenuEvent context(QContextMenuEvent::Mouse,click,lane.mapToGlobal(click));QApplication::sendEvent(&lane,&context);QVERIFY(context.isAccepted());QVERIFY(!QApplication::activePopupWidget());
+  for(const auto& p:track->capabilities().parameters) if(p.id=="example.power"||p.id=="example.soft"||p.id=="example.mode") {
+   lane.setParameterLane(p);QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,QPoint(300,100));QVERIFY(clip->curves().contains(p.id));QCOMPARE(clip->curves()[p.id].scope,p.scope);QCOMPARE(clip->curves()[p.id].valueAt(120),std::optional<QJsonValue>(p.defaultValue));
+  }
  }
  void parameterLaneDrawingAndPersistence() {
   const auto& voice=svs::Registry::instance().voices()[0];auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong()));track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));

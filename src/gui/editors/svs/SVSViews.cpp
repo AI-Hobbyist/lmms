@@ -225,9 +225,15 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* tools=new QButtonGroup(this);
  canvas->batchLyricsRequested=[this,clip,canvas]{auto* dialog=new SVSLyricEditor(clip,canvas->selectedNotes(),this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->open();};
  auto* lyrics=new QToolButton(this); lyrics->setObjectName("svsBatchLyricsButton"); lyrics->setText(tr("Lyrics")); toolbar->addWidget(lyrics); connect(lyrics,&QToolButton::clicked,this,[canvas]{if(canvas->batchLyricsRequested) canvas->batchLyricsRequested();});
- const QStringList toolNames{tr("Notes"),tr("Freehand"),tr("Anchor"),tr("Line"),tr("Smooth"),tr("Erase")};
- for(int i=0;i<toolNames.size();++i) { auto* button=new QToolButton(this); button->setObjectName(QString("svsTool%1").arg(i)); button->setText(toolNames[i]); button->setCheckable(true); button->setChecked(i==0); tools->addButton(button,i); toolbar->addWidget(button); }
+ const QStringList toolNames{tr("Select"),tr("Pencil"),tr("Pitch pen"),tr("Anchor"),tr("Smooth"),tr("Line"),tr("Erase")};
+ for(int i=0;i<toolNames.size();++i) { auto* button=new QToolButton(this); button->setObjectName(QString("svsTool%1").arg(i)); button->setText(toolNames[i]); button->setCheckable(true); button->setFocusPolicy(Qt::NoFocus); if(i<5) button->setToolTip(tr("%1 (%2)").arg(toolNames[i]).arg(i+1)); tools->addButton(button,i); toolbar->addWidget(button); }
  connect(tools,&QButtonGroup::idClicked,this,[canvas,parameterCanvas,strip](int id){strip->cancelOperation();canvas->setTool(static_cast<SVSCanvas::Tool>(id));parameterCanvas->setTool(static_cast<SVSCanvas::Tool>(id));});
+ auto syncTool=[canvas,parameterCanvas,strip,tools](SVSCanvas* source){strip->cancelOperation(); const auto tool=source->tool();canvas->setTool(tool);parameterCanvas->setTool(tool);if(auto* button=tools->button(static_cast<int>(tool))) button->setChecked(true);};
+ connect(canvas,&SVSCanvas::toolChanged,this,[canvas,syncTool]{syncTool(canvas);});
+ connect(parameterCanvas,&SVSCanvas::toolChanged,this,[parameterCanvas,syncTool]{syncTool(parameterCanvas);});
+ canvas->setTool(SVSCanvas::Tool::Pencil);
+ auto* parameterVisible=new QToolButton(this);parameterVisible->setObjectName("svsParameterAreaVisible");parameterVisible->setText(tr("Parameters"));parameterVisible->setCheckable(true);parameterVisible->setChecked(clip->editorState()["parameterAreaVisible"].toBool(true));toolbar->addWidget(parameterVisible);parameterBody->setVisible(parameterVisible->isChecked());
+ connect(parameterVisible,&QToolButton::toggled,this,[clip,parameterBody,parameterCanvas](bool visible){parameterCanvas->cancelOperation();parameterBody->setVisible(visible);auto state=clip->editorState();state["parameterAreaVisible"]=visible;clip->setEditorState(state);});
  auto* quantization=new QComboBox(this); quantization->setObjectName("svsQuantization");
  for(int divisor:{1,2,4,8,16,32,64}) quantization->addItem(QString("1/%1").arg(divisor),double(TimePos::ticksPerBar())/divisor);
  quantization->setCurrentIndex(std::max(0,quantization->findData(clip->editorState()["quantization"].toDouble(12)))); toolbar->addWidget(quantization);

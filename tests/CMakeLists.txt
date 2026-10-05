@@ -63,7 +63,10 @@ endforeach()
 add_dependencies(SVSIntegrationTest SVSExample)
 target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
 set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
- ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;QT_QPA_PLATFORM=offscreen")
+ ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs")
+if(WIN32)
+ set_property(TEST SVSIntegrationTest APPEND PROPERTY ENVIRONMENT "QT_QPA_PLATFORM=windows")
+endif()
 
 if(TARGET Vst2CompatibilityTest)
 	# Compile the existing proxy into the test executable so Engine's static

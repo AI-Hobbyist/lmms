@@ -414,3 +414,11 @@ PASS：侧栏从有效引擎声明补齐 Power、Soft、Mode 等可调项，数�
 PASS：轨道头像/名称按钮打开 LMMS 原生 Qt Widgets 插件设置窗口，提供说话人、头像/立绘路径及文件浏览、显隐、透明度与效果链。移除轨道行说话人选择；插件界面选择说话人后轨道名跟随其名称。图片路径和透明度保存在工程。SVSExample 的本机开发配置默认使用用户指定 avatar.png/character.png，未写入插件、SDK 或 Release 默认资源，不构成独立运行依赖。
 
 第 22/23 节 Release 编译及 Windows 原生完整回归 55 passed/0 failed/0 skipped；两张实窗截图已检查，开发版二进制更新并核对哈希，测试窗口关闭。仅修改 SVS 模块与必要测试，未修改普通钢琴窗或相邻系统，未使用 offscreen 或 Computer Use。证据及行为细节见 doc/svs/SVS-parameter-sync-and-plugin-settings.md。用户最终人工验收 MANUAL/PENDING。
+
+## 24. 用户验收修正：优化版 TuneLab 钢琴窗操作（2026-10-06）
+
+PASS：铅笔按下创建、长按拖动尾部；已有音符主体移动、首端/尾端延长和缩短，其中首端保持尾部不动。选择工具与铅笔区分，按钮及数字 1–5 同步工具状态，未完成操作切换时取消。参数区左键自由绘制，右键局部/连续恢复曲线基线，保留范围外数据、全局基础值及只读门禁；Shift+右键保留计划内曲线高级菜单。音高编辑按工具突出/淡化显示，参数区可收起并持久化，两个汉字按时间顺序填充两个选中音符，行内歌词仍对应单音符。
+
+Release 主程序、示例插件与测试程序前台编译通过；Windows 原生完整 SVS 回归 **57 passed / 0 failed / 0 skipped**，包含首端双向伸缩、撤销/重做、工具切换、自由绘制、右键连续重置及 Power/Soft/Mode 默认值和作用域测试。开发安装目录二进制更新并核对哈希。证据：`doc/svs/validation/SVS-TuneLab-alignment-build-final.log`、`SVS-TuneLab-alignment-regression.txt`、`SVS-TuneLab-alignment-regression.log`、`SVS-TuneLab-alignment-deploy.log`；实现映射见 `doc/svs/SVS-TuneLab-editing-alignment.md`，参考实测见 `doc/svs/TuneLab-optimized-editing-behavior.md`。
+
+开发版原 lmms.exe 正在运行且存在未保存工程，初次覆盖因占用失败；保留该窗口，最新主程序部署为 `build/svs-lmms-clean-install/lmms-svs-aligned.exe` 并核对哈希，人工体验需启动该文件。用户指示先修改代码、编译、提交推送；本轮实机体验默认 **MANUAL/PENDING**，不阻塞完成。未使用 Computer Use 或 offscreen，未开启 TuneLab 或原安装版 LMMS。测试中的已有图标缺失和 journal ID 诊断仅记录为 follow-up，不扩大本轮范围。
