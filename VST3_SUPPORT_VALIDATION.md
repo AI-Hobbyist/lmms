@@ -53,3 +53,36 @@ Electric88 可能需要配套采样库；按照用户指示排除其验收，不
 最终发布 ZIP：`build/vst-s8/lmms-1.3.0-alpha.2.35-vst3-win64-release.zip`。
 SHA256：`db45f3325f427ba49cd11622f6911c4121df0d30304fa94c940f59dc34dbd970`。
 旁置校验文件：同名 `.zip.sha256`。ZIP 包含 `WINDOWS-VST3-RELEASE.md`、`windows-runtime-manifest.json`、LMMS 资源及依赖许可。只验证 Windows；其它平台和 x86 DAW 未纳入交付。
+
+
+## S8 后实机修复：当前 Windows 交付验收（2026-10-05）
+
+状态 **PASS_WITH_MANUAL_SKIPS**；本节优先于前述历史 S8 交付。
+
+2026-10-05：S8 后 Windows 发布版实机问题修复。交付范围继续以计划 §10 为准：VeSTige 是 VST2/VST3 Instrument 唯一官方入口，VstEffect 是 VST2/VST3 Effect 唯一官方入口；保留多路径扫描、WaveShell/multi-class、Instrument/Effect 分类及原 Sidebar/Effect Browser 元数据选择。S6、第三种加载/宿主/生命周期、全局 Mixer/PDC、侧链及高级路由仍为 REMOVED_BY_USER，没有恢复这些扩张。
+
+实机反馈暴露了原 S8 离线验收的覆盖缺口：离线渲染通过并不证明 SDL 连续音频和原生编辑器稳定。修复回调连续到达时结果尚未就绪、已准入回调内嵌套工作被控制屏障拒绝、编辑器打开/隐藏缺少现有 Pause/Resume 屏障。生产结果等待上限 100 ms；默认独立实时会话仍为 0 ms，真正挂起的 DSP 仍故障退出。修复 Kontakt 原生多总线布局与元数据容量、attach 前不提供尺寸的编辑器兼容：共享音频总通道容量 128（单总线仍最多 32），IPC ProtocolVersion=3；实际两个入口仍只映射既有主 stereo，未新增端口/路由界面。主程序与四个 helpers 必须作为同一套更新。
+
+Kontakt 8.12.1 初次加载计时 4645/5191 ms，空采样器峰值 0 不判失败。随后安装版实机点击 Tools 标签连续两次令 helper 退出，日志为 error 12 / stage 4 / native 0；确认 helper 主线程窗口消息处理阻塞 DSP。现在同一个受监督 VST3 helper 内由专用线程处理 DSP，控制修改仍用互斥及原有 Pause/Resume 排空屏障，GUI 消息保留主线程。实机 Tools、Loops、Instruments 切换和持续播放/编辑器重开均通过，同一 helper PID 11524 存活，无音频故障日志。没有采样库的静音不表示失败；Kontakt 和 Electric88 可能需要配套采样库，不列作未完成。
+
+新增可控原生 GUI handler 阻塞 350 ms 的回归：旧 helper 在连续实时音频请求失败（gui-slow-handler-regression-red.log）；修复版两种 ABI 在 GUI 仍忙时完成连续音频，输出为 0.625，不等待 GUI 返回。该测试属于现有原生编辑器生命周期套件，没有新增生产生命周期。
+
+人工听音、商业授权/认证、主观 UI/DPI/焦点审核按指示 SKIPPED_MANUAL；本机可自动观察的加载、UI 操作、存活、音频数据与清理已测试，不声称所有商业类全面认证。此前直接发 NoteOn 的 Element 停止 transport 场景失败日志保留；最终商业乐器验收采用实际 SongPlayback，不把先前失败解释成已经证实的“仅错过瞬时峰值”。
+
+| 检查 | 当前结果与证据（均在 build/vst-live-fix） |
+| --- | --- |
+| 全量 Release | PASS，`gui-thread-release-build.log`；生产源 d3508bbbad9d7e3a87f4f4168fe19350b25bed15。 |
+| 全量回归 | 65/65 PASS，201.96 s；faults 11 项、43.41 s；`gui-thread-final-tests-2.log`。 |
+| 原生编辑器/慢 GUI 回归 | x64/cross-ABI 各 50 生命周期 PASS（6.84/6.79 s）；350 ms GUI 忙时连续实时音频仍为 0.625，旧 helper 的相同测试在第 58 行失败；`gui-slow-handler-regression-red.log`。 |
+| 官方入口实机音频矩阵 | 8 种 VST2/VST3 × Instrument/Effect × x86/x64 PASS（15.22 s），实际 SDL 256 帧、可见编辑器、重开、同 PID、非零音频与清理；`gui-thread-realtime-results.txt`。 |
+| WaveShell Element / Q10 | 最终二进制 4/4 PASS（11.267 s），实际 SongPlayback/效果处理峰值 0.207691/1.16406；同 PID、编辑器重开 PASS；`waves-gui-thread-final.txt`。此前三次 SongPlayback PASS 日志 waves-song-1/2/3 仍保留。 |
+| Kontakt 8.12.1 | 最终二进制 3/3 PASS（10.429 s），加载 4164 ms，峰值 0，显式 EmptySampler 接受；同 PID 与重开 PASS；`kontakt-gui-thread-final.txt`。此前 4645/5191 ms 记录为历史测量。 |
+| 安装版 Kontakt GUI | Tools 标签原来连续两次令 helper 退出：error 12/stage 4/native 0；新 helper Tools/Loops/Instruments 操作、持续播放/重开通过，PID 11524 保持存活；`kontakt-installed-ui-diagnostic.log` / `kontakt-installed-ui-thread-green-1.log`。测试工程手工空 fingerprint/state 属性曾触发合法拒绝，已修正本机测试文件，不是插件静音失败。 |
+| ZIP / 依赖 | `gui-thread-final-install.log` / `gui-thread-final-package.log` / `gui-thread-final-zip-audit-2.log`：184 个 PE、x86/x64 四 helpers、依赖/许可/CRC/逐文件 SHA256 PASS。增加 plugins 与 plugins/32 各自的 msvcp140_atomic_wait.dll。首次 ZIP 校验使用大小写敏感路径导致 KeyError；按 Windows 路径规则重验通过，旧日志保留。 |
+| 已安装文件 | `installed-gui-thread-final-update.json` DEPLOYED，本轮最终替换 5 文件，核对全部 184 PE；此前整体替换 12 文件见 `installed-final-update.json`。均在主程序/helpers 关闭时更新，配置替换期间保持原样，原始备份不覆盖。 |
+| 干净 PATH | 安装版只用 Windows 系统 PATH 的 --version PASS；`installed-gui-thread-clean-path-version.log`。 |
+| computer use | 测试主程序与 helpers 关闭，computer-use REPL 已重置结束；未卸载技能/插件。 |
+
+曾错误地对所有 CTest 设置 LMMS_VST_LIVE_GUI，导致离线 VstEntryPoints 的 nativeBundleLocator 在不支持的 GUI 模式崩溃；该 64/65 失败日志 `gui-thread-final-tests.log` 保留。移除全局开关，让专属 VstEntryPointsRealtime 使用其既定 GUI 配置，最终全套 65/65 PASS；未以跳过测试掩盖失败。此前 `final-sampler-tests.log` 的 65/65（249.56 s）属于 attach/capacity 修复候选，不能证明后续 Tools 标签稳定性。
+
+当前 ZIP：`build/vst-live-fix/lmms-1.3.0-alpha.2.36-vst3-kontakt-ui-fix-win64.zip`；SHA256：`54abb7710b3fbb5c2ac9016c4678e71ac6440e2546682f2f321b00a28632935d`。显示 `1.3.0-alpha.2.36+9682079`，配置时间早于修复提交；生产源 d3508bbbad9d7e3a87f4f4168fe19350b25bed15，包含 add227a61 / 14542d852。旧 alpha.2.35、20 ms realtime-fix、attach-only final-fix 包均已被本包取代。包内不含商业插件、采样库、SDK 源码或测试工具。

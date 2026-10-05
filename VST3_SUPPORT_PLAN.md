@@ -300,3 +300,24 @@ Invoke-LoggedNative ctest @('--test-dir','build/release','-C','Release','--outpu
 Electric88 **可能需要配套采样库**；按用户指示排除该项验收，不列为未完成。商业插件及其所需资源由用户本机安装。本报告不等同于所有商业类的完整认证；人工听音、激活／认证和主观 UI／DPI 审核统一 SKIPPED_MANUAL。
 
 发布版本 `1.3.0-alpha.2.35+8099048`，生产二进制源提交 `8099048cc`。最终 ZIP：`build/vst-s8/lmms-1.3.0-alpha.2.35-vst3-win64-release.zip`，SHA256：`db45f3325f427ba49cd11622f6911c4121df0d30304fa94c940f59dc34dbd970`。阶段与日志详见 `VST3_SUPPORT_PROGRESS.md` 和 `VST3_SUPPORT_VALIDATION.md`。S8 打包脚本及完成记录随本阶段提交推送。
+
+
+## 11. S8 后实机修复完成记录（2026-10-05，当前交付）
+
+状态 **PASS_WITH_MANUAL_SKIPS**。本节交付包替代 §10 的 alpha.2.35 包，以及本机早期 20 ms / attach-only 修复候选；旧结果保留为历史证据。S0～S5、S7、S8 保持完成，S6 保持 REMOVED_BY_USER。
+
+2026-10-05：S8 后 Windows 发布版实机问题修复。交付范围继续以计划 §10 为准：VeSTige 是 VST2/VST3 Instrument 唯一官方入口，VstEffect 是 VST2/VST3 Effect 唯一官方入口；保留多路径扫描、WaveShell/multi-class、Instrument/Effect 分类及原 Sidebar/Effect Browser 元数据选择。S6、第三种加载/宿主/生命周期、全局 Mixer/PDC、侧链及高级路由仍为 REMOVED_BY_USER，没有恢复这些扩张。
+
+实机反馈暴露了原 S8 离线验收的覆盖缺口：离线渲染通过并不证明 SDL 连续音频和原生编辑器稳定。修复回调连续到达时结果尚未就绪、已准入回调内嵌套工作被控制屏障拒绝、编辑器打开/隐藏缺少现有 Pause/Resume 屏障。生产结果等待上限 100 ms；默认独立实时会话仍为 0 ms，真正挂起的 DSP 仍故障退出。修复 Kontakt 原生多总线布局与元数据容量、attach 前不提供尺寸的编辑器兼容：共享音频总通道容量 128（单总线仍最多 32），IPC ProtocolVersion=3；实际两个入口仍只映射既有主 stereo，未新增端口/路由界面。主程序与四个 helpers 必须作为同一套更新。
+
+Kontakt 8.12.1 初次加载计时 4645/5191 ms，空采样器峰值 0 不判失败。随后安装版实机点击 Tools 标签连续两次令 helper 退出，日志为 error 12 / stage 4 / native 0；确认 helper 主线程窗口消息处理阻塞 DSP。现在同一个受监督 VST3 helper 内由专用线程处理 DSP，控制修改仍用互斥及原有 Pause/Resume 排空屏障，GUI 消息保留主线程。实机 Tools、Loops、Instruments 切换和持续播放/编辑器重开均通过，同一 helper PID 11524 存活，无音频故障日志。没有采样库的静音不表示失败；Kontakt 和 Electric88 可能需要配套采样库，不列作未完成。
+
+新增可控原生 GUI handler 阻塞 350 ms 的回归：旧 helper 在连续实时音频请求失败（gui-slow-handler-regression-red.log）；修复版两种 ABI 在 GUI 仍忙时完成连续音频，输出为 0.625，不等待 GUI 返回。该测试属于现有原生编辑器生命周期套件，没有新增生产生命周期。
+
+人工听音、商业授权/认证、主观 UI/DPI/焦点审核按指示 SKIPPED_MANUAL；本机可自动观察的加载、UI 操作、存活、音频数据与清理已测试，不声称所有商业类全面认证。此前直接发 NoteOn 的 Element 停止 transport 场景失败日志保留；最终商业乐器验收采用实际 SongPlayback，不把先前失败解释成已经证实的“仅错过瞬时峰值”。
+
+最终 Release 全量编译 PASS；65/65 CTest PASS（201.96 s），faults 11 项（43.41 s）；实际 SDL/256 帧两个官方入口的 8 种组合 PASS（15.22 s）。最终 WaveShell Element/Q10 主音频峰值 0.207691/1.16406，编辑器存活/重开通过；Kontakt 最新加载 4164 ms，空采样器静音不判失败。
+
+最终包 `build/vst-live-fix/lmms-1.3.0-alpha.2.36-vst3-kontakt-ui-fix-win64.zip`；SHA256 `54abb7710b3fbb5c2ac9016c4678e71ac6440e2546682f2f321b00a28632935d`。显示版本 `1.3.0-alpha.2.36+9682079` 是修复提交前的配置版本；实际生产源 `d3508bbbad9d7e3a87f4f4168fe19350b25bed15`，包含 `add227a61`、`14542d852` 的修复。184 个 PE（新增两个架构的 atomic-wait 运行库）、依赖、许可、ZIP CRC 与逐文件 SHA256 PASS。安装目录 `D:/Program Files/LMMS` 已更新并核对全部 184 个运行文件；替换前确认主程序及 helpers 关闭，替换期间配置保持原样。测试主程序及 helpers 已退出，computer use 已结束。
+
+**最终保留**：VeSTige/VstEffect 两入口、多路径扫描、WaveShell/multi-class、分类与现有 Sidebar/Effect Browser、主 stereo/普通 MIDI/参数/编辑器/工程及 preset、Windows 双位数 helper、受监督故障清理。**最终砍掉**：S6、第三加载/宿主/生命周期路径、全局 Mixer/PDC、侧链、额外输入输出/MIDI 目的地及高级路由 UI/撤销、非 Windows 与 x86 DAW。内部容量及线程兼容修复不开放额外路由。

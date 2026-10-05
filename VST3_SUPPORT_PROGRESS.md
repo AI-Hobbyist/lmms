@@ -46,3 +46,18 @@ S5 验证：`build/vst-s5/final-scoped-build-10.log`、`build/vst-s5/final-scope
 全局 Mixer / PDC、侧链、高级输入输出／MIDI 目的地、路由撤销历史、额外宿主入口和 S6 已撤回。Instrument / Effect 分类及 Sidebar / Effect Browser 只传递元数据身份键，实际加载／宿主／路由／生命周期仍由 VeSTige / VstEffect 承担。计划书最后检查表已记录最终保留／删除项。
 
 发布包：`build/vst-s8/lmms-1.3.0-alpha.2.35-vst3-win64-release.zip`（43,821,367 bytes）。SHA256：`db45f3325f427ba49cd11622f6911c4121df0d30304fa94c940f59dc34dbd970`。听音、人工商业授权／认证和主观编辑器／DPI 验收为 SKIPPED_MANUAL。其它平台不在本次范围。
+
+
+## 当前交付完成：S8 后发布版实机修复（2026-10-05）
+
+**PASS_WITH_MANUAL_SKIPS**；S0～S5、S7、S8 完成；S6 REMOVED_BY_USER。旧 S8 离线/渲染结果不等于 SDL 实时验证，本次补充并修复真实入口、编辑器和 Kontakt 的问题，详见计划 §11 与验证记录末节。
+
+- 最终生产源 `d3508bbbad9d7e3a87f4f4168fe19350b25bed15`（含 `add227a61` / `14542d852`），Windows Release 编译 PASS。
+- 65/65 CTest PASS（201.96 s），11 项故障测试 PASS（43.41 s）；8 种实际 GUI/SDL 入口组合 PASS。
+- Kontakt 8.12.1 最新加载 4164 ms；安装版 Tools/Loops/Instruments、持续播放、关闭/重开编辑器 PASS，同一 helper 存活。空采样器/缺少采样库时无声不判失败；Kontakt/Electric88 可能需要配套采样库，Electric88 不列未完成。
+- WaveShell Element/Q10 最新实际主音频和编辑器重开 PASS（峰值 0.207691/1.16406）。
+- 包内 184 个 PE、正确架构/运行库/许可、ZIP CRC 与 SHA256 PASS；安装版已更新，全文件核对 PASS，替换前主程序/helper 关闭，个人配置保留。备份仍在 `build/vst-live-fix/installed-before-fix`。
+- computer use 已结束；测试主程序/helpers 已关闭。人工听音、授权认证、主观 UI/DPI 审核 SKIPPED_MANUAL。
+- 保留与撤回范围沿用计划 §10/§11：两个官方入口、多路径/WaveShell/multi-class/分类选择保留；S6、第三路径、Mixer/PDC/侧链/高级路由撤回。
+
+**当前包**：`build/vst-live-fix/lmms-1.3.0-alpha.2.36-vst3-kontakt-ui-fix-win64.zip`。SHA256：`54abb7710b3fbb5c2ac9016c4678e71ac6440e2546682f2f321b00a28632935d`。显示版本 `1.3.0-alpha.2.36+9682079`；源提交以包内 README 为准。此包替代 alpha.2.35、realtime-fix、final-fix 等早期候选，不继续使用那些历史包。
