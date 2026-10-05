@@ -39,6 +39,7 @@
 #include <QTabWidget>
 #include <QLocale>
 #include <QStyle>
+#include <QStyleOptionToolButton>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QCheckBox>
@@ -54,22 +55,22 @@ public:
  using QToolButton::QToolButton;
  std::function<void()> toggleVisibility;
  QColor curveColor;
- void displayState(bool editing,bool visible) {
-  setChecked(editing);
-  QPixmap image(16,16);image.fill(Qt::transparent);QPainter painter(&image);
-  const auto tint=editing||visible?curveColor:palette().color(QPalette::Disabled,QPalette::Text);
-  painter.setPen(QPen(tint,1.2));painter.drawEllipse(QRectF(1,4,14,8));painter.setBrush(tint);painter.drawEllipse(QPointF(8,8),2,2);
-  setIcon(QIcon(image));update();
- }
+ bool curveVisible=true;
+ void displayState(bool editing,bool visible) {setChecked(editing);curveVisible=visible;update();}
+
 protected:
  void mousePressEvent(QMouseEvent* event) override {
   if(event->button()==Qt::RightButton) {if(toggleVisibility) toggleVisibility();event->accept();return;}
   QToolButton::mousePressEvent(event);
  }
- void paintEvent(QPaintEvent* event) override {
-  QToolButton::paintEvent(event);
-  if(isChecked()) {QPainter painter(this);painter.setPen(QPen(curveColor,2));painter.drawLine(3,height()-2,width()-3,height()-2);}
+ void paintEvent(QPaintEvent*) override {
+  QPainter painter(this);QStyleOptionToolButton option;initStyleOption(&option);option.text.clear();option.icon=QIcon{};
+  style()->drawComplexControl(QStyle::CC_ToolButton,&option,&painter,this);
+  const auto box=rect().adjusted(1,1,-1,-1);auto fill=curveColor;fill.setAlpha(isChecked()?90:curveVisible?35:10);
+  painter.setRenderHint(QPainter::Antialiasing);painter.setBrush(fill);painter.setPen(QPen(isChecked()?curveColor:palette().color(QPalette::Mid),isChecked()?2:1));painter.drawRoundedRect(box,3,3);
+  painter.setPen(isChecked()||curveVisible?curveColor:palette().color(QPalette::Disabled,QPalette::Text));painter.drawText(rect().adjusted(8,0,-8,0),Qt::AlignCenter,text());
  }
+
 };
 }
 
@@ -126,7 +127,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* parameterLayout=new QVBoxLayout(parameterBody);parameterLayout->setContentsMargins(0,0,0,0);parameterLayout->setSpacing(0);
  auto* parameterCanvas=new SVSCanvas(clip,parameterBody);parameterCanvas->setThemeColors(m_colors);svs::Parameter emptyParameter;parameterCanvas->setParameterLane(emptyParameter);parameterCanvas->setParameterActive(false);parameterCanvas->setMinimumHeight(80);parameterLayout->addWidget(parameterCanvas,1);
  auto* parameterScroll=new QScrollArea(parameterBody);parameterScroll->setObjectName("svsParameterTabs");parameterScroll->setWidgetResizable(true);parameterScroll->setFrameShape(QFrame::NoFrame);parameterScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);parameterScroll->setFixedHeight(44);
- auto* tabBody=new QWidget(parameterScroll);auto* parameterTabs=new QHBoxLayout(tabBody);parameterTabs->setContentsMargins(8,2,8,2);parameterTabs->setSpacing(6);parameterTabs->addStretch();parameterScroll->setWidget(tabBody);parameterLayout->addWidget(parameterScroll);
+ auto* tabBody=new QWidget(parameterScroll);auto* parameterTabs=new QHBoxLayout(tabBody);parameterTabs->setContentsMargins(8,2,8,2);parameterTabs->setSpacing(6);parameterTabs->addStretch();parameterTabs->addStretch();parameterScroll->setWidget(tabBody);parameterLayout->addWidget(parameterScroll);
  splitter->setSizes({440,180});
  const auto storedSizes=clip->editorState()["areaSizes"].toArray();if(storedSizes.size()==2) splitter->setSizes({storedSizes[0].toInt(440),storedSizes[1].toInt(180)});
  connect(splitter,&QSplitter::splitterMoved,this,[clip,splitter]{auto state=clip->editorState();QJsonArray sizes;for(auto size:splitter->sizes()) sizes.append(size);state["areaSizes"]=sizes;clip->setEditorState(state);});
@@ -147,7 +148,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,parameterCanvas]{if(parameterCanvas->horizontalZoom()!=canvas->horizontalZoom()) parameterCanvas->setZoom(canvas->horizontalZoom(),parameterCanvas->verticalZoom());if(parameterCanvas->scrollTick()!=canvas->scrollTick()) parameterCanvas->setScroll(canvas->scrollTick(),parameterCanvas->topPitch());});
  connect(parameterCanvas,&SVSCanvas::viewportChanged,this,[canvas,parameterCanvas]{if(canvas->horizontalZoom()!=parameterCanvas->horizontalZoom()) canvas->setZoom(parameterCanvas->horizontalZoom(),canvas->verticalZoom());if(canvas->scrollTick()!=parameterCanvas->scrollTick()) canvas->setScroll(parameterCanvas->scrollTick(),canvas->topPitch());});
  parameterCanvas->setZoom(canvas->horizontalZoom(),parameterCanvas->verticalZoom());parameterCanvas->setScroll(canvas->scrollTick(),parameterCanvas->topPitch());
- auto* strip=new SVSResultStrip(clip,noteArea); strip->setThemeColors(m_colors); grid->addWidget(strip,1,0); connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,strip]{strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom());}); strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom()); connect(strip,&SVSResultStrip::scrollRequested,this,[canvas](double tick){canvas->setScroll(tick,canvas->topPitch());});
+ auto* strip=new SVSResultStrip(clip,noteArea); strip->setThemeColors(m_colors); grid->addWidget(strip,1,0);grid->setRowStretch(0,1);grid->setRowStretch(1,0); connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,strip]{strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom());}); strip->setViewport(canvas->scrollTick(),canvas->horizontalZoom()); connect(strip,&SVSResultStrip::scrollRequested,this,[canvas](double tick){canvas->setScroll(tick,canvas->topPitch());});
  auto* horizontal=new QScrollBar(Qt::Horizontal,this); horizontal->setObjectName("svsHorizontalScroll"); outerGrid->addWidget(horizontal,1,0);
  auto* vertical=new QScrollBar(Qt::Vertical,this); vertical->setObjectName("svsVerticalScroll"); vertical->setRange(0,12700); grid->addWidget(vertical,0,1);
  auto refreshScroll=[clip,canvas,horizontal,vertical]{ QSignalBlocker h(horizontal),v(vertical); horizontal->setRange(0,std::max(19200,int(clip->length())*100)); horizontal->setValue(int(canvas->scrollTick()*100)); vertical->setValue(int((127-canvas->topPitch())*100)); };
@@ -217,7 +218,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
    if(!parameter.curve||parameter.type=="string") return;
    const auto key=(feedback?"feedback:":"input:")+parameter.id;
    if(!lanes->contains(key)) {
-    auto* tab=new SVSParameterTab(tabBody);tab->setObjectName("svsParameterTab."+key);tab->setCheckable(true);tab->setAutoRaise(true);tab->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);tab->setFocusPolicy(Qt::NoFocus);
+    auto* tab=new SVSParameterTab(tabBody);tab->setObjectName("svsParameterTab."+key);tab->setCheckable(true);tab->setAutoRaise(true);tab->setToolButtonStyle(Qt::ToolButtonTextOnly);tab->setFocusPolicy(Qt::NoFocus);
     parameterTabs->insertWidget(parameterTabs->count()-1,tab);lanes->insert(key,{tab,parameter,feedback});
     connect(tab,&QToolButton::clicked,this,[clip,key,selectedParameter,updateParameterDisplay,parameterCanvas]{
      parameterCanvas->cancelOperation();*selectedParameter=key;

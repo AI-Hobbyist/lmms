@@ -16,7 +16,7 @@
 #include <cmath>
 namespace lmms::gui {
 SVSResultStrip::SVSResultStrip(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip) {
- setObjectName("svsWaveformPhonemes"); setMinimumHeight(110); setFocusPolicy(Qt::StrongFocus); setMouseTracking(true);
+ setObjectName("svsWaveformPhonemes"); setFixedHeight(80); setFocusPolicy(Qt::StrongFocus); setMouseTracking(true);
  m_autoScroll=new QTimer(this); m_autoScroll->setInterval(25);
  connect(m_autoScroll,&QTimer::timeout,this,[this]{if(!m_dragging) return; const double delta=m_pointer.x()<84?-8/m_pixelsPerTick:m_pointer.x()>width()-24?8/m_pixelsPerTick:0; if(delta) { emit scrollRequested(std::max(0.,m_scroll+delta)); updateBoundary(tickAt(m_pointer.x())); }});
  connect(clip,&Clip::dataChanged,this,[this]{if(m_dragging&&m_clip->notes()!=m_before) cancelOperation(); if(!m_dragging&&!m_selectedNote.isEmpty()) { bool exists=false; for(const auto& cell:cells()) if(cell.note==m_selectedNote&&cell.index==m_selectedIndex) exists=true; if(!exists) { m_selectedNote.clear(); m_selectedIndex=-1; emit selectionChanged(); } } update();});

@@ -386,3 +386,9 @@ PASS：SVS 钢琴窗默认嵌入 LMMS 工作区，可通过现有标题栏分离
 参数栏改为一张共享曲线图及底部横向参数按钮，移除每参数独立高度控件；左键选中/保持编辑，右键显隐其他曲线。插件提供参数名称、颜色、值范围与尺度；旧插件无颜色时沿用主题回退，没有宿主内置参数配色/范围表。保留动态声明、只读反馈、曲线编辑/撤销、同步视口与按 ID 持久化，不修改其他编辑区或普通钢琴窗。Windows 原生 Qt 完整回归 50 passed/0 failed/0 skipped；真实窗口截图验证通过，开发目录已更新。详见 doc/svs/SVS-parameter-layout.md。
 
 后续 GUI 测试禁用 offscreen，字体/布局使用实窗截图。当前布局开发不使用 Computer Use；仅在之后对比 TuneLab 钢琴窗实际操作逻辑时使用。规则已写入 AGENTS.md。用户最终人工布局/操作验收 MANUAL/PENDING，不扩大本次范围。
+
+## 19. 用户验收修正：音素区、居中彩色参数标签、音名选项（2026-10-05）
+
+波形/音素区固定为 80px 的窄条，将多余高度留给音符画布；参数按钮居中，移除眼睛图标，改为使用插件颜色的纯文字标签，保留编辑/显隐交互。SVS 钢琴窗读取并实时响应现有 ui/printnotelabels（Enable all note labels in piano roll），显示白键音名及有空间的音符音名，同时保留歌词。不修改普通 PianoRoll 或设置系统。
+
+Release 构建、Windows 原生专项及完整 SVS 回归通过（51 passed/0 failed/0 skipped）；真实窗口截图和开发目录已更新。证据见 doc/svs/SVS-compact-layout.md。未使用 offscreen 或 Computer Use 操作应用，用户最终人工布局/操作验收 MANUAL/PENDING。

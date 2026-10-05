@@ -2,6 +2,7 @@
 #include "SVSTrack.h"
 #include "SVSLyricEditor.h"
 #include "SVSNoteOperations.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Song.h"
 #include "ProjectJournal.h"
@@ -33,6 +34,10 @@
 namespace lmms::gui {
 namespace {
 constexpr int KeyboardWidth=60,TimelineHeight=24;
+QString noteLabel(int pitch) {
+ static const QStringList names{"C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"};
+ return names[(pitch%12+12)%12]+QString::number(pitch/12-1);
+}
 constexpr const char* NoteMime="application/x-lmms-svs-notes";
 constexpr const char* CurveMime="application/x-lmms-svs-curve";
 QJsonObject noteJson(const svs::Note& note) {
@@ -62,6 +67,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip)
   QSet<QString> valid; if(m_clip) for(const auto& note:m_clip->notes()) if(m_selected.contains(note.id)) valid.insert(note.id);
   if(m_action==Action::None&&valid!=m_selected) { m_selected=valid; emit selectionChanged(); } update();
  });
+ connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString& key,const QString&){if(group=="ui"&&key=="printnotelabels") update();});
  connect(clip,&QObject::destroyed,this,[this]{cancelOperation(); m_lyric->hide(); setEnabled(false);});
  connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song),&Timeline::positionChanged,this,qOverload<>(&SVSCanvas::update));
 }
@@ -214,6 +220,7 @@ QSize SVSCanvas::portraitTargetSize() const {return QSize(std::max(1,int((width(
 void SVSCanvas::resizeEvent(QResizeEvent* event) {QWidget::resizeEvent(event); emit portraitSizeChanged();}
 void SVSCanvas::paintEvent(QPaintEvent*) {
  QPainter painter(this); painter.fillRect(rect(),color("backgroundColor",QPalette::Base));
+ const bool allNoteLabels=ConfigManager::inst()->value("ui","printnotelabels").toInt()!=0;
  const QRectF grid(KeyboardWidth,TimelineHeight,width()-KeyboardWidth,height()-TimelineHeight);
  painter.save(); painter.setClipRect(grid);
  painter.setPen(color("gridLineColor",QPalette::Mid));
@@ -229,7 +236,9 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   for(const auto& note:displayedNotes()) {
    auto rectangle=noteRect(note); if(!rectangle.intersects(grid)) continue;
    painter.fillRect(rectangle.adjusted(0,1,-1,-1),m_selected.contains(note.id)?color("selectedNoteColor",QPalette::Highlight).lighter(125):color("noteColor",QPalette::Highlight));
-   painter.setPen(color("lyricColor",QPalette::HighlightedText)); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter|Qt::AlignLeft,fontMetrics().elidedText(note.lyric,Qt::ElideRight,int(rectangle.width()-6)));
+   const auto namedLyric=noteLabel(int(std::floor(note.pitch)))+" · "+note.lyric;
+   const auto label=allNoteLabels&&fontMetrics().horizontalAdvance(namedLyric)<=rectangle.width()-6?namedLyric:note.lyric;
+   painter.setPen(color("lyricColor",QPalette::HighlightedText)); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter|Qt::AlignLeft,fontMetrics().elidedText(label,Qt::ElideRight,int(rectangle.width()-6)));
    const auto reading=note.pronunciation.isEmpty()?readings[note.id].toObject()["text"].toString():note.pronunciation;
    if(!reading.isEmpty()) { painter.setPen(color("pronunciationColor",QPalette::Text)); painter.drawText(rectangle.translated(0,-m_rowHeight).adjusted(3,0,-3,0),Qt::AlignBottom|Qt::AlignLeft,fontMetrics().elidedText(reading,Qt::ElideRight,std::max(0,int(rectangle.width()-6)))); }
   }
@@ -251,7 +260,7 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   const int pitch=int(std::floor(m_topPitch))-row; if(pitch<0||pitch>127) continue; const int key=(pitch%12+12)%12;
   const bool black=key==1||key==3||key==6||key==8||key==10; const auto y=TimelineHeight+(m_topPitch-pitch)*m_rowHeight;
   painter.fillRect(QRectF(0,y,black?KeyboardWidth*.65:KeyboardWidth,m_rowHeight-1),black?palette().dark():palette().light());
-  if(key==0) { painter.setPen(palette().windowText().color()); painter.drawText(QRectF(0,y,KeyboardWidth-3,m_rowHeight),Qt::AlignRight|Qt::AlignVCenter,QString("C%1").arg(pitch/12-1)); }
+  if(key==0||(allNoteLabels&&!black)) { painter.setPen(palette().windowText().color()); painter.drawText(QRectF(0,y,KeyboardWidth-3,m_rowHeight),Qt::AlignRight|Qt::AlignVCenter,noteLabel(pitch)); }
  }
  painter.fillRect(QRect(0,0,width(),TimelineHeight),palette().window()); painter.setPen(palette().windowText().color());
  const auto bar=TimePos::ticksPerBar(); const double offset=m_clip?int(m_clip->startPosition())+int(m_clip->startTimeOffset()):0;

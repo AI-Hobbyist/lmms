@@ -135,7 +135,7 @@ private slots:
    clip->setEditorData(clip->notes(),{{tension.id,tension},{gender.id,gender}});QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
    auto* tab=editor->findChild<QToolButton*>("svsParameterTab.input:example.tension");QVERIFY(tab);QTest::mouseClick(tab,Qt::LeftButton);canvas->setScroll(0,64);QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);
    const auto available=editor->screen()->availableGeometry();editor->move(available.topLeft()+QPoint(20,20));editor->resize(std::min(1100,available.width()-40),std::min(740,available.height()-80));editor->raise();editor->activateWindow();QVERIFY(QTest::qWaitForWindowExposed(editor));QTest::qWait(300);
-   const auto capture=editor->screen()->grabWindow(editor->winId());QVERIFY(!capture.isNull());QVERIFY(capture.save("doc/svs/validation/SVS-parameter-layout-native-window.png"));
+   const auto capture=editor->screen()->grabWindow(editor->winId());QVERIFY(!capture.isNull());QVERIFY(capture.save(qEnvironmentVariable("SVS_PARAMETER_WINDOW_CAPTURE_PATH","doc/svs/validation/SVS-parameter-layout-native-window.png")));
   }
   QTest::mouseDClick(view,Qt::LeftButton);QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);QVERIFY(frame->isDetached());
   editor->close();QCoreApplication::processEvents();
@@ -675,6 +675,21 @@ private slots:
   QDomDocument doc;auto root=doc.createElement("test");doc.appendChild(root);track->saveState(doc,root);auto* restored=static_cast<SVSTrack*>(Track::create(root.firstChildElement(),Engine::getSong()));auto* saved=static_cast<SVSClip*>(restored->getClip(0));QCOMPARE(saved->editorState(),clip->editorState());QCOMPARE(saved->curves(),before);
   QTRY_VERIFY_WITH_TIMEOUT(restored->capabilitiesReady(),10000);gui::SVSPianoRoll reopened(saved);auto* restoredTab=reopened.findChild<QToolButton*>("svsParameterTab.input:example.gender");QVERIFY(restoredTab);QVERIFY(restoredTab->isChecked());
   delete restored;delete track;
+ }
+ void compactEditorLayoutAndNoteLabels() {
+  auto* config=ConfigManager::inst();const auto previous=config->value("ui","printnotelabels");auto restore=qScopeGuard([&]{config->setValue("ui","printnotelabels",previous);});config->setValue("ui","printnotelabels","0");
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="compact-note";note.pitch=62;note.duration=96;note.lyric="la";clip->setNotes({note});
+  gui::SVSPianoRoll editor(clip);editor.resize(1500,900);editor.show();QCoreApplication::processEvents();
+  auto* strip=editor.findChild<gui::SVSResultStrip*>();QVERIFY(strip);QCOMPARE(strip->height(),80);
+  auto* tabs=editor.findChild<QScrollArea*>("svsParameterTabs");QVERIFY(tabs);
+  auto verifyTags=[&]{QRect bounds;for(auto* tab:tabs->findChildren<QToolButton*>()) if(tab->isVisible()) {QVERIFY(tab->icon().isNull());QCOMPARE(tab->toolButtonStyle(),Qt::ToolButtonTextOnly);bounds=bounds.united(QRect(tab->mapTo(tabs->widget(),QPoint()),tab->size()));}QVERIFY(!bounds.isEmpty());QVERIFY(std::abs(bounds.center().x()-tabs->widget()->rect().center().x())<=2);};verifyTags();
+  editor.resize(1200,740);QCoreApplication::processEvents();QCOMPARE(strip->height(),80);verifyTags();
+  auto* canvas=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");QVERIFY(canvas);canvas->setScroll(0,65);QCoreApplication::processEvents();
+  const auto originalNotes=clip->notes();const auto before=canvas->grab().toImage();config->setValue("ui","printnotelabels","1");QCoreApplication::processEvents();const auto labeled=canvas->grab().toImage();
+  const auto keyTop=int(canvas->pointAt(0,62).y());QVERIFY(before.copy(QRect(0,keyTop,60,24))!=labeled.copy(QRect(0,keyTop,60,24)));
+  const auto noteRect=canvas->noteRect(note).toRect();QVERIFY(before.copy(noteRect)!=labeled.copy(noteRect));QCOMPARE(clip->notes(),originalNotes);
+  config->setValue("ui","printnotelabels","0");QCoreApplication::processEvents();QCOMPARE(canvas->grab().toImage().copy(noteRect),before.copy(noteRect));
+  delete track;
  }
  void parameterPanelStateAndFocus() {
   const auto& voice=svs::Registry::instance().voices()[0]; auto plugin=svs::Registry::instance().plugin(voice.pluginId);
