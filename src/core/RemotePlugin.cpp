@@ -264,7 +264,7 @@ bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QStr
 	if (!executable.endsWith(".exe", Qt::CaseInsensitive)) { executable += ".exe"; }
 	auto bridge = std::make_unique<vsthost::LegacyHostBridge>([this](const message& reply) { processMessage(reply); });
 	m_vstBridge = bridge.get(); setMessageTransport(std::move(bridge));
-	m_failed = !m_vstBridge->open({executable.toStdWString(), {embedMethod.toStdWString()}, 30000});
+	m_failed = !m_vstBridge->open({executable.toStdWString(), {embedMethod.toStdWString()}, 30000, 20});
 	if (!m_failed) { sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey())); }
 	return failed();
 #else

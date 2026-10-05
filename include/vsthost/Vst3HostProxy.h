@@ -147,8 +147,8 @@ public:
 		if (reply.error != Error::None) { fail(reply.error); }
 		return reply.error;
 	}
-	HostSession::Reply showEditor() { return m_session.request(MessageType::ShowEditor, {}, 15000).get(); }
-	Error hideEditor() { return m_session.request(MessageType::HideEditor, {}, 15000).get().error; }
+		HostSession::Reply showEditor() { return editorControl(MessageType::ShowEditor); }
+		Error hideEditor() { return editorControl(MessageType::HideEditor).error; }
 	HostSession::Reply midiOutput() { return m_session.request(MessageType::Midi, {}, 15000).get(); }
 	bool postEvent(const Vst3BlockEvent& event) noexcept
 	{
@@ -215,6 +215,17 @@ public:
 		if (error() != Error::None) { std::fill(output.begin(), output.end(), 0.0f); return false; } return success;
 	}
 private:
+		HostSession::Reply editorControl(MessageType type)
+		{
+			// Native window operations run on the helper's audio owner thread.
+			// Retire partial buffers under the existing pause/resume boundary so
+			// editor creation/activation cannot be mistaken for an audio deadline miss.
+			auto reply = m_session.requestPrepared(type, [this] {
+				retireBuffered(); return std::vector<std::uint8_t>{};
+			}, 15000, true).get();
+			if (reply.error != Error::None) { fail(reply.error); }
+			return reply;
+		}
 	void publishMetadata(HostSession::Reply& result)
 	{
 		Vst3Metadata metadata;

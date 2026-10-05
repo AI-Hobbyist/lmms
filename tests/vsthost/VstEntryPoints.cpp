@@ -34,6 +34,12 @@
 #include "PresetPreviewPlayHandle.h"
 #include "AudioEngine.h"
 #include "AudioDevice.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "InstrumentView.h"
+#include "InstrumentTrackView.h"
+#include "InstrumentTrackWindow.h"
+#include "EffectControlDialog.h"
 
 // Native LMMS DLLs import lmms.exe. This test's output name is lmms.exe so
 // imports resolve to the same Engine/CommandBus as the test, not a second copy.
@@ -62,6 +68,7 @@ class VstEntryPoints : public QObject
 	QString m_fixture;
 	QTemporaryDir m_fixtureDirectory;
 	QElapsedTimer m_caseTimer;
+	std::unique_ptr<lmms::gui::GuiApplication> m_liveGui;
 	std::set<DWORD> fixtureProcesses(const char* entry, const wchar_t* moduleName = L"Vst2Baseline.dll")
 	{
 		std::set<DWORD> result;
@@ -135,12 +142,23 @@ private slots:
 			QStandardPaths::setTestModeEnabled(true);
 			QVERIFY(lmms::ConfigManager::inst()->setVstScanRoots({{m_fixtureRoot, {"vst2"}}}));
 			lmms::NotePlayHandleManager::init();
-		lmms::Engine::init(true);
+			if (qEnvironmentVariableIsSet("LMMS_VST_LIVE_GUI"))
+			{
+				lmms::ConfigManager::inst()->loadConfigFile(m_fixtureRoot + "/test-config.xml");
+				lmms::ConfigManager::inst()->setWorkingDir(m_fixtureRoot + '/');
+				lmms::ConfigManager::inst()->setValue("audioengine", "audiodev", "SDL (Simple DirectMedia Layer)");
+				lmms::ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer", "256");
+				lmms::ConfigManager::inst()->setValue("ui", "vstembedmethod", "win32");
+				lmms::ConfigManager::inst()->setValue("app", "configured", "1");
+				m_liveGui = std::make_unique<lmms::gui::GuiApplication>();
+				m_liveGui->mainWindow()->show();
+			}
+			else { lmms::Engine::init(true); }
 		lmms::ConfigManager::inst()->setVSTDir(m_fixtureRoot + '/');
 		QVERIFY(!lmms::PluginFactory::instance()->pluginInfo("vestige").isNull());
 			QVERIFY(!lmms::PluginFactory::instance()->pluginInfo("vsteffect").isNull());
 			QVERIFY(lmms::Engine::refreshVstCatalog());
-			QTRY_VERIFY_WITH_TIMEOUT(!lmms::Engine::vstCatalog()->snapshot().busy, 10000);
+			QTRY_VERIFY_WITH_TIMEOUT(!lmms::Engine::vstCatalog()->snapshot().busy, 30000);
 			const auto report = lmms::Engine::vstCatalog()->snapshot().report;
 			QVERIFY(report); QCOMPARE(report->entries.size(), std::size_t{6}); QVERIFY(report->failures.empty());
 		}
@@ -208,6 +226,140 @@ private slots:
 			QVERIFY(fixtureProcesses("catalog-only scans leave no native instance").empty());
 			selector.close();
 		}
+	void liveGuiAndAudio_data()
+	{
+		QTest::addColumn<QString>("architecture");
+		QTest::addColumn<bool>("native");
+		QTest::addColumn<bool>("instrument");
+		for (const auto* architecture : {"x86", "x64"})
+		{
+			for (const bool native : {false, true})
+			{
+				for (const bool instrument : {true, false})
+				{
+					const auto tag = QString("%1-%2-%3").arg(architecture,
+						native ? "vst3" : "vst2", instrument ? "instrument" : "effect");
+					QTest::newRow(tag.toUtf8().constData()) << QString(architecture) << native << instrument;
+				}
+			}
+		}
+	}
+	void liveGuiAndAudio()
+	{
+		if (!m_liveGui) { QSKIP("Separate realtime suite exercises actual GUI and SDL workers"); }
+		QFETCH(QString, architecture);
+		QFETCH(bool, native);
+		QFETCH(bool, instrument);
+		lmms::Engine::getSong()->clearProject();
+		QTest::qWait(20);
+		QVERIFY(command("track.create", {{"type", "instrument"}}).ok);
+		const auto path = native ?
+			QDir(qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT")).absoluteFilePath(
+				"../vst-host/" + architecture + "/Release/Vst3Native.vst3") :
+			m_fixtureRoot + '/' + architecture + "/fixtures/Release/Vst2Baseline.dll";
+		lmms::Plugin::Descriptor::SubPluginFeatures::Key key;
+		key.attributes["file"] = path;
+		if (native)
+		{
+			key.attributes["format"] = "vst3";
+			key.attributes["architecture"] = architecture == "x86" ? "32" : "64";
+			key.attributes["classid"] = instrument ?
+				"0002000154761032fedcba9824681357" : "040302f1cdab01ef1357246898765432";
+		}
+		QWidget* view = nullptr;
+		std::unique_ptr<QWidget> effectView;
+		if (instrument)
+		{
+			QDomDocument doc;
+			auto state = doc.createElement("vestige");
+			for (auto it = key.attributes.cbegin(); it != key.attributes.cend(); ++it)
+			{ state.setAttribute(it.key(), it.value()); }
+			state.setAttribute("plugin", path);
+			auto* plugin = track()->loadInstrument("vestige");
+			QVERIFY(plugin);
+			plugin->restoreState(state);
+			QTest::qWait(20);
+			lmms::gui::InstrumentTrackView* trackView = nullptr;
+			for (auto* candidate : m_liveGui->mainWindow()->findChildren<lmms::gui::InstrumentTrackView*>())
+			{ if (candidate->model() == track()) { trackView = candidate; break; } }
+			QVERIFY(trackView);
+			auto* window = trackView->getInstrumentTrackWindow();
+			window->show();
+			for (auto* child : window->findChildren<QWidget*>())
+			{
+				if (auto* instrumentView = dynamic_cast<lmms::gui::InstrumentView*>(child))
+				{ view = instrumentView; break; }
+			}
+			QVERIFY(view);
+			QVERIFY(QMetaObject::invokeMethod(view, "toggleGUI", Qt::DirectConnection));
+		}
+		else
+		{
+			QVERIFY(track()->loadInstrument("tripleoscillator"));
+			auto* chain = track()->audioBusHandle()->effects();
+			auto* effect = lmms::Effect::instantiate("vsteffect", chain, &key);
+			QVERIFY(effect);
+			QVERIFY(!effect->dontRun());
+			chain->appendEffect(effect);
+			effectView.reset(effect->controls()->createView());
+			view = effectView.get();
+			QVERIFY(view);
+			QVERIFY(QMetaObject::invokeMethod(view, "togglePluginUI", Qt::DirectConnection, Q_ARG(bool, true)));
+		}
+		view->show();
+		QTest::qWait(50);
+		const auto module = native ? L"Vst3Native.vst3" : L"Vst2Baseline.dll";
+		const auto children = fixtureProcesses("before realtime note", module);
+		QCOMPARE(children.size(), std::size_t(1));
+		const auto editorVisible = [&]
+		{
+			struct Search { const std::set<DWORD>* children; bool visible = false; } search{&children};
+			const auto inspect = [](HWND window, LPARAM context) -> BOOL
+			{
+				auto& found = *reinterpret_cast<Search*>(context);
+				DWORD pid = 0;
+				GetWindowThreadProcessId(window, &pid);
+				found.visible |= found.children->contains(pid) && IsWindowVisible(window);
+				return TRUE;
+			};
+			EnumWindows(inspect, reinterpret_cast<LPARAM>(&search));
+			EnumChildWindows(reinterpret_cast<HWND>(m_liveGui->mainWindow()->winId()), inspect, reinterpret_cast<LPARAM>(&search));
+			EnumChildWindows(reinterpret_cast<HWND>(view->winId()), inspect, reinterpret_cast<LPARAM>(&search));
+			return search.visible;
+		};
+		QVERIFY2(editorVisible(), "editor did not open through official GUI entry");
+		track()->processInEvent(lmms::MidiEvent(lmms::MidiNoteOn, 0, 57, 100));
+		QTest::qWait(500);
+		QVERIFY2(fixtureProcesses("after realtime note", module) == children, "helper vanished after realtime audio");
+		QVERIFY2(editorVisible(), "editor vanished after realtime audio");
+		float peak = 0;
+		for (unsigned poll = 0; poll < 20; ++poll)
+		{
+			QTest::qWait(15);
+			auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
+			peak = std::max(peak, lmms::Engine::mixer()->mixerChannel(0)->m_peakLeft);
+		}
+		QVERIFY2(peak > 0.001f, "official entry is silent on actual audio worker threads");
+		if (instrument)
+		{
+			QVERIFY(QMetaObject::invokeMethod(view, "toggleGUI", Qt::DirectConnection));
+			QVERIFY(QMetaObject::invokeMethod(view, "toggleGUI", Qt::DirectConnection));
+		}
+		else
+		{
+			QVERIFY(QMetaObject::invokeMethod(view, "togglePluginUI", Qt::DirectConnection, Q_ARG(bool, false)));
+			QVERIFY(QMetaObject::invokeMethod(view, "togglePluginUI", Qt::DirectConnection, Q_ARG(bool, true)));
+		}
+		QTest::qWait(100);
+		QVERIFY(fixtureProcesses("after editor reopen", module) == children);
+		QVERIFY2(editorVisible(), "editor failed to reopen while realtime audio was active");
+		track()->processInEvent(lmms::MidiEvent(lmms::MidiNoteOff, 0, 57, 0));
+		// The instrument window owns its view. Only the standalone effect view
+		// belongs to this test; deleting an instrument tab would leave its tab bar dangling.
+		effectView.reset();
+		lmms::Engine::getSong()->clearProject();
+		QTest::qWait(20);
+	}
 	void nativeEffects()
 	{
 		QElapsedTimer phaseTimer; phaseTimer.start();
@@ -523,8 +675,13 @@ private slots:
 	}
 	void cleanupTestCase()
 	{
-			lmms::Engine::destroy();
-			QVERIFY(lmms::Engine::vstCatalog() == nullptr);
+		if (m_liveGui)
+		{
+			delete static_cast<QWidget*>(m_liveGui->mainWindow());
+			m_liveGui.reset();
+		}
+		else { lmms::Engine::destroy(); }
+		QVERIFY(lmms::Engine::vstCatalog() == nullptr);
 		QVERIFY(fixtureProcesses("DAW shutdown").empty());
 		lmms::NotePlayHandleManager::free();
 	}

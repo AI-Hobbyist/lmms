@@ -138,6 +138,53 @@ int wmain(int argc, wchar_t** argv)
 		check(rejected.error == Error::InvalidState && !published, "failed request returns without publication handshake");
 	}
 	DWORD before = 0, after = 0; GetProcessHandleCount(GetCurrentProcess(), &before);
+	{
+		HostSession session(1024);
+		check(reply(session.open(configuration())).error == Error::None, "nested admission fixture ready");
+		std::future<HostSession::Reply> pending;
+		check(session.withAudio([&] {
+			pending = session.request(MessageType::SetState, {1}, 1000, true);
+			// A separate producer observes that control has stopped NEW admissions.
+			// This already admitted callback must still finish its nested processing.
+			auto barrier = std::async(std::launch::async, [&] {
+				const auto deadline = GetTickCount64() + 1000;
+				while (GetTickCount64() < deadline)
+				{
+					if (!session.withAudio([] { return true; })) { return true; }
+					Sleep(1);
+				}
+				return false;
+			});
+			check(barrier.get(), "control closes new audio admissions");
+			return session.withAudio([&] { return session.process({4, 2, 2}, input, output); });
+		}), "already admitted block survives pending control barrier");
+		check(reply(std::move(pending)).error == Error::None, "control resumes after whole callback finishes");
+		check(reply(session.close()).error == Error::None, "nested admission cleanup");
+	}
+	{
+		HostSession session(1024);
+		auto config = configuration(); config.audioResultWaitMs = 20;
+		check(reply(session.open(config)).error == Error::None, "burst worker fixture ready");
+		check(session.process({4, 2, 2}, input, output), "burst first block");
+		for (unsigned block = 0; block < 100; ++block)
+		{
+			check(session.process({4, 2, 2}, input, output), "back-to-back worker blocks keep helper alive");
+			for (unsigned sample = 0; sample < input.size(); ++sample)
+			{ check(output[sample] == input[sample] * 0.25f, "burst samples preserve preceding sequence"); }
+		}
+		check(reply(session.close()).error == Error::None, "burst worker cleanup");
+		config = configuration(L"hang-audio"); config.audioResultWaitMs = 20;
+		check(reply(session.open(config)).error == Error::None, "bounded worker hang ready");
+		check(session.process({4, 2, 2}, input, output), "bounded worker hang submit");
+		const auto begin = GetTickCount64();
+		check(!session.process({4, 2, 2}, input, output) && GetTickCount64() - begin < 100,
+			"worker wait remains bounded for hung helper");
+		const auto deadline = GetTickCount64() + 2000;
+		while (session.state() != SessionState::Faulted && GetTickCount64() < deadline) { Sleep(1); }
+		check(session.state() == SessionState::Faulted && session.error() == Error::ProcessingFailed,
+			"bounded worker hang remains supervised");
+		check(reply(session.close()).error == Error::None, "bounded worker fault cleanup");
+	}
 	for (unsigned i = 0; i < 50; ++i)
 	{
 		HostSession session(1024);

@@ -248,7 +248,7 @@ VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QStrin
 		const vsthost::Vst3Create instance{selection->identity.cid,
 			double(Engine::audioEngine()->outputSampleRate()), static_cast<std::uint32_t>(frames),
 			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting(), m_plugin.toUtf8().toStdString()};
-		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000}, instance);
+		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 20}, instance);
 		if (m_failed) { return; }
 		m_name = selection->name.isEmpty() ? QFileInfo(m_plugin).completeBaseName() : selection->name;
 		m_vendorString = selection->vendor; m_productString = m_name;

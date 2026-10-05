@@ -85,6 +85,10 @@ if(TARGET VstEntryPoints)
 	endif()
 	set_tests_properties(VstEntryPoints PROPERTIES TIMEOUT 120 LABELS "vsthost;baseline"
 		ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins;LMMS_NATIVE_PLUGIN_DIR=$<TARGET_FILE_DIR:vestige>;LMMS_VST_FIXTURE_ROOT=${CMAKE_BINARY_DIR}/vst-s0")
+	add_test(NAME VstEntryPointsRealtime COMMAND $<TARGET_FILE:VstEntryPoints> liveGuiAndAudio
+		-o "${CMAKE_CURRENT_BINARY_DIR}/VstEntryPointsRealtime-results.txt,txt" -o "-,txt")
+	set_tests_properties(VstEntryPointsRealtime PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE LABELS "vsthost;realtime"
+		ENVIRONMENT "LMMS_VST_LIVE_GUI=1;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins;LMMS_NATIVE_PLUGIN_DIR=$<TARGET_FILE_DIR:vestige>;LMMS_VST_FIXTURE_ROOT=${CMAKE_BINARY_DIR}/vst-s0")
 endif()
 
 if(WANT_AGENT)

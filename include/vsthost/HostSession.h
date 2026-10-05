@@ -26,6 +26,10 @@ public:
 		std::wstring helper;
 		std::vector<std::wstring> arguments;
 		DWORD startupMs = 30000;
+		// LMMS device callbacks may render several periods back-to-back. Its
+		// existing worker bridge opts into a bounded wait for the matching result.
+		// Standalone realtime callers retain the nonblocking deadline policy.
+		DWORD audioResultWaitMs = 0;
 	};
 	struct Reply { Error error = Error::None; std::vector<std::uint8_t> payload; std::vector<std::uint8_t> followupPayload; };
 	struct Followup { MessageType type; std::function<std::vector<std::uint8_t>()> prepare; };
@@ -180,14 +184,25 @@ public:
 	// Include caller-side assembly in the session's audio admission barrier.
 	template<class Process> bool withAudio(Process process) noexcept
 	{
+			// A control barrier stops new callbacks, not nested work belonging to
+			// a callback already counted by that barrier.
+			if (m_audioOwner == this) { return process(); }
 		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
 		m_audioUsers.fetch_add(1, std::memory_order_acq_rel);
-		struct Exit { std::atomic<unsigned>& users; ~Exit() { users.fetch_sub(1, std::memory_order_release); } } exit{m_audioUsers};
+			struct Exit
+			{
+				std::atomic<unsigned>& users;
+				HostSession*& owner;
+				HostSession* previous;
+				~Exit() { owner = previous; users.fetch_sub(1, std::memory_order_release); }
+			} exit{m_audioUsers, m_audioOwner, m_audioOwner};
 		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
+			m_audioOwner = this;
 		return process();
 	}
 	// Exactly one audio producer. First block returns silence; later blocks consume
-	// only the preceding sequence. A missed deadline faults instead of using late audio.
+	// only the preceding sequence. Device callbacks can request successive periods
+	// in a burst, so the next call alone is not a wall-clock processing deadline.
 	bool process(AudioQueue::Layout layout, std::span<const float> input, std::span<float> output,
 		std::span<const std::uint8_t> events = {}) noexcept
 	{
@@ -198,18 +213,29 @@ public:
 		std::uint32_t* outputEventBytes = nullptr) noexcept
 	{
 		// The audio owner supplies reusable storage; this path never allocates
-		// or waits. Feedback belongs to the same preceding sequence as audio.
+		// or performs control requests. Only the explicitly configured bounded result
+		// wait is permitted. Feedback belongs to the preceding audio sequence.
 		if (outputEventBytes) { *outputEventBytes = 0; }
 		std::fill(output.begin(), output.end(), 0.0f);
-		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
-		m_audioUsers.fetch_add(1, std::memory_order_acq_rel);
-		struct Exit { std::atomic<unsigned>& users; ~Exit() { users.fetch_sub(1, std::memory_order_release); } } exit{m_audioUsers};
-		if (!m_audioAllowed.load(std::memory_order_acquire)) { return false; }
+			if (m_audioOwner != this)
+			{
+				return withAudio([&] {
+					return processPrepared(layout, input, output, std::move(prepare), outputEvents, outputEventBytes);
+				});
+			}
 		if (!m_audio || output.size() != std::uint64_t(layout.frames) * layout.outputs || m_audioSequence == UINT64_MAX)
 		{ audioFault(Error::InvalidMessage); return false; }
 		if (m_havePrevious)
 		{
-			if (m_audio->receive(m_session, generation(), m_audioSequence - 1, output, outputEvents, outputEventBytes) != AudioQueue::Result::Ok)
+			auto received = m_audio->receive(m_session, generation(), m_audioSequence - 1, output, outputEvents, outputEventBytes);
+			const auto deadline = GetTickCount64() + m_audioResultWaitMs;
+			while (received == AudioQueue::Result::Empty && GetTickCount64() < deadline &&
+				!m_cancelled.load(std::memory_order_acquire) && error() == Error::None)
+			{
+				Sleep(1);
+				received = m_audio->receive(m_session, generation(), m_audioSequence - 1, output, outputEvents, outputEventBytes);
+			}
+			if (received != AudioQueue::Result::Ok)
 			{ audioFault(Error::ProcessingFailed); return false; }
 		}
 		const Header header{MessageType::Process, m_session, generation(), m_audioSequence, 0};
@@ -221,7 +247,8 @@ public:
 		++m_audioSequence; m_havePrevious = true;
 		return true;
 	}
-	// Renderer-only request. Audio callbacks use processPrepared and never wait.
+	// Renderer-only request. Audio workers use processPrepared with their own
+	// bounded result policy; they never wait on this dispatcher transaction.
 	template<class Prepare> std::future<Reply> renderOffline(AudioQueue::Layout layout,
 		std::vector<float> input, Prepare prepare, DWORD timeoutMs = 5000, std::optional<MessageType> followup = {})
 	{
@@ -401,6 +428,7 @@ private:
 		m_nativeCode.store(0); m_faultStage.store(ProcessSupervisor::Stage::Startup);
 		m_state.store(SessionState::Starting, std::memory_order_release);
 		m_audioSequence = 0; m_controlSequence = 0; m_havePrevious = false;
+		m_audioResultWaitMs = std::min<DWORD>(configuration.audioResultWaitMs, 20);
 		if (!m_control->initialize() || !m_audio->initialize()) { return faultReply(Error::InitializationFailed); }
 		m_supervisor = std::make_unique<ProcessSupervisor>();
 		m_supervisor->setAudioFaultSource(&m_audioFault);
@@ -435,9 +463,11 @@ private:
 		m_state.store(SessionState::Stopped, std::memory_order_release);
 		return result;
 	}
+	inline static thread_local HostSession* m_audioOwner = nullptr;
 	std::uint32_t m_capacity;
 	std::uint64_t m_session = 0, m_audioSequence = 0, m_controlSequence = 0;
 	bool m_havePrevious = false;
+	DWORD m_audioResultWaitMs = 0;
 	std::wstring m_baseName;
 	SharedRegion m_controlRegion, m_audioRegion;
 	std::unique_ptr<ControlChannel> m_control;
