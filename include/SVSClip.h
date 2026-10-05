@@ -16,6 +16,12 @@ public:
  QString nodeName() const override { return "svsclip"; }
  gui::ClipView* createView(gui::TrackView*) override;
  Clip* clone() override;
+ SVSClip* splitAt(const TimePos& projectTick);
+ void setStartTimeOffset(const TimePos&) override;
+ void movePosition(const TimePos&) override;
+ void changeLength(const TimePos&) override;
+ bool readOnly() const;
+ QString migrationDiagnostic() const;
  void saveSettings(QDomDocument&,QDomElement&) override;
  void loadSettings(const QDomElement&) override;
  void setNotes(const QVector<svs::Note>&);
@@ -25,7 +31,10 @@ public:
  const QJsonObject& editorState() const { return m_editorState; }
  void setEditorState(const QJsonObject&);
  void synthesize();
+ svs::Input captureInput(uint32_t sampleRate) const;
+ bool captureCachedInput(svs::Input&) const;
  void invalidate();
+ void cancelSynthesis();
  std::shared_ptr<const svs::Audio> audio() const;
  QString status() const { return m_status; }
  QString id() const { return m_id; }
@@ -35,7 +44,14 @@ public:
  bool importDictionary(const QByteArray&,QString& error);
  const QJsonArray& projectDictionaryData() const { return m_projectDictionaryData; }
 private:
+ void scheduleSynthesis();
+ bool m_synthesisScheduled=false;
+ bool m_loading=false;
+ QString m_migrationDiagnostic;
+ QJsonObject m_notesXmlExtras,m_unparsedCurves;
  QString m_id,m_status="Dirty";
+ QString m_cacheKey,m_cacheInputHash;
+ uint32_t m_cacheRate=0;
  QVector<svs::Note> m_notes;
  svs::Curves m_curves;
  QJsonObject m_editorState;
@@ -45,6 +61,7 @@ private:
  std::atomic<uint64_t> m_revision{1};
  uint64_t m_generation=1,m_request=0;
  std::shared_ptr<const svs::Audio> m_audio;
+ std::shared_ptr<svs::RenderControl> m_renderControl;
 };
 }
 #endif

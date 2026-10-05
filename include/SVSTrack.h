@@ -5,6 +5,7 @@
 #include "SVSModel.h"
 #include "SVSCapabilities.h"
 #include <QDomElement>
+#include <optional>
 namespace lmms {
 class SVSTrack : public Track {
  Q_OBJECT
@@ -13,6 +14,8 @@ public:
  ~SVSTrack() override;
  QString nodeName() const override { return "svstrack"; }
  bool play(const TimePos&,f_cnt_t,f_cnt_t,int=-1) override;
+ void setExportRegions(std::shared_ptr<const QVector<svs::ExportAudioRegion>> regions) {std::atomic_store(&m_exportRegions,std::move(regions));}
+ std::optional<bar_t> frozenExportLength() const;
  gui::TrackView* createView(gui::TrackContainerView*) override;
  Clip* createClip(const TimePos&) override;
  void saveTrackSpecificSettings(QDomDocument&,QDomElement&,bool) override;
@@ -28,6 +31,7 @@ public:
  QString pluginId() const { return m_pluginId; }
  QString voiceId() const { return m_voiceId; }
  const svs::Capabilities& capabilities() const { return m_capabilities; }
+ bool capabilitiesReady() const {return m_capabilitiesReady;}
  const QVector<svs::Dictionary>& dictionaries() const { return m_dictionaries; }
  const QJsonObject& parameters() const { return m_parameters; }
  QString language() const { return m_language; }
@@ -37,7 +41,11 @@ public:
  void refreshCapabilities(const QJsonObject& context = {});
  const QJsonObject& portraitSettings() const { return m_portraitSettings; }
  void setPortraitSettings(const QJsonObject&);
+ bool readOnly() const {return !m_migrationDiagnostic.isEmpty();}
+ QString migrationDiagnostic() const {return m_migrationDiagnostic;}
 private:
+ std::shared_ptr<const QVector<svs::ExportAudioRegion>> m_exportRegions;
+ QString m_migrationDiagnostic;
  FloatModel m_volume,m_pan;
  IntModel m_mix;
  AudioBusHandle m_bus;
@@ -45,6 +53,7 @@ private:
  bool m_customName=false;
  svs::Voice m_voice;
  svs::Capabilities m_capabilities;
+ bool m_capabilitiesReady=false;
  QVector<svs::Dictionary> m_dictionaries;
  QJsonObject m_parameters;
  QJsonObject m_portraitSettings;

@@ -34,6 +34,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "SVSSynthesisScheduler.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 #ifdef LMMS_BUILD_WIN32
@@ -149,6 +150,7 @@ void Engine::destroy()
 #endif
 	s_projectJournal->stopAllJournalling();
 	s_audioEngine->stopProcessing();
+	svs::SynthesisScheduler::instance().shutdown();
 
 	PresetPreviewPlayHandle::cleanup();
 

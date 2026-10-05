@@ -443,6 +443,10 @@ void Track::removeBar( const TimePos & pos )
 
 bar_t Track::length() const
 {
+	if (type() == Type::SVS && Engine::getSong()->isExporting())
+	{
+		if (const auto frozen = static_cast<const SVSTrack*>(this)->frozenExportLength()) { return *frozen; }
+	}
 	// find last end-position
 	tick_t last = 0;
 	for (const auto& clip : m_clips)

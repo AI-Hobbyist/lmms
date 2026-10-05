@@ -28,6 +28,7 @@
 #include "ProjectRenderer.h"
 #include "Song.h"
 #include "PerfLog.h"
+#include "SVSExportSnapshot.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -134,20 +135,44 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 
 ProjectRenderer::~ProjectRenderer()
 {
+	if(isRunning()) {m_abort=true;wait();}
+	if(m_svsSnapshot) {m_svsSnapshot->completed={};m_svsSnapshot->cancel();m_svsSnapshot->deactivate();}
+	if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
 	// The audio engine owns the device after startProcessing transfers it.
 	if (!m_deviceTransferred) { delete m_fileDev; }
 }
 
 void ProjectRenderer::startProcessing()
 {
-
 	if( isReady() )
 	{
+			if(!m_svsSnapshot) m_svsSnapshot=std::make_unique<svs::ExportSnapshot>(svs::ExportSnapshot::capture(*Engine::getSong(),m_fileDev->sampleRate()));
+		Engine::audioEngine()->stopProcessing();
+			m_svsSnapshot->freezeTimeline(*Engine::getSong());
+			m_svsSnapshot->invalidated=[this](const QString& reason){m_renderError=reason;m_abort=true;emit svsExportFailed(reason);};
+		Engine::getSong()->startExport();m_exportStarted=true;
+		m_svsSnapshot->completed=[this]{
+				if(m_svsSnapshot->state()==svs::ExportSnapshot::State::Ready&&!m_abort) m_svsSnapshot->activate(*Engine::getSong());
+			if(m_svsSnapshot->state()!=svs::ExportSnapshot::State::Ready||m_abort) {
+				if(!m_abort) m_renderError=m_svsSnapshot->diagnostics().join('\n');
+				const auto path=m_fileDev->outputFile();delete m_fileDev;m_fileDev=nullptr;QFile::remove(path);
+				if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
+				QPointer<ProjectRenderer> target(this);if(!m_renderError.isEmpty()) emit svsExportFailed(m_renderError);if(!target) return;
+				emit finished();return;
+			}
+				startPreparedRender();
+		};
+		connect(this,&QThread::finished,this,[this]{if(m_svsSnapshot) m_svsSnapshot->deactivate();emit finished();});
+		m_svsSnapshot->prepare(m_ignoreFailedSVS);
+	}
+}
+void ProjectRenderer::setSVSSnapshot(std::unique_ptr<svs::ExportSnapshot> snapshot) {m_svsSnapshot=std::move(snapshot);}
+void ProjectRenderer::startPreparedRender()
+{
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::audioEngine()->setAudioDevice(m_fileDev, false);
 		m_deviceTransferred = true;
-		Engine::getSong()->startExport();
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -155,7 +180,6 @@ void ProjectRenderer::startProcessing()
 #endif
 						);
 
-	}
 }
 
 
@@ -190,16 +214,16 @@ void ProjectRenderer::run()
 	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
+	m_exportStarted=false;
 	m_fileDev->finalize();
 	m_succeeded = !m_abort.load() && !m_fileDev->hasWriteError();
 
 	perfLog.end();
 
 	// If the user aborted export-process, the file has to be deleted.
-	const QString f = m_fileDev->outputFile();
 	if( m_abort )
 	{
-		QFile( f ).remove();
+		m_fileDev->discardOutput();
 	}
 }
 
@@ -209,7 +233,11 @@ void ProjectRenderer::run()
 void ProjectRenderer::abortProcessing()
 {
 	m_abort = true;
+	if(m_svsSnapshot) {m_svsSnapshot->completed={};m_svsSnapshot->cancel();}
 	wait();
+	if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
+	if(m_svsSnapshot) m_svsSnapshot->deactivate();
+	if(!m_deviceTransferred&&m_fileDev) {const auto path=m_fileDev->outputFile();delete m_fileDev;m_fileDev=nullptr;QFile::remove(path);}
 }
 
 

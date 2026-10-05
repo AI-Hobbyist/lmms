@@ -23,6 +23,9 @@
  */
 
 #include "ExportProjectDialog.h"
+#include <QMessageBox>
+#include <algorithm>
+#include "Track.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -162,6 +165,9 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	exportSettingsLayout->addWidget(m_exportAsLoopBox);
 	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
 	exportSettingsLayout->addLayout(loopRepeatLayout);
+	m_ignoreFailedSVSBox=new QCheckBox(tr("Export failed SVS regions as silence"),exportSettingsGroupBox);
+	const auto& tracks=Engine::getSong()->tracks();m_ignoreFailedSVSBox->setVisible(std::any_of(tracks.begin(),tracks.end(),[](const auto* track){return track->type()==Track::Type::SVS;}));
+	exportSettingsLayout->addWidget(m_ignoreFailedSVSBox);
 
 	m_fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
 
@@ -254,6 +260,8 @@ void ExportProjectDialog::onStartButtonClicked()
 
 	const auto format = static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatComboBox->currentData().toInt());
 	m_renderManager = std::make_unique<RenderManager>(outputSettings, format, m_path);
+	m_renderManager->setIgnoreFailedSVSRegions(m_ignoreFailedSVSBox->isChecked());
+	connect(m_renderManager.get(),&RenderManager::svsExportFailed,this,[this](const QString& reason){QMessageBox::warning(this,tr("SVS export failed"),reason);});
 	m_startButton->setEnabled(false);
 
 	Engine::getSong()->setExportLoop(m_exportAsLoopBox->isChecked());

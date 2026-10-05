@@ -1,6 +1,7 @@
 #ifndef LMMS_SVS_RESULT_STRIP_H
 #define LMMS_SVS_RESULT_STRIP_H
 #include "SVSClip.h"
+#include "SVSTempoSnapshot.h"
 #include <QWidget>
 #include <QPointer>
 #include <QColor>
@@ -39,10 +40,13 @@ private:
  bool m_dragging=false,m_finishing=false;
  QPointF m_pointer;
  QTimer* m_autoScroll=nullptr;
+ std::shared_ptr<const svs::TempoSnapshot> m_timing;
+ double m_timingOrigin=0;
  QVector<Cell> cells() const;
  QJsonObject manualPhonemes(const QString&) const;
  void updateBoundary(double tick);
- double secondsPerTick() const;
+ void captureTiming();
+ double shiftedTick(double localTick,double seconds) const;
  double tickAt(double x) const { return m_scroll+(x-60)/m_pixelsPerTick; }
  double xAt(double tick) const { return 60+(tick-m_scroll)*m_pixelsPerTick; }
  QColor color(const QString&,QPalette::ColorRole) const;

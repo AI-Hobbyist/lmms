@@ -1,7 +1,7 @@
 # SVS轨道 / SVS插件 / SVS钢琴窗支持计划书
 
 日期：2026-10-03  
-状态：执行中；M0→M3 已通过该阶段自动验证，M4→M5 尚未完成。
+状态：执行中；M0→M4 已通过该阶段自动验证，M5 尚未完成。
 目标项目：当前 LMMS 工作区；行为参考 `tl_ref`，界面融入 LMMS Qt Widgets 与主题 CSS。
 
 ## 1. 目标与交付边界
@@ -368,7 +368,11 @@ if ($buildExitCode -ne 0) {
 | M1 | PASS | 原生 SVS 轨道/片段、独立钢琴窗最小音符输入、SDK C ABI、SVSExample、异步 PCM 合成及 LMMS 混音已接通。Release 主程序/示例/集成测试编译通过；QtTest 验证鼠标创建、合成、混音、声库换名、XML 恢复、复制 ID/移动和通道路由；日志 `doc/svs/validation/M1-build.log`、`M1-test.log`、`M1-enum-regression.log`。开发版实机主题/图标/独立配置启动通过；听感验收 MANUAL/PENDING，完整编辑/调度验收归 M3/M4。 |
 | M2 | PASS | 五类参数/四作用域、受约束资源 ID、Schema 校验、控件 ID/焦点保留、多选三态、只读回显、条件显隐、异步声明重查及持久化已接通；三语言字典/候选/覆盖优先级/诊断及插件解析已验证。完整→精简→完整声库切换保留输入，缺失能力拒绝编辑，Gain 实际 PCM 能量按比例变化。Release 编译及 6 个 QtTest 槽通过；证据 `doc/svs/M2-capabilities.md`、`doc/svs/validation/M2-build.log`、`M2-test.log`、`M2-QtTest.txt`。音符/音素选择和候选菜单等完整交互在 M3 接入，听感验收 MANUAL/PENDING 不阻塞。 |
 | M3 | PASS | 独立编辑器及工具切换、连续音高/参数曲线、歌词/读音/延音链、音素/波形条、异步头像/立绘、持久化与主题回退完成；实际插件输入及 PCM、相对音高显式基准转换、单次撤销与操作门禁通过。Release 编译及 21 个 QtTest 槽通过；100%/150%/200% offscreen 主题/立绘检查通过。证据 `doc/svs/M3-editor-progress.md`、`doc/svs/validation/M3-final-build.log`、`M3-final-test.log`、`M3-final-QtTest.txt`。真实系统 IME、桌面主题/DPI 观感 MANUAL/PENDING，不阻塞 M4。 |
-| M4 | PENDING | 生命周期、缓存、迁移、导出待实现 |
+| M4 | PASS | 调度/真实取消及并发预算、旧结果门禁、有界缓存/缺插件有效缓存、tempo 自动化快照/时间映射、播放循环/跳转、迁移与未知数据、复制/切片、导出等待/定位失败/显式忽略/取消、连续分轨冻结快照及运行中混音/tempo/删除轨道中止清理通过。Release 主程序/示例/集成测试和 A3/MCP 入口构建通过；完整 QtTest 44 passed / 0 failed / 0 skipped，SVS CTest 连续五次通过，A3/MCP 两项通过。证据 `doc/svs/M4-lifecycle-progress.md`、`doc/svs/validation/M4-final-entry-build.log`、`M4-final-callback-test.log`、`M4-final-callback-QtTest.txt`、`M4-final-entry-test.log`。初次单次超时及有界复验实情记录于实施记录；人工项 MANUAL/PENDING，不阻塞 M5。 |
 | M5 | PENDING | SDK 外部构建、演示工程、最终回归与独立性验证待执行 |
 
 参考图已读取，实际布局按“布局和功能.png”、视觉按“配色和风格.png”及 LMMS 主题。已有 Song/VST 未提交修改保留，不纳入 SVS 里程碑提交。
+
+用户验收安排（2026-10-05）：M5 及最终自动回归完成后，用户先进行人工验收；TuneLab 钢琴窗布局/操作差异由用户指导修复。人工观感项按 MANUAL/PENDING 保留，不阻塞 M4/M5。实机测试按需打开开发版 LMMS/TuneLab，使用结束立即关闭，原安装版不打开。
+
+最新执行约束（2026-10-05）：计划书实施期间暂不使用 Computer Use；仅运行自动验证。M5 完成后用户人工验收，再按用户指出的钢琴窗差异修复。

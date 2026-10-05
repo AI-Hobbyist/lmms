@@ -1,6 +1,7 @@
 #include "SVSModel.h"
 #include "SVSCapabilities.h"
 #include "SVSCurve.h"
+#include "SVSTimeMapping.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -10,14 +11,16 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QSet>
+#include <QCryptographicHash>
 #include <cmath>
 #include "ConfigManager.h"
 namespace lmms::svs {
-struct Plugin::Impl { QLibrary library; svs_api api{}; svs_engine engine=nullptr; QString error; QMutex mutex; explicit Impl(const QString& path):library(path){} };
+struct Plugin::Impl { QLibrary library; svs_api api{}; svs_engine engine=nullptr; QString error,identity; QMutex mutex; explicit Impl(const QString& path):library(path){} };
 Plugin::Plugin(const QString& path):m_impl(std::make_unique<Impl>(path)) {
  auto& d=*m_impl;
  auto get=reinterpret_cast<svs_get_api_fn>(d.library.resolve("svs_get_api"));
  if(!get) { d.error=d.library.errorString(); return; }
+ QFile binary(d.library.fileName()); QCryptographicHash identity(QCryptographicHash::Sha256); if(binary.open(QIODevice::ReadOnly)&&identity.addData(&binary)) d.identity=QString::fromLatin1(identity.result().toHex());
  if(get(SVS_ABI_MAJOR,SVS_ABI_MINOR,sizeof(d.api),&d.api)!=SVS_OK||d.api.major!=SVS_ABI_MAJOR||d.api.size<SVS_API_REQUIRED_SIZE||!d.api.create_engine||!d.api.destroy_engine||!d.api.catalog||!d.api.capabilities||!d.api.release_string||!d.api.create_session||!d.api.destroy_session||!d.api.submit||!d.api.render||!d.api.cancel||!d.api.release_result) { d.error="Incompatible SVS ABI"; return; }
  if(d.api.size<sizeof(svs_api)) d.api.pronunciation=nullptr;
  svs_host host{}; host.size=sizeof(host);
@@ -26,6 +29,7 @@ Plugin::Plugin(const QString& path):m_impl(std::make_unique<Impl>(path)) {
 Plugin::~Plugin() { if(m_impl->engine) m_impl->api.destroy_engine(m_impl->engine); }
 bool Plugin::valid() const { return m_impl->engine&&m_impl->error.isEmpty(); }
 QString Plugin::error() const { return m_impl->error; }
+QString Plugin::identity() const { return m_impl->identity; }
 QJsonObject Plugin::capabilities(const QString& voice, const QJsonObject& context, QString& error) {
  QMutexLocker lock(&m_impl->mutex); const char* text=nullptr;
  auto voiceBytes=voice.toUtf8(), request=QJsonDocument(context).toJson(QJsonDocument::Compact);
@@ -54,15 +58,26 @@ QVector<Voice> Plugin::voices(const QString& package,const QString& id) {
   voices.push_back({id,voiceId,v["name"].toString(),v["version"].toString(),v["defaultLanguage"].toString(),v["defaultLyric"].toString(),resource("avatar"),resource("portrait"),package,v});
  } return voices;
 }
-std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error) {
- // v0.1 M1: serialize instance access. M4 adds cancellation and priority scheduling.
+std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error,const std::shared_ptr<RenderControl>& control) {
+ if(control&&control->cancelled) { error="Cancelled"; return {}; }
  QMutexLocker lock(&m_impl->mutex); auto& d=*m_impl; if(!valid()) { error=d.error; return {}; }
+ if(control&&control->cancelled) { error="Cancelled"; return {}; }
  auto voice=input.voiceId.toUtf8(); svs_session session=nullptr;
+ TimeMapping inputMapping;if(!readTimeMapping(input.document,input.secondsPerTick,inputMapping,error)) return {};
  if(d.api.create_session(d.engine,voice.constData(),&session)!=SVS_OK||!session) { error="Voice session unavailable"; return {}; }
  struct Strings { QByteArray id,lyric,language,pronunciation,phonemes,parameters; };
  std::vector<Strings> strings; strings.reserve(input.notes.size()); std::vector<svs_note> notes; notes.reserve(input.notes.size());
- for(const auto& n:input.notes) { strings.push_back({n.id.toUtf8(),n.lyric.toUtf8(),n.language.toUtf8(),n.pronunciation.toUtf8(),QJsonDocument(n.phonemes).toJson(QJsonDocument::Compact),QJsonDocument(n.parameters).toJson(QJsonDocument::Compact)}); auto& s=strings.back(); notes.push_back({sizeof(svs_note),s.id.constData(),n.tick,n.duration,n.tick*input.secondsPerTick,n.duration*input.secondsPerTick,n.pitch,s.lyric.constData(),s.language.constData(),s.pronunciation.constData(),s.phonemes.constData(),s.parameters.constData()}); }
+ for(const auto& n:input.notes) { strings.push_back({n.id.toUtf8(),n.lyric.toUtf8(),n.language.toUtf8(),n.pronunciation.toUtf8(),QJsonDocument(n.phonemes).toJson(QJsonDocument::Compact),QJsonDocument(n.parameters).toJson(QJsonDocument::Compact)}); auto& s=strings.back(); notes.push_back({sizeof(svs_note),s.id.constData(),n.tick,n.duration,inputMapping.localSeconds(n.tick),inputMapping.localSeconds(n.tick+n.duration)-inputMapping.localSeconds(n.tick),n.pitch,s.lyric.constData(),s.language.constData(),s.pronunciation.constData(),s.phonemes.constData(),s.parameters.constData()}); }
  auto document=input.document; Capabilities cap;
+ if(document["queryCapabilities"].toBool()) {
+  auto context=document; const auto parameters=context["trackParameters"].toObject(); for(auto i=parameters.begin();i!=parameters.end();++i) context[i.key()]=i.value();
+  QJsonArray contextNotes; for(const auto& note:input.notes) contextNotes.append(QJsonObject{{"id",note.id},{"tick",note.tick},{"duration",note.duration},{"pitch",note.pitch},{"lyric",note.lyric},{"language",note.language},{"pronunciation",note.pronunciation},{"parameters",note.parameters},{"phonemes",note.phonemes}}); context["notes"]=contextNotes; context["noteCount"]=input.notes.size();
+  const auto json=QJsonDocument(context).toJson(QJsonDocument::Compact); const char* schema=nullptr;
+  auto status=d.api.capabilities(d.engine,voice.constData(),json.constData(),&schema); QJsonParseError parse;
+  const auto queried=schema?QJsonDocument::fromJson(schema,&parse):QJsonDocument{}; if(schema) d.api.release_string(d.engine,schema);
+  if(status!=SVS_OK||queried.isNull()||!queried.isObject()||parse.error!=QJsonParseError::NoError) {error="Snapshot capability query failed";d.api.destroy_session(session);return {};}
+  document["capabilities"]=queried.object();
+ }
  if(!Capabilities::parse(document["capabilities"].toObject(),cap,error)) { d.api.destroy_session(session); return {}; }
  if(cap.pitchInput=="offset") {
   auto curves=document["curves"].toObject(); Curve reference; if(!Curve::fromJson(cap.original["pitch"].toObject()["referencePitch"].toObject(),reference,error)) {d.api.destroy_session(session);return {};}
@@ -89,10 +104,15 @@ std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error) {
  auto id=input.clipId.toUtf8(); auto json=QJsonDocument(document).toJson(QJsonDocument::Compact);
  svs_snapshot snapshot{sizeof(svs_snapshot),id.constData(),input.generation,input.revision,input.request,voice.constData(),input.rate,notes.data(),uint32_t(notes.size()),input.duration,json.constData()};
  auto status=d.api.submit(session,&snapshot); svs_result result{}; result.size=sizeof(result);
- if(status==SVS_OK) status=d.api.render(session,&result);
+ if(status==SVS_OK) {
+  if(control) control->attach([&d,session]{d.api.cancel(session);});
+  if(control&&control->cancelled) status=SVS_CANCELLED; else status=d.api.render(session,&result);
+ }
+ if(control) control->detach();
  std::shared_ptr<Audio> audio;
- if(status==SVS_OK&&result.size>=sizeof(result)&&result.channels==2&&result.sample_rate>=8000&&result.sample_rate<=192000&&result.frame_count<=16*1024*1024&&(!result.frame_count||result.audio)) {
+ if((!control||!control->cancelled)&&status==SVS_OK&&result.size>=sizeof(result)&&result.channels==2&&result.sample_rate>=8000&&result.sample_rate<=192000&&result.frame_count<=16*1024*1024&&std::isfinite(result.start_seconds)&&input.secondsPerTick>0&&(!result.frame_count||result.audio)) {
   audio=std::make_shared<Audio>(); audio->rate=result.sample_rate; audio->revision=input.revision; if(result.frame_count) audio->samples.assign(result.audio,result.audio+result.frame_count*2); audio->feedback=QJsonDocument::fromJson(result.feedback_json?result.feedback_json:"{}").object(); audio->feedback["pronunciations"]=pronunciations; audio->feedback["dictionaryDiagnostics"]=dictionaryDiagnostics;
+  audio->mapping=inputMapping;audio->startSeconds=result.start_seconds; audio->startTick=inputMapping.resultStartTick(result.start_seconds);
   for(float sample:audio->samples) if(!std::isfinite(sample)) { error="Non-finite SVS audio"; audio.reset(); break; }
   if(audio) audio->waveform.build(audio->samples);
  } else error=QString("SVS synthesis failed (%1)").arg(status);
@@ -110,6 +130,7 @@ const QVector<Voice>& Registry::voices() {
   if(m_plugins.contains(id)) continue; // same installed package may be visible through two roots
   auto plugin=std::make_shared<Plugin>(package+"/"+entry); if(!plugin->valid()) { m_diagnostics<<id+": "+plugin->error(); continue; }
   auto voices=plugin->voices(package,id); if(voices.isEmpty()) { m_diagnostics<<id+": invalid/empty voice catalog"; continue; }
+  for(auto& voice:voices) voice.metadata["pluginVersion"]=manifest["version"];
   m_plugins[id]=plugin; m_voices+=voices;
  } return m_voices;
 }

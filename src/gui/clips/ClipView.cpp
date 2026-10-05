@@ -45,6 +45,7 @@
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "Song.h"
+#include "SVSClip.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -1236,6 +1237,7 @@ bool ClipView::splitClip(const TimePos pos)
 	// Cutting at exactly the start/end position would create a zero length
 	// clip (bad), and a clip the same length as the original one (pointless).
 	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
+	if (auto* svs = dynamic_cast<SVSClip*>(m_clip)) { return svs->splitAt(splitPos) != nullptr; }
 
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);

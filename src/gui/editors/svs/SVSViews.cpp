@@ -73,7 +73,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QDialog(parent) {
  auto* play=new QPushButton(tr("Play"),this); toolbar->addWidget(play); connect(play,&QPushButton::clicked,Engine::getSong(),&Song::playSong);
  auto* stop=new QPushButton(tr("Stop"),this); toolbar->addWidget(stop); connect(stop,&QPushButton::clicked,Engine::getSong(),&Song::stop);
  auto* render=new QPushButton(tr("Synthesize"),this); toolbar->addWidget(render); connect(render,&QPushButton::clicked,clip,&SVSClip::synthesize);
- auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status]{status->setText(clip->status());}); connect(clip,&QObject::destroyed,this,&QDialog::close);
+ auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status,render]{status->setText(clip->status());render->setEnabled(!clip->readOnly());}); render->setEnabled(!clip->readOnly()); connect(clip,&QObject::destroyed,this,&QDialog::close);
  auto* body=new QHBoxLayout; layout->addLayout(body,1);
  auto* outerGrid=new QGridLayout; body->addLayout(outerGrid,1); auto* splitter=new QSplitter(Qt::Vertical,this); splitter->setObjectName("svsEditorAreas"); outerGrid->addWidget(splitter,0,0);
  auto* noteArea=new QWidget(splitter); auto* grid=new QGridLayout(noteArea); grid->setContentsMargins(0,0,0,0); auto* canvas=new SVSCanvas(clip,noteArea); m_canvas=canvas; canvas->setThemeColors(m_colors); grid->addWidget(canvas,0,0);
@@ -169,6 +169,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QDialog(parent) {
   for(auto i=lanes->begin();i!=lanes->end();++i) if(!shown.contains(i.key())) i->frame->hide();
  };
  connect(clip,&Clip::dataChanged,this,refresh); connect(track,&Track::dataChanged,this,refresh); connect(canvas,&SVSCanvas::selectionChanged,this,refresh); refresh();
+ auto migrationState=[clip,track,canvas,strip,parameterBody,tabs,lyrics,language,import]{const bool editable=!clip->readOnly();canvas->setEnabled(editable);strip->setEnabled(editable);parameterBody->setEnabled(editable);tabs->setEnabled(editable);lyrics->setEnabled(editable);language->setEnabled(!track->readOnly());import->setEnabled(editable);};
+ connect(clip,&Clip::dataChanged,this,migrationState);connect(track,&Track::dataChanged,this,migrationState);migrationState();
 }
 void SVSPianoRoll::setThemeColor(const QString& name,const QColor& value) {
  if(value.isValid()) m_colors[name]=value; else m_colors.remove(name);

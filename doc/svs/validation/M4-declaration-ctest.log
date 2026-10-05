@@ -1,0 +1,11 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start 16: SVSIntegrationTest
+1/1 Test #16: SVSIntegrationTest ...............   Passed    5.31 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+M1     =   5.31 sec*proc (1 test)
+svs    =   5.31 sec*proc (1 test)
+
+Total Test time (real) =   5.34 sec

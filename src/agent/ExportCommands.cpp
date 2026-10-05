@@ -116,6 +116,7 @@ void finishTask(const std::shared_ptr<ExportTask>& task, bool cancelled = false)
 	QObject::disconnect(renderer, nullptr, Engine::audioEngine(), nullptr);
 	renderer->wait();
 	const bool succeeded = renderer->renderSucceeded();
+	if(!succeeded&&!renderer->renderError().isEmpty()) task->error=renderer->renderError();
 	task->progress = std::clamp(renderer->progressPercent(), 0, 100);
 	// Closing the encoder finalizes its header before the temporary file can be committed.
 	Engine::audioEngine()->restoreAudioDevice();
@@ -257,7 +258,7 @@ CommandResult exportAudio(const QJsonObject& arguments)
 	tasks.push_back(task);
 	task->renderer = renderer.release();
 	task->elapsed.start();
-	QObject::connect(task->renderer.data(), &QThread::finished, Engine::audioEngine(), [task] { finishTask(task); }, Qt::QueuedConnection);
+	QObject::connect(task->renderer.data(), &ProjectRenderer::finished, Engine::audioEngine(), [task] { finishTask(task); }, Qt::QueuedConnection);
 	Engine::audioEngine()->storeAudioDevice();
 	task->renderer->startProcessing();
 	return CommandResult::success(taskInfo(*task));

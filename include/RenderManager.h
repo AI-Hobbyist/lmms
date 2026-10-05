@@ -27,6 +27,7 @@
 #define LMMS_RENDER_MANAGER_H
 
 #include <memory>
+#include <QPointer>
 
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
@@ -51,10 +52,12 @@ public:
 	void renderTracks();
 
 	void abortProcessing();
+	void setIgnoreFailedSVSRegions(bool ignore) {m_ignoreFailedSVS=ignore;}
 
 signals:
 	void progressChanged( int );
 	void finished();
+	void svsExportFailed(const QString& reason);
 
 private slots:
 	void renderNextTrack();
@@ -64,7 +67,7 @@ private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
-	void render( QString outputPath );
+	void render( QString outputPath, Track* renderTrack=nullptr );
 
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormat m_format;
@@ -72,8 +75,10 @@ private:
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
-	std::vector<Track*> m_tracksToRender;
-	std::vector<Track*> m_unmuted;
+	std::vector<QPointer<Track>> m_tracksToRender;
+	std::vector<QPointer<Track>> m_unmuted;
+	std::unique_ptr<svs::ExportSnapshot> m_svsBatch;
+	bool m_ignoreFailedSVS=false;
 } ;
 
 

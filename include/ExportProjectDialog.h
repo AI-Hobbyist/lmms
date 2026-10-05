@@ -81,6 +81,7 @@ private:
 	QFormLayout* m_fileFormatSettingsLayout = nullptr;
 
 	QCheckBox* m_exportAsLoopBox = nullptr;
+	QCheckBox* m_ignoreFailedSVSBox = nullptr;
 	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
 	QLabel* m_loopRepeatLabel = nullptr;
 	QSpinBox* m_loopRepeatBox = nullptr;

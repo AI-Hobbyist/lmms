@@ -1,0 +1,30 @@
+********* Start testing of A3CommandsTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : A3CommandsTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : A3CommandsTest::initTestCase()
+PASS   : A3CommandsTest::persistsCoreEditingAndProtectsSaveDestinations()
+PASS   : A3CommandsTest::humanizesOnlySelectedNotesReproducibly()
+PASS   : A3CommandsTest::rendersAudioWithQueriesAndRestoresPlayback()
+PASS   : A3CommandsTest::rendersAvailableFormatsAndRepeatedRanges()
+PASS   : A3CommandsTest::cancelsAudioExportsWithoutOverwritingFiles()
+PASS   : A3CommandsTest::readsAndSetsConfigurationWithoutProjectHistory()
+SKIP   : A3CommandsTest::reflectsNativeParametersPresetsAndPeakControllers() Set LMMS_AGENT_PLUGIN_TEST_PATH to run native DLL integration.
+D:\UserData\Desktop\Project\lmms\tests\src\agent\A3CommandsTest.cpp(359) : failure location
+SKIP   : A3CommandsTest::exportsNativeMidiAndRoundTripsNotes() Set LMMS_AGENT_PLUGIN_TEST_PATH to run native DLL integration.
+D:\UserData\Desktop\Project\lmms\tests\src\agent\A3CommandsTest.cpp(424) : failure location
+SKIP   : A3CommandsTest::importsNativeMidiAndHydrogenWithoutDialogs() Set LMMS_AGENT_PLUGIN_TEST_PATH to run native DLL integration.
+D:\UserData\Desktop\Project\lmms\tests\src\agent\A3CommandsTest.cpp(482) : failure location
+QWARN  : A3CommandsTest::importsSamplesAtomically() "Failed to load sample at path D:/Temp/User/A3CommandsTest-MugDfR/invalid.wav, the file may not exist, be corrupted, or is unsupported."
+PASS   : A3CommandsTest::importsSamplesAtomically()
+PASS   : A3CommandsTest::persistsSongLoopRangeWithoutGui()
+PASS   : A3CommandsTest::supportsMidiSampleAndPreviewCommands()
+PASS   : A3CommandsTest::supportsSongLifecycleCommands()
+PASS   : A3CommandsTest::persistsScalesAndSnapsSelectedNotes()
+PASS   : A3CommandsTest::configuresInstrumentFunctionsAndMidiPorts()
+PASS   : A3CommandsTest::editsControllersAndRestoresConnections()
+PASS   : A3CommandsTest::movesPatternTracksWithTheirRowContent()
+PASS   : A3CommandsTest::editsAndPersistsPatternsWithoutGui()
+PASS   : A3CommandsTest::leavesActiveExportForEngineShutdown()
+PASS   : A3CommandsTest::cleanupTestCase()
+Totals: 18 passed, 0 failed, 3 skipped, 0 blacklisted, 1536ms
+********* Finished testing of A3CommandsTest *********

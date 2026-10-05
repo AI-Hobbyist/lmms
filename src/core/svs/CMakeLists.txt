@@ -1,5 +1,5 @@
 # Independent native SVS module; no TuneLab/.NET/reference-source dependencies.
-add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWaveform.cpp SVSClip.cpp ../../tracks/SVSTrack.cpp ../../gui/editors/svs/SVSViews.cpp ../../gui/editors/svs/SVSParameterPanel.cpp ../../gui/editors/svs/SVSCanvas.cpp
+add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWaveform.cpp SVSCache.cpp SVSExportSnapshot.cpp SVSTempoSnapshot.cpp SVSTempoSource.cpp "${CMAKE_SOURCE_DIR}/include/SVSTempoSource.h" SVSSynthesisScheduler.cpp SVSClip.cpp ../../tracks/SVSTrack.cpp ../../gui/editors/svs/SVSViews.cpp ../../gui/editors/svs/SVSParameterPanel.cpp ../../gui/editors/svs/SVSCanvas.cpp
   ../../gui/editors/svs/SVSLyricEditor.cpp
   ../../gui/editors/svs/SVSImageLoader.cpp
   ../../gui/editors/svs/SVSResultStrip.cpp "${CMAKE_SOURCE_DIR}/include/SVSResultStrip.h"

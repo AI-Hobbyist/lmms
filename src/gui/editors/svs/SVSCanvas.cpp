@@ -37,12 +37,12 @@ constexpr const char* NoteMime="application/x-lmms-svs-notes";
 constexpr const char* CurveMime="application/x-lmms-svs-curve";
 QJsonObject noteJson(const svs::Note& note) {
  return {{"id",note.id},{"tick",note.tick},{"duration",note.duration},{"pitch",note.pitch},{"lyric",note.lyric},
-  {"language",note.language},{"pronunciation",note.pronunciation},{"parameters",note.parameters},{"phonemes",note.phonemes}};
+  {"language",note.language},{"pronunciation",note.pronunciation},{"parameters",note.parameters},{"phonemes",note.phonemes},{"xmlExtras",note.xmlExtras}};
 }
 svs::Note noteFromJson(const QJsonObject& object) {
  svs::Note note; note.id=object["id"].toString(); note.tick=object["tick"].toDouble(); note.duration=object["duration"].toDouble(48);
  note.pitch=object["pitch"].toDouble(60); note.lyric=object["lyric"].toString(); note.language=object["language"].toString();
- note.pronunciation=object["pronunciation"].toString(); note.parameters=object["parameters"].toObject(); note.phonemes=object["phonemes"].toObject(); return note;
+ note.pronunciation=object["pronunciation"].toString(); note.parameters=object["parameters"].toObject(); note.phonemes=object["phonemes"].toObject(); note.xmlExtras=object["xmlExtras"].toObject(); return note;
 }
 }
 SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip),m_transaction(std::make_unique<SVSEditTransaction>(clip)),m_curveGesture(std::make_unique<SVSCurveGesture>()) {
@@ -143,10 +143,9 @@ void SVSCanvas::paintPitch(QPainter& painter) {
  if(const auto audio=m_clip->audio();audio&&!m_parameter) {
   painter.setPen(QPen(color("synthesizedPitchColor",QPalette::Text),1));
   double previousEnd=-INFINITY; QPointF previous; bool have=false;
-  const double secondsPerTick=60./(Engine::getSong()->getTempo()*(DefaultTicksPerBar/4));
   for(const auto& item:audio->feedback["pitch"].toArray()) {
-   const auto sample=item.toObject(); auto tick=sample["startSeconds"].toDouble()/secondsPerTick;
-   const auto end=tick+sample["durationSeconds"].toDouble()/secondsPerTick;
+   const auto sample=item.toObject(); const auto seconds=sample["startSeconds"].toDouble(); auto tick=audio->mapping.tickAtLocalSeconds(seconds);
+   const auto end=audio->mapping.tickAtLocalSeconds(seconds+sample["durationSeconds"].toDouble());
    if(end<from||tick>to) { have=false; continue; }
    auto point=curvePointAt(tick,sample["value"].toDouble());
    if(have&&std::abs(tick-previousEnd)<1e-3) painter.drawLine(previous,point);

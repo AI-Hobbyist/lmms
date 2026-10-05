@@ -1,0 +1,9 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start 22: A3CommandsTest
+1/2 Test #22: A3CommandsTest ...................   Passed    1.62 sec
+    Start 28: McpExportLifecycleTest
+2/2 Test #28: McpExportLifecycleTest ...........   Passed    0.74 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.39 sec
