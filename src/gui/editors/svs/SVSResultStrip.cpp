@@ -16,7 +16,7 @@
 #include <cmath>
 namespace lmms::gui {
 SVSResultStrip::SVSResultStrip(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip) {
- setObjectName("svsWaveformPhonemes"); setFixedHeight(80); setFocusPolicy(Qt::StrongFocus); setMouseTracking(true);
+ setObjectName("svsWaveformPhonemes"); setFixedHeight(36); setFocusPolicy(Qt::StrongFocus); setMouseTracking(true);
  m_autoScroll=new QTimer(this); m_autoScroll->setInterval(25);
  connect(m_autoScroll,&QTimer::timeout,this,[this]{if(!m_dragging) return; const double delta=m_pointer.x()<84?-8/m_pixelsPerTick:m_pointer.x()>width()-24?8/m_pixelsPerTick:0; if(delta) { emit scrollRequested(std::max(0.,m_scroll+delta)); updateBoundary(tickAt(m_pointer.x())); }});
  connect(clip,&Clip::dataChanged,this,[this]{if(m_dragging&&m_clip->notes()!=m_before) cancelOperation(); if(!m_dragging&&!m_selectedNote.isEmpty()) { bool exists=false; for(const auto& cell:cells()) if(cell.note==m_selectedNote&&cell.index==m_selectedIndex) exists=true; if(!exists) { m_selectedNote.clear(); m_selectedIndex=-1; emit selectionChanged(); } } update();});
@@ -53,22 +53,14 @@ bool SVSResultStrip::setSelectedParameter(const QString& id,const QJsonValue& va
 void SVSResultStrip::paintEvent(QPaintEvent*) {
  QPainter painter(this); painter.fillRect(rect(),color("backgroundColor",QPalette::Base)); if(!m_clip) return;
  painter.save(); painter.setClipRect(QRect(60,0,width()-60,height()));
- painter.setPen(color("waveformColor",QPalette::Highlight));
- if(auto audio=m_clip->audio()) for(int x=60;x<width();++x) {
-  const auto first=std::max(0.,audio->mapping.samplePosition(tickAt(x),audio->startTick,audio->rate)),end=std::max(0.,audio->mapping.samplePosition(tickAt(x+1),audio->startTick,audio->rate));
-  if(first>=audio->samples.size()/2) break;
-  auto peak=audio->waveform.peak(size_t(first),size_t(std::ceil(end)));
-  if(end-first<64) { peak={}; for(auto frame=size_t(first);frame<std::min(audio->samples.size()/2,size_t(std::ceil(end)));++frame) { peak.minimum=std::min({peak.minimum,audio->samples[frame*2],audio->samples[frame*2+1]}); peak.maximum=std::max({peak.maximum,audio->samples[frame*2],audio->samples[frame*2+1]}); } }
-  painter.drawLine(QPointF(x,27-std::clamp(double(peak.maximum),-1.,1.)*24),QPointF(x,27-std::clamp(double(peak.minimum),-1.,1.)*24));
- }
  for(const auto& cell:cells()) {
-  QRectF rectangle(xAt(cell.tick),58,cell.duration*m_pixelsPerTick,height()-60); if(!rectangle.intersects(rect())) continue;
+  QRectF rectangle(xAt(cell.tick),2,cell.duration*m_pixelsPerTick,height()-4); if(!rectangle.intersects(rect())) continue;
   painter.fillRect(rectangle.adjusted(1,1,-1,-1),cell.note==m_selectedNote&&cell.index==m_selectedIndex?palette().highlight():palette().button()); painter.setPen(color("phonemeColor",QPalette::Text)); painter.drawRect(rectangle); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter,fontMetrics().elidedText(cell.symbol,Qt::ElideRight,int(rectangle.width()-6)));
  }
- painter.restore(); painter.fillRect(QRect(0,0,60,height()),palette().window()); painter.setPen(palette().windowText().color()); painter.drawText(QRect(2,0,56,52),Qt::AlignVCenter,tr("Wave")); painter.drawText(QRect(2,58,56,height()-58),Qt::AlignVCenter,tr("Phonemes"));
+ painter.restore(); painter.fillRect(QRect(0,0,60,height()),palette().window()); painter.setPen(palette().windowText().color()); painter.drawText(QRect(2,2,56,height()-4),Qt::AlignVCenter,tr("Phonemes"));
 }
 void SVSResultStrip::mousePressEvent(QMouseEvent* event) {
- if(!m_clip||event->button()!=Qt::LeftButton||event->position().x()<60||event->position().y()<58) return; setFocus(); const auto items=cells(); m_pointer=event->position();
+ if(!m_clip||event->button()!=Qt::LeftButton||event->position().x()<60||event->position().y()<2||event->position().y()>=height()-2) return; setFocus(); const auto items=cells(); m_pointer=event->position();
  for(auto i=items.crbegin();i!=items.crend();++i) if(event->position().x()>=xAt(i->tick)-2&&event->position().x()<=xAt(i->tick+i->duration)+2) {
   m_selectedNote=i->note; m_selectedIndex=i->index; emit selectionChanged(); update();
   if(!static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().phonemeTiming) return;
@@ -91,7 +83,7 @@ void SVSResultStrip::updateBoundary(double tick) {
   note.phonemes["segments"]=segments;
  } update();
 }
-void SVSResultStrip::mouseMoveEvent(QMouseEvent* event) { m_pointer=event->position(); if(m_dragging) updateBoundary(tickAt(m_pointer.x())); else { bool edge=false; for(const auto& cell:cells()) if(m_pointer.y()>=58&&(std::abs(m_pointer.x()-xAt(cell.tick))<5||std::abs(m_pointer.x()-xAt(cell.tick+cell.duration))<5)) edge=true; setCursor(edge&&m_clip&&static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().phonemeTiming?Qt::SizeHorCursor:Qt::ArrowCursor); } }
+void SVSResultStrip::mouseMoveEvent(QMouseEvent* event) { m_pointer=event->position(); if(m_dragging) updateBoundary(tickAt(m_pointer.x())); else { bool edge=false; for(const auto& cell:cells()) if(m_pointer.y()>=2&&m_pointer.y()<height()-2&&m_pointer.x()>=60&&(std::abs(m_pointer.x()-xAt(cell.tick))<5||std::abs(m_pointer.x()-xAt(cell.tick+cell.duration))<5)) edge=true; setCursor(edge&&m_clip&&static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().phonemeTiming?Qt::SizeHorCursor:Qt::ArrowCursor); } }
 void SVSResultStrip::mouseReleaseEvent(QMouseEvent* event) { if(event->button()==Qt::LeftButton&&m_dragging) { updateBoundary(tickAt(event->position().x())); m_finishing=true; m_dragging=false; m_autoScroll->stop(); releaseMouse(); if(m_clip&&m_preview!=m_before) m_clip->setNotes(m_preview); m_finishing=false; emit selectionChanged(); update(); } }
 void SVSResultStrip::cancelOperation() { if(m_finishing) return; m_finishing=true; const bool active=m_dragging; m_dragging=false; m_autoScroll->stop(); if(active) releaseMouse(); m_before.clear(); m_preview.clear(); m_finishing=false; update(); }
 bool SVSResultStrip::event(QEvent* event) { if(!m_finishing&&(event->type()==QEvent::UngrabMouse||event->type()==QEvent::WindowDeactivate)) cancelOperation(); return QWidget::event(event); }

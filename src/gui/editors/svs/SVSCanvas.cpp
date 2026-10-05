@@ -206,7 +206,7 @@ void SVSCanvas::setTool(Tool value) {
 }
 void SVSCanvas::setQuantization(double value) { m_quantization=std::max(0.,value); rememberViewport(); update(); }
 void SVSCanvas::setZoom(double horizontal,double vertical) {
- m_pixelsPerTick=2*std::clamp(horizontal,.125,16.); m_rowHeight=12*std::clamp(vertical,.5,4.); rememberViewport(); emit viewportChanged(); update();
+ m_pixelsPerTick=2*std::clamp(horizontal,.015625,16.); m_rowHeight=12*std::clamp(vertical,.5,4.); rememberViewport(); emit viewportChanged(); update();
 }
 void SVSCanvas::setScroll(double tick,double topPitch) {
  m_scrollTick=std::max(0.,tick); m_topPitch=std::clamp(topPitch,0.,127.); rememberViewport(); emit viewportChanged(); update();
@@ -217,7 +217,7 @@ void SVSCanvas::rememberViewport() {
 }
 void SVSCanvas::setPortrait(const QImage& image,bool visible,int transparency,QPointF position) { m_portrait=image; m_showPortrait=visible; m_transparency=std::clamp(transparency,0,100); m_portraitPosition={std::clamp(position.x(),0.,1.),std::clamp(position.y(),0.,1.)}; update(); }
 QSize SVSCanvas::portraitTargetSize() const {return QSize(std::max(1,int((width()-KeyboardWidth)*.55*devicePixelRatioF())),std::max(1,int((height()-TimelineHeight)*.9*devicePixelRatioF())));}
-void SVSCanvas::resizeEvent(QResizeEvent* event) {QWidget::resizeEvent(event); emit portraitSizeChanged();}
+void SVSCanvas::resizeEvent(QResizeEvent* event) {QWidget::resizeEvent(event); emit portraitSizeChanged(); emit viewportChanged();}
 void SVSCanvas::paintEvent(QPaintEvent*) {
  QPainter painter(this); painter.fillRect(rect(),color("backgroundColor",QPalette::Base));
  const bool allNoteLabels=ConfigManager::inst()->value("ui","printnotelabels").toInt()!=0;
@@ -234,7 +234,26 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
  if(m_clip&&!m_parameter) {
   const auto audio=m_clip->audio(); const auto readings=audio?audio->feedback["pronunciations"].toObject():QJsonObject{};
   for(const auto& note:displayedNotes()) {
-   auto rectangle=noteRect(note); if(!rectangle.intersects(grid)) continue;
+   auto rectangle=noteRect(note);
+   // The cached synthesis waveform follows the note's time span and pitch row.
+   const double waveHeight=std::clamp(m_rowHeight*.75,6.,24.);
+   const QRectF wave(rectangle.left(),rectangle.bottom()+2,rectangle.width(),waveHeight);
+   if(!rectangle.united(wave).intersects(grid)) continue;
+   if(audio&&wave.intersects(grid)) {
+    painter.save(); painter.setClipRect(wave,Qt::IntersectClip); painter.setPen(color("waveformColor",QPalette::Highlight));
+    const int left=std::max(KeyboardWidth,int(std::ceil(wave.left()))),right=std::min(width(),int(std::ceil(wave.right())));
+    for(int x=left;x<right;++x) {
+     const auto from=audio->mapping.samplePosition(std::max(note.tick,tickAt(x)),audio->startTick,audio->rate);
+     const auto to=audio->mapping.samplePosition(std::min(note.tick+note.duration,tickAt(x+1)),audio->startTick,audio->rate);
+     if(to<=0||from>=double(audio->samples.size()/2)||to<=from) continue;
+     const auto first=size_t(std::max(0.,from)),end=std::min(audio->samples.size()/2,size_t(std::ceil(std::max(0.,to))));
+     auto peak=audio->waveform.peak(first,end);
+     if(end-first<64) {peak={};for(auto frame=first;frame<end;++frame) {peak.minimum=std::min({peak.minimum,audio->samples[frame*2],audio->samples[frame*2+1]});peak.maximum=std::max({peak.maximum,audio->samples[frame*2],audio->samples[frame*2+1]});}}
+     const double center=wave.center().y(),amplitude=wave.height()*.5;
+     painter.drawLine(QPointF(x,center-std::clamp(double(peak.maximum),-1.,1.)*amplitude),QPointF(x,center-std::clamp(double(peak.minimum),-1.,1.)*amplitude));
+    }
+    painter.restore();
+   }
    painter.fillRect(rectangle.adjusted(0,1,-1,-1),m_selected.contains(note.id)?color("selectedNoteColor",QPalette::Highlight).lighter(125):color("noteColor",QPalette::Highlight));
    const auto namedLyric=noteLabel(int(std::floor(note.pitch)))+" · "+note.lyric;
    const auto label=allNoteLabels&&fontMetrics().horizontalAdvance(namedLyric)<=rectangle.width()-6?namedLyric:note.lyric;
@@ -506,11 +525,13 @@ void SVSCanvas::keyPressEvent(QKeyEvent* event) {
  QWidget::keyPressEvent(event);
 }
 void SVSCanvas::wheelEvent(QWheelEvent* event) {
- if(m_parameter&&!event->modifiers().testFlag(Qt::ControlModifier)&&!event->modifiers().testFlag(Qt::ShiftModifier)&&event->angleDelta().x()==0&&event->pixelDelta().x()==0) { event->ignore(); return; }
+ if(m_parameter&&event->position().y()>=TimelineHeight&&!event->modifiers().testFlag(Qt::ControlModifier)&&!event->modifiers().testFlag(Qt::ShiftModifier)&&event->angleDelta().x()==0&&event->pixelDelta().x()==0) { event->ignore(); return; }
  const auto point=event->position(); const double delta=event->pixelDelta().isNull()?event->angleDelta().y()/120.:event->pixelDelta().y()/60.;
- if(event->modifiers().testFlag(Qt::ControlModifier)) {
+ const bool keyboard=!m_parameter&&point.x()<KeyboardWidth&&point.y()>=TimelineHeight;
+ const bool ruler=point.x()>=KeyboardWidth&&point.y()<TimelineHeight;
+ if(keyboard||ruler||event->modifiers().testFlag(Qt::ControlModifier)) {
   const auto tick=tickAt(point.x()),pitch=pitchAt(point.y());
-  if(event->modifiers().testFlag(Qt::ShiftModifier)) { setZoom(horizontalZoom(),verticalZoom()*std::pow(1.15,delta)); setScroll(m_scrollTick,pitch+(point.y()-TimelineHeight)/m_rowHeight); }
+  if(keyboard||(!ruler&&event->modifiers().testFlag(Qt::ShiftModifier))) { setZoom(horizontalZoom(),verticalZoom()*std::pow(1.15,delta)); setScroll(m_scrollTick,pitch+(point.y()-TimelineHeight)/m_rowHeight); }
   else { setZoom(horizontalZoom()*std::pow(1.15,delta),verticalZoom()); setScroll(tick-(point.x()-KeyboardWidth)/m_pixelsPerTick,m_topPitch); }
  } else if(event->modifiers().testFlag(Qt::ShiftModifier)) setScroll(m_scrollTick-delta*48,m_topPitch);
  else { if(event->pixelDelta().x()) setScroll(m_scrollTick-event->pixelDelta().x()/m_pixelsPerTick,m_topPitch); else if(event->angleDelta().x()) setScroll(m_scrollTick-event->angleDelta().x()/120.*48,m_topPitch); setScroll(m_scrollTick,m_topPitch+delta*3); }

@@ -392,3 +392,9 @@ PASS：SVS 钢琴窗默认嵌入 LMMS 工作区，可通过现有标题栏分离
 波形/音素区固定为 80px 的窄条，将多余高度留给音符画布；参数按钮居中，移除眼睛图标，改为使用插件颜色的纯文字标签，保留编辑/显隐交互。SVS 钢琴窗读取并实时响应现有 ui/printnotelabels（Enable all note labels in piano roll），显示白键音名及有空间的音符音名，同时保留歌词。不修改普通 PianoRoll 或设置系统。
 
 Release 构建、Windows 原生专项及完整 SVS 回归通过（51 passed/0 failed/0 skipped）；真实窗口截图和开发目录已更新。证据见 doc/svs/SVS-compact-layout.md。未使用 offscreen 或 Computer Use 操作应用，用户最终人工布局/操作验收 MANUAL/PENDING。
+
+## 20. 用户验收修正：音符下方波形、加高音素条和缩放（2026-10-05）
+
+波形改为直接位于对应音符下方，按音符时间/音高和已有 PCM 时间映射绘制；独立音素条加高至 36px，替代第 19 节的 80px 组合条。琴键区滚轮调整琴键高度并保持指针音高；标尺滚轮横向缩放，工具栏可按 1/2/4/8/16 个可见小节缩放，音符/音素/参数同步并沿用视口持久化。
+
+Release 构建与 Windows 原生完整回归通过（52 passed/0 failed/0 skipped）；实窗截图已检查，配置好主题的开发目录已更新，测试窗口已关闭。仅修改独立 SVS 模块及必要测试，不修改普通钢琴窗/音频框架。见 doc/svs/SVS-note-wave-zoom.md。未使用 offscreen 或 Computer Use，用户最终人工布局/操作验收 MANUAL/PENDING。

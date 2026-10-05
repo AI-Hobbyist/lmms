@@ -169,6 +169,11 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* zoomIn=new QToolButton(this); zoomIn->setText(tr("+")); toolbar->addWidget(zoomIn);
  connect(zoomOut,&QToolButton::clicked,this,[canvas]{canvas->setZoom(canvas->horizontalZoom()/1.25,canvas->verticalZoom());});
  connect(zoomIn,&QToolButton::clicked,this,[canvas]{canvas->setZoom(canvas->horizontalZoom()*1.25,canvas->verticalZoom());});
+ auto* barZoom=new QComboBox(this);barZoom->setObjectName("svsBarZoom");barZoom->setToolTip(tr("Horizontal zoom: bars visible in the note area"));barZoom->addItem(tr("Custom"),0);
+ for(int bars:{1,2,4,8,16}) barZoom->addItem(tr("%n bar(s)",nullptr,bars),bars);
+ toolbar->addWidget(barZoom);
+ connect(barZoom,qOverload<int>(&QComboBox::activated),this,[canvas,barZoom](int index){const int bars=barZoom->itemData(index).toInt();if(bars>0) canvas->setZoom(double(canvas->width()-60)/(2.*TimePos::ticksPerBar()*bars),canvas->verticalZoom());});
+ connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,barZoom]{const auto bars=double(canvas->width()-60)/(2.*TimePos::ticksPerBar()*canvas->horizontalZoom());int index=0;for(int i=1;i<barZoom->count();++i) if(std::abs(bars-barZoom->itemData(i).toInt())<.01) index=i;barZoom->setCurrentIndex(index);});
  toolbar->addStretch();
  auto* track=static_cast<SVSTrack*>(clip->getTrack()); auto* side=new QWidget(this); side->setObjectName("svsVoicePanel"); side->setMaximumWidth(300); auto* controls=new QVBoxLayout(side); body->addWidget(side);
  auto* properties=new QToolButton(this); properties->setText(tr("Properties")); properties->setCheckable(true); properties->setChecked(true); toolbar->addWidget(properties); connect(properties,&QToolButton::toggled,side,&QWidget::setVisible);
