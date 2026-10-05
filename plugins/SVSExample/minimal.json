@@ -1,0 +1,8 @@
+{
+ "schemaVersion":1,"languages":["en"],"defaultLanguage":"en","noteLanguage":false,
+ "parameters":[{"id":"example.gain","name":"Gain","scope":"track","type":"float","default":1,"min":0.01,"max":2,"step":0.01}],
+ "feedbackParameters":[],"pitch":{"input":"none","feedback":false},
+ "phonemes":{"timingEditable":false,"attributesEditable":false},
+ "pronunciation":{"parser":"example.symbols.v1","phonemeSet":"example.multilingual.v1","phonemes":["l","a","hello","sil"],"dictionaries":["en.json"]},
+ "synthesis":{"cancel":true,"concurrent":false,"channels":2,"format":"float32"}
+}

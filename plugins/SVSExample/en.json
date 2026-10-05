@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"example.en","version":"1","language":"en","phonemeSet":"example.multilingual.v1","entries":[{"text":"la","candidates":[{"reading":"la","phonemes":["l","a"]}]},{"text":"hello","candidates":[{"reading":"hello","phonemes":["hello"]}]}]}

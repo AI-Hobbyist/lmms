@@ -2,6 +2,7 @@
 #ifndef SVS_API_H
 #define SVS_API_H
 #include <stdint.h>
+#include <stddef.h>
 #ifdef _WIN32
 #define SVS_CALL __cdecl
 #ifdef SVS_PLUGIN_BUILD
@@ -77,7 +78,11 @@ typedef struct svs_api {
     svs_status (SVS_CALL *render)(svs_session, svs_result*);
     void (SVS_CALL *cancel)(svs_session); /* thread-safe request; render must still exit */
     void (SVS_CALL *release_result)(svs_session, svs_result*);
+    /* Optional tail: UTF-8 JSON request/result. Returned text uses release_string. */
+    svs_status (SVS_CALL *pronunciation)(svs_engine, const char* voice_id, const char* request_json, const char** result_json);
 } svs_api;
+/* Required prefix excludes optional tail functions. */
+#define SVS_API_REQUIRED_SIZE ((uint32_t)offsetof(svs_api, pronunciation))
 typedef svs_status (SVS_CALL *svs_get_api_fn)(uint32_t, uint32_t, uint32_t, svs_api*);
 SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major, uint32_t minor, uint32_t size, svs_api* api);
 #ifdef __cplusplus

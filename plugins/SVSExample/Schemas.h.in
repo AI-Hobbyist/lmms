@@ -1,0 +1,2 @@
+static const char fullSchema[] = R"svs_schema(@SVS_FULL_SCHEMA@)svs_schema";
+static const char minimalSchema[] = R"svs_schema(@SVS_MINIMAL_SCHEMA@)svs_schema";

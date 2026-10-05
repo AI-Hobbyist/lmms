@@ -1,7 +1,7 @@
 # SVS轨道 / SVS插件 / SVS钢琴窗支持计划书
 
 日期：2026-10-03  
-状态：执行中；M0/M1 已通过该阶段自动验证，M2→M5 尚未完成。
+状态：执行中；M0→M2 已通过该阶段自动验证，M3→M5 尚未完成。
 目标项目：当前 LMMS 工作区；行为参考 `tl_ref`，界面融入 LMMS Qt Widgets 与主题 CSS。
 
 ## 1. 目标与交付边界
@@ -366,7 +366,7 @@ if ($buildExitCode -ne 0) {
 | --- | --- | --- |
 | M0 | PASS | `doc/svs/M0-contract.md` 冻结 v0.1 数据/ABI/时间/所有权/交互/接入清单和性能数据集；`tests/svs/M0ContractTest.py` 通过；日志 `doc/svs/validation/M0.log`。TuneLab 本机交互复核 MANUAL/PENDING，不阻塞 M1。 |
 | M1 | PASS | 原生 SVS 轨道/片段、独立钢琴窗最小音符输入、SDK C ABI、SVSExample、异步 PCM 合成及 LMMS 混音已接通。Release 主程序/示例/集成测试编译通过；QtTest 验证鼠标创建、合成、混音、声库换名、XML 恢复、复制 ID/移动和通道路由；日志 `doc/svs/validation/M1-build.log`、`M1-test.log`、`M1-enum-regression.log`。开发版实机主题/图标/独立配置启动通过；听感验收 MANUAL/PENDING，完整编辑/调度验收归 M3/M4。 |
-| M2 | PENDING | 能力与字典待实现 |
+| M2 | PASS | 五类参数/四作用域、受约束资源 ID、Schema 校验、控件 ID/焦点保留、多选三态、只读回显、条件显隐、异步声明重查及持久化已接通；三语言字典/候选/覆盖优先级/诊断及插件解析已验证。完整→精简→完整声库切换保留输入，缺失能力拒绝编辑，Gain 实际 PCM 能量按比例变化。Release 编译及 6 个 QtTest 槽通过；证据 `doc/svs/M2-capabilities.md`、`doc/svs/validation/M2-build.log`、`M2-test.log`、`M2-QtTest.txt`。音符/音素选择和候选菜单等完整交互在 M3 接入，听感验收 MANUAL/PENDING 不阻塞。 |
 | M3 | PENDING | 独立编辑器与主题专项验收待实现 |
 | M4 | PENDING | 生命周期、缓存、迁移、导出待实现 |
 | M5 | PENDING | SDK 外部构建、演示工程、最终回归与独立性验证待执行 |

@@ -1,6 +1,7 @@
 #include "SVSViews.h"
 #include "SVSTrack.h"
 #include "SVSClip.h"
+#include "SVSParameterPanel.h"
 #include "TrackLabelButton.h"
 #include "StringPairDrag.h"
 #include "Knob.h"
@@ -21,6 +22,10 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QUuid>
+#include <QFileDialog>
+#include <QFile>
+#include <QTabWidget>
+#include <QLocale>
 #include <cmath>
 namespace lmms::gui {
 SVSTrackView::SVSTrackView(SVSTrack* track,TrackContainerView* container):TrackView(track,container) {
@@ -73,6 +78,27 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QDialog(parent) {
  auto* stop=new QPushButton(tr("Stop"),this); toolbar->addWidget(stop); connect(stop,&QPushButton::clicked,Engine::getSong(),&Song::stop);
  auto* render=new QPushButton(tr("Synthesize"),this); toolbar->addWidget(render); connect(render,&QPushButton::clicked,clip,&SVSClip::synthesize);
  auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status]{status->setText(clip->status());}); connect(clip,&QObject::destroyed,this,&QDialog::close);
- auto* scroll=new QScrollArea(this); scroll->setWidget(new NoteCanvas(clip,scroll)); layout->addWidget(scroll); toolbar->addStretch();
+ auto* body=new QHBoxLayout; layout->addLayout(body); auto* scroll=new QScrollArea(this); scroll->setWidget(new NoteCanvas(clip,scroll)); body->addWidget(scroll,1); toolbar->addStretch();
+ auto* track=static_cast<SVSTrack*>(clip->getTrack()); auto* side=new QWidget(this); side->setMaximumWidth(300); auto* controls=new QVBoxLayout(side); body->addWidget(side);
+ auto* language=new QComboBox(side); language->setObjectName("svsLanguage"); controls->addWidget(language);
+ connect(language,qOverload<int>(&QComboBox::activated),this,[track,language](int index){ track->setLanguage(language->itemData(index).toString()); });
+ auto* diagnostics=new QLabel(side); diagnostics->setWordWrap(true); controls->addWidget(diagnostics);
+ auto* import=new QPushButton(tr("Import project dictionary"),side); controls->addWidget(import);
+ connect(import,&QPushButton::clicked,this,[this,clip,diagnostics]{ auto path=QFileDialog::getOpenFileName(this,tr("Import dictionary"),{},tr("JSON dictionary (*.json)")); if(path.isEmpty()) return; QFile file(path); if(!file.open(QIODevice::ReadOnly)) { diagnostics->setText(file.errorString()); return; } QString error; if(!clip->importDictionary(file.read(4*1024*1024+1),error)) diagnostics->setText(error); });
+ auto* tabs=new QTabWidget(side); controls->addWidget(tabs);
+ auto* trackPanel=new SVSParameterPanel(tabs); tabs->addTab(trackPanel,tr("Track"));
+ auto* clipPanel=new SVSParameterPanel(tabs); tabs->addTab(clipPanel,tr("Clip"));
+ auto* feedbackPanel=new SVSParameterPanel(tabs); tabs->addTab(feedbackPanel,tr("Result"));
+ auto refresh=[clip,track,language,diagnostics,trackPanel,clipPanel,feedbackPanel]{
+  auto context=track->parameters(); for(const auto& p:track->capabilities().parameters) if(p.scope=="track"&&!context.contains(p.id)) context[p.id]=p.defaultValue;
+  for(auto i=clip->parameters().begin();i!=clip->parameters().end();++i) context[i.key()]=i.value();
+  trackPanel->refresh(track->capabilities().parameters,"track",{track->parameters()},context,[track](const QString& id,const QJsonValue& value){track->setParameter(id,value);});
+  clipPanel->refresh(track->capabilities().parameters,"clip",{clip->parameters()},context,[clip](const QString& id,const QJsonValue& value){clip->setParameter(id,value);});
+  auto audio=clip->audio(); feedbackPanel->refresh(track->capabilities().feedbackParameters,"clip",audio?QVector<QJsonObject>{audio->feedback["parameters"].toObject()}:QVector<QJsonObject>{},context,{});
+  QStringList current; for(int i=0;i<language->count();++i) current<<language->itemData(i).toString();
+  if(current!=track->capabilities().languages) { language->clear(); for(const auto& value:track->capabilities().languages) { auto label=QLocale(value).nativeLanguageName(); language->addItem(label.isEmpty()?value:label,value); } }
+  language->setCurrentIndex(language->findData(track->language())); diagnostics->setText(track->capabilityDiagnostics().join('\n'));
+ };
+ connect(clip,&Clip::dataChanged,this,refresh); connect(track,&Track::dataChanged,this,refresh); refresh();
 }
 }

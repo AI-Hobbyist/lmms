@@ -10,4 +10,6 @@ The development executable is build/Release/lmms.exe. Qt runtime deployment is r
 
 Computer Use verified that the development executable loads the dark LMMS theme and toolbar icons without missing-plugin startup dialogs. The original installed LMMS was closed at the user's request. Development configuration, blank template and copied resources are local build fixtures, excluded from delivery. Automatic tests use QTemporaryDir configuration and do not overwrite the development or installed application settings.
 
+User test workflow: launch TuneLab or the configured development LMMS only when an interactive check requires it; close the application after the check. Keep the original installed LMMS closed during validation. Both test applications were closed after this theme check.
+
 Listening and broader interactive acceptance: MANUAL/PENDING. These do not block M2. The current editor is a minimal M1 entry surface; inline lyrics, tool switching, curves and complete TuneLab interaction alignment belong to M3.

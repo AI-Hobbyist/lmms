@@ -5,6 +5,7 @@
 #include <atomic>
 #include <QPointer>
 #include <QDomElement>
+#include <QJsonArray>
 namespace lmms {
 class SVSClip : public Clip {
  Q_OBJECT
@@ -23,9 +24,16 @@ public:
  std::shared_ptr<const svs::Audio> audio() const;
  QString status() const { return m_status; }
  QString id() const { return m_id; }
+ const QJsonObject& parameters() const { return m_parameters; }
+ bool setParameter(const QString&,const QJsonValue&);
+ bool setNoteParameter(const QStringList& noteIds,const QString& id,const QJsonValue& value,bool phoneme=false);
+ bool importDictionary(const QByteArray&,QString& error);
+ const QJsonArray& projectDictionaryData() const { return m_projectDictionaryData; }
 private:
  QString m_id,m_status="Dirty";
  QVector<svs::Note> m_notes;
+ QJsonObject m_parameters;
+ QJsonArray m_projectDictionaryData;
  QDomElement m_original;
  std::atomic<uint64_t> m_revision{1};
  uint64_t m_generation=1,m_request=0;

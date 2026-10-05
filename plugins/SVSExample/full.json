@@ -1,0 +1,20 @@
+{
+ "schemaVersion": 1,
+ "languages": ["zh", "ja", "en"], "defaultLanguage": "en", "noteLanguage": true,
+ "parameters": [
+  {"id":"example.mode","name":"Mode","group":"Voice","order":0,"scope":"track","type":"enum","default":"basic","choices":[{"id":"basic","name":"Basic"},{"id":"advanced","name":"Advanced"}]},
+  {"id":"example.gain","name":"Gain","group":"Voice","order":1,"scope":"track","type":"float","default":1,"min":0.01,"max":2,"step":0.01,"scale":"log","unit":"ratio"},
+  {"id":"example.breath","name":"Breath","group":"Expression","order":2,"scope":"clip","type":"float","default":0.1,"min":0,"max":1,"step":0.01,"curve":true,"interpolation":"hermite","visibleWhen":{"example.mode":"advanced"}},
+  {"id":"example.tension","name":"Tension","group":"Expression","order":3,"scope":"clip","type":"float","default":0.25,"min":0,"max":1,"step":0.01,"curve":true,"interpolation":"linear"},
+  {"id":"example.gender","name":"Gender","group":"Expression","order":4,"scope":"clip","type":"float","default":0,"min":-1,"max":1,"step":0.01,"curve":true,"interpolation":"linear"},
+  {"id":"example.power","name":"Power","group":"Note","order":5,"scope":"note","type":"int","default":100,"min":0,"max":200,"step":1,"curve":true,"interpolation":"step","unit":"%"},
+  {"id":"example.soft","name":"Soft","group":"Note","order":6,"scope":"note","type":"bool","default":false,"curve":true,"interpolation":"step"},
+  {"id":"example.label","name":"Label","group":"Note","order":7,"scope":"note","type":"string","default":""},
+  {"id":"example.phonemeGain","name":"Phoneme gain","group":"Phoneme","order":8,"scope":"phoneme","type":"float","default":1,"min":0,"max":2,"step":0.01,"interpolation":"linear"}
+ ],
+ "feedbackParameters": [{"id":"example.energy","name":"Rendered energy","scope":"clip","type":"float","default":0,"min":0,"max":1000000,"step":0.01,"curve":true,"interpolation":"linear","writable":false}],
+ "pitch": {"input":"absolute","unit":"semitone","referencePitch":"note","feedback":true},
+ "phonemes": {"timingEditable":true,"attributesEditable":true,"minimumDurationSeconds":0.005,"maximumLeadSeconds":0.2},
+ "pronunciation": {"parser":"example.symbols.v1","candidates":true,"continuation":"-","phonemeSet":"example.multilingual.v1","phonemes":["l","a","n","i","h","ao","zh","ong","ch","k","o","s","e","t","hello","sil"],"dictionaries":["zh.json","ja.json","en.json"]},
+ "synthesis": {"cancel":true,"concurrent":false,"segmented":false,"channels":2,"format":"float32"}
+}

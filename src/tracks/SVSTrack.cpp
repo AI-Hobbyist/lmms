@@ -10,6 +10,13 @@
 #include "volume.h"
 #include "panning.h"
 #include <cmath>
+#include <QFile>
+#include <QDir>
+#include <QJsonDocument>
+#include <QPointer>
+#include <QCoreApplication>
+#include <QThreadPool>
+#include <QRunnable>
 namespace lmms {
 namespace {
 class SVSPlaybackHandle : public PlayHandle {
@@ -34,10 +41,59 @@ void SVSTrack::setName(const QString& name) { m_customName=true; Track::setName(
 void SVSTrack::restoreVoiceName() { addJournalCheckPoint(); m_customName=false; Track::setName(m_voice.name.isEmpty()?"SVS":m_voice.name); m_bus.setName(name()); }
 void SVSTrack::bindVoice(const QString& plugin,const QString& voice) {
  addJournalCheckPoint(); m_pluginId=plugin; m_voiceId=voice; m_voice={}; for(const auto& v:svs::Registry::instance().voices()) if(v.pluginId==plugin&&v.id==voice) { m_voice=v; break; }
+ ++m_capabilityRequest;
+ m_capabilities={}; m_dictionaries.clear(); m_capabilityDiagnostics.clear(); QString error;
+ if(auto instance=svs::Registry::instance().plugin(plugin)) {
+  auto schema=instance->capabilities(voice,m_parameters,error);
+  if(!error.isEmpty()||!svs::Capabilities::parse(schema,m_capabilities,error)) m_capabilityDiagnostics<<error;
+  else for(const auto& resource:m_capabilities.dictionaryResources) {
+   const auto root=QFileInfo(m_voice.package).canonicalFilePath()+"/";
+   const auto path=QFileInfo(QDir(m_voice.package).filePath(resource)).canonicalFilePath();
+   QFile file(path); svs::Dictionary dictionary;
+   if(!path.startsWith(root,Qt::CaseInsensitive)||!file.open(QIODevice::ReadOnly)) m_capabilityDiagnostics<<"Missing dictionary: "+resource;
+   else if(!svs::Dictionary::parse(file.read(4*1024*1024+1),m_capabilities.phonemeSet,dictionary,error)) m_capabilityDiagnostics<<resource+": "+error;
+   else if(dictionary.phonemeSet!=m_capabilities.phonemeSetId||!m_capabilities.languages.contains(dictionary.language)) m_capabilityDiagnostics<<resource+": incompatible dictionary language/phoneme set";
+   else m_dictionaries.push_back(dictionary);
+  }
+ }
+ if(!m_capabilities.languages.contains(m_language)) m_language=m_capabilities.defaultLanguage;
  if(!m_customName) Track::setName(m_voice.name.isEmpty()?"SVS":m_voice.name); m_bus.setName(name());
  for(auto* clip:getClips()) { auto* c=static_cast<SVSClip*>(clip); c->invalidate(); c->synthesize(); } emit dataChanged(); Engine::getSong()->setModified();
 }
 Clip* SVSTrack::createClip(const TimePos& pos) { auto* clip=new SVSClip(this); clip->movePosition(pos); return clip; }
+bool SVSTrack::setParameter(const QString& id,const QJsonValue& value) {
+ const auto* parameter=m_capabilities.parameter(id,"track");
+ if(!parameter||!parameter->writable||!parameter->enabled||!parameter->accepts(value)) return false;
+ if(m_parameters.value(id)==value) return true;
+ addJournalCheckPoint(); m_parameters[id]=value;
+ refreshCapabilities();
+ for(auto* clip:getClips()) { auto* c=static_cast<SVSClip*>(clip); c->invalidate(); c->synthesize(); }
+ emit dataChanged(); Engine::getSong()->setModified(); return true;
+}
+bool SVSTrack::setLanguage(const QString& value) {
+ if(!m_capabilities.languages.contains(value)) return false; if(m_language==value) return true;
+ addJournalCheckPoint(); m_language=value;
+ refreshCapabilities();
+ for(auto* clip:getClips()) { auto* c=static_cast<SVSClip*>(clip); c->invalidate(); c->synthesize(); }
+ emit dataChanged(); Engine::getSong()->setModified(); return true;
+}
+void SVSTrack::refreshCapabilities(const QJsonObject& editorContext) {
+ auto plugin=svs::Registry::instance().plugin(m_pluginId); if(!plugin) return;
+ const auto request=++m_capabilityRequest; const auto voice=m_voiceId; auto context=m_parameters;
+ for(auto i=editorContext.begin();i!=editorContext.end();++i) context[i.key()]=i.value(); context["language"]=m_language;
+ QPointer<SVSTrack> target(this);
+ QThreadPool::globalInstance()->start(QRunnable::create([plugin,target,voice,request,context]{
+  QString error; auto declaration=plugin->capabilities(voice,context,error); svs::Capabilities parsed;
+  if(error.isEmpty()) svs::Capabilities::parse(declaration,parsed,error);
+  QMetaObject::invokeMethod(QCoreApplication::instance(),[target,request,parsed,error]{
+   if(!target||target->m_capabilityRequest!=request) return;
+   if(!error.isEmpty()) { target->m_capabilityDiagnostics={error}; emit target->dataChanged(); return; }
+   if(target->m_capabilities.original==parsed.original) return;
+   target->m_capabilities=parsed; emit target->dataChanged();
+   for(auto* clip:target->getClips()) { auto* current=static_cast<SVSClip*>(clip); current->invalidate(); current->synthesize(); }
+  },Qt::QueuedConnection);
+ }));
+}
 gui::TrackView* SVSTrack::createView(gui::TrackContainerView* view) { return new gui::SVSTrackView(this,view); }
 bool SVSTrack::play(const TimePos& start,f_cnt_t frames,f_cnt_t offset,int clipNum) {
  if(clipNum>=0||isMuted()||!tryLock()) return false; bool played=false;
@@ -52,8 +108,9 @@ bool SVSTrack::play(const TimePos& start,f_cnt_t frames,f_cnt_t offset,int clipN
 void SVSTrack::saveTrackSpecificSettings(QDomDocument& doc,QDomElement& node,bool) {
  if(!m_original.isNull()) { auto attrs=m_original.attributes(); for(int i=0;i<attrs.count();++i) node.setAttribute(attrs.item(i).nodeName(),attrs.item(i).nodeValue()); }
  node.setAttribute("schemaVersion",1); node.setAttribute("pluginId",m_pluginId); node.setAttribute("voiceId",m_voiceId); node.setAttribute("voiceVersion",m_voice.version); node.setAttribute("language",m_voice.language); node.setAttribute("nameMode",m_customName?"custom":"followVoice"); m_volume.saveSettings(doc,node,"vol"); m_pan.saveSettings(doc,node,"pan"); m_mix.saveSettings(doc,node,"mixch"); m_bus.effects()->saveState(doc,node);
+ node.setAttribute("language",m_language); node.setAttribute("parameters",QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact)));
 }
 void SVSTrack::loadTrackSpecificSettings(const QDomElement& node) {
- m_original=node.cloneNode(true).toElement(); m_customName=node.attribute("nameMode")=="custom"; bindVoice(node.attribute("pluginId"),node.attribute("voiceId")); m_volume.loadSettings(node,"vol"); m_pan.loadSettings(node,"pan"); m_mix.loadSettings(node,"mixch"); m_bus.effects()->clear(); auto effects=node.firstChildElement(m_bus.effects()->nodeName()); if(!effects.isNull()) m_bus.effects()->restoreState(effects);
+ m_original=node.cloneNode(true).toElement(); m_parameters=QJsonDocument::fromJson(node.attribute("parameters").toUtf8()).object(); m_language=node.attribute("language"); m_customName=node.attribute("nameMode")=="custom"; bindVoice(node.attribute("pluginId"),node.attribute("voiceId")); m_volume.loadSettings(node,"vol"); m_pan.loadSettings(node,"pan"); m_mix.loadSettings(node,"mixch"); m_bus.effects()->clear(); auto effects=node.firstChildElement(m_bus.effects()->nodeName()); if(!effects.isNull()) m_bus.effects()->restoreState(effects);
 }
 }

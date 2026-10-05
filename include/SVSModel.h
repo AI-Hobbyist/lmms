@@ -26,6 +26,8 @@ public:
  bool valid() const;
  QString error() const;
  QVector<Voice> voices(const QString& package,const QString& id);
+ QJsonObject capabilities(const QString& voice, const QJsonObject& context, QString& error);
+ QJsonObject pronunciation(const QString& voice, const QJsonObject& request, QString& error);
  std::shared_ptr<const Audio> render(const Input&,QString& error);
 private:
  struct Impl; std::unique_ptr<Impl> m_impl;

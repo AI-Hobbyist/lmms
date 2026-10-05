@@ -3,6 +3,7 @@
 #include "Track.h"
 #include "AudioBusHandle.h"
 #include "SVSModel.h"
+#include "SVSCapabilities.h"
 #include <QDomElement>
 namespace lmms {
 class SVSTrack : public Track {
@@ -26,6 +27,14 @@ public:
  AudioBusHandle* audioBusHandle() { return &m_bus; }
  QString pluginId() const { return m_pluginId; }
  QString voiceId() const { return m_voiceId; }
+ const svs::Capabilities& capabilities() const { return m_capabilities; }
+ const QVector<svs::Dictionary>& dictionaries() const { return m_dictionaries; }
+ const QJsonObject& parameters() const { return m_parameters; }
+ QString language() const { return m_language; }
+ QStringList capabilityDiagnostics() const { return m_capabilityDiagnostics; }
+ bool setParameter(const QString&, const QJsonValue&);
+ bool setLanguage(const QString&);
+ void refreshCapabilities(const QJsonObject& context = {});
 private:
  FloatModel m_volume,m_pan;
  IntModel m_mix;
@@ -33,6 +42,12 @@ private:
  QString m_pluginId,m_voiceId;
  bool m_customName=false;
  svs::Voice m_voice;
+ svs::Capabilities m_capabilities;
+ QVector<svs::Dictionary> m_dictionaries;
+ QJsonObject m_parameters;
+ QString m_language;
+ QStringList m_capabilityDiagnostics;
+ uint64_t m_capabilityRequest=0;
  QDomElement m_original;
 };
 }
