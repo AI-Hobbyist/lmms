@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QLayout>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QScreen>
 #include <QScrollArea>
 #include <QToolButton>
@@ -141,6 +142,8 @@ private slots:
   editor->close();QCoreApplication::processEvents();
   QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(!editor->isWindow());
   QCOMPARE(editor->findChild<gui::SVSCanvas*>("svsNoteCanvas"),canvas);QVERIFY(canvas->selectedNotes().contains(note.id));
+  for(const auto& behavior:QStringList{"show","hide","detached"}) {ConfigManager::inst()->setValue("ui","detachbehavior",behavior);frame->detach();QVERIFY(frame->isDetached());editor->close();QCoreApplication::processEvents();QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(editor->isVisible());QVERIFY(canvas->selectedNotes().contains(note.id));}
+  ConfigManager::inst()->setValue("ui","detachbehavior","show");
   frame->close();QVERIFY(!frame->isVisible());QTest::mouseDClick(view,Qt::LeftButton);QVERIFY(frame->isVisible());
   frame->detach();delete track;
   QTRY_VERIFY(editor.isNull());QTRY_VERIFY(lifetime.isNull());
@@ -689,6 +692,20 @@ private slots:
   auto* bars=editor.findChild<QComboBox*>("svsBarZoom");QVERIFY(bars);for(int count:{1,4,16}) {const int index=bars->findData(count);QVERIFY(index>0);bars->setCurrentIndex(index);QVERIFY(QMetaObject::invokeMethod(bars,"activated",Q_ARG(int,index)));QVERIFY(std::abs(canvas->tickAt(canvas->width())-canvas->scrollTick()-count*TimePos::ticksPerBar())<1e-8);QCOMPARE(parameters->horizontalZoom(),canvas->horizontalZoom());QCOMPARE(bars->currentIndex(),index);}
   editor.resize(1500,740);QCoreApplication::processEvents();QCOMPARE(bars->currentIndex(),0);
   const auto state=clip->editorState();QCOMPARE(state["horizontalZoom"].toDouble(),canvas->horizontalZoom());QCOMPARE(state["verticalZoom"].toDouble(),canvas->verticalZoom());gui::SVSCanvas restored(clip);QCOMPARE(restored.horizontalZoom(),canvas->horizontalZoom());QCOMPARE(restored.verticalZoom(),canvas->verticalZoom());QCOMPARE(restored.scrollTick(),canvas->scrollTick());
+ }
+ void globalSidebarVoiceAndRelativeValues() {
+  auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});auto* clip=static_cast<SVSClip*>(track->createClip(0));gui::SVSPianoRoll editor(clip);editor.resize(1200,740);editor.show();QCoreApplication::processEvents();
+  auto* sidebar=editor.findChild<QScrollArea*>("svsVoicePanel");auto* singer=editor.findChild<QComboBox*>("svsSinger");QVERIFY(sidebar);QVERIFY(singer);QVERIFY(singer->isVisible());QCOMPARE(singer->currentIndex(),0);QVERIFY(sidebar->findChildren<QSlider*>().isEmpty());auto* settings=editor.findChild<QDialog*>("svsEditorSettings");QVERIFY(settings);QVERIFY(!settings->isVisible());QVERIFY(!editor.findChild<QCheckBox*>("svsPortraitVisible")->isVisible());
+  const auto voice=svs::Registry::instance().voices().first();const int full=singer->findData(voice.pluginId+"\nfull");QVERIFY(full>0);QVERIFY(QMetaObject::invokeMethod(singer,"activated",Q_ARG(int,full)));QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QCOMPARE(track->voiceId(),QString("full"));QCOMPARE(singer->currentIndex(),full);
+  auto* tension=editor.findChild<QDoubleSpinBox*>("svsGlobalValue.clip.example.tension");auto* slider=editor.findChild<QSlider*>("svsGlobalSlider.clip.example.tension");QVERIFY(tension);QVERIFY(slider);QVERIFY(slider->isVisible());QCOMPARE(tension->value(),0.);QCOMPARE(tension->minimum(),-.25);QCOMPARE(tension->maximum(),.75);
+  svs::Note note;note.id="global-note";note.duration=96;note.lyric="la";svs::Curve curve;curve.id="example.tension";curve.type="float";curve.interpolation="linear";curve.evaluator.interpolation=svs_sdk::Interpolation::Linear;curve.insert(0,.2);curve.insert(96,.5);clip->setEditorData({note},{{curve.id,curve}});QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);const auto original=clip->curves(),baseline=original;const auto before=clip->audio();
+  slider->setValue(4500);QCOMPARE(clip->parameters()[curve.id].toDouble(),.45);QCOMPARE(tension->value(),.2);QCOMPARE(clip->curves(),original);QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);const auto shifted=clip->audio();QVERIFY(shifted->samples!=before->samples);
+  auto shiftedCurve=curve;for(auto& point:shiftedCurve.evaluator.points) point.value+=.2;tension->setValue(0);clip->setEditorData({note},{{curve.id,shiftedCurve}});QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);QCOMPARE(clip->audio()->samples.size(),shifted->samples.size());double error=0;for(size_t i=0;i<shifted->samples.size();++i) error=std::max(error,std::abs(double(shifted->samples[i]-clip->audio()->samples[i])));QVERIFY(error<1e-6);
+  clip->setEditorData({note},original);tension->setValue(.2);QCOMPARE(clip->curves(),baseline);
+  const int minimal=singer->findData(voice.pluginId+"\nminimal");QVERIFY(minimal>0);QVERIFY(QMetaObject::invokeMethod(singer,"activated",Q_ARG(int,minimal)));QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(slider->isHidden()||!slider->isVisible());QCOMPARE(clip->parameters()[curve.id].toDouble(),.45);
+  QVERIFY(QMetaObject::invokeMethod(singer,"activated",Q_ARG(int,full)));QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(slider->isVisible());QCOMPARE(tension->value(),.2);QCOMPARE(editor.findChild<QSlider*>("svsGlobalSlider.clip.example.tension"),slider);
+  QDomDocument doc;auto root=doc.createElement("test");doc.appendChild(root);track->saveState(doc,root);auto* restored=static_cast<SVSTrack*>(Track::create(root.firstChildElement(),Engine::getSong()));auto restoreCleanup=qScopeGuard([&]{delete restored;});QTRY_VERIFY_WITH_TIMEOUT(restored->capabilitiesReady(),10000);auto* saved=static_cast<SVSClip*>(restored->getClip(0));gui::SVSPianoRoll reopened(saved);QCOMPARE(saved->curves(),original);QCOMPARE(reopened.findChild<QDoubleSpinBox*>("svsGlobalValue.clip.example.tension")->value(),.2);
+  auto* button=editor.findChild<QToolButton*>("svsEditorSettingsButton");QVERIFY(button);QTest::mouseClick(button,Qt::LeftButton);QVERIFY(settings->isVisible());settings->close();
  }
  void compactEditorLayoutAndNoteLabels() {
   auto* config=ConfigManager::inst();const auto previous=config->value("ui","printnotelabels");auto restore=qScopeGuard([&]{config->setValue("ui","printnotelabels",previous);});config->setValue("ui","printnotelabels","0");

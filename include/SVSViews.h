@@ -77,6 +77,7 @@ public:
  void seterrorColor(const QColor& value) { setThemeColor(QStringLiteral("errorColor"),value); }
 protected:
  void changeEvent(QEvent*) override;
+ bool eventFilter(QObject*,QEvent*) override;
 private:
  void setThemeColor(const QString&,const QColor&);
  QMap<QString,QColor> m_colors;

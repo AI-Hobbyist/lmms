@@ -398,3 +398,9 @@ Release 构建、Windows 原生专项及完整 SVS 回归通过（51 passed/0 fa
 波形改为直接位于对应音符下方，按音符时间/音高和已有 PCM 时间映射绘制；独立音素条加高至 36px，替代第 19 节的 80px 组合条。琴键区滚轮调整琴键高度并保持指针音高；标尺滚轮横向缩放，工具栏可按 1/2/4/8/16 个可见小节缩放，音符/音素/参数同步并沿用视口持久化。
 
 Release 构建与 Windows 原生完整回归通过（52 passed/0 failed/0 skipped）；实窗截图已检查，配置好主题的开发目录已更新，测试窗口已关闭。仅修改独立 SVS 模块及必要测试，不修改普通钢琴窗/音频框架。见 doc/svs/SVS-note-wave-zoom.md。未使用 offscreen 或 Computer Use，用户最终人工布局/操作验收 MANUAL/PENDING。
+
+## 21. 用户验收修正：关闭直接回嵌与全局基础值侧栏（2026-10-05）
+
+PASS：分离的 SVS 钢琴窗关闭后直接回嵌同一窗口并保持可见，复用现有窗口恢复逻辑，覆盖 show/hide/detached 设置。默认侧栏仅有歌手选择，支持的 track/clip 数值基础项由引擎+声库能力动态提供；滑块/数值相对声库默认值调节，保留曲线数据并进入合成。示例引擎验证基础值与已有曲线叠加。详细属性、立绘和语言等保留在 Settings 中。
+
+Release 构建及 Windows 原生完整回归 53 passed/0 failed/0 skipped；实际窗口截图、开发版三项二进制更新和哈希核对完成，测试窗口关闭。仅修改 SVS 视图、示例引擎的必要参数组合及测试，不改普通钢琴窗/窗口框架，不使用 offscreen 或 Computer Use。见 doc/svs/SVS-global-sidebar.md。用户最终人工布局/操作验收 MANUAL/PENDING。
