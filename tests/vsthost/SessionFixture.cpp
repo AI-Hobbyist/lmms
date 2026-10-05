@@ -30,6 +30,7 @@ int wmain(int argc, wchar_t** argv)
 		if (result != AudioQueue::Result::Ok) { return result; }
 		if (!matches(claim.header, session, generation, claim.header.sequence)) { return AudioQueue::Result::Invalid; }
 		if (mode == L"hang-audio") { Sleep(INFINITE); }
+		if (mode == L"slow-audio") { Sleep(30); }
 		if (mode == L"crash-audio") { RaiseException(0xE0000042, EXCEPTION_NONCONTINUABLE, 0, nullptr); }
 		const auto count = claim.layout.frames * claim.layout.outputs;
 		for (std::uint32_t frame = 0; frame < claim.layout.frames; ++frame)

@@ -173,11 +173,22 @@ int wmain(int argc, wchar_t** argv)
 			{ check(output[sample] == input[sample] * 0.25f, "burst samples preserve preceding sequence"); }
 		}
 		check(reply(session.close()).error == Error::None, "burst worker cleanup");
-		config = configuration(L"hang-audio"); config.audioResultWaitMs = 20;
+		config = configuration(L"slow-audio"); config.audioResultWaitMs = 100;
+		check(reply(session.open(config)).error == Error::None, "slow worker fixture ready");
+		check(session.process({4, 2, 2}, input, output), "slow worker first block");
+		for (unsigned block = 0; block < 10; ++block)
+		{
+			check(session.process({4, 2, 2}, input, output), "worker accepts processing longer than old 20 ms budget");
+			for (unsigned sample = 0; sample < input.size(); ++sample)
+			{ check(output[sample] == input[sample] * 0.25f, "slow worker preserves matching audio"); }
+		}
+		check(reply(session.close()).error == Error::None, "slow worker cleanup");
+		// Even excessive configuration cannot remove the hard worker bound.
+		config = configuration(L"hang-audio"); config.audioResultWaitMs = 1000;
 		check(reply(session.open(config)).error == Error::None, "bounded worker hang ready");
 		check(session.process({4, 2, 2}, input, output), "bounded worker hang submit");
 		const auto begin = GetTickCount64();
-		check(!session.process({4, 2, 2}, input, output) && GetTickCount64() - begin < 100,
+		check(!session.process({4, 2, 2}, input, output) && GetTickCount64() - begin < 250,
 			"worker wait remains bounded for hung helper");
 		const auto deadline = GetTickCount64() + 2000;
 		while (session.state() != SessionState::Faulted && GetTickCount64() < deadline) { Sleep(1); }

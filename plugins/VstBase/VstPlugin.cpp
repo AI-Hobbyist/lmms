@@ -248,8 +248,15 @@ VstPlugin::VstPlugin(const QString& _plugin, std::uint32_t shellId, const QStrin
 		const vsthost::Vst3Create instance{selection->identity.cid,
 			double(Engine::audioEngine()->outputSampleRate()), static_cast<std::uint32_t>(frames),
 			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting(), m_plugin.toUtf8().toStdString()};
-		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 20}, instance);
-		if (m_failed) { return; }
+		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 100}, instance);
+		if (m_failed)
+		{
+			const auto fault = m_native->proxy.fault();
+			qWarning() << "VST3 initialization failed" << m_plugin
+				<< "error" << static_cast<unsigned>(m_native->proxy.error())
+				<< "stage" << static_cast<unsigned>(fault.stage) << "native" << fault.nativeCode;
+			return;
+		}
 		m_name = selection->name.isEmpty() ? QFileInfo(m_plugin).completeBaseName() : selection->name;
 		m_vendorString = selection->vendor; m_productString = m_name;
 		for (const auto& parameter : m_native->proxy.metadata().parameters) { m_native->ids.push_back(parameter.id); }
@@ -1200,7 +1207,17 @@ void VstPlugin::idleUpdate()
 #ifdef LMMS_BUILD_WIN32
 	if (m_native)
 	{
-		m_native->applyFeedback(*this, m_native->proxy.poll());
+		const auto feedback = m_native->proxy.poll();
+		m_native->applyFeedback(*this, feedback);
+		if (feedback.error != vsthost::Error::None && !m_failed)
+		{
+			m_failed = true;
+			const auto fault = m_native->proxy.fault();
+			qWarning() << "VST3 session failed" << m_name
+				<< "error" << static_cast<unsigned>(fault.error)
+				<< "stage" << static_cast<unsigned>(fault.stage)
+				<< "native" << fault.nativeCode;
+		}
 		return;
 	}
 #endif

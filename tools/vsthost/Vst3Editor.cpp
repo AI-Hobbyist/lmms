@@ -21,8 +21,15 @@ void Vst3Editor::open(Vst::IEditController& controller)
 	m_view = owned(controller.createView(Vst::ViewType::kEditor));
 	if (!m_view) { throw std::runtime_error("VST3 controller has no native editor"); }
 	require(m_view->isPlatformTypeSupported(kPlatformTypeHWND), "VST3 editor does not support HWND");
-	ViewRect rectangle{}; require(m_view->getSize(&rectangle), "VST3 editor getSize failed");
-	if (!valid(rectangle)) { throw std::runtime_error("VST3 editor has invalid dimensions"); }
+	// Some editors (including Kontakt) only establish their dimensions after
+	// receiving a native parent. Use a temporary parent size until attachment.
+	ViewRect rectangle{0, 0, 640, 480};
+	ViewRect preferred{};
+	if (m_view->getSize(&preferred) == kResultOk)
+	{
+		if (!valid(preferred)) { throw std::runtime_error("VST3 editor has invalid dimensions"); }
+		rectangle = preferred;
+	}
 	WNDCLASSEXW windowClass{}; windowClass.cbSize = sizeof(windowClass);
 	windowClass.hInstance = GetModuleHandleW(nullptr); windowClass.lpfnWndProc = windowProcedure;
 	windowClass.lpszClassName = L"LMMS-VST3-Editor"; windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
@@ -37,6 +44,9 @@ void Vst3Editor::open(Vst::IEditController& controller)
 		!SetWindowPos(m_window, nullptr, 0, 0, outer.right - outer.left, outer.bottom - outer.top, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE))
 	{ throw std::runtime_error("VST3 editor initial window sizing failed"); }
 	require(m_view->attached(m_window, kPlatformTypeHWND), "VST3 editor attach failed"); m_attached = true;
+	require(m_view->getSize(&rectangle), "VST3 attached editor getSize failed");
+	if (!valid(rectangle)) { throw std::runtime_error("VST3 attached editor has invalid dimensions"); }
+	require(resizeView(m_view, &rectangle), "VST3 attached editor sizing failed");
 	ShowWindow(m_window, SW_SHOW);
 }
 void Vst3Editor::close()

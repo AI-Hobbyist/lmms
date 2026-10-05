@@ -17,7 +17,9 @@ class AudioQueue
 public:
 	static constexpr std::uint32_t Slots = 3;
 	static constexpr std::uint32_t MaxFrames = 4096;
-	static constexpr std::uint32_t MaxChannels = 32;
+		// Internal native bus storage also accommodates multi-output samplers.
+		// Production entries still expose only their existing main stereo pair.
+		static constexpr std::uint32_t MaxChannels = MaxAudioChannels;
 	static constexpr std::uint32_t MaxSamples = MaxFrames * MaxChannels;
 	static constexpr std::uint32_t MaxEventBytes = 16384;
 	static constexpr std::uint32_t MaxOutputEventBytes = 32768;

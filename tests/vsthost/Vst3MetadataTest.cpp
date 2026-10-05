@@ -87,6 +87,15 @@ int main()
 	CHECK(decoded.buses[0].name == metadata.buses[0].name);
 	metadata.buses[0].name = std::string("bad\0name", 8); CHECK(!encodeVst3Metadata(metadata, bytes));
 	metadata = {}; CHECK(encodeVst3Metadata(metadata, bytes) && decodeVst3Metadata(bytes, decoded));
+	// Multi-output samplers retain native storage while the official entry
+	// continues to select only the first main stereo pair.
+	metadata.outputs = 64;
+	for (std::uint32_t index = 0; index < 32; ++index)
+	{ metadata.buses.push_back({0, 1, index, 2, index ? 1u : 0u, 1, 2 * index, true, 3, "Sampler output"}); }
+	CHECK(encodeVst3Metadata(metadata, bytes) && decodeVst3Metadata(bytes, decoded));
+	CHECK(decoded.outputs == 64 && decoded.buses.size() == 32);
+	CHECK(resolveVst3Port(decoded, 1, Vst3AudioPorts::Automatic, 0, port) && port.offset == 0 && port.channels == 2);
+	metadata.outputs = MaxAudioChannels + 1; CHECK(!encodeVst3Metadata(metadata, bytes));
 	std::cout << "PASS named audio/event bus metadata, multi-output/sidechain offsets, flags, activation and hostile envelopes\n";
 	return 0;
 }

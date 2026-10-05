@@ -58,7 +58,7 @@ inline bool validVst3Buses(const Vst3Metadata& metadata)
 		if (bus.media == 0)
 		{
 			if (bus.channels > 32 || static_cast<std::uint32_t>(std::popcount(bus.arrangement)) != bus.channels ||
-				bus.channelOffset != channels[bus.direction] || channels[bus.direction] + bus.channels > 32) { return false; }
+					bus.channelOffset != channels[bus.direction] || channels[bus.direction] + bus.channels > MaxAudioChannels) { return false; }
 			channels[bus.direction] += bus.channels;
 		}
 		else if (bus.channels > 16 || bus.arrangement || bus.channelOffset) { return false; }
@@ -67,7 +67,7 @@ inline bool validVst3Buses(const Vst3Metadata& metadata)
 }
 inline bool encodeVst3Metadata(const Vst3Metadata& metadata, std::vector<std::uint8_t>& bytes)
 {
-	if (metadata.inputs > 32 || metadata.outputs > 32 || metadata.sampleSize > 1 || metadata.parameters.size() > 65536 || !validVst3Buses(metadata)) { return false; }
+		if (metadata.inputs > MaxAudioChannels || metadata.outputs > MaxAudioChannels || metadata.sampleSize > 1 || metadata.parameters.size() > 65536 || !validVst3Buses(metadata)) { return false; }
 	std::unordered_set<std::uint32_t> ids;
 	std::size_t size = 32;
 	for (const auto& info : metadata.parameters)
@@ -113,8 +113,8 @@ inline bool encodeVst3Metadata(const Vst3Metadata& metadata, std::vector<std::ui
 inline bool decodeVst3Metadata(std::span<const std::uint8_t> bytes, Vst3Metadata& metadata)
 {
 	metadata = {};
-	if (bytes.size() < 32 || bytes.size() > MaxControlBytes || get(bytes, 0, 4) != 3 || get(bytes, 4, 4) > 32 ||
-		get(bytes, 8, 4) > 32 || get(bytes, 12, 4) > 1 || get(bytes, 20, 4) > 65536 ||
+		if (bytes.size() < 32 || bytes.size() > MaxControlBytes || get(bytes, 0, 4) != 3 || get(bytes, 4, 4) > MaxAudioChannels ||
+			get(bytes, 8, 4) > MaxAudioChannels || get(bytes, 12, 4) > 1 || get(bytes, 20, 4) > 65536 ||
 		get(bytes, 24, 4) > 1 || get(bytes, 28, 4) > 128 || get(bytes, 20, 4) > (bytes.size() - 32) / 44 ||
 		get(bytes, 28, 4) > (bytes.size() - 32) / 44) { return false; }
 	Vst3Metadata result{static_cast<std::uint32_t>(get(bytes, 4, 4)), static_cast<std::uint32_t>(get(bytes, 8, 4)),

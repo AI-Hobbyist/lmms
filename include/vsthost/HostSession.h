@@ -428,7 +428,7 @@ private:
 		m_nativeCode.store(0); m_faultStage.store(ProcessSupervisor::Stage::Startup);
 		m_state.store(SessionState::Starting, std::memory_order_release);
 		m_audioSequence = 0; m_controlSequence = 0; m_havePrevious = false;
-		m_audioResultWaitMs = std::min<DWORD>(configuration.audioResultWaitMs, 20);
+		m_audioResultWaitMs = std::min<DWORD>(configuration.audioResultWaitMs, 100);
 		if (!m_control->initialize() || !m_audio->initialize()) { return faultReply(Error::InitializationFailed); }
 		m_supervisor = std::make_unique<ProcessSupervisor>();
 		m_supervisor->setAudioFaultSource(&m_audioFault);
