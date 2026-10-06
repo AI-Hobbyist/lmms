@@ -69,7 +69,7 @@ set_target_properties(ThemeWidgetTest PROPERTIES OUTPUT_NAME lmms
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/theme/$<CONFIG>"
 	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/theme/$<CONFIG>")
 set_tests_properties(ThemeWidgetTest PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
-	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins/Release;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/theme-evidence")
+	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/$<CONFIG>/plugins;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/theme-evidence")
 # One aggregate lets MSBuild schedule the frozen UI plugin coverage in parallel.
 add_custom_target(UiPluginCoverage)
 file(STRINGS "${CMAKE_SOURCE_DIR}/doc/ui-modernization/validation/plugin-targets.txt" UI_PLUGIN_TARGETS)
@@ -83,7 +83,7 @@ set_target_properties(UiBaselineCapture PROPERTIES OUTPUT_NAME lmms
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/ui/$<CONFIG>"
 	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/ui/$<CONFIG>")
 set_tests_properties(UiBaselineCapture PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
-	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins/Release;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/ui-baseline;LMMS_UI_SAMPLE=${CMAKE_SOURCE_DIR}/doc/ui-modernization/fixtures/tone.wav;LMMS_UI_FIXTURE=${CMAKE_BINARY_DIR}/ui-fixture.mmp")
+	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/$<CONFIG>/plugins;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/ui-baseline;LMMS_UI_SAMPLE=${CMAKE_SOURCE_DIR}/doc/ui-modernization/fixtures/tone.wav;LMMS_UI_FIXTURE=${CMAKE_BINARY_DIR}/ui-fixture.mmp")
 target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
 set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"

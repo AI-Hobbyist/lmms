@@ -1,0 +1,215 @@
+[
+    {
+        "plugin": "dispersion",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "sfxr",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "taptempo",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitcrush",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "waveshaper",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "spectrumanalyzer",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "xpressive",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "amplifier",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dualfilter",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "monstro",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "tripleoscillator",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "organic",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "eq",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "frequencyshifter",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vsteffect",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "carlarack",
+        "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "granularpitchshifter",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "delay",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bassbooster",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dynamicsprocessor",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "compressor",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "watsyn",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "opulenz",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lb302",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "nes",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "crossovereq",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitinvader",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "slewdistortion",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lv2effect",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "kicker",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "peakcontrollereffect",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "zynaddsubfx",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vectorscope",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "ladspaeffect",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "malletsstk",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lv2instrument",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "stereoenhancer",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "oscilloscope",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "sf2player",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "reverbsc",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "slicert",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vibedstrings",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "multitapecho",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "flanger",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "ladspabrowser",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "freeboy",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "stereomatrix",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "audiofileprocessor",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "patman",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "carlapatchbay",
+        "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "lomm",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vestige",
+        "status": "BASELINE CAPTURED"
+    }
+]

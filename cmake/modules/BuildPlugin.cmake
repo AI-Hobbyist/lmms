@@ -64,6 +64,11 @@ MACRO(BUILD_PLUGIN PLUGIN_NAME)
 		ENDIF()
 	ENDIF(LMMS_BUILD_APPLE)
 	IF(LMMS_BUILD_WIN32)
+		# Use the development executable's portable plugin directory. Keeping a
+		# second DLL deployment here leaves old widget ABIs beside the new exe.
+		SET_TARGET_PROPERTIES(${PLUGIN_NAME} PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/plugins"
+			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/plugins")
 		add_custom_command(
 			TARGET "${PLUGIN_NAME}"
 			POST_BUILD

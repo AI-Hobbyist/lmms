@@ -298,7 +298,7 @@ QtTest 在 Windows 终端没有文本不表示测试没有执行；同时读取 
 
 新建构建目录时，先沿用当前项目必要配置选项，再从共享环境取 `LMMS_CMAKE_GENERATOR`、`LMMS_CMAKE_PLATFORM`、`LMMS_CMAKE_TOOLCHAIN_FILE`、`QTDIR` 和 `SVSSDK_ROOT`。只在相应变量非空且生成器支持时追加 `-A` / toolchain 参数；不要仅用一条简化 configure 命令丢失现有插件配置。configure 同样套用上面的日志与退出码模板。
 
-F6 在受控开发前缀安装：使用 `cmake --install build --config Release --prefix <已确认的独立开发目录>`，同样通过 Tee-Object、记录退出码和日志。若现有 build 的完整 install 依赖未构建目标，先完成 F0 清单要求的目标构建，不能忽略 install 错误。交付前核对安装的 CSS/SVG/程序哈希和资源引用，并从安装目录进行 S01/S02/S05/S07 冒烟。
+F6 沿用原有受控开发前缀安装（禁止另起目录，2026-10-07 用户补充）：使用 `cmake --install build --config Release --prefix <原有开发目录>`，同样通过 Tee-Object、记录退出码和日志。若现有 build 的完整 install 依赖未构建目标，先完成 F0 清单要求的目标构建，不能忽略 install 错误。交付前核对安装的 CSS/SVG/程序哈希和资源引用，并从安装目录进行 S01/S02/S05/S07 冒烟。
 
 ## 12. 完成定义与交付清单
 

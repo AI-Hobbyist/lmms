@@ -7,6 +7,15 @@
 #include <QWheelEvent>
 #include <QHBoxLayout>
 #include <QInputDialog>
+#include <QTreeWidget>
+#include <QToolButton>
+#include "PluginBrowser.h"
+#include "SongEditor.h"
+#include "TrackLabelButton.h"
+#include "Clipboard.h"
+#include <QMimeData>
+#include <QDropEvent>
+#include <QDragEnterEvent>
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LcdFloatSpinBox.h"
@@ -16,6 +25,7 @@
 #include "Piano.h"
 #include "NotePlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
 #include "ProjectJournal.h"
@@ -104,6 +114,50 @@ private slots:
 		QVERIFY(!target.isNull());QTest::mouseClick(&tabs,Qt::LeftButton,Qt::NoModifier,target);QCOMPARE(tabs.activeTab(),11);
 		capture(&window,"F2-widgets");window.close();
 	}
+		void instrumentBrowser()
+		{
+			auto* browser=m_gui->mainWindow()->findChild<PluginBrowser*>();QVERIFY(browser);
+			QToolButton* opener=nullptr;
+			for(auto* button:m_gui->mainWindow()->findChildren<QToolButton*>())
+				if(button->toolTip()==browser->title()) {opener=button;break;}
+			QVERIFY(opener);auto* tree=browser->findChild<QTreeWidget*>();QVERIFY(tree);
+			for(int iteration=0;iteration<3;++iteration)
+			{
+				QTest::mouseClick(opener,Qt::LeftButton);QTRY_VERIFY(browser->isVisible());
+				QElapsedTimer elapsed;elapsed.start();bool responsive=false;
+				QTimer::singleShot(100,[&]{responsive=true;});QTRY_VERIFY_WITH_TIMEOUT(responsive,2000);
+				QVERIFY(elapsed.elapsed()<2000);QVERIFY(tree->topLevelItemCount()>0);
+				tree->expandAll();QTest::qWait(200);tree->collapseAll();tree->expandAll();
+				auto* search=browser->findChild<QLineEdit*>();QVERIFY(search);
+				search->setFocus();QTest::keyClicks(search,"Triple");QTest::qWait(100);
+				QTest::keyClick(search,Qt::Key_A,Qt::ControlModifier);QTest::keyClick(search,Qt::Key_Backspace);
+				if(iteration==0) {capture(m_gui->mainWindow(),"F3-instrument-browser");}
+				QTest::mouseClick(opener,Qt::LeftButton);QTRY_VERIFY(!browser->isVisible());
+			}
+		}
+		void droppedInstrumentWindow()
+		{
+			auto* editor=m_gui->songEditor()->m_editor;
+			m_gui->songEditor()->show();m_gui->songEditor()->parentWidget()->show();
+			QTest::qWait(200);
+			for(const auto& name:{QString("tripleoscillator"),QString("kicker")})
+			{
+				QMimeData mime;mime.setData(Clipboard::mimeType(Clipboard::MimeType::StringPair),("instrument:"+name).toUtf8());
+				QDragEnterEvent enter(QPoint(500,200),Qt::CopyAction,&mime,Qt::LeftButton,Qt::NoModifier);
+				QApplication::sendEvent(editor,&enter);QVERIFY(enter.isAccepted());
+				QDropEvent drop(QPointF(500,200),Qt::CopyAction,&mime,Qt::LeftButton,Qt::NoModifier);
+				QApplication::sendEvent(editor,&drop);QVERIFY(drop.isAccepted());
+				InstrumentTrackView* view=nullptr;
+				QTRY_VERIFY_WITH_TIMEOUT(([&]{for(auto* candidate:editor->findChildren<InstrumentTrackView*>())
+					{auto* instrument=candidate->model()->instrument();if(instrument&&QString::fromUtf8(instrument->descriptor()->name)==name){view=candidate;return true;}}return false;})(),5000);
+				auto* label=view->findChild<TrackLabelButton*>();QVERIFY(label);QTRY_VERIFY(label->isEnabled());
+				QTest::mouseClick(label,Qt::LeftButton,Qt::NoModifier,QPoint(10,label->height()/2));
+				auto* window=view->getInstrumentTrackWindow();QTRY_VERIFY(window->isVisible());
+				capture(m_gui->mainWindow(),"F3-dropped-"+name);
+				QTest::mouseClick(label,Qt::LeftButton,Qt::NoModifier,QPoint(10,label->height()/2));
+				QTRY_VERIFY(!window->isVisible());
+			}
+		}
 	void groupAndWindowLifecycle()
 	{
 		auto* panel=new QWidget;auto* layout=new QVBoxLayout(panel);

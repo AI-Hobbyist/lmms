@@ -16,7 +16,7 @@
 | F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 4235348fb，已推送 origin/master |
 | F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 5ad278c44，已推送 origin/master |
 | F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | a2eb86f36，已推送 origin/master |
-| F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 本阶段检查点 |
+| F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 6f90902e7，已推送 origin/master；部署补修见下 |
 | F4 | TODO | — | — | — |
 | F5 | TODO | — | 逐项登记 PNG 例外 | — |
 | F6 | TODO | — | 人工项不阻塞交付 | — |
@@ -86,3 +86,11 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - 测试初始化补齐主程序的 NotePlayHandleManager::init，并使用 Windows 原生扫描码；模型保留到 GUI 销毁。LED 新属性 setter 仅调用 QWidget::update，避免主题重载对已解除绑定的模型执行同步读取。这些修正保留实际输入路径，不增加离屏路径。
 - F3-100 / F3-150：S01–S08、标准状态及独立进程 fixture 重开通过。F3-widgets-100 / F3-widgets-150：数字、禁用、字体变更和琴键实窗。设置采样率与缓冲区滑块轨道在 150% 实窗中清晰可见。
 - SKIPPED / PNG：插件私有背景与嵌入 artwork 图标保留，F5 逐项登记；本阶段没有修改 PNG 资产。截图 PNG 是原生窗口证据。观感、真实跨屏 DPI、完整中文 IME 为 MANUAL/PENDING，不阻塞检查点。
+## F3 后插件窗口崩溃与部署补修（2026-10-07）
+
+- 用户复现路径：从左侧乐器插件拖入 Song Editor，再点击轨道名称打开插件窗口。相同原生 Windows 测试加载旧 `build/Release/plugins` DLL 时以 `0xc0000005` 崩溃；仅切换到 F3 新 DLL 后通过。之前的 52 插件构建写入 `build/plugins/Release`，手动启动的开发程序仍加载旁边的旧 DLL，形成控件 ABI 不一致。之前的自动通过记录未覆盖手动启动实际部署目录，这一缺口在本次补齐。
+- `BUILD_PLUGIN` 在 Windows 同时设置 MODULE 的库输出和 SHARED 的运行时输出为原程序旁的 `build/Release/plugins`；Carla 支持库也输出到同处。52 个冻结 UI 目标全部直接覆盖原 DLL，另重建三项导入导出插件。路径、大小、修改时间及 SHA256 见 `F3-plugin-directory-manifest.json`；最终构建日志 `F3-plugin-directory-build-final.log`。程序仍为 `build/Release/lmms.exe`，没有另建构建或部署目录。
+- 原目录存在当前缺少 Perl 而未构建的旧 `sid.dll`，全插件面板检查在 Sid 处再次复现崩溃。已原地改名 `sid.dll.disabled` 停用，文件未删除或迁移；GigPlayer DLL 原目录不存在。保留失败记录 `F3-plugin-directory-panels-stale-sid-results.txt`。Sid/GigPlayer 依赖例外继续明确记录，不算已编译。
+- 验证改为加载实际部署目录：`F3-plugin-directory-tests.log` 必要回归 3/3 PASS；最终 `F3-plugin-directory-tests-final.log` / `F3-plugin-directory-theme-results.txt` 控件 10 PASS，包含实际 DnD 入口、异步加载后点击轨道标签开关 TripleOscillator/Kicker、浏览器三轮展开/折叠/搜索和事件循环响应。`F3-widgets-100/F3-dropped-*` 与 `F3-instrument-browser.png` 为原生实窗证据。
+- `F3-100-plugins-results.txt` 全面板实窗测试 3 PASS / 0 FAIL；`F3-100/plugin-panels.json` 登记 47 个面板打开与截图，5 个外部环境项 MANUAL/PENDING（Carla Rack/Patchbay、VST effect、LV2 instrument/effect）。这只是运行与截图证据，人工观感仍待验收；未修改 PNG 资产。最初重复 Tee-Object 争用 build.log 的检查已终止并按脚本自身前台日志管线重跑，不能算 PASS。
+- 用户要求已写入 AGENTS.md：沿用原构建/部署目录，插件及支持库直接覆盖原 plugins；验证使用同一目录；核对残留禁用插件。F6 计划也改为沿用原开发前缀。补修独立提交推送后恢复 F4，F4–F6 未提前标完成。

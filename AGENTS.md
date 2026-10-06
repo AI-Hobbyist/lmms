@@ -30,6 +30,14 @@
    & <BUILD_COMMAND> 2>&1 | Tee-Object -FilePath "build.log"
    $buildExitCode =$LASTEXITCODE
    if ($buildExitCode -ne 0) { exit$buildExitCode }
+   ```
+
+## Existing build and plugin deployment directories
+
+- Reuse the existing build and development deployment directories. Do not create a replacement directory for a build, plugin deployment, or validation; keep each artifact in its original location unless the user explicitly requests relocation.
+- Windows development plugins must compile directly into the existing executable's `plugins` directory: `build/Release/plugins` beside `build/Release/lmms.exe`. Overwrite the previous plugin DLLs there; do not deploy another plugin set under `build/plugins/Release` or a new installation prefix.
+- Validation must load plugins from that same deployed directory. Before reporting a build complete, verify the enabled plugin targets actually wrote their DLLs there and report the executable path.
+- Rebuild plugin support libraries in the same directory too. If a plugin is disabled by the current configuration, check for a leftover DLL and record its in-place retirement (for example, rename it to `.dll.disabled`) so the application cannot load an obsolete ABI.
 
 ## Native Windows GUI validation
 

@@ -1,0 +1,11 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\theme\Release\lmms.exe.
+While testing droppedInstrumentWindow
+Function time: 356ms Total time: 4379ms
+
+Exception address: 0x00007FF8E5CEC660
+Exception code   : 0xc0000005

@@ -1,0 +1,218 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_lmms.cpp
+  qrc_lmms.cpp
+  ScriptRunner.cpp
+  McpProtocol.cpp
+  ConfigManager.cpp
+D:\UserData\Desktop\Project\lmms\src\core\ConfigManager.cpp(762,18): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.vcxproj]
+  DataFile.cpp
+  GuiApplication.cpp
+  MainWindow.cpp
+  MicrotunerConfig.cpp
+  AboutDialog.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  main.cpp
+D:\UserData\Desktop\Project\lmms\src\core\main.cpp(449,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmms.vcxproj]
+D:\UserData\Desktop\Project\lmms\src\core\main.cpp(465,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmms.vcxproj]
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  Automatic MOC and UIC for target lmmssvs
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  gme.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\FreeBoy\Release\gme.lib
+  adplug.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\OpulenZ\Release\adplug.lib
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\libcarla_native-plugin.dll
+  Automatic MOC and UIC for target RemoteCatalogIo
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Automatic UIC for target sf2player
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.exp
+  granularpitchshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\granularpitchshifter.dll
+  opulenz.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\opulenz.dll
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\audiofileprocessor.dll
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitinvader.dll
+  analyzer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\analyzer.dll
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlabase.dll
+  zynaddsubfx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\zynaddsubfx.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.exp
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitcrush.dll
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\crossovereq.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.exp
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\compressor.dll
+  dualfilter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dualfilter.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.exp
+  vectorscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vectorscope.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.exp
+  lomm.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lomm.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.exp
+  dispersion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dispersion.dll
+  frequencyshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\frequencyshifter.dll
+  dynamicsprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dynamicsprocessor.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.exp
+  eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\eq.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  patman.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\patman.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.exp
+  freeboy.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\freeboy.dll
+  lb302.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lb302.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.exp
+  lv2instrument.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lv2instrument.dll
+  ladspabrowser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\ladspabrowser.dll
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\multitapecho.dll
+  monstro.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\monstro.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.exp
+  nes.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\nes.dll
+  organic.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\organic.dll
+  lv2effect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lv2effect.dll
+  malletsstk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\malletsstk.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.exp
+  ladspaeffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\ladspaeffect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.exp
+  peakcontrollereffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\peakcontrollereffect.dll
+  reverbsc.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\reverbsc.dll
+  sfxr.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\sfxr.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  sf2player.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\sf2player.dll
+  oscilloscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\oscilloscope.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.exp
+  flanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\flanger.dll
+  stereomatrix.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\stereomatrix.dll
+  stereoenhancer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\stereoenhancer.dll
+  slicert.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\slicert.dll
+  waveshaper.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\waveshaper.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.exp
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\delay.dll
+  taptempo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\taptempo.dll
+  watsyn.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\watsyn.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.exp
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bassbooster.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.exp
+  xpressive.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\xpressive.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.exp
+  vibedstrings.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vibedstrings.dll
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.exp
+  slewdistortion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\slewdistortion.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.exp
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlapatchbay.dll
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlarack.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.exp
+  vestige.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vestige.dll
+  vsteffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vsteffect.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+  Automatic MOC for target ThemeWidgetTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/theme/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/theme/Release/lmms.exp
+  ThemeWidgetTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\theme\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+  Automatic MOC for target UiBaselineCapture
+  UiBaselineCapture.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.exp
+  UiBaselineCapture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target AutomatableModelTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.exp
+  AutomatableModelTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AutomatableModelTest.exe

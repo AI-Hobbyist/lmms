@@ -1,0 +1,366 @@
+[
+  {
+    "Target": "audiofileprocessor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\audiofileprocessor.dll",
+    "Bytes": 366592,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "F4DB730B73CD9269C5335E59CCEE38A548F38313B8D122241C9A2C60C7871CEB"
+  },
+  {
+    "Target": "kicker",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\kicker.dll",
+    "Bytes": 173056,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "7D7BD78B5DE5C8B93BEF4B612B4D1B411515F9401EFD1862037A5F79C2741939"
+  },
+  {
+    "Target": "tripleoscillator",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\tripleoscillator.dll",
+    "Bytes": 125440,
+    "Modified": "2026-10-07T00:06:27",
+    "SHA256": "E44724EC3E8F698CD81F0735BE7910C76B454EA315877158BA8B0E61852133AB"
+  },
+  {
+    "Target": "amplifier",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\amplifier.dll",
+    "Bytes": 48128,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "75C7BDDBBC5AA69E281E8352CB3BFA2F190638FEB91864261B6F53102CAFA4CD"
+  },
+  {
+    "Target": "bassbooster",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bassbooster.dll",
+    "Bytes": 44544,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "60A89B405EE6F42B1B56B7DFB8C5BA7AB5AA2CA08E9712296633EEDE6039F904"
+  },
+  {
+    "Target": "bitinvader",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitinvader.dll",
+    "Bytes": 180736,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "79185FD4901145BB36E5D94078EB3E5C00F77056644A77434EB2A99095D1DEE1"
+  },
+  {
+    "Target": "bitcrush",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitcrush.dll",
+    "Bytes": 56832,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "3834F2F7A30D5671F5291C4DA73EF7DFF53075B0E8D55B11C07A02CFA2B195B5"
+  },
+  {
+    "Target": "carlapatchbay",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlapatchbay.dll",
+    "Bytes": 22016,
+    "Modified": "2026-10-07T00:06:28",
+    "SHA256": "1D43061771223A5BA9B6E4C7F877822837F093FADEFA87F81271559EAD9439E8"
+  },
+  {
+    "Target": "carlarack",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlarack.dll",
+    "Bytes": 22016,
+    "Modified": "2026-10-07T00:06:28",
+    "SHA256": "D2D1F62290B64FA4B98F9CC343FAD67D0F391BEE337A777E2AA2B8B13E303633"
+  },
+  {
+    "Target": "compressor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\compressor.dll",
+    "Bytes": 353280,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "41AAFD226D1AD910193E38FE329606598A3694328D5AE4052F3B4F7327DA7B74"
+  },
+  {
+    "Target": "crossovereq",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\crossovereq.dll",
+    "Bytes": 64000,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "71835DC0D51488876C6C5EF6119DEC58D55C976C68444A61EE0181921DE29CCD"
+  },
+  {
+    "Target": "delay",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\delay.dll",
+    "Bytes": 57856,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "FCC659198C9372839D8AB8D031B14F1ABB9E57BB6D7FBBE06FB50E2D630A2AD9"
+  },
+  {
+    "Target": "dispersion",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dispersion.dll",
+    "Bytes": 47616,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "17FD8A0D24CACB843250C7A8F65BDA5F54B934A1C49AD9BEB0283C146DC98586"
+  },
+  {
+    "Target": "dualfilter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dualfilter.dll",
+    "Bytes": 75264,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "C813CF043D05D2EC948E597E297912C0B684B7ECE688C5A44CB52556547018C2"
+  },
+  {
+    "Target": "dynamicsprocessor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dynamicsprocessor.dll",
+    "Bytes": 78336,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "A44E521F7DABCEA1AEAA16F1F7DEF893AABF9A6F2FFB4D6B18D4E86D74E5785D"
+  },
+  {
+    "Target": "eq",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\eq.dll",
+    "Bytes": 193536,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "24903048E6F3CE619BE065EA4DB2FAFC3FF9025F366DAACA0334348C9212CEB8"
+  },
+  {
+    "Target": "flanger",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\flanger.dll",
+    "Bytes": 57344,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "3261870BE38EDF0F86798B5E50A61FCBB0C682B73F0BECDEBAA0CC75E23115D7"
+  },
+  {
+    "Target": "frequencyshifter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\frequencyshifter.dll",
+    "Bytes": 187904,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "F88D5737C0D91F9C55D75DC319BC0F9838866D4C18E9E0B4E82BCAAEF7CCFF76"
+  },
+  {
+    "Target": "granularpitchshifter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\granularpitchshifter.dll",
+    "Bytes": 148480,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "4D8A1B8B638D8AD4691D190C23E3965EC656D2A6185A06E092BB98778AD30AE6"
+  },
+  {
+    "Target": "ladspabrowser",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspabrowser.dll",
+    "Bytes": 93696,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "6C8411BC4AA359DC97900D480B582FB0566942CE8658229364C6982DB3A8B1DE"
+  },
+  {
+    "Target": "ladspaeffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspaeffect.dll",
+    "Bytes": 116736,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "216CB1D5199F929789573DDBF567785477A3227382E9A47BF87B81ED08B343D1"
+  },
+  {
+    "Target": "lomm",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lomm.dll",
+    "Bytes": 303616,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "BBD8EB0F5CB9E155A8B563B81F336B9CC4BFF10163EFDA68B82369773E5E312F"
+  },
+  {
+    "Target": "lv2effect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2effect.dll",
+    "Bytes": 37888,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "1B81E78A7D313622620406B6DE85C11695A916BF0994A13EA49B236073FA4660"
+  },
+  {
+    "Target": "lv2instrument",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2instrument.dll",
+    "Bytes": 42496,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "1EEF53F45CABBECBC3CF1B81DF7BD042C09DA2723CF40905BB7A7307F5608597"
+  },
+  {
+    "Target": "lb302",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lb302.dll",
+    "Bytes": 171008,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "B2E9B0DDFA386E7458BD30BFE3DFC80C7A0EE619A3AF254BEE6F949C515C2876"
+  },
+  {
+    "Target": "multitapecho",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\multitapecho.dll",
+    "Bytes": 64512,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "8242F4F2EFF96ADB56C392444CC82D24F90F8EA9492332D62F81756880714317"
+  },
+  {
+    "Target": "monstro",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\monstro.dll",
+    "Bytes": 310784,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "45CCB89D1F0EA7068C660992DFB6ACBDE4486AD25F2E624B4B561CAAC155C228"
+  },
+  {
+    "Target": "nes",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\nes.dll",
+    "Bytes": 192512,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "9F493A7B84D0B7280920FD745E13C03B8EE23409C187A718F62D6CD57B4DF902"
+  },
+  {
+    "Target": "opulenz",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\opulenz.dll",
+    "Bytes": 227840,
+    "Modified": "2026-10-07T00:06:28",
+    "SHA256": "A4BD141F6BD5C8017C42B437592D3BCDFF4EA799F5DB658E23148F5C615E62D6"
+  },
+  {
+    "Target": "organic",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\organic.dll",
+    "Bytes": 127488,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "1F79CB96DCE623871BF2AA421295B159692B161987E2C988F4A2C786DC9FB74E"
+  },
+  {
+    "Target": "oscilloscope",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\oscilloscope.dll",
+    "Bytes": 61952,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "9A28649B698F6ADA448ACEC794975254720E58AEFDF2CDA4A6793AE84FC08E4C"
+  },
+  {
+    "Target": "freeboy",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\freeboy.dll",
+    "Bytes": 171008,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "C8E269E72D1DC895FD38613DB11F742DA929292A9D52A2492BA1D3730F23F57D"
+  },
+  {
+    "Target": "patman",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\patman.dll",
+    "Bytes": 105984,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "8D70A29CDB24073B2683E7A174E2D6D0529D09684F35AA5D9E269FCDD70F8A3C"
+  },
+  {
+    "Target": "peakcontrollereffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\peakcontrollereffect.dll",
+    "Bytes": 70656,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "514C2BE39256B763180B207272F83E01983B05B5A1DB3BE842834735B5E9859D"
+  },
+  {
+    "Target": "reverbsc",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\reverbsc.dll",
+    "Bytes": 48640,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "B25C03A445DDAFE7F8EBED69938680FBD9BCF2B19497B573921AC80F0E19B12D"
+  },
+  {
+    "Target": "sf2player",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sf2player.dll",
+    "Bytes": 235520,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "F9DBDDD75BE500A27AB7BFDAA5BD11C62222E8C727D7444A44C7C0B3120BB582"
+  },
+  {
+    "Target": "sfxr",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sfxr.dll",
+    "Bytes": 186880,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "D9EB5D0536F944DCD414DDC9635EC2526D872235ED98059424875760B7C14029"
+  },
+  {
+    "Target": "slewdistortion",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slewdistortion.dll",
+    "Bytes": 270336,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "24DD0F85D9004BBEEB4BBFAF68C41D9D2FAF0A52559B3322098FC61906C300EB"
+  },
+  {
+    "Target": "slicert",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slicert.dll",
+    "Bytes": 131584,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "7A706DBA6A2E8B4F8082BA8E49A7FC868DCAC699E1FF5E1655CFDA3C07C0C794"
+  },
+  {
+    "Target": "analyzer",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\analyzer.dll",
+    "Bytes": 173056,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "FE85B16AAD6EFF95688E968823A63CCDDD01587A5F2641F9B59AF1B952E0193C"
+  },
+  {
+    "Target": "stereoenhancer",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereoenhancer.dll",
+    "Bytes": 36864,
+    "Modified": "2026-10-07T00:06:23",
+    "SHA256": "5BC6DC86EE93D57190225AC289B941B9D0FE863935240B664807D9E5FF773A5F"
+  },
+  {
+    "Target": "stereomatrix",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereomatrix.dll",
+    "Bytes": 44544,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "9E17CCF710B35969014FDDC0CB0315A7969295CBF83CDDDFC118164BE89D767A"
+  },
+  {
+    "Target": "malletsstk",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\malletsstk.dll",
+    "Bytes": 216576,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "679A142824B359B79123F079EAC2B289F719FDE2534ADC32737666BCB9EB4604"
+  },
+  {
+    "Target": "taptempo",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\taptempo.dll",
+    "Bytes": 54784,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "A02121F5781EAE3337AB3BD0840AD2B029FFEB4E66D39CA4EDC543A5874539E0"
+  },
+  {
+    "Target": "vestige",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vestige.dll",
+    "Bytes": 158208,
+    "Modified": "2026-10-07T00:06:28",
+    "SHA256": "2B98F5949CBB2659E9F379D59C43731288115A4CBD84390C877F908B0E475684"
+  },
+  {
+    "Target": "vsteffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vsteffect.dll",
+    "Bytes": 167424,
+    "Modified": "2026-10-07T00:06:28",
+    "SHA256": "587800339CD339D3A6D94BA37450367EA37050891E70C80CAE40CB5FC05D06C2"
+  },
+  {
+    "Target": "watsyn",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\watsyn.dll",
+    "Bytes": 238592,
+    "Modified": "2026-10-07T00:06:25",
+    "SHA256": "ACF22287F363D560DA05365A55CB4825F4490868A79969F7C1D0F54AC8C2EEEE"
+  },
+  {
+    "Target": "waveshaper",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\waveshaper.dll",
+    "Bytes": 64000,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "CA3C6A6106B2D9488356272D92E1EBAC9DDBE29C11310AD6593BA9274719CD7C"
+  },
+  {
+    "Target": "vectorscope",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vectorscope.dll",
+    "Bytes": 53760,
+    "Modified": "2026-10-07T00:06:26",
+    "SHA256": "2299FB9538B21A3845B898982FB075243B4147188267C073DEA2617DCDF4C7DD"
+  },
+  {
+    "Target": "vibedstrings",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vibedstrings.dll",
+    "Bytes": 124416,
+    "Modified": "2026-10-07T00:06:24",
+    "SHA256": "C46B1B418D7AEEC0D85061A241B3272AC6A4E60DFD63939ACD3BB46C81E7A958"
+  },
+  {
+    "Target": "xpressive",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\xpressive.dll",
+    "Bytes": 2723328,
+    "Modified": "2026-10-07T00:06:27",
+    "SHA256": "97F900235AF58272BF4DA75BBA4E20798CA201F314B67BF06FA0D27C7855DDE6"
+  },
+  {
+    "Target": "zynaddsubfx",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\zynaddsubfx.dll",
+    "Bytes": 534528,
+    "Modified": "2026-10-07T00:06:27",
+    "SHA256": "3A7BCC78A48AAC12012EEAFDA6C2C00D22A4E7F051DFEBAFD62C85D175600D9F"
+  }
+]
