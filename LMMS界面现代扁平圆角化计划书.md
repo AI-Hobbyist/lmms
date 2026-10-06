@@ -197,7 +197,7 @@ M0 的插件清单限定为本仓库当前构建配置启用的 **LMMS 自有 UI
 
 步骤：先补现代 Styled 旋钮和 LCD 文本模式，再迁移已登记通用调用；推子/LED/CPU/键盘逐一替换绘制；图表仅改外框和主题色；保留所有模型和输入路径。
 
-**完成条件**：增益旋钮、对数旋钮、推子 -inf/0 dB、带小数 LCD、LED 切换、琴键都正常；数值拖动撤销和自动化绑定通过；主题/DPI 变化不会显示旧缓存。证据：S06/S08、状态与行为断言。状态：TODO。
+**完成条件**：增益旋钮、对数旋钮、推子 -inf/0 dB、带小数 LCD、LED 切换、琴键都正常；数值拖动撤销和自动化绑定通过；主题/DPI 变化不会显示旧缓存。证据：S06/S08、状态与行为断言。状态：DONE / MANUAL-PENDING；自动证据见 doc/ui-modernization/acceptance.md 的 F3 检查点。
 
 ### F4：编曲与编辑画布视觉
 
@@ -333,7 +333,8 @@ F6 在受控开发前缀安装：使用 `cmake --install build --config Release 
 | F0 全量面板清单及截图基线 | DONE / MANUAL-PENDING | inventory、visual-spec、fixture；52 个插件构建；双 DPI 45 个插件面板；必要回归 2/2 PASS；外部与人工例外见 acceptance |
 | F1 标准控件与主题资产 | DONE / MANUAL-PENDING | F1 双 DPI 实窗及资源状态检查，必要回归 2/2 PASS；PNG 例外见 acceptance |
 | F2 主题属性、代理样式及自绘外框 | DONE / MANUAL-PENDING | 原生 ThemeWidgetTest 6 PASS、核心回归 PASS、双 DPI S01–S08；滑块轨道可见性修复 |
-| F3–F6 产品改造 | TODO | 按阶段提交推送后依次实施 |
+| F3 旋钮、推子、数字与小型显示 | DONE / MANUAL-PENDING | 52 插件编译；核心回归 PASS；双 DPI 控件各 8 PASS 与场景实窗 |
+| F4–F6 产品改造 | TODO | 按阶段提交推送后依次实施 |
 
 执行者从 F0 开始；每阶段只更新与实际完成证据相符的状态。本文没有将此前 SVS 任务的构建通过记录当作本轮现代化验收。
 

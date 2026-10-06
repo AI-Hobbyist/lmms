@@ -73,6 +73,7 @@ public:
 	Q_PROPERTY(bool levelsDisplayedInDBFS MEMBER m_levelsDisplayedInDBFS)
 	Q_PROPERTY(bool renderUnityLine READ getRenderUnityLine WRITE setRenderUnityLine)
 	Q_PROPERTY(QColor unityMarker MEMBER m_unityMarker)
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 
 	Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear = true);
 	Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear = true);
@@ -192,6 +193,7 @@ private:
 	QColor m_unityMarker {63, 63, 63, 255};
 
 	bool m_renderUnityLine {true};
+	bool m_flatStyle = false;
 } ;
 
 

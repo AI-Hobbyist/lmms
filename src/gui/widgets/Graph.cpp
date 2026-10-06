@@ -292,6 +292,10 @@ void Graph::mouseReleaseEvent( QMouseEvent * _me )
 void Graph::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	if (m_flatStyle)
+	{
+		p.fillRect(rect(), palette().base());
+	}
 
 	p.setPen( QPen( m_graphColor, 1 ) );
 	QColor gcol = QColor( m_graphColor.red(), m_graphColor.green(), m_graphColor.blue(), 100 );
@@ -403,11 +407,18 @@ void Graph::paintEvent( QPaintEvent * )
 	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0x70, 0x7C, 0x91 ) );
+		p.setPen(m_flatStyle ? palette().mid().color() : QColor(0x70, 0x7C, 0x91));
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
-	p.drawPixmap( 0, 0, m_foreground );
+	if (m_flatStyle)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setBrush(Qt::NoBrush);
+		p.setPen(palette().mid().color());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+	}
+	else { p.drawPixmap(0, 0, m_foreground); }
 }
 
 

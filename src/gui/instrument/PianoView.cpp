@@ -685,6 +685,17 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 void PianoView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	const auto drawFlatKey = [this, &p](int x, int key)
+	{
+		const bool black = Piano::isBlackKey(key);
+		const bool enabled = isEnabled() && m_piano && m_piano->instrumentTrack()->isKeyMapped(key);
+		const bool pressed = enabled && m_piano->isKeyPressed(key);
+		const QColor fill = !enabled ? palette().color(QPalette::Disabled, black ? QPalette::Base : QPalette::Text) :
+			pressed ? palette().brightText().color() : palette().color(black ? QPalette::Base : QPalette::Text);
+		p.setPen(palette().mid().color());
+		p.setBrush(fill);
+		p.drawRect(QRect(x, PIANO_BASE, getKeyWidth(key) - 1, getKeyHeight(key) - 1));
+	};
 
 	// set smaller font for printing number of every octave
 	p.setFont(adjustedToPixelSize(p.font(), LABEL_TEXT_SIZE));
@@ -692,14 +703,14 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	// draw bar above the keyboard (there will be the labels
 	// for all C's)
-	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );
+	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), m_flatStyle ? palette().window() : p.background() );
 
 	// draw the line above the keyboard
-	p.setPen( Qt::black );
+	p.setPen(m_flatStyle ? palette().mid().color() : QColor(Qt::black));
 	p.drawLine( 0, 0, width(), 0 );
 	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
 
-	p.setPen( Qt::white );
+	p.setPen(m_flatStyle ? palette().text().color() : QColor(Qt::white));
 
 	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
 	if (m_piano != nullptr && !m_piano->instrumentTrack()->keyRangeImport())
@@ -736,7 +747,8 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
-		if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
+		if (m_flatStyle) { drawFlatKey(x, cur_key); }
+		else if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
@@ -770,7 +782,8 @@ void PianoView::paintEvent( QPaintEvent * )
 	int startKey = m_startKey;
 	if (startKey > 0 && Piano::isBlackKey(--startKey))
 	{
-		if (m_piano && m_piano->instrumentTrack()->isKeyMapped(startKey))
+		if (m_flatStyle) { drawFlatKey(0 - PW_WHITE_KEY_WIDTH / 2, startKey); }
+		else if (m_piano && m_piano->instrumentTrack()->isKeyMapped(startKey))
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
@@ -793,7 +806,8 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (Piano::isBlackKey(cur_key))
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
-			if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
+			if (m_flatStyle) { drawFlatKey(x + PW_WHITE_KEY_WIDTH / 2, cur_key); }
+			else if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{

@@ -27,6 +27,7 @@
 #define LMMS_GUI_LCD_FLOATSPINBOX_H
 
 #include <QString>
+#include <QLabel>
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
@@ -38,7 +39,10 @@ namespace lmms::gui
 class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool textMode READ textMode WRITE setTextMode)
 public:
+	bool textMode() const { return m_textMode; }
+	void setTextMode(bool enabled);
 	LcdFloatSpinBox(int numWhole, int numFrac, const QString& name = QString(), QWidget* parent = nullptr);
 	LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent = nullptr);
 
@@ -80,6 +84,9 @@ private:
 	QPoint m_origMousePos;
 	int m_displayOffset;
 	QString m_label;
+	QLabel* m_dotLabel = nullptr;
+	QPixmap m_dotPixmap;
+	bool m_textMode = false;
 
 signals:
 	void manualChange();

@@ -62,8 +62,34 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 
 
 
+void CPULoadWidget::setFlatStyle(bool enabled)
+{
+	m_flatStyle = enabled;
+	setFixedSize(enabled ? QSize(std::max(m_background.width(), fontMetrics().horizontalAdvance(tr("CPU 100%")) + 40),
+		std::max(m_background.height(), fontMetrics().height() + 4)) : m_background.size());
+	m_changed = true;
+	update();
+}
+
 void CPULoadWidget::paintEvent( QPaintEvent *  )
 {
+	if (m_flatStyle)
+	{
+		QPainter p(this);
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setPen(palette().mid().color());
+		p.setBrush(palette().base());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+		const QString text = tr("CPU %1%").arg(m_currentLoad);
+		p.setPen(palette().text().color());
+		p.drawText(rect().adjusted(4, 0, -4, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
+		const int barLeft = p.fontMetrics().horizontalAdvance(tr("CPU 100%")) + 8;
+		const QRectF bar(barLeft, height() / 2.0 - 2, std::max(0, width() - barLeft - 4), 4);
+		p.fillRect(bar, palette().mid());
+		p.fillRect(QRectF(bar.topLeft(), QSizeF(bar.width() * std::clamp(m_currentLoad, 0, 100) / 100.0, bar.height())),
+			m_currentLoad >= 100 ? m_overloadColor : palette().brightText().color());
+		return;
+	}
 	if( m_changed == true )
 	{
 		m_changed = false;

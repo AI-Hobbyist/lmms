@@ -42,6 +42,7 @@ namespace gui
 class LfoGraph : public QWidget, public ModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 	Q_PROPERTY(QColor noAmountColor MEMBER m_noAmountColor)
 	Q_PROPERTY(QColor fullAmountColor MEMBER m_fullAmountColor)
 
@@ -62,6 +63,7 @@ private:
 	float m_randomGraph {0.};
 	QColor m_noAmountColor;
 	QColor m_fullAmountColor;
+	bool m_flatStyle = false;
 };
 
 } // namespace gui

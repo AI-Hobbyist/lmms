@@ -15,8 +15,8 @@
 |---|---|---|---|---|
 | F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 4235348fb，已推送 origin/master |
 | F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 5ad278c44，已推送 origin/master |
-| F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | 本阶段检查点 |
-| F3 | TODO | — | — | — |
+| F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | a2eb86f36，已推送 origin/master |
+| F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 本阶段检查点 |
 | F4 | TODO | — | — | — |
 | F5 | TODO | — | 逐项登记 PNG 例外 | — |
 | F6 | TODO | — | 人工项不阻塞交付 | — |
@@ -75,3 +75,14 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - 用户反馈的滑块轨道消失：水平/垂直 groove 从与面板相同的 #20262D 改为 #35414D。F2-100/S02-audio.png 与 F2-150/S02-audio.png 确认实际采样率、缓冲区轨道可见；没有修改 PNG 资产。
 - 编译产物：build/Release/lmms.exe。F2-build.log、F2-theme-build.log；AutomatableModelTest PASS、SVSIntegrationTest 全套 PASS、ThemeWidgetTest 6 PASS / 0 FAIL。首轮 SVS 超时后相同套件 18.69 秒通过，保留 timeout.log，不通过扩大超时隐藏问题。主题重载初轮失败为测试未更新 resources 搜索路径，修正临时主题配置后通过。
 - 双 DPI S01–S08、标准控件状态及 fixture 重开通过；F2-widgets 保存原生交互窗口证据。观感、真实跨屏 DPI、人工拖动边缘缩放/中文 IME 仍为 MANUAL/PENDING。F3 的自绘数字/旋钮与 F4 的编辑画布尚未实施。
+
+
+## F3 检查点
+
+- 默认主题显式启用旋钮矢量绘制、LCD 文本数字与小数点、推子纯色帽/电平、LED indicator、CPU 条、琴键和图表平面外框；缺少新属性的旧主题继续使用原资源。数值模型、映射、输入和采样计时未改动。
+- 旋钮现代分支每次按当前 palette/DPR 绘制；旧缓存按尺寸与 DPR 校验，并在主题、字体、状态、尺寸和 DPR 变化时清理。LCD/LED 按字体度量更新尺寸。
+- F3-final-build.log：主程序、必要回归目标和 UiPluginCoverage 编译成功，覆盖 F0 冻结的 52 个启用插件 DLL。输出 build/Release/lmms.exe。GigPlayer/Sid 的配置依赖例外沿用 F0；外部运行环境不算构建失败。
+- AutomatableModelTest PASS、SVSIntegrationTest 全套 PASS（17.89 秒）；F3-theme-tests.log / F3-theme-tests-150.log 在原生 Windows 窗口各 8 PASS。验证增益/对数旋钮滚轮、拖动撤销、双击数值、自动化对象绑定、整数与小数 LCD、推子 -inf/0 dB/电平、LED 单次切换、黑白琴键按下释放、字体变化、主题重载及旧主题回退。
+- 测试初始化补齐主程序的 NotePlayHandleManager::init，并使用 Windows 原生扫描码；模型保留到 GUI 销毁。LED 新属性 setter 仅调用 QWidget::update，避免主题重载对已解除绑定的模型执行同步读取。这些修正保留实际输入路径，不增加离屏路径。
+- F3-100 / F3-150：S01–S08、标准状态及独立进程 fixture 重开通过。F3-widgets-100 / F3-widgets-150：数字、禁用、字体变更和琴键实窗。设置采样率与缓冲区滑块轨道在 150% 实窗中清晰可见。
+- SKIPPED / PNG：插件私有背景与嵌入 artwork 图标保留，F5 逐项登记；本阶段没有修改 PNG 资产。截图 PNG 是原生窗口证据。观感、真实跨屏 DPI、完整中文 IME 为 MANUAL/PENDING，不阻塞检查点。

@@ -109,6 +109,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPix
 	Fader(model, name, parent, modelIsLinear)
 {
 	m_knob = knob;
+	m_knobSize = embed::logicalSize(m_knob);
 }
 
 void Fader::adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction)
@@ -558,7 +559,22 @@ void Fader::paintEvent(QPaintEvent* ev)
 	}
 
 	// Draw the knob
-	painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob);
+	if (m_flatStyle)
+	{
+		painter.setRenderHint(QPainter::Antialiasing);
+		painter.setPen(palette().mid().color());
+		painter.setBrush(palette().base());
+		painter.drawRoundedRect(QRectF(width() / 2.0 - 1, m_knobSize.height() / 2.0, 2,
+			height() - m_knobSize.height()), 1, 1);
+		const QRectF cap((width() - m_knobSize.width()) / 2.0 + .5,
+			calculateKnobPosYFromModel() - m_knobSize.height() + .5, m_knobSize.width() - 1, m_knobSize.height() - 1);
+		painter.setPen(hasFocus() ? palette().brightText().color() : palette().mid().color());
+		painter.setBrush(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::ButtonText));
+		painter.drawRoundedRect(cap, 3, 3);
+		painter.setPen(palette().base().color());
+		painter.drawLine(QPointF(cap.left() + 3, cap.center().y()), QPointF(cap.right() - 3, cap.center().y()));
+	}
+	else { painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob); }
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
@@ -603,7 +619,7 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 	qreal radius = 2;
 	path.addRoundedRect(leftMeterOutlineRect, radius, radius);
 	path.addRoundedRect(rightMeterOutlineRect, radius, radius);
-	painter.fillPath(path, Qt::black);
+	painter.fillPath(path, m_flatStyle ? palette().mid() : QBrush(Qt::black));
 
 	// Now clip everything to the paths of the meters
 	painter.setClipPath(path);
@@ -637,6 +653,30 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 
 		return result;
 	};
+	if (m_flatStyle)
+	{
+		// Keep the existing meter mapping and peak hold; only the fill becomes solid zones.
+		for (const auto& meter : {leftMeterRect, rightMeterRect})
+		{
+			painter.fillRect(meter, palette().base());
+			const bool left = meter == leftMeterRect;
+			const float peak = left ? mappedPeakL : mappedPeakR;
+			const float persistent = left ? mappedPersistentPeakL : mappedPersistentPeakR;
+			if (peak > mappedMinPeak)
+			{
+				painter.fillRect(computeLevelRect(meter, peak), m_peakOk);
+				const int warningY = valuesToWindowCoordinates.map(mapper(dbfsToAmp(-6)));
+				const int clipY = valuesToWindowCoordinates.map(mappedUnity);
+				const auto level = computeLevelRect(meter, peak);
+				painter.fillRect(level.intersected(QRect(meter.x(), meter.y(), meter.width(), warningY - meter.y())), m_peakWarn);
+				painter.fillRect(level.intersected(QRect(meter.x(), meter.y(), meter.width(), clipY - meter.y())), m_peakClip);
+			}
+			if (persistent > mappedMinPeak) { painter.fillRect(computePeakRect(meter, persistent), palette().text()); }
+			if (getRenderUnityLine()) { painter.fillRect(computeLevelMarkerRect(meter, mappedUnity), m_unityMarker); }
+		}
+		painter.restore();
+		return;
+	}
 
 	// Draw left and right level markers for the unity lines (0 dbFS, 1.0 amplitude)
 	if (getRenderUnityLine())

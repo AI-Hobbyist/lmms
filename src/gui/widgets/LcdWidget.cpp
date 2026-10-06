@@ -137,6 +137,25 @@ void LcdWidget::setTextShadowColor( const QColor & c )
 void LcdWidget::paintEvent( QPaintEvent* )
 {
 	QPainter p( this );
+	if (m_textMode)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		const QRectF display(0.5, 0.5, width() - 1, m_cellHeight + 1);
+		p.setPen(palette().mid().color());
+		p.setBrush(palette().base());
+		if (m_seamlessLeft || m_seamlessRight) { p.fillRect(display, palette().base()); }
+		else { p.drawRoundedRect(display, 4, 4); }
+		p.setPen(isEnabled() ? textColor() : palette().color(QPalette::Disabled, QPalette::Text));
+		const int left = m_seamlessLeft ? 0 : m_marginWidth + 1;
+		const int right = m_seamlessRight ? 0 : m_marginWidth + 1;
+		p.drawText(QRect(left, 1, width() - left - right, m_cellHeight), Qt::AlignRight | Qt::AlignVCenter, m_display);
+		if (!m_label.isEmpty())
+		{
+			p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+			p.drawText(QRect(0, m_cellHeight + 2, width(), height() - m_cellHeight - 2), Qt::AlignCenter, m_label);
+		}
+		return;
+	}
 
 	QSize cellSize( m_cellWidth, m_cellHeight );
 
@@ -246,6 +265,12 @@ void LcdWidget::setMarginWidth( int width )
 
 void LcdWidget::updateSize()
 {
+	if (m_textMode)
+	{
+		const QFontMetrics metrics(font());
+		m_cellWidth = metrics.horizontalAdvance('0');
+		m_cellHeight = metrics.height();
+	}
 	const int marginX1 = m_seamlessLeft ? 0 : 1 + m_marginWidth;
 	const int marginX2 = m_seamlessRight ? 0 : 1 + m_marginWidth;
 	const int marginY = 1;
@@ -263,11 +288,29 @@ void LcdWidget::updateSize()
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
 				QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).horizontalAdvance(m_label)
 			),
-			m_cellHeight + (2 * marginY) + 9
+			m_cellHeight + (2 * marginY) + (m_textMode ? QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height() : 9)
 		);
 	}
 
 	update();
+}
+
+void LcdWidget::setTextMode(bool enabled)
+{
+	if (m_textMode == enabled) { return; }
+	m_textMode = enabled;
+	if (!enabled)
+	{
+		m_cellWidth = m_lcdPixmap.width() / charsPerPixmap;
+		m_cellHeight = m_lcdPixmap.height() / 2;
+	}
+	updateSize();
+}
+
+void LcdWidget::changeEvent(QEvent* event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange) { updateSize(); }
 }
 
 

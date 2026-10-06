@@ -379,17 +379,49 @@ bool Knob::updateAngle()
 
 void Knob::drawKnob( QPainter * _p )
 {
+	if (m_flatStyle)
+	{
+		updateAngle();
+		_p->save();
+		_p->setRenderHint(QPainter::Antialiasing);
+		const auto labelFont = fixedFontSizeLabelRendering() ? adjustedToPixelSize(font(), SMALL_FONT_SIZE) : font();
+		const int labelHeight = m_label.isEmpty() ? 0 : QFontMetrics(labelFont).height();
+		const qreal diameter = m_knobNum == KnobType::Styled
+			? std::max(4, std::min(width(), height() - labelHeight)) : m_knobPixmap->deviceIndependentSize().width();
+		const QPointF center(width() / 2.0, diameter / 2.0);
+		const qreal radius = std::max(2.0, diameter / 2.0 - 2);
+		const QRectF circle(center.x() - radius, center.y() - radius, radius * 2, radius * 2);
+		_p->setPen(QPen(isEnabled() && (hasFocus() || underMouse()) ? m_lineActiveColor : palette().mid().color(), 1));
+		_p->setBrush(palette().button());
+		_p->drawEllipse(circle);
+		_p->setBrush(Qt::NoBrush);
+		_p->setPen(QPen(isEnabled() ? m_arcActiveColor : m_arcInactiveColor, 2, Qt::SolidLine, Qt::RoundCap));
+		_p->drawArc(circle, (90 + m_totalAngle / 2) * 16, -m_totalAngle * 16);
+		if (model() && model()->maxValue() != model()->minValue())
+		{
+			const auto centerAngle = angleFromValue(model()->inverseScaledValue(model()->centerValue()),
+				model()->minValue(), model()->maxValue(), m_totalAngle);
+			_p->setPen(QPen(isEnabled() ? m_lineActiveColor : m_lineInactiveColor, 2, Qt::SolidLine, Qt::RoundCap));
+			_p->drawArc(circle, (90 - centerAngle) * 16, -(m_angle - centerAngle) * 16);
+		}
+		_p->setPen(QPen(isEnabled() ? palette().text().color() : m_lineInactiveColor, 1.5, Qt::SolidLine, Qt::RoundCap));
+		_p->drawLine(calculateLine(center, radius - 3, radius * .25));
+		_p->restore();
+		return;
+	}
 	bool enabled = this->isEnabled();
 	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
 	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
 
-	if( updateAngle() == false && !m_cache.isNull() )
+	if( updateAngle() == false && !m_cache.isNull() && m_cache.deviceIndependentSize() == QSizeF(size()) &&
+		m_cache.devicePixelRatio() == devicePixelRatioF())
 	{
 		_p->drawImage( 0, 0, m_cache );
 		return;
 	}
 
-	m_cache = QImage( size(), QImage::Format_ARGB32 );
+	m_cache = QImage( size() * devicePixelRatioF(), QImage::Format_ARGB32 );
+	m_cache.setDevicePixelRatio(devicePixelRatioF());
 	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
 
 	QPainter p( &m_cache );
@@ -496,7 +528,7 @@ void Knob::drawLabel(QPainter& p)
 		const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
 		const auto y = height() - descent; 
 
-		p.setPen(textColor());
+		p.setPen(isEnabled() ? textColor() : palette().color(QPalette::Disabled, QPalette::Text));
 		p.drawText(x, y, m_label);
 	}
 }
@@ -509,8 +541,27 @@ void Knob::paintEvent(QPaintEvent*)
 	drawLabel(p);
 }
 
+bool Knob::event(QEvent* event)
+{
+	const bool result = FloatModelEditorBase::event(event);
+	if (event->type() == QEvent::Enter || event->type() == QEvent::Leave ||
+		event->type() == QEvent::FocusIn || event->type() == QEvent::FocusOut ||
+		event->type() == QEvent::DevicePixelRatioChange || event->type() == QEvent::Resize)
+	{
+		m_cache = QImage();
+		update();
+	}
+	return result;
+}
+
 void Knob::changeEvent(QEvent * ev)
 {
+	if (ev->type() == QEvent::StyleChange || ev->type() == QEvent::PaletteChange ||
+		ev->type() == QEvent::FontChange || ev->type() == QEvent::EnabledChange)
+	{
+		m_cache = QImage();
+		update();
+	}
 	if (ev->type() == QEvent::EnabledChange)
 	{
 		onKnobNumUpdated();

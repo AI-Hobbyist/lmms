@@ -47,6 +47,7 @@ class LMMS_EXPORT Knob : public FloatModelEditorBase
 {
 	Q_OBJECT
 	Q_ENUMS( KnobType )
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
@@ -164,6 +165,7 @@ public:
 
 
 protected:
+	bool event(QEvent* event) override;
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
@@ -217,6 +219,7 @@ private:
 	float m_totalAngle;
 	int m_angle;
 	QImage m_cache;
+	bool m_flatStyle = false;
 
 	// Styled knob stuff, could break out
 	QPointF m_centerPoint;

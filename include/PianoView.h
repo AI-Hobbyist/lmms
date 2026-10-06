@@ -43,6 +43,7 @@ namespace gui
 class PianoView : public QWidget, public ModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 public:
 	//! @brief Create a new keyboard display view
 	//! @param parent the parent instrument plugin window
@@ -170,6 +171,7 @@ private:
 	QPixmap m_blackKeyDisabledPm = embed::getIconPixmap("black_key_disabled");
 
 	Piano* m_piano = nullptr;
+	bool m_flatStyle = false;
 
 	QScrollBar * m_pianoScroll;
 	int m_startKey; //!< first key when drawing

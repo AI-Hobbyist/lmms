@@ -42,7 +42,11 @@ class CPULoadWidget : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(int stepSize MEMBER m_stepSize)
+	Q_PROPERTY(bool flatStyle READ flatStyle WRITE setFlatStyle)
+	Q_PROPERTY(QColor overloadColor MEMBER m_overloadColor)
 public:
+	bool flatStyle() const { return m_flatStyle; }
+	void setFlatStyle(bool enabled);
 	CPULoadWidget( QWidget * _parent );
 	~CPULoadWidget() override = default;
 
@@ -69,6 +73,8 @@ private:
 	QTimer m_updateTimer;
 
 	int m_stepSize = 1;
+	bool m_flatStyle = false;
+	QColor m_overloadColor = Qt::red;
 
 } ;
 

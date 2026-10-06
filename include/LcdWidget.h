@@ -40,6 +40,7 @@ class LMMS_EXPORT LcdWidget : public QWidget
 	// theming qproperties
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY(bool textMode READ textMode WRITE setTextMode)
 	
 public:
 	explicit LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = false);
@@ -69,6 +70,8 @@ public:
 	void setTextShadowColor( const QColor & c );
 
 	int cellHeight() const { return m_cellHeight; }
+	bool textMode() const { return m_textMode; }
+	void setTextMode(bool enabled);
 
 	void setSeamless(bool left, bool right)
 	{
@@ -83,6 +86,7 @@ public slots:
 
 protected:
 	void paintEvent( QPaintEvent * pe ) override;
+	void changeEvent(QEvent* event) override;
 
 	virtual void updateSize();
 
@@ -108,6 +112,7 @@ private:
 	bool m_seamlessLeft;
 	bool m_seamlessRight;
 	bool m_leadingZero;
+	bool m_textMode = false;
 
 	void initUi( const QString& name, const QString &style ); //!< to be called by ctors
 

@@ -47,6 +47,8 @@ namespace gui
 class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
+	Q_PROPERTY(QColor graphColor MEMBER m_graphColor)
 public:
 	enum class Style
 	{
@@ -113,6 +115,7 @@ private:
 
 	QPixmap m_foreground;
 	QColor m_graphColor;
+	bool m_flatStyle = false;
 
 	Style m_graphStyle;
 

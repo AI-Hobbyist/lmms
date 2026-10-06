@@ -107,7 +107,13 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 
 	// Draw the graph background
-	p.drawPixmap(rect(), m_envGraph);
+	if (m_flatStyle)
+	{
+		p.setPen(palette().mid().color());
+		p.setBrush(palette().base());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+	}
+	else { p.drawPixmap(rect(), m_envGraph); }
 
 	const auto* params = castModel<EnvelopeAndLfoParameters>();
 	if (!params) { return; }

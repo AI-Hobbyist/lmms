@@ -73,6 +73,21 @@ void LedCheckBox::setText( const QString &s )
 
 void LedCheckBox::paintEvent( QPaintEvent * pe )
 {
+	if (m_flatStyle)
+	{
+		QPainter p(this);
+		p.setRenderHint(QPainter::Antialiasing);
+		const int diameter = m_ledOffPixmap.deviceIndependentSize().height();
+		const QRectF indicator(.5, (height() - diameter) / 2.0 + .5, diameter - 1, diameter - 1);
+		const QColor active = m_ledColor == LedColor::Red ? m_errorColor :
+			m_ledColor == LedColor::Yellow ? m_warningColor : palette().brightText().color();
+		p.setPen(isEnabled() && (hasFocus() || underMouse()) ? palette().brightText().color() : palette().mid().color());
+		p.setBrush(model()->value() ? (isEnabled() ? active : palette().color(QPalette::Disabled, QPalette::Text)) : palette().base().color());
+		p.drawRoundedRect(indicator, 3, 3);
+		p.setPen(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Text));
+		p.drawText(rect().adjusted(diameter + 5, 0, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, text());
+		return;
+	}
 	if (!m_legacyMode)
 	{
 		paintNonLegacy(pe);
@@ -88,6 +103,7 @@ void LedCheckBox::paintEvent( QPaintEvent * pe )
 
 void LedCheckBox::setLedColor(LedColor color)
 {
+	m_ledColor = color;
 	setCheckable( true );
 
 	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(color)].toUtf8().constData());
@@ -106,9 +122,22 @@ void LedCheckBox::onTextUpdated()
 	QFontMetrics const fm = fontMetrics();
 
 	int const width = m_ledOffPixmap.width() + 5 + fm.horizontalAdvance(text());
-	int const height = m_legacyMode ? m_ledOffPixmap.height() : qMax(m_ledOffPixmap.height(), fm.height());
+	int const height = m_legacyMode && !m_flatStyle ? m_ledOffPixmap.height() : qMax(m_ledOffPixmap.height(), fm.height());
 
 	setFixedSize(width, height);
+}
+
+void LedCheckBox::setFlatStyle(bool enabled)
+{
+	m_flatStyle = enabled;
+	onTextUpdated();
+	QWidget::update();
+}
+
+void LedCheckBox::changeEvent(QEvent* event)
+{
+	AutomatableButton::changeEvent(event);
+	if (event->type() == QEvent::FontChange) { onTextUpdated(); }
 }
 
 void LedCheckBox::paintLegacy(QPaintEvent * pe)

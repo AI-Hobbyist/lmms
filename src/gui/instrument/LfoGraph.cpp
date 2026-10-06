@@ -65,7 +65,13 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 
 	// Draw the graph background
-	p.drawPixmap(rect(), m_lfoGraph);
+	if (m_flatStyle)
+	{
+		p.setPen(palette().mid().color());
+		p.setBrush(palette().base());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+	}
+	else { p.drawPixmap(rect(), m_lfoGraph); }
 
 	const auto* params = castModel<EnvelopeAndLfoParameters>();
 	if (!params) { return; }
@@ -176,10 +182,10 @@ void LfoGraph::drawInfoText(const EnvelopeAndLfoParameters& params)
 	// This gives the bounding rectangle if the text was rendered at the origin ...
 	const auto boundingRect = fontMetrics.boundingRect(infoText);
 	// ... so we translate it to the actual position where the text will be rendered.
-	p.fillRect(boundingRect.translated(textPosition), QColor{0, 0, 0, 192});
+	p.fillRect(boundingRect.translated(textPosition), m_flatStyle ? palette().base().color() : QColor{0, 0, 0, 192});
 
 	// Now draw the actual info text
-	p.setPen(QColor(201, 201, 225));
+	p.setPen(m_flatStyle ? palette().text().color() : QColor(201, 201, 225));
 	p.drawText(textPosition, infoText);
 }
 

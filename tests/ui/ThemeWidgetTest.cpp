@@ -5,6 +5,22 @@
 #include <QLabel>
 #include <QTimer>
 #include <QWheelEvent>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include "Knob.h"
+#include "LcdSpinBox.h"
+#include "LcdFloatSpinBox.h"
+#include "Fader.h"
+#include "LedCheckBox.h"
+#include "PianoView.h"
+#include "Piano.h"
+#include "NotePlayHandle.h"
+#include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
+#include "InstrumentTrackWindow.h"
+#include "ProjectJournal.h"
+#include "Graph.h"
+#include "AutomationClip.h"
 #include "AudioDummy.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
@@ -45,6 +61,7 @@ private slots:
 	void initTestCase()
 	{
 		QCOMPARE(QGuiApplication::platformName(),QString("windows")); QVERIFY(m_config.isValid());
+			NotePlayHandleManager::init();
 		auto* config=ConfigManager::inst();config->loadConfigFile(m_config.filePath("theme.xml"));
 		config->setWorkingDir(m_config.path()+'/');config->setValue("app","configured","1");
 		config->setValue("audioengine","audiodev",AudioDummy::name());
@@ -113,13 +130,80 @@ private slots:
 		QVERIFY(theme.open(QIODevice::WriteOnly));theme.write(m_theme.toUtf8());theme.close();
 		QTRY_COMPARE(qApp->palette().color(QPalette::Window),QColor("#20262D"));
 	}
+	void numericControls()
+	{
+		QWidget window;QHBoxLayout layout(&window);
+		FloatModel gain(40,0,100,1);FloatModel logarithmic(440,20,20000,1);logarithmic.setScaleType(AutomatableModel::ScaleType::Logarithmic);
+		AutomationClip automation(nullptr);QVERIFY(automation.addObject(&gain));const auto endpointId=gain.id();
+		Knob knob(KnobType::Bright26,"Gain",&window);knob.setModel(&gain);layout.addWidget(&knob);
+		Knob logKnob(KnobType::Bright26,"Hz",&window);logKnob.setModel(&logarithmic);layout.addWidget(&logKnob);
+		IntModel integer(123,0,999);LcdSpinBox lcd(3,&window);lcd.setModel(&integer);lcd.setLabel("Integer");layout.addWidget(&lcd);
+		FloatModel fractional(-.25f,-99,99,.01f);LcdFloatSpinBox decimal(3,2,"Decimal",&window);decimal.setModel(&fractional);decimal.setLabel("Decimal");layout.addWidget(&decimal);
+		FloatModel volume(1,0,2,.001f);Fader fader(&volume,"Volume",&window);fader.setFixedSize(32,160);layout.addWidget(&fader);
+		LedCheckBox led("Enabled / 启用",&window);layout.addWidget(&led);
+		Graph graph(&window);graph.setMinimumSize(132,104);graph.model()->setWaveToSine();layout.addWidget(&graph);
+		window.show();QVERIFY(QTest::qWaitForWindowExposed(&window));QTest::qWait(200);
+		QVERIFY(knob.property("flatStyle").toBool());QVERIFY(lcd.textMode());QVERIFY(decimal.textMode());QVERIFY(fader.property("flatStyle").toBool());
+		wheel(&lcd,120);QCOMPARE(integer.value(),124);
+		const QPoint fractionPoint(decimal.width()-4,5);
+		QWheelEvent fractionWheel(fractionPoint,decimal.mapToGlobal(fractionPoint),{},QPoint(0,120),Qt::NoButton,Qt::NoModifier,Qt::NoScrollPhase,false);
+		QApplication::sendEvent(&decimal,&fractionWheel);QVERIFY(qAbs(fractional.value()+.24f)<.001);
+		wheel(&decimal,120);QVERIFY(qAbs(fractional.value()-.76f)<.001);
+		wheel(&knob,120);const float modernGain=gain.value();gain.setValue(40);knob.setProperty("flatStyle",false);
+		wheel(&knob,120);QCOMPARE(gain.value(),modernGain);knob.setProperty("flatStyle",true);
+		wheel(&logKnob,120);const float modernLog=logarithmic.value();logarithmic.setValue(440);logKnob.setProperty("flatStyle",false);
+		wheel(&logKnob,120);QCOMPARE(logarithmic.value(),modernLog);logKnob.setProperty("flatStyle",true);
+		Engine::projectJournal()->setJournalling(true);gain.setJournalling(true);gain.setValue(40);
+		QTest::mousePress(&knob,Qt::LeftButton,Qt::NoModifier,QPoint(12,18));
+		QTest::mouseMove(&knob,QPoint(12,4));QTest::mouseRelease(&knob,Qt::LeftButton,Qt::NoModifier,QPoint(12,4));
+		QVERIFY(gain.value()!=40);Engine::projectJournal()->undo();QCOMPARE(gain.value(),40.f);
+		bool entered=false;QTimer::singleShot(100,[&]{if(auto* dialog=qobject_cast<QInputDialog*>(QApplication::activeModalWidget())) {entered=true;dialog->setDoubleValue(65);dialog->accept();}});
+		QTest::mouseDClick(&knob,Qt::LeftButton);QVERIFY(entered);QCOMPARE(gain.value(),65.f);
+		QCOMPARE(gain.id(),endpointId);QCOMPARE(automation.objects().front().data(),static_cast<AutomatableModel*>(&gain));
+		QTest::mouseClick(&fader,Qt::LeftButton,Qt::NoModifier,QPoint(16,159));QCOMPARE(volume.value(),0.f);QVERIFY(fader.toolTip().contains("-inf"));
+		fader.adjustByDecibelDelta(1);QVERIFY(volume.value()>0);volume.setValue(1);QVERIFY(fader.toolTip().contains("0.00"));
+		fader.adjustByDecibelDelta(1);QVERIFY(qAbs(volume.value()-dbfsToAmp(1))<.002);
+		fader.setPeak_L(.5f);fader.setPeak_R(1.2f);QCOMPARE(fader.getPeak_L(),.5f);QCOMPARE(fader.getPeak_R(),1.2f);
+		QSignalSpy ledChanges(led.model(),SIGNAL(dataChanged()));const bool previous=led.model()->value();
+		QTest::mouseClick(&led,Qt::LeftButton);QCOMPARE(led.model()->value(),!previous);QCOMPARE(ledChanges.size(),1);
+		capture(&window,"F3-numeric-controls");knob.setEnabled(false);lcd.setEnabled(false);led.setEnabled(false);capture(&window,"F3-disabled-controls");
+		auto larger=lcd.font();larger.setPixelSize(20);lcd.setFont(larger);led.setFont(larger);
+		QVERIFY(lcd.cellHeight()>=QFontMetrics(larger).height());QVERIFY(led.height()>=QFontMetrics(larger).height());
+		capture(&window,"F3-font-change");
+		window.close();
+	}
+	void pianoKeys()
+	{
+		auto* track=new InstrumentTrack(Engine::getSong());QVERIFY(track->loadInstrument("tripleoscillator"));
+			QCoreApplication::processEvents();
+		InstrumentTrackView* view=nullptr;
+		for(auto* candidate:m_gui->mainWindow()->findChildren<InstrumentTrackView*>()) if(candidate->model()==track) {view=candidate;break;}
+		QVERIFY(view);auto* window=view->getInstrumentTrackWindow();auto* piano=window->findChild<PianoView*>();QVERIFY(piano);
+		window->show();auto* frame=qobject_cast<QMdiSubWindow*>(window->parentWidget());QVERIFY(frame);frame->show();frame->raise();
+		QVERIFY(QTest::qWaitForWindowExposed(m_gui->mainWindow()));QTest::qWait(200);QVERIFY(piano->property("flatStyle").toBool());
+		for(const auto key:{Qt::Key_Z,Qt::Key_S})
+		{
+				const quint32 scan=key==Qt::Key_Z?44:31;
+				QKeyEvent press(QEvent::KeyPress,key,Qt::NoModifier,scan,key,0);
+				const int note=PianoView::getKeyFromKeyEvent(&press);QVERIFY(note>=0&&note<NumKeys);
+				QApplication::sendEvent(piano,&press);QVERIFY(track->pianoModel()->isKeyPressed(note));capture(m_gui->mainWindow(),QString("F3-piano-%1").arg(key));
+				QKeyEvent release(QEvent::KeyRelease,key,Qt::NoModifier,scan,key,0);
+				QApplication::sendEvent(piano,&release);QVERIFY(!track->pianoModel()->isKeyPressed(note));
+		}
+		window->close();frame->hide();
+			// Keep the song-owned model alive until the actual GUI views are destroyed.
+	}
 	void legacyAndRepolish()
 	{
 		qApp->setStyleSheet("");LmmsPalette legacyPalette(nullptr,qApp->style());QVERIFY(!legacyPalette.flatFrames());QVERIFY(!LmmsStyle::s_flatFrames);
 		QWidget legacy;QVBoxLayout layout(&legacy);ComboBox combo;combo.model()->addItem("Legacy");layout.addWidget(&combo);
 		GroupBox group("Legacy",&legacy);group.setMinimumHeight(60);layout.addWidget(&group);
 		TabWidget tabs("",&legacy);tabs.setMinimumHeight(80);tabs.addTab(new QWidget(&tabs),"Old");layout.addWidget(&tabs);
-		legacy.resize(360,220);legacy.show();QVERIFY(QTest::qWaitForWindowExposed(&legacy));
+		Knob oldKnob(KnobType::Bright26,"Legacy",&legacy);layout.addWidget(&oldKnob);
+		LcdSpinBox oldLcd(3,&legacy);layout.addWidget(&oldLcd);LcdFloatSpinBox oldDecimal(3,2,"Legacy",&legacy);layout.addWidget(&oldDecimal);
+		LedCheckBox oldLed("Legacy",&legacy);layout.addWidget(&oldLed);
+		legacy.resize(360,400);legacy.show();QVERIFY(QTest::qWaitForWindowExposed(&legacy));
+		QVERIFY(!oldKnob.property("flatStyle").toBool());QVERIFY(!oldLcd.textMode());QVERIFY(!oldDecimal.textMode());QVERIFY(!oldLed.flatStyle());
 		QVERIFY(!combo.property("flatStyle").toBool());QVERIFY(!group.flatStyle());QVERIFY(!tabs.flatStyle());QCOMPARE(group.titleBarHeight(),11);
 		capture(&legacy,"F2-legacy");legacy.close();
 		qApp->setStyleSheet(m_theme);LmmsPalette modernPalette(nullptr,qApp->style());QVERIFY(modernPalette.flatFrames());

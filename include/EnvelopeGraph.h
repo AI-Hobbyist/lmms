@@ -42,6 +42,7 @@ namespace gui
 class EnvelopeGraph : public QWidget, public ModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 	Q_PROPERTY(QColor noAmountColor MEMBER m_noAmountColor)
 	Q_PROPERTY(QColor fullAmountColor MEMBER m_fullAmountColor)
 	Q_PROPERTY(QColor markerFillColor MEMBER m_markerFillColor)
@@ -79,6 +80,7 @@ private:
 	QColor m_fullAmountColor;
 	QColor m_markerFillColor;
 	QColor m_markerOutlineColor;
+	bool m_flatStyle = false;
 };
 
 } // namespace gui

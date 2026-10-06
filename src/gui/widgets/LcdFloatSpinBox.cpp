@@ -89,8 +89,11 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->addWidget(&m_wholeDisplay);
 
 	auto dotLabel = new QLabel("", this);
+	m_dotLabel = dotLabel;
+	dotLabel->setObjectName("lcdDecimalPoint");
 	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
 	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
+	m_dotPixmap = dotLabel->pixmap();
 	lcdLayout->addWidget(dotLabel);
 
 	lcdLayout->addWidget(&m_fractionDisplay);
@@ -106,6 +109,28 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	outerLayout->setSizeConstraint(QLayout::SetFixedSize);
 	this->setLayout(outerLayout);
 	this->setFixedHeight(32);
+}
+
+void LcdFloatSpinBox::setTextMode(bool enabled)
+{
+	m_textMode = enabled;
+	m_wholeDisplay.setTextMode(enabled);
+	m_fractionDisplay.setTextMode(enabled);
+	if (!m_dotLabel) { return; }
+	if (enabled)
+	{
+		m_dotLabel->setPixmap(QPixmap());
+		m_dotLabel->setText(".");
+		m_dotLabel->setAlignment(Qt::AlignCenter);
+		m_dotLabel->setFixedSize(QFontMetrics(m_wholeDisplay.font()).horizontalAdvance('.'), m_wholeDisplay.height());
+		setFixedHeight(m_wholeDisplay.height() + QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height());
+	}
+	else
+	{
+		m_dotLabel->setPixmap(m_dotPixmap);
+		m_dotLabel->setFixedSize(m_dotPixmap.deviceIndependentSize().toSize());
+		setFixedHeight(32);
+	}
 }
 
 
@@ -251,6 +276,12 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 	if (!m_label.isEmpty())
 	{
 		p.setFont(adjustedToPixelSize(p.font(), DEFAULT_FONT_SIZE));
+		if (m_textMode)
+		{
+			p.setPen(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Text));
+			p.drawText(QRect(0, m_wholeDisplay.height(), width(), height() - m_wholeDisplay.height()), Qt::AlignCenter, m_label);
+			return;
+		}
 		p.setPen(m_wholeDisplay.textShadowColor());
 		p.drawText(width() / 2 - p.fontMetrics().boundingRect(m_label).width() / 2 + 1, height(), m_label);
 		p.setPen(m_wholeDisplay.textColor());

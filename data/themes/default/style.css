@@ -51,9 +51,34 @@ lmms--gui--FileBrowser QCheckBox
 }
 
 lmms--gui--Knob {
-	qproperty-lineInactiveColor: rgb(120, 120, 120);
-	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+	qproperty-flatStyle: true;
+	qproperty-textColor: #E5EAF0;
+	qproperty-lineActiveColor: #42A065;
+	qproperty-lineInactiveColor: #6F7B87;
+	qproperty-arcActiveColor: #35414D;
+	qproperty-arcInactiveColor: #29323B;
 }
+
+lmms--gui--LcdWidget, lmms--gui--LcdFloatSpinBox {
+	qproperty-textMode: true;
+	font-family: "Consolas";
+	font-size: 14px;
+}
+lmms--gui--LcdWidget { qproperty-textColor: #E5EAF0; qproperty-textShadowColor: transparent; }
+QLabel#lcdDecimalPoint { color: #E5EAF0; background: #14181D; font-family: "Consolas"; font-size: 14px; }
+lmms--gui--LedCheckBox {
+	qproperty-flatStyle: true;
+	qproperty-warningColor: #DAB55A;
+	qproperty-errorColor: #E05B65;
+}
+lmms--gui--PianoView { qproperty-flatStyle: true; }
+lmms--gui--Graph { qproperty-flatStyle: true; qproperty-graphColor: #42A065; }
+lmms--gui--EnvelopeGraph, lmms--gui--LfoGraph {
+	qproperty-flatStyle: true;
+	qproperty-noAmountColor: #6F7B87;
+	qproperty-fullAmountColor: #42A065;
+}
+lmms--gui--EnvelopeGraph { qproperty-markerFillColor: #A8B4C0; qproperty-markerOutlineColor: #35414D; }
 
 lmms--gui--AutomationEditor {
 	color: #ffffff;
@@ -316,7 +341,8 @@ lmms--gui--Oscilloscope {
 
 lmms--gui--CPULoadWidget {
 	border: none;
-	background: url("resources:cpuload_bg.png");
+	qproperty-flatStyle: true;
+	qproperty-overloadColor: #E05B65;
 	qproperty-stepSize: 1;
 }
 
@@ -877,9 +903,11 @@ lmms--gui--PeakIndicator {
 
 /* persistent peak markers for fx peak meters */
 lmms--gui--Fader {
-	qproperty-peakOk: #0ad45c;
-	qproperty-peakWarn: #d6ec52;
-	qproperty-peakClip: #c12038;
+	qproperty-flatStyle: true;
+	qproperty-peakOk: #42A065;
+	qproperty-peakWarn: #DAB55A;
+	qproperty-peakClip: #E05B65;
+	qproperty-unityMarker: #A8B4C0;
 }
 
 lmms--gui--TimeLineWidget {

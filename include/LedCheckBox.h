@@ -36,6 +36,9 @@ namespace lmms::gui
 class LMMS_EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle READ flatStyle WRITE setFlatStyle)
+	Q_PROPERTY(QColor warningColor MEMBER m_warningColor)
+	Q_PROPERTY(QColor errorColor MEMBER m_errorColor)
 public:
 	enum class LedColor
 	{
@@ -60,11 +63,14 @@ public:
 
 	void setText( const QString& s );
 	void setLedColor(LedColor color);
+	bool flatStyle() const { return m_flatStyle; }
+	void setFlatStyle(bool enabled);
 
 	Q_PROPERTY( QString text READ text WRITE setText )
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
+	void changeEvent(QEvent* event) override;
 
 
 private:
@@ -74,6 +80,10 @@ private:
 	QString m_text;
 
 	bool m_legacyMode;
+	bool m_flatStyle = false;
+	LedColor m_ledColor = LedColor::Yellow;
+	QColor m_warningColor = Qt::yellow;
+	QColor m_errorColor = Qt::red;
 	
 
 	void onTextUpdated(); //!< to be called when you updated @a m_text
