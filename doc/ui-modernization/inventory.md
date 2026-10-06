@@ -4,17 +4,17 @@
 
 | ID | 路径/入口/页面 | 绘制、属性及动作 | 保留契约 | 阶段 | 验收 | 状态 |
 |---|---|---|---|---|---|---|
-| A01 | QPushButton、QToolButton、TabButton、设置分类 | 去渐变；统一纯色、4 DIP 圆角和状态；清理已有 `#btn`、mute/solo 等高优先级覆盖 | checked 与 pressed 可区别；icon-only 和 menu-button 不被裁切 | F1 | S01/S02/S07 | TODO |
-| A02 | QLineEdit、QTextEdit、QPlainTextEdit | 纯色输入底、细边框、选区、focus/readonly/disabled；限制选择器范围 | 中文输入、选区、只读复制、错误提示可见 | F1 | S01/S02/S07 | TODO |
-| A03 | **Qt** QComboBox、QSpinBox、QDoubleSpinBox | 框体、箭头/增减子控件、弹出列表及焦点 | 可编辑组合框、下拉列表文字、上下箭头命中区；不能代替 C01/C02 | F1 | S01/S02/S07 | TODO |
-| A04 | QCheckBox、QRadioButton | 扁平 indicator，SVG 勾/圆点，indeterminate 与禁用状态 | 键盘 Space 和原有切换行为保持 | F1 | S01/S02/S07 | TODO |
-| A05 | QSlider、QProgressBar、QScrollBar | 纯色 groove/handle、圆角、最小柄尺寸和进度文本 | 横竖方向、0/100%、page step、滚轮、箭头区域 | F1 | S01/S02/S07 | TODO |
-| A06 | QMenu、QMenuBar、QToolTip | 去顶部装饰条和阴影感；菜单项圆角、选中与分隔线统一 | 子菜单箭头、快捷键、勾选和长中文；原生系统菜单排除 | F1 | S01/S02/S07 | TODO |
-| A07 | QTreeView/QTreeWidget、QListView/QListWidget、QHeaderView | 行背景、选中/hover、表头分隔、展开箭头 SVG | 选中与失焦选中；branch、排序箭头及横向滚动 | F1 | S01/S02/S07 | TODO |
-| A08 | **Qt** QTabWidget/QTabBar、QGroupBox、QFrame、QScrollArea | 平面标题、面板边框、内外间距 | 标签过多可滚动；滚动视口与外框无异色；不能代替 C03/C04 | F1 | S01/S02/S07 | TODO |
-| A09 | QMdiArea、主工具栏及窗口内容容器 | 背景分层、分隔线；避免大面积纹理和浮雕 | 不覆盖编辑画布自行绘制的颜色；不改变 docking/MDI 行为 | F1 | S01/S02/S07 | TODO |
-| A10 | SideBar 的 QStyle 工具按钮、TrackLabelButton | 复用工具按钮状态与扁平外观 | 竖排旋转文字、紧凑轨道、重命名框尺寸 | F1 | S01/S02/S07 | TODO |
-| A11 | SetupDialog、ExportProjectDialog、SVSSettingsPage 的标准控件 | 应用 A01–A08；SVS/VST 分类、设备禁用和 AI 滑块状态保留 | 长引擎名、长设备名、滚动和默认值；全局规则不挤压 48 DIP 分类图标 | F1 | S01/S02/S07 | TODO |
+| A01 | QPushButton、QToolButton、TabButton、设置分类 | 去渐变；统一纯色、4 DIP 圆角和状态；清理已有 `#btn`、mute/solo 等高优先级覆盖 | checked 与 pressed 可区别；icon-only 和 menu-button 不被裁切 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A02 | QLineEdit、QTextEdit、QPlainTextEdit | 纯色输入底、细边框、选区、focus/readonly/disabled；限制选择器范围 | 中文输入、选区、只读复制、错误提示可见 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A03 | **Qt** QComboBox、QSpinBox、QDoubleSpinBox | 框体、箭头/增减子控件、弹出列表及焦点 | 可编辑组合框、下拉列表文字、上下箭头命中区；不能代替 C01/C02 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A04 | QCheckBox、QRadioButton | 扁平 indicator，SVG 勾/圆点，indeterminate 与禁用状态 | 键盘 Space 和原有切换行为保持 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A05 | QSlider、QProgressBar、QScrollBar | 纯色 groove/handle、圆角、最小柄尺寸和进度文本 | 横竖方向、0/100%、page step、滚轮、箭头区域 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A06 | QMenu、QMenuBar、QToolTip | 去顶部装饰条和阴影感；菜单项圆角、选中与分隔线统一 | 子菜单箭头、快捷键、勾选和长中文；原生系统菜单排除 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A07 | QTreeView/QTreeWidget、QListView/QListWidget、QHeaderView | 行背景、选中/hover、表头分隔、展开箭头 SVG | 选中与失焦选中；branch、排序箭头及横向滚动 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A08 | **Qt** QTabWidget/QTabBar、QGroupBox、QFrame、QScrollArea | 平面标题、面板边框、内外间距 | 标签过多可滚动；滚动视口与外框无异色；不能代替 C03/C04 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A09 | QMdiArea、主工具栏及窗口内容容器 | 背景分层、分隔线；避免大面积纹理和浮雕 | 不覆盖编辑画布自行绘制的颜色；不改变 docking/MDI 行为 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A10 | SideBar 的 QStyle 工具按钮、TrackLabelButton | 复用工具按钮状态与扁平外观 | 竖排旋转文字、紧凑轨道、重命名框尺寸 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
+| A11 | SetupDialog、ExportProjectDialog、SVSSettingsPage 的标准控件 | 应用 A01–A08；SVS/VST 分类、设备禁用和 AI 滑块状态保留 | 长引擎名、长设备名、滚动和默认值；全局规则不挤压 48 DIP 分类图标 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
 | B01 | `LmmsPalette`：include/LmmsPalette.h、src/gui/LmmsPalette.cpp | 现有颜色属性 | 若重载后 palette 未更新，在 M2 修正主题应用入口；不另建颜色文件格式 | F2/F3/F4 | S02–S08 | TODO |
 | B02 | `KnobType::Styled`：include/Knob.h、src/gui/widgets/Knob.cpp | 半径、中心、线宽、outerColor、line/arcActive/InactiveColor | 标签、固定尺寸、缓存和非 Styled 分支见 C05 | F3 | S02–S08 | TODO |
 | B03 | `Fader`：include/Fader.h、src/gui/widgets/Fader.cpp | peakOk/peakWarn/peakClip、unityMarker 等 | 推子帽、边界形状及缓存见 C06 | F3 | S02–S08 | TODO |

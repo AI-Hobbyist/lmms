@@ -1,0 +1,73 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_lmms.cpp
+  qrc_lmms.cpp
+  ScriptRunner.cpp
+  McpProtocol.cpp
+  ConfigManager.cpp
+D:\UserData\Desktop\Project\lmms\src\core\ConfigManager.cpp(762,18): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.vcxproj]
+  DataFile.cpp
+  GuiApplication.cpp
+  MainWindow.cpp
+  MicrotunerConfig.cpp
+  AboutDialog.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  main.cpp
+D:\UserData\Desktop\Project\lmms\src\core\main.cpp(449,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmms.vcxproj]
+D:\UserData\Desktop\Project\lmms\src\core\main.cpp(465,10): warning C4834: 放弃具有 [[nodiscard]] 属性的函数的返回值 [D:\UserData\Desktop\Project\lmms\build\src\lmms.vcxproj]
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  Automatic MOC for target UiBaselineCapture
+  UiBaselineCapture.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.exp
+  UiBaselineCapture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target AutomatableModelTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.exp
+  AutomatableModelTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AutomatableModelTest.exe

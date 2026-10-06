@@ -331,6 +331,7 @@ F6 在受控开发前缀安装：使用 `cmake --install build --config Release 
 | 关键源码调研与 A–E 分类 | DONE | 第 2、4–7 节路径与机制 |
 | 可执行规格、F0–F6、验证与完成定义 | DONE（文档） | 第 3、8–12 节 |
 | F0 全量面板清单及截图基线 | DONE / MANUAL-PENDING | inventory、visual-spec、fixture；52 个插件构建；双 DPI 45 个插件面板；必要回归 2/2 PASS；外部与人工例外见 acceptance |
-| F1–F6 产品改造 | TODO | F0 检查点提交推送后依次实施 |
+| F1 标准控件与主题资产 | DONE / MANUAL-PENDING | F1 双 DPI 实窗及资源状态检查，必要回归 2/2 PASS；PNG 例外见 acceptance |
+| F2–F6 产品改造 | TODO | 按阶段提交推送后依次实施 |
 
 执行者从 F0 开始；每阶段只更新与实际完成证据相符的状态。本文没有将此前 SVS 任务的构建通过记录当作本轮现代化验收。

@@ -8,6 +8,17 @@
 #include <QMenuBar>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QGridLayout>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QSpinBox>
+#include <QProgressBar>
+#include <QSlider>
+#include <QToolButton>
+#include <QPushButton>
+#include <QLabel>
 #include "AudioDummy.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
@@ -266,6 +277,57 @@ private slots:
   }
   QFile report(m_output+"/plugin-panels.json");QVERIFY(report.open(QIODevice::WriteOnly));
   report.write(QJsonDocument(coverage).toJson());Engine::getSong()->setModified(false);
+ }
+ void standardControls()
+ {
+  QFile theme(qEnvironmentVariable("LMMS_DATA_DIR")+"/themes/default/style.css");
+  QVERIFY(theme.open(QIODevice::ReadOnly));
+  const auto stylesheet=QString::fromUtf8(theme.readAll());
+  auto matches=QRegularExpression("resources:(ui-[^\"]+\\.svg)").globalMatch(stylesheet);
+  QStringList resources;
+  while(matches.hasNext())
+  {
+   const auto name=matches.next().captured(1);
+   QVERIFY2(!QPixmap("resources:"+name).isNull(),qPrintable(name));
+   if(!resources.contains(name)) resources.append(name);
+  }
+  QFile report(m_output+"/standard-resources.json");QVERIFY(report.open(QIODevice::WriteOnly));
+  report.write(QJsonDocument(QJsonArray::fromStringList(resources)).toJson());
+  QWidget window;window.setWindowTitle("LMMS standard theme states");
+  auto* layout=new QGridLayout(&window);
+  layout->setContentsMargins(12,12,12,12);layout->setSpacing(8);
+  const QStringList states{"Normal / 中文","Checked","Disabled","Read only"};
+  for(int column=0;column<4;++column)
+  {
+   layout->addWidget(new QLabel(states[column]),0,column);
+   auto* button=new QPushButton(states[column]);button->setCheckable(true);
+   button->setChecked(column==1);button->setEnabled(column!=2);layout->addWidget(button,1,column);
+   auto* check=new QCheckBox("Enable / 启用");check->setTristate(true);
+   check->setCheckState(column==0?Qt::Unchecked:column==1?Qt::Checked:Qt::PartiallyChecked);
+   check->setEnabled(column!=2);layout->addWidget(check,2,column);
+   auto* radio=new QRadioButton("Choice");radio->setChecked(column==1);radio->setEnabled(column!=2);layout->addWidget(radio,3,column);
+   auto* input=new QLineEdit("长名称 / text");input->setEnabled(column!=2);input->setReadOnly(column==3);layout->addWidget(input,4,column);
+   auto* combo=new QComboBox;combo->addItems({"Long device / 长设备名称","Second"});combo->setEditable(column==1);combo->setEnabled(column!=2);layout->addWidget(combo,5,column);
+   auto* spin=new QSpinBox;spin->setRange(-100,100);spin->setValue(42);spin->setEnabled(column!=2);layout->addWidget(spin,6,column);
+   auto* slider=new QSlider(Qt::Horizontal);slider->setValue(column*33);slider->setEnabled(column!=2);layout->addWidget(slider,7,column);
+   auto* progress=new QProgressBar;progress->setValue(column==3?100:column*33);layout->addWidget(progress,8,column);
+  }
+  window.resize(880,440);window.show();QVERIFY(QTest::qWaitForWindowExposed(&window));
+  auto* check=window.findChild<QCheckBox*>();QVERIFY(check);
+  check->setFocus();QTest::keyClick(check,Qt::Key_Space);QVERIFY(check->checkState()!=Qt::Unchecked);check->setCheckState(Qt::Unchecked);
+  auto* input=window.findChild<QLineEdit*>();QVERIFY(input);input->setFocus();input->selectAll();
+  const auto before=input->geometry();capture(&window,"standard-states-focus");
+  QTest::keyClicks(input,"typed");QCOMPARE(input->text(),QString("typed"));QCOMPARE(input->geometry(),before);
+  auto* button=window.findChild<QPushButton*>();QVERIFY(button);
+  QTest::mouseMove(button,button->rect().center());capture(&window,"standard-states-hover");
+  QTest::mousePress(button,Qt::LeftButton);capture(&window,"standard-states-pressed");QTest::mouseRelease(button,Qt::LeftButton);
+  QVERIFY(button->isChecked());
+  QMenu menu;menu.addAction("Long submenu / 长菜单名称");auto* checked=menu.addAction("Checked");checked->setCheckable(true);checked->setChecked(true);
+  auto* disabled=menu.addAction("Disabled");disabled->setEnabled(false);menu.addSeparator();menu.addMenu("Submenu")->addAction("Child");
+  menu.popup(window.mapToGlobal(QPoint(20,20)));capture(&menu,"standard-menu");menu.close();
+  for(auto* widget:window.findChildren<QWidget*>())
+   if(widget->isVisible()&&widget->parentWidget()==&window) QVERIFY(window.rect().contains(widget->geometry()));
+  window.close();
  }
  void cleanupTestCase()
  {

@@ -13,8 +13,8 @@
 
 | 阶段 | 状态 | 自动证据 | 人工/例外 | 提交 |
 |---|---|---|---|---|
-| F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 本阶段独立提交 |
-| F1 | TODO | — | — | — |
+| F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 4235348fb，已推送 origin/master |
+| F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 本阶段独立提交 |
 | F2 | TODO | — | — | — |
 | F3 | TODO | — | — | — |
 | F4 | TODO | — | — | — |
@@ -56,3 +56,13 @@ F0 证据位于 `validation/F0-100/`、`validation/F0-150/`，包含 S01 主窗�
 - 中文轨道名在原生 Song 窗口截图中正常显示；完整中文界面和输入法 MANUAL/PENDING。所有实窗测试结束后已由测试清理窗口。
 
 - 实窗截图目标抽查后修正：浮动 EffectControlDialog 捕获其自身原生窗口，MDI 子窗捕获主窗口；双 DPI 全部重跑，避免只拍主窗口误记面板通过。
+
+## F1 检查点
+
+A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；替换现有高优先级按钮/轨道/侧栏规则中的渐变和阴影图片，保留紧凑按钮 20 DIP、步进按钮 16 DIP 与设置分类 48 DIP 图标槽。Qt 自绘控件的属性、数字 sprite、MDI painter 和画布改造仍由 F2–F4 实施，不通过全局选择器冒充完成。
+
+- 新增 17 个被主题引用的白色/禁用 SVG：branch、scrollbar、checkbox/radio/menu、SVS 播放/停止/曲线工具；主题安装规则已包含 *.svg。旧 PNG 保留兼容，不修改内容。Qt-native slider 的装饰帽改为 QSS 几何，不修改旧 PNG。
+- 状态测试在实际 Windows 窗口中检查 Space 切换、输入框键入、焦点几何稳定、按钮切换、可见子控件处于窗口边界内；拍摄 focus/hover/pressed/菜单与 checked/disabled/read-only 状态，资源由 QPixmap 实际解析。
+- F1-100 / F1-150：S01–S08 和 standard-* 图片；设置窗口底部按钮可达，中文文字正常。结果 4 PASS / 0 FAIL，两个 SKIP 是由独立进程执行的重开槽及单独执行的全插件槽。
+- 必要回归：F1-tests.log，AutomatableModelTest 与 SVSIntegrationTest 全部通过（2/2）；主题相关 SVS 既有断言保留。
+- SKIPPED / PNG：尚未替换的设置分类、通用工具栏中的 legacy 位图图标保留；不是已重绘资源。外观偏好、完整中文 IME、真实跨屏 DPI MANUAL/PENDING。
