@@ -54,6 +54,7 @@
 #include "ProjectJournal.h"
 #include <QScopeGuard>
 #include "../../src/gui/editors/svs/operations/SVSCurveGesture.h"
+#include "../../src/gui/editors/svs/operations/SVSFeedbackPitch.h"
 #include "PatternStore.h"
 #include "SampleFrame.h"
 #include <QSemaphore>
@@ -144,6 +145,15 @@ private slots:
    note.duration=96;clip->setEditorData({note},{{tension.id,tension},{gender.id,gender}});QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
    QVERIFY(clip->setGlobalParameter("example.tension",.35));
    auto* tab=editor->findChild<QToolButton*>("svsParameterTab.input:example.tension");QVERIFY(tab);QTest::mouseClick(tab,Qt::LeftButton);canvas->setScroll(0,64);QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);
+   if(qEnvironmentVariableIsSet("SVS_SMOOTH_WINDOW_CAPTURE")) {
+    note.tick=0;note.duration=320;clip->setNotes({note});canvas->setScroll(0,66);canvas->setTool(gui::SVSCanvas::Tool::Freehand);
+    const QVector<QPointF> pitchPoints{{0,60},{40,64},{80,60},{140,64},{180,60},{240,63},{300,61}};
+    QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,canvas->curvePointAt(0,60).toPoint());for(const auto& p:pitchPoints) QTest::mouseMove(canvas,canvas->curvePointAt(p.x(),p.y()).toPoint());QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,canvas->curvePointAt(300,61).toPoint());
+    auto* lane=editor->findChild<gui::SVSCanvas*>("svsParameterLane.example.tension.input");QVERIFY(lane);lane->setTool(gui::SVSCanvas::Tool::Pencil);
+    QTest::mousePress(lane,Qt::LeftButton,Qt::NoModifier,lane->curvePointAt(0,.2).toPoint());for(const auto& p:QVector<QPointF>{{50,.85},{110,.2},{170,.8},{230,.3},{300,.65}}) QTest::mouseMove(lane,lane->curvePointAt(p.x(),p.y()).toPoint());QTest::mouseRelease(lane,Qt::LeftButton,Qt::NoModifier,lane->curvePointAt(300,.65).toPoint());
+    canvas->setTool(gui::SVSCanvas::Tool::Freehand);
+    QTRY_VERIFY2_WITH_TIMEOUT(clip->audio()!=nullptr,qPrintable(clip->status()),10000);
+   }
    const auto available=editor->screen()->availableGeometry();editor->move(available.topLeft()+QPoint(20,20));editor->resize(std::min(1100,available.width()-40),std::min(740,available.height()-80));editor->raise();editor->activateWindow();QVERIFY(QTest::qWaitForWindowExposed(editor));QTest::qWait(300);
    const auto capture=editor->screen()->grabWindow(editor->winId());QVERIFY(!capture.isNull());QVERIFY(capture.save(qEnvironmentVariable("SVS_PARAMETER_WINDOW_CAPTURE_PATH","doc/svs/validation/SVS-parameter-layout-native-window.png")));
   }
@@ -610,6 +620,44 @@ private slots:
   gesture.begin(original,192.5,64.,gui::SVSCurveGesture::Kind::Erase); gesture.update(384.25,68.); QVERIFY(!gesture.preview.valueAt(250));
   for(double tick=0;tick<192.5;tick+=.75) QVERIFY(std::abs(original.valueAt(tick)->toDouble()-gesture.preview.valueAt(tick)->toDouble())<1e-8);
  }
+ void freehandMonotonicInterpolation() {
+  // Dense mouse events on a shallow ramp must not become dozens of corners.
+  svs::Curve original;original.id="continuous";original.type="float";original.insert(0,0.);original.insert(100,1.);
+  gui::SVSCurveGesture gesture;gesture.begin(original,20.,.2,gui::SVSCurveGesture::Kind::Freehand);
+  for(int tick=21;tick<=60;++tick) gesture.update(tick,tick/100.);
+  const auto& curve=gesture.preview;
+  QVERIFY2(std::abs(curve.derivativeAt(20))<1e-9,"Freehand stroke must ease in with TuneLab's zero endpoint tangent");
+  QVERIFY(std::abs(curve.derivativeAt(60))<1e-9);
+  int interior=0;for(const auto& point:curve.evaluator.points) if(point.tick>=20&&point.tick<=60) ++interior;
+  QVERIFY2(interior<=10,"Dense pointer events must be simplified before monotonic Hermite interpolation");
+  for(double tick=20;tick<=60;tick+=.25) {const auto value=curve.valueAt(tick)->toDouble();QVERIFY(value>=.2-1e-9&&value<=.6+1e-9);}
+  QCOMPARE(curve.valueAt(10),original.valueAt(10));QCOMPARE(curve.valueAt(80),original.valueAt(80));
+  svs::Curve restored;QString error;QVERIFY(svs::Curve::fromJson(curve.toJson(),restored,error));
+  for(double tick=20;tick<=60;tick+=.25) QCOMPARE(restored.valueAt(tick),curve.valueAt(tick));
+  gesture.begin(original,0,.2,gui::SVSCurveGesture::Kind::Freehand);gesture.update(0,.2);
+  const auto serialized=QJsonDocument::fromJson(QJsonDocument(gesture.preview.toJson()).toJson()).object();QVERIFY2(svs::Curve::fromJson(serialized,restored,error),qPrintable(error));
+  // Independently calculated Hermite reference: harmonic interior tangent
+  // 2/(1/.01+1/.02), zero endpoint tangent, and u=.5 on the first span.
+  gesture.begin(original,20.,.2,gui::SVSCurveGesture::Kind::Freehand);gesture.update(40.,.4);gesture.update(60.,.8);
+  QVERIFY(std::abs(gesture.preview.valueAt(30)->toDouble()-(.3-20*(2./(100+50))*.125))<1e-9);
+  const auto slopeLeft=gesture.preview.derivativeAt(40-1e-5),slopeRight=gesture.preview.derivativeAt(40+1e-5);QVERIFY(std::abs(slopeLeft-slopeRight)<1e-7);
+  for(const auto& type:QStringList{"int","bool","enum"}) {
+   auto discrete=original;discrete.type=type;discrete.interpolation="step";discrete.evaluator.interpolation=svs_sdk::Interpolation::Step;discrete.evaluator.points.clear();
+   const QJsonValue low=type=="bool"?QJsonValue(false):type=="enum"?QJsonValue("low"):QJsonValue(0),high=type=="bool"?QJsonValue(true):type=="enum"?QJsonValue("high"):QJsonValue(1);
+   gesture.begin(discrete,20,low,gui::SVSCurveGesture::Kind::Freehand);gesture.update(60,high);QCOMPARE(gesture.preview.valueAt(40),std::optional<QJsonValue>(low));
+  }
+ }
+ void feedbackPitchInterpolation() {
+  svs::TimeMapping mapping;mapping.secondsPerTick=.01;
+  QJsonArray samples;for(int i=0;i<3;++i) samples.append(QJsonObject{{"noteId","first"},{"startSeconds",i*.04},{"durationSeconds",.04},{"value",i==1?64.:60.}});
+  const auto curves=gui::feedbackPitchCurves(samples,mapping);QCOMPARE(curves.size(),1);
+  const auto& curve=curves[0];QVERIFY(curve.valueAt(2)->toDouble()>60.);QVERIFY(curve.valueAt(2)->toDouble()<64.);QCOMPARE(curve.valueAt(4)->toDouble(),64.);
+  for(double tick=0;tick<12;tick+=.1) {const auto value=curve.valueAt(tick)->toDouble();QVERIFY(value>=60.-1e-9&&value<=64.+1e-9);}
+  const auto left=curve.derivativeAt(4-1e-5),right=curve.derivativeAt(4+1e-5);QVERIFY(std::abs(left-right)<1e-4);
+  samples.append(QJsonObject{{"noteId","second"},{"startSeconds",.12},{"durationSeconds",.04},{"value",72.}});
+  samples.append(QJsonObject{{"noteId","second"},{"startSeconds",.20},{"durationSeconds",.04},{"value",75.}});
+  const auto split=gui::feedbackPitchCurves(samples,mapping);QCOMPARE(split.size(),3);QVERIFY(!split[1].valueAt(18));QCOMPARE(split[0].valueAt(12)->toDouble(),60.);QCOMPARE(split[1].valueAt(12)->toDouble(),72.);
+ }
  void pitchDrawingAndPluginEvaluation() {
   const auto& voice=svs::Registry::instance().voices()[0]; auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong())); track->bindVoice(voice.pluginId,"full"); QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
   auto* clip=static_cast<SVSClip*>(track->createClip(192)); QVector<svs::Note> notes;
@@ -694,7 +742,11 @@ private slots:
   auto start=lane.curvePointAt(0,.2).toPoint(),end=lane.curvePointAt(300,.8).toPoint();QTest::mousePress(&lane,Qt::LeftButton,Qt::NoModifier,start);QTest::mouseMove(&lane,lane.curvePointAt(100,.7).toPoint());QTest::mouseRelease(&lane,Qt::LeftButton,Qt::NoModifier,end);
   QVERIFY(clip->curves().contains(parameter.id));const auto original=clip->curves();QVERIFY(original[parameter.id].valueAt(100)->toDouble()>.6);
   auto* journal=Engine::projectJournal();const bool previous=journal->isJournalling();auto restore=qScopeGuard([&]{journal->setJournalling(previous);});journal->setJournalling(true);clip->setJournalling(true);const auto depth=journal->undoDepth();
-  const auto click=lane.curvePointAt(120,.9).toPoint();QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,click);const auto single=clip->curves();QCOMPARE(single[parameter.id].valueAt(120),std::optional<QJsonValue>(parameter.defaultValue));QCOMPARE(single[parameter.id].valueAt(100),original[parameter.id].valueAt(100));QCOMPARE(single[parameter.id].valueAt(140),original[parameter.id].valueAt(140));QCOMPARE(journal->undoDepth(),depth+1);
+  const auto click=lane.curvePointAt(120,.9).toPoint();QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,click);const auto single=clip->curves();QCOMPARE(single[parameter.id].valueAt(120),std::optional<QJsonValue>(parameter.defaultValue));
+  // Splitting a cubic re-expresses its coefficients: compare within floating
+  // point error, across the whole untouched interval rather than two samples.
+  for(double tick=0;tick<=300;tick+=.5) if(tick!=120) QVERIFY(std::abs(single[parameter.id].valueAt(tick)->toDouble()-original[parameter.id].valueAt(tick)->toDouble())<1e-10);
+  QCOMPARE(journal->undoDepth(),depth+1);
   QTest::keyClick(&lane,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->curves(),original);
   QTest::mousePress(&lane,Qt::RightButton,Qt::NoModifier,lane.curvePointAt(80,.9).toPoint());QTest::mouseMove(&lane,lane.curvePointAt(160,.1).toPoint());QTest::mouseMove(&lane,lane.curvePointAt(60,.4).toPoint());QCOMPARE(clip->curves(),original);QTest::mouseRelease(&lane,Qt::RightButton,Qt::NoModifier,lane.curvePointAt(120,.7).toPoint());
   const auto reset=clip->curves();for(double tick:{60.,80.,100.,120.,140.,160.}) QCOMPARE(reset[parameter.id].valueAt(tick),std::optional<QJsonValue>(parameter.defaultValue));for(double tick:{20.,50.,170.,280.}) QVERIFY(std::abs(reset[parameter.id].valueAt(tick)->toDouble()-original[parameter.id].valueAt(tick)->toDouble())<1e-8);QCOMPARE(clip->notes(),QVector<svs::Note>{note});QCOMPARE(journal->undoDepth(),depth+1);
@@ -724,8 +776,20 @@ private slots:
   auto* tab=editor.findChild<QToolButton*>("svsParameterTab.input:example.tension");QVERIFY(tab);QTest::mouseClick(tab,Qt::RightButton);QCOMPARE(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool(),false);
   QTest::mouseClick(tab,Qt::LeftButton);QVERIFY(tab->isChecked());QCOMPARE(clip->editorState()["selectedParameter"].toString(),QString("input:example.tension"));QTest::mouseClick(tab,Qt::RightButton);QVERIFY(tab->isChecked());QTest::mouseClick(tab,Qt::LeftButton);QVERIFY(tab->isChecked());QVERIFY(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool());
   // Plugin RGB reaches both active curve and overlay pixels, with each own range.
+  // Isolate this overlay: several discrete parameters share the zero baseline
+  // and antialiased strokes legitimately blend with each other there.
+  const auto* softDescriptor=track->capabilities().parameter("example.soft","note");QVERIFY(softDescriptor);tension->setParameterOverlays({{*softDescriptor,false}});
   tension->resize(900,160);tension->setScroll(0,72);tension->setTool(gui::SVSCanvas::Tool::Line);const auto image=tension->grab().toImage();
-  auto nearColor=[&](QPoint point,QColor expected){for(int y=point.y()-2;y<=point.y()+2;++y) for(int x=point.x()-2;x<=point.x()+2;++x) if(image.rect().contains(x,y)&&image.pixelColor(x,y)==expected) return true;return false;};
+  const auto background=editor.backgroundColor().isValid()?editor.backgroundColor():tension->palette().base().color();
+  auto nearColor=[&](QPoint point,QColor expected){
+   const double dr=expected.red()-background.red(),dg=expected.green()-background.green(),db=expected.blue()-background.blue(),length=dr*dr+dg*dg+db*db;
+   for(int y=point.y()-2;y<=point.y()+2;++y) for(int x=point.x()-2;x<=point.x()+2;++x) if(image.rect().contains(x,y)) {
+    const auto actual=image.pixelColor(x,y);const auto coverage=((actual.red()-background.red())*dr+(actual.green()-background.green())*dg+(actual.blue()-background.blue())*db)/length;
+    // A one-pixel antialiased overlay may blend with the background; its RGB
+    // must still be the declared color at a common coverage in all channels.
+    if(coverage>=.3&&coverage<=1.01&&std::abs(actual.red()-background.red()-coverage*dr)<3&&std::abs(actual.green()-background.green()-coverage*dg)<3&&std::abs(actual.blue()-background.blue()-coverage*db)<3) return true;
+   }return false;
+  };
   QVERIFY(nearColor(tension->curvePointAt(150,.5).toPoint(),QColor("#AFD867")));QVERIFY(nearColor(tension->curvePointAt(100,0).toPoint(),QColor("#83B9EB")));
   auto* gender=select("input:example.gender");QVERIFY(gender);QCOMPARE(gender->curvePointAt(10,-1).y(),gender->curvePointAt(10,1).y()+gender->height()-30.); // 24px ruler + 6px inset
   track->bindVoice(voice.pluginId,"minimal");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(tab->isHidden());QCOMPARE(clip->curves(),before);track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);QVERIFY(!tab->isHidden());QCOMPARE(editor.findChildren<gui::SVSCanvas*>().size(),2);

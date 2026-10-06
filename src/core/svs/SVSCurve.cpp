@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <limits>
 
 namespace lmms::svs {
 Curve withParameterBase(const Curve& source,const Parameter& p,const QJsonValue& base) {
@@ -46,17 +47,22 @@ void Curve::replaceRange(double start,double end,const Curve& source) {
  if(!std::isfinite(start)||!std::isfinite(end)||start>end) return;
  pinTangents();
  // Preserve the outside limits independently of the newly drawn endpoint values.
- const double leftTick=std::nextafter(start,-INFINITY),rightTick=std::nextafter(end,INFINITY);
+ // Qt's JSON writer rounds nextafter(0) (a subnormal) to zero, collapsing
+ // the boundary gap and making a stroke at the content origin invalid.
+ const double originBoundary=std::numeric_limits<double>::epsilon();
+ const double leftTick=start==0?-originBoundary:std::nextafter(start,-INFINITY),rightTick=end==0?originBoundary:std::nextafter(end,INFINITY);
  const auto left=valueAt(leftTick),right=valueAt(rightTick);
  const auto leftSlope=derivativeAt(leftTick),rightSlope=derivativeAt(rightTick);
+ auto segmentAt=[&](double tick) {auto upper=std::upper_bound(evaluator.points.begin(),evaluator.points.end(),tick,[](double t,const auto& p){return t<p.tick;});return upper==evaluator.points.begin()?-1:std::prev(upper)->segmentInterpolation;};
+ const auto leftSegment=segmentAt(leftTick),rightSegment=segmentAt(rightTick);
  auto& points=evaluator.points;
  for(size_t i=0;i+1<points.size();++i) if(points[i].breakAfter) { evaluator.gaps.push_back({points[i].tick,points[i+1].tick}); points[i].breakAfter=false; }
  points.erase(std::remove_if(points.begin(),points.end(),[&](const auto& point){return point.tick>=start&&point.tick<=end;}),points.end());
- auto retainBoundary=[&](double tick,const std::optional<QJsonValue>& value,double slope) {
+ auto retainBoundary=[&](double tick,const std::optional<QJsonValue>& value,double slope,int segment) {
   if(!value) return;
-  insert(tick,*value); auto point=std::lower_bound(points.begin(),points.end(),tick,[](const auto& p,double t){return p.tick<t;}); point->automatic=false; point->tangentIn=point->tangentOut=slope;
+  insert(tick,*value); auto point=std::lower_bound(points.begin(),points.end(),tick,[](const auto& p,double t){return p.tick<t;}); point->automatic=false; point->tangentIn=point->tangentOut=slope;point->segmentInterpolation=segment;
  };
- retainBoundary(leftTick,left,leftSlope); retainBoundary(rightTick,right,rightSlope);
+ retainBoundary(leftTick,left,leftSlope,leftSegment); retainBoundary(rightTick,right,rightSlope,rightSegment);
  connect(start,end);
  for(const auto& point:source.evaluator.points) {
   auto copied=point; copied.tick+=start;
@@ -87,7 +93,7 @@ Curve Curve::slice(double start,double end) const {
  Curve result=*this; result.evaluator.points.clear(); result.evaluator.gaps.clear();
  if(start>end) std::swap(start,end);
  for(size_t index=0;index<evaluator.points.size();++index) { const auto& point=evaluator.points[index]; if(point.tick>=start&&point.tick<=end) { auto copied=point; copied.tick-=start; if(copied.automatic) { copied.automatic=false; copied.tangentIn=copied.tangentOut=evaluator.automaticTangent(index); } result.evaluator.points.push_back(copied); } }
- auto boundary=[&](double time) { if(auto value=valueAt(time)) { result.insert(time-start,*value); auto& points=result.evaluator.points; auto i=std::lower_bound(points.begin(),points.end(),time-start,[](const auto& p,double t){return p.tick<t;}); i->automatic=false; i->tangentIn=i->tangentOut=derivativeAt(time); } };
+ auto boundary=[&](double time) { if(auto value=valueAt(time)) { result.insert(time-start,*value); auto& points=result.evaluator.points; auto i=std::lower_bound(points.begin(),points.end(),time-start,[](const auto& p,double t){return p.tick<t;}); i->automatic=false; i->tangentIn=i->tangentOut=derivativeAt(time);auto upper=std::upper_bound(evaluator.points.begin(),evaluator.points.end(),time,[](double t,const auto& p){return t<p.tick;});if(upper!=evaluator.points.begin()) i->segmentInterpolation=std::prev(upper)->segmentInterpolation; } };
  boundary(start); boundary(end);
  for(const auto& gap:evaluator.gaps) if(gap.end>start&&gap.start<end) result.evaluator.gaps.push_back({std::max(gap.start,start)-start,std::min(gap.end,end)-start});
  return result;

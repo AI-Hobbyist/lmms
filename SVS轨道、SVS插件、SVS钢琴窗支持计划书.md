@@ -422,3 +422,11 @@ PASS：铅笔按下创建、长按拖动尾部；已有音符主体移动、首�
 Release 主程序、示例插件与测试程序前台编译通过；Windows 原生完整 SVS 回归 **57 passed / 0 failed / 0 skipped**，包含首端双向伸缩、撤销/重做、工具切换、自由绘制、右键连续重置及 Power/Soft/Mode 默认值和作用域测试。开发安装目录二进制更新并核对哈希。证据：`doc/svs/validation/SVS-TuneLab-alignment-build-final.log`、`SVS-TuneLab-alignment-regression.txt`、`SVS-TuneLab-alignment-regression.log`、`SVS-TuneLab-alignment-deploy.log`；实现映射见 `doc/svs/SVS-TuneLab-editing-alignment.md`，参考实测见 `doc/svs/TuneLab-optimized-editing-behavior.md`。
 
 开发版原 lmms.exe 正在运行且存在未保存工程，初次覆盖因占用失败；保留该窗口，最新主程序部署为 `build/svs-lmms-clean-install/lmms-svs-aligned.exe` 并核对哈希，人工体验需启动该文件。用户指示先修改代码、编译、提交推送；本轮实机体验默认 **MANUAL/PENDING**，不阻塞完成。未使用 Computer Use 或 offscreen，未开启 TuneLab 或原安装版 LMMS。测试中的已有图标缺失和 journal ID 诊断仅记录为 follow-up，不扩大本轮范围。
+
+## 25. 用户验收修正：曲线阶梯感与平滑插值（2026-10-06）
+
+PASS：连续浮点自由笔参考 TuneLab 的笔触简化和单调三次 Hermite 插值，固定零端点切线、同向内部割线调和平均及极值零切线，保留分数 tick 和受约束无过冲求值。曲线层启用抗锯齿，合成音高回显连续采样平滑连接、不同音符和覆盖缺口断开；原始反馈及 PCM 不被显示处理改写。混合段局部替换/切片保留边界段类型，时间 0 的极小边界可稳定 JSON 序列化，避免零宽断段阻止合成。整数 Power、布尔 Soft、枚举 Mode 及显式 step 参数仍按声明离散，不静默迁移旧工程曲线。
+
+Release 前台编译通过；最终 Windows 原生完整回归 **59 passed / 0 failed / 0 skipped**。原生窗口绘制、合成及截图专项 **4 passed / 0 failed / 0 skipped**，实际截图已读取确认连续音高与浮点参数呈平滑弧线，测试窗口已关闭。开发版 `lmms.exe`、`lmms-svs-aligned.exe`、示例插件和测试程序已更新并核对哈希。证据：`doc/svs/validation/SVS-smooth-build-final.log`、`SVS-smooth-regression.txt`、`SVS-smooth-native-window.txt`、`SVS-smooth-native-window.png`、`SVS-smooth-deploy.log`；初始失败及实现映射见 `doc/svs/SVS-curve-smoothing.md`。
+
+仅修改独立 SVS 模块和必要测试，无公开 ABI 变更，不增加参考目录、TuneLab/.NET 或本机图像依赖。未使用 offscreen、Computer Use 或原安装版 LMMS。最终操作手感/听感仍为 **MANUAL/PENDING**；安装目录内测试程序加载相邻 LADSPA 模块的失败只记录 follow-up，不改相邻系统。

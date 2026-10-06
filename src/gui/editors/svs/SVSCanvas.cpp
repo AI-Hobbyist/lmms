@@ -9,6 +9,7 @@
 #include "Timeline.h"
 #include "operations/SVSEditTransaction.h"
 #include "operations/SVSCurveGesture.h"
+#include "operations/SVSFeedbackPitch.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
@@ -181,14 +182,15 @@ void SVSCanvas::paintPitch(QPainter& painter) {
  }
  if(const auto audio=m_clip->audio();audio&&!m_parameter) {
   painter.setPen(QPen(color("synthesizedPitchColor",QPalette::Text),1));
-  double previousEnd=-INFINITY; QPointF previous; bool have=false;
-  for(const auto& item:audio->feedback["pitch"].toArray()) {
-   const auto sample=item.toObject(); const auto seconds=sample["startSeconds"].toDouble(); auto tick=audio->mapping.tickAtLocalSeconds(seconds);
-   const auto end=audio->mapping.tickAtLocalSeconds(seconds+sample["durationSeconds"].toDouble());
-   if(end<from||tick>to) { have=false; continue; }
-   auto point=curvePointAt(tick,sample["value"].toDouble());
-   if(have&&std::abs(tick-previousEnd)<1e-3) painter.drawLine(previous,point);
-   painter.drawLine(point,curvePointAt(end,sample["value"].toDouble())); previous=curvePointAt(end,sample["value"].toDouble()); previousEnd=end; have=true;
+  for(const auto& feedback:feedbackPitchCurves(audio->feedback["pitch"].toArray(),audio->mapping)) {
+   QPainterPath feedbackPath;bool have=false;
+   const auto first=std::max(from,feedback.evaluator.points.front().tick),last=std::min(to,feedback.evaluator.points.back().tick);
+   for(double tick=first;tick<=last;tick+=1/m_pixelsPerTick) {
+    const auto value=feedback.valueAt(tick);if(!value) {have=false;continue;}
+    const auto point=curvePointAt(tick,value->toDouble());if(have) feedbackPath.lineTo(point);else feedbackPath.moveTo(point);have=true;
+   }
+   if(have) feedbackPath.lineTo(curvePointAt(last,feedback.valueAt(last)->toDouble()));
+   painter.drawPath(feedbackPath);
   }
  }
 }
@@ -274,8 +276,10 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   }
  }
  if(m_action==Action::Frame) { painter.setPen(color("selectedNoteColor",QPalette::Highlight)); auto fill=color("selectedNoteColor",QPalette::Highlight); fill.setAlpha(40); painter.fillRect(m_frame,fill); painter.drawRect(m_frame); }
+ painter.save();painter.setRenderHint(QPainter::Antialiasing);
  paintParameterOverlays(painter);
  paintPitch(painter);
+ painter.restore();
  if(m_action==Action::CurveFrame) { painter.setPen(color("selectedNoteColor",QPalette::Highlight)); painter.drawRect(m_frame); }
  painter.restore();
  // Keyboard and ruler remain fixed while the shared content coordinates scroll.

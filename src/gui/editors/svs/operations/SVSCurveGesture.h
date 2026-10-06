@@ -1,6 +1,7 @@
 #ifndef LMMS_SVS_CURVE_GESTURE_H
 #define LMMS_SVS_CURVE_GESTURE_H
 #include "SVSCurve.h"
+#include "SVSMonotonicCurve.h"
 #include <algorithm>
 
 namespace lmms::gui {
@@ -27,8 +28,22 @@ public:
    points.erase(std::remove_if(points.begin(),points.end(),[&](const auto& p){return p.tick>std::min(m_last,tick)&&p.tick<std::max(m_last,tick);}),points.end());
    m_stroke.insert(tick,value); m_last=tick;
    const auto first=points.front().tick,last=points.back().tick;
-   auto source=m_stroke.slice(first,last);
-   // Drawing defaults to the curve's declared interpolation, without quantizing time.
+   auto stroke=m_stroke;
+   if(stroke.type=="float"&&stroke.evaluator.interpolation!=svs_sdk::Interpolation::Step) {
+    // TuneLab's freehand reduction: keep extrema, collapse flat interiors,
+    // and suppress near-collinear samples less than five ticks apart.
+    auto& reduced=stroke.evaluator.points;reduced.clear();reduced.push_back(points.front());
+    for(size_t i=1;i+1<points.size();++i) {
+     const auto& previous=reduced.back();const auto& point=points[i];const auto& next=points[i+1];
+     const auto left=(point.value-previous.value)/(point.tick-previous.tick),right=(next.value-point.value)/(next.tick-point.tick);
+     if(left==0&&right==0) continue;
+     if(point.tick-previous.tick<5&&left*right>0&&std::abs(std::log2(left/right))<2) continue;
+     reduced.push_back(point);
+    }
+    if(points.size()>1) reduced.push_back(points.back());
+    stroke=monotonicCurve(std::move(stroke));
+   }
+   auto source=stroke.slice(first,last);
    preview.replaceRange(first,last,source);
   } else {
    auto source=original; source.evaluator.points.clear(); source.evaluator.gaps.clear();
