@@ -13,6 +13,7 @@ set(LMMS_TESTS
 	src/tracks/AutomationTrackTest.cpp
 	svs/SVSIntegrationTest.cpp
 	ui/UiBaselineCapture.cpp
+	ui/ThemeWidgetTest.cpp
 )
 
 if(WIN32 AND LMMS_HAVE_VST)
@@ -63,6 +64,12 @@ endforeach()
 
 add_dependencies(SVSIntegrationTest SVSExample)
 add_dependencies(UiBaselineCapture tripleoscillator kicker amplifier SVSExample)
+add_dependencies(ThemeWidgetTest tripleoscillator kicker amplifier SVSExample)
+set_target_properties(ThemeWidgetTest PROPERTIES OUTPUT_NAME lmms
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/theme/$<CONFIG>"
+	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/theme/$<CONFIG>")
+set_tests_properties(ThemeWidgetTest PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
+	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins/Release;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/theme-evidence")
 # One aggregate lets MSBuild schedule the frozen UI plugin coverage in parallel.
 add_custom_target(UiPluginCoverage)
 file(STRINGS "${CMAKE_SOURCE_DIR}/doc/ui-modernization/validation/plugin-targets.txt" UI_PLUGIN_TARGETS)

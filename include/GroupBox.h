@@ -39,7 +39,12 @@ namespace lmms::gui
 class GroupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle READ flatStyle WRITE setFlatStyle)
+	Q_PROPERTY(qreal cornerRadius MEMBER m_cornerRadius)
+	Q_PROPERTY(QColor borderColor MEMBER m_borderColor)
 public:
+	bool flatStyle() const { return m_flatStyle; }
+	void setFlatStyle(bool enabled);
 	GroupBox( const QString & _caption, QWidget * _parent = nullptr );
 	~GroupBox() override;
 
@@ -81,7 +86,10 @@ private:
 
 	PixmapButton * m_led;
 	QString m_caption;
-	const int m_titleBarHeight;
+	int m_titleBarHeight;
+	bool m_flatStyle = false;
+	qreal m_cornerRadius = 0;
+	QColor m_borderColor;
 
 } ;
 

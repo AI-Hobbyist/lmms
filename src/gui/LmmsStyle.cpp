@@ -30,11 +30,13 @@
 #include <QFileInfo>
 #include <QPainter>
 #include <QPainterPath>  // IWYU pragma: keep
+#include <QPixmapCache>
 #include <QStyleFactory>
 #include <QStyleOption>
 
 #include "embed.h"
 #include "LmmsStyle.h"
+#include "LmmsPalette.h"
 #include "TextFloat.h"
 
 
@@ -43,6 +45,7 @@ namespace lmms::gui
 
 
 QPalette * LmmsStyle::s_palette = nullptr;
+bool LmmsStyle::s_flatFrames = false;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -147,7 +150,10 @@ LmmsStyle::LmmsStyle() :
 			if (auto file = QFile{path}; file.exists())
 			{
 				file.open(QIODevice::ReadOnly);
+				QPixmapCache::clear();
 				qApp->setStyleSheet(file.readAll());
+				LmmsPalette themePalette(nullptr, this);
+				if (s_palette) { *s_palette = themePalette.palette(); qApp->setPalette(*s_palette); }
 				TextFloat::displayMessage(
 					tr("Theme updated"),
 					tr("LMMS theme file %1 has been reloaded.").arg(file.fileName()),
@@ -228,6 +234,18 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		const QStyleOption *option, QPainter *painter,
 		const QWidget *widget) const
 {
+	if (s_flatFrames &&
+		(element == PE_Frame || element == PE_FrameLineEdit || element == PE_PanelLineEdit))
+	{
+		// Styled standard controls own their QSS border; unstyled frames get one flat line.
+		painter->save();
+		painter->setRenderHint(QPainter::Antialiasing);
+		painter->setBrush(element == PE_PanelLineEdit ? option->palette.base() : QBrush(Qt::NoBrush));
+		painter->setPen(option->palette.mid().color());
+		painter->drawRoundedRect(QRectF(option->rect).adjusted(.5, .5, -.5, -.5), 4, 4);
+		painter->restore();
+		return;
+	}
 	if( element == QStyle::PE_Frame ||
 			element == QStyle::PE_FrameLineEdit ||
 			element == QStyle::PE_PanelLineEdit )
@@ -354,6 +372,10 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 
 		case QStyle::PM_TitleBarHeight:
 			return 24;
+
+		case QStyle::PM_MdiSubWindowFrameWidth:
+			if (s_flatFrames) { return 1; }
+			return QProxyStyle::pixelMetric(_metric, _option, _widget);
 
 		default:
 			return QProxyStyle::pixelMetric( _metric, _option, _widget );

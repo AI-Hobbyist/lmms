@@ -36,6 +36,7 @@ namespace lmms::gui
 class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatFrames READ flatFrames WRITE setFlatFrames)
 	Q_PROPERTY( QColor background READ background WRITE setBackground )
 	Q_PROPERTY( QColor windowText READ windowText WRITE setWindowText )
 	Q_PROPERTY( QColor base READ base WRITE setBase )
@@ -48,6 +49,8 @@ class LMMS_EXPORT LmmsPalette : public QWidget
 	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
 
 public:
+	bool flatFrames() const { return m_flatFrames; }
+	void setFlatFrames(bool enabled);
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
 	~LmmsPalette() override = default;
 
@@ -72,6 +75,7 @@ public:
 	QPalette palette() const;
 
 private:
+	bool m_flatFrames = false;
 	QColor m_background;
 	QColor m_windowText;
 	QColor m_base;

@@ -14,8 +14,8 @@
 | 阶段 | 状态 | 自动证据 | 人工/例外 | 提交 |
 |---|---|---|---|---|
 | F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 4235348fb，已推送 origin/master |
-| F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 本阶段独立提交 |
-| F2 | TODO | — | — | — |
+| F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 5ad278c44，已推送 origin/master |
+| F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | 本阶段检查点 |
 | F3 | TODO | — | — | — |
 | F4 | TODO | — | — | — |
 | F5 | TODO | — | 逐项登记 PNG 例外 | — |
@@ -66,3 +66,12 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - F1-100 / F1-150：S01–S08 和 standard-* 图片；设置窗口底部按钮可达，中文文字正常。结果 4 PASS / 0 FAIL，两个 SKIP 是由独立进程执行的重开槽及单独执行的全插件槽。
 - 必要回归：F1-tests.log，AutomatableModelTest 与 SVSIntegrationTest 全部通过（2/2）；主题相关 SVS 既有断言保留。
 - SKIPPED / PNG：尚未替换的设置分类、通用工具栏中的 legacy 位图图标保留；不是已重绘资源。外观偏好、完整中文 IME、真实跨屏 DPI MANUAL/PENDING。
+
+## F2 检查点
+
+- ComboBox、TabWidget、GroupBox 和 SubWindow 由默认主题显式启用平面绘制；旧主题缺少新属性时保留原绘制。自绘标签的绘制与命中使用同一几何，支持稀疏 tab id；不改变参数模型和菜单入口。
+- 代理边框使用单层描边，MDI 边框为 1 DIP；分离/回嵌、最大化/恢复、关闭通过原生窗口交互。GroupBox 标题按字体高度布局并调整既有内容偏移。
+- 主题文件重载同步 palette 并清理 QPixmapCache。测试修改独立临时主题及 SVG，确认颜色、图标实际更新，重新打开控件及旧主题回退通过。
+- 用户反馈的滑块轨道消失：水平/垂直 groove 从与面板相同的 #20262D 改为 #35414D。F2-100/S02-audio.png 与 F2-150/S02-audio.png 确认实际采样率、缓冲区轨道可见；没有修改 PNG 资产。
+- 编译产物：build/Release/lmms.exe。F2-build.log、F2-theme-build.log；AutomatableModelTest PASS、SVSIntegrationTest 全套 PASS、ThemeWidgetTest 6 PASS / 0 FAIL。首轮 SVS 超时后相同套件 18.69 秒通过，保留 timeout.log，不通过扩大超时隐藏问题。主题重载初轮失败为测试未更新 resources 搜索路径，修正临时主题配置后通过。
+- 双 DPI S01–S08、标准控件状态及 fixture 重开通过；F2-widgets 保存原生交互窗口证据。观感、真实跨屏 DPI、人工拖动边缘缩放/中文 IME 仍为 MANUAL/PENDING。F3 的自绘数字/旋钮与 F4 的编辑画布尚未实施。

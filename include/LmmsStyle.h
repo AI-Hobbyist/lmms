@@ -57,6 +57,7 @@ public:
 					const QWidget * widget = 0 ) const override;
 
 	static QPalette * s_palette;
+	static bool s_flatFrames;
 
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;

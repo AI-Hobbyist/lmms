@@ -49,6 +49,7 @@ namespace lmms::gui
 class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
+	Q_PROPERTY(qreal cornerRadius MEMBER m_cornerRadius)
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
@@ -123,6 +124,7 @@ signals:
 	void focusLost();
 
 private:
+	qreal m_cornerRadius = 0;
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
 	QPushButton * m_closeBtn;
@@ -135,7 +137,7 @@ private:
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect * m_shadow;
+	QGraphicsDropShadowEffect * m_shadow = nullptr;
 	bool m_hasFocus;
 	bool m_isDetachable;
 

@@ -15,7 +15,7 @@
 | A09 | QMdiArea、主工具栏及窗口内容容器 | 背景分层、分隔线；避免大面积纹理和浮雕 | 不覆盖编辑画布自行绘制的颜色；不改变 docking/MDI 行为 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
 | A10 | SideBar 的 QStyle 工具按钮、TrackLabelButton | 复用工具按钮状态与扁平外观 | 竖排旋转文字、紧凑轨道、重命名框尺寸 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
 | A11 | SetupDialog、ExportProjectDialog、SVSSettingsPage 的标准控件 | 应用 A01–A08；SVS/VST 分类、设备禁用和 AI 滑块状态保留 | 长引擎名、长设备名、滚动和默认值；全局规则不挤压 48 DIP 分类图标 | F1 | S01/S02/S07 | IMPLEMENTED / MANUAL-PENDING |
-| B01 | `LmmsPalette`：include/LmmsPalette.h、src/gui/LmmsPalette.cpp | 现有颜色属性 | 若重载后 palette 未更新，在 M2 修正主题应用入口；不另建颜色文件格式 | F2/F3/F4 | S02–S08 | TODO |
+| B01 | `LmmsPalette`：include/LmmsPalette.h、src/gui/LmmsPalette.cpp | 现有颜色属性 | 若重载后 palette 未更新，在 M2 修正主题应用入口；不另建颜色文件格式 | F2/F3/F4 | S02–S08 | F2 IMPLEMENTED；F3/F4 follow-on |
 | B02 | `KnobType::Styled`：include/Knob.h、src/gui/widgets/Knob.cpp | 半径、中心、线宽、outerColor、line/arcActive/InactiveColor | 标签、固定尺寸、缓存和非 Styled 分支见 C05 | F3 | S02–S08 | TODO |
 | B03 | `Fader`：include/Fader.h、src/gui/widgets/Fader.cpp | peakOk/peakWarn/peakClip、unityMarker 等 | 推子帽、边界形状及缓存见 C06 | F3 | S02–S08 | TODO |
 | B04 | 普通 PianoRoll：include/PianoRoll.h、src/gui/editors/PianoRoll.cpp | 音符、选中、ghost、网格、琴键 brush；把琴键渐变改纯色 | 音符圆角或固定几何需要局部 painter 修改；不改手势算法 | F4 | S02–S08 | TODO |
@@ -23,11 +23,11 @@
 | B06 | ClipView 及 Midi/Automation/Sample 派生 View | `gradient: false`、选中、静音、文字/文字阴影等 | 默认主题已禁用 gradient；圆角边框、内容裁剪及旧双层边框需要 C08 | F2/F3/F4 | S02–S08 | TODO |
 | B07 | TrackContentWidget、TimeLineWidget | 已有网格、循环区、标尺颜色及部分宽度属性 | 圆角循环范围、位图播放头和边缘命中须按实际 painter 处理 | F4 | S02–S08 | TODO |
 | B08 | SVSPianoRoll：include/SVSViews.h、src/gui/editors/svs/SVSCanvas.cpp | 背景、音符、状态、小节/拍线等现有主题属性 | 音符圆角与参数栏局部布局；保留只读分界、滚动、头像/立绘功能 | F4 | S02–S08 | TODO |
-| B09 | 自绘 TabWidget、SubWindow、EnvelopeGraph/LfoGraph 等已有主题属性 | 现有颜色/brush | 属性能换色不代表 QSS border-radius 能改变其内部图形；仍按 C/D 检查 | F2/F3/F4 | S02–S08 | TODO |
-| C01 | src/gui/widgets/ComboBox.cpp、include/ComboBox.h | 去硬编码阴影与立体分隔；画纯色圆角框、单层文字和 SVG 箭头；补 theme 色/圆角属性 | ComboBoxModel、滚轮、菜单选项、图标、控制器/自动化上下文菜单 | F2/F3/F4 | S02–S08 | TODO |
+| B09 | 自绘 TabWidget、SubWindow、EnvelopeGraph/LfoGraph 等已有主题属性 | 现有颜色/brush | 属性能换色不代表 QSS border-radius 能改变其内部图形；仍按 C/D 检查 | F2/F3/F4 | S02–S08 | F2 Tab/MDI IMPLEMENTED；graphs F3 |
+| C01 | src/gui/widgets/ComboBox.cpp、include/ComboBox.h | 去硬编码阴影与立体分隔；画纯色圆角框、单层文字和 SVG 箭头；补 theme 色/圆角属性 | ComboBoxModel、滚轮、菜单选项、图标、控制器/自动化上下文菜单 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C02 | src/gui/widgets/LcdWidget.cpp、include/LcdWidget.h | 为现代默认主题提供 QPainter 文本数字模式，替换数字 sprite；按字体度量安排数字、负号、边距；保留 legacy 位图回退 | LcdSpinBox/LcdFloatSpinBox 的拖动、进位、小数、单位、范围、无缝拼接和输入弹窗；不改数值模型 | F3 | S02–S08 | TODO |
-| C03 | src/gui/widgets/TabWidget.cpp、include/TabWidget.h | 圆角选中标签、纯色标题区、单层文字；绘制与 findTabAtPos 使用同一组几何 | 稀疏 tab id、图标标签、caption、切页信号、现有页面所有权 | F2/F3/F4 | S02–S08 | TODO |
-| C04 | src/gui/widgets/GroupBox.cpp、include/GroupBox.h | 纯色圆角面板和标题分隔，按字体计算标题高度；去 darker 浮雕矩形 | 可切换 LED 标题和内容 enable 关系；不误用普通 QGroupBox 覆盖它 | F2/F3/F4 | S02–S08 | TODO |
+| C03 | src/gui/widgets/TabWidget.cpp、include/TabWidget.h | 圆角选中标签、纯色标题区、单层文字；绘制与 findTabAtPos 使用同一组几何 | 稀疏 tab id、图标标签、caption、切页信号、现有页面所有权 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| C04 | src/gui/widgets/GroupBox.cpp、include/GroupBox.h | 纯色圆角面板和标题分隔，按字体计算标题高度；去 darker 浮雕矩形 | 可切换 LED 标题和内容 enable 关系；不误用普通 QGroupBox 覆盖它 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C05 | src/gui/widgets/Knob.cpp、include/Knob.h | 复用 Styled 的矢量弧/指针；补齐标签/尺寸与 disabled/focus；对登记的位图旋钮转现代绘制；尺寸/主题/DPR 变化清缓存 | FloatModelEditorBase、精细拖动、滚轮、双击输入、reset、自动化菜单和对数参数；绘图时不写 model | F3 | S02–S08 | TODO |
 | C06 | src/gui/widgets/Fader.cpp、include/Fader.h | 矢量纯色推子帽、细槽和电平条；显示尺寸与实际命中几何一致 | 原 dB/线性映射、-inf、峰值保持、0 dB 线、修饰键步进、复制链接及撤销 | F3 | S02–S08 | TODO |
 | C07 | src/gui/widgets/LedCheckBox.cpp、src/gui/widgets/PixmapButton.cpp | 对通用 LED/开关用矢量 indicator 或现代 SVG 状态；必要时新增 opt-in 视觉模式，保持旧 artwork 调用可用 | AutomatableButton、on/off/pressed、只读/禁用、双击和信号次数；不简单换 QCheckBox | F3 | S02–S08 | TODO |
@@ -35,13 +35,13 @@
 | C09 | src/gui/widgets/CPULoadWidget.cpp、include/CPULoadWidget.h | 用矢量纯色条与文本替代背景/LED sprite，尺寸从现有工具栏约束计算 | 负载采样、100 ms 刷新、平滑和 tooltip 原样保留；不改 AudioEngineProfiler | F3 | S02–S08 | TODO |
 | C10 | src/gui/instrument/PianoView.cpp | 替换或扁平化位图琴键，必要时用 QPainter 纯色键；补主题颜色和 DPR 处理 | 黑白键命中、按下/禁用/根音/范围标记与 MIDI 键盘演奏保持一致 | F3 | S02–S08 | TODO |
 | C11 | src/gui/widgets/Graph.cpp 及 M0 清单中的图表 View | 对硬编码背景、框线和 foreground artwork 增加最少主题入口，改平面外框 | 波形/包络/LFO 的数据及拖动算法不变；数据曲线不强制圆角化 | F3 | S02–S08 | TODO |
-| C12 | src/gui/LmmsStyle.cpp | 处理现代主题下 PE_Frame/PE_FrameLineEdit/PE_PanelLineEdit 残余浮雕；用适用的 QStyle 委托或单层绘制；按 M0 实测修改必要 pixelMetric | 不重复画 QSS 已接管的边框；标题栏高度、菜单指标、平台窗口操作不回归 | F2/F3/F4 | S02–S08 | TODO |
-| C13 | src/gui/SubWindow.cpp、include/SubWindow.h | MDI 外框与标题区纯色；若圆角属性不足，最小增加自绘属性；内容避免越过圆角外框 | 不切掉 resize 热区；关闭、最大化、分离、回嵌、状态恢复保持；不新增全套无框顶层窗口 | F2/F3/F4 | S02–S08 | TODO |
+| C12 | src/gui/LmmsStyle.cpp | 处理现代主题下 PE_Frame/PE_FrameLineEdit/PE_PanelLineEdit 残余浮雕；用适用的 QStyle 委托或单层绘制；按 M0 实测修改必要 pixelMetric | 不重复画 QSS 已接管的边框；标题栏高度、菜单指标、平台窗口操作不回归 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| C13 | src/gui/SubWindow.cpp、include/SubWindow.h | MDI 外框与标题区纯色；若圆角属性不足，最小增加自绘属性；内容避免越过圆角外框 | 不切掉 resize 热区；关闭、最大化、分离、回嵌、状态恢复保持；不新增全套无框顶层窗口 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | D01 | 默认主题功能图标、箭头、LED 和有立体背景的按钮资源 | 按实际引用登记；纯功能符号优先 SVG；不把纯白图标缩在过大的 viewBox 中；状态资源命名成组；C++ 与 QSS 引用同步 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | D02 | SetupDialog / TabBar、工具栏、轨道控制区、MixerChannelView、仪器公共页 | 先处理 fixedSize、固定边距与字体度量冲突，再调 QSS padding；保持紧凑模式；容器不足优先使用已有滚动机制 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | D03 | 自有 instrument/effect 插件面板 | M0 从当前启用的构建目标列出面板，逐个记录源码、artwork、绝对定位、共享控件；按组迁移，不能把 TripleOscillator 示例替代全部覆盖 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | D04 | 插件 artwork 中的面板边框、文字、旋钮槽 | 将装饰背景拆成纯色面板；功能标签改成可翻译 QWidget/QPainter 文字；保留有实际内容意义的图像；绝对坐标依赖必须随 View 调整 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
-| D05 | 主题缓存、图标大小和 DPI | 沿用 embed::getIconPixmap / logicalSize；SVG 指定逻辑尺寸；检查 Knob、LCD、CPU/clip 的缓存键或失效路径，避免放大旧 pixmap | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
+| D05 | 主题缓存、图标大小和 DPI | 沿用 embed::getIconPixmap / logicalSize；SVG 指定逻辑尺寸；检查 Knob、LCD、CPU/clip 的缓存键或失效路径，避免放大旧 pixmap | 按计划第 7 节 | F1/F5/F6 | S02–S08 | F2 QPixmapCache reload PASS；其他缓存 F3/F4/F6 |
 | D06 | 安装与配置 | 新 CSS/SVG 走现有 data/themes 安装；开发安装保持独立配置；不能依赖源码绝对路径或用户 Desktop 图片 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | E01 | 第三方 VST/Carla 原生内容、系统对话框 | 仅验证宿主容器、弹出/嵌入、关闭与焦点；截图标注为外部 UI，不虚报已换肤 | 按计划第 7 节 | F5/F6 | S02–S08 | TODO |
 | E02 | 分离后的 Windows 标题栏和系统阴影 | 由系统窗口装饰负责；原生关闭、拖动、缩放优先；不将系统圆角差异列为计划失败 | 按计划第 7 节 | F5/F6 | S02–S08 | TODO |
@@ -147,3 +147,4 @@ A01–A11 的样式路径为 `data/themes/default/style.css`；标准页面入�
 当前配置的 52 个自有插件 DLL 全部构建成功，目标与 SHA256 见 validation/F0-plugin-artifacts.json。双 DPI 原生窗口覆盖 45 个可直接实例化的面板，详细状态见 validation/F0-100/plugin-panels.json 与 F0-150/plugin-panels.json。其余 7 项依赖外部 Carla 引擎或 VST/LV2/LADSPA 插件 fixture，MANUAL/PENDING；不将缺失 fixture 视为面板现代化通过。GigPlayer/Sid 未启用，分别缺 libgig/Perl。
 
 本节仅确认 F0 基线；上表的产品实现状态仍为 TODO。后续遇到 PNG 装饰且不能以 SVG 替代时按用户授权记 SKIPPED / PNG；允许 SVG 重绘，保留兼容旧资源。
+

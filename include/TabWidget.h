@@ -37,7 +37,11 @@ const int GRAPHIC_TAB_HEIGHT = 17;
 class TabWidget : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle READ flatStyle WRITE setFlatStyle)
+	Q_PROPERTY(qreal cornerRadius MEMBER m_cornerRadius)
 public:
+	bool flatStyle() const { return m_flatStyle; }
+	void setFlatStyle(bool enabled);
 	//! @param caption Text describing the tab group as a whole
 	//! @param parent The parent widget
 	//! @param usePixmap Whether to enable use of pixmap icons in tabs
@@ -93,6 +97,9 @@ protected:
 	QSize sizeHint() const override;
 
 private:
+	QMap<int, QRect> tabRects() const;
+	bool m_flatStyle = false;
+	qreal m_cornerRadius = 0;
 	struct widgetDesc
 	{
 		QWidget* w;         // ptr to widget

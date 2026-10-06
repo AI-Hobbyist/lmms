@@ -38,6 +38,7 @@
 #include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPushButton>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
@@ -93,6 +94,7 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	m_shadow->setColor( m_textShadowColor );
 	m_shadow->setXOffset( 1 );
 	m_shadow->setYOffset( 1 );
+	m_shadow->setEnabled(m_textShadowColor.alpha() != 0);
 
 	m_windowTitle = new QLabel( this );
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
@@ -120,6 +122,21 @@ void SubWindow::paintEvent( QPaintEvent * )
 	QRect rect( 0, 0, width(), m_titleBarHeight );
 
 	const bool isActive = windowState() & Qt::WindowActive;
+	if (m_cornerRadius > 0)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		QPainterPath outline;
+		outline.addRoundedRect(QRectF(this->rect()).adjusted(.5, .5, -.5, -.5), m_cornerRadius, m_cornerRadius);
+		p.fillPath(outline, palette().window());
+		p.save();
+		p.setClipPath(outline);
+		p.fillRect(rect, isActive ? activeColor() : p.pen().brush());
+		p.restore();
+		p.setPen(borderColor());
+		p.drawPath(outline);
+	}
+	else
+	{
 
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
 
@@ -130,6 +147,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.drawLine( 0, height() - 1, width(), height() - 1 );
 	p.drawLine( 0, m_titleBarHeight, 0, height() - 1 );
 	p.drawLine( width() - 1, m_titleBarHeight, width() - 1, height() - 1 );
+	}
 
 	// window icon
 	if( widget() )
@@ -279,6 +297,7 @@ void SubWindow::setActiveColor( const QBrush & b )
 void SubWindow::setTextShadowColor( const QColor & c )
 {
 	m_textShadowColor = c;
+	if (m_shadow) { m_shadow->setColor(c); m_shadow->setEnabled(c.alpha() != 0); }
 }
 
 

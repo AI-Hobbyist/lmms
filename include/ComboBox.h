@@ -37,6 +37,9 @@ namespace lmms::gui
 class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
+	Q_PROPERTY(qreal cornerRadius MEMBER m_cornerRadius)
+	Q_PROPERTY(QColor borderColor MEMBER m_borderColor)
 public:
 	ComboBox( QWidget* parent = nullptr, const QString& name = QString() );
 	~ComboBox() override = default;
@@ -66,6 +69,9 @@ protected:
 
 
 private:
+	bool m_flatStyle = false;
+	qreal m_cornerRadius = 0;
+	QColor m_borderColor;
 	QPixmap m_background = embed::getIconPixmap("combobox_bg");
 	QPixmap m_arrow = embed::getIconPixmap("combobox_arrow");
 	QPixmap m_arrowSelected = embed::getIconPixmap("combobox_arrow_selected");

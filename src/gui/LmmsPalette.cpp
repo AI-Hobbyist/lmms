@@ -26,6 +26,7 @@
 #include <QApplication>
 #include <QStyle>
 #include "LmmsPalette.h"
+#include "LmmsStyle.h"
 
 
 namespace lmms::gui
@@ -47,9 +48,16 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 	m_highlight( 100, 100, 100 ),
 	m_highlightedText( 255, 255, 255  )
 {
+	LmmsStyle::s_flatFrames = false;
 	setStyle( stylearg );
 	stylearg->polish( this );
 	ensurePolished();
+}
+
+void LmmsPalette::setFlatFrames(bool enabled)
+{
+	m_flatFrames = enabled;
+	LmmsStyle::s_flatFrames = enabled;
 }
 
 #define ACCESSMET( read, write ) \
@@ -85,6 +93,13 @@ QPalette LmmsPalette::palette() const
 	pal.setColor( QPalette::Shadow, 			shadow() );	
 	pal.setColor( QPalette::Highlight, 			highlight() );	
 	pal.setColor( QPalette::HighlightedText, 	highlightedText() );
+	if (m_flatFrames)
+	{
+		pal.setColor(QPalette::AlternateBase, button());
+		pal.setColor(QPalette::Mid, QColor("#35414D"));
+		for (const auto role : {QPalette::Text, QPalette::WindowText, QPalette::ButtonText})
+			pal.setColor(QPalette::Disabled, role, QColor("#6F7B87"));
+	}
 	return pal;
 }
 

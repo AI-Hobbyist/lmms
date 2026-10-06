@@ -122,8 +122,8 @@ QScrollArea > QWidget > QWidget { background: #20262D; }
 QFrame[frameShape="4"], QFrame[frameShape="5"] { color: #35414D; }
 QProgressBar { border: 1px solid #35414D; border-radius: 4px; background: #20262D; color: #E5EAF0; text-align: center; }
 QProgressBar::chunk { background: #42A065; border-radius: 3px; }
-QSlider::groove:horizontal { background: #20262D; height: 4px; border-radius: 2px; }
-QSlider::groove:vertical { background: #20262D; width: 4px; border-radius: 2px; }
+QSlider::groove:horizontal { background: #35414D; height: 4px; border-radius: 2px; }
+QSlider::groove:vertical { background: #35414D; width: 4px; border-radius: 2px; }
 QSlider::handle:horizontal { background: #A8B4C0; border: 1px solid #35414D; border-radius: 4px; width: 12px; margin: -4px 0; }
 QSlider::handle:vertical { background: #A8B4C0; border: 1px solid #35414D; border-radius: 4px; height: 12px; margin: 0 -4px; }
 QSlider::handle:hover { background: #E5EAF0; }
@@ -277,17 +277,28 @@ lmms--gui--PianoRoll {
 }
 
 lmms--gui--TabWidget {
-	background-color: #262b30;
-	qproperty-tabText: rgba(255, 255, 255, 180);
-	qproperty-tabTitleText: #fff;
-	qproperty-tabSelected: #1c4933;
-	qproperty-tabTextSelected: rgba(255, 255, 255, 255);
-	qproperty-tabBackground: #181b1f;
-	qproperty-tabBorder: #181b1f;
+	background-color: #20262D;
+	qproperty-flatStyle: true;
+	qproperty-cornerRadius: 6;
+	qproperty-tabText: #A8B4C0;
+	qproperty-tabTitleText: #E5EAF0;
+	qproperty-tabSelected: #244A35;
+	qproperty-tabTextSelected: #E5EAF0;
+	qproperty-tabBackground: #20262D;
+	qproperty-tabBorder: #35414D;
+}
+
+lmms--gui--ComboBox {
+	qproperty-flatStyle: true;
+	qproperty-cornerRadius: 4;
+	qproperty-borderColor: #35414D;
 }
 
 lmms--gui--GroupBox {
-	background-color: #262b30;
+	background-color: #29323B;
+	qproperty-flatStyle: true;
+	qproperty-cornerRadius: 6;
+	qproperty-borderColor: #35414D;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
@@ -964,10 +975,11 @@ lmms--gui--PatternClipView {
 
 /* Subwindows in MDI-Area */
 lmms--gui--SubWindow {
-	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #090909, stop:0.05 #3D454F, stop:1 #262B30);
-	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #090909, stop:0.05 #636c7a, stop:1 #343840);
-	qproperty-textShadowColor: #000;
-	qproperty-borderColor: #5c6b7a;
+	color: #20262D;
+	qproperty-activeColor: #29323B;
+	qproperty-textShadowColor: transparent;
+	qproperty-borderColor: #35414D;
+	qproperty-cornerRadius: 6;
 }
 
 /* Subwindow title text */
@@ -1309,14 +1321,15 @@ QWidget#svsVoicePanel {
 }
 
 lmms--gui--LmmsPalette {
-	qproperty-background: #262b30;
-	qproperty-windowText: #1de276;
-	qproperty-base: #101213;
-	qproperty-text: #d1d8e4;
-	qproperty-button: #3f4750;
-	qproperty-shadow: rgb(0,0,0);
-	qproperty-buttonText: #d1d8e4;
-	qproperty-brightText: #d1d8e4;
-	qproperty-highlight: #262b30;
-	qproperty-highlightedText: #d1d8e4;
+	qproperty-flatFrames: true;
+	qproperty-background: #20262D;
+	qproperty-windowText: #E5EAF0;
+	qproperty-base: #14181D;
+	qproperty-text: #E5EAF0;
+	qproperty-button: #29323B;
+	qproperty-shadow: transparent;
+	qproperty-buttonText: #E5EAF0;
+	qproperty-brightText: #E5EAF0;
+	qproperty-highlight: #244A35;
+	qproperty-highlightedText: #E5EAF0;
 }

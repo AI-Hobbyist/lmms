@@ -1,26 +1,26 @@
 /*
- * TabWidget.cpp - tabwidget for LMMS
- *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
- * This file is part of LMMS - https://lmms.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program (see COPYING); if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- *
- */
+	* TabWidget.cpp - tabwidget for LMMS
+	*
+	* Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+	*
+	* This file is part of LMMS - https://lmms.io
+	*
+	* This program is free software; you can redistribute it and/or
+	* modify it under the terms of the GNU General Public
+	* License as published by the Free Software Foundation; either
+	* version 2 of the License, or (at your option) any later version.
+	*
+	* This program is distributed in the hope that it will be useful,
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of
+	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	* General Public License for more details.
+	*
+	* You should have received a copy of the GNU General Public
+	* License along with this program (see COPYING); if not, write to the
+	* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+	* Boston, MA 02110-1301 USA.
+	*
+	*/
 
 
 #include "TabWidget.h"
@@ -66,6 +66,22 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 	pal.setColor(QPalette::Window, bg_color);
 	setPalette(pal);
 
+}
+
+void TabWidget::setFlatStyle(bool enabled)
+{
+	if (m_flatStyle == enabled) { return; }
+	m_flatStyle = enabled;
+	m_tabbarHeight = m_usePixmap ? GRAPHIC_TAB_HEIGHT : TEXT_TAB_HEIGHT;
+	if (enabled) { m_tabbarHeight = std::max<int>(m_tabbarHeight, fontMetrics().height() + 4); }
+	m_tabheight = m_tabbarHeight - (m_caption.isEmpty() ? 3 : 4);
+	for (const auto& widget : m_widgets)
+	{
+		widget.w->move(2, m_tabbarHeight - 1);
+		if (!m_resizable) { widget.w->setFixedSize(width() - 4, height() - m_tabbarHeight); }
+	}
+	updateGeometry();
+	update();
 }
 
 void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int idx)
@@ -123,31 +139,28 @@ void TabWidget::setActiveTab(int idx)
 
 
 // Return the index of the tab at position "pos"
-int TabWidget::findTabAtPos(const QPoint& pos)
+QMap<int, QRect> TabWidget::tabRects() const
 {
-
-	if (pos.y() > 1 && pos.y() < m_tabbarHeight - 1)
+	QMap<int, QRect> result;
+	int x = m_caption.isEmpty() ? 4 : 14 + fontMetrics().horizontalAdvance(m_caption);
+	const int iconWidth = m_widgets.isEmpty() ? 0 : std::max(0, (width() - x) / static_cast<int>(m_widgets.size()));
+	for (auto it = m_widgets.cbegin(); it != m_widgets.cend(); ++it)
 	{
-		int cx = ((m_caption == "") ? 4 : 14) + fontMetrics().horizontalAdvance(m_caption);
-
-		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
-		{
-			int const currentWidgetWidth = it->nwidth;
-
-			if (pos.x() >= cx && pos.x() <= cx + currentWidgetWidth)
-			{
-				return(it.key());
-			}
-			cx += currentWidgetWidth;
-		}
+		const int tabWidth = m_usePixmap ? iconWidth : fontMetrics().horizontalAdvance(it->name) + 10;
+		result.insert(it.key(), QRect(x, 2, tabWidth, m_tabbarHeight - 4));
+		x += tabWidth;
 	}
-
-	// Haven't found any tab at position "pos"
-	return(-1);
+	return result;
 }
 
+int TabWidget::findTabAtPos(const QPoint& pos)
+{
+	const auto rectangles = tabRects();
+	for (auto it = rectangles.cbegin(); it != rectangles.cend(); ++it)
+		if (it.value().contains(pos)) { return it.key(); }
+	return -1;
+}
 
-// Overload the QWidget::event handler to display tooltips (from https://doc.qt.io/qt-4.8/qt-widgets-tooltips-example.html)
 bool TabWidget::event(QEvent* event)
 {
 
@@ -214,6 +227,41 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	QPainter p(this);
 	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
+	if (m_flatStyle)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setPen(tabBorder());
+		p.setBrush(palette().window());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), m_cornerRadius, m_cornerRadius);
+		p.fillRect(1, 1, width() - 2, m_tabbarHeight - 2, tabBackground());
+		if (!m_caption.isEmpty())
+		{
+			p.setPen(tabTitleText());
+			p.drawText(QRect(5, 1, fontMetrics().horizontalAdvance(m_caption) + 4, m_tabbarHeight - 2), Qt::AlignVCenter, m_caption);
+		}
+		const auto rectangles = tabRects();
+		for (auto it = m_widgets.cbegin(); it != m_widgets.cend(); ++it)
+		{
+			const auto tabRect = rectangles.value(it.key());
+			if (it.key() == m_activeTab)
+			{
+				p.setPen(Qt::NoPen); p.setBrush(tabSelected());
+				p.drawRoundedRect(QRectF(tabRect).adjusted(.5, 0, -.5, 0), std::min(m_cornerRadius, tabRect.height() / 2.0), std::min(m_cornerRadius, tabRect.height() / 2.0));
+			}
+			if (m_usePixmap)
+			{
+				const auto artwork = embed::getIconPixmap(it->pixmap);
+				p.drawPixmap(tabRect.center().x() - artwork.width() / 2, (m_tabbarHeight - artwork.height()) / 2, artwork);
+			}
+			else
+			{
+				p.setPen(it.key() == m_activeTab ? tabTextSelected() : tabText());
+				p.drawText(tabRect.adjusted(3, 0, -3, 0), Qt::AlignVCenter | Qt::AlignLeft, it->name);
+			}
+		}
+		return;
+	}
+
 	// Draw background
 	QBrush bg_color = p.background();
 	p.fillRect(0, 0, width() - 1, height() - 1, bg_color);
@@ -232,29 +280,23 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 		p.drawText(5, 11, m_caption);
 	}
 
-	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().horizontalAdvance(m_caption);
-
-	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
-	widgetStack::iterator first = m_widgets.begin();
-	widgetStack::iterator last = m_widgets.end();
-	int tab_width = width();
-	if (first != last)
-	{
-		tab_width = (width() - tab_x_offset) / std::distance(first, last);
-	}
-
+	const auto rectangles = tabRects();
+	auto first = m_widgets.begin();
+	auto last = m_widgets.end();
 	// Draw all tabs
 	p.setPen(tabText());
 	for (widgetStack::iterator it = first ; it != last ; ++it)
 	{
 		auto & currentWidgetDesc = *it;
+		const auto tabRect = rectangles.value(it.key());
+		const int tab_x_offset = tabRect.x();
+		const int tab_width = tabRect.width();
 
 		// Draw a text tab or a artwork tab.
 		if (m_usePixmap)
 		{
 			// Fixes tab's width, because original size is only correct for text tabs
-			currentWidgetDesc.nwidth = tab_width;
+
 
 			// Get artwork
 			QPixmap artwork(embed::getIconPixmap(currentWidgetDesc.pixmap));
@@ -262,18 +304,18 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 			// Highlight active tab
 			if (it.key() == m_activeTab)
 			{
-				p.fillRect(tab_x_offset, 0, currentWidgetDesc.nwidth, m_tabbarHeight - 1, tabSelected());
+				p.fillRect(tab_x_offset, 0, tab_width, m_tabbarHeight - 1, tabSelected());
 			}
 
 			// Draw artwork
-			p.drawPixmap(tab_x_offset + (currentWidgetDesc.nwidth - artwork.width()) / 2, 1, artwork);
+			p.drawPixmap(tab_x_offset + (tab_width - artwork.width()) / 2, 1, artwork);
 		}
 		else
 		{
 			// Highlight tab when active
 			if (it.key() == m_activeTab)
 			{
-				p.fillRect(tab_x_offset, 2, currentWidgetDesc.nwidth - 6, m_tabbarHeight - 4, tabSelected());
+				p.fillRect(tab_x_offset, 2, tab_width - 6, m_tabbarHeight - 4, tabSelected());
 				p.setPen(tabTextSelected());
 				p.drawText(tab_x_offset + 3, m_tabheight + 1, currentWidgetDesc.name);
 			}
@@ -285,8 +327,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 			}
 		}
 
-		// Next tab's horizontal position
-		tab_x_offset += currentWidgetDesc.nwidth;
+
 	}
 }
 
@@ -302,17 +343,19 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 	}
 
 	we->accept();
-	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
-	int tab = m_activeTab;
-	while(tab > -1 && static_cast<int>(tab) < m_widgets.count())
+	const bool next = we->angleDelta().y() < 0;
+	auto it = m_widgets.constFind(m_activeTab);
+	if (it == m_widgets.cend()) { return; }
+	if (next)
 	{
-		tab += dir;
-		if (m_widgets.contains(tab))
-		{
-			break;
-		}
+		if (++it == m_widgets.cend()) { return; }
 	}
-	setActiveTab(tab);
+	else
+	{
+		if (it == m_widgets.cbegin()) { return; }
+		--it;
+	}
+	setActiveTab(it.key());
 }
 
 

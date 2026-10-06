@@ -155,6 +155,32 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 void ComboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
+	if (m_flatStyle)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setBrush(palette().color(m_pressed ? QPalette::Highlight : QPalette::Button));
+		p.setPen(hasFocus() ? palette().color(QPalette::Highlight) : m_borderColor);
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), m_cornerRadius, m_cornerRadius);
+		p.setPen(m_borderColor);
+		p.drawLine(width() - CB_ARROW_BTN_WIDTH, 4, width() - CB_ARROW_BTN_WIDTH, height() - 4);
+		const auto arrow = embed::getIconPixmap(isEnabled() ? "ui-down" : "ui-down-disabled");
+		p.drawPixmap(width() - CB_ARROW_BTN_WIDTH + 4, (height() - 10) / 2, 10, 10, arrow);
+		if (model() && model()->size() > 0)
+		{
+			int left = 5;
+			p.setClipRect(QRect(left, 2, width() - CB_ARROW_BTN_WIDTH - left - 3, height() - 4));
+			if (const auto data = model()->currentData())
+			{
+				const auto icon = data->pixmap().scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				p.drawPixmap(left, (height() - icon.height()) / 2, icon);
+				left += icon.width() + 3;
+			}
+			p.setPen(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Text));
+			p.drawText(QRect(left, 1, width() - CB_ARROW_BTN_WIDTH - left - 3, height() - 2),
+				Qt::AlignLeft | Qt::AlignVCenter, model()->currentText());
+		}
+		return;
+	}
 
 	p.fillRect(2, 2, width() - 2, height() - 4, m_background);
 

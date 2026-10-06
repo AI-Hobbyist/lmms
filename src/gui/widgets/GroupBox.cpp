@@ -80,11 +80,26 @@ void GroupBox::setLedButtonShown(bool value)
 }
 
 
+void GroupBox::setFlatStyle(bool enabled)
+{
+	if (m_flatStyle == enabled) { return; }
+	const int previousHeight = m_titleBarHeight;
+	m_flatStyle = enabled;
+	m_titleBarHeight = enabled ? QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height() + 2 : 11;
+	// Existing panels place children relative to titleBarHeight before polish.
+	for (auto* child : findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly))
+	{
+		if (child != m_led) { child->move(child->x(), child->y() + m_titleBarHeight - previousHeight); }
+	}
+	m_led->move(3, enabled ? (m_titleBarHeight - m_led->height()) / 2 : 0);
+	update();
+}
+
 void GroupBox::mousePressEvent( QMouseEvent * _me )
 {
 	const auto pos = position(_me);
 
-	if (ledButtonShown() && pos.y() > 1 && pos.y() < 13 && _me->button() == Qt::LeftButton)
+	if (ledButtonShown() && pos.y() > 1 && pos.y() < m_titleBarHeight + 2 && _me->button() == Qt::LeftButton)
 	{
 		model()->setValue(!model()->value());
 	}
@@ -96,6 +111,20 @@ void GroupBox::mousePressEvent( QMouseEvent * _me )
 void GroupBox::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
+	if (m_flatStyle)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setBrush(palette().window());
+		p.setPen(m_borderColor);
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), m_cornerRadius, m_cornerRadius);
+		p.drawLine(1, m_titleBarHeight + 1, width() - 2, m_titleBarHeight + 1);
+		p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+		p.setPen(palette().text().color());
+		const int captionX = ledButtonShown() ? 22 : 6;
+		p.drawText(QRect(captionX, 0, width() - captionX - 4, m_titleBarHeight),
+			Qt::AlignVCenter | Qt::AlignLeft, m_caption);
+		return;
+	}
 
 	// Draw background
 	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
