@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>SVS freehand pitch tool</title>
+  <path d="M3 18c4 0 3-9 7-9s3 10 7 10c1.5 0 2.5-1 4-3" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="m14 8 4.8-5.4a1.4 1.4 0 0 1 2 .1l.5.5a1.4 1.4 0 0 1 0 2L16 10l-3 1Z" fill="#ffffff"/>
+</svg>

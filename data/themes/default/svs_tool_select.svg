@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>SVS selection tool</title>
+  <path d="M4 3v16l4.8-4.4 3.1 6.2 3.2-1.6-3.1-6.1H18Z" fill="#ffffff" stroke-linejoin="round"/>
+  <path d="M17 3h4v4M21 11v3M17 14h-2" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

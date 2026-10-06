@@ -226,7 +226,15 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  canvas->batchLyricsRequested=[this,clip,canvas]{auto* dialog=new SVSLyricEditor(clip,canvas->selectedNotes(),this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->open();};
  auto* lyrics=new QToolButton(this); lyrics->setObjectName("svsBatchLyricsButton"); lyrics->setText(tr("Lyrics")); toolbar->addWidget(lyrics); connect(lyrics,&QToolButton::clicked,this,[canvas]{if(canvas->batchLyricsRequested) canvas->batchLyricsRequested();});
  const QStringList toolNames{tr("Select"),tr("Pencil"),tr("Pitch pen"),tr("Anchor"),tr("Smooth"),tr("Line"),tr("Erase")};
- for(int i=0;i<toolNames.size();++i) { auto* button=new QToolButton(this); button->setObjectName(QString("svsTool%1").arg(i)); button->setText(toolNames[i]); button->setCheckable(true); button->setFocusPolicy(Qt::NoFocus); if(i<5) button->setToolTip(tr("%1 (%2)").arg(toolNames[i]).arg(i+1)); tools->addButton(button,i); toolbar->addWidget(button); }
+ const QStringList toolIcons{"svs_tool_select","svs_tool_pencil","svs_tool_pitch","svs_tool_anchor","svs_tool_smooth","svs_tool_line","svs_tool_erase"};
+ for(int i=0;i<toolNames.size();++i) {
+  auto* button=new QToolButton(this); button->setObjectName(QString("svsTool%1").arg(i)); button->setText(toolNames[i]);
+  QIcon icon(QString("resources:%1.svg").arg(toolIcons[i]));
+  if(icon.isNull()) icon=QIcon(QString("data:/themes/default/%1.svg").arg(toolIcons[i]));
+  button->setIcon(icon); button->setIconSize(QSize(24,24)); button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  button->setCheckable(true); button->setFocusPolicy(Qt::NoFocus); button->setToolTip(i<5?tr("%1 (%2)").arg(toolNames[i]).arg(i+1):toolNames[i]);
+  tools->addButton(button,i); toolbar->addWidget(button);
+ }
  connect(tools,&QButtonGroup::idClicked,this,[canvas,parameterCanvas,strip](int id){strip->cancelOperation();canvas->setTool(static_cast<SVSCanvas::Tool>(id));parameterCanvas->setTool(static_cast<SVSCanvas::Tool>(id));});
  auto syncTool=[canvas,parameterCanvas,strip,tools](SVSCanvas* source){strip->cancelOperation(); const auto tool=source->tool();canvas->setTool(tool);parameterCanvas->setTool(tool);if(auto* button=tools->button(static_cast<int>(tool))) button->setChecked(true);};
  connect(canvas,&SVSCanvas::toolChanged,this,[canvas,syncTool]{syncTool(canvas);});

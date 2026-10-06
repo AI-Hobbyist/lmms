@@ -1215,6 +1215,15 @@ lmms--gui--SVSPianoRoll {
 	qproperty-errorColor: #9b1313;
 }
 
+/* White SVG tools; the track's missing-avatar fallback uses svs_track.svg. */
+lmms--gui--SVSPianoRoll QToolButton#svsTool0 { qproperty-icon: url("resources:svs_tool_select.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool1 { qproperty-icon: url("resources:svs_tool_pencil.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool2 { qproperty-icon: url("resources:svs_tool_pitch.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool3 { qproperty-icon: url("resources:svs_tool_anchor.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool4 { qproperty-icon: url("resources:svs_tool_smooth.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool5 { qproperty-icon: url("resources:svs_tool_line.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsTool6 { qproperty-icon: url("resources:svs_tool_erase.svg"); }
+
 QWidget#svsVoicePanel {
 	background-color: palette(window);
 	color: palette(window-text);

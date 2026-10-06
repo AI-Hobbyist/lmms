@@ -601,6 +601,14 @@ private slots:
   QImage placeholder("data:/themes/default/svs_track.svg"); QVERIFY(!placeholder.isNull()); QCOMPARE(placeholder.size(),QSize(24,24));
   auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong())); auto* clip=static_cast<SVSClip*>(track->createClip(0));
   gui::SVSPianoRoll editor(clip); auto* canvas=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas"); QVERIFY(canvas);
+  const QStringList icons{"select","pencil","pitch","anchor","smooth","line","erase","track"};
+  for(int i=0;i<icons.size();++i) {
+   QImage image(QString("data:/themes/default/svs_%1.svg").arg(i<7?"tool_"+icons[i]:icons[i])); QVERIFY(!image.isNull()); QCOMPARE(image.size(),QSize(24,24));
+   bool ink=false,transparent=false;
+   for(int y=0;y<image.height();++y) for(int x=0;x<image.width();++x) {const auto color=image.pixelColor(x,y);if(color.alpha()) {ink=true;QCOMPARE(color.red(),255);QCOMPARE(color.green(),255);QCOMPARE(color.blue(),255);}else transparent=true;}
+   QVERIFY(ink); QVERIFY(transparent);
+   if(i<7) {auto* button=editor.findChild<QToolButton*>(QString("svsTool%1").arg(i));QVERIFY(button);QVERIFY(!button->icon().isNull());QCOMPARE(button->iconSize(),QSize(24,24));QVERIFY(!button->toolTip().isEmpty());}
+  }
   auto renderColor=[canvas,&editor]{ editor.show();QCoreApplication::processEvents();canvas->window()->layout()->activate(); QImage image(canvas->size(),QImage::Format_ARGB32); image.fill(Qt::transparent); canvas->render(&image); return image.pixelColor(image.width()-5,image.height()-5); };
   editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #132435; qproperty-noteColor: #456789; }"); editor.ensurePolished();
   QCOMPARE(editor.backgroundColor(),QColor("#132435")); QCOMPARE(editor.noteColor(),QColor("#456789")); QCOMPARE(renderColor(),QColor("#132435"));
