@@ -37,6 +37,8 @@ class SVSPianoRoll : public QWidget {
  Q_OBJECT
  Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setbackgroundColor)
  Q_PROPERTY(QColor gridLineColor READ gridLineColor WRITE setgridLineColor)
+ Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setbeatLineColor)
+ Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setbarLineColor)
  Q_PROPERTY(QColor noteColor READ noteColor WRITE setnoteColor)
  Q_PROPERTY(QColor selectedNoteColor READ selectedNoteColor WRITE setselectedNoteColor)
  Q_PROPERTY(QColor lyricColor READ lyricColor WRITE setlyricColor)
@@ -55,6 +57,10 @@ public:
  void setbackgroundColor(const QColor& value) { setThemeColor(QStringLiteral("backgroundColor"),value); }
  QColor gridLineColor() const { return m_colors.value(QStringLiteral("gridLineColor")); }
  void setgridLineColor(const QColor& value) { setThemeColor(QStringLiteral("gridLineColor"),value); }
+ QColor beatLineColor() const { return m_colors.value(QStringLiteral("beatLineColor")); }
+ void setbeatLineColor(const QColor& value) { setThemeColor(QStringLiteral("beatLineColor"),value); }
+ QColor barLineColor() const { return m_colors.value(QStringLiteral("barLineColor")); }
+ void setbarLineColor(const QColor& value) { setThemeColor(QStringLiteral("barLineColor"),value); }
  QColor noteColor() const { return m_colors.value(QStringLiteral("noteColor")); }
  void setnoteColor(const QColor& value) { setThemeColor(QStringLiteral("noteColor"),value); }
  QColor selectedNoteColor() const { return m_colors.value(QStringLiteral("selectedNoteColor")); }

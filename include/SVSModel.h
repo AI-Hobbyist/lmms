@@ -49,6 +49,7 @@ public:
  QString identity() const;
  QVector<Voice> voices(const QString& package,const QString& id);
  QJsonObject capabilities(const QString& voice, const QJsonObject& context, QString& error);
+ QJsonObject engineSettings(const QString& fallbackVoice,const QJsonObject& context,QString& error);
  QJsonObject pronunciation(const QString& voice, const QJsonObject& request, QString& error);
  QByteArray resource(const QString& id, QString& contentType, QString& error);
  std::shared_ptr<const Audio> render(const Input&,QString& error,const std::shared_ptr<RenderControl>& control={});

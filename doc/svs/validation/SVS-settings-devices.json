@@ -1,0 +1,14 @@
+[
+    {
+        "id": "cpu",
+        "name": "CPU"
+    },
+    {
+        "id": "dxgi:00000000:000156d9",
+        "name": "AMD Radeon 780M Graphics"
+    },
+    {
+        "id": "dxgi:00000000:00017853",
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU"
+    }
+]

@@ -71,6 +71,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip)
  connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString& key,const QString&){if(group=="ui"&&key=="printnotelabels") update();});
  connect(clip,&QObject::destroyed,this,[this]{cancelOperation(); m_lyric->hide(); setEnabled(false);});
  connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song),&Timeline::positionChanged,this,qOverload<>(&SVSCanvas::update));
+ connect(Engine::getSong(),&Song::timeSignatureChanged,this,[this](int,int){update();});
 }
 SVSCanvas::~SVSCanvas() = default;
 const QVector<svs::Note>& SVSCanvas::displayedNotes() const { static const QVector<svs::Note> empty; return m_transaction->active()?m_transaction->notes:m_clip?m_clip->notes():empty; }
@@ -238,6 +239,16 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
  const double step=std::max(1.,m_quantization); const double first=std::floor(m_scrollTick/step)*step;
  for(double tick=first;tick<=tickAt(width());tick+=step) { auto x=pointAt(tick,0).x(); painter.drawLine(QPointF(x,TimelineHeight),QPointF(x,height())); }
  for(int row=0;row<(height()-TimelineHeight)/m_rowHeight+2;++row) { auto y=TimelineHeight+row*m_rowHeight; painter.drawLine(QPointF(KeyboardWidth,y),QPointF(width(),y)); }
+ // Align beats and bars to project time, like the bar labels, including trimmed clips.
+ const double projectOffset=m_clip?int(m_clip->startPosition())+int(m_clip->startTimeOffset()):0;
+ auto drawTimeGrid=[&](double ticks,const QColor& lineColor){
+  if(ticks<=0) return;painter.setPen(lineColor);
+  for(double projectTick=std::floor((m_scrollTick+projectOffset)/ticks)*ticks;projectTick<=tickAt(width())+projectOffset;projectTick+=ticks) {
+   const auto x=pointAt(projectTick-projectOffset,0).x();painter.drawLine(QPointF(x,TimelineHeight),QPointF(x,height()));
+  }
+ };
+ drawTimeGrid(double(DefaultTicksPerBar)/Engine::getSong()->getTimeSigModel().getDenominator(),color("beatLineColor",QPalette::Midlight));
+ drawTimeGrid(TimePos::ticksPerBar(),color("barLineColor",QPalette::Highlight));
  if(!m_parameter&&m_showPortrait&&!m_portrait.isNull()&&m_transparency<100) {
   const auto size=m_portrait.size().scaled(QSize(int(grid.width()*.55),int(grid.height()*.9)),Qt::KeepAspectRatio);
   painter.setOpacity(1.-m_transparency/100.); painter.drawImage(QRectF(grid.left()+(grid.width()-size.width())*m_portraitPosition.x(),grid.top()+(grid.height()-size.height())*m_portraitPosition.y(),size.width(),size.height()),m_portrait); painter.setOpacity(1);

@@ -6,6 +6,7 @@
 #include "SVSTempoSource.h"
 #include "SVSNoteOperations.h"
 #include "SVSXml.h"
+#include "ConfigManager.h"
 #include <QScopeGuard>
 #include "Engine.h"
 #include "Song.h"
@@ -121,6 +122,9 @@ svs::Input SVSClip::captureInput(uint32_t rate) const {
  input.document={{"clipId",m_id},{"voiceId",track->voiceId()},{"pluginId",track->pluginId()},{"position",int(startPosition())},{"contentOffset",-int(startTimeOffset())},{"tempo",tempo->baseTempo},{"tempoSource",tempo->toJson()},{"contentEndTick",contentEnd}};
  if(!m_globalParameters.isEmpty()) input.document["globalParameters"]=m_globalParameters;
  input.document["trackParameters"]=track->parameters(); input.document["clipParameters"]=m_parameters;
+ input.document["engineSettings"]=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(track->pluginId().toUtf8().toHex())).toUtf8()).object();
+ input.document["computeBackend"]="cpu";
+ input.document["computeDevice"]="cpu";
  input.document["curves"]=svs::curvesToJson(m_curves); input.document["secondsPerTick"]=input.secondsPerTick;
  input.document["language"]=track->language(); input.document["capabilities"]=track->capabilities().original;
  input.document["projectDictionaries"]=m_projectDictionaryData;

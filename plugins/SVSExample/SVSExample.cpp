@@ -88,7 +88,13 @@ void SVS_CALL destroy(svs_engine e) { delete static_cast<Engine*>(e); }
 svs_status SVS_CALL catalog(svs_engine, const char** s) {
  return ownedString(R"({"voices":[{"id":"full","name":"SVS Example","description":"Deterministic multilingual SDK demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["zh","ja","en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar.svg","portrait":"portrait.svg","range":[36,84]},{"id":"minimal","name":"SVS Example Lite","description":"Restricted capability demonstration","author":"LMMS SVS contributors","license":"GPL-2.0-or-later","version":"0.1.0","languages":["en"],"defaultLanguage":"en","defaultLyric":"la","avatar":"avatar-lite.svg","portrait":"portrait-lite.svg"}]})",s);
 }
-svs_status SVS_CALL capabilities(svs_engine,const char* voice,const char*,const char** s) { if(!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT; return ownedString(std::strcmp(voice,"full")==0?fullSchema:minimalSchema,s); }
+svs_status SVS_CALL capabilities(svs_engine,const char* voice,const char*,const char** s) {
+ if(!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT;
+ const char* schema=std::strcmp(voice,"full")==0?fullSchema:minimalSchema;
+ if(std::strcmp(voice,"full")) return ownedString(schema,s);
+ const auto start=std::strchr(schema,'{');if(!start) return SVS_FAILED;
+ return ownedString(std::string(R"({"engineSettings":[{"id":"example.outputGain","name":"Example engine output gain","type":"float","default":1,"min":0.1,"max":2,"step":0.1}],)")+std::string(start+1),s);
+}
 void SVS_CALL releaseString(svs_engine,const char* text) { delete[] text; }
 svs_status SVS_CALL pronunciation(svs_engine,const char* voice,const char* request,const char** out) {
  if(!voice||(std::strcmp(voice,"full")&&std::strcmp(voice,"minimal"))) return SVS_INVALID_INPUT;
@@ -138,7 +144,7 @@ svs_status renderImpl(svs_session handle,svs_result* out) {
  s.audio.assign(static_cast<size_t>(std::ceil((s.duration-audioStart)*s.rate))*2,0.f);
  constexpr double pi=3.14159265358979323846;
  const auto& parameters=s.input["clipParameters"]; const bool full=s.voice=="full";
- const double gain=std::clamp(s.input["trackParameters"]["example.gain"].numeric(1),0.01,2.);
+ const double gain=std::clamp(s.input["trackParameters"]["example.gain"].numeric(1),0.01,2.)*std::clamp(s.input["engineSettings"]["example.outputGain"].numeric(1),0.1,2.);
  const double tension=full?std::clamp(parameters["example.tension"].numeric(.25),0.,1.):.25;
  const double breath=full?std::clamp(parameters["example.breath"].numeric(.1),0.,1.):0;
  const double gender=full?std::clamp(parameters["example.gender"].numeric(0),-1.,1.):0;
@@ -213,10 +219,16 @@ svs_status SVS_CALL readResource(svs_engine engine,svs_resource handle,uint64_t 
 }
 void SVS_CALL closeResource(svs_engine,svs_resource handle) {delete static_cast<Resource*>(handle);}
 svs_status SVS_CALL queryRanges(svs_session handle,const char** out) {if(!handle) return SVS_INVALID_INPUT;try {const auto& session=*static_cast<Session*>(handle);double begin=0,end=session.secondsPerTick>0?localTick(session,session.duration):0;for(const auto& note:session.notes) {begin=std::min(begin,note.tick);end=std::max(end,note.tick+note.durationTicks);}return ownedString("{\"ranges\":[{\"id\":\"clip\",\"startTick\":"+decimal(begin)+",\"endTick\":"+decimal(end)+"}]}",out);}catch(...) {return SVS_FAILED;}}
+svs_status SVS_CALL queryEngineSettings(svs_engine engine,const char* context,const char** out) {
+ if(!engine||!context||!out) return SVS_INVALID_INPUT;
+ try {if(example::Reader(context).read().type!=example::Json::Object) return SVS_INVALID_INPUT;
+  return ownedString(R"({"schemaVersion":1,"name":"SVS Example","engineType":"example","engineSettings":[{"id":"example.outputGain","name":"Example engine output gain","type":"float","default":1,"min":0.1,"max":2,"step":0.1}]})",out);
+ }catch(...) {return SVS_INVALID_INPUT;}
+}
 }
 extern "C" SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major,uint32_t,uint32_t size,svs_api* out) {
  if(major!=SVS_ABI_MAJOR||!out||size<SVS_API_REQUIRED_SIZE) return SVS_BAD_ABI;
  const auto copied=std::min(size,uint32_t(sizeof(svs_api)));
- const svs_api api{copied,SVS_ABI_MAJOR,SVS_ABI_MINOR,SVS_FEATURE_PRONUNCIATION|SVS_FEATURE_RESOURCES|SVS_FEATURE_RANGES|SVS_FEATURE_HOST_BUFFERS,create,destroy,catalog,capabilities,releaseString,createSession,destroySession,submit,render,cancel,releaseResult,pronunciation,openResource,readResource,closeResource,queryRanges};
+ const svs_api api{copied,SVS_ABI_MAJOR,SVS_ABI_MINOR,SVS_FEATURE_PRONUNCIATION|SVS_FEATURE_RESOURCES|SVS_FEATURE_RANGES|SVS_FEATURE_HOST_BUFFERS|SVS_FEATURE_ENGINE_SETTINGS,create,destroy,catalog,capabilities,releaseString,createSession,destroySession,submit,render,cancel,releaseResult,pronunciation,openResource,readResource,closeResource,queryRanges,queryEngineSettings};
  std::memcpy(out,&api,copied); return SVS_OK;
 }

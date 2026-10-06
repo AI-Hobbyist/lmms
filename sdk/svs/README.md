@@ -1,4 +1,4 @@
-# Native SVS SDK 1.1
+# Native SVS SDK 1.2
 
 This SDK builds native Singing Voice Synthesis plugins independently of LMMS. The C ABI requires a matching platform and pointer width. C++17 conveniences are compiled into the caller. No Qt, LMMS internal header, TuneLab, .NET, Libjack, online service or model download is required by the examples.
 
@@ -25,3 +25,5 @@ Copy a plugin's entire package directory to LMMS's `svs` discovery root; do not 
 Run `SVSConformance <absolute plugin-library path>` through the same foreground logging pattern. Exit 0 means the catalog, tested Schema fields, resources, audible finite PCM, nonzero origin, cancellation and result ownership passed. Exit 1 reports the first failed contract; exit 2 means invalid command usage. See [validation.md](docs/validation.md) for the tool's limits and host diagnostics.
 
 Read [api.md](docs/api.md) for ABI, ownership and threads, [formats.md](docs/formats.md) for value formats, and [packages.md](docs/packages.md) for packaging and compatibility. Example SVG artwork is generated for this distribution. Local singer fixtures and reference application files are excluded from the SDK.
+
+ABI 1.2 adds the optional engine-wide settings query and C++ helpers, preserving the ABI 1.0 mandatory prefix. See [EngineSettings.md](docs/EngineSettings.md) for engine names/types, global option descriptors, AI backend/device placeholders and immutable synthesis settings. The full example provides an output-gain option; the minimal C example remains a legacy-prefix compatibility fixture.

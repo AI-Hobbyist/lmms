@@ -1,4 +1,4 @@
-/* SVS SDK v0.1. Public C ABI; no LMMS, Qt or C++ runtime types at this boundary. */
+/* SVS SDK ABI 1.2. Public C ABI; no LMMS, Qt or C++ runtime types at this boundary. */
 #ifndef SVS_API_H
 #define SVS_API_H
 #include <stdint.h>
@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 #define SVS_ABI_MAJOR 1u
-#define SVS_ABI_MINOR 1u
+#define SVS_ABI_MINOR 2u
 typedef void* svs_engine;
 typedef void* svs_session;
 typedef void* svs_resource;
@@ -29,6 +29,14 @@ enum { SVS_OK=0, SVS_BAD_ABI=1, SVS_INVALID_INPUT=2, SVS_CANCELLED=3, SVS_FAILED
 #define SVS_FEATURE_RESOURCES UINT64_C(2)
 #define SVS_FEATURE_RANGES UINT64_C(4)
 #define SVS_FEATURE_HOST_BUFFERS UINT64_C(8)
+#define SVS_FEATURE_ENGINE_SETTINGS UINT64_C(16)
+#define SVS_ENGINE_TYPE_AI "ai"
+#define SVS_ENGINE_TYPE_CONCATENATIVE "concatenative"
+#define SVS_ENGINE_TYPE_EXAMPLE "example"
+#define SVS_COMPUTE_CPU "cpu"
+#define SVS_COMPUTE_DIRECTML "directml"
+#define SVS_COMPUTE_LIBTORCH "libtorch"
+#define SVS_COMPUTE_VULKAN "vulkan"
 typedef struct svs_buffer {
     uint32_t size;
     void* data;
@@ -112,6 +120,12 @@ typedef struct svs_api {
     void (SVS_CALL *close_resource)(svs_engine, svs_resource);
     /* Plugin-owned UTF-8 JSON: {"ranges":[{"id":"...","startTick":0,"endTick":48}]}. */
     svs_status (SVS_CALL *query_ranges)(svs_session, const char** result_json);
+    /* ABI 1.2 optional engine-wide declaration (no voice required).
+       context_json carries current engineSettings and requested compute settings.
+       Result: schemaVersion, name, engineType, engineSettings descriptors.
+       Release the returned string using release_string; values reach submit
+       through snapshot input_json, not mutable shared engine state. */
+    svs_status (SVS_CALL *query_engine_settings)(svs_engine, const char* context_json, const char** result_json);
 } svs_api;
 /* Check the complete field before inspecting an optional pointer or host service. */
 #define SVS_HAS_FIELD(value, type, field) ((value).size >= offsetof(type, field) + sizeof((value).field))

@@ -47,6 +47,7 @@
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
+#include "SVSSettingsPage.h"
 #include "TabBar.h"
 #include "TabButton.h"
 #include "TimeLineWidget.h"
@@ -498,8 +499,18 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_animateAFP, SLOT(toggleAnimateAFP(bool)), false);
 
 
-	// Plugins group
-	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performance_w);
+	auto* vst_w = new QWidget(settings_w);
+	vst_w->setObjectName("vstSettingsPage");
+	auto* vst_layout = new QVBoxLayout(vst_w);
+	vst_layout->setContentsMargins(0, 0, 0, 0);
+	labelWidget(vst_w, tr("VST"));
+	auto* vstScroll = new QScrollArea(vst_w);
+	vstScroll->setWidgetResizable(true);
+	auto* vstControls = new QWidget(vstScroll);
+	auto* vstControlsLayout = new QVBoxLayout(vstControls);
+	vstScroll->setWidget(vstControls);
+	vst_layout->addWidget(vstScroll);
+	QGroupBox * pluginsBox = new QGroupBox(tr("Plugin windows"), vstControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
@@ -507,6 +518,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	pluginsLayout->addWidget(m_vstEmbedLbl);
 
 	m_vstEmbedComboBox = new QComboBox(pluginsBox);
+	m_vstEmbedComboBox->setObjectName("vstEmbeddingMethod");
 
 	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
@@ -530,14 +542,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_vstAlwaysOnTopCheckBox = addCheckBox(tr("Keep plugin windows on top when not embedded"), pluginsBox, pluginsLayout,
 		m_vstAlwaysOnTop, SLOT(toggleVSTAlwaysOnTop(bool)), false);
 
-	addCheckBox(tr("Keep effects running even without input"), pluginsBox, pluginsLayout,
+	auto* effectsBox = new QGroupBox(tr("Effects"), performance_w);
+	auto* effectsLayout = new QVBoxLayout(effectsBox);
+	addCheckBox(tr("Keep effects running even without input"), effectsBox, effectsLayout,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
 
 
 	// Performance layout ordering.
 	performance_layout->addWidget(autoSaveBox);
 	performance_layout->addWidget(uiFxBox);
-	performance_layout->addWidget(pluginsBox);
+	performance_layout->addWidget(effectsBox);
+	vstControlsLayout->addWidget(pluginsBox);
 	performance_layout->addStretch();
 
 
@@ -840,6 +855,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// Paths widget.
 	auto paths_w = new QWidget(settings_w);
+	paths_w->setObjectName("pathsSettingsPage");
 
 	auto paths_layout = new QVBoxLayout(paths_w);
 	paths_layout->setSpacing(10);
@@ -890,13 +906,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(setVSTDir(const QString&)),
 		SLOT(openVSTDir()),
 		m_vstDirLineEdit);
+	auto* legacyVstPath = m_vstDirLineEdit->parentWidget();
+	pathSelectorsLayout->removeWidget(legacyVstPath);
+	legacyVstPath->setParent(vstControls);
+	vstControlsLayout->addWidget(legacyVstPath);
 	{
-		auto* scanBox = new QGroupBox(tr("VST scan directories"), pathSelectors);
+		auto* scanBox = new QGroupBox(tr("VST scan directories"), vstControls);
 		auto* scanLayout = new QVBoxLayout(scanBox);
 		QString scanError;
 		const auto roots = ConfigManager::inst()->vstScanRoots(&scanError);
 		m_vstScanRoots = new ScanRootsWidget(roots, scanError, scanBox);
-		scanLayout->addWidget(m_vstScanRoots); pathSelectorsLayout->addWidget(scanBox);
+		scanLayout->addWidget(m_vstScanRoots); vstControlsLayout->addWidget(scanBox);
 #ifdef LMMS_BUILD_WIN32
 		auto* actions = new QHBoxLayout;
 		auto* refresh = new QPushButton(tr("Refresh saved directories"), scanBox);
@@ -995,6 +1015,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	settingsLayout->addWidget(audio_w);
 	settingsLayout->addWidget(midi_w);
 	settingsLayout->addWidget(paths_w);
+	settingsLayout->addWidget(vst_w);
+	auto* svs_w = new SVSSettingsPage(settings_w);
+	m_svsSettings = svs_w;
+	settingsLayout->addWidget(svs_w);
+	vstControlsLayout->addStretch();
 
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
@@ -1010,8 +1035,14 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			tr("MIDI"), 3, false, true, false)->setIcon(
 					embed::getIconPixmap("setup_midi"));
 	m_tabBar->addTab(paths_w,
-			tr("Paths"), 4, true, true, false)->setIcon(
+			tr("Paths"), 4, false, true, false)->setIcon(
 					embed::getIconPixmap("setup_directories"));
+	auto* vstTab = m_tabBar->addTab(vst_w, tr("VST"), 5, false, true, false);
+	vstTab->setObjectName("vstSettingsTab");
+	vstTab->setIcon(embed::getIconPixmap("setup_vst.svg", 48, 48));
+	auto* svsTab = m_tabBar->addTab(svs_w, tr("SVS"), 6, true, true, false);
+	svsTab->setObjectName("svsSettingsTab");
+	svsTab->setIcon(embed::getIconPixmap("svs_track.svg", 48, 48));
 
 	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
@@ -1174,6 +1205,7 @@ void SetupDialog::accept()
 	{
 		it.value()->saveSettings();
 	}
+	static_cast<SVSSettingsPage*>(m_svsSettings)->save();
 	ConfigManager::inst()->saveConfigFile();
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstScanRoots && m_vstScanRoots->changed()) { Engine::refreshVstCatalog(); }

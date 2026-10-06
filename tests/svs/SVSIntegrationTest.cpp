@@ -16,6 +16,11 @@
 #include <qt_windows.h>
 #endif
 #include "SVSParameterPanel.h"
+#include "SVSSettingsPage.h"
+#include "SetupDialog.h"
+#include <QTabWidget>
+#include <QTreeWidget>
+#include <QLabel>
 #include <QDomDocument>
 #include <QFileInfo>
 #include "Mixer.h"
@@ -127,6 +132,33 @@ private slots:
   auto* addSVS=mainWindow->findChild<QAction*>("svsAddTrackAction");QVERIFY(addSVS);
   QCOMPARE(addSVS->icon().pixmap(24,24).toImage(),QIcon("resources:svs_track.svg").pixmap(24,24).toImage());
   const auto existingWindows=mainWindow->workspace()->subWindowList().size();
+  if(qEnvironmentVariableIsSet("SVS_SETTINGS_TEST")) {
+   auto* config=ConfigManager::inst();const auto backend=config->value("svs","computeBackend");const auto device=config->value("svs","computeDevice");
+   const auto voice=svs::Registry::instance().voices().first();const auto key="engine_"+QString::fromLatin1(voice.pluginId.toUtf8().toHex());const auto original=config->value("svsEngineSettings",key);
+   const auto oldSteps=config->value("svs","aiExampleRenderSteps");config->setValue("svs","aiExampleRenderSteps","20");
+   auto restoreSettings=qScopeGuard([&]{config->setValue("svs","computeBackend",backend);config->setValue("svs","computeDevice",device);config->setValue("svsEngineSettings",key,original);config->setValue("svs","aiExampleRenderSteps",oldSteps);});
+   config->setValue("svs","computeBackend","cpu");config->setValue("svs","computeDevice","cpu");
+   gui::SetupDialog settings(gui::SetupDialog::ConfigTab::SvsSettings);auto* page=static_cast<gui::SVSSettingsPage*>(settings.findChild<QWidget*>("svsSettingsPage"));QVERIFY(page);
+   auto* backendBox=page->findChild<QComboBox*>("svsComputeBackend");auto* deviceBox=page->findChild<QComboBox*>("svsComputeDevice");QVERIFY(backendBox);QVERIFY(deviceBox);QCOMPARE(backendBox->count(),4);QCOMPARE(backendBox->currentText(),QString("CPU"));QCOMPARE(deviceBox->itemText(0),QString("CPU"));QVERIFY(!deviceBox->isEnabled());
+   for(int index=1;index<4;++index) {backendBox->setCurrentIndex(index);QVERIFY(deviceBox->isEnabled());QVERIFY(backendBox->currentText().contains("Coming soon"));backendBox->setCurrentIndex(0);QVERIFY(!deviceBox->isEnabled());QCOMPARE(deviceBox->currentText(),QString("CPU"));}
+   QJsonArray deviceList;for(int index=0;index<deviceBox->count();++index) deviceList.append(QJsonObject{{"name",deviceBox->itemText(index)},{"id",deviceBox->itemData(index).toString()}});
+   QFile devicesFile("doc/svs/validation/SVS-settings-devices.json");QVERIFY(devicesFile.open(QIODevice::WriteOnly));devicesFile.write(QJsonDocument(deviceList).toJson());devicesFile.close();
+   auto* engineTabs=page->findChild<QTabWidget*>("svsEngineTabs");QVERIFY(engineTabs);QVERIFY(engineTabs->count()>0);QCOMPARE(engineTabs->tabText(0),gui::SVSSettingsPage::engineLabel(voice));QVERIFY(page->findChild<QLabel*>("svsComputeHint")->text().contains("only to AI voicebanks"));
+   auto ai=voice;ai.metadata["engineType"]="ai";QVERIFY(gui::SVSSettingsPage::engineLabel(ai).endsWith("(AI)"));ai.metadata["engineType"]="concatenative";QVERIFY(gui::SVSSettingsPage::engineLabel(ai).endsWith("(Traditional concatenation)"));
+   auto* steps=page->findChild<QSlider*>("svsAiExampleRenderSteps");QVERIFY(steps);QCOMPARE(steps->minimum(),1);QCOMPARE(steps->maximum(),100);QCOMPARE(steps->value(),20);
+   QTRY_VERIFY(page->findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain"));auto* outputGain=page->findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain");outputGain->setValue(.5);
+   QTRY_COMPARE(page->findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain")->value(),.5);
+   backendBox->setCurrentIndex(1);if(deviceBox->count()>1) deviceBox->setCurrentIndex(1);const auto selectedDevice=deviceBox->currentData();page->save();QCOMPARE(config->value("svs","computeBackend"),QString("directml"));
+   {gui::SVSSettingsPage reopened;QCOMPARE(reopened.findChild<QComboBox*>("svsComputeBackend")->currentData().toString(),QString("directml"));QVERIFY(reopened.findChild<QComboBox*>("svsComputeDevice")->isEnabled());QCOMPARE(reopened.findChild<QComboBox*>("svsComputeDevice")->currentData(),selectedDevice);QTRY_VERIFY(reopened.findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain"));QCOMPARE(reopened.findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain")->value(),.5);}
+   auto* vstPage=settings.findChild<QWidget*>("vstSettingsPage");auto* pathsPage=settings.findChild<QWidget*>("pathsSettingsPage");QVERIFY(vstPage);QVERIFY(pathsPage);QVERIFY(vstPage->findChild<QComboBox*>("vstEmbeddingMethod"));QVERIFY(vstPage->findChild<QTreeWidget*>("vstCatalogCategories"));QVERIFY(!pathsPage->findChild<QTreeWidget*>("vstCatalogCategories"));
+   settings.show();QVERIFY(QTest::qWaitForWindowExposed(&settings));settings.raise();settings.activateWindow();QTest::qWait(300);const auto image=settings.screen()->grabWindow(settings.winId());QVERIFY(image.save(qEnvironmentVariable("SVS_SETTINGS_CAPTURE_PATH","doc/svs/validation/SVS-settings-window.png")));
+   engineTabs->setCurrentIndex(engineTabs->count()-1);QCOMPARE(engineTabs->currentWidget()->objectName(),QString("svsEnginePage.aiExample"));QVERIFY(engineTabs->currentWidget()->findChildren<QDoubleSpinBox*>().isEmpty());QTest::qWait(200);QVERIFY(settings.screen()->grabWindow(settings.winId()).save("doc/svs/validation/SVS-settings-ai-example.png"));
+   steps->setFocus();QTest::keyClick(steps,Qt::Key_Right);QCOMPARE(steps->value(),21);QCOMPARE(page->findChild<QLabel*>("svsAiExampleRenderStepsValue")->text(),QString("21"));page->save();{gui::SVSSettingsPage reopened;QCOMPARE(reopened.findChild<QSlider*>("svsAiExampleRenderSteps")->value(),21);}settings.reject();
+   {gui::SetupDialog vstSettings(gui::SetupDialog::ConfigTab::VstSettings);vstSettings.show();QVERIFY(QTest::qWaitForWindowExposed(&vstSettings));vstSettings.raise();QTest::qWait(200);QVERIFY(vstSettings.screen()->grabWindow(vstSettings.winId()).save("doc/svs/validation/SVS-settings-vst-window.png"));vstSettings.reject();}
+   auto* sampleTrack=new SVSTrack(Engine::getSong());sampleTrack->bindVoice(voice.pluginId,voice.id);QTRY_VERIFY(sampleTrack->capabilitiesReady());auto* sampleClip=static_cast<SVSClip*>(sampleTrack->createClip(0));svs::Note sampleNote;sampleNote.id="engine-settings-note";sampleNote.duration=48;sampleClip->setNotes({sampleNote});
+   auto input=sampleClip->captureInput(48000);QCOMPARE(input.document["computeBackend"].toString(),QString("cpu"));QCOMPARE(input.document["engineSettings"].toObject()["example.outputGain"].toDouble(),.5);
+   QString error;const auto plugin=svs::Registry::instance().plugin(voice.pluginId);auto quieter=plugin->render(input,error);QVERIFY2(quieter,qPrintable(error));input.document["engineSettings"]=QJsonObject{{"example.outputGain",1.}};auto louder=plugin->render(input,error);QVERIFY2(louder,qPrintable(error));QCOMPARE(quieter->samples.size(),louder->samples.size());bool audible=false;for(size_t i=0;i<louder->samples.size();++i) {audible|=std::abs(louder->samples[i])>.001f;QVERIFY(std::abs(quieter->samples[i]*2-louder->samples[i])<1e-6f);}QVERIFY(audible);delete sampleTrack;
+  }
   auto* track=new SVSTrack(Engine::getSong());auto* clip=static_cast<SVSClip*>(track->createClip(TimePos(0)));
   QTRY_VERIFY(!mainWindow->findChildren<gui::SVSTrackView*>().isEmpty());auto* trackView=mainWindow->findChild<gui::SVSTrackView*>();QVERIFY(trackView);QVERIFY(!trackView->findChild<QComboBox*>("svsVoiceSelector"));auto* pluginSettings=trackView->findChild<QDialog*>("svsPluginSettings");QVERIFY(pluginSettings);auto* avatarButton=trackView->findChild<QToolButton*>("svsTrackAvatar");QVERIFY(avatarButton);QTest::mouseClick(avatarButton,Qt::LeftButton);QVERIFY(pluginSettings->isVisible());pluginSettings->close();
   QTRY_VERIFY(!mainWindow->findChildren<gui::SVSClipView*>().isEmpty());auto* view=mainWindow->findChild<gui::SVSClipView*>();
@@ -202,6 +234,9 @@ private slots:
   svs_host prefix=host;prefix.size=uint32_t(offsetof(svs_host,allocate_buffer));svs_engine legacy=nullptr;QCOMPARE(api.create_engine(&prefix,&legacy),svs_status(SVS_OK));api.destroy_engine(legacy);
   QCOMPARE(api.submit(session,&snapshot),svs_status(SVS_OK));api.cancel(session);result.size=sizeof(result);QCOMPARE(api.render(session,&result),svs_status(SVS_CANCELLED));QVERIFY(result.error_json);const auto failure=QJsonDocument::fromJson(result.error_json).object();QCOMPARE(failure["clipId"].toString(),QString("sdk-clip"));QCOMPARE(failure["code"].toInt(),int(SVS_CANCELLED));api.release_result(session,&result);
   svs_sdk::Engine wrappedOwner(get,&host);QVERIFY(wrappedOwner.catalog().copy().find("minimal")!=std::string::npos);
+  QVERIFY(wrappedOwner.hasEngineSettings());const auto settingsJson=wrappedOwner.engineSettings().copy();const auto settingsObject=QJsonDocument::fromJson(QByteArray::fromStdString(settingsJson)).object();QCOMPARE(settingsObject["engineType"].toString(),QString("example"));QCOMPARE(settingsObject["engineSettings"].toArray().size(),1);
+  const char* invalidSettings=nullptr;QCOMPARE(api.query_engine_settings(engine,"[]",&invalidSettings),svs_status(SVS_INVALID_INPUT));QVERIFY(!invalidSettings);
+  svs_api oldTable{};QCOMPARE(get(SVS_ABI_MAJOR,1,uint32_t(offsetof(svs_api,query_engine_settings)),&oldTable),svs_status(SVS_OK));QVERIFY(!SVS_HAS_FIELD(oldTable,svs_api,query_engine_settings));QVERIFY(!oldTable.query_engine_settings);
   auto resource=[&]{svs_sdk::Engine owner(get,&host);return owner.resource("portrait-lite.svg");}();
   const auto resourceBytes=resource.read();QCOMPARE(uint64_t(resourceBytes.size()),resource.info().byte_count);QVERIFY(!resourceBytes.empty());
   auto wrappedSession=[&]{svs_sdk::Engine owner(get,&host);return owner.session("minimal");}();QCOMPARE(wrappedSession.submit(snapshot),svs_status(SVS_INVALID_INPUT));auto minimalSnapshot=snapshot;minimalSnapshot.voice_id="minimal";QCOMPARE(wrappedSession.submit(minimalSnapshot),svs_status(SVS_OK));
@@ -630,6 +665,11 @@ private slots:
   editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #132435; qproperty-noteColor: #456789; }"); editor.ensurePolished();
   QCOMPARE(editor.backgroundColor(),QColor("#132435")); QCOMPARE(editor.noteColor(),QColor("#456789")); QCOMPARE(renderColor(),QColor("#132435"));
   editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #abcdef; }"); editor.ensurePolished(); QCOMPARE(renderColor(),QColor("#abcdef"));
+  editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-gridLineColor: #112233; qproperty-beatLineColor: #446655; qproperty-barLineColor: #77aa88; }");editor.ensurePolished();
+  clip->movePosition(TimePos(12));canvas->setScroll(0,72);canvas->setQuantization(12);canvas->setZoom(.5,1);QCoreApplication::processEvents();
+  auto verifyGrid=[&]{const auto image=canvas->grab().toImage();auto pixel=[&](double tick){const auto point=canvas->pointAt(tick,canvas->topPitch()-.5).toPoint();return image.pixelColor(point);};QCOMPARE(pixel(double(DefaultTicksPerBar)/Engine::getSong()->getTimeSigModel().getDenominator()-12),QColor("#446655"));QCOMPARE(pixel(TimePos::ticksPerBar()-12),QColor("#77aa88"));};
+  verifyGrid();const auto fine=canvas->grab().toImage();QCOMPARE(fine.pixelColor(canvas->pointAt(12,canvas->topPitch()-.5).toPoint()),QColor("#112233"));
+  canvas->setQuantization(96);canvas->setScroll(13,72);QCoreApplication::processEvents();verifyGrid();
   editor.setStyleSheet(""); editor.ensurePolished(); QVERIFY(!editor.backgroundColor().isValid()); QCOMPARE(renderColor(),canvas->palette().base().color());
   delete track;
  }

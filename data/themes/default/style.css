@@ -1202,6 +1202,8 @@ lmms--gui--BarModelEditor {
 lmms--gui--SVSPianoRoll {
 	qproperty-backgroundColor: #141616;
 	qproperty-gridLineColor: #292929;
+	qproperty-beatLineColor: #2d6b45;
+	qproperty-barLineColor: #42a065;
 	qproperty-noteColor: #0bd556;
 	qproperty-selectedNoteColor: #064d79;
 	qproperty-lyricColor: #ffffff;
@@ -1214,6 +1216,9 @@ lmms--gui--SVSPianoRoll {
 	qproperty-renderingColor: #42a065;
 	qproperty-errorColor: #9b1313;
 }
+
+lmms--gui--SetupDialog QPushButton#vstSettingsTab { qproperty-icon: url("resources:setup_vst.svg"); qproperty-iconSize: 48px 48px; }
+lmms--gui--SetupDialog QPushButton#svsSettingsTab { qproperty-icon: url("resources:svs_track.svg"); qproperty-iconSize: 48px 48px; }
 
 /* White SVG tools; the track's missing-avatar fallback uses svs_track.svg. */
 lmms--gui--SVSPianoRoll QToolButton#svsPlayButton { qproperty-icon: url("resources:play.png"); }

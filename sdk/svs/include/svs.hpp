@@ -16,6 +16,7 @@ inline svs_api negotiate(svs_get_api_fn entry) {
  if(!SVS_HAS_FIELD(api,svs_api,read_resource)) api.read_resource=nullptr;
  if(!SVS_HAS_FIELD(api,svs_api,close_resource)) api.close_resource=nullptr;
  if(!SVS_HAS_FIELD(api,svs_api,query_ranges)) api.query_ranges=nullptr;
+ if(!SVS_HAS_FIELD(api,svs_api,query_engine_settings)) api.query_engine_settings=nullptr;
  return api;
 }
 namespace detail {
@@ -94,6 +95,8 @@ public:
  Engine(const Engine&)=delete;Engine& operator=(const Engine&)=delete;
  Engine(Engine&&)=default;Engine& operator=(Engine&&)=default;
  String catalog() const {return query([&](const char** out){return m_state->api.catalog(m_state->handle,out);});}
+ bool hasEngineSettings() const {return m_state->api.query_engine_settings!=nullptr;}
+ String engineSettings(const char* context="{}") const {if(!hasEngineSettings()) throw std::runtime_error("SVS engine settings API unavailable");return query([&](const char** out){return m_state->api.query_engine_settings(m_state->handle,context,out);});}
  String capabilities(const char* voice,const char* context="{}") const {return query([&](const char** out){return m_state->api.capabilities(m_state->handle,voice,context,out);});}
  String pronunciation(const char* voice,const char* request) const {if(!m_state->api.pronunciation) throw std::runtime_error("SVS pronunciation API unavailable");return query([&](const char** out){return m_state->api.pronunciation(m_state->handle,voice,request,out);});}
  Resource resource(const char* id) const {return Resource(m_state,id);}

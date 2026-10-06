@@ -2,6 +2,7 @@
 add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWaveform.cpp SVSCache.cpp SVSExportSnapshot.cpp SVSTempoSnapshot.cpp SVSTempoSource.cpp "${CMAKE_SOURCE_DIR}/include/SVSTempoSource.h" SVSSynthesisScheduler.cpp SVSClip.cpp ../../tracks/SVSTrack.cpp ../../gui/editors/svs/SVSViews.cpp ../../gui/editors/svs/SVSParameterPanel.cpp ../../gui/editors/svs/SVSCanvas.cpp
   ../../gui/editors/svs/SVSLyricEditor.cpp
   ../../gui/editors/svs/SVSImageLoader.cpp
+  ../../gui/editors/svs/SVSSettingsPage.cpp
   ../../gui/editors/svs/SVSResultStrip.cpp "${CMAKE_SOURCE_DIR}/include/SVSResultStrip.h"
   "${CMAKE_SOURCE_DIR}/include/SVSClip.h" "${CMAKE_SOURCE_DIR}/include/SVSTrack.h" "${CMAKE_SOURCE_DIR}/include/SVSViews.h" "${CMAKE_SOURCE_DIR}/include/SVSCanvas.h")
 target_compile_features(lmmssvs PUBLIC cxx_std_20)

@@ -50,6 +50,7 @@ Plugin::Plugin(const QString& path):m_impl(std::make_unique<Impl>(path)) {
  if(!SVS_HAS_FIELD(d.api,svs_api,read_resource)) d.api.read_resource=nullptr;
  if(!SVS_HAS_FIELD(d.api,svs_api,close_resource)) d.api.close_resource=nullptr;
  if(!SVS_HAS_FIELD(d.api,svs_api,query_ranges)) d.api.query_ranges=nullptr;
+ if(!SVS_HAS_FIELD(d.api,svs_api,query_engine_settings)) d.api.query_engine_settings=nullptr;
  svs_host host{sizeof(svs_host),&d.services,hostLog,hostProgress,hostAllocate,hostRelease,hostCompleted};
  if(d.api.create_engine(&host,&d.engine)!=SVS_OK||!d.engine) d.error="SVS engine initialization failed";
 }
@@ -67,6 +68,16 @@ QByteArray Plugin::resource(const QString& id,QString& contentType,QString& erro
  while(offset<info.byte_count) {uint64_t read=0;const auto remaining=info.byte_count-offset;if(d.api.read_resource(d.engine,handle,offset,bytes.data()+offset,remaining,&read)!=SVS_OK||!read||read>remaining) {error="Incomplete SVS resource";return {};}offset+=read;}
  const auto hash=QByteArray(info.sha256);if(hash.size()!=64||QCryptographicHash::hash(bytes,QCryptographicHash::Sha256).toHex()!=hash) {error="SVS resource hash mismatch";return {};}
  contentType=QString::fromUtf8(info.content_type);return bytes;
+}
+QJsonObject Plugin::engineSettings(const QString& fallbackVoice,const QJsonObject& context,QString& error) {
+ if(!m_impl->api.query_engine_settings) return capabilities(fallbackVoice,context,error);
+ QMutexLocker lock(&m_impl->mutex);const auto request=QJsonDocument(context).toJson(QJsonDocument::Compact);const char* text=nullptr;
+ const auto status=m_impl->api.query_engine_settings(m_impl->engine,request.constData(),&text);
+ if(status==SVS_UNSUPPORTED) {if(text) m_impl->api.release_string(m_impl->engine,text);error.clear();return {};}
+ if(status!=SVS_OK||!text) {if(text) m_impl->api.release_string(m_impl->engine,text);error="SVS engine settings query failed";return {};}
+ QJsonParseError parse;const auto document=QJsonDocument::fromJson(text,&parse);m_impl->api.release_string(m_impl->engine,text);
+ if(parse.error!=QJsonParseError::NoError||!document.isObject()||document.object()["schemaVersion"].toInt()!=1) {error="Invalid SVS engine settings declaration";return {};}
+ error.clear();return document.object();
 }
 QJsonObject Plugin::capabilities(const QString& voice, const QJsonObject& context, QString& error) {
  QMutexLocker lock(&m_impl->mutex); const char* text=nullptr;
@@ -202,7 +213,7 @@ const QVector<Voice>& Registry::voices() {
   if(m_plugins.contains(id)) {const auto existing=std::find_if(m_voices.begin(),m_voices.end(),[&](const auto& voice){return voice.pluginId==id;});if(existing==m_voices.end()||QFileInfo(existing->package).canonicalFilePath().compare(QFileInfo(package).canonicalFilePath(),pathSensitivity)!=0) m_diagnostics<<"Duplicate SVS plugin ID: "+id+" in "+package;continue;}
   auto plugin=std::make_shared<Plugin>(package+"/"+entry); if(!plugin->valid()) { m_diagnostics<<id+": "+plugin->error(); continue; }
   auto voices=plugin->voices(package,id); if(voices.isEmpty()) { m_diagnostics<<id+": invalid/empty voice catalog"; continue; }
-  for(auto& voice:voices) voice.metadata["pluginVersion"]=manifest["version"];
+  for(auto& voice:voices) {voice.metadata["pluginVersion"]=manifest["version"];voice.metadata["pluginName"]=manifest["name"].toString(id);voice.metadata["engineType"]=manifest["engineType"];}
   m_plugins[id]=plugin; m_voices+=voices;
  } return m_voices;
 }

@@ -59,7 +59,9 @@ public:
 		PerformanceSettings,
 		AudioSettings,
 		MidiSettings,
-		PathsSettings
+			PathsSettings,
+			VstSettings,
+			SvsSettings
 	};
 
 	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
@@ -134,6 +136,7 @@ private slots:
 
 private:
 	TabBar * m_tabBar;
+	QWidget* m_svsSettings = nullptr;
 
 	// General settings widgets.
 	bool m_tooltips;
