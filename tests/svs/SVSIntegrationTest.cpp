@@ -11,6 +11,10 @@
 #include <QScrollBar>
 #include <QFrame>
 #include <QToolButton>
+#include <QAction>
+#ifdef Q_OS_WIN
+#include <qt_windows.h>
+#endif
 #include "SVSParameterPanel.h"
 #include <QDomDocument>
 #include <QFileInfo>
@@ -120,6 +124,8 @@ private slots:
   auto restore=qScopeGuard([&]{ConfigManager::inst()->setValue("ui","detachbehavior",previous);});
   ConfigManager::inst()->setValue("ui","detachbehavior","show");
   auto* mainWindow=m_guiApplication->mainWindow();mainWindow->resize(1400,1000);mainWindow->show();
+  auto* addSVS=mainWindow->findChild<QAction*>("svsAddTrackAction");QVERIFY(addSVS);
+  QCOMPARE(addSVS->icon().pixmap(24,24).toImage(),QIcon("resources:svs_track.svg").pixmap(24,24).toImage());
   const auto existingWindows=mainWindow->workspace()->subWindowList().size();
   auto* track=new SVSTrack(Engine::getSong());auto* clip=static_cast<SVSClip*>(track->createClip(TimePos(0)));
   QTRY_VERIFY(!mainWindow->findChildren<gui::SVSTrackView*>().isEmpty());auto* trackView=mainWindow->findChild<gui::SVSTrackView*>();QVERIFY(trackView);QVERIFY(!trackView->findChild<QComboBox*>("svsVoiceSelector"));auto* pluginSettings=trackView->findChild<QDialog*>("svsPluginSettings");QVERIFY(pluginSettings);auto* avatarButton=trackView->findChild<QToolButton*>("svsTrackAvatar");QVERIFY(avatarButton);QTest::mouseClick(avatarButton,Qt::LeftButton);QVERIFY(pluginSettings->isVisible());pluginSettings->close();
@@ -135,6 +141,11 @@ private slots:
   QTest::mouseClick(canvas,Qt::LeftButton,Qt::NoModifier,canvas->noteRect(note).center().toPoint());QVERIFY(canvas->selectedNotes().contains(note.id));
   frame->detach();QCoreApplication::processEvents();
   QVERIFY(frame->isDetached());QVERIFY(editor->isWindow());QVERIFY(editor->isVisible());
+  QVERIFY2(editor->windowFlags().testFlag(Qt::WindowCloseButtonHint),"Detached SVS editor must expose an enabled native close button for reattachment");
+#ifdef Q_OS_WIN
+  const auto closeState=GetMenuState(GetSystemMenu(reinterpret_cast<HWND>(editor->winId()),FALSE),SC_CLOSE,MF_BYCOMMAND);
+  QVERIFY(closeState!=UINT(-1));QVERIFY(!(closeState&(MF_DISABLED|MF_GRAYED)));
+#endif
   if(qEnvironmentVariableIsSet("SVS_PARAMETER_WINDOW_CAPTURE")) {
    QCOMPARE(QGuiApplication::platformName(),QString("windows"));
    const auto voice=svs::Registry::instance().voices().first();track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
@@ -156,9 +167,15 @@ private slots:
    }
    const auto available=editor->screen()->availableGeometry();editor->move(available.topLeft()+QPoint(20,20));editor->resize(std::min(1100,available.width()-40),std::min(740,available.height()-80));editor->raise();editor->activateWindow();QVERIFY(QTest::qWaitForWindowExposed(editor));QTest::qWait(300);
    const auto capture=editor->screen()->grabWindow(editor->winId());QVERIFY(!capture.isNull());QVERIFY(capture.save(qEnvironmentVariable("SVS_PARAMETER_WINDOW_CAPTURE_PATH","doc/svs/validation/SVS-parameter-layout-native-window.png")));
+   if(qEnvironmentVariableIsSet("SVS_WINDOW_CHROME_CAPTURE_PATH")) {const auto rect=editor->frameGeometry();const auto chrome=editor->screen()->grabWindow(0,rect.x(),rect.y(),rect.width(),rect.height());QVERIFY(!chrome.isNull());QVERIFY(chrome.save(qEnvironmentVariable("SVS_WINDOW_CHROME_CAPTURE_PATH")));}
   }
   QTest::mouseDClick(view,Qt::LeftButton);QCOMPARE(mainWindow->workspace()->subWindowList().size(),existingWindows+1);QVERIFY(frame->isDetached());
-  editor->close();QCoreApplication::processEvents();
+#ifdef Q_OS_WIN
+  SendMessageW(reinterpret_cast<HWND>(editor->winId()),WM_SYSCOMMAND,SC_CLOSE,0);
+#else
+  editor->close();
+#endif
+  QCoreApplication::processEvents();
   QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(!editor->isWindow());
   QCOMPARE(editor->findChild<gui::SVSCanvas*>("svsNoteCanvas"),canvas);QVERIFY(canvas->selectedNotes().contains(note.id));
   for(const auto& behavior:QStringList{"show","hide","detached"}) {ConfigManager::inst()->setValue("ui","detachbehavior",behavior);frame->detach();QVERIFY(frame->isDetached());editor->close();QCoreApplication::processEvents();QVERIFY(!frame->isDetached());QVERIFY(frame->isVisible());QVERIFY(editor->isVisible());QVERIFY(canvas->selectedNotes().contains(note.id));}

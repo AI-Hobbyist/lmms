@@ -171,7 +171,7 @@ void SVSClipView::mouseDoubleClickEvent(QMouseEvent*) {
 }
 void SVSPianoRoll::openIn(MainWindow* mainWindow) {
  if(!m_subWindow) {
-  m_subWindow=mainWindow->addWindowedWidget(this,Qt::WindowTitleHint|Qt::WindowSystemMenuHint|Qt::WindowMinMaxButtonsHint);
+  m_subWindow=mainWindow->addWindowedWidget(this,Qt::WindowTitleHint|Qt::WindowSystemMenuHint|Qt::WindowMinMaxButtonsHint|Qt::WindowCloseButtonHint);
   installEventFilter(this);
   m_subWindow->resize(size()+QSize(2*m_subWindow->frameWidth(),m_subWindow->titleBarHeight()+m_subWindow->frameWidth()));
  }

@@ -1,0 +1,24 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : SVSIntegrationTest::initTestCase()
+FAIL!  : SVSIntegrationTest::embeddedWindowLifecycle() 'process.exitStatus()==QProcess::NormalExit&&process.exitCode()==0' returned FALSE. (********* Start testing of SVSIntegrationTest *********?
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11?
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized?
+PASS   : SVSIntegrationTest::initTestCase()?
+FAIL!  : SVSIntegrationTest::embeddedWindowLifecycle() 'editor->windowFlags().testFlag(Qt::WindowCloseButtonHint)' returned FALSE. (Detached SVS editor must expose an enabled native close button for reattachment)?
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(138) : failure location?
+PASS   : SVSIntegrationTest::cleanupTestCase()?
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 3702ms?
+********* Finished testing of SVSIntegrationTest *********?
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+)
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(117) : failure location
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 4006ms
+********* Finished testing of SVSIntegrationTest *********
