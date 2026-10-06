@@ -1,0 +1,11 @@
+********* Start testing of AutomatableModelTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : AutomatableModelTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+PASS   : AutomatableModelTest::initTestCase()
+PASS   : AutomatableModelTest::onM1Changed()
+PASS   : AutomatableModelTest::onM2Changed()
+PASS   : AutomatableModelTest::CastTests()
+PASS   : AutomatableModelTest::LinkTests()
+PASS   : AutomatableModelTest::cleanupTestCase()
+Totals: 6 passed, 0 failed, 0 skipped, 0 blacklisted, 818ms
+********* Finished testing of AutomatableModelTest *********

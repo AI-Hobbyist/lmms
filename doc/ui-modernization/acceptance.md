@@ -1,0 +1,58 @@
+# UI 现代化执行与验收记录
+
+执行基线：`146212993`。当前工作区另有 `include/Song.h`、`src/core/Song.cpp`、`tests/vsthost/Vst2CompatibilityTest.cpp` 的未提交修改；本计划不提交这些文件。构建会使用当前工作区，故基线证据不是纯 HEAD 的重建。
+
+## 用户补充的执行范围
+
+- 每个阶段直接提交、推送 `origin/master`，不使用 codex 分支。
+- 人工观感、真实跨屏 DPI、实际输入法及需要人工操作的验收直接跳过，记 `MANUAL/PENDING`，不等待人工确认。
+- 不修改 PNG。确实需要重绘 PNG 且未以 SVG 替代的部分记 `SKIPPED / PNG`，保留原资源；不算已现代化。
+- 可以用 SVG 重绘的图标和装饰允许用 SVG 替代，保留旧资源兼容引用。PNG 跳过项作为用户批准的范围例外。
+
+## 阶段状态
+
+| 阶段 | 状态 | 自动证据 | 人工/例外 | 提交 |
+|---|---|---|---|---|
+| F0 | DONE / MANUAL-PENDING | 清单、规格、fixture；52 个 DLL 构建；45 个面板双 DPI 基线；2/2 必要回归 | 观感及 7 个外部运行环境项 MANUAL/PENDING | 本阶段独立提交 |
+| F1 | TODO | — | — | — |
+| F2 | TODO | — | — | — |
+| F3 | TODO | — | — | — |
+| F4 | TODO | — | — | — |
+| F5 | TODO | — | 逐项登记 PNG 例外 | — |
+| F6 | TODO | — | 人工项不阻塞交付 | — |
+
+## 实窗证据
+
+`UiBaselineCapture` 使用产品 GuiApplication 和实际页面，在独立临时配置中启动 Windows QPA；先等待窗口暴露，再等 600ms，使用 QScreen::grabWindow，最后销毁实际主窗口。没有使用离屏 QPA 或 QWidget::render。
+
+F0 证据位于 `validation/F0-100/`、`validation/F0-150/`，包含 S01 主窗口、S02 五类设置与导出、S03 Song/Pattern、S04 Piano/Automation、S05 SVS 及插件设置、S06 Mixer/效果/控制器、S07 MDI、S08 仪器公共页。100%/150% 使用 QT_SCALE_FACTOR 模拟；真实跨屏 DPI 为 MANUAL/PENDING。S08 的每个插件后续状态按 inventory 的 D03 明细登记，基线公共页不代替插件现代化覆盖。
+
+构建配置的 Qt 为 6.10.3，窗口基准 1280×800 DIP，默认主题；实际字体、平台、DPR、系统语言见各目录 environment.json。当前测试未加载产品翻译包，UI 为英文并加入中文轨道名；完整中文界面/中文 IME 人工项为 MANUAL/PENDING。
+
+## 工程 fixture
+
+`fixtures/modernization/modernization.mmp` 是可搬移的工程 bundle，sample 仅引用 bundle 内 `resources/tone.wav`；生成音频为 0.5 秒 440Hz 正弦。包含 MIDI、Pattern/步进、Sample、Automation、SVS、两个额外 Mixer 通道、Amplifier 效果及 LFO 控制器。截图程序在临时目录保存后，使用实际 bundle 内的 mmp 重新载入，并检查轨道数和 MIDI 内容。
+
+## 验证过程中的修正
+
+- Windows 插件导入 lmms.exe：截图程序沿用现有 VstEntryPoints 的方法命名为 lmms.exe，放在 build/tests/ui/Release，确保插件共享同一个 Engine，避免第二份静态 Engine 导致 LV2 枚举崩溃。只修改测试目标，不改变产品。
+- 增加 UiPluginCoverage 聚合目标，让 MSBuild 在同一构建图中并行安排 F0 冻结的插件；原串行批次主动停止，保留 partial.log 但不作为完整通过记录。
+- DataFile 的 bundle 保存不覆盖已有 bundle；重复截图在临时目录创建新的 bundle，持久 fixture 只在首次生成时复制。重开指向 bundle 内真正的 mmp 文件，由全新测试进程按应用启动路径加载；同时验证 MIDI、Sample、Automation、SVS、Mixer、效果与控制器内容。
+
+## Follow-up（不修改产品行为）
+
+- 初版截图程序在刚创建完整工程后立即同进程 loadProject，恢复轨道期间处理事件时崩溃。证据：F0-reopen-crash.log / results。当前 F0 使用全新进程验证可重开的工程，后续窗口生命周期测试独立执行；同进程反复替换工程的崩溃需要另行定位，不在 F0 修改产品加载流程。
+
+## 回滚
+
+每阶段独立提交是回滚单位。恢复对应阶段的 QSS/SVG 与 View 属性引用，保留旧资源及用户工程、配置；不使用 reset --hard 或递归清理工作区。提交号在每个阶段的下一次记录中补齐，阶段本身可由提交标题定位。
+
+## F0 检查点
+
+- 52 个已配置插件 DLL 均已构建：F0-plugin-build.log，F0-plugin-artifacts.json 含 SHA256。GigPlayer 缺 libgig、Sid 缺 Perl，当前配置未启用，单列且不计成功。
+- 100% / 150% 各捕获 45 个插件面板：plugin-panels.json 与 F0-*-plugins-results.txt。Carla Rack/Patchbay 的外部原生引擎初始化崩溃；VeSTige、VST/LV2/LADSPA 效果与 LV2 instrument 缺外部 fixture，7 项 MANUAL/PENDING，不作为宿主技术通过证据。
+- STK rawwaves 使用当前 CMake SDK 路径写入截图程序的临时配置；不改产品路径或 UI。Carla DLL 本身编译通过，运行依赖问题与未编译项分开登记。
+- 核心回归：AutomatableModelTest、SVSIntegrationTest 均 PASS，后者 59 个用例通过。修正 CTest 工作目录为源码根，使既有相对主题路径可读取；不改断言及产品实现。
+- 中文轨道名在原生 Song 窗口截图中正常显示；完整中文界面和输入法 MANUAL/PENDING。所有实窗测试结束后已由测试清理窗口。
+
+- 实窗截图目标抽查后修正：浮动 EffectControlDialog 捕获其自身原生窗口，MDI 子窗捕获主窗口；双 DPI 全部重跑，避免只拍主窗口误记面板通过。

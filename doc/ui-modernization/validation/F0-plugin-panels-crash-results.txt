@@ -1,0 +1,5 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()

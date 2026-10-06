@@ -1,0 +1,246 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  AudioFileProcessor.cpp
+  AudioFileProcessorView.cpp
+  AudioFileProcessorWaveView.cpp
+  moc_AudioFileProcessor.cpp
+  moc_AudioFileProcessorView.cpp
+  moc_AudioFileProcessorWaveView.cpp
+  qrc_audiofileprocessor.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.exp
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\audiofileprocessor.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  BassBooster.cpp
+  BassBoosterControls.cpp
+  BassBoosterControlDialog.cpp
+  moc_BassBoosterControls.cpp
+  moc_BassBoosterControlDialog.cpp
+  qrc_bassbooster.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.exp
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bassbooster.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  BitInvader.cpp
+  moc_BitInvader.cpp
+  qrc_bitinvader.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.exp
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitinvader.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Bitcrush.cpp
+  BitcrushControls.cpp
+  BitcrushControlDialog.cpp
+  moc_BitcrushControls.cpp
+  moc_BitcrushControlDialog.cpp
+  qrc_bitcrush.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.exp
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitcrush.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\libcarla_native-plugin.dll
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Carla.cpp
+  moc_Carla.cpp
+  qrc_carlabase.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.exp
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlabase.dll
+  CarlaPatchbay.cpp
+  qrc_carlapatchbay.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.exp
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlapatchbay.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\libcarla_native-plugin.dll
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlabase.dll
+  CarlaRack.cpp
+  qrc_carlarack.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.exp
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlarack.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Compressor.cpp
+  CompressorControls.cpp
+  CompressorControlDialog.cpp
+  moc_Compressor.cpp
+  moc_CompressorControls.cpp
+  moc_CompressorControlDialog.cpp
+  moc_EqFader.cpp
+  qrc_compressor.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.exp
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\compressor.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  CrossoverEQ.cpp
+  CrossoverEQControls.cpp
+  CrossoverEQControlDialog.cpp
+  moc_CrossoverEQControls.cpp
+  moc_CrossoverEQControlDialog.cpp
+  qrc_crossovereq.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.exp
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\crossovereq.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  DelayEffect.cpp
+  DelayControls.cpp
+  DelayControlsDialog.cpp
+  Lfo.cpp
+  StereoDelay.cpp
+  moc_DelayControls.cpp
+  moc_DelayControlsDialog.cpp
+  moc_EqFader.cpp
+  qrc_delay.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.exp
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\delay.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Dispersion.cpp
+  DispersionControls.cpp

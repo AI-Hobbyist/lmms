@@ -1,0 +1,366 @@
+[
+  {
+    "plugin": "AudioFileProcessor",
+    "target": "audiofileprocessor",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "1B8FE3A4AD31953F1B6058E1506EDD1B6BFE78E3CCF8B7B87ADBEDCC1794DAC4"
+  },
+  {
+    "plugin": "Kicker",
+    "target": "kicker",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "70D2DB095AB1C4DAC240F4999AF4038516BFA1B64ABE95294AE71591E020F27C"
+  },
+  {
+    "plugin": "TripleOscillator",
+    "target": "tripleoscillator",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "2E7433BD442BC40E339F59288BA184EB6D468373E07BC7FA8CCBCE3222FF6CE7"
+  },
+  {
+    "plugin": "Amplifier",
+    "target": "amplifier",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "AF0779D929FCBA892500E4EB38F4F22BBD6BDF6EF41D4137C0F25AE75D57F1E9"
+  },
+  {
+    "plugin": "BassBooster",
+    "target": "bassbooster",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "49F14AF14614FE7CA6A2AA715FF8DA14F7FC526A8B195419243635DA184327D9"
+  },
+  {
+    "plugin": "BitInvader",
+    "target": "bitinvader",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "3956A7EF232FB38467F107C442ADE36F12F16A6D9B9283C69A9380BC59E056A2"
+  },
+  {
+    "plugin": "Bitcrush",
+    "target": "bitcrush",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "8915994DBD7CB793C2EA54AB35D81B717F28BE834668723DEE9BF3D61FBE1571"
+  },
+  {
+    "plugin": "CarlaPatchbay",
+    "target": "carlapatchbay",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "67F1D647BB8C5B56C581330DE9FB04309057C4A2AD207209A00790C335708F47"
+  },
+  {
+    "plugin": "CarlaRack",
+    "target": "carlarack",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "92C3788F6741155FB0EAE2EBCECCC2EF2C39C207C2AE73204E1C7CE913508AED"
+  },
+  {
+    "plugin": "Compressor",
+    "target": "compressor",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "25F3F7DEFD942B3C751A394D8B65FC55E2D747AC0DE0514231C01649EBC2479A"
+  },
+  {
+    "plugin": "CrossoverEQ",
+    "target": "crossovereq",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "0B87ED03B866C410451E165DB6746B62A4E18E68F6229122C4CA2B6C3B630E6B"
+  },
+  {
+    "plugin": "Delay",
+    "target": "delay",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "EB4D22101AD454723EB715799683FD8E00D0379C7386C1D47EA197B81DD83825"
+  },
+  {
+    "plugin": "Dispersion",
+    "target": "dispersion",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "31BB4B58832452FD2BBEFF721F3A794543BAFD84851E2CF9628E6CE75CE9DECF"
+  },
+  {
+    "plugin": "DualFilter",
+    "target": "dualfilter",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "FDD76F0A3DBFE3BBC1D3263FA87CAA295959C23A29293FE285BE912361682D51"
+  },
+  {
+    "plugin": "DynamicsProcessor",
+    "target": "dynamicsprocessor",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "3259A9558E7C038749FE42855CD991060A8C0A84F57170BF0204CA4B01A67DAC"
+  },
+  {
+    "plugin": "Eq",
+    "target": "eq",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "CA7A8CE5006C8D87BB00A9EB66E98B9E0C5363B41580240DE031C56C6E8156DE"
+  },
+  {
+    "plugin": "Flanger",
+    "target": "flanger",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "77933CC0E2BDB7918167FC793C9616CD7D2C8D69E9F18410258E1BE5E56FDF5B"
+  },
+  {
+    "plugin": "FrequencyShifter",
+    "target": "frequencyshifter",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "6C60B1EA9BBD384D81461BA94A3D51EEDD8DB283DA4873656456970E89027000"
+  },
+  {
+    "plugin": "GranularPitchShifter",
+    "target": "granularpitchshifter",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "6499D41475753CC05F3D41338A5A01518440FF8CF23B73D9297E9F3F7A410B65"
+  },
+  {
+    "plugin": "LadspaBrowser",
+    "target": "ladspabrowser",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "265E0C522E0B858143ECB877941731DB3714954192FCA6A91FF9BB5D87E9B127"
+  },
+  {
+    "plugin": "LadspaEffect",
+    "target": "ladspaeffect",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "78F2A346C91274DE80C069CC60EC1BEBE17D5EC1CE2C7DB5E1D14D3F5F773DF1"
+  },
+  {
+    "plugin": "LOMM",
+    "target": "lomm",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "4F2CDA66977DF891E42C9D344C22BA4708DF740DA6BFF81BE7781C616EEF4C6B"
+  },
+  {
+    "plugin": "Lv2Effect",
+    "target": "lv2effect",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "4647B12D1FFAAECA4000FE989187EAEE0E7144717C7528DB8E36DBDCB37CB651"
+  },
+  {
+    "plugin": "Lv2Instrument",
+    "target": "lv2instrument",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "25C44C0ACE63217318CDF098B722DC38EABCC2138472438313ED12F64CDC179E"
+  },
+  {
+    "plugin": "Lb302",
+    "target": "lb302",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "49BB79A9DC6D1CBD4CD106A8AC7556311DC61E66CB70217482B83305BD04AC97"
+  },
+  {
+    "plugin": "MultitapEcho",
+    "target": "multitapecho",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "36386762CE86DBE7A40631DA54F878F85B4838FA482DD256709495F7B4EF22EF"
+  },
+  {
+    "plugin": "Monstro",
+    "target": "monstro",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "1EA80B7D6C422F8A249025F84F29DE5200537A1538F7DFB1637ACF9666BCE35B"
+  },
+  {
+    "plugin": "Nes",
+    "target": "nes",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "DF621DB320BAF8E995A8FE0729C75D17AC2C71DD1EE8A68607267B9004BDE6B4"
+  },
+  {
+    "plugin": "OpulenZ",
+    "target": "opulenz",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "F27249AEB765F381223DE771FE98F84023D0077D3DBF30CAAF65C6780273F51D"
+  },
+  {
+    "plugin": "Organic",
+    "target": "organic",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "3658B99614B7901F9D12DC1C850A3E98E405CA074047507E543A44313DB8BDE2"
+  },
+  {
+    "plugin": "Oscilloscope",
+    "target": "oscilloscope",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "A3D952E8368F55F41EBDA1737F21E32D8CC2C6B1BA1C28C4BF8B1D496186DA84"
+  },
+  {
+    "plugin": "FreeBoy",
+    "target": "freeboy",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "BA628DF320730D4AFB7653F5BEF10A8ED8148F3F0266DC428751C1BB50A2E240"
+  },
+  {
+    "plugin": "Patman",
+    "target": "patman",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "B820760E8CE25A5DE5622A96219253959BFCBC6578F5B0FEB8C02EA87B5D565A"
+  },
+  {
+    "plugin": "PeakControllerEffect",
+    "target": "peakcontrollereffect",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "1A00BE8D0CFCE4F9E7A7CCD6C8B873E6C252546232FFC915A4FFD3CE576F33B8"
+  },
+  {
+    "plugin": "ReverbSC",
+    "target": "reverbsc",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "29FEC0125F10742B783BA13907D889BB0E6F453B8325CFCF8267A0A70FBFEAEE"
+  },
+  {
+    "plugin": "Sf2Player",
+    "target": "sf2player",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "2118468458B084E20EBCFBE89845BE29EC391491C6BBBEF88E35A9523F20115B"
+  },
+  {
+    "plugin": "Sfxr",
+    "target": "sfxr",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "2B81D7A5EAE7A6F75A5DA6790316FFEA162C114ECA755881F20CB22749212685"
+  },
+  {
+    "plugin": "SlewDistortion",
+    "target": "slewdistortion",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "82DB56DFA71A1917C5B732E670D2F62C160B124E0BF559D12717CD3ABA118C56"
+  },
+  {
+    "plugin": "SlicerT",
+    "target": "slicert",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "8D6F29F2F1EEEB81CE8764B3224FF3ABD9284718DC4D812CE4D95754956FA0EE"
+  },
+  {
+    "plugin": "SpectrumAnalyzer",
+    "target": "analyzer",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "98CAB77090DA1E04FD5B64C2106B404FA09670AF281E05889E9DBD065AE0D594"
+  },
+  {
+    "plugin": "StereoEnhancer",
+    "target": "stereoenhancer",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "C4164BD720C6D5D11CFA40269691913084D02593A64063EE5D05FC96498C940E"
+  },
+  {
+    "plugin": "StereoMatrix",
+    "target": "stereomatrix",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "36999D8AAB8BD7B8553529FF760CBD16830A92D4FE187B902003B4FC92F65348"
+  },
+  {
+    "plugin": "Stk",
+    "target": "malletsstk",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "D94E84B5DD544667D446A99E29575987B92E39810F5F9638AB3272CC5D111000"
+  },
+  {
+    "plugin": "TapTempo",
+    "target": "taptempo",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "AFCD59CE23C9B17A4121F2824FA34025E0CBEA777E4D00FACD8B7AA6EC2C353D"
+  },
+  {
+    "plugin": "Vestige",
+    "target": "vestige",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "9EBD007F4F4768571E41D820D44D36B248ED797E5DA0E901D729B56CF7A7EA9E"
+  },
+  {
+    "plugin": "VstEffect",
+    "target": "vsteffect",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "32237F64686BE082B2DEB5D6D3596E990EAD4F6BD4DBD856339F4A16ED616998"
+  },
+  {
+    "plugin": "Watsyn",
+    "target": "watsyn",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "681E89B61FE673E959848B1B3E57A36D16693A0F9913A9372D8E4DBA5D44E3F5"
+  },
+  {
+    "plugin": "WaveShaper",
+    "target": "waveshaper",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "7516F665EC2798490C8867D028F52BF5901419865CD9687F93DED14B706C3903"
+  },
+  {
+    "plugin": "Vectorscope",
+    "target": "vectorscope",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "52AFED42A690C37D95CA874BB9CE1EE5E2DFACF2C8394727412E5981BAD01891"
+  },
+  {
+    "plugin": "Vibed",
+    "target": "vibedstrings",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "4482F647AB337440F79D70FE58388B1204A9981FF1F4401578614E2A050001D6"
+  },
+  {
+    "plugin": "Xpressive",
+    "target": "xpressive",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "0B01CDF55A3FBED248D48B1163D5600A8BD183378BDAC3CD7791851D1ED5721A"
+  },
+  {
+    "plugin": "ZynAddSubFx",
+    "target": "zynaddsubfx",
+    "dllPresent": true,
+    "buildStatus": "PASS: F0-plugin-build.log, exit 0",
+    "sha256": "55D0450F866D77E829A1385B6984A1C89140EBF523C3EDC34C467745BFA7B09E"
+  }
+]

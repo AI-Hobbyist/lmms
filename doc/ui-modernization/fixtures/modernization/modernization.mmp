@@ -1,0 +1,361 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project creator="LMMS" creatorplatform="winnt" creatorplatformtype="windows" creatorversion="1.3.0-alpha.2.60+1462129" type="song" version="31">
+  <head masterpitch="0" mastervol="100" timesig_denominator="4" timesig_numerator="4">
+    <bpm id="31051" scale_type="linear" value="140"/>
+  </head>
+  <song>
+    <trackcontainer height="300" maximized="0" type="song" visible="1" width="600" x="5" y="5">
+      <track muted="0" mutedBeforeSolo="0" name="TripleOscillator" solo="0" type="0">
+        <instrumenttrack basenote="69" enablecc="0" enabled="0" firstkey="0" keymap="0" lastkey="127" mixch="0" pan="0" pitch="0" pitchrange="1" range_import="1" scale="0" usemasterpitch="1" vol="100">
+          <midicontrollers cc0="0" cc1="0" cc10="0" cc100="0" cc101="0" cc102="0" cc103="0" cc104="0" cc105="0" cc106="0" cc107="0" cc108="0" cc109="0" cc11="0" cc110="0" cc111="0" cc112="0" cc113="0" cc114="0" cc115="0" cc116="0" cc117="0" cc118="0" cc119="0" cc12="0" cc120="0" cc121="0" cc122="0" cc123="0" cc124="0" cc125="0" cc126="0" cc127="0" cc13="0" cc14="0" cc15="0" cc16="0" cc17="0" cc18="0" cc19="0" cc2="0" cc20="0" cc21="0" cc22="0" cc23="0" cc24="0" cc25="0" cc26="0" cc27="0" cc28="0" cc29="0" cc3="0" cc30="0" cc31="0" cc32="0" cc33="0" cc34="0" cc35="0" cc36="0" cc37="0" cc38="0" cc39="0" cc4="0" cc40="0" cc41="0" cc42="0" cc43="0" cc44="0" cc45="0" cc46="0" cc47="0" cc48="0" cc49="0" cc5="0" cc50="0" cc51="0" cc52="0" cc53="0" cc54="0" cc55="0" cc56="0" cc57="0" cc58="0" cc59="0" cc6="0" cc60="0" cc61="0" cc62="0" cc63="0" cc64="0" cc65="0" cc66="0" cc67="0" cc68="0" cc69="0" cc7="0" cc70="0" cc71="0" cc72="0" cc73="0" cc74="0" cc75="0" cc76="0" cc77="0" cc78="0" cc79="0" cc8="0" cc80="0" cc81="0" cc82="0" cc83="0" cc84="0" cc85="0" cc86="0" cc87="0" cc88="0" cc89="0" cc9="0" cc90="0" cc91="0" cc92="0" cc93="0" cc94="0" cc95="0" cc96="0" cc97="0" cc98="0" cc99="0"/>
+          <instrument name="tripleoscillator">
+            <tripleoscillator coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" finel2="0" finer0="0" finer1="0" finer2="0" modalgo1="2" modalgo2="2" modalgo3="2" pan0="0" pan1="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" stphdetun0="0" stphdetun1="0" stphdetun2="0" useWaveTable1="1" useWaveTable2="1" useWaveTable3="1" userwavefile0="" userwavefile1="" userwavefile2="" vol0="33" vol1="33" vol2="33" wavetype0="0" wavetype1="0" wavetype2="0">
+              <key/>
+            </tripleoscillator>
+          </instrument>
+          <eldata fcut="14000" fres="0.5" ftype="0" fwet="0">
+            <elvol amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+            <elcut amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+            <elres amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+          </eldata>
+          <chordcreator chord="0" chord-enabled="0" chordrange="1"/>
+          <arpeggiator arp="0" arp-enabled="0" arpcycle="0" arpdir="0" arpgate="100" arpmiss="0" arpmode="0" arprange="1" arprepeats="1" arpskip="0" arptime="100" arptime_denominator="4" arptime_numerator="4" arptime_syncmode="0"/>
+          <midiport basevelocity="63" fixedinputvelocity="-1" fixedoutputnote="-1" fixedoutputvelocity="-1" inputchannel="0" inputcontroller="0" outputchannel="1" outputcontroller="0" outputprogram="1" readable="0" writable="0"/>
+          <fxchain enabled="0" numofeffects="0"/>
+        </instrumenttrack>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Sample track" solo="0" type="2">
+        <sampletrack mixch="0" pan="0" vol="100">
+          <fxchain enabled="0" numofeffects="0"/>
+        </sampletrack>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Pattern 0" solo="0" type="1">
+        <patterntrack lengthbars="0">
+          <trackcontainer height="400" maximized="0" type="patternstore" visible="0" width="734" x="610" y="5">
+            <track muted="0" mutedBeforeSolo="0" name="Kicker" solo="0" type="0">
+              <instrumenttrack basenote="69" enablecc="0" enabled="0" firstkey="0" keymap="0" lastkey="127" mixch="0" pan="0" pitch="0" pitchrange="1" range_import="1" scale="0" usemasterpitch="1" vol="100">
+                <midicontrollers cc0="0" cc1="0" cc10="0" cc100="0" cc101="0" cc102="0" cc103="0" cc104="0" cc105="0" cc106="0" cc107="0" cc108="0" cc109="0" cc11="0" cc110="0" cc111="0" cc112="0" cc113="0" cc114="0" cc115="0" cc116="0" cc117="0" cc118="0" cc119="0" cc12="0" cc120="0" cc121="0" cc122="0" cc123="0" cc124="0" cc125="0" cc126="0" cc127="0" cc13="0" cc14="0" cc15="0" cc16="0" cc17="0" cc18="0" cc19="0" cc2="0" cc20="0" cc21="0" cc22="0" cc23="0" cc24="0" cc25="0" cc26="0" cc27="0" cc28="0" cc29="0" cc3="0" cc30="0" cc31="0" cc32="0" cc33="0" cc34="0" cc35="0" cc36="0" cc37="0" cc38="0" cc39="0" cc4="0" cc40="0" cc41="0" cc42="0" cc43="0" cc44="0" cc45="0" cc46="0" cc47="0" cc48="0" cc49="0" cc5="0" cc50="0" cc51="0" cc52="0" cc53="0" cc54="0" cc55="0" cc56="0" cc57="0" cc58="0" cc59="0" cc6="0" cc60="0" cc61="0" cc62="0" cc63="0" cc64="0" cc65="0" cc66="0" cc67="0" cc68="0" cc69="0" cc7="0" cc70="0" cc71="0" cc72="0" cc73="0" cc74="0" cc75="0" cc76="0" cc77="0" cc78="0" cc79="0" cc8="0" cc80="0" cc81="0" cc82="0" cc83="0" cc84="0" cc85="0" cc86="0" cc87="0" cc88="0" cc89="0" cc9="0" cc90="0" cc91="0" cc92="0" cc93="0" cc94="0" cc95="0" cc96="0" cc97="0" cc98="0" cc99="0"/>
+                <instrument name="kicker">
+                  <kicker click="0.40000001" decay="440" decay_denominator="4" decay_numerator="4" decay_syncmode="0" dist="0.80000001" distend="0.80000001" endfreq="40" endnote="0" env="0.163" gain="1" noise="0" slope="0.059999999" startfreq="150" startnote="1" version="1">
+                    <key/>
+                  </kicker>
+                </instrument>
+                <eldata fcut="14000" fres="0.5" ftype="0" fwet="0">
+                  <elvol amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                  <elcut amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                  <elres amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                </eldata>
+                <chordcreator chord="0" chord-enabled="0" chordrange="1"/>
+                <arpeggiator arp="0" arp-enabled="0" arpcycle="0" arpdir="0" arpgate="100" arpmiss="0" arpmode="0" arprange="1" arprepeats="1" arpskip="0" arptime="100" arptime_denominator="4" arptime_numerator="4" arptime_syncmode="0"/>
+                <midiport basevelocity="63" fixedinputvelocity="-1" fixedoutputnote="-1" fixedoutputvelocity="-1" inputchannel="0" inputcontroller="0" outputchannel="1" outputcontroller="0" outputprogram="1" readable="0" writable="0"/>
+                <fxchain enabled="0" numofeffects="0"/>
+              </instrumenttrack>
+              <midiclip autoresize="1" len="192" muted="0" name="" off="0" pos="0" steps="16" type="0"/>
+              <midiclip autoresize="1" len="192" muted="0" name="" off="0" pos="192" steps="16" type="0"/>
+            </track>
+            <track muted="0" mutedBeforeSolo="0" name="Kicker" solo="0" type="0">
+              <instrumenttrack basenote="69" enablecc="0" enabled="0" firstkey="0" keymap="0" lastkey="127" mixch="0" pan="0" pitch="0" pitchrange="1" range_import="1" scale="0" usemasterpitch="1" vol="100">
+                <midicontrollers cc0="0" cc1="0" cc10="0" cc100="0" cc101="0" cc102="0" cc103="0" cc104="0" cc105="0" cc106="0" cc107="0" cc108="0" cc109="0" cc11="0" cc110="0" cc111="0" cc112="0" cc113="0" cc114="0" cc115="0" cc116="0" cc117="0" cc118="0" cc119="0" cc12="0" cc120="0" cc121="0" cc122="0" cc123="0" cc124="0" cc125="0" cc126="0" cc127="0" cc13="0" cc14="0" cc15="0" cc16="0" cc17="0" cc18="0" cc19="0" cc2="0" cc20="0" cc21="0" cc22="0" cc23="0" cc24="0" cc25="0" cc26="0" cc27="0" cc28="0" cc29="0" cc3="0" cc30="0" cc31="0" cc32="0" cc33="0" cc34="0" cc35="0" cc36="0" cc37="0" cc38="0" cc39="0" cc4="0" cc40="0" cc41="0" cc42="0" cc43="0" cc44="0" cc45="0" cc46="0" cc47="0" cc48="0" cc49="0" cc5="0" cc50="0" cc51="0" cc52="0" cc53="0" cc54="0" cc55="0" cc56="0" cc57="0" cc58="0" cc59="0" cc6="0" cc60="0" cc61="0" cc62="0" cc63="0" cc64="0" cc65="0" cc66="0" cc67="0" cc68="0" cc69="0" cc7="0" cc70="0" cc71="0" cc72="0" cc73="0" cc74="0" cc75="0" cc76="0" cc77="0" cc78="0" cc79="0" cc8="0" cc80="0" cc81="0" cc82="0" cc83="0" cc84="0" cc85="0" cc86="0" cc87="0" cc88="0" cc89="0" cc9="0" cc90="0" cc91="0" cc92="0" cc93="0" cc94="0" cc95="0" cc96="0" cc97="0" cc98="0" cc99="0"/>
+                <instrument name="kicker">
+                  <kicker click="0.40000001" decay="440" decay_denominator="4" decay_numerator="4" decay_syncmode="0" dist="0.80000001" distend="0.80000001" endfreq="40" endnote="0" env="0.163" gain="1" noise="0" slope="0.059999999" startfreq="150" startnote="1" version="1">
+                    <key/>
+                  </kicker>
+                </instrument>
+                <eldata fcut="14000" fres="0.5" ftype="0" fwet="0">
+                  <elvol amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                  <elcut amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                  <elres amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+                </eldata>
+                <chordcreator chord="0" chord-enabled="0" chordrange="1"/>
+                <arpeggiator arp="0" arp-enabled="0" arpcycle="0" arpdir="0" arpgate="100" arpmiss="0" arpmode="0" arprange="1" arprepeats="1" arpskip="0" arptime="200" arptime_denominator="4" arptime_numerator="4" arptime_syncmode="0"/>
+                <midiport basevelocity="63" fixedinputvelocity="-1" fixedoutputnote="-1" fixedoutputvelocity="-1" inputchannel="0" inputcontroller="-1" outputchannel="1" outputcontroller="-1" outputprogram="1" readable="0" writable="0"/>
+                <fxchain enabled="0" numofeffects="0"/>
+              </instrumenttrack>
+              <midiclip autoresize="1" len="192" muted="0" name="" off="0" pos="0" steps="16" type="0">
+                <note key="69" len="12" pan="0" pos="0" type="1" vol="100"/>
+                <note key="69" len="12" pan="0" pos="48" type="1" vol="100"/>
+                <note key="69" len="12" pan="0" pos="96" type="1" vol="100"/>
+                <note key="69" len="12" pan="0" pos="144" type="1" vol="100"/>
+              </midiclip>
+            </track>
+          </trackcontainer>
+        </patterntrack>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Automation track" solo="0" type="5">
+        <automationtrack/>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="MIDI / 长名称乐器轨道" solo="0" type="0">
+        <instrumenttrack basenote="69" enablecc="0" enabled="0" firstkey="0" keymap="0" lastkey="127" mixch="0" pan="0" pitch="0" pitchrange="1" range_import="1" scale="0" usemasterpitch="1" vol="100">
+          <midicontrollers cc0="0" cc1="0" cc10="0" cc100="0" cc101="0" cc102="0" cc103="0" cc104="0" cc105="0" cc106="0" cc107="0" cc108="0" cc109="0" cc11="0" cc110="0" cc111="0" cc112="0" cc113="0" cc114="0" cc115="0" cc116="0" cc117="0" cc118="0" cc119="0" cc12="0" cc120="0" cc121="0" cc122="0" cc123="0" cc124="0" cc125="0" cc126="0" cc127="0" cc13="0" cc14="0" cc15="0" cc16="0" cc17="0" cc18="0" cc19="0" cc2="0" cc20="0" cc21="0" cc22="0" cc23="0" cc24="0" cc25="0" cc26="0" cc27="0" cc28="0" cc29="0" cc3="0" cc30="0" cc31="0" cc32="0" cc33="0" cc34="0" cc35="0" cc36="0" cc37="0" cc38="0" cc39="0" cc4="0" cc40="0" cc41="0" cc42="0" cc43="0" cc44="0" cc45="0" cc46="0" cc47="0" cc48="0" cc49="0" cc5="0" cc50="0" cc51="0" cc52="0" cc53="0" cc54="0" cc55="0" cc56="0" cc57="0" cc58="0" cc59="0" cc6="0" cc60="0" cc61="0" cc62="0" cc63="0" cc64="0" cc65="0" cc66="0" cc67="0" cc68="0" cc69="0" cc7="0" cc70="0" cc71="0" cc72="0" cc73="0" cc74="0" cc75="0" cc76="0" cc77="0" cc78="0" cc79="0" cc8="0" cc80="0" cc81="0" cc82="0" cc83="0" cc84="0" cc85="0" cc86="0" cc87="0" cc88="0" cc89="0" cc9="0" cc90="0" cc91="0" cc92="0" cc93="0" cc94="0" cc95="0" cc96="0" cc97="0" cc98="0" cc99="0"/>
+          <instrument name="tripleoscillator">
+            <tripleoscillator coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" finel2="0" finer0="0" finer1="0" finer2="0" modalgo1="2" modalgo2="2" modalgo3="2" pan0="0" pan1="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" stphdetun0="0" stphdetun1="0" stphdetun2="0" useWaveTable1="1" useWaveTable2="1" useWaveTable3="1" userwavefile0="" userwavefile1="" userwavefile2="" vol0="33" vol1="33" vol2="33" wavetype0="0" wavetype1="0" wavetype2="0">
+              <key/>
+            </tripleoscillator>
+          </instrument>
+          <eldata fcut="14000" fres="0.5" ftype="0" fwet="0">
+            <elvol amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+            <elcut amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+            <elres amt="0" att="0" ctlenvamt="0" dec="0.5" hold="0.5" lamt="0" latt="0" lpdel="0" lshp="0" lspd="0.1" lspd_denominator="4" lspd_numerator="4" lspd_syncmode="0" pdel="0" rel="0.1" sustain="0.5" userwavefile="" x100="0"/>
+          </eldata>
+          <chordcreator chord="0" chord-enabled="0" chordrange="1"/>
+          <arpeggiator arp="0" arp-enabled="0" arpcycle="0" arpdir="0" arpgate="100" arpmiss="0" arpmode="0" arprange="1" arprepeats="1" arpskip="0" arptime="200" arptime_denominator="4" arptime_numerator="4" arptime_syncmode="0"/>
+          <midiport basevelocity="63" fixedinputvelocity="-1" fixedoutputnote="-1" fixedoutputvelocity="-1" inputchannel="0" inputcontroller="-1" outputchannel="1" outputcontroller="-1" outputprogram="1" readable="0" writable="0"/>
+          <fxchain enabled="0" numofeffects="0"/>
+        </instrumenttrack>
+        <midiclip autoresize="1" len="192" muted="0" name="" off="0" pos="0" steps="16" type="1">
+          <note key="60" len="3" pan="0" pos="0" type="0" vol="100"/>
+          <note key="61" len="24" pan="0" pos="24" type="0" vol="100"/>
+          <note key="62" len="24" pan="0" pos="48" type="0" vol="100"/>
+          <note key="63" len="24" pan="0" pos="72" type="0" vol="100"/>
+          <note key="64" len="24" pan="0" pos="96" type="0" vol="100"/>
+          <note key="60" len="24" pan="0" pos="120" type="0" vol="100"/>
+          <note key="61" len="24" pan="0" pos="144" type="0" vol="100"/>
+          <note key="62" len="24" pan="0" pos="168" type="0" vol="100"/>
+        </midiclip>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Pattern 1" solo="0" type="1">
+        <patterntrack lengthbars="0"/>
+        <patternclip autoresize="1" len="192" muted="0" name="" off="0" pos="192"/>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Sample track" solo="0" type="2">
+        <sampletrack mixch="0" pan="0" vol="100">
+          <fxchain enabled="0" numofeffects="0"/>
+        </sampletrack>
+        <sampleclip autoresize="1" len="56" muted="0" off="0" pos="0" sample_rate="48000" src="local:resources/tone.wav"/>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="Automation track" solo="0" type="5">
+        <automationtrack/>
+        <automationclip autoresize="1" len="192" mute="0" name="Tempo" off="0" pos="0" prog="0" tens="1">
+          <time inTan="0" lockedTan="0" outTan="0.20833333" outValue="120" pos="0" value="120"/>
+          <time inTan="0" lockedTan="0" outTan="0" outValue="140" pos="96" value="140"/>
+          <object id="31051"/>
+        </automationclip>
+      </track>
+      <track muted="0" mutedBeforeSolo="0" name="SVS Example" solo="0" type="7">
+        <svstrack language="" mixch="0" nameMode="followVoice" pan="0" parameters="{}" pluginId="org.lmms.svs.example" pluginVersion="0.1.0" portraitSettings="{&quot;transparency&quot;:70,&quot;visible&quot;:true,&quot;x&quot;:1,&quot;y&quot;:1}" schemaVersion="1" voiceId="full" voiceVersion="0.1.0" vol="100">
+          <fxchain enabled="0" numofeffects="0"/>
+        </svstrack>
+        <svsclip autoresize="1" cacheInputHash="" cacheKey="" cacheSampleRate="0" curves="{}" editorState="{}" globalParameters="{}" id="4da29f09-8b12-4a39-a97f-dd8bd0a88bb5" len="192" muted="0" name="SVS" off="0" parameters="{}" pos="0" projectDictionaries="[]" schemaVersion="1">
+          <notes>
+            <note duration="96" id="ui-baseline-note" language="" lyric="la" parameters="{}" phonemes="{}" pitch="60" pronunciation="" tick="0"/>
+          </notes>
+        </svsclip>
+      </track>
+    </trackcontainer>
+    <timeline lp0pos="0" lp1pos="192" lpstate="0" stopbehaviour="1"/>
+    <mixer height="387" maximized="0" visible="1" width="607" x="5" y="310">
+      <mixerchannel muted="0" name="Master" num="0" soloed="0" volume="1">
+        <fxchain enabled="0" numofeffects="0"/>
+      </mixerchannel>
+      <mixerchannel muted="0" name="Channel 1" num="1" soloed="0" volume="1">
+        <fxchain enabled="1" numofeffects="1">
+          <effect autoquit="1" autoquit_denominator="4" autoquit_numerator="4" autoquit_syncmode="0" name="amplifier" on="1" wet="1">
+            <AmplifierControls left="100" pan="0" right="100" volume="100"/>
+            <key/>
+          </effect>
+        </fxchain>
+        <send amount="1" channel="0"/>
+      </mixerchannel>
+      <mixerchannel muted="0" name="Channel 2" num="2" soloed="0" volume="1">
+        <fxchain enabled="0" numofeffects="0"/>
+        <send amount="1" channel="0"/>
+      </mixerchannel>
+    </mixer>
+    <ControllerRackView height="228" maximized="0" visible="1" width="358" x="680" y="310"/>
+    <pianoroll chord="0" height="513" key="0" maximized="0" scale="0" stopbehaviour="0" visible="0" width="978" x="5" y="5"/>
+    <automationeditor height="508" maximized="0" visible="0" width="868" x="383" y="208"/>
+    <projectnotes height="300" maximized="0" visible="0" width="400" x="700" y="10"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]></projectnotes>
+    <controllers>
+      <lfocontroller amount="1" base="0.5" multiplier="0" name="Controller 1" phase="0" speed="2" speed_denominator="4" speed_numerator="4" speed_syncmode="0" type="1" userwavefile="" wave="0"/>
+    </controllers>
+    <scales>
+      <scale description="12-tone EDO (default)">
+        <interval den="1" num="1"/>
+        <interval cents="100"/>
+        <interval cents="200"/>
+        <interval cents="300"/>
+        <interval cents="400"/>
+        <interval cents="500"/>
+        <interval cents="600"/>
+        <interval cents="700"/>
+        <interval cents="800"/>
+        <interval cents="900"/>
+        <interval cents="1000"/>
+        <interval cents="1100"/>
+        <interval den="1" num="2"/>
+      </scale>
+      <scale description="24-tone EDO">
+        <interval den="1" num="1"/>
+        <interval cents="50"/>
+        <interval cents="100"/>
+        <interval cents="150"/>
+        <interval cents="200"/>
+        <interval cents="250"/>
+        <interval cents="300"/>
+        <interval cents="350"/>
+        <interval cents="400"/>
+        <interval cents="450"/>
+        <interval cents="500"/>
+        <interval cents="550"/>
+        <interval cents="600"/>
+        <interval cents="650"/>
+        <interval cents="700"/>
+        <interval cents="750"/>
+        <interval cents="800"/>
+        <interval cents="850"/>
+        <interval cents="900"/>
+        <interval cents="950"/>
+        <interval cents="1000"/>
+        <interval cents="1050"/>
+        <interval cents="1100"/>
+        <interval cents="1150"/>
+        <interval den="1" num="2"/>
+      </scale>
+      <scale description="7-tone JI C-major (Ptolemaic)">
+        <interval den="1" num="1"/>
+        <interval den="8" num="9"/>
+        <interval den="4" num="5"/>
+        <interval den="3" num="4"/>
+        <interval den="2" num="3"/>
+        <interval den="3" num="5"/>
+        <interval den="8" num="15"/>
+        <interval den="1" num="2"/>
+      </scale>
+      <scale description="12-tone JI (3-limit / Pythagorean)">
+        <interval den="1" num="1"/>
+        <interval den="243" num="256"/>
+        <interval den="8" num="9"/>
+        <interval den="27" num="32"/>
+        <interval den="64" num="81"/>
+        <interval den="3" num="4"/>
+        <interval den="512" num="729"/>
+        <interval den="2" num="3"/>
+        <interval den="81" num="128"/>
+        <interval den="16" num="27"/>
+        <interval den="9" num="16"/>
+        <interval den="128" num="243"/>
+        <interval den="1" num="2"/>
+      </scale>
+      <scale description="5-tone A-minor (3-limit / Pythagorean)">
+        <interval den="1" num="1"/>
+        <interval den="27" num="32"/>
+        <interval den="3" num="4"/>
+        <interval den="2" num="3"/>
+        <interval den="9" num="16"/>
+        <interval den="1" num="2"/>
+      </scale>
+      <scale description="empty">
+        <interval den="1" num="1"/>
+      </scale>
+      <scale description="empty">
+        <interval den="1" num="1"/>
+      </scale>
+      <scale description="empty">
+        <interval den="1" num="1"/>
+      </scale>
+      <scale description="empty">
+        <interval den="1" num="1"/>
+      </scale>
+      <scale description="empty">
+        <interval den="1" num="1"/>
+      </scale>
+    </scales>
+    <keymaps>
+      <keymap base_freq="440" base_key="69" description="all keys 1:1 (default)" first_key="0" last_key="127" middle_key="0"/>
+      <keymap base_freq="440" base_key="69" description="white keys to 7 degrees" first_key="0" last_key="127" middle_key="60">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+      </keymap>
+      <keymap base_freq="440" base_key="69" description="white keys to 12 degrees" first_key="0" last_key="127" middle_key="60">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+      </keymap>
+      <keymap base_freq="440" base_key="69" description="white keys to 24 degrees" first_key="0" last_key="127" middle_key="60">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+        <degree value="12"/>
+        <degree value="-1"/>
+        <degree value="14"/>
+        <degree value="-1"/>
+        <degree value="16"/>
+        <degree value="17"/>
+        <degree value="-1"/>
+        <degree value="19"/>
+        <degree value="-1"/>
+        <degree value="21"/>
+        <degree value="-1"/>
+        <degree value="23"/>
+      </keymap>
+      <keymap base_freq="440" base_key="61" description="black keys to 5 degrees" first_key="0" last_key="127" middle_key="60">
+        <degree value="-1"/>
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+      </keymap>
+      <keymap base_freq="466.16501" base_key="70" description="black keys to 12 degrees" first_key="0" last_key="127" middle_key="60">
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+        <degree value="-1"/>
+        <degree value="8"/>
+        <degree value="-1"/>
+        <degree value="10"/>
+        <degree value="-1"/>
+      </keymap>
+      <keymap base_freq="440" base_key="69" description="empty" first_key="0" last_key="127" middle_key="60"/>
+      <keymap base_freq="440" base_key="69" description="empty" first_key="0" last_key="127" middle_key="60"/>
+      <keymap base_freq="440" base_key="69" description="empty" first_key="0" last_key="127" middle_key="60"/>
+      <keymap base_freq="440" base_key="69" description="empty" first_key="0" last_key="127" middle_key="60"/>
+    </keymaps>
+  </song>
+</lmms-project>

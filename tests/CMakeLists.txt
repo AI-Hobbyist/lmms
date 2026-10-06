@@ -12,6 +12,7 @@ set(LMMS_TESTS
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 	svs/SVSIntegrationTest.cpp
+	ui/UiBaselineCapture.cpp
 )
 
 if(WIN32 AND LMMS_HAVE_VST)
@@ -61,8 +62,24 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 endforeach()
 
 add_dependencies(SVSIntegrationTest SVSExample)
+add_dependencies(UiBaselineCapture tripleoscillator kicker amplifier SVSExample)
+# One aggregate lets MSBuild schedule the frozen UI plugin coverage in parallel.
+add_custom_target(UiPluginCoverage)
+file(STRINGS "${CMAKE_SOURCE_DIR}/doc/ui-modernization/validation/plugin-targets.txt" UI_PLUGIN_TARGETS)
+foreach(UI_PLUGIN_TARGET IN LISTS UI_PLUGIN_TARGETS)
+	if(TARGET ${UI_PLUGIN_TARGET})
+		add_dependencies(UiPluginCoverage ${UI_PLUGIN_TARGET})
+	endif()
+endforeach()
+# Windows plugins import lmms.exe; give the harness that name so they share its Engine.
+set_target_properties(UiBaselineCapture PROPERTIES OUTPUT_NAME lmms
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/ui/$<CONFIG>"
+	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/ui/$<CONFIG>")
+set_tests_properties(UiBaselineCapture PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
+	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/plugins/Release;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/ui-baseline;LMMS_UI_SAMPLE=${CMAKE_SOURCE_DIR}/doc/ui-modernization/fixtures/tone.wav;LMMS_UI_FIXTURE=${CMAKE_BINARY_DIR}/ui-fixture.mmp")
 target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
 set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
+ WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
  ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/svs")
 if(WIN32)
  set_property(TEST SVSIntegrationTest APPEND PROPERTY ENVIRONMENT "QT_QPA_PLATFORM=windows")

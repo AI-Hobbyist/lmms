@@ -1,0 +1,57 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe.
+While testing scenes
+Function time: 546ms Total time: 4199ms
+
+Exception address: 0x00007FF6FDEA7DDB
+Exception code   : 0xc0000005
+Nearby symbol    : lmms::gui::TabBar::tr
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FF9A4A49C00
+#  2: UnhandledExceptionFilter() - 0x00007FFA2ADFED90
+#  3: strncpy() - 0x00007FFA2DB67150
+#  4: _C_specific_handler() - 0x00007FFA2DB24670
+#  5: _chkstk() - 0x00007FFA2DB65460
+#  6: RtlWow64GetCurrentMachine() - 0x00007FFA2DACB6D0
+#  7: KiUserExceptionDispatcher() - 0x00007FFA2DB64E10
+#  8: lmms::gui::TabBar::tr() - 0x00007FF6FDEA4C20
+#  9: lmms::LadspaManager::setRunAddingGain() - 0x00007FF6FDD8FBE0
+# 10: QObject::qt_static_metacall() - 0x00007FF8E5D9A090
+# 11: QMetaObject::activate() - 0x00007FF8E5D9E190
+# 12: QObject::event() - 0x00007FF8E5DA5330
+# 13: QWidget::event() - 0x00007FF8E8259690
+# 14: QApplicationPrivate::notify_helper() - 0x00007FF8E82133D0
+# 15: QApplication::notify() - 0x00007FF8E82110B0
+# 16: QCoreApplication::notifyInternal2() - 0x00007FF8E5D59B50
+# 17: QEventDispatcherWin32::event() - 0x00007FF8E5EF8F60
+# 18: QApplicationPrivate::notify_helper() - 0x00007FF8E82133D0
+# 19: QApplication::notify() - 0x00007FF8E82110B0
+# 20: QCoreApplication::notifyInternal2() - 0x00007FF8E5D59B50
+# 21: QCoreApplicationPrivate::sendPostedEvents() - 0x00007FF8E5D5C270
+# 22: QWindowsGuiEventDispatcher::sendPostedEvents() - 0x00007FF8E6A457D0
+# 23: QEventDispatcherWin32::processEvents() - 0x00007FF8E5EF9190
+# 24: QWindowsGuiEventDispatcher::processEvents() - 0x00007FF8E6A45740
+# 25: QCoreApplication::processEvents() - 0x00007FF8E5D5A4A0
+# 26: lmms::TrackContainer::loadSettings() - 0x00007FF6FDDDBB90
+# 27: lmms::SerializingObject::restoreState() - 0x00007FF6FDDCD7B0
+# 28: lmms::JournallingObject::restoreState() - 0x00007FF6FDD88B50
+# 29: lmms::Song::loadProject() - 0x00007FF6FDDD15F0
+# 30: lmms::AudioEngine::framesPerPeriod() - 0x00007FF6FDD2F380
+# 31: QMetaMethodInvoker::invokeImpl() - 0x00007FF8E5D63FD0
+# 32: QMetaMethod::invokeImpl() - 0x00007FF8E5D63DB0
+# 33: QTest::ignoreMessage() - 0x00007FF9A4A25E80
+# 34: QTest::ignoreMessage() - 0x00007FF9A4A25E80
+# 35: QTest::ignoreMessage() - 0x00007FF9A4A25E80
+# 36: QTest::ignoreMessage() - 0x00007FF9A4A25E80
+# 37: QTest::qRun() - 0x00007FF9A4A2B310
+# 38: QTest::qExec() - 0x00007FF9A4A28840
+# 39: lmms::Clip::name() - 0x00007FF6FDD30DA0
+# 40: lmms::gui::TabBar::widgetShown() - 0x00007FF6FDF7CE60
+# 41: BaseThreadInitThunk() - 0x00007FFA2BF3CD70
+# 42: RtlUserThreadStart() - 0x00007FFA2DAACAC0
+

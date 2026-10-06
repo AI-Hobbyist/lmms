@@ -1,0 +1,76 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe.
+While testing pluginPanels
+Function time: 1458ms Total time: 6091ms
+
+Exception address: 0x00007FF8E8266AFA
+Exception code   : 0xc0000005
+Nearby symbol    : QWidget::resize
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FF987529C00
+#  2: UnhandledExceptionFilter() - 0x00007FFA2ADFED90
+#  3: strncpy() - 0x00007FFA2DB67150
+#  4: _C_specific_handler() - 0x00007FFA2DB24670
+#  5: _chkstk() - 0x00007FFA2DB65460
+#  6: RtlWow64GetCurrentMachine() - 0x00007FFA2DACB6D0
+#  7: KiUserExceptionDispatcher() - 0x00007FFA2DB64E10
+#  8: QWidget::resize() - 0x00007FF8E8266AF0
+#  9: QWidget::resize() - 0x00007FF8E8201FB0
+# 10: lmms::gui::SimpleTextFloat::tr() - 0x00007FF788E3FB40
+# 11: QWidget::event() - 0x00007FF8E8259690
+# 12: QApplicationPrivate::notify_helper() - 0x00007FF8E82133D0
+# 13: QApplication::notify() - 0x00007FF8E82110B0
+# 14: QCoreApplication::notifyInternal2() - 0x00007FF8D9069B50
+# 15: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 16: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 17: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 18: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 19: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 20: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 21: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 22: QWidgetPrivate::sendPendingMoveAndResizeEvents() - 0x00007FF8E8268990
+# 23: QWidgetPrivate::prepareToRender() - 0x00007FF8E8263200
+# 24: QWidget::render() - 0x00007FF8E8265510
+# 25: QLabel::pixmap() - 0x00007FF8E8262D80
+# 26: QGraphicsDropShadowEffect::draw() - 0x00007FF8E82BD790
+# 27: QWidgetPrivate::drawWidget() - 0x00007FF8E8258290
+# 28: QWidgetPrivate::paintSiblingsRecursive() - 0x00007FF8E8262840
+# 29: QWidgetPrivate::drawWidget() - 0x00007FF8E8258290
+# 30: QWidgetRepaintManager::paintAndFlush() - 0x00007FF8E827A550
+# 31: QWidget::event() - 0x00007FF8E8259690
+# 32: QApplicationPrivate::notify_helper() - 0x00007FF8E82133D0
+# 33: QApplication::notify() - 0x00007FF8E82110B0
+# 34: QCoreApplication::notifyInternal2() - 0x00007FF8D9069B50
+# 35: QCoreApplicationPrivate::sendPostedEvents() - 0x00007FF8D906C270
+# 36: QWindowsGuiEventDispatcher::sendPostedEvents() - 0x00007FF8D9D557D0
+# 37: QEventDispatcherWin32::processEvents() - 0x00007FF8D9209190
+# 38: QWindowsGuiEventDispatcher::processEvents() - 0x00007FF8D9D55740
+# 39: QEventLoop::exec() - 0x00007FF8D90704A0
+# 40: QDialog::exec() - 0x00007FF8E845A980
+# 41: QMessageBox::showEvent() - 0x00007FF8E8490FB0
+# 42: QMessageBox::information() - 0x00007FF8E848E060
+# 43: Unable to obtain symbol
+# 44: Unable to obtain symbol
+# 45: lmms::Plugin::createView() - 0x00007FF788D74740
+# 46: lmms::gui::SimpleTextFloat::tr() - 0x00007FF788E3FB40
+# 47: lmms::gui::SimpleTextFloat::tr() - 0x00007FF788E3FB40
+# 48: lmms::gui::TabBar::tr() - 0x00007FF788E764E0
+# 49: lmms::AudioEngine::framesPerPeriod() - 0x00007FF788CFFF50
+# 50: QMetaMethodInvoker::invokeImpl() - 0x00007FF8D9073FD0
+# 51: QMetaMethod::invokeImpl() - 0x00007FF8D9073DB0
+# 52: QTest::ignoreMessage() - 0x00007FF987505E80
+# 53: QTest::ignoreMessage() - 0x00007FF987505E80
+# 54: QTest::ignoreMessage() - 0x00007FF987505E80
+# 55: QTest::ignoreMessage() - 0x00007FF987505E80
+# 56: QTest::qRun() - 0x00007FF98750B310
+# 57: QTest::qExec() - 0x00007FF987508840
+# 58: lmms::TrackContainer::tracks() - 0x00007FF788D03500
+# 59: lmms::gui::TabBar::widgetShown() - 0x00007FF788F4E720
+# 60: BaseThreadInitThunk() - 0x00007FFA2BF3CD70
+# 61: RtlUserThreadStart() - 0x00007FFA2DAACAC0
+

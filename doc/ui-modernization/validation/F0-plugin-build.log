@@ -1,0 +1,773 @@
+CMake is re-running because D:/UserData/Desktop/Project/lmms/build/tests/CMakeFiles/generate.stamp is out-of-date.
+  the file 'D:/UserData/Desktop/Project/lmms/tests/CMakeLists.txt'
+  is newer than 'D:/UserData/Desktop/Project/lmms/build/tests/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Running vcpkg install
+Detecting compiler hash for triplet x64-windows...
+Compiler found: D:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe
+The following packages are already installed:
+  * brotli:x64-windows@1.2.0
+  * bzip2[core,tool]:x64-windows@1.0.8#6
+  * dirent:x64-windows@1.26
+  * expat:x64-windows@2.8.3
+    fftw3[core,sse2,sse]:x64-windows@3.3.11
+    fltk:x64-windows@1.3.11#1
+    fluidsynth[core,sndfile]:x64-windows@2.5.7
+  * fontconfig:x64-windows@2.17.1#2
+  * freetype[core,zlib,png,bzip2,brotli]:x64-windows@2.14.3
+  * gcem:x64-windows@1.18.0
+  * gperf:x64-windows@3.3
+    libflac[core,stack-protector]:x64-windows@1.5.0
+  * libjpeg-turbo:x64-windows@3.2.0
+    libogg:x64-windows@1.3.6#1
+  * libpng:x64-windows@1.6.58
+    libsamplerate:x64-windows@0.2.2#1
+    libsndfile[core,mpeg,external-libs]:x64-windows@1.2.2#2
+    libstk:x64-windows@4.6.1#3
+    libvorbis:x64-windows@1.3.7#4
+    lilv:x64-windows@0.28.0
+  * lv2:x64-windows@1.18.10#1
+    mp3lame:x64-windows@3.100#17
+  * mpg123:x64-windows@1.33.7#1
+  * opus:x64-windows@1.6.1
+  * pcre2[core,platform-default-features,jit]:x64-windows@10.47#1
+  * pkgconf:x64-windows@3.0.3
+    portaudio:x64-windows@19.7#9
+    sdl2:x64-windows@2.32.10#1
+  * serd:x64-windows@0.32.10
+  * sord:x64-windows@0.16.22
+  * sratom:x64-windows@0.6.22
+  * vcpkg-cmake:x64-windows@2025-08-07
+  * vcpkg-cmake-config:x64-windows@2026-07-21
+  * vcpkg-cmake-get-vars:x64-windows@2025-05-29
+  * vcpkg-make:x64-windows@2026-07-09
+  * vcpkg-msbuild:x64-windows@2023-08-08
+  * vcpkg-pkgconfig-get-modules:x64-windows@2024-04-03
+  * vcpkg-tool-meson:x64-windows@1.9.0#10
+  * yasm[core,tools]:x64-windows@1.3.0#8
+  * zix:x64-windows@0.8.2
+    zlib:x64-windows@1.3.2#2
+fftw3 provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(FFTW3 CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3)
+
+  find_package(FFTW3f CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3f)
+
+  find_package(FFTW3l CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3l)
+
+fftw3 provides pkg-config modules:
+
+  # fast Fourier transform library
+  fftw3
+
+  # fast Fourier transform library
+  fftw3f
+
+  # fast Fourier transform library
+  fftw3l
+
+zlib is compatible with built-in CMake targets:
+
+  find_package(ZLIB REQUIRED)
+  target_link_libraries(main PRIVATE ZLIB::ZLIB)
+
+zlib provides pkg-config modules:
+
+  # zlib compression library
+  zlib
+
+fltk provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(FLTK CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE fltk fltk_forms fltk_images)
+
+mp3lame provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(mp3lame CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE mp3lame::mp3lame)
+
+libogg provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(Ogg CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE Ogg::ogg)
+
+libogg provides pkg-config modules:
+
+  # ogg is a library for manipulating ogg bitstreams
+  ogg
+
+The package libvorbis provides CMake targets:
+
+    # Vorbis reference encoder and decoder, low-level API
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbis)
+
+    # Audio stream decoding and basic manipulation, high-level API
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+
+    # Convenience API for setting up an encoding environment
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+
+The package libflac provides CMake targets:
+
+    find_package(FLAC CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE FLAC::FLAC)
+    
+    # Or use the C++ API
+    find_package(FLAC CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE FLAC::FLAC++)
+
+libsndfile provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(SndFile CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE SndFile::sndfile)
+
+libsndfile provides pkg-config modules:
+
+  # A library for reading and writing audio files
+  sndfile
+
+fluidsynth provides CMake targets:
+
+  find_package(FluidSynth CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FluidSynth::libfluidsynth)
+  add_custom_command(OUTPUT result COMMAND FluidSynth::fluidsynth ARGS ...)
+
+fluidsynth provides pkg-config modules:
+
+  # Software SoundFont synth
+  fluidsynth
+
+libsamplerate provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(SampleRate CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE SampleRate::samplerate)
+
+libsamplerate provides pkg-config modules:
+
+  # An audio Sample Rate Conversion library
+  samplerate
+
+libstk provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(unofficial-libstk CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE unofficial::libstk::libstk)
+
+lilv provides pkg-config modules:
+
+  # Library for hosting LV2 plugins
+  lilv-0
+
+portaudio provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(portaudio CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE portaudio)
+
+portaudio provides pkg-config modules:
+
+  # Portable audio I/O
+  portaudio-2.0
+
+sdl2 provides CMake targets:
+
+    find_package(SDL2 CONFIG REQUIRED)
+    target_link_libraries(main
+        PRIVATE
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    )
+
+All requested installations completed successfully in: 912 us
+-- Running vcpkg install - done
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+
+Checking submodules...
+-- Checking qt5-x11embed...
+--   Found src/3rdparty/qt5-x11embed/CMakeLists.txt
+-- Checking zynaddsubfx...
+--   Found plugins/ZynAddSubFx/zynaddsubfx/CMakeLists.txt
+-- Checking game-music-emu...
+--   Found plugins/FreeBoy/game-music-emu/CMakeLists.txt
+-- Checking adplug...
+--   Found plugins/OpulenZ/adplug/Makefile.am
+-- Checking veal...
+--   Found plugins/LadspaEffect/calf/veal/CMakeLists.txt
+-- Checking exprtk...
+--   Found plugins/Xpressive/exprtk/Makefile
+-- Checking ladspa...
+--   Found plugins/LadspaEffect/swh/ladspa/Makefile.am
+-- Checking tap-plugins...
+--   Found plugins/LadspaEffect/tap/tap-plugins/Makefile
+-- Checking weakjack...
+--   Found src/3rdparty/weakjack/weakjack/.gitignore
+-- Checking wiki...
+--   Found doc/wiki/Home.md
+-- Checking ringbuffer...
+--   Found src/3rdparty/ringbuffer/CMakeLists.txt
+-- Checking carla...
+--   Found plugins/CarlaBase/carla/Makefile
+-- Checking resid...
+--   Found plugins/Sid/resid/resid/Makefile.am
+-- Checking jack2...
+--   Found src/3rdparty/jack2/.gitignore
+-- Checking cmt...
+--   Found plugins/LadspaEffect/cmt/cmt/.gitignore
+-- Checking hiir...
+--   Found src/3rdparty/hiir/hiir/license.txt
+-- Checking portsmf...
+--   Found plugins/MidiImport/portsmf/CMakeLists.txt
+-- Done validating submodules.
+
+
+Configuring LMMS
+--------------------------
+* Project version             : 1.3.0-alpha.2.60+1462129
+*   Major version             : 1
+*   Minor version             : 3
+*   Release version           : 0
+*   Stage version             : alpha
+*   Build version             : 2
+*
+
+Optional Version Usage:
+--------------------------
+*   Override version:           -DFORCE_VERSION=x.x.x-x
+*   Ignore Git information:     -DFORCE_VERSION=internal
+
+-- Setting target microarchitecture to 'none'
+PROCESSOR: AMD64
+-- Target host is 64 bit, Intel
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Using Qt version: 6.10.3
+-- Found Qt translations in C:/Qt/6.10.3/msvc2022_64/translations
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+-- Checking for module 'suil-0'
+--   Package 'suil-0' not found
+-- Checking for module 'carla-native-plugin'
+--   Package 'carla-native-plugin' not found
+-- Checking for module 'carla-standalone>=1.9.5'
+--   Package 'carla-standalone' not found
+-- Checking for module 'gig'
+--   Package 'gig' not found
+-- Using Git to generate the CONTRIBUTORS file
+
+Installation Summary
+--------------------
+* Install Directory           : C:/Program Files/lmms
+
+Supported audio interfaces
+--------------------------
+* ALSA                        : <not supported on this platform>
+* JACK                        : OK (weak linking enabled)
+* Sndio                       : <not supported on this platform>
+* PortAudio                   : OK
+* PulseAudio                  : <not supported on this platform>
+* SDL                         : OK
+
+Supported MIDI interfaces
+-------------------------
+* ALSA                        : <not supported on this platform>
+* Sndio                       : <not supported on this platform>
+* JACK                        : OK (weak linking enabled)
+* WinMM                       : OK
+* AppleMidi                   : <not supported on this platform>
+
+Supported file formats for project export
+-----------------------------------------
+* WAVE                        : OK
+* FLAC                        : OK
+* OGG/VORBIS                  : OK
+* MP3/Lame                    : OK
+
+Optional plugins
+----------------
+* Lv2 plugins                 : OK
+* SUIL for plugin UIs         : not found, install it or set PKG_CONFIG_PATH appropriately
+* ZynAddSubFX instrument      : OK
+* Carla Patchbay & Rack       : OK (weak linking enabled)
+* SoundFont2 player           : OK
+* Sid instrument              : not found, please install perl if you require the Sid instrument
+* Stk Mallets                 : OK
+* VST plugin host             : OK
+  * 32-bit Windows host       : OK
+  * 64-bit Windows host       : OK
+* CALF LADSPA plugins         : OK
+* CAPS LADSPA plugins         : OK
+* CMT LADSPA plugins          : OK
+* TAP LADSPA plugins          : OK
+* SWH LADSPA plugins          : Skipping, perl is missing
+* GIG player                  : not found, libgig needed for decoding .gig files
+
+Developer options
+-----------------------------------------
+* Debug FP exceptions               : Disabled
+* Debug using AddressSanitizer      : Disabled
+* Debug using ThreadSanitizer       : Disabled
+* Debug using MemorySanitizer       : Disabled
+* Debug using UBSanitizer           : Disabled
+* Debug packaging commands          : Disabled
+* Profile using GNU profiler        : Disabled , NOT SUPPORTED BY THIS COMPILER
+* Debug assertions                  : Disabled
+* Experimental Qt6 support          : Enabled
+
+
+-----------------------------------------------------------------
+IMPORTANT:
+after installing missing packages, remove CMakeCache.txt before
+running cmake again!
+-----------------------------------------------------------------
+
+
+
+-- Configuring done (16.9s)
+-- Generating done (15.5s)
+-- Build files have been written to: D:/UserData/Desktop/Project/lmms/build
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_lmms.cpp
+  qrc_lmms.cpp
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  adplug.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\OpulenZ\Release\adplug.lib
+  gme.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\FreeBoy\Release\gme.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\libcarla_native-plugin.dll
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Automatic UIC for target sf2player
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitcrush.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  LadspaEffect.cpp
+  EqEffect.cpp
+  FlangerEffect.cpp
+  FrequencyShifterEffect.cpp
+  PeakControllerEffect.cpp
+  Oscilloscope.cpp
+  Organic.cpp
+  GranularPitchShifterEffect.cpp
+  Sf2Player.cpp
+  Xpressive.cpp
+  OscilloscopeControls.cpp
+  FlangerControls.cpp
+  EqCurve.cpp
+  PeakControllerEffectControls.cpp
+  GranularPitchShifterControls.cpp
+  FrequencyShifterControls.cpp
+  LadspaControls.cpp
+  moc_Organic.cpp
+  ExprSynth.cpp
+  PatchesDialog.cpp
+  qrc_organic.cpp
+  正在生成代码...
+  OscilloscopeControlDialog.cpp
+  FlangerControlsDialog.cpp
+  EqControls.cpp
+  GranularPitchShifterControlDialog.cpp
+  SlewDistortion.cpp
+  PeakControllerEffectControlDialog.cpp
+  FrequencyShifterControlDialog.cpp
+  LadspaControlDialog.cpp
+  moc_Sf2Player.cpp
+  OscilloscopeGraph.cpp
+  MonoDelay.cpp
+  moc_FlangerControls.cpp
+  EqControlsDialog.cpp
+  moc_PeakControllerEffectControls.cpp
+  SlewDistortionControls.cpp
+  moc_GranularPitchShifterControls.cpp
+  moc_FrequencyShifterEffect.cpp
+  LadspaMatrixControlDialog.cpp
+  moc_PatchesDialog.cpp
+  moc_Xpressive.cpp
+  moc_FlangerControlsDialog.cpp
+  moc_OscilloscopeControls.cpp
+  EqParameterWidget.cpp
+  moc_PeakControllerEffectControlDialog.cpp
+  SlewDistortionControlDialog.cpp
+  moc_GranularPitchShifterControlDialog.cpp
+  LadspaSubPluginFeatures.cpp
+  moc_FrequencyShifterControls.cpp
+  qrc_sf2player.cpp
+  正在生成代码...
+  Nes.cpp
+  qrc_flanger.cpp
+  正在生成代码...
+  qrc_xpressive.cpp
+  正在生成代码...
+  qrc_peakcontrollereffect.cpp
+  正在生成代码...
+  EqSpectrumView.cpp
+  moc_OscilloscopeControlDialog.cpp
+  Lb302.cpp
+  qrc_granularpitchshifter.cpp
+  正在生成代码...
+  LadspaWidgetFactory.cpp
+  Dispersion.cpp
+  moc_FrequencyShifterControlDialog.cpp
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlabase.dll
+  moc_SlewDistortion.cpp
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+  DualFilter.cpp
+  moc_Nes.cpp
+  moc_OscilloscopeGraph.cpp
+  moc_LadspaEffect.cpp
+  moc_EqControls.cpp
+  moc_Lb302.cpp
+  qrc_frequencyshifter.cpp
+  DispersionControls.cpp
+  正在生成代码...
+  DualFilterControls.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.exp
+  frequencyshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\frequencyshifter.dll
+  moc_SlewDistortionControls.cpp
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  Watsyn.cpp
+  qrc_nes.cpp
+  正在生成代码...
+  正在生成代码...
+  moc_LadspaControls.cpp
+  qrc_lb302.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.exp
+  DispersionControlDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.exp
+  nes.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\nes.dll
+  moc_EqControlsDialog.cpp
+  oscilloscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\oscilloscope.dll
+  flanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\flanger.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.exp
+  lb302.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lb302.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.exp
+  organic.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\organic.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.exp
+  LadspaBrowser.cpp
+  granularpitchshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\granularpitchshifter.dll
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\audiofileprocessor.dll
+  vst_base.cpp
+  Analyzer.cpp
+  DualFilterControlDialog.cpp
+  moc_SlewDistortionControlDialog.cpp
+  moc_Watsyn.cpp
+  VstPlugin.cpp
+  moc_EqCurve.cpp
+  moc_LadspaControlDialog.cpp
+  LadspaDescription.cpp
+  SaProcessor.cpp
+  moc_DispersionControls.cpp
+  qrc_slewdistortion.cpp
+  正在生成代码...
+  moc_DualFilterControls.cpp
+  qrc_watsyn.cpp
+  正在生成代码...
+  moc_EqParameterWidget.cpp
+  moc_LadspaMatrixControlDialog.cpp
+  LadspaPortDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.exp
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\compressor.dll
+  slewdistortion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\slewdistortion.dll
+  Mallets.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.exp
+  watsyn.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\watsyn.dll
+  xpressive.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\xpressive.dll
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\delay.dll
+  ReverbSC.cpp
+  DynamicsProcessor.cpp
+  SaControls.cpp
+  moc_DispersionControlDialog.cpp
+  moc_DualFilterControlDialog.cpp
+  moc_VstPlugin.cpp
+  moc_EqFader.cpp
+  qrc_ladspaeffect.cpp
+  正在生成代码...
+  moc_LadspaBrowser.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.exp
+  ReverbSCControls.cpp
+  ladspaeffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\ladspaeffect.dll
+  DynamicsProcessorControls.cpp
+  正在生成代码...
+  moc_Mallets.cpp
+  TapTempo.cpp
+  SaControlsDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.exp
+  dispersion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dispersion.dll
+  WaveShaper.cpp
+  qrc_dualfilter.cpp
+  正在生成代码...
+  正在生成代码...
+  moc_EqSpectrumView.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.exp
+  dualfilter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dualfilter.dll
+  Lv2Effect.cpp
+  moc_LadspaDescription.cpp
+  qrc_malletsstk.cpp
+  正在生成代码...
+  ReverbSCControlDialog.cpp
+  TapTempoView.cpp
+  DynamicsProcessorControlDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.exp
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vstbase.dll
+  StereoEnhancer.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.exp
+  malletsstk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\malletsstk.dll
+  SaSpectrumView.cpp
+  Vibed.cpp
+  WaveShaperControls.cpp
+  qrc_eq.cpp
+  正在生成代码...
+  moc_LadspaPortDialog.cpp
+  Lv2FxControls.cpp
+  moc_TapTempo.cpp
+  moc_ReverbSCControls.cpp
+  moc_DynamicsProcessorControls.cpp
+  StereoEnhancerControls.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.exp
+  eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\eq.dll
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bassbooster.dll
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\crossovereq.dll
+  LOMM.cpp
+  WaveShaperControlDialog.cpp
+  NineButtonSelector.cpp
+  SaWaterfallView.cpp
+  qrc_ladspabrowser.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.exp
+  Lv2FxControlDialog.cpp
+  moc_TapTempoView.cpp
+  ladspabrowser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\ladspabrowser.dll
+  Patman.cpp
+  moc_ReverbSCControlDialog.cpp
+  moc_DynamicsProcessorControlDialog.cpp
+  StereoEnhancerControlDialog.cpp
+  VibratingString.cpp
+  LOMMControls.cpp
+  moc_WaveShaperControls.cpp
+  moc_SaProcessor.cpp
+  moc_SaControls.cpp
+  qrc_taptempo.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.exp
+  taptempo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\taptempo.dll
+  moc_Lv2Effect.cpp
+  StereoMatrix.cpp
+  moc_Patman.cpp
+  qrc_reverbsc.cpp
+  正在生成代码...
+  qrc_dynamicsprocessor.cpp
+  正在生成代码...
+  moc_Vibed.cpp
+  base.c
+  revsc.c
+  dcblock.c
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.exp
+  moc_StereoEnhancerControls.cpp
+  reverbsc.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\reverbsc.dll
+  dynamicsprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\dynamicsprocessor.dll
+  Monstro.cpp
+  Vectorscope.cpp
+  LOMMControlDialog.cpp
+  moc_WaveShaperControlDialog.cpp
+  moc_SaControlsDialog.cpp
+  moc_Lv2FxControls.cpp
+  StereoMatrixControls.cpp
+  moc_NineButtonSelector.cpp
+  qrc_patman.cpp
+  正在生成代码...
+  VecControls.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.exp
+  patman.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\patman.dll
+  Sfxr.cpp
+  moc_StereoEnhancerControlDialog.cpp
+  qrc_waveshaper.cpp
+  正在生成代码...
+  moc_SaSpectrumView.cpp
+  moc_Monstro.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.exp
+  waveshaper.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\waveshaper.dll
+  moc_LOMM.cpp
+  MultitapEcho.cpp
+  moc_Lv2FxControlDialog.cpp
+  qrc_vibedstrings.cpp
+  正在生成代码...
+  StereoMatrixControlDialog.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.exp
+  moc_SaWaterfallView.cpp
+  vibedstrings.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vibedstrings.dll
+  VecControlsDialog.cpp
+  Lv2Instrument.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.exp
+  stereoenhancer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\stereoenhancer.dll
+  moc_Sfxr.cpp
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\bitinvader.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.exp
+  sf2player.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\sf2player.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.exp
+  peakcontrollereffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\peakcontrollereffect.dll
+  qrc_monstro.cpp
+  正在生成代码...
+  SlicerT.cpp
+  MultitapEchoControls.cpp
+  qrc_lv2effect.cpp
+  正在生成代码...
+  moc_LOMMControls.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.exp
+  lv2effect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lv2effect.dll
+  moc_StereoMatrixControls.cpp
+  moc_DataprocLauncher.cpp
+  qrc_analyzer.cpp
+  正在生成代码...
+  qrc_sfxr.cpp
+  正在生成代码...
+  VectorView.cpp
+  moc_Lv2Instrument.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.exp
+  monstro.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\monstro.dll
+  MultitapEchoControlDialog.cpp
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlarack.dll
+  SlicerTView.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.exp
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\carlapatchbay.dll
+  analyzer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\analyzer.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.exp
+  sfxr.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\sfxr.dll
+  FreeBoy.cpp
+  VstEffect.cpp
+  OpulenZ.cpp
+  moc_LOMMControlDialog.cpp
+  Vestige.cpp
+  moc_StereoMatrixControlDialog.cpp
+  qrc_lv2instrument.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.exp
+  lv2instrument.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lv2instrument.dll
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+  moc_VecControls.cpp
+  ZynAddSubFx.cpp
+  qrc_lomm.cpp
+  正在生成代码...
+  moc_MultitapEchoControls.cpp
+  GbApuWrapper.cpp
+  moc_FreeBoy.cpp
+  SlicerTWaveform.cpp
+  moc_OpulenZ.cpp
+  qrc_stereomatrix.cpp
+  正在生成代码...
+  VstEffectControls.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.exp
+  stereomatrix.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\stereomatrix.dll
+  moc_Vestige.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.exp
+  moc_VecControlsDialog.cpp
+  lomm.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\lomm.dll
+  qrc_freeboy.cpp
+  正在生成代码...
+  moc_ZynAddSubFx.cpp
+  moc_MultitapEchoControlDialog.cpp
+  qrc_opulenz.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.exp
+  freeboy.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\freeboy.dll
+  moc_SlicerT.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.exp
+  opulenz.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\opulenz.dll
+  moc_VectorView.cpp
+  qrc_vestige.cpp
+  正在生成代码...
+  VstEffectControlDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.exp
+  vestige.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vestige.dll
+  qrc_multitapecho.cpp
+  正在生成代码...
+  qrc_zynaddsubfx.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.exp
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\multitapecho.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.exp
+  zynaddsubfx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\zynaddsubfx.dll
+  正在生成代码...
+  moc_SlicerTView.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.exp
+  vectorscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vectorscope.dll
+  VstSubPluginFeatures.cpp
+  moc_SlicerTWaveform.cpp
+  moc_VstEffectControlDialog.cpp
+  qrc_slicert.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.exp
+  slicert.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\slicert.dll
+  moc_VstEffectControls.cpp
+  qrc_vsteffect.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.exp
+  vsteffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\vsteffect.dll
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/tests/CMakeLists.txt
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\kicker.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\tripleoscillator.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\amplifier.dll
+  Automatic MOC for target UiBaselineCapture
+  UiBaselineCapture.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.exp
+  UiBaselineCapture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target AutomatableModelTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.exp
+  AutomatableModelTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AutomatableModelTest.exe

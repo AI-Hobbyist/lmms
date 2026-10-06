@@ -1,0 +1,60 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin delay
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lb302
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin nes
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin sf2player
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vestige
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin waveshaper
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin bitcrush
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin crossovereq
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin ladspaeffect
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin bassbooster
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin audiofileprocessor
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin opulenz
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin ladspabrowser
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vectorscope
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin kicker
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin dynamicsprocessor
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin freeboy
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin stereoenhancer
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin watsyn
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin organic
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vibedstrings
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin slewdistortion
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lv2instrument
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin taptempo
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin multitapecho
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin monstro
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vsteffect
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lv2effect
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin eq
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin stereomatrix
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin spectrumanalyzer
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin dualfilter
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin malletsstk
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin sfxr
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin flanger
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin slicert
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin dispersion
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin xpressive
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin peakcontrollereffect
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin frequencyshifter
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin tripleoscillator
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin bitinvader
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin amplifier
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lomm
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin compressor
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin zynaddsubfx
+QDEBUG : UiBaselineCapture::pluginPanels() QtXmlWrapper::loadXMLfile(): empty data
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin oscilloscope
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin reverbsc
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin patman
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin granularpitchshifter
+PASS   : UiBaselineCapture::pluginPanels()
+PASS   : UiBaselineCapture::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 51297ms
+********* Finished testing of UiBaselineCapture *********
