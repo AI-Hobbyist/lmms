@@ -183,8 +183,10 @@ void SVSPianoRoll::openIn(MainWindow* mainWindow) {
 SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  setWindowIcon(embed::getIconPixmap("piano"));
  setWindowTitle(tr("SVS Piano Roll — LMMS")); resize(1100,740); auto* layout=new QVBoxLayout(this); auto* toolbar=new QHBoxLayout; layout->addLayout(toolbar);
- auto* play=new QPushButton(tr("Play"),this); toolbar->addWidget(play); connect(play,&QPushButton::clicked,Engine::getSong(),&Song::playSong);
- auto* stop=new QPushButton(tr("Stop"),this); toolbar->addWidget(stop); connect(stop,&QPushButton::clicked,Engine::getSong(),&Song::stop);
+ auto nativeIcon=[](const QString& name){QIcon icon("resources:"+name+".png");return icon.isNull()?QIcon("data:/themes/default/"+name+".png"):icon;};
+ auto iconButton=[nativeIcon](QToolButton* button,const QString& icon,const QString& title){button->setIcon(nativeIcon(icon));button->setIconSize(QSize(24,24));button->setText(title);button->setToolTip(title);button->setAccessibleName(title);button->setToolButtonStyle(Qt::ToolButtonIconOnly);};
+ auto* play=new QToolButton(this);play->setObjectName("svsPlayButton");iconButton(play,"play",tr("Play song"));toolbar->addWidget(play);connect(play,&QToolButton::clicked,Engine::getSong(),&Song::playSong);
+ auto* stop=new QToolButton(this);stop->setObjectName("svsStopButton");iconButton(stop,"stop",tr("Stop"));toolbar->addWidget(stop);connect(stop,&QToolButton::clicked,Engine::getSong(),&Song::stop);
  auto* render=new QPushButton(tr("Synthesize"),this); toolbar->addWidget(render); connect(render,&QPushButton::clicked,clip,&SVSClip::synthesize);
  auto* status=new QLabel(clip->status(),this); toolbar->addWidget(status); connect(clip,&Clip::dataChanged,this,[clip,status,render]{status->setText(clip->status());render->setEnabled(!clip->readOnly());}); render->setEnabled(!clip->readOnly()); connect(clip,&QObject::destroyed,this,[this]{if(m_subWindow) deleteLater();else close();});
  auto* body=new QHBoxLayout; layout->addLayout(body,1);
@@ -225,6 +227,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* tools=new QButtonGroup(this);
  canvas->batchLyricsRequested=[this,clip,canvas]{auto* dialog=new SVSLyricEditor(clip,canvas->selectedNotes(),this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->open();};
  auto* lyrics=new QToolButton(this); lyrics->setObjectName("svsBatchLyricsButton"); lyrics->setText(tr("Lyrics")); toolbar->addWidget(lyrics); connect(lyrics,&QToolButton::clicked,this,[canvas]{if(canvas->batchLyricsRequested) canvas->batchLyricsRequested();});
+ QIcon lyricsIcon("resources:svs_lyrics.svg");if(lyricsIcon.isNull()) lyricsIcon=QIcon("data:/themes/default/svs_lyrics.svg");
+ lyrics->setIcon(lyricsIcon);lyrics->setIconSize(QSize(24,24));lyrics->setToolButtonStyle(Qt::ToolButtonIconOnly);lyrics->setToolTip(tr("Batch lyrics"));lyrics->setAccessibleName(tr("Batch lyrics"));
  const QStringList toolNames{tr("Select"),tr("Pencil"),tr("Pitch pen"),tr("Anchor"),tr("Smooth"),tr("Line"),tr("Erase")};
  const QStringList toolIcons{"svs_tool_select","svs_tool_pencil","svs_tool_pitch","svs_tool_anchor","svs_tool_smooth","svs_tool_line","svs_tool_erase"};
  for(int i=0;i<toolNames.size();++i) {
@@ -241,8 +245,10 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  connect(parameterCanvas,&SVSCanvas::toolChanged,this,[parameterCanvas,syncTool]{syncTool(parameterCanvas);});
  canvas->setTool(SVSCanvas::Tool::Pencil);
  auto* parameterVisible=new QToolButton(this);parameterVisible->setObjectName("svsParameterAreaVisible");parameterVisible->setText(tr("Parameters"));parameterVisible->setCheckable(true);parameterVisible->setChecked(clip->editorState()["parameterAreaVisible"].toBool(true));toolbar->addWidget(parameterVisible);parameterBody->setVisible(parameterVisible->isChecked());
+ iconButton(parameterVisible,"automation",tr("Show/hide parameters"));
  connect(parameterVisible,&QToolButton::toggled,this,[clip,parameterBody,parameterCanvas](bool visible){parameterCanvas->cancelOperation();parameterBody->setVisible(visible);auto state=clip->editorState();state["parameterAreaVisible"]=visible;clip->setEditorState(state);});
  auto* quantization=new QComboBox(this); quantization->setObjectName("svsQuantization");
+ quantization->setToolTip(tr("Quantization"));auto* quantizationIcon=new QLabel(this);quantizationIcon->setObjectName("svsQuantizationIcon");quantizationIcon->setPixmap(nativeIcon("quantize").pixmap(16,16));quantizationIcon->setToolTip(quantization->toolTip());quantizationIcon->setBuddy(quantization);toolbar->addWidget(quantizationIcon);
  for(int divisor:{1,2,4,8,16,32,64}) quantization->addItem(QString("1/%1").arg(divisor),double(TimePos::ticksPerBar())/divisor);
  quantization->setCurrentIndex(std::max(0,quantization->findData(clip->editorState()["quantization"].toDouble(12)))); toolbar->addWidget(quantization);
  connect(quantization,qOverload<int>(&QComboBox::activated),this,[canvas,quantization](int index){canvas->setQuantization(quantization->itemData(index).toDouble());});
@@ -252,6 +258,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  connect(zoomIn,&QToolButton::clicked,this,[canvas]{canvas->setZoom(canvas->horizontalZoom()*1.25,canvas->verticalZoom());});
  auto* barZoom=new QComboBox(this);barZoom->setObjectName("svsBarZoom");barZoom->setToolTip(tr("Horizontal zoom: bars visible in the note area"));barZoom->addItem(tr("Custom"),0);
  for(int bars:{1,2,4,8,16}) barZoom->addItem(tr("%n bar(s)",nullptr,bars),bars);
+ auto* zoomIcon=new QLabel(this);zoomIcon->setObjectName("svsBarZoomIcon");zoomIcon->setPixmap(nativeIcon("zoom_x").pixmap(16,16));zoomIcon->setToolTip(barZoom->toolTip());zoomIcon->setBuddy(barZoom);toolbar->addWidget(zoomIcon);
  toolbar->addWidget(barZoom);
  connect(barZoom,qOverload<int>(&QComboBox::activated),this,[canvas,barZoom](int index){const int bars=barZoom->itemData(index).toInt();if(bars>0) canvas->setZoom(double(canvas->width()-60)/(2.*TimePos::ticksPerBar()*bars),canvas->verticalZoom());});
  connect(canvas,&SVSCanvas::viewportChanged,this,[canvas,barZoom]{const auto bars=double(canvas->width()-60)/(2.*TimePos::ticksPerBar()*canvas->horizontalZoom());int index=0;for(int i=1;i<barZoom->count();++i) if(std::abs(bars-barZoom->itemData(i).toInt())<.01) index=i;barZoom->setCurrentIndex(index);});
@@ -265,6 +272,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  globalControls->beginGesture=[clip=QPointer<SVSClip>(clip),track=QPointer<SVSTrack>(track)](const svs::Parameter& p)->std::function<void()>{if(!clip||!track) return {};if(p.scope=="track") {track->addJournalCheckPoint();track->saveJournallingState(false);return [track]{if(track) track->restoreJournallingState();};}clip->addJournalCheckPoint();clip->saveJournallingState(false);return [clip]{if(clip) clip->restoreJournallingState();};};
  auto* side=new QDialog(this);side->setObjectName("svsEditorSettings");side->setWindowTitle(tr("SVS editor settings"));auto* controls=new QVBoxLayout(side);
  auto* settings=new QToolButton(this);settings->setText(tr("Settings"));settings->setObjectName("svsEditorSettingsButton");toolbar->addWidget(settings);connect(settings,&QToolButton::clicked,side,[side]{side->show();side->raise();});
+ iconButton(settings,"setup_general",tr("SVS editor settings"));
  auto* properties=new QToolButton(this); properties->setText(tr("Properties")); properties->setCheckable(true); properties->setChecked(true); toolbar->addWidget(properties); connect(properties,&QToolButton::toggled,sidebarScroll,&QWidget::setVisible);
  auto* portrait=new SVSImageLoader(canvas); portrait->setObjectName("svsPortraitLoader"); auto* portraitVisible=new QCheckBox(tr("Show portrait"),side); portraitVisible->setObjectName("svsPortraitVisible"); controls->addWidget(portraitVisible);
  auto* portraitRow=new QHBoxLayout; controls->addLayout(portraitRow); portraitRow->addWidget(new QLabel(tr("Transparency"),side)); auto* transparency=new QSlider(Qt::Horizontal,side); transparency->setObjectName("svsPortraitTransparency"); transparency->setRange(0,100); portraitRow->addWidget(transparency,1);

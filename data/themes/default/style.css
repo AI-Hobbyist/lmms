@@ -1216,6 +1216,11 @@ lmms--gui--SVSPianoRoll {
 }
 
 /* White SVG tools; the track's missing-avatar fallback uses svs_track.svg. */
+lmms--gui--SVSPianoRoll QToolButton#svsPlayButton { qproperty-icon: url("resources:play.png"); }
+lmms--gui--SVSPianoRoll QToolButton#svsStopButton { qproperty-icon: url("resources:stop.png"); }
+lmms--gui--SVSPianoRoll QToolButton#svsParameterAreaVisible { qproperty-icon: url("resources:automation.png"); }
+lmms--gui--SVSPianoRoll QToolButton#svsEditorSettingsButton { qproperty-icon: url("resources:setup_general.png"); }
+lmms--gui--SVSPianoRoll QToolButton#svsBatchLyricsButton { qproperty-icon: url("resources:svs_lyrics.svg"); }
 lmms--gui--SVSPianoRoll QToolButton#svsTool0 { qproperty-icon: url("resources:svs_tool_select.svg"); }
 lmms--gui--SVSPianoRoll QToolButton#svsTool1 { qproperty-icon: url("resources:svs_tool_pencil.svg"); }
 lmms--gui--SVSPianoRoll QToolButton#svsTool2 { qproperty-icon: url("resources:svs_tool_pitch.svg"); }

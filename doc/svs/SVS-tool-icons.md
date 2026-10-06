@@ -14,3 +14,11 @@
 - Song Editor 的“添加 SVS 轨道”入口此前仍使用 `add_sample_track`，现改为白色 `svs_track.svg`。
 - 原生窗口回归先复现关闭标志缺失，再验证 Windows 系统菜单关闭项可用，发送 `WM_SYSCOMMAND/SC_CLOSE` 后成功回嵌；三种 detachbehavior 下重复弹出关闭均保留选择。
 - 验证入口图标与主题 SVG 一致；Release 编译和两项针对性测试通过（含初始化/清理共 4 passed）。截图及前后测试记录见 `validation/SVS-close-button-*`。开发安装同步并校验哈希，测试窗口已关闭。
+
+## 复用原生工具栏图标及歌词 SVG（2026-10-06）
+
+- 播放、停止、参数区开关和设置分别复用 `play.png`、`stop.png`、`automation.png`、`setup_general.png`；图标按钮提供悬停提示，参数区保留选中状态。
+- 量化和横向缩放下拉框旁分别复用普通 Piano Roll 的 `quantize.png`、`zoom_x.png`，保留当前值及原有选择逻辑。
+- 新增白色透明 `svs_lyrics.svg`（歌词气泡与音符），接入批量歌词按钮和主题 CSS。合成、状态、属性保留文字，缩放加减保留符号。
+- 仅改变 SVS 工具栏呈现，未复用普通 Piano Roll 的播放或编辑行为。Release 编译及原生窗口生命周期、紧凑布局、批量歌词测试通过（含初始化/清理共 5 passed）。实窗截图：`validation/SVS-toolbar-native-icons-window.png`。
+- 开发安装同步二进制、主题和图标并校验哈希；主观体验为 MANUAL/PENDING。
