@@ -1,0 +1,86 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  gme.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\FreeBoy\Release\gme.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\libcarla_native-plugin.dll
+  adplug.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\OpulenZ\Release\adplug.lib
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bassbooster.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll
+  granularpitchshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\granularpitchshifter.dll
+  stereoenhancer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereoenhancer.dll
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll
+  monstro.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\monstro.dll
+  oscilloscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\oscilloscope.dll
+  waveshaper.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\waveshaper.dll
+  lb302.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lb302.dll
+  xpressive.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\xpressive.dll
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitinvader.dll
+  vectorscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vectorscope.dll
+  ladspabrowser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspabrowser.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll
+  lv2instrument.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2instrument.dll
+  peakcontrollereffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\peakcontrollereffect.dll
+  analyzer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\analyzer.dll
+  ladspaeffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspaeffect.dll
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\audiofileprocessor.dll
+  patman.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\patman.dll
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitcrush.dll
+  nes.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\nes.dll
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\compressor.dll
+  malletsstk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\malletsstk.dll
+  lomm.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lomm.dll
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\crossovereq.dll
+  slicert.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slicert.dll
+  sfxr.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sfxr.dll
+  dispersion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dispersion.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll
+  dynamicsprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dynamicsprocessor.dll
+  frequencyshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\frequencyshifter.dll
+  eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\eq.dll
+  flanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\flanger.dll
+  lv2effect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2effect.dll
+  dualfilter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dualfilter.dll
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\delay.dll
+  Automatic UIC for target sf2player
+  freeboy.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\freeboy.dll
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\multitapecho.dll
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlabase.dll
+  slewdistortion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slewdistortion.dll
+  stereomatrix.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereomatrix.dll
+  organic.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\organic.dll
+  vibedstrings.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vibedstrings.dll
+  sf2player.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sf2player.dll
+  zynaddsubfx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\zynaddsubfx.dll
+  taptempo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\taptempo.dll
+  opulenz.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\opulenz.dll
+  reverbsc.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\reverbsc.dll
+  watsyn.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\watsyn.dll
+  vsteffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vsteffect.dll
+  vestige.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vestige.dll
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll

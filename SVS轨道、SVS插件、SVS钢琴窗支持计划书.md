@@ -441,3 +441,10 @@ PASS：按 TuneLab 钢琴窗实测对齐音符首尾伸缩、覆盖相邻音符�
 PASS：只读参数曲线增加按插件颜色的半透明填充，缺口不连接；去掉 Read-only 前置标签，保留输入／结果分界。每条结果按钮右键独立显隐，包括选中结果；关闭后按钮变淡，状态按 ID 持久化，无全局开关，不触发重新合成。SVSExample full 提供 Rendered level／Rendered peak 两条不同颜色的实际 PCM RMS／峰值曲线，SDK 格式文档同步，无公开 ABI 变更。
 
 第 26／27 节前台 Release 编译通过，启用的原生插件在 build/Release/plugins 原位重新链接，开发主程序为 build/Release/lmms.exe。Windows 原生完整 SVS 回归 **61 passed / 0 failed / 0 skipped**；开发主题实窗专项 **4 passed / 0 failed / 0 skipped**，真实屏幕截图已检查，测试窗口关闭。未使用 offscreen 或 Computer Use；用户最终操作／布局人工验收 **MANUAL/PENDING**。证据与限定范围见 `doc/svs/SVS-stretch-and-reference-alignment.md`。
+
+
+## 28. 开发部署目录纠正（2026-10-07）
+
+确认第 26／27 节的示例插件测试目录与开发版实际加载目录不一致，实际运行仍使用旧 SVSExample，导致 Level／Peak 未出现；上一节的开发部署完成结论在此纠正。Windows 工程 SVSExample 改为直接写入现有 build/Release/svs/SVSExample，CTest 读取目标目录，不新建目录。旧 build/svs 输出 DLL 原位停用为 .dll.disabled。
+
+前台编译通过，实际部署目录开发主题实窗专项 **4 passed / 0 failed / 0 skipped**，完整 SVS CTest **1/1 通过**。铅笔新建音符后的合成、自动生成音素交界独立拖动、单音素增益和两条有值结果独立显隐已验证。原截图 Failed (2) 尚未稳定复现，更新后用户工程复核为 **MANUAL/PENDING**，不宣称其全部根因已确认。详见 `doc/svs/SVS-deployed-plugin-correction.md`。

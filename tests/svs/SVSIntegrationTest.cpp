@@ -860,6 +860,16 @@ private slots:
    lane.setParameterLane(p);QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,QPoint(300,100));QVERIFY(clip->curves().contains(p.id));QCOMPARE(clip->curves()[p.id].scope,p.scope);QCOMPARE(clip->curves()[p.id].valueAt(120),std::optional<QJsonValue>(p.defaultValue));
   }
  }
+ void generatedPhonemeDragRenders() {
+  auto* song=Engine::getSong();const auto tempo=song->getTempo();song->tempoModel().setValue(120);auto restore=qScopeGuard([&]{song->tempoModel().setValue(tempo);});
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(song);auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note a;a.id="generated-a";a.tick=60;a.duration=32;a.pitch=58;a.lyric="la";auto b=a;b.id="generated-b";b.tick=92;b.duration=52;b.pitch=60;
+  {gui::SVSCanvas canvas(clip);canvas.resize(900,400);canvas.setTool(gui::SVSCanvas::Tool::Pencil);canvas.show();QVERIFY(QTest::qWaitForWindowExposed(&canvas));for(const auto& note:{a,b}) {QTest::mousePress(&canvas,Qt::LeftButton,Qt::AltModifier,canvas.pointAt(note.tick,note.pitch).toPoint()+QPoint(0,6));QTest::mouseRelease(&canvas,Qt::LeftButton,Qt::AltModifier,canvas.pointAt(note.tick+note.duration,note.pitch).toPoint()+QPoint(0,6));QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);QCOMPARE(clip->status(),QString("Ready"));}QCOMPARE(clip->notes().size(),2);canvas.close();}
+  clip->setNotes({a,b});QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);QCOMPARE(clip->audio()->feedback["phonemes"].toArray().size(),4);
+  gui::SVSResultStrip strip(clip);strip.resize(900,36);strip.show();QVERIFY(QTest::qWaitForWindowExposed(&strip));
+  for(const auto& note:{a,b}) {const auto junction=note.tick+note.duration/2;QPoint from(int(60+2*junction),28);QTest::mousePress(&strip,Qt::LeftButton,Qt::NoModifier,from);QTest::mouseRelease(&strip,Qt::LeftButton,Qt::NoModifier,from+QPoint(8,0));QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);QCOMPARE(clip->status(),QString("Ready"));QCOMPARE(clip->audio()->feedback["phonemes"].toArray().size(),4);}
+  const auto notes=clip->notes();QCOMPARE(notes[0].tick,a.tick);QCOMPARE(notes[0].duration,a.duration);QCOMPARE(notes[1].tick,b.tick);QCOMPARE(notes[1].duration,b.duration);QVERIFY(strip.setSelectedParameter("example.phonemeGain",.5));QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);strip.close();
+ }
  void readOnlyReferenceNativeWindow() {
   const auto& voice=svs::Registry::instance().voices()[0];auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong()));track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
   auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="reference-note";note.duration=192;note.lyric="la";clip->setNotes({note});clip->synthesize();QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);
