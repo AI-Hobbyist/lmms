@@ -37,6 +37,7 @@ public:
  double verticalZoom() const { return m_rowHeight/12; }
  const QSet<QString>& selectedNotes() const { return m_selected; }
  void setMoveCurves(bool value) { m_moveCurves=value; }
+ void setNotePreview(const QVector<svs::Note>& notes,bool active) {m_externalPreview=notes;m_hasExternalPreview=active;update();}
  void cancelOperation();
  void beginLyric(const QString& id);
  void copySelection();
@@ -51,6 +52,7 @@ public:
  void setParameterLane(const svs::Parameter&,bool feedback=false);
  void setParameterOverlays(const QVector<QPair<svs::Parameter,bool>>& overlays) { m_parameterOverlays=overlays; update(); }
  void setParameterActive(bool active) { if(m_parameterActive!=active) cancelOperation(); m_parameterActive=active; update(); }
+ void setReferenceVisible(bool visible) {m_referenceVisible=visible;update();}
  QString curveId() const { return m_curveId; }
  bool isParameterLane() const { return m_parameter.has_value(); }
  std::function<void()> batchLyricsRequested;
@@ -87,6 +89,8 @@ private:
  QTimer* m_autoScroll=nullptr;
  QString m_lyricId,m_hitId;
  svs::Note m_createdNote;
+ QVector<svs::Note> m_externalPreview;
+ bool m_hasExternalPreview=false;
  bool m_composing=false,m_moveCurves=false,m_finishing=false,m_mouseCaptured=false;
  QPointF m_begin,m_pointer;
  QRectF m_frame;
@@ -98,6 +102,7 @@ private:
  QString m_curveId="svs.pitch";
  std::optional<svs::Parameter> m_parameter;
  bool m_feedback=false;
+ bool m_referenceVisible=true;
  bool m_parameterActive=true;
  QVector<QPair<svs::Parameter,bool>> m_parameterOverlays;
  const QVector<svs::Note>& displayedNotes() const;

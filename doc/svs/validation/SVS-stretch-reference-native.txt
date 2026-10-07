@@ -1,0 +1,67 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\slicert.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\reverbsc.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\oscilloscope.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\sf2player.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereoenhancer.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2instrument.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\malletsstk.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspaeffect.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\vectorscope.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\zynaddsubfx.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\peakcontrollereffect.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2effect.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\vestige.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\lomm.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\audiofileprocessor.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\patman.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereomatrix.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\freeboy.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspabrowser.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\flanger.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\multitapecho.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\vibedstrings.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\eq.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\organic.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\monstro.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\dualfilter.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\hydrogenimport.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\xpressive.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\analyzer.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\waveshaper.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitcrush.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\taptempo.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\sfxr.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\dispersion.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiimport.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\slewdistortion.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitinvader.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\crossovereq.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiexport.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\nes.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\lb302.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\opulenz.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\watsyn.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\compressor.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\dynamicsprocessor.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\bassbooster.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\delay.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\granularpitchshifter.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\vsteffect.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\frequencyshifter.dll: ????????????î•
+QWARN  : SVSIntegrationTest::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlabase.dll: ????????????î•
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::readOnlyReferenceNativeWindow()
+PASS   : SVSIntegrationTest::tuneLabStretchAlignmentNativeWindow()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted, 5181ms
+********* Finished testing of SVSIntegrationTest *********

@@ -21,6 +21,7 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #include <QResizeEvent>
+#include "operations/SVSStretchOperations.h"
 #include <QInputMethodEvent>
 #include <QInputMethod>
 #include <QHelpEvent>
@@ -35,6 +36,12 @@
 namespace lmms::gui {
 namespace {
 constexpr int KeyboardWidth=60,TimelineHeight=24;
+void fillReferenceCurve(QPainter& painter,const QPainterPath& path,QColor color,double baseline) {
+ QPainterPath area;QPointF first,last;bool connected=false;
+ auto finish=[&]{if(!connected) return;area.lineTo(last.x(),baseline);area.lineTo(first.x(),baseline);area.closeSubpath();};
+ for(int i=0;i<path.elementCount();++i) {const auto point=path.elementAt(i);if(point.isMoveTo()) {finish();first=last=QPointF(point.x,point.y);area.moveTo(first);connected=true;}else if(point.isLineTo()) {last=QPointF(point.x,point.y);area.lineTo(last);}}
+ finish();color.setAlpha(64);painter.fillPath(area,color);
+}
 QString noteLabel(int pitch) {
  static const QStringList names{"C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"};
  return names[(pitch%12+12)%12]+QString::number(pitch/12-1);
@@ -74,7 +81,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip)
  connect(Engine::getSong(),&Song::timeSignatureChanged,this,[this](int,int){update();});
 }
 SVSCanvas::~SVSCanvas() = default;
-const QVector<svs::Note>& SVSCanvas::displayedNotes() const { static const QVector<svs::Note> empty; return m_transaction->active()?m_transaction->notes:m_clip?m_clip->notes():empty; }
+const QVector<svs::Note>& SVSCanvas::displayedNotes() const { static const QVector<svs::Note> empty; return m_transaction->active()?m_transaction->notes:m_hasExternalPreview?m_externalPreview:m_clip?m_clip->notes():empty; }
 QPointF SVSCanvas::pointAt(double tick,double pitch) const { return {KeyboardWidth+(tick-m_scrollTick)*m_pixelsPerTick,TimelineHeight+(m_topPitch-pitch)*m_rowHeight}; }
 QRectF SVSCanvas::noteRect(const svs::Note& note) const { return {pointAt(note.tick,note.pitch),QSizeF(note.duration*m_pixelsPerTick,m_rowHeight)}; }
 double SVSCanvas::tickAt(double x) const { return m_scrollTick+(x-KeyboardWidth)/m_pixelsPerTick; }
@@ -142,7 +149,7 @@ svs::Curve SVSCanvas::pitchCurve() const {
 void SVSCanvas::paintParameterOverlays(QPainter& painter) {
  if(!m_clip||!m_parameter) return;
  for(const auto& entry:m_parameterOverlays) {
-  const auto& parameter=entry.first; auto curve=parameterCurve(parameter,entry.second);if(!entry.second) curve=svs::withParameterBase(curve,parameter,m_clip->parameterBase(parameter));
+  const auto& parameter=entry.first;const bool readOnly=entry.second||!parameter.writable; auto curve=parameterCurve(parameter,entry.second);if(!entry.second) curve=svs::withParameterBase(curve,parameter,m_clip->parameterBase(parameter));
   const double minimum=parameter.type=="enum"||parameter.type=="bool"?0:parameter.minimum;
   const double maximum=parameter.type=="enum"?std::max(0,int(parameter.choices.size())-1):parameter.type=="bool"?1:parameter.maximum;
   QPainterPath path; bool connected=false;
@@ -154,11 +161,14 @@ void SVSCanvas::paintParameterOverlays(QPainter& painter) {
    const QPointF point(pointAt(tick,0).x(),TimelineHeight+3+(1-normalized)*std::max(1.,double(height()-TimelineHeight-6)));
    if(connected) path.lineTo(point);else path.moveTo(point);connected=true;
   }
-  const QColor declared(parameter.color);painter.setPen(QPen(declared.isValid()?declared:color("userPitchColor",QPalette::Highlight),1));painter.drawPath(path);
+  const QColor declared(parameter.color);const auto lineColor=declared.isValid()?declared:color("userPitchColor",QPalette::Highlight);
+  if(readOnly) fillReferenceCurve(painter,path,lineColor,height()-3);
+  painter.setPen(QPen(lineColor,1));painter.drawPath(path);
  }
 }
 void SVSCanvas::paintPitch(QPainter& painter) {
  if(!m_clip||(m_parameter&&!m_parameterActive)) return;
+ const bool readOnly=m_parameter&&(m_feedback||!m_parameter->writable);if(readOnly&&!m_referenceVisible) return;
  const auto curve=pitchCurve();const auto displayed=m_parameter&&!m_feedback?svs::withParameterBase(curve,*m_parameter,m_clip->parameterBase(*m_parameter)):curve; QPainterPath path; bool connected=false;
  const double from=std::max(0.,tickAt(KeyboardWidth)),to=tickAt(width());
  // The visible interval alone determines rendering cost, independent of song length.
@@ -169,6 +179,7 @@ void SVSCanvas::paintPitch(QPainter& painter) {
  }
  const QColor declared(m_parameter?m_parameter->color:QString{}); auto curveColor=declared.isValid()?declared:color("userPitchColor",QPalette::Highlight);
  if(!m_parameter&&noteTool()) curveColor.setAlphaF(.5);
+ if(readOnly) fillReferenceCurve(painter,path,curveColor,height()-3);
  painter.setPen(QPen(curveColor,2)); painter.drawPath(path);
  if(effectiveTool()==Tool::Anchor) {
   for(const auto& anchor:curve.evaluator.points) {
@@ -181,7 +192,7 @@ void SVSCanvas::paintPitch(QPainter& painter) {
    }
   }
  }
- if(const auto audio=m_clip->audio();audio&&!m_parameter) {
+ if(const auto audio=m_clip->audio();audio&&!m_parameter&&m_referenceVisible) {
   painter.setPen(QPen(color("synthesizedPitchColor",QPalette::Text),1));
   for(const auto& feedback:feedbackPitchCurves(audio->feedback["pitch"].toArray(),audio->mapping)) {
    QPainterPath feedbackPath;bool have=false;
@@ -411,6 +422,15 @@ void SVSCanvas::updateOperation(const QPointF& point,Qt::KeyboardModifiers modif
   const double minimum=modifiers.testFlag(Qt::AltModifier)?1.:std::max(1.,m_quantization);
   note.duration=std::max(minimum,snap(tickAt(point.x()),modifiers)-note.tick);
   m_transaction->notes.push_back(note); update(); return;
+ }
+ if(m_action==Action::LeftEdge||m_action==Action::RightEdge) {
+  for(const auto& note:m_transaction->originalNotes) if(note.id==m_hitId) {
+   const auto edge=m_action==Action::LeftEdge?note.tick:note.tick+note.duration;
+   const auto boundary=snap(edge+tickAt(point.x())-tickAt(m_begin.x()),modifiers);
+   const auto minimum=modifiers.testFlag(Qt::AltModifier)?1.:std::max(1.,m_quantization);
+   svsedit::stretchNote(m_transaction->notes,m_hitId,boundary,m_action==Action::LeftEdge,minimum);break;
+  }
+  update();return;
  }
  double delta=snap(tickAt(point.x()),modifiers)-m_beginTick;
  double transpose=modifiers.testFlag(Qt::ShiftModifier)?0:std::ceil(pitchAt(point.y()))-m_beginPitch;

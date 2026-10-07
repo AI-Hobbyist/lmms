@@ -193,7 +193,13 @@ svs_status renderImpl(svs_session handle,svs_result* out) {
   for(size_t i=0;i<symbols.size();++i) { if(!firstPhoneme) phonemes+=','; firstPhoneme=false; phonemes+="{\"noteId\":"+example::quote(note.id)+",\"symbol\":"+example::quote(symbols[i].text())+",\"startSeconds\":"+decimal(note.start+double(i)*note.duration/symbols.size())+",\"durationSeconds\":"+decimal(note.duration/symbols.size())+"}"; }
  }
  double energy=0; for(float value:s.audio) energy+=value*value;
- s.feedback="{\"pitch\":"+pitch+"],\"phonemes\":"+phonemes+"],\"labels\":"+labels+"],\"parameters\":"+(full?"{\"example.energy\":"+decimal(energy)+"}":"{}")+"}";
+ std::string level="[",peak="[";const size_t frames=s.audio.size()/2,stepFrames=std::max(size_t(1),size_t(s.rate/50));
+ if(full) for(size_t frame=0;frame<frames;frame+=stepFrames) {
+  const size_t end=std::min(frames,frame+stepFrames);double sum=0,maximum=0;for(size_t i=frame*2;i<end*2;++i) {sum+=double(s.audio[i])*s.audio[i];maximum=std::max(maximum,std::abs(double(s.audio[i])));}
+  if(frame) {level+=',';peak+=',';}peak+="{\"tick\":"+decimal(localTick(s,audioStart+double(frame)/s.rate))+",\"value\":"+decimal(std::clamp(maximum,0.,1.))+"}";level+="{\"tick\":"+decimal(localTick(s,audioStart+double(frame)/s.rate))+",\"value\":"+decimal(std::clamp(std::sqrt(sum/double((end-frame)*2)),0.,1.))+"}";
+ }
+ level+=']';peak+=']';
+ s.feedback="{\"pitch\":"+pitch+"],\"phonemes\":"+phonemes+"],\"labels\":"+labels+"],\"parameters\":"+(full?"{\"example.energy\":"+decimal(energy)+"}":"{}")+",\"curves\":"+(full?"{\"example.level\":{\"id\":\"example.level\",\"unit\":\"ratio\",\"scope\":\"clip\",\"type\":\"float\",\"mode\":\"absolute\",\"interpolation\":\"linear\",\"points\":"+level+"},\"example.peak\":{\"id\":\"example.peak\",\"unit\":\"ratio\",\"scope\":\"clip\",\"type\":\"float\",\"mode\":\"absolute\",\"interpolation\":\"linear\",\"points\":"+peak+"}}":"{}")+"}";
  const double globalOrigin=s.tempo.empty()?s.originTick*s.secondsPerTick:s.tempo.secondsAt(s.originTick);
  const float* audio=s.audio.data();
  if(!s.audio.empty()&&s.host.allocate_buffer&&s.host.release_buffer) {s.buffer.size=sizeof(svs_buffer);if(s.host.allocate_buffer(s.host.context,SVS_BUFFER_AUDIO,uint64_t(s.audio.size())*sizeof(float),&s.buffer)!=SVS_OK||!s.buffer.data||s.buffer.byte_count<uint64_t(s.audio.size())*sizeof(float)) {s.releaseBuffer();return SVS_FAILED;}std::memcpy(s.buffer.data,s.audio.data(),s.audio.size()*sizeof(float));audio=static_cast<const float*>(s.buffer.data);}

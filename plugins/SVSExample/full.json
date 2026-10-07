@@ -12,7 +12,7 @@
   {"id":"example.label","name":"Label","group":"Note","order":7,"scope":"note","type":"string","default":""},
   {"id":"example.phonemeGain","name":"Phoneme gain","group":"Phoneme","order":8,"scope":"phoneme","type":"float","default":1,"min":0,"max":2,"step":0.01,"interpolation":"linear"}
  ],
- "feedbackParameters": [{"id":"example.energy","color":"#E5C75E","name":"Rendered energy","scope":"clip","type":"float","default":0,"min":0,"max":1000000,"step":0.01,"curve":true,"interpolation":"linear","writable":false}],
+ "feedbackParameters": [{"id":"example.energy","color":"#E5C75E","name":"Rendered energy","scope":"clip","type":"float","default":0,"min":0,"max":1000000,"step":0.01,"curve":true,"interpolation":"linear","writable":false}, {"id":"example.level","color":"#B590F5","name":"Rendered level","scope":"clip","type":"float","default":0,"min":0,"max":1,"step":0.001,"unit":"ratio","curve":true,"interpolation":"linear","writable":false}, {"id":"example.peak","color":"#64CEC9","name":"Rendered peak","scope":"clip","type":"float","default":0,"min":0,"max":1,"step":0.001,"unit":"ratio","curve":true,"interpolation":"linear","writable":false}],
  "pitch": {"input":"absolute","unit":"semitone","referencePitch":"note","feedback":true},
  "phonemes": {"timingEditable":true,"attributesEditable":true,"minimumDurationSeconds":0.005,"maximumLeadSeconds":0.2},
  "pronunciation": {"parser":"example.symbols.v1","candidates":true,"continuation":"-","phonemeSet":"example.multilingual.v1","phonemes":["l","a","n","i","h","ao","zh","ong","ch","k","o","s","e","t","hello","sil"],"dictionaries":["zh.json","ja.json","en.json"]},

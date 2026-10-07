@@ -800,6 +800,42 @@ private slots:
   gui::SVSLyricEditor lyrics(clip,canvas->selectedNotes());lyrics.findChild<QPlainTextEdit*>("svsBatchLyricText")->setPlainText(QString::fromUtf8("你好"));lyrics.accept();QCOMPARE(clip->notes()[0].lyric,QString::fromUtf8("好"));QCOMPARE(clip->notes()[1].lyric,QString::fromUtf8("你"));
   auto* visible=editor.findChild<QToolButton*>("svsParameterAreaVisible");QVERIFY(visible);visible->click();QVERIFY(!clip->editorState()["parameterAreaVisible"].toBool());visible->click();QVERIFY(clip->editorState()["parameterAreaVisible"].toBool());
  }
+ void tuneLabStretchAlignmentNativeWindow() {
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));
+  svs::Note a;a.id="stretch-a";a.tick=48;a.duration=48;a.pitch=60;a.lyric="la";auto b=a;b.id="stretch-b";b.tick=96;b.pitch=63;
+  auto segment=[](const char* symbol,double start,double duration,double weight){return QJsonObject{{"symbol",symbol},{"startTick",start},{"durationTicks",duration},{"stretchWeight",weight},{"fixtureExtra","retained"}};};
+  a.phonemes={{"symbols",QJsonArray{"l","a"}},{"segments",QJsonArray{segment("l",-12,10,0),segment("a",-2,32,1)}}};
+  b.phonemes={{"symbols",QJsonArray{"l","a"}},{"segments",QJsonArray{segment("l",-18,18,0),segment("a",0,48,1)}}};
+  const QVector<svs::Note> original{a,b};clip->setNotes(original);
+  QWidget window;window.setWindowTitle(QString::fromUtf8("SVS 拉伸操作对齐"));auto* layout=new QVBoxLayout(&window);auto* canvas=new gui::SVSCanvas(clip,&window);canvas->setTool(gui::SVSCanvas::Tool::Pencil);canvas->setScroll(0,72);canvas->setQuantization(12);layout->addWidget(canvas);auto* strip=new gui::SVSResultStrip(clip,&window);strip->setQuantization(12);layout->addWidget(strip);QObject::connect(strip,&gui::SVSResultStrip::notePreviewChanged,canvas,&gui::SVSCanvas::setNotePreview);window.resize(700,420);window.show();QVERIFY(QTest::qWaitForWindowExposed(&window));QTest::qWait(120);
+  auto* journal=Engine::projectJournal();const auto journalling=journal->isJournalling();auto restore=qScopeGuard([&]{journal->setJournalling(journalling);});journal->setJournalling(true);clip->setJournalling(true);
+  // Both notes, both edges, extension and contraction. The untouched outer
+  // endpoint and the exact neighbor edit are checked against the UI evidence.
+  for(int which:{0,1}) for(bool head:{false,true}) for(int delta:{-12,12}) {
+   clip->setNotes(original);const auto& note=original[which];const auto r=canvas->noteRect(note);const QPoint from(int(head?r.left()+2:r.right()-2),int(r.center().y()));
+   const auto depth=journal->undoDepth();QTest::mousePress(canvas,Qt::LeftButton,Qt::NoModifier,from);QTest::mouseMove(canvas,from+QPoint(delta*2,0));QCOMPARE(clip->notes(),original);
+   QTest::mouseRelease(canvas,Qt::LeftButton,Qt::NoModifier,from+QPoint(delta*2,0));const auto changed=clip->notes();QCOMPARE(changed.size(),2);QCOMPARE(changed[which].pitch,note.pitch);
+   QCOMPARE(changed[which].tick,head?note.tick+delta:note.tick);QCOMPARE(changed[which].tick+changed[which].duration,head?note.tick+note.duration:note.tick+note.duration+delta);
+   if(which==0&&!head&&delta>0) {QCOMPARE(changed[1].tick,108.);QCOMPARE(changed[1].tick+changed[1].duration,144.);} else if(which==1&&head&&delta<0) {QCOMPARE(changed[0].tick,48.);QCOMPARE(changed[0].duration,36.);} else {QCOMPARE(changed[1-which].tick,original[1-which].tick);QCOMPARE(changed[1-which].duration,original[1-which].duration);QCOMPARE(changed[1-which].pitch,original[1-which].pitch);QCOMPARE(changed[1-which].parameters,original[1-which].parameters);}
+   QCOMPARE(journal->undoDepth(),depth+1);QTest::keyClick(canvas,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  }
+  auto drag=[&](double from,double to,int y,Qt::KeyboardModifiers modifiers=Qt::NoModifier){QPoint start(int(60+from*2),y),end(int(60+to*2),y);QTest::mousePress(strip,Qt::LeftButton,modifiers,start);QTest::mouseMove(strip,end);QCOMPARE(clip->notes(),original);QTest::mouseRelease(strip,Qt::LeftButton,modifiers,end);};
+  auto get=[&](int note,int index,const char* field){return clip->notes()[note].phonemes["segments"].toArray()[index].toObject()[field].toDouble();};
+  const int lower=strip->height()-6,upper=6;
+  clip->setNotes(original);drag(36,32,lower);QCOMPARE(get(0,0,"startTick"),-16.);QCOMPARE(get(0,0,"durationTicks"),14.);QCOMPARE(clip->notes()[0].tick,48.);QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  drag(46,50,lower);QCOMPARE(get(0,0,"startTick"),-8.);QCOMPARE(get(0,0,"durationTicks"),10.);QCOMPARE(get(0,1,"startTick"),2.);QCOMPARE(get(0,1,"durationTicks"),28.);QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  drag(78,74,lower);QCOMPARE(get(0,1,"durationTicks"),28.);QCOMPARE(get(1,0,"startTick"),-22.);QCOMPARE(get(1,0,"durationTicks"),22.);QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  const auto depth=journal->undoDepth();drag(96,100,lower);QCOMPARE(get(1,0,"startTick"),-14.);QCOMPARE(get(1,0,"durationTicks"),18.);QCOMPARE(get(0,1,"durationTicks"),36.);QCOMPARE(get(1,1,"startTick"),4.);QCOMPARE(get(1,1,"durationTicks"),44.);QCOMPARE(clip->notes()[1].tick,96.);QCOMPARE(journal->undoDepth(),depth+1);QCOMPARE(clip->notes()[1].phonemes["segments"].toArray()[0].toObject()["fixtureExtra"].toString(),QString("retained"));
+  QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  // Same x, different vertical half: shared note boundary changes both notes.
+  drag(96,100,upper);QCOMPARE(clip->notes()[0].duration,52.);QCOMPARE(clip->notes()[1].tick,100.);QCOMPARE(clip->notes()[1].tick+clip->notes()[1].duration,144.);QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  drag(144,148,lower);QCOMPARE(clip->notes()[1].duration,52.);QCOMPARE(get(1,1,"durationTicks"),52.);QTest::keyClick(strip,Qt::Key_Z,Qt::ControlModifier);QCOMPARE(clip->notes(),original);
+  drag(96,101,lower,Qt::AltModifier);QCOMPARE(get(1,1,"startTick"),0.);QCOMPARE(clip->notes(),original); // Alt snaps back to 96, no override/checkpoint.
+  QPoint point(252,lower);QTest::mousePress(strip,Qt::LeftButton,Qt::NoModifier,point);QTest::mouseMove(strip,point+QPoint(8,0));QTest::keyClick(strip,Qt::Key_Escape);QTest::mouseRelease(strip,Qt::LeftButton,Qt::NoModifier,point+QPoint(8,0));QCOMPARE(clip->notes(),original);
+  QTest::qWait(120);if(const auto evidence=qEnvironmentVariable("LMMS_SVS_STRETCH_EVIDENCE");!evidence.isEmpty()) {QVERIFY(window.screen()->grabWindow(window.winId()).save(evidence));}
+  window.close();
+ }
  void optimizedTuneLabParameterResetSemantics() {
   const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="reset-note";note.duration=384;clip->setNotes({note});
   const auto* declaration=track->capabilities().parameter("example.tension","clip");QVERIFY(declaration);const auto parameter=*declaration;
@@ -823,6 +859,23 @@ private slots:
   for(const auto& p:track->capabilities().parameters) if(p.id=="example.power"||p.id=="example.soft"||p.id=="example.mode") {
    lane.setParameterLane(p);QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,QPoint(300,100));QVERIFY(clip->curves().contains(p.id));QCOMPARE(clip->curves()[p.id].scope,p.scope);QCOMPARE(clip->curves()[p.id].valueAt(120),std::optional<QJsonValue>(p.defaultValue));
   }
+ }
+ void readOnlyReferenceNativeWindow() {
+  const auto& voice=svs::Registry::instance().voices()[0];auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong()));track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="reference-note";note.duration=192;note.lyric="la";clip->setNotes({note});clip->synthesize();QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);
+  const auto audio=clip->audio();const auto notes=clip->notes();const auto curves=clip->curves();const svs::Parameter* parameter=nullptr;for(const auto& item:track->capabilities().feedbackParameters) if(item.id=="example.level") parameter=&item;QVERIFY(parameter);QVERIFY(!parameter->writable);
+  svs::Curve level;QString error;QVERIFY2(svs::Curve::fromJson(audio->feedback["curves"].toObject()["example.level"].toObject(),level,error,parameter),qPrintable(error));QVERIFY(level.evaluator.points.size()>2);bool nonzero=false;for(const auto& point:level.evaluator.points) {QVERIFY(point.value>=0&&point.value<=1);nonzero|=point.value>0;}QVERIFY(nonzero);
+  gui::SVSPianoRoll editor(clip);editor.resize(1200,850);editor.show();QVERIFY(QTest::qWaitForWindowExposed(&editor));QTest::qWait(150);
+  QVERIFY(!editor.findChild<QLabel*>("svsReadOnlyLabel"));QVERIFY(editor.findChild<QFrame*>("svsReadOnlyDivider")->isVisible());QVERIFY(!editor.findChild<QToolButton*>("svsReferenceVisible"));
+  auto* tab=editor.findChild<QToolButton*>("svsParameterTab.feedback:example.level");QVERIFY(tab);QTest::mouseClick(tab,Qt::LeftButton);auto* lane=editor.findChild<gui::SVSCanvas*>("svsParameterLane.example.level.feedback");QVERIFY(lane);
+  auto* peakTab=editor.findChild<QToolButton*>("svsParameterTab.feedback:example.peak");QVERIFY(peakTab);const auto peakPoints=audio->feedback["curves"].toObject()["example.peak"].toObject()["points"].toArray();QVERIFY(peakPoints.size()>2);QVERIFY(peakPoints[1].toObject()["value"].toDouble()>0);
+  QTest::mouseClick(peakTab,Qt::RightButton);QVERIFY(!clip->editorState()["lanes"].toObject()["feedback:example.peak"].toObject()["visible"].toBool());QVERIFY(clip->editorState()["lanes"].toObject()["feedback:example.level"].toObject()["visible"].toBool());QTest::mouseClick(peakTab,Qt::RightButton);
+  auto capture=[&]{QTest::qWait(100);return editor.screen()->grabWindow(0,editor.mapToGlobal(QPoint()).x(),editor.mapToGlobal(QPoint()).y(),editor.width(),editor.height());};
+  const auto on=capture();QTest::mouseClick(tab,Qt::RightButton);QVERIFY(!clip->editorState()["lanes"].toObject()["feedback:example.level"].toObject()["visible"].toBool());QVERIFY(clip->editorState()["lanes"].toObject()["feedback:example.energy"].toObject()["visible"].toBool(true));const auto off=capture();QVERIFY(on.toImage()!=off.toImage());QTest::mouseClick(peakTab,Qt::RightButton);const auto bothOff=capture();QVERIFY(off.toImage()!=bothOff.toImage());QTest::mouseClick(peakTab,Qt::RightButton);
+  QTest::mouseClick(lane,Qt::LeftButton,Qt::NoModifier,lane->curvePointAt(60,.7).toPoint());QTest::mouseClick(lane,Qt::RightButton,Qt::NoModifier,lane->curvePointAt(60,.7).toPoint());QCOMPARE(clip->curves(),curves);QCOMPARE(clip->notes(),notes);QCOMPARE(clip->audio(),audio);
+  {gui::SVSPianoRoll restored(clip);QVERIFY(!clip->editorState()["lanes"].toObject()["feedback:example.level"].toObject()["visible"].toBool());}
+  QTest::mouseClick(tab,Qt::RightButton);QVERIFY(clip->editorState()["lanes"].toObject()["feedback:example.level"].toObject()["visible"].toBool());QCOMPARE(clip->audio(),audio);
+  const auto evidence=qEnvironmentVariable("LMMS_SVS_REFERENCE_EVIDENCE");if(!evidence.isEmpty()) {QVERIFY(on.save(evidence+"-on.png"));QVERIFY(off.save(evidence+"-off.png"));}editor.close();
  }
  void parameterLaneDrawingAndPersistence() {
   const auto& voice=svs::Registry::instance().voices()[0];auto* track=static_cast<SVSTrack*>(Track::create(Track::Type::SVS,Engine::getSong()));track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));

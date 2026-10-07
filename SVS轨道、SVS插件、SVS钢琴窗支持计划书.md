@@ -430,3 +430,14 @@ PASS：连续浮点自由笔参考 TuneLab 的笔触简化和单调三次 Hermit
 Release 前台编译通过；最终 Windows 原生完整回归 **59 passed / 0 failed / 0 skipped**。原生窗口绘制、合成及截图专项 **4 passed / 0 failed / 0 skipped**，实际截图已读取确认连续音高与浮点参数呈平滑弧线，测试窗口已关闭。开发版 `lmms.exe`、`lmms-svs-aligned.exe`、示例插件和测试程序已更新并核对哈希。证据：`doc/svs/validation/SVS-smooth-build-final.log`、`SVS-smooth-regression.txt`、`SVS-smooth-native-window.txt`、`SVS-smooth-native-window.png`、`SVS-smooth-deploy.log`；初始失败及实现映射见 `doc/svs/SVS-curve-smoothing.md`。
 
 仅修改独立 SVS 模块和必要测试，无公开 ABI 变更，不增加参考目录、TuneLab/.NET 或本机图像依赖。未使用 offscreen、Computer Use 或原安装版 LMMS。最终操作手感/听感仍为 **MANUAL/PENDING**；安装目录内测试程序加载相邻 LADSPA 模块的失败只记录 follow-up，不改相邻系统。
+
+
+## 26. 用户验收修正：实测音符／音素边界拉伸（2026-10-07）
+
+PASS：按 TuneLab 钢琴窗实测对齐音符首尾伸缩、覆盖相邻音符的边界修剪、缩短留空、相对边缘偏移、默认量化／Alt 自由。音素条上半区处理音符共享边界、下半区处理音素起点；刚性前置辅音平移与相邻元音时长联动，末尾转交音符尾端。支持非写入预览、一次提交／撤销、取消及插件时长能力门禁，未知音素 JSON 字段保持。仅改独立 SVS 模块，不引入 TuneLab 运行依赖。
+
+## 27. 用户验收修正：独立只读参照及有值示例（2026-10-07）
+
+PASS：只读参数曲线增加按插件颜色的半透明填充，缺口不连接；去掉 Read-only 前置标签，保留输入／结果分界。每条结果按钮右键独立显隐，包括选中结果；关闭后按钮变淡，状态按 ID 持久化，无全局开关，不触发重新合成。SVSExample full 提供 Rendered level／Rendered peak 两条不同颜色的实际 PCM RMS／峰值曲线，SDK 格式文档同步，无公开 ABI 变更。
+
+第 26／27 节前台 Release 编译通过，启用的原生插件在 build/Release/plugins 原位重新链接，开发主程序为 build/Release/lmms.exe。Windows 原生完整 SVS 回归 **61 passed / 0 failed / 0 skipped**；开发主题实窗专项 **4 passed / 0 failed / 0 skipped**，真实屏幕截图已检查，测试窗口关闭。未使用 offscreen 或 Computer Use；用户最终操作／布局人工验收 **MANUAL/PENDING**。证据与限定范围见 `doc/svs/SVS-stretch-and-reference-alignment.md`。

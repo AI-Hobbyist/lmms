@@ -8,6 +8,8 @@ Declare `languages`, `defaultLanguage`, `noteLanguage`, `parameters`, `feedbackP
 
 `curve:true` enables an input lane. Float curves use `linear`, `hermite` or `step`; integer, boolean and enum curves use `step`. String parameters remain discrete fields. The full example's `example.label` returns note-ID-bound text in feedback `labels`; numeric/bool/enum inputs affect PCM and `example.energy` reports rendered energy. This extra feedback field is preserved as an extension, without introducing an extra editor lane.
 
+Declared read-only numeric curves may be returned in `feedback.curves`, keyed by parameter ID, using the same curve object and content-local tick coordinates as input curves. The full example returns `example.level` (20 ms RMS) and `example.peak` (20 ms peak magnitude), both in the declared 0–1 range, calculated from its actual stereo PCM. LMMS draws each read-only parameter curve with a translucent fill and lets its parameter tab independently toggle visibility with the right mouse button, including the currently selected result. Visibility is editor state and does not change PCM or synthesis inputs. The existing C ABI is unchanged.
+
 Pitch input is `none`, `absolute` or `offset`. Continuous semitones use fractional MIDI pitch. Offset input requires `referencePitch`; the host derives offset from its retained absolute curve. Feedback availability is declared independently. Phoneme timing/attribute editing and minimum duration/maximum lead seconds are capability limits, not hardcoded UI constants. Synthesis declares float32/stereo, cancellation and concurrency. The initial example returns one aggregate range; internal range subdivision must preserve continuous curve evaluation.
 
 ## Dictionaries and pronunciation

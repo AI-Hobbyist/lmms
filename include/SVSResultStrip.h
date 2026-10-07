@@ -12,6 +12,7 @@ class SVSResultStrip : public QWidget {
 public:
  explicit SVSResultStrip(SVSClip*,QWidget* parent=nullptr);
  void setViewport(double tick,double zoom);
+ void setQuantization(double tick) {cancelOperation();m_quantization=tick;}
  void setThemeColors(const QMap<QString,QColor>& colors) { m_colors=colors; update(); }
  QString selectedNote() const { return m_selectedNote; }
  int selectedPhoneme() const { return m_selectedIndex; }
@@ -21,6 +22,7 @@ public:
 signals:
  void selectionChanged();
  void scrollRequested(double tick);
+ void notePreviewChanged(const QVector<svs::Note>& notes,bool active);
 protected:
  void paintEvent(QPaintEvent*) override;
  void mousePressEvent(QMouseEvent*) override;
@@ -30,10 +32,14 @@ protected:
  void contextMenuEvent(QContextMenuEvent*) override;
  bool event(QEvent*) override;
 private:
- struct Cell { QString note,symbol; int index=0; double tick=0,duration=0; QJsonObject parameters; };
+ struct Cell { QString note,symbol; int index=0; double tick=0,duration=0; QJsonObject parameters,metadata; };
  QPointer<SVSClip> m_clip;
  QMap<QString,QColor> m_colors;
- QVector<svs::Note> m_before,m_preview;
+ QVector<svs::Note> m_before,m_preview,m_seed;
+ enum class Drag { Phoneme,NoteHead,NoteTail };
+ Drag m_drag=Drag::Phoneme;
+ QString m_coupled;
+ double m_offset=0,m_quantization=12;
  QString m_selectedNote;
  int m_selectedIndex=-1,m_boundary=-1;
  double m_scroll=0,m_pixelsPerTick=2;
@@ -44,7 +50,7 @@ private:
  double m_timingOrigin=0;
  QVector<Cell> cells() const;
  QJsonObject manualPhonemes(const QString&) const;
- void updateBoundary(double tick);
+ void updateBoundary(double tick,Qt::KeyboardModifiers modifiers=Qt::NoModifier);
  void captureTiming();
  double shiftedTick(double localTick,double seconds) const;
  double tickAt(double x) const { return m_scroll+(x-60)/m_pixelsPerTick; }
