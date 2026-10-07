@@ -14,6 +14,7 @@ $zipPath = Join-Path $output $name
 if (Test-Path -LiteralPath $zipPath) { throw "Package already exists: $zipPath" }
 $payload = @{}
 foreach ($file in Get-ChildItem -LiteralPath $runtime -File) {
+    if ($file.Name -match '^(concrt140d|msvcp140(_[12])?d(_.*)?|vcruntime140(_1)?d|ucrtbased)\.dll$') { continue }
     if ($file.Extension -eq '.dll' -or $file.Name -in @('lmms.exe', 'lmms.exe.manifest', 'lmms.VisualElementsManifest.xml')) { $payload[$file.Name] = $file.FullName }
 }
 # Only installed data/voices enter the package, never a local workspace/config.
@@ -23,6 +24,11 @@ foreach ($path in Get-Content -LiteralPath (Join-Path $project 'build/install_ma
     $relative = $full.Substring($runtime.Length + 1).Replace('\', '/')
     if ($relative -match '^(data|svs)/') { $payload[$relative] = $full }
 }
+# The SVS example is built directly into the runtime; its DLL may be absent
+# from the top-level install manifest when the nested target is excluded.
+$svsExampleDll = Join-Path $runtime 'svs/SVSExample/SVSExample.dll'
+if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) { throw 'Deployed SVS example DLL missing.' }
+$payload['svs/SVSExample/SVSExample.dll'] = $svsExampleDll
 foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imageformats', 'networkinformation', 'platforms', 'styles', 'tls')) {
     $folder = Join-Path $runtime $directory
     if (-not (Test-Path -LiteralPath $folder)) { continue }
@@ -37,6 +43,9 @@ if ($targets.Count -ne 52) { throw 'Frozen plugin target count differs.' }
 foreach ($target in $targets) { if (-not $payload.ContainsKey("plugins/$target.dll")) { throw "Missing enabled plugin: $target" } }
 foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'data/themes/default/style.css', 'plugins/midiimport.dll', 'plugins/midiexport.dll', 'plugins/hydrogenimport.dll', 'plugins/vstbase.dll', 'plugins/RemoteCatalogIo.exe', 'plugins/RemoteVstHost64.exe', 'plugins/32/RemoteVstHost32.exe', 'plugins/RemoteVstPlugin64.exe', 'plugins/32/RemoteVstPlugin32.exe', 'plugins/RemoteZynAddSubFx.exe')) {
     if (-not $payload.ContainsKey($required)) { throw "Incomplete runtime: $required" }
+}
+foreach ($required in @('svs/SVSExample/SVSExample.dll', 'svs/SVSExample/manifest.json', 'svs/SVSExample/avatar.svg', 'svs/SVSExample/portrait.svg', 'data/themes/default/svs_track.svg')) {
+    if (-not $payload.ContainsKey($required)) { throw "Incomplete SVS runtime: $required" }
 }
 $records = @($payload.Keys | Sort-Object | ForEach-Object {
     $file = Get-Item -LiteralPath $payload[$_]
@@ -61,9 +70,10 @@ LMMS 现代界面全量替换包（Windows x64）
 
 本包为完整运行文件，并非差分包：主程序、52 个启用 UI 插件、3 个导入导出插件、
 支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与 SVS 示例。
-Sid（缺 Perl）与 GigPlayer（缺 libgig）未构建；人工观感、真实跨屏 DPI、完整中文 IME、
-听感与 5 个外部插件环境未人工验收；私有 PNG artwork 按用户要求保留。
-程序/资源已经在原生 Windows Qt 窗口检查，100%/150% 完整场景及 125%/200% 有限抽查通过。
+Sid（缺 Perl）与 GigPlayer（缺 libgig）未构建。
+本包包含 SVS 音符拉伸音素时长限制修复与原版风格琴键，SVS 自动回归 63 项通过。
+SVS 实窗专项使用实际部署插件与主题通过；最终操作体验和听感待人工验收。
+本机测试头像、立绘及开发版个人配置未打包；示例使用自带 SVG 资源。
 
 构建来源：https://github.com/AI-Hobbyist/lmms
 源代码版本：7b44c5487187d241c2dece22630a573479129c44（F6）
