@@ -1,7 +1,11 @@
-param([string]$ProductCommit = '7b44c5487187d241c2dece22630a573479129c44')
+param([string]$ProductCommit)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $project = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+if (-not $ProductCommit) {
+    $ProductCommit = & git -C $project rev-parse HEAD
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the product source commit.' }
+}
 $runtime = Join-Path $project 'build/Release'
 $output = Join-Path $project 'build/packages'
 if (-not (Test-Path -LiteralPath $runtime -PathType Container) -or -not (Test-Path -LiteralPath $output -PathType Container)) { throw 'Reuse the existing runtime and package directories.' }
@@ -67,6 +71,7 @@ Sid（缺 Perl）与 GigPlayer（缺 libgig）未构建；人工观感、真实�
 详细证据：仓库 doc/ui-modernization/acceptance.md 与 delivery-audit.md。
 许可文本：LICENSE.txt；第三方资源随其原有许可。请保留自己的原安装文件作为回滚来源。
 '@
+$instructions = $instructions.Replace('7b44c5487187d241c2dece22630a573479129c44（F6）', $ProductCommit)
 $cmd = "@echo off`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"%~dp0Install-Replace.ps1`"`r`npause`r`n"
 $expected = @{}
 $archive = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Create)

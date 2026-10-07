@@ -731,6 +731,14 @@ void InstrumentTrackWindow::viewPrevInstrument()
 
 void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 {
+	if (LmmsStyle::s_flatFrames && w == m_instrumentView && m_instrumentView && !m_instrumentView->isResizable())
+	{
+		// Fixed artwork has absolute control coordinates. The wider common pages
+		// must not stretch this panel and tile its background into another copy.
+		w->resize(w->sizeHint());
+		w->update();
+		return;
+	}
 	// "-1" :
 	// in "TabWidget::addTab", under "Position tab's window", the widget is
 	// moved up by 1 pixel

@@ -28,6 +28,7 @@
 #include "NotePlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
+#include "InstrumentView.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
 #include "MidiClip.h"
@@ -173,6 +174,35 @@ private slots:
 				capture(m_gui->mainWindow(),"F3-dropped-"+name);
 				QTest::mouseClick(label,Qt::LeftButton,Qt::NoModifier,QPoint(10,label->height()/2));
 				QTRY_VERIFY(!window->isVisible());
+			}
+		}
+		void fixedInstrumentArtworkGeometry()
+		{
+			for(const auto& name:{QString("tripleoscillator"),QString("vibedstrings")})
+			{
+				auto* track=new InstrumentTrack(Engine::getSong());QVERIFY(track->loadInstrument(name));
+				InstrumentTrackView* view=nullptr;
+				QTRY_VERIFY(([&]{for(auto* candidate:m_gui->mainWindow()->findChildren<InstrumentTrackView*>())
+					if(candidate->model()==track){view=candidate;return true;}return false;})());
+				auto* window=view->getInstrumentTrackWindow();window->toggleVisibility(true);
+				window->parentWidget()->move(0,0);
+				QVERIFY(QTest::qWaitForWindowExposed(window->window()));QTest::qWait(200);
+				InstrumentView* panel=nullptr;
+				for(auto* candidate:window->findChildren<QWidget*>())
+					if(auto* instrument=dynamic_cast<InstrumentView*>(candidate)){panel=instrument;break;}
+				QVERIFY(panel);QVERIFY(!panel->isResizable());
+				capture(m_gui->mainWindow(),"plugin-geometry-"+name);
+				const auto artwork=panel->palette().brush(panel->backgroundRole()).texture();QVERIFY(!artwork.isNull());
+				const auto artworkSize=artwork.size()/artwork.devicePixelRatio();
+				QCOMPARE(panel->size(),artworkSize);
+				QVERIFY(panel->parentWidget()->rect().contains(panel->geometry()));
+				window->tabWidgetParent()->setActiveTab(1);QTest::qWait(100);
+				for(auto* label:window->findChildren<LedCheckBox*>())
+					if(label->isVisibleTo(window)) {QVERIFY(label->width()>=label->sizeHint().width());QVERIFY(label->parentWidget()->rect().contains(label->geometry()));}
+				window->tabWidgetParent()->setActiveTab(0);QTest::qWait(100);
+				QCOMPARE(panel->size(),artworkSize);
+				QVERIFY(panel->parentWidget()->rect().contains(panel->geometry()));
+				window->toggleVisibility(false);
 			}
 		}
 	void editorCanvasInteractions()

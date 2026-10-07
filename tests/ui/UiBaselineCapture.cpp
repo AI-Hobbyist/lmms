@@ -306,7 +306,12 @@ private slots:
      if(candidate->model()==track) {view=candidate;break;}
     QVERIFY2(view,qPrintable(name));
     const auto preset=settings(track->instrument());
-    showEditor(view->getInstrumentTrackWindow(),"S08-plugin-"+name);
+    // Keep the default host geometry; forcing an MDI size masks fixed-panel regressions.
+    auto* window=view->getInstrumentTrackWindow();window->toggleVisibility(true);
+    window->parentWidget()->move(0,0);
+    QVERIFY(window->isVisible());QVERIFY(!window->visibleRegion().isEmpty());
+    capture(m_gui->mainWindow(),"S08-plugin-"+name);
+    window->toggleVisibility(false);
     checkPreset(track->instrument(),preset);
    }
    else if(descriptor->type==Plugin::Type::Effect)

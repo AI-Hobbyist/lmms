@@ -132,3 +132,7 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 ## 完成后的全量替换包
 
 已制作 `build/packages/lmms-modern-ui-full-7b44c5487-win64.zip`（60,648,335 bytes）。3480 个运行文件、4 个安装/说明文件；ZIP 全 entry 哈希校验、Windows PowerShell 校验/实际原目录覆盖、配置保留检查及覆盖后原生实窗 3 PASS 均完成。详见 [replacement-package.md](replacement-package.md) 与 validation/package-artifact.json。此包不包含个人配置/工程；旧包外插件 DLL 原地停用以避免 ABI 混用，未实际覆盖用户的原安装版。
+
+## 原生乐器固定页裁切补修
+
+用户截图中的故障在默认尺寸窗口中复现：250×250 artwork 被宿主拉成 266×286，QPalette 自动平铺产生右侧/底部截断的第二块内容。固定插件页现按自身尺寸显示；滚动条原本存在，保留。核心 3/3、控件 13 PASS、两个截图插件双 DPI 几何/公共标签断言及默认尺寸下 47 面板双 DPI 检查通过；PNG 与模型/音频未改。原面板截图的强制 MDI 尺寸没有覆盖这一默认几何缺口，测试现已纠正。详见 [plugin-geometry-repair.md](plugin-geometry-repair.md)；此前 7b44c5487 全量包需由本次修复包替代。
