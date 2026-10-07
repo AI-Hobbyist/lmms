@@ -111,7 +111,8 @@ void SVSResultStrip::updateBoundary(double tick,Qt::KeyboardModifiers modifiers)
  tick-=m_offset;if(modifiers.testFlag(Qt::AltModifier)&&m_quantization>0) tick=std::round(tick/m_quantization)*m_quantization;
  m_preview=m_seed;
  if(m_drag!=Drag::Phoneme) {
-  svsedit::stretchNote(m_preview,m_selectedNote,tick,m_drag==Drag::NoteHead,modifiers.testFlag(Qt::AltModifier)?std::max(1.,m_quantization):1.,m_coupled);
+  const auto declaration=static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().original["phonemes"].toObject();const svsedit::StretchLimits limits{m_timing,m_timingOrigin,declaration["minimumDurationSeconds"].toDouble(.005),declaration["maximumLeadSeconds"].toDouble(0)};
+  svsedit::stretchNote(m_preview,m_selectedNote,tick,m_drag==Drag::NoteHead,modifiers.testFlag(Qt::AltModifier)?std::max(1.,m_quantization):1.,m_coupled,&limits);
   emit notePreviewChanged(m_preview,true);update();return;
  }
  const auto declaration=static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().original["phonemes"].toObject();

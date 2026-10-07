@@ -22,6 +22,7 @@
 #include <QWheelEvent>
 #include <QResizeEvent>
 #include "operations/SVSStretchOperations.h"
+#include "SVSTempoSource.h"
 #include <QInputMethodEvent>
 #include <QInputMethod>
 #include <QHelpEvent>
@@ -317,12 +318,26 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   painter.drawText(QRect(2,TimelineHeight,KeyboardWidth-4,20),Qt::AlignLeft,QString::number(curveMaximum(),'g',4));
   painter.drawText(QRect(2,height()-22,KeyboardWidth-4,20),Qt::AlignLeft,QString::number(curveMinimum(),'g',4));
   }
- } else for(int row=0;row<(height()-TimelineHeight)/m_rowHeight+2;++row) {
-  const int pitch=int(std::floor(m_topPitch))-row; if(pitch<0||pitch>127) continue; const int key=(pitch%12+12)%12;
-  const bool black=key==1||key==3||key==6||key==8||key==10; const auto y=TimelineHeight+(m_topPitch-pitch)*m_rowHeight;
-  painter.fillRect(QRectF(0,y,black?KeyboardWidth*.65:KeyboardWidth,m_rowHeight-1),black?palette().dark():palette().light());
-  if(key==0||(allNoteLabels&&!black)) { painter.setPen(palette().windowText().color()); painter.drawText(QRectF(0,y,KeyboardWidth-3,m_rowHeight),Qt::AlignRight|Qt::AlignVCenter,noteLabel(pitch)); }
+ } else {
+  painter.save();painter.setClipRect(QRect(0,TimelineHeight,KeyboardWidth,height()-TimelineHeight));
+  QFont font=painter.font();font.setPixelSize(std::max(1,int(m_rowHeight*.8)));painter.setFont(font);
+  const auto white=color("whiteKeyInactiveBackground",QPalette::Light),black=color("blackKeyInactiveBackground",QPalette::Dark);
+  const auto text=m_colors.contains("whiteKeyInactiveTextColor")?m_colors["whiteKeyInactiveTextColor"]:QColor(white.lightnessF()>.5?Qt::black:Qt::white);
+  // Native PianoRoll geometry: small white keys span 1.5 rows, D/G/A
+  // span two rows. Draw white keys first, then the shorter black keys.
+  for(bool drawBlack:{false,true}) for(int row=-1;row<(height()-TimelineHeight)/m_rowHeight+2;++row) {
+   const int pitch=int(std::floor(m_topPitch))-row;if(pitch<0||pitch>127) continue;const int key=pitch%12;
+   const bool isBlack=key==1||key==3||key==6||key==8||key==10;if(isBlack!=drawBlack) continue;
+   const auto y=TimelineHeight+(m_topPitch-pitch)*m_rowHeight;
+   const bool big=key==2||key==7||key==9;const auto smallHeight=std::floor(m_rowHeight*1.5);
+   const auto correction=isBlack?m_rowHeight:(big||key==0||key==5)?smallHeight:m_rowHeight;
+   const auto keyHeight=isBlack?m_rowHeight:big?2*m_rowHeight:smallHeight;
+   painter.setPen(Qt::black);painter.setBrush(isBlack?black:white);painter.drawRect(QRectF(0,y+m_rowHeight-1-correction,isBlack?KeyboardWidth*.75-1:KeyboardWidth-1,keyHeight));
+   if(!isBlack&&(key==0||allNoteLabels)) {painter.setPen(text);painter.drawText(QRectF(0,y,KeyboardWidth-3,m_rowHeight),Qt::AlignRight|Qt::AlignVCenter,noteLabel(pitch));}
+  }
+  painter.restore();
  }
+
  painter.fillRect(QRect(0,0,width(),TimelineHeight),palette().window()); painter.setPen(palette().windowText().color());
  const auto bar=TimePos::ticksPerBar(); const double offset=m_clip?int(m_clip->startPosition())+int(m_clip->startTimeOffset()):0;
  for(int index=int(std::floor((m_scrollTick+offset)/bar));index<=(tickAt(width())+offset)/bar;++index) { const auto x=pointAt(index*bar-offset,0).x(); if(x<KeyboardWidth) continue; painter.drawText(QRectF(x+3,0,80,TimelineHeight),Qt::AlignVCenter,QString::number(index+1)); }
@@ -428,7 +443,9 @@ void SVSCanvas::updateOperation(const QPointF& point,Qt::KeyboardModifiers modif
    const auto edge=m_action==Action::LeftEdge?note.tick:note.tick+note.duration;
    const auto boundary=snap(edge+tickAt(point.x())-tickAt(m_begin.x()),modifiers);
    const auto minimum=modifiers.testFlag(Qt::AltModifier)?1.:std::max(1.,m_quantization);
-   svsedit::stretchNote(m_transaction->notes,m_hitId,boundary,m_action==Action::LeftEdge,minimum);break;
+   const auto declaration=static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().original["phonemes"].toObject();
+   const svsedit::StretchLimits limits{svs::TempoSource::forSong(*Engine::getSong()).snapshot(),double(int(m_clip->startPosition())+int(m_clip->startTimeOffset())),declaration["minimumDurationSeconds"].toDouble(.005),declaration["maximumLeadSeconds"].toDouble(0)};
+   svsedit::stretchNote(m_transaction->notes,m_hitId,boundary,m_action==Action::LeftEdge,minimum,{},&limits);break;
   }
   update();return;
  }

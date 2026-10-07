@@ -36,6 +36,9 @@ class SVSCanvas;
 class SVSPianoRoll : public QWidget {
  Q_OBJECT
  Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setbackgroundColor)
+ Q_PROPERTY(QColor whiteKeyInactiveBackground READ whiteKeyInactiveBackground WRITE setwhiteKeyInactiveBackground)
+ Q_PROPERTY(QColor blackKeyInactiveBackground READ blackKeyInactiveBackground WRITE setblackKeyInactiveBackground)
+ Q_PROPERTY(QColor whiteKeyInactiveTextColor READ whiteKeyInactiveTextColor WRITE setwhiteKeyInactiveTextColor)
  Q_PROPERTY(QColor gridLineColor READ gridLineColor WRITE setgridLineColor)
  Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setbeatLineColor)
  Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setbarLineColor)
@@ -55,6 +58,12 @@ public:
  void openIn(MainWindow*);
  QColor backgroundColor() const { return m_colors.value(QStringLiteral("backgroundColor")); }
  void setbackgroundColor(const QColor& value) { setThemeColor(QStringLiteral("backgroundColor"),value); }
+ QColor whiteKeyInactiveBackground() const { return m_colors.value("whiteKeyInactiveBackground"); }
+ void setwhiteKeyInactiveBackground(const QColor& value) { setThemeColor("whiteKeyInactiveBackground",value); }
+ QColor blackKeyInactiveBackground() const { return m_colors.value("blackKeyInactiveBackground"); }
+ void setblackKeyInactiveBackground(const QColor& value) { setThemeColor("blackKeyInactiveBackground",value); }
+ QColor whiteKeyInactiveTextColor() const { return m_colors.value("whiteKeyInactiveTextColor"); }
+ void setwhiteKeyInactiveTextColor(const QColor& value) { setThemeColor("whiteKeyInactiveTextColor",value); }
  QColor gridLineColor() const { return m_colors.value(QStringLiteral("gridLineColor")); }
  void setgridLineColor(const QColor& value) { setThemeColor(QStringLiteral("gridLineColor"),value); }
  QColor beatLineColor() const { return m_colors.value(QStringLiteral("beatLineColor")); }

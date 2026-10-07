@@ -121,7 +121,7 @@ svs_status SVS_CALL submit(svs_session handle,const svs_snapshot* in) {
    for(const auto& segment:note.phonemes["segments"].array) {
     const double start=segmentBegin(s,note,segment)-note.start,duration=segmentEnd(s,note,segment)-segmentBegin(s,note,segment);
     if(segment["startTick"].type!=example::Json::Number||segment["durationTicks"].type!=example::Json::Number) return SVS_INVALID_INPUT;
-    if(!std::isfinite(start)||!std::isfinite(duration)||start<-.2||start<previous-1e-8||duration<.005-1e-8||start+duration>note.duration+1e-8) return SVS_INVALID_INPUT;
+    if(!std::isfinite(start)||!std::isfinite(duration)||start<-.2-1e-8||start<previous-1e-8||duration<.005-1e-8||start+duration>note.duration+1e-8) return SVS_INVALID_INPUT;
     bool known=false; for(const auto& symbol:phonemeSchema["pronunciation"]["phonemes"].array) known|=symbol.text()==segment["symbol"].text(); if(!known) return SVS_INVALID_INPUT;
     const auto& gain=segment["parameters"]["example.phonemeGain"]; if(gain.type!=example::Json::Null&&(gain.type!=example::Json::Number||gain.number<0||gain.number>2)) return SVS_INVALID_INPUT;
     previous=start+duration;

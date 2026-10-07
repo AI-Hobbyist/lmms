@@ -1313,6 +1313,9 @@ lmms--gui--BarModelEditor {
 
 /* Native SVS editor follows this theme's piano and palette colors. */
 lmms--gui--SVSPianoRoll {
+	qproperty-whiteKeyInactiveBackground: #E5EAF0;
+	qproperty-blackKeyInactiveBackground: #20262D;
+	qproperty-whiteKeyInactiveTextColor: #000;
 	qproperty-backgroundColor: #14181D;
 	qproperty-gridLineColor: #29323B;
 	qproperty-beatLineColor: #35414D;

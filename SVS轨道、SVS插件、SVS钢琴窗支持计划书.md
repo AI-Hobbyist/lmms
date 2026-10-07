@@ -448,3 +448,12 @@ PASS：只读参数曲线增加按插件颜色的半透明填充，缺口不连�
 确认第 26／27 节的示例插件测试目录与开发版实际加载目录不一致，实际运行仍使用旧 SVSExample，导致 Level／Peak 未出现；上一节的开发部署完成结论在此纠正。Windows 工程 SVSExample 改为直接写入现有 build/Release/svs/SVSExample，CTest 读取目标目录，不新建目录。旧 build/svs 输出 DLL 原位停用为 .dll.disabled。
 
 前台编译通过，实际部署目录开发主题实窗专项 **4 passed / 0 failed / 0 skipped**，完整 SVS CTest **1/1 通过**。铅笔新建音符后的合成、自动生成音素交界独立拖动、单音素增益和两条有值结果独立显隐已验证。原截图 Failed (2) 尚未稳定复现，更新后用户工程复核为 **MANUAL/PENDING**，不宣称其全部根因已确认。详见 `doc/svs/SVS-deployed-plugin-correction.md`。
+
+
+## 29. 拉伸后音素失败与琴键风格修正（2026-10-07）
+
+PASS：已稳定复现短辅音随音符按比例缩短到声库最短时长以下，导致 Failed (2)／合成音素反馈丢失。画布与音素条共享伸缩加入 tempo-aware 最短时长、提前量、顺序及尾端约束；过短段保留最小时长并顺移相邻起点，放不下时限制整段手势边界。示例插件提前量比较补齐浮点舍入容差。原八种音符首尾方向追加再次合成验证，新增短辅音及三音素极限缩短回归。
+
+SVS 琴键按原版钢琴窗的白键跨度、叠加黑键、轮廓、宽度比例和随高度缩放字号绘制，默认主题使用原版琴键配色与黑色音名；保留 SVS 区域宽度与交互，不修改普通 PianoRoll。主题 CSS 已同步到既有开发部署目录并核对哈希。
+
+前台 Release 构建通过；开发程序／SVSExample／普通插件仍在原目录。完整 SVS 回归 **63 passed / 0 failed / 0 skipped**，完整 CTest **1/1 通过**；使用实际部署数据和插件的实窗专项 **5 passed / 0 failed / 0 skipped**。真实截图已检查，测试窗口关闭。无 offscreen 或 Computer Use；最终人工手感验收 **MANUAL/PENDING**。详见 `doc/svs/SVS-stretch-phoneme-limits-and-keyboard.md`。
