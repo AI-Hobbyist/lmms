@@ -364,7 +364,7 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 // Let parent widgets know how much space this tab widget needs
 QSize TabWidget::minimumSizeHint() const
 {
-	if (m_resizable)
+	if (m_resizable || m_flatStyle)
 	{
 		int maxWidth = 0, maxHeight = 0;
 		for (const auto& widget : m_widgets)
@@ -385,7 +385,7 @@ QSize TabWidget::minimumSizeHint() const
 
 QSize TabWidget::sizeHint() const
 {
-	if (m_resizable)
+	if (m_resizable || m_flatStyle)
 	{
 		int maxWidth = 0, maxHeight = 0;
 		for (const auto& widget : m_widgets)

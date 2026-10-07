@@ -1,0 +1,1292 @@
+[
+  {
+    "Plugin": "AudioFileProcessor",
+    "Target": "audiofileprocessor",
+    "Descriptor": "audiofileprocessor",
+    "Source": "plugins/AudioFileProcessor/AudioFileProcessor.cpp / plugins/AudioFileProcessor/AudioFileProcessorView.cpp / plugins/AudioFileProcessor/AudioFileProcessorWaveView.cpp / plugins/AudioFileProcessor/AudioFileProcessor.h / plugins/AudioFileProcessor/AudioFileProcessorView.h / plugins/AudioFileProcessor/AudioFileProcessorWaveView.h",
+    "View": "AudioFileProcessorView / AudioFileProcessorWaveView",
+    "Artwork": "SKIPPED / PNG：artwork / loop_off_off / loop_off_on / loop_on_off / loop_on_on / loop_pingpong_off / loop_pingpong_on / reverse_off / reverse_on / select_file / stutter_off / stutter_on",
+    "Widgets": "PixmapButton",
+    "Geometry": "AudioFileProcessorView.cpp, AudioFileProcessorWaveView.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "audiofileprocessor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "audiofileprocessor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-audiofileprocessor.png) / [150%](validation/F5-150/S08-plugin-audiofileprocessor.png)"
+  },
+  {
+    "Plugin": "Kicker",
+    "Target": "kicker",
+    "Descriptor": "kicker",
+    "Source": "plugins/Kicker/Kicker.cpp / plugins/Kicker/Kicker.h",
+    "View": "KickerInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "LedCheckBox",
+    "Geometry": "Kicker.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "kicker",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "kicker",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-kicker.png) / [150%](validation/F5-150/S08-plugin-kicker.png)"
+  },
+  {
+    "Plugin": "TripleOscillator",
+    "Target": "tripleoscillator",
+    "Descriptor": "tripleoscillator",
+    "Source": "plugins/TripleOscillator/TripleOscillator.cpp / plugins/TripleOscillator/TripleOscillator.h",
+    "View": "TripleOscillatorView",
+    "Artwork": "SKIPPED / PNG：am_active / am_inactive / artwork / exp_shape_active / exp_shape_inactive / fm_active / fm_inactive / mix_active / mix_inactive / moog_saw_shape_active / moog_saw_shape_inactive / pm_active / pm_inactive / saw_shape_active / saw_shape_inactive / sin_shape_active / sin_shape_inactive / square_shape_active / square_shape_inactive / sync_active / sync_inactive / triangle_shape_active / triangle_shape_inactive / usr_shape_active / usr_shape_inactive / wavetable_active / wavetable_inactive / white_noise_shape_active / white_noise_shape_inactive",
+    "Widgets": "PixmapButton",
+    "Geometry": "TripleOscillator.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "tripleoscillator",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "tripleoscillator",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-tripleoscillator.png) / [150%](validation/F5-150/S08-plugin-tripleoscillator.png)"
+  },
+  {
+    "Plugin": "Amplifier",
+    "Target": "amplifier",
+    "Descriptor": "amplifier",
+    "Source": "plugins/Amplifier/AmplifierControlDialog.cpp / plugins/Amplifier/AmplifierControlDialog.h / plugins/Amplifier/AmplifierControls.h",
+    "View": "AmplifierControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / QGridLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "amplifier",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "amplifier",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-amplifier.png) / [150%](validation/F5-150/S08-plugin-amplifier.png)"
+  },
+  {
+    "Plugin": "BassBooster",
+    "Target": "bassbooster",
+    "Descriptor": "bassbooster",
+    "Source": "plugins/BassBooster/BassBoosterControlDialog.cpp / plugins/BassBooster/BassBoosterControlDialog.h / plugins/BassBooster/BassBoosterControls.h",
+    "View": "BassBoosterControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / QHBoxLayout / QVBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "bassbooster",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "bassbooster",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-bassbooster.png) / [150%](validation/F5-150/S08-plugin-bassbooster.png)"
+  },
+  {
+    "Plugin": "BitInvader",
+    "Target": "bitinvader",
+    "Descriptor": "bitinvader",
+    "Source": "plugins/BitInvader/BitInvader.cpp / plugins/BitInvader/BitInvader.h",
+    "View": "BitInvaderView",
+    "Artwork": "SKIPPED / PNG：artwork / saw_wave_active / saw_wave_inactive / sin_wave_active / sin_wave_inactive / smooth_active / smooth_inactive / square_wave_active / square_wave_inactive / triangle_wave_active / triangle_wave_inactive / usr_wave_active / usr_wave_inactive / wavegraph / white_noise_wave_active / white_noise_wave_inactive",
+    "Widgets": "Graph / Knob / LedCheckBox / PixmapButton",
+    "Geometry": "BitInvader.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "bitinvader",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "bitinvader",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-bitinvader.png) / [150%](validation/F5-150/S08-plugin-bitinvader.png)"
+  },
+  {
+    "Plugin": "Bitcrush",
+    "Target": "bitcrush",
+    "Descriptor": "bitcrush",
+    "Source": "plugins/Bitcrush/BitcrushControlDialog.cpp / plugins/Bitcrush/BitcrushControlDialog.h / plugins/Bitcrush/BitcrushControls.h",
+    "View": "BitcrushControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / LedCheckBox / QLabel",
+    "Geometry": "BitcrushControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "bitcrush",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "bitcrush",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-bitcrush.png) / [150%](validation/F5-150/S08-plugin-bitcrush.png)"
+  },
+  {
+    "Plugin": "CarlaPatchbay",
+    "Target": "carlapatchbay",
+    "Descriptor": "carlapatchbay",
+    "Source": "plugins/CarlaBase/Carla.cpp",
+    "View": "instantiateView / createView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "共享/私有 painter",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "MANUAL/PENDING：外部运行环境",
+    "Preset": "MANUAL/PENDING",
+    "Runtime100": {
+      "plugin": "carlapatchbay",
+      "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+      "status": "MANUAL/PENDING"
+    },
+    "Runtime150": {
+      "plugin": "carlapatchbay",
+      "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+      "status": "MANUAL/PENDING"
+    },
+    "Evidence": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment"
+  },
+  {
+    "Plugin": "CarlaRack",
+    "Target": "carlarack",
+    "Descriptor": "carlarack",
+    "Source": "plugins/CarlaBase/Carla.cpp",
+    "View": "instantiateView / createView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "共享/私有 painter",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "MANUAL/PENDING：外部运行环境",
+    "Preset": "MANUAL/PENDING",
+    "Runtime100": {
+      "plugin": "carlarack",
+      "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+      "status": "MANUAL/PENDING"
+    },
+    "Runtime150": {
+      "plugin": "carlarack",
+      "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+      "status": "MANUAL/PENDING"
+    },
+    "Evidence": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment"
+  },
+  {
+    "Plugin": "Compressor",
+    "Target": "compressor",
+    "Descriptor": "compressor",
+    "Source": "plugins/Compressor/CompressorControlDialog.cpp / plugins/Compressor/Compressor.h / plugins/Compressor/CompressorControlDialog.h / plugins/Compressor/CompressorControls.h",
+    "View": "CompressorControlDialog",
+    "Artwork": "SKIPPED / PNG：audition_sel / audition_unsel / autogain_sel / autogain_unsel / average_sel / average_unsel / blend_sel / blend_unsel / compressor_sel / compressor_unsel / controlsBox / feedback_sel / feedback_unsel / knob_enabled / knob_enabled_large / leftright_sel / leftright_unsel / limiter_sel / limiter_unsel / lookahead_sel / lookahead_unsel / maximum_sel / maximum_unsel / midside_sel / midside_unsel / minimum_sel / minimum_unsel / peak_sel / peak_unsel / rms_sel / rms_unsel / unlinked_sel / unlinked_unsel",
+    "Widgets": "Knob / PixmapButton / QLabel",
+    "Geometry": "CompressorControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "compressor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "compressor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-compressor.png) / [150%](validation/F5-150/S08-plugin-compressor.png)"
+  },
+  {
+    "Plugin": "CrossoverEQ",
+    "Target": "crossovereq",
+    "Descriptor": "crossovereq",
+    "Source": "plugins/CrossoverEQ/CrossoverEQControlDialog.cpp / plugins/CrossoverEQ/CrossoverEQControlDialog.h / plugins/CrossoverEQ/CrossoverEQControls.h",
+    "View": "CrossoverEQControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / QGridLayout / QHBoxLayout / QVBoxLayout",
+    "Geometry": "CrossoverEQControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "crossovereq",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "crossovereq",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-crossovereq.png) / [150%](validation/F5-150/S08-plugin-crossovereq.png)"
+  },
+  {
+    "Plugin": "Delay",
+    "Target": "delay",
+    "Descriptor": "delay",
+    "Source": "plugins/Delay/DelayControlsDialog.cpp / plugins/Delay/DelayControls.h / plugins/Delay/DelayControlsDialog.h",
+    "View": "DelayControlsDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "共享/私有 painter",
+    "Geometry": "DelayControlsDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "delay",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "delay",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-delay.png) / [150%](validation/F5-150/S08-plugin-delay.png)"
+  },
+  {
+    "Plugin": "Dispersion",
+    "Target": "dispersion",
+    "Descriptor": "dispersion",
+    "Source": "plugins/Dispersion/DispersionControlDialog.cpp / plugins/Dispersion/DispersionControlDialog.h / plugins/Dispersion/DispersionControls.h",
+    "View": "DispersionControlDialog",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "Knob / LcdSpinBox / QHBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "dispersion",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "dispersion",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-dispersion.png) / [150%](validation/F5-150/S08-plugin-dispersion.png)"
+  },
+  {
+    "Plugin": "DualFilter",
+    "Target": "dualfilter",
+    "Descriptor": "dualfilter",
+    "Source": "plugins/DualFilter/DualFilterControlDialog.cpp / plugins/DualFilter/DualFilterControlDialog.h / plugins/DualFilter/DualFilterControls.h",
+    "View": "DualFilterControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / LedCheckBox",
+    "Geometry": "DualFilterControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "dualfilter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "dualfilter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-dualfilter.png) / [150%](validation/F5-150/S08-plugin-dualfilter.png)"
+  },
+  {
+    "Plugin": "DynamicsProcessor",
+    "Target": "dynamicsprocessor",
+    "Descriptor": "dynamicsprocessor",
+    "Source": "plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp / plugins/DynamicsProcessor/DynamicsProcessorControlDialog.h / plugins/DynamicsProcessor/DynamicsProcessorControls.h",
+    "View": "DynProcControlDialog",
+    "Artwork": "SKIPPED / PNG：add1_active / add1_inactive / artwork / avg_active / avg_inactive / max_active / max_inactive / reset_active / reset_inactive / smooth_active / smooth_inactive / sub1_active / sub1_inactive / unl_active / unl_inactive / wavegraph",
+    "Widgets": "Graph / Knob / PixmapButton",
+    "Geometry": "DynamicsProcessorControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "dynamicsprocessor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "dynamicsprocessor",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-dynamicsprocessor.png) / [150%](validation/F5-150/S08-plugin-dynamicsprocessor.png)"
+  },
+  {
+    "Plugin": "Eq",
+    "Target": "eq",
+    "Descriptor": "eq",
+    "Source": "plugins/Eq/EqControls.cpp / plugins/Eq/EqControlsDialog.cpp / plugins/Eq/EqCurve.cpp / plugins/Eq/EqEffect.cpp / plugins/Eq/EqParameterWidget.cpp / plugins/Eq/EqSpectrumView.cpp / plugins/Eq/EqControls.h / plugins/Eq/EqControlsDialog.h / plugins/Eq/EqCurve.h / plugins/Eq/EqFader.h / plugins/Eq/EqParameterWidget.h / plugins/Eq/EqSpectrumView.h",
+    "View": "EqControlsDialog / EqSpectrumView",
+    "Artwork": "SKIPPED / PNG：12dB / 12dBoff / 24dB / 24dBoff / 48dB / 48dBoff / artwork / handlehover",
+    "Widgets": "Knob / LedCheckBox / PixmapButton / QGraphicsScene / QGraphicsView",
+    "Geometry": "EqControlsDialog.cpp, EqSpectrumView.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "eq",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "eq",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-eq.png) / [150%](validation/F5-150/S08-plugin-eq.png)"
+  },
+  {
+    "Plugin": "Flanger",
+    "Target": "flanger",
+    "Descriptor": "flanger",
+    "Source": "plugins/Flanger/FlangerControlsDialog.cpp / plugins/Flanger/FlangerControls.h / plugins/Flanger/FlangerControlsDialog.h",
+    "View": "FlangerControlsDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / LedCheckBox / QHBoxLayout / QVBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "flanger",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "flanger",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-flanger.png) / [150%](validation/F5-150/S08-plugin-flanger.png)"
+  },
+  {
+    "Plugin": "FrequencyShifter",
+    "Target": "frequencyshifter",
+    "Descriptor": "frequencyshifter",
+    "Source": "plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp / plugins/FrequencyShifter/FrequencyShifterControlDialog.h / plugins/FrequencyShifter/FrequencyShifterControls.h",
+    "View": "FrequencyShifterControlDialog / FrequencyShifterHelpView",
+    "Artwork": "SKIPPED / PNG：antireflect_off / antireflect_on / artwork / help_off / help_on / mute_off / mute_on / pass_off / pass_on / reset_lfo_off / reset_lfo_on / reset_shifter_off / reset_shifter_on / send_off / send_on",
+    "Widgets": "Knob / LcdFloatSpinBox / PixmapButton",
+    "Geometry": "FrequencyShifterControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "frequencyshifter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "frequencyshifter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-frequencyshifter.png) / [150%](validation/F5-150/S08-plugin-frequencyshifter.png)"
+  },
+  {
+    "Plugin": "GranularPitchShifter",
+    "Target": "granularpitchshifter",
+    "Descriptor": "granularpitchshifter",
+    "Source": "plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp / plugins/GranularPitchShifter/GranularPitchShifterControlDialog.h / plugins/GranularPitchShifter/GranularPitchShifterControls.h",
+    "View": "GranularPitchShifterControlDialog / GranularPitchShifterHelpView",
+    "Artwork": "SKIPPED / PNG：artwork / help_active / help_inactive / logo / prefilter_active / prefilter_inactive",
+    "Widgets": "Knob / LcdFloatSpinBox / PixmapButton",
+    "Geometry": "GranularPitchShifterControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "granularpitchshifter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "granularpitchshifter",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-granularpitchshifter.png) / [150%](validation/F5-150/S08-plugin-granularpitchshifter.png)"
+  },
+  {
+    "Plugin": "LadspaBrowser",
+    "Target": "ladspabrowser",
+    "Descriptor": "ladspabrowser",
+    "Source": "plugins/LadspaBrowser/LadspaBrowser.cpp / plugins/LadspaBrowser/LadspaDescription.cpp / plugins/LadspaBrowser/LadspaPortDialog.cpp / plugins/LadspaBrowser/LadspaBrowser.h / plugins/LadspaBrowser/LadspaDescription.h / plugins/LadspaBrowser/LadspaPortDialog.h",
+    "View": "LadspaBrowserView / LadspaPortDialog",
+    "Artwork": "SKIPPED / PNG：analysis / ports / setup_audio / setup_midi / uhoh / unavailable_sound",
+    "Widgets": "QGroupBox / QHBoxLayout / QLabel / QListWidget / QScrollArea / QTableWidget / QTableWidgetItem / QVBoxLayout / QWidget",
+    "Geometry": "LadspaBrowser.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "N/A: tool panel",
+    "Runtime100": {
+      "plugin": "ladspabrowser",
+      "preset": "N/A: tool panel",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "ladspabrowser",
+      "preset": "N/A: tool panel",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-ladspabrowser.png) / [150%](validation/F5-150/S08-plugin-ladspabrowser.png)"
+  },
+  {
+    "Plugin": "LadspaEffect",
+    "Target": "ladspaeffect",
+    "Descriptor": "ladspaeffect",
+    "Source": "plugins/LadspaEffect/LadspaControlDialog.cpp / plugins/LadspaEffect/LadspaMatrixControlDialog.cpp / plugins/LadspaEffect/LadspaSubPluginFeatures.cpp / plugins/LadspaEffect/LadspaWidgetFactory.cpp / plugins/LadspaEffect/LadspaControlDialog.h / plugins/LadspaEffect/LadspaControls.h / plugins/LadspaEffect/LadspaMatrixControlDialog.h / plugins/LadspaEffect/LadspaSubPluginFeatures.h / plugins/LadspaEffect/LadspaWidgetFactory.h",
+    "View": "LadspaControlDialog / LadspaMatrixControlDialog",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "LedCheckBox / QGridLayout / QGroupBox / QHBoxLayout / QLabel / QScrollArea / QSpacerItem / QVBoxLayout / QWidget",
+    "Geometry": "LadspaSubPluginFeatures.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "ladspaeffect",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "ladspaeffect",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-ladspaeffect.png) / [150%](validation/F5-150/S08-plugin-ladspaeffect.png)"
+  },
+  {
+    "Plugin": "LOMM",
+    "Target": "lomm",
+    "Descriptor": "lomm",
+    "Source": "plugins/LOMM/LOMMControlDialog.cpp / plugins/LOMM/LOMM.h / plugins/LOMM/LOMMControlDialog.h / plugins/LOMM/LOMMControls.h",
+    "View": "LOMMControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / LcdFloatSpinBox / PixmapButton",
+    "Geometry": "LOMMControlDialog.cpp, LOMMControlDialog.h",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "lomm",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "lomm",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-lomm.png) / [150%](validation/F5-150/S08-plugin-lomm.png)"
+  },
+  {
+    "Plugin": "Lv2Effect",
+    "Target": "lv2effect",
+    "Descriptor": "lv2effect",
+    "Source": "plugins/Lv2Effect/Lv2FxControlDialog.cpp / plugins/Lv2Effect/Lv2FxControls.cpp / plugins/Lv2Effect/Lv2FxControlDialog.h / plugins/Lv2Effect/Lv2FxControls.h",
+    "View": "Lv2FxControlDialog",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "共享/私有 painter",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "MANUAL/PENDING：外部运行环境",
+    "Preset": "MANUAL/PENDING",
+    "Runtime100": {
+      "plugin": "lv2effect",
+      "reason": "No external subplugin fixture installed",
+      "status": "MANUAL/PENDING"
+    },
+    "Runtime150": {
+      "plugin": "lv2effect",
+      "reason": "No external subplugin fixture installed",
+      "status": "MANUAL/PENDING"
+    },
+    "Evidence": "No external subplugin fixture installed"
+  },
+  {
+    "Plugin": "Lv2Instrument",
+    "Target": "lv2instrument",
+    "Descriptor": "lv2instrument",
+    "Source": "plugins/Lv2Instrument/Lv2Instrument.cpp / plugins/Lv2Instrument/Lv2Instrument.h",
+    "View": "Lv2InsView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "共享/私有 painter",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "MANUAL/PENDING：外部运行环境",
+    "Preset": "MANUAL/PENDING",
+    "Runtime100": {
+      "plugin": "lv2instrument",
+      "reason": "No external subplugin fixture installed",
+      "status": "MANUAL/PENDING"
+    },
+    "Runtime150": {
+      "plugin": "lv2instrument",
+      "reason": "No external subplugin fixture installed",
+      "status": "MANUAL/PENDING"
+    },
+    "Evidence": "No external subplugin fixture installed"
+  },
+  {
+    "Plugin": "Lb302",
+    "Target": "lb302",
+    "Descriptor": "lb302",
+    "Source": "plugins/Lb302/Lb302.cpp / plugins/Lb302/Lb302.h",
+    "View": "Lb302SynthView",
+    "Artwork": "SKIPPED / PNG：artwork / exp_wave_active / exp_wave_inactive / moog_saw_wave_active / moog_saw_wave_inactive / round_square_wave_active / round_square_wave_inactive / saw_wave_active / saw_wave_inactive / sin_wave_active / sin_wave_inactive / square_wave_active / square_wave_inactive / triangle_wave_active / triangle_wave_inactive / white_noise_wave_active / white_noise_wave_inactive",
+    "Widgets": "Knob / LedCheckBox / PixmapButton",
+    "Geometry": "Lb302.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "lb302",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "lb302",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-lb302.png) / [150%](validation/F5-150/S08-plugin-lb302.png)"
+  },
+  {
+    "Plugin": "MultitapEcho",
+    "Target": "multitapecho",
+    "Descriptor": "multitapecho",
+    "Source": "plugins/MultitapEcho/MultitapEchoControlDialog.cpp / plugins/MultitapEcho/MultitapEchoControlDialog.h / plugins/MultitapEcho/MultitapEchoControls.h",
+    "View": "MultitapEchoControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork / graph_bg",
+    "Widgets": "Graph / Knob / LcdSpinBox / LedCheckBox",
+    "Geometry": "MultitapEchoControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "multitapecho",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "multitapecho",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-multitapecho.png) / [150%](validation/F5-150/S08-plugin-multitapecho.png)"
+  },
+  {
+    "Plugin": "Monstro",
+    "Target": "monstro",
+    "Descriptor": "monstro",
+    "Source": "plugins/Monstro/Monstro.cpp / plugins/Monstro/Monstro.h",
+    "View": "MonstroView",
+    "Artwork": "SKIPPED / PNG：artwork_op / artwork_mat / am_active / am_inactive / fm_active / fm_inactive / matview_active / matview_inactive / mix_active / mix_inactive / opview_active / opview_inactive / pm_active / pm_inactive / tinyled_off / tinyled_on",
+    "Widgets": "PixmapButton / QWidget",
+    "Geometry": "Monstro.cpp, Monstro.h",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "monstro",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "monstro",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-monstro.png) / [150%](validation/F5-150/S08-plugin-monstro.png)"
+  },
+  {
+    "Plugin": "Nes",
+    "Target": "nes",
+    "Descriptor": "nes",
+    "Source": "plugins/Nes/Nes.cpp / plugins/Nes/Nes.h",
+    "View": "NesInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / nesdc_off / nesled_off / nesled_on",
+    "Widgets": "Knob / PixmapButton",
+    "Geometry": "Nes.h",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "nes",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "nes",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-nes.png) / [150%](validation/F5-150/S08-plugin-nes.png)"
+  },
+  {
+    "Plugin": "OpulenZ",
+    "Target": "opulenz",
+    "Descriptor": "opulenz",
+    "Source": "plugins/OpulenZ/OpulenZ.cpp / plugins/OpulenZ/OpulenZ.h",
+    "View": "OpulenzInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / led_off / led_on",
+    "Widgets": "Knob / PixmapButton",
+    "Geometry": "OpulenZ.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "opulenz",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "opulenz",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-opulenz.png) / [150%](validation/F5-150/S08-plugin-opulenz.png)"
+  },
+  {
+    "Plugin": "Organic",
+    "Target": "organic",
+    "Descriptor": "organic",
+    "Source": "plugins/Organic/Organic.cpp / plugins/Organic/Organic.h",
+    "View": "OrganicInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / randomise / randomise_pressed",
+    "Widgets": "PixmapButton",
+    "Geometry": "Organic.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "organic",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "organic",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-organic.png) / [150%](validation/F5-150/S08-plugin-organic.png)"
+  },
+  {
+    "Plugin": "Oscilloscope",
+    "Target": "oscilloscope",
+    "Descriptor": "oscilloscope",
+    "Source": "plugins/Oscilloscope/OscilloscopeControlDialog.cpp / plugins/Oscilloscope/OscilloscopeControls.cpp / plugins/Oscilloscope/OscilloscopeGraph.cpp / plugins/Oscilloscope/OscilloscopeControlDialog.h / plugins/Oscilloscope/OscilloscopeControls.h / plugins/Oscilloscope/OscilloscopeGraph.h",
+    "View": "OscilloscopeControlDialog",
+    "Artwork": "SKIPPED / PNG：pause / play",
+    "Widgets": "Knob / LedCheckBox / OscilloscopeGraph / PixmapButton / QHBoxLayout / QVBoxLayout / QWidget",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "oscilloscope",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "oscilloscope",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-oscilloscope.png) / [150%](validation/F5-150/S08-plugin-oscilloscope.png)"
+  },
+  {
+    "Plugin": "FreeBoy",
+    "Target": "freeboy",
+    "Descriptor": "freeboy",
+    "Source": "plugins/FreeBoy/FreeBoy.cpp / plugins/FreeBoy/FreeBoy.h",
+    "View": "FreeBoyInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / btn_15 / btn_7 / btn_down / btn_off / btn_on / btn_up",
+    "Widgets": "Graph / PixmapButton",
+    "Geometry": "FreeBoy.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "freeboy",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "freeboy",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-freeboy.png) / [150%](validation/F5-150/S08-plugin-freeboy.png)"
+  },
+  {
+    "Plugin": "Patman",
+    "Target": "patman",
+    "Descriptor": "patman",
+    "Source": "plugins/Patman/Patman.cpp / plugins/Patman/Patman.h",
+    "View": "PatmanView",
+    "Artwork": "SKIPPED / PNG：artwork / loop_off / loop_on / select_file / select_file_on / tune_off / tune_on",
+    "Widgets": "PixmapButton",
+    "Geometry": "Patman.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "patman",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "patman",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-patman.png) / [150%](validation/F5-150/S08-plugin-patman.png)"
+  },
+  {
+    "Plugin": "PeakControllerEffect",
+    "Target": "peakcontrollereffect",
+    "Descriptor": "peakcontrollereffect",
+    "Source": "plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp / plugins/PeakControllerEffect/PeakControllerEffectControlDialog.h / plugins/PeakControllerEffect/PeakControllerEffectControls.h",
+    "View": "PeakControllerEffectControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork / controller",
+    "Widgets": "Knob / LedCheckBox / QHBoxLayout / QVBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "peakcontrollereffect",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "peakcontrollereffect",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-peakcontrollereffect.png) / [150%](validation/F5-150/S08-plugin-peakcontrollereffect.png)"
+  },
+  {
+    "Plugin": "ReverbSC",
+    "Target": "reverbsc",
+    "Descriptor": "reverbsc",
+    "Source": "plugins/ReverbSC/ReverbSCControlDialog.cpp / plugins/ReverbSC/ReverbSCControlDialog.h / plugins/ReverbSC/ReverbSCControls.h",
+    "View": "ReverbSCControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / QHBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "reverbsc",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "reverbsc",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-reverbsc.png) / [150%](validation/F5-150/S08-plugin-reverbsc.png)"
+  },
+  {
+    "Plugin": "Sf2Player",
+    "Target": "sf2player",
+    "Descriptor": "sf2player",
+    "Source": "plugins/Sf2Player/PatchesDialog.cpp / plugins/Sf2Player/Sf2Player.cpp / plugins/Sf2Player/PatchesDialog.h / plugins/Sf2Player/Sf2Player.h",
+    "View": "PatchesDialog / Sf2InstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / chorus_off / chorus_on / fileselect_off / fileselect_on / patches_off / patches_on / reverb_off / reverb_on / zoom",
+    "Widgets": "LcdSpinBox / PixmapButton / QHBoxLayout / QLabel / QStandardItem / QVBoxLayout",
+    "Geometry": "Sf2Player.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "sf2player",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "sf2player",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-sf2player.png) / [150%](validation/F5-150/S08-plugin-sf2player.png)"
+  },
+  {
+    "Plugin": "Sfxr",
+    "Target": "sfxr",
+    "Descriptor": "sfxr",
+    "Source": "plugins/Sfxr/Sfxr.cpp / plugins/Sfxr/Sfxr.h",
+    "View": "SfxrInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "PixmapButton",
+    "Geometry": "Sfxr.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "sfxr",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "sfxr",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-sfxr.png) / [150%](validation/F5-150/S08-plugin-sfxr.png)"
+  },
+  {
+    "Plugin": "SlewDistortion",
+    "Target": "slewdistortion",
+    "Descriptor": "slewdistortion",
+    "Source": "plugins/SlewDistortion/SlewDistortionControlDialog.cpp / plugins/SlewDistortion/SlewDistortion.h / plugins/SlewDistortion/SlewDistortionControlDialog.h / plugins/SlewDistortion/SlewDistortionControls.h",
+    "View": "SlewDistortionControlDialog / SlewDistortionHelpView",
+    "Artwork": "SKIPPED / PNG：artwork / handle / handle_zero / help_off / help_on",
+    "Widgets": "Knob / PixmapButton",
+    "Geometry": "SlewDistortionControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "slewdistortion",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "slewdistortion",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-slewdistortion.png) / [150%](validation/F5-150/S08-plugin-slewdistortion.png)"
+  },
+  {
+    "Plugin": "SlicerT",
+    "Target": "slicert",
+    "Descriptor": "slicert",
+    "Source": "plugins/SlicerT/SlicerT.cpp / plugins/SlicerT/SlicerTView.cpp / plugins/SlicerT/SlicerTWaveform.cpp / plugins/SlicerT/SlicerT.h / plugins/SlicerT/SlicerTView.h / plugins/SlicerT/SlicerTWaveform.h",
+    "View": "SlicerTView",
+    "Artwork": "SKIPPED / PNG：clear_slices_active / clear_slices_inactive / copy_midi / folder_icon / full_logo / reset_slices / sample_track / slice_indicator_arrow / sync_active / sync_inactive / toolbox",
+    "Widgets": "Knob / LcdSpinBox / PixmapButton / QPushButton",
+    "Geometry": "SlicerT.cpp, SlicerTView.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "slicert",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "slicert",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-slicert.png) / [150%](validation/F5-150/S08-plugin-slicert.png)"
+  },
+  {
+    "Plugin": "SpectrumAnalyzer",
+    "Target": "analyzer",
+    "Descriptor": "spectrumanalyzer",
+    "Source": "plugins/SpectrumAnalyzer/Analyzer.cpp / plugins/SpectrumAnalyzer/SaControls.cpp / plugins/SpectrumAnalyzer/SaControlsDialog.cpp / plugins/SpectrumAnalyzer/SaProcessor.cpp / plugins/SpectrumAnalyzer/SaSpectrumView.cpp / plugins/SpectrumAnalyzer/SaWaterfallView.cpp / plugins/SpectrumAnalyzer/SaControls.h / plugins/SpectrumAnalyzer/SaControlsDialog.h / plugins/SpectrumAnalyzer/SaSpectrumView.h / plugins/SpectrumAnalyzer/SaWaterfallView.h",
+    "View": "EffectControlDialog / SaControlsDialog / SaSpectrumView / SaWaterfallView",
+    "Artwork": "SKIPPED / PNG：advanced_off / advanced_on / block_size / freeze / freeze_off / pause / play / window / x_linear / x_log / y_linear / y_log",
+    "Widgets": "Knob / LedCheckBox / PixmapButton / QGridLayout / QHBoxLayout / QLabel / QSplitter / QWidget",
+    "Geometry": "SaProcessor.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "spectrumanalyzer",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "spectrumanalyzer",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-spectrumanalyzer.png) / [150%](validation/F5-150/S08-plugin-spectrumanalyzer.png)"
+  },
+  {
+    "Plugin": "StereoEnhancer",
+    "Target": "stereoenhancer",
+    "Descriptor": "stereoenhancer",
+    "Source": "plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp / plugins/StereoEnhancer/StereoEnhancerControlDialog.h / plugins/StereoEnhancer/StereoEnhancerControls.h",
+    "View": "StereoEnhancerControlDialog",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "Knob / QHBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "stereoenhancer",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "stereoenhancer",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-stereoenhancer.png) / [150%](validation/F5-150/S08-plugin-stereoenhancer.png)"
+  },
+  {
+    "Plugin": "StereoMatrix",
+    "Target": "stereomatrix",
+    "Descriptor": "stereomatrix",
+    "Source": "plugins/StereoMatrix/StereoMatrixControlDialog.cpp / plugins/StereoMatrix/StereoMatrixControlDialog.h / plugins/StereoMatrix/StereoMatrixControls.h",
+    "View": "StereoMatrixControlDialog",
+    "Artwork": "SKIPPED / PNG：artwork",
+    "Widgets": "Knob / QHBoxLayout",
+    "Geometry": "StereoMatrixControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "stereomatrix",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "stereomatrix",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-stereomatrix.png) / [150%](validation/F5-150/S08-plugin-stereomatrix.png)"
+  },
+  {
+    "Plugin": "Stk",
+    "Target": "malletsstk",
+    "Descriptor": "malletsstk",
+    "Source": "plugins/Stk/Mallets/Mallets.cpp / plugins/Stk/Mallets/Mallets.h",
+    "View": "MalletsInstrumentView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "Knob / LedCheckBox / QWidget",
+    "Geometry": "Mallets.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "malletsstk",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "malletsstk",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-malletsstk.png) / [150%](validation/F5-150/S08-plugin-malletsstk.png)"
+  },
+  {
+    "Plugin": "TapTempo",
+    "Target": "taptempo",
+    "Descriptor": "taptempo",
+    "Source": "plugins/TapTempo/TapTempoView.cpp / plugins/TapTempo/TapTempo.h / plugins/TapTempo/TapTempoView.h",
+    "View": "TapTempoView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "QCheckBox / QHBoxLayout / QLabel / QPushButton / QVBoxLayout",
+    "Geometry": "TapTempoView.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "N/A: tool panel",
+    "Runtime100": {
+      "plugin": "taptempo",
+      "preset": "N/A: tool panel",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "taptempo",
+      "preset": "N/A: tool panel",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-taptempo.png) / [150%](validation/F5-150/S08-plugin-taptempo.png)"
+  },
+  {
+    "Plugin": "Vestige",
+    "Target": "vestige",
+    "Descriptor": "vestige",
+    "Source": "plugins/Vestige/Vestige.cpp / plugins/Vestige/Vestige.h",
+    "View": "ManageVestigeInstrumentView / VestigeInstrumentView",
+    "Artwork": "SKIPPED / PNG：artwork / controls / controls_active / edit_copy / logo / project_open / project_save / sample_file / select_file / select_file_active / stop / zoom",
+    "Widgets": "PixmapButton / QAction / QGridLayout / QMenu / QPushButton / QScrollArea / QSpacerItem / QWidget",
+    "Geometry": "Vestige.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "vestige",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS unloaded host wrapper; foreign editor and sound MANUAL/PENDING",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "vestige",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS unloaded host wrapper; foreign editor and sound MANUAL/PENDING",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-vestige.png) / [150%](validation/F5-150/S08-plugin-vestige.png)"
+  },
+  {
+    "Plugin": "VstEffect",
+    "Target": "vsteffect",
+    "Descriptor": "vsteffect",
+    "Source": "plugins/VstEffect/VstEffectControlDialog.cpp / plugins/VstEffect/VstEffectControls.cpp / plugins/VstEffect/VstSubPluginFeatures.cpp / plugins/VstEffect/VstEffect.h / plugins/VstEffect/VstEffectControlDialog.h / plugins/VstEffect/VstEffectControls.h / plugins/VstEffect/VstSubPluginFeatures.h",
+    "View": "ManageVSTEffectView / VstEffectControlDialog",
+    "Artwork": "SKIPPED / PNG：controls / controls_active / edit_copy / logo / project_open / project_save / sample_file",
+    "Widgets": "PixmapButton / QAction / QGridLayout / QLabel / QMenu / QPushButton / QScrollArea / QSpacerItem / QToolBar / QWidget",
+    "Geometry": "VstEffectControls.cpp, VstSubPluginFeatures.cpp",
+    "HostStatus": "MANUAL/PENDING：外部运行环境",
+    "Preset": "MANUAL/PENDING",
+    "Runtime100": {
+      "plugin": "vsteffect",
+      "reason": "No external subplugin fixture installed",
+      "status": "MANUAL/PENDING"
+    },
+    "Runtime150": {
+      "plugin": "vsteffect",
+      "reason": "External effect initialization returned an invalid/dummy effect or an unloaded VST wrapper; placeholder is not panel coverage",
+      "status": "MANUAL/PENDING"
+    },
+    "Evidence": "No external subplugin fixture installed"
+  },
+  {
+    "Plugin": "Watsyn",
+    "Target": "watsyn",
+    "Descriptor": "watsyn",
+    "Source": "plugins/Watsyn/Watsyn.cpp / plugins/Watsyn/Watsyn.h",
+    "View": "WatsynView",
+    "Artwork": "SKIPPED / PNG：a1_active / a1_inactive / a2_active / a2_inactive / aam_active / aam_inactive / amix_active / amix_inactive / apm_active / apm_inactive / arm_active / arm_inactive / artwork / b1_active / b1_inactive / b2_active / b2_inactive / bam_active / bam_inactive / bmix_active / bmix_inactive / bpm_active / bpm_inactive / brm_active / brm_inactive / inv_active / inv_inactive / load_active / load_inactive / norm_active / norm_inactive / phl_active / phl_inactive / phr_active / phr_inactive / saw_active / saw_inactive / sin_active / sin_inactive / smooth_active / smooth_inactive / sqr_active / sqr_inactive / tri_active / tri_inactive / wavegraph",
+    "Widgets": "Graph / PixmapButton",
+    "Geometry": "Watsyn.cpp, Watsyn.h",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "watsyn",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "watsyn",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-watsyn.png) / [150%](validation/F5-150/S08-plugin-watsyn.png)"
+  },
+  {
+    "Plugin": "WaveShaper",
+    "Target": "waveshaper",
+    "Descriptor": "waveshaper",
+    "Source": "plugins/WaveShaper/WaveShaperControlDialog.cpp / plugins/WaveShaper/WaveShaperControlDialog.h / plugins/WaveShaper/WaveShaperControls.h",
+    "View": "WaveShaperControlDialog",
+    "Artwork": "SKIPPED / PNG：add1_active / add1_inactive / artwork / reset_active / reset_inactive / smooth_active / smooth_inactive / sub1_active / sub1_inactive / wavegraph",
+    "Widgets": "Graph / LedCheckBox / PixmapButton",
+    "Geometry": "WaveShaperControlDialog.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "waveshaper",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "waveshaper",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-waveshaper.png) / [150%](validation/F5-150/S08-plugin-waveshaper.png)"
+  },
+  {
+    "Plugin": "Vectorscope",
+    "Target": "vectorscope",
+    "Descriptor": "vectorscope",
+    "Source": "plugins/Vectorscope/VecControls.cpp / plugins/Vectorscope/VecControlsDialog.cpp / plugins/Vectorscope/Vectorscope.cpp / plugins/Vectorscope/VectorView.cpp / plugins/Vectorscope/VecControls.h / plugins/Vectorscope/VecControlsDialog.h / plugins/Vectorscope/VectorView.h",
+    "View": "VecControlsDialog / VectorView",
+    "Artwork": "无直接 artwork；数据绘制保留",
+    "Widgets": "LedCheckBox / QHBoxLayout / QVBoxLayout",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "vectorscope",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "vectorscope",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-vectorscope.png) / [150%](validation/F5-150/S08-plugin-vectorscope.png)"
+  },
+  {
+    "Plugin": "Vibed",
+    "Target": "vibedstrings",
+    "Descriptor": "vibedstrings",
+    "Source": "plugins/Vibed/NineButtonSelector.cpp / plugins/Vibed/Vibed.cpp / plugins/Vibed/NineButtonSelector.h / plugins/Vibed/Vibed.h",
+    "View": "VibedView",
+    "Artwork": "SKIPPED / PNG：artwork / button_-1_off / button_-1_on / button_-2_off / button_-2_on / button_1_off / button_1_on / button_2_off / button_2_on / button_3_off / button_3_on / button_4_off / button_4_on / button_5_off / button_5_on / button_6_off / button_6_on / button_7_off / button_7_on / button_8_off / button_8_on / button_9_off / button_9_on / button_f_off / button_f_on / normalize_active / normalize_inactive / saw_wave_active / saw_wave_inactive / sin_wave_active / sin_wave_inactive / smooth_active / smooth_inactive / square_wave_active / square_wave_inactive / triangle_wave_active / triangle_wave_inactive / usr_wave_active / usr_wave_inactive / wavegraph4 / white_noise_wave_active / white_noise_wave_inactive",
+    "Widgets": "PixmapButton",
+    "Geometry": "NineButtonSelector.cpp, Vibed.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "vibedstrings",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "vibedstrings",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-vibedstrings.png) / [150%](validation/F5-150/S08-plugin-vibedstrings.png)"
+  },
+  {
+    "Plugin": "Xpressive",
+    "Target": "xpressive",
+    "Descriptor": "xpressive",
+    "Source": "plugins/Xpressive/Xpressive.cpp / plugins/Xpressive/Xpressive.h",
+    "View": "XpressiveHelpView / XpressiveView",
+    "Artwork": "SKIPPED / PNG：artwork / exp_wave_active / exp_wave_inactive / help_active / help_inactive / logo / moog_saw_wave_active / moog_saw_wave_inactive / o1_active / o1_inactive / o2_active / o2_inactive / saw_wave_active / saw_wave_inactive / sin_wave_active / sin_wave_inactive / square_wave_active / square_wave_inactive / triangle_wave_active / triangle_wave_inactive / usr_wave_active / usr_wave_inactive / w1_active / w1_inactive / w2_active / w2_inactive / w3_active / w3_inactive / wavegraph / white_noise_wave_active / white_noise_wave_inactive",
+    "Widgets": "Graph / Knob / LedCheckBox / PixmapButton / QPlainTextEdit",
+    "Geometry": "Xpressive.cpp",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "xpressive",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "xpressive",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-xpressive.png) / [150%](validation/F5-150/S08-plugin-xpressive.png)"
+  },
+  {
+    "Plugin": "ZynAddSubFx",
+    "Target": "zynaddsubfx",
+    "Descriptor": "zynaddsubfx",
+    "Source": "plugins/ZynAddSubFx/ZynAddSubFx.cpp / plugins/ZynAddSubFx/ZynAddSubFx.h",
+    "View": "ZynAddSubFxView",
+    "Artwork": "SKIPPED / PNG：artwork / zoom",
+    "Widgets": "Knob / LedCheckBox / QGridLayout / QPushButton",
+    "Geometry": "布局管理器/需按入口验证",
+    "HostStatus": "PASS；观感 MANUAL/PENDING",
+    "Preset": "UI snapshot and restore/save checked",
+    "Runtime100": {
+      "plugin": "zynaddsubfx",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Runtime150": {
+      "plugin": "zynaddsubfx",
+      "preset": "UI snapshot and restore/save checked",
+      "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+      "status": "BASELINE CAPTURED"
+    },
+    "Evidence": "[100%](validation/F5-100/S08-plugin-zynaddsubfx.png) / [150%](validation/F5-150/S08-plugin-zynaddsubfx.png)"
+  }
+]

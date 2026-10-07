@@ -189,7 +189,12 @@ void SVSPianoRoll::openIn(MainWindow* mainWindow) {
 }
 SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  setWindowIcon(embed::getIconPixmap("piano"));
- setWindowTitle(tr("SVS Piano Roll — LMMS")); resize(1100,740); auto* layout=new QVBoxLayout(this); auto* toolbar=new QHBoxLayout; layout->addLayout(toolbar);
+ setWindowTitle(tr("SVS Piano Roll — LMMS")); resize(1100,740); auto* layout=new QVBoxLayout(this);
+ auto* toolbarScroll=new QScrollArea(this);toolbarScroll->setObjectName("svsToolbarScroll");toolbarScroll->setWidgetResizable(true);
+ toolbarScroll->setFrameShape(QFrame::NoFrame);toolbarScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+ toolbarScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);layout->addWidget(toolbarScroll);
+ auto* toolbarBody=new QWidget(toolbarScroll);auto* toolbar=new QHBoxLayout(toolbarBody);toolbar->setContentsMargins(0,0,0,0);
+ toolbarScroll->setWidget(toolbarBody);
  auto nativeIcon=[](const QString& name){QIcon icon("resources:"+name+".png");return icon.isNull()?QIcon("data:/themes/default/"+name+".png"):icon;};
  auto iconButton=[nativeIcon](QToolButton* button,const QString& icon,const QString& title){button->setIcon(nativeIcon(icon));button->setIconSize(QSize(24,24));button->setText(title);button->setToolTip(title);button->setAccessibleName(title);button->setToolButtonStyle(Qt::ToolButtonIconOnly);};
  auto* play=new QToolButton(this);play->setObjectName("svsPlayButton");iconButton(play,"play",tr("Play song"));toolbar->addWidget(play);connect(play,&QToolButton::clicked,Engine::getSong(),&Song::playSong);
@@ -281,6 +286,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* settings=new QToolButton(this);settings->setText(tr("Settings"));settings->setObjectName("svsEditorSettingsButton");toolbar->addWidget(settings);connect(settings,&QToolButton::clicked,side,[side]{side->show();side->raise();});
  iconButton(settings,"setup_general",tr("SVS editor settings"));
  auto* properties=new QToolButton(this); properties->setText(tr("Properties")); properties->setCheckable(true); properties->setChecked(true); toolbar->addWidget(properties); connect(properties,&QToolButton::toggled,sidebarScroll,&QWidget::setVisible);
+ toolbarBody->ensurePolished();toolbarScroll->setFixedHeight(toolbarBody->sizeHint().height()+style()->pixelMetric(QStyle::PM_ScrollBarExtent));
  auto* portrait=new SVSImageLoader(canvas); portrait->setObjectName("svsPortraitLoader"); auto* portraitVisible=new QCheckBox(tr("Show portrait"),side); portraitVisible->setObjectName("svsPortraitVisible"); controls->addWidget(portraitVisible);
  auto* portraitRow=new QHBoxLayout; controls->addLayout(portraitRow); portraitRow->addWidget(new QLabel(tr("Transparency"),side)); auto* transparency=new QSlider(Qt::Horizontal,side); transparency->setObjectName("svsPortraitTransparency"); transparency->setRange(0,100); portraitRow->addWidget(transparency,1);
  auto* transparencyValue=new QSpinBox(side); transparencyValue->setObjectName("svsPortraitTransparencyValue"); transparencyValue->setRange(0,100); transparencyValue->setSuffix("%"); portraitRow->addWidget(transparencyValue);

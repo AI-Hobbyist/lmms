@@ -49,6 +49,13 @@
 #include "SubWindow.h"
 #include "LmmsPalette.h"
 #include "LmmsStyle.h"
+#include "Mixer.h"
+#include "MixerView.h"
+#include "MixerChannelView.h"
+#include "Effect.h"
+#include "EffectView.h"
+#include "EffectControlDialog.h"
+#include <QPushButton>
 
 using namespace lmms;
 using namespace lmms::gui;
@@ -87,7 +94,10 @@ private slots:
 		m_themeFile=themeDir+"/style.css";QVERIFY(QFile::copy(source+"style.css",m_themeFile));
 		QVERIFY(QFile::copy(source+"ui-down.svg",themeDir+"/ui-down.svg"));config->setThemeDir(themeDir+'/');
 		QDir::setSearchPaths("resources",{themeDir,config->defaultThemeDir()});
-		m_gui=std::make_unique<GuiApplication>();m_gui->mainWindow()->resize(1100,750);
+			m_gui=std::make_unique<GuiApplication>();
+			const auto available=m_gui->mainWindow()->screen()->availableGeometry();
+			m_gui->mainWindow()->resize(QSize(1100,750).boundedTo(available.size()-QSize(20,40)));
+			m_gui->mainWindow()->move(available.topLeft());
 		m_gui->mainWindow()->show();QVERIFY(QTest::qWaitForWindowExposed(m_gui->mainWindow()));
 		m_theme=qApp->styleSheet();QVERIFY(LmmsStyle::s_flatFrames);
 		QCOMPARE(qApp->palette().color(QPalette::Window),QColor("#20262D"));
@@ -261,7 +271,35 @@ private slots:
 		capture(m_gui->mainWindow(),"F4-piano-actions");
 		m_gui->pianoRoll()->hide();m_gui->pianoRoll()->parentWidget()->hide();
 	}
-	void groupAndWindowLifecycle()
+		void hostPanelInteractions()
+		{
+			auto* mixer=m_gui->mixerView();const auto index=mixer->addNewChannel();
+			mixer->show();mixer->parentWidget()->show();mixer->parentWidget()->move(0,0);mixer->parentWidget()->raise();
+			auto* channel=mixer->channelView(index);QVERIFY(channel);
+			QTest::qWait(200);QTest::mouseClick(channel,Qt::LeftButton,Qt::NoModifier,QPoint(2,2));
+			QCOMPARE(mixer->currentMixerChannel(),channel);
+			auto* chain=&Engine::mixer()->mixerChannel(index)->m_fxChain;
+			auto* effect=Effect::instantiate("amplifier",chain,nullptr);QVERIFY(effect);chain->appendEffect(effect);
+			EffectView* card=nullptr;
+			QTRY_VERIFY(([&]{for(auto* candidate:mixer->findChildren<EffectView*>()) if(candidate->effect()==effect) {card=candidate;return true;}return false;})());
+			auto* enabled=card->findChild<LedCheckBox*>();QVERIFY(enabled);
+			const auto before=effect->isEnabled();QTest::mouseClick(enabled,Qt::LeftButton);
+			QCOMPARE(effect->isEnabled(),!before);QTest::mouseClick(enabled,Qt::LeftButton);QCOMPARE(effect->isEnabled(),before);
+			QPushButton* controls=nullptr;
+			for(auto* button:card->findChildren<QPushButton*>()) if(button->text()=="Controls") {controls=button;break;}
+			QVERIFY(controls);EffectControlDialog* dialog=nullptr;
+			for(auto* widget:m_gui->mainWindow()->findChildren<QWidget*>())
+				if(auto* candidate=dynamic_cast<EffectControlDialog*>(widget)) {dialog=candidate;break;}
+			QVERIFY(dialog);
+			QTest::mouseClick(controls,Qt::LeftButton);QTest::qWait(100);
+			QTRY_VERIFY(dialog->isVisible());
+			capture(m_gui->mainWindow(),"F5-effect-controls");
+			QTest::mouseClick(controls,Qt::LeftButton);QTest::qWait(100);
+			QTRY_VERIFY(!dialog->isVisible());
+			capture(m_gui->mainWindow(),"F5-mixer-rack");
+			mixer->hide();mixer->parentWidget()->hide();
+		}
+		void groupAndWindowLifecycle()
 	{
 		auto* panel=new QWidget;auto* layout=new QVBoxLayout(panel);
 		auto* group=new GroupBox("Enabled / 启用",panel);group->setMinimumSize(320,140);layout->addWidget(group);

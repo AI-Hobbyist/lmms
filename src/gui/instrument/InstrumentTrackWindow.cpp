@@ -58,6 +58,7 @@
 #include "LedCheckBox.h"
 #include "LeftRightNav.h"
 #include "MainWindow.h"
+#include "LmmsStyle.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
@@ -468,12 +469,22 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->setActiveTab( 0 );
 
 		// If instrument is resizable, unset size constraints on tabs.
-		// Otherwise, prevent other tabs from exceeding the size of the
-		// instrument tab
+		// Modern common pages must also fit their font-measured labels.
+		int commonWidth = INSTRUMENT_WIDTH;
+		if (LmmsStyle::s_flatFrames)
+		{
+			for (auto* page : {static_cast<QWidget*>(m_ssView), m_instrumentFunctionsView,
+					static_cast<QWidget*>(m_effectView), static_cast<QWidget*>(m_midiView), static_cast<QWidget*>(m_tuningView)})
+			{
+				page->ensurePolished();
+				commonWidth = std::max(commonWidth, page->minimumSizeHint().width() + 4);
+			}
+		}
+		m_tabWidget->setMinimumWidth(LmmsStyle::s_flatFrames ? commonWidth : 0);
 		const auto maxSize = m_instrumentView->isResizable()
 			? QSize{QWIDGETSIZE_MAX, QWIDGETSIZE_MAX}
 			: QSize{
-				std::max(INSTRUMENT_WIDTH, m_instrumentView->width()),
+				std::max(commonWidth, m_instrumentView->width()),
 				std::max(INSTRUMENT_HEIGHT, m_instrumentView->maximumHeight()),
 			};
 		m_tabWidget->setMaximumSize(maxSize);

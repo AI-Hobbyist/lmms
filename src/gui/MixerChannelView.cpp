@@ -46,6 +46,7 @@
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdWidget.h"
+#include "LmmsStyle.h"
 #include "lmms_math.h"
 #include "Mixer.h"
 #include "MixerView.h"
@@ -212,6 +213,14 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 		painter.fillRect(rect(), channel->color()->darker(isActive ? 120 : 150));
 	}
 	else { painter.fillRect(rect(), isActive ? backgroundActive().color() : painter.background().color()); }
+	if (LmmsStyle::s_flatFrames)
+	{
+		painter.setRenderHint(QPainter::Antialiasing);
+		painter.setBrush(Qt::NoBrush);
+		painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
+		painter.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+		return;
+	}
 
 	// inner border
 	painter.setPen(isActive ? strokeInnerActive() : strokeInnerInactive());

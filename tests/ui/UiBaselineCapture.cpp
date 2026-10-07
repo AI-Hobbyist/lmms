@@ -1,10 +1,14 @@
 #include <QtTest>
 #include <QScreen>
+#include <QMdiArea>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QTemporaryDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDomDocument>
 #include <QMenuBar>
 #include <QProcess>
 #include <QProcessEnvironment>
@@ -29,6 +33,7 @@
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
 #include "MidiClip.h"
@@ -47,6 +52,7 @@
 #include "Mixer.h"
 #include "MixerView.h"
 #include "Effect.h"
+#include "DummyEffect.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
 #include "Controller.h"
@@ -54,6 +60,8 @@
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "SubWindow.h"
+#include "TabWidget.h"
+#include "LedCheckBox.h"
 
 using namespace lmms;
 using namespace lmms::gui;
@@ -79,7 +87,8 @@ class UiBaselineCapture : public QObject
  {
   widget->show();
   auto* frame = qobject_cast<QMdiSubWindow*>(widget->parentWidget());
-  if(frame) {frame->show();frame->setGeometry(0,0,1000,600);frame->raise();}
+  if(frame) {frame->show();frame->setGeometry(QRect(QPoint(0,0),QSize(1000,600).boundedTo(m_gui->mainWindow()->workspace()->viewport()->size())));frame->raise();}
+  QVERIFY(widget->isVisible());QVERIFY(!widget->visibleRegion().isEmpty());
   capture(widget->isWindow()?widget:static_cast<QWidget*>(m_gui->mainWindow()),name);
   if(frame) frame->hide();
   else if(widget->isWindow()) widget->hide();
@@ -103,7 +112,9 @@ private slots:
   config->setValue("app","configured","1");
   config->setValue("audioengine","audiodev",AudioDummy::name());
   m_gui=std::make_unique<GuiApplication>();
-  auto* window=m_gui->mainWindow();window->resize(1280,800);window->show();
+  auto* window=m_gui->mainWindow();
+  const auto available=window->screen()->availableGeometry();
+  window->resize(QSize(1280,800).boundedTo(available.size()-QSize(20,40)));window->move(available.topLeft());window->show();
   QVERIFY(QTest::qWaitForWindowExposed(window));
   QJsonObject environment{{"qt",qVersion()},{"platform",QGuiApplication::platformName()},
    {"scale",window->devicePixelRatioF()},{"font",window->font().toString()},
@@ -202,6 +213,19 @@ private slots:
   frame->show();capture(m_gui->mainWindow(),"S07-mdi");frame->hide();
   auto* view=m_gui->mainWindow()->findChild<InstrumentTrackView*>();QVERIFY(view);
   auto* instrumentWindow=view->getInstrumentTrackWindow();showEditor(instrumentWindow,"S08-instrument");
+  auto* instrumentTabs=instrumentWindow->findChild<TabWidget*>();QVERIFY(instrumentTabs);
+  for(int tab=1;tab<=5;++tab)
+  {
+   instrumentTabs->setActiveTab(tab);QCOMPARE(instrumentTabs->activeTab(),tab);
+   showEditor(instrumentWindow,QString("S08-common-%1").arg(tab));
+   for(auto* label:instrumentWindow->findChildren<LedCheckBox*>())
+   {
+    if(!label->isVisibleTo(instrumentWindow)) continue;
+    QVERIFY2(label->width()>=label->sizeHint().width(),qPrintable(label->text()));
+    QVERIFY2(label->parentWidget()->rect().contains(label->geometry()),qPrintable(label->text()));
+   }
+  }
+  instrumentTabs->setActiveTab(0);
   song->setModified(false);
  }
  void reopenFixture()
@@ -234,6 +258,19 @@ private slots:
   Engine::getSong()->createNewProject();
   if(Engine::mixer()->numChannels()<2) Engine::mixer()->createChannel();
   QJsonArray coverage;
+  auto settings=[](Plugin* plugin){QDomDocument doc;auto root=doc.createElement("preset");doc.appendChild(root);plugin->saveState(doc,root);return doc;};
+  auto checkPreset=[&](Plugin* plugin,const QDomDocument& before){
+   QCOMPARE(settings(plugin).toString(),before.toString());
+   plugin->restoreState(before.documentElement().firstChildElement());
+   auto actual=settings(plugin);auto expected=before.cloneNode(true).toDocument();
+   // Preset loading deliberately regenerates this controller's runtime ID.
+   if(QString::fromUtf8(plugin->descriptor()->name)=="peakcontrollereffect")
+   {
+    for(auto* doc:{&actual,&expected})
+     doc->elementsByTagName("peakcontrollereffectcontrols").at(0).toElement().removeAttribute("effectId");
+   }
+   QCOMPARE(actual.toString(),expected.toString());
+  };
   for(const auto& info:PluginFactory::instance()->pluginInfos())
   {
    const auto* descriptor=info.descriptor;
@@ -248,8 +285,9 @@ private slots:
    }
    qInfo().noquote()<<"Capturing plugin"<<name;
    Plugin::Descriptor::SubPluginFeatures::KeyList keys;
-   if(descriptor->subPluginFeatures) descriptor->subPluginFeatures->listSubPluginKeys(descriptor,keys);
-   if(descriptor->subPluginFeatures && keys.empty())
+   // VeSTige has a useful LMMS host panel even without a foreign plugin.
+   if(descriptor->subPluginFeatures && name!="vestige") descriptor->subPluginFeatures->listSubPluginKeys(descriptor,keys);
+   if(descriptor->subPluginFeatures && keys.empty() && name!="vestige")
    {
     coverage.append(QJsonObject{{"plugin",name},{"status","MANUAL/PENDING"},{"reason","No external subplugin fixture installed"}});
     continue;
@@ -264,23 +302,36 @@ private slots:
     for(auto* candidate:m_gui->mainWindow()->findChildren<InstrumentTrackView*>())
      if(candidate->model()==track) {view=candidate;break;}
     QVERIFY2(view,qPrintable(name));
+    const auto preset=settings(track->instrument());
     showEditor(view->getInstrumentTrackWindow(),"S08-plugin-"+name);
+    checkPreset(track->instrument(),preset);
    }
    else if(descriptor->type==Plugin::Type::Effect)
    {
     auto* chain=&Engine::mixer()->mixerChannel(1)->m_fxChain;
     auto* effect=Effect::instantiate(name,chain,key);QVERIFY2(effect,qPrintable(name));
+    if(dynamic_cast<DummyEffect*>(effect)||!effect->isOkay()
+      ||(name=="vsteffect"&&effect->controls()->controlCount()==0))
+    {
+     coverage.append(QJsonObject{{"plugin",name},{"status","MANUAL/PENDING"},
+      {"reason","External effect initialization returned an invalid/dummy effect or an unloaded VST wrapper; placeholder is not panel coverage"}});
+     delete effect;continue;
+    }
     chain->appendEffect(effect);auto* panel=effect->controls()->createView();QVERIFY(panel);
+    const auto preset=settings(effect);
     showEditor(panel,"S08-plugin-"+name);
+    checkPreset(effect,preset);
    }
    else
    {
     auto* plugin=Plugin::instantiate(name,Engine::getSong(),nullptr);QVERIFY(plugin);
     m_toolPlugins.append(plugin);
     auto* panel=plugin->createView(m_gui->mainWindow());QVERIFY(panel);
-    capture(panel,"S08-plugin-"+name);panel->hide();
+    showEditor(panel,"S08-plugin-"+name);
    }
-   coverage.append(QJsonObject{{"plugin",name},{"status","BASELINE CAPTURED"}});
+   coverage.append(QJsonObject{{"plugin",name},{"status","BASELINE CAPTURED"},
+    {"scope",name=="vestige"?"LMMS unloaded host wrapper; foreign editor and sound MANUAL/PENDING":"LMMS host/shared controls; artwork exceptions in inventory"},
+    {"preset",descriptor->type==Plugin::Type::Tool?"N/A: tool panel":"UI snapshot and restore/save checked"}});
    QCoreApplication::sendPostedEvents(nullptr,QEvent::DeferredDelete);QTest::qWait(100);
   }
   QFile report(m_output+"/plugin-panels.json");QVERIFY(report.open(QIODevice::WriteOnly));

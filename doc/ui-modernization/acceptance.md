@@ -17,8 +17,8 @@
 | F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 5ad278c44，已推送 origin/master |
 | F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | a2eb86f36，已推送 origin/master |
 | F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 6f90902e7，已推送 origin/master；部署补修见下 |
-| F4 | DONE / MANUAL-PENDING | 52 DLL 原目录编译；核心 3/3 PASS；双 DPI 场景及编辑交互 | PNG 保留；观感/IME/跨屏 DPI MANUAL/PENDING | 本阶段提交，推送 origin/master |
-| F5 | TODO | — | 逐项登记 PNG 例外 | — |
+| F4 | DONE / MANUAL-PENDING | 52 DLL 原目录编译；核心 3/3 PASS；双 DPI 场景及编辑交互 | PNG 保留；观感/IME/跨屏 DPI MANUAL/PENDING | e5fba8574，已推送 origin/master |
+| F5 | DONE / MANUAL-PENDING | 52 DLL；核心 3/3 PASS；控件双 DPI 各 12 PASS；47 有效面板双 DPI 与预设检查 | 5 外部待验收；私有 PNG 逐项 SKIPPED | 本阶段提交，推送 origin/master |
 | F6 | TODO | — | 人工项不阻塞交付 | — |
 
 ## 实窗证据
@@ -41,6 +41,7 @@ F0 证据位于 `validation/F0-100/`、`validation/F0-150/`，包含 S01 主窗�
 
 ## Follow-up（不修改产品行为）
 
+- 经典/现代主题切换入口：用户于 2026-10-07 明确要求列为未来计划，本轮不实现，不作为 F0–F6 完成门槛。现有 Settings → Paths → Theme directory 保留；测试中的 legacy 自动切换仅用于回退验证，不代表已提供专用切换功能。
 - 初版截图程序在刚创建完整工程后立即同进程 loadProject，恢复轨道期间处理事件时崩溃。证据：F0-reopen-crash.log / results。当前 F0 使用全新进程验证可重开的工程，后续窗口生命周期测试独立执行；同进程反复替换工程的崩溃需要另行定位，不在 F0 修改产品加载流程。
 
 ## 回滚
@@ -104,3 +105,17 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - F4-100 / F4-150：S01–S08、标准状态及 fixture 独立进程重开通过；S03/S04/S05 是实际 Windows 窗口，SVS noteRect 到时间/音高反变换断言通过。截图测试明确选音符画布而非参数画布，并将视口移到 fixture 的 C4，保证音符可见。F4-clip-actions、F4-short-clip、F4-piano-actions 是实际交互后的窗口。100% 中文轨道名正常，无方块字。
 - 初轮编译的 ClipView 命名歧义修正为 lmms::gui::ClipView；150% 像素检查的采样点移入可见轨道，并等待实际主窗激活重绘后通过。失败记录保留，不计 PASS。150% 截图超过当前屏幕可用范围的外围区域不作为布局正确证据；全窗适配继续在 F5/F6 的既定布局检查内处理。
 - SKIPPED / PNG：旧工具栏和私有插件 artwork 位图保持原内容，留待 F5 逐项登记；本阶段未修改 PNG 资产。截图 PNG 是实窗证据。人工观感、真实跨屏 DPI、完整中文 IME 为 MANUAL/PENDING，不阻塞阶段检查点。
+
+## F5 检查点
+
+- Mixer 通道与效果卡片采用默认主题纯色单层圆角边框，效果名称取消阴影；Controls 按文本尺寸取紧凑宽度并保留完整 tooltip。选通道、效果 LED 启停和 Controls 打开/关闭使用真实输入验证，模型结果保持。旧主题继续原绘制。
+- 仪器公共页不再只受插件的 256 DIP 固定宽度约束。现代 TabWidget 报告内容布局尺寸，宿主按公共页实际最小宽度设置约束；包络/LFO 长标签在 100%/150% 均完整显示，有可见标签宽度及父区域边界断言。现代滤波器内容使用 GroupBox 的标题高度，legacy 保持原 18 DIP 内容偏移；插件私有 artwork 仍保持原尺寸和坐标。
+- SVS 顶部工具栏在窄窗时可水平滚动，保留原按钮、信号和输入入口；F5-150/S05-svs.png 的 Settings/Properties 均可见，参数侧栏和只读分界保持。当前屏幕的场景主窗口/MDI 与控件测试主窗口均适配可用区域；真实跨屏 DPI 仍为 MANUAL/PENDING。
+- F5-final-build.log（最终）及 F5-tab-size-build.log、F5-unloaded-wrapper-build.log、F5-visible-tool-build.log、F5-host-wrapper-build.log：产品、测试与 52 个 UiPluginCoverage 目标编译成功。DLL 原地位于 build/Release/plugins，清单/哈希见 F5-plugin-artifacts.json；支持库仍在相同目录。主程序为 build/Release/lmms.exe。Sid 原 DLL 保持 .disabled，GigPlayer 缺依赖、未启用；没有新建部署目录。
+- F5-tests-final.log：AutomatableModelTest、完整 SVSIntegrationTest、ThemeWidgetTest 3/3 PASS（44.93 秒）。F5-theme-results.txt / F5-theme-150-results.txt：原生控件各 12 PASS；包括此前用户的浏览器/拖入乐器/点击名称打开窗口路径、编辑交互、重载与旧主题回退，以及本阶段 Mixer/效果卡片操作。实际截图 F5-mixer-rack / F5-effect-controls 分别归档在双 DPI 目录。
+- 最终重跑曾在 SVS 导出上下文用例超时，保留 F5-final-regression-timeout.log / F5-final-svs-timeout-results.txt；同一套件保持原 60 秒上限重跑后 17.95 秒通过，未扩大超时、未修改导出/DSP 行为。该间歇性导出用例超时列为既有 follow-up，不计失败轮为 PASS。
+- F5-100 / F5-150：S01–S08、五个仪器公共页、标准状态与全新进程 fixture 重开通过；场景各 4 PASS / 0 FAIL，两个 SKIP 是分别独立执行的槽。插件各 3 PASS / 0 FAIL，52 项中 47 个有效宿主面板实际打开、截图，45 个 instrument/effect 做 UI 显示前后状态及 restore/save 比较，2 个 Tool 明确预设 N/A。逐项源入口、目标、共享/私有控件、资源键、截图与例外见 [plugin-coverage.md](plugin-coverage.md) 和 F5-plugin-coverage.json。
+- Carla Rack/Patchbay、VST effect、LV2 instrument/effect 共 5 项外部运行环境 MANUAL/PENDING。VeSTige 按实际可独立打开的 LMMS 空宿主页检查，不依赖异步发现的个人外部插件；其外部插件编辑器/声音不算通过。ZynAddSubFX 只计 LMMS 宿主，不把 vendored 原生编辑器算作换肤。人工验收全部按用户要求跳过。
+- 实窗审查发现 VST 初始化失败后 isOkay() 仍可能为真，返回零 controls 的空框；仅排除 DummyEffect 不够。测试增加空 VST wrapper 判断，旧 placeholder 截图和旧 48 项记录仅留诊断、不能算最终 PASS。Tool 原截图未显示 MDI 父窗口，现已用实际显示/前置/可见区域检查重跑；S08-unshown-* 仅为旧错误取证，最终 S08-plugin-ladspabrowser/taptempo 含真实控件。
+- 首轮预设比较在 View 绑定前取快照，Eq 构造的既有单选归一化导致差异。当前快照在绑定后获取，准确验证显示操作和预设恢复；该构造归一化作为既有 follow-up，不扩大本阶段音频/预设行为范围。PeakController 按原语义在恢复时重新生成运行时 effectId，仅恢复后的比较排除此字段，显示前后仍完整比较。测试修正日志保留，不把失败算通过。
+- SKIPPED / PNG：逐项保留私有背景、bitmap 图标、嵌入装饰标签与其固定几何；不是已重绘。Monstro 的 artwork_op/artwork_mat 已补入资源清单。宿主纯色框与共享控件已实施；有意义的数据波形/频谱/矩阵保持算法，未修改任何插件 DSP、参数 id 或预设实现。听感、完整中文 UI/IME、真实 DPI 与外观偏好为 MANUAL/PENDING。F6 的安装、125%/200% 有限抽查及最终逐条交付审计尚未完成。

@@ -1,0 +1,262 @@
+[
+    {
+        "plugin": "malletsstk",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "ladspaeffect",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vectorscope",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "zynaddsubfx",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "kicker",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "peakcontrollereffect",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lv2effect",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "slicert",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "reverbsc",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "oscilloscope",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "sf2player",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "stereoenhancer",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lv2instrument",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "ladspabrowser",
+        "preset": "N/A: tool panel",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "flanger",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "multitapecho",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vibedstrings",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vestige",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lomm",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "carlapatchbay",
+        "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "audiofileprocessor",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "patman",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "stereomatrix",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "freeboy",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "spectrumanalyzer",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "waveshaper",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitcrush",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "taptempo",
+        "preset": "N/A: tool panel",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "sfxr",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dispersion",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "eq",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "organic",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "monstro",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "tripleoscillator",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dualfilter",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "xpressive",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "amplifier",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "compressor",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bassbooster",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dynamicsprocessor",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "delay",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "carlarack",
+        "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "granularpitchshifter",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vsteffect",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "frequencyshifter",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "slewdistortion",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitinvader",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "crossovereq",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "nes",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lb302",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "watsyn",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "opulenz",
+        "preset": "UI snapshot and restore/save checked",
+        "status": "BASELINE CAPTURED"
+    }
+]

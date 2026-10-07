@@ -884,11 +884,11 @@ lmms--gui--ControllerRackView QPushButton {
 }
 
 lmms--gui--MixerChannelView {
-	background: #14161A;
-	color: #d1d8e4;
-	qproperty-backgroundActive: #3B424A;
-	qproperty-strokeOuterActive: #262B30;
-	qproperty-strokeOuterInactive: #262B30;
+	background: #20262D;
+	color: #E5EAF0;
+	qproperty-backgroundActive: #29323B;
+	qproperty-strokeOuterActive: #42A065;
+	qproperty-strokeOuterInactive: #35414D;
 	qproperty-strokeInnerActive: #0C0D0F;
 	qproperty-strokeInnerInactive: #0C0D0F;
 }

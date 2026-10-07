@@ -28,6 +28,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
+#include <algorithm>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -37,6 +38,7 @@
 #include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
+#include "LmmsStyle.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
@@ -82,7 +84,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
-		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->ensurePolished();
+		const int controlsWidth = std::clamp(ctls_btn->sizeHint().width(), 50, DEFAULT_WIDTH - 154);
+		ctls_btn->setGeometry(150, 14, controlsWidth, 20);
+		ctls_btn->setToolTip(ctls_btn->text());
 		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -220,7 +225,14 @@ void EffectView::mouseMoveEvent(QMouseEvent* event)
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-	p.drawPixmap( 0, 0, m_bg );
+	if (LmmsStyle::s_flatFrames)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setBrush(palette().button());
+		p.setPen(palette().mid().color());
+		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
+	}
+	else { p.drawPixmap(0, 0, m_bg); }
 
 	QFont f = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
 	f.setBold( true );
@@ -228,8 +240,11 @@ void EffectView::paintEvent( QPaintEvent * )
 
 	QString elidedText = p.fontMetrics().elidedText( model()->displayName(), Qt::ElideRight, width() - 22 );
 
-	p.setPen( palette().shadow().color() );
-	p.drawText( 6, 55, elidedText );
+	if (!LmmsStyle::s_flatFrames)
+	{
+		p.setPen(palette().shadow().color());
+		p.drawText(6, 55, elidedText);
+	}
 	p.setPen( palette().text().color() );
 	p.drawText( 5, 54, elidedText );
 }

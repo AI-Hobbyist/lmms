@@ -35,6 +35,7 @@
 #include "FontHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "Knob.h"
+#include "LmmsStyle.h"
 #include "TabWidget.h"
 
 
@@ -64,7 +65,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	m_filterGroupBox = new GroupBox(tr("FILTER"), this);
 	QHBoxLayout* filterLayout = new QHBoxLayout(m_filterGroupBox);
 	QMargins filterMargins = filterLayout->contentsMargins();
-	filterMargins.setTop(18);
+	filterMargins.setTop(LmmsStyle::s_flatFrames ? m_filterGroupBox->titleBarHeight() + 2 : 18);
 	filterLayout->setContentsMargins(filterMargins);
 
 	m_filterComboBox = new ComboBox(m_filterGroupBox);
