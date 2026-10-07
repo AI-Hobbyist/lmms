@@ -62,6 +62,9 @@
 #include "SubWindow.h"
 #include "TabWidget.h"
 #include "LedCheckBox.h"
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 using namespace lmms;
 using namespace lmms::gui;
@@ -387,6 +390,67 @@ private slots:
   for(auto* widget:window.findChildren<QWidget*>())
    if(widget->isVisible()&&widget->parentWidget()==&window) QVERIFY(window.rect().contains(widget->geometry()));
   window.close();
+ }
+ void crowdedWindow()
+ {
+  auto* song=Engine::getSong();song->createNewProject();
+  auto* track=new SVSTrack(song);
+  const auto voices=svs::Registry::instance().voices();QVERIFY(!voices.isEmpty());
+  track->bindVoice(voices.first().pluginId,voices.first().id);
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));
+  svs::Note note;note.id="scale-spot-check";note.duration=96;note.pitch=60;clip->setNotes({note});
+  auto* editor=new SVSPianoRoll(clip);editor->openIn(m_gui->mainWindow());
+  for(auto* canvas:editor->findChildren<SVSCanvas*>()) if(!canvas->isParameterLane()) canvas->setScroll(0,67);
+  showEditor(editor,"S05-scale-spot-check");
+  auto* toolbar=editor->findChild<QScrollArea*>("svsToolbarScroll");QVERIFY(toolbar);
+  toolbar->horizontalScrollBar()->setValue(toolbar->horizontalScrollBar()->maximum());
+  showEditor(editor,"S05-scale-toolbar-end");
+  for(auto* area:editor->findChildren<QScrollArea*>())
+  {
+   if(area==toolbar) continue;
+   auto* scroll=area->verticalScrollBar();scroll->setValue(scroll->maximum());QCOMPARE(scroll->value(),scroll->maximum());
+  }
+  showEditor(editor,"S05-scale-parameters-end");
+  {SetupDialog settings(SetupDialog::ConfigTab::AudioSettings);capture(&settings,"S02-scale-audio");settings.close();}
+  song->setModified(false);
+ }
+ void installedLaunch()
+ {
+  const auto executable=qEnvironmentVariable("LMMS_UI_INSTALLED_EXE");
+  if(executable.isEmpty()) QSKIP("Installed executable smoke is selected explicitly.");
+#ifdef Q_OS_WIN
+  QVERIFY(QFile::exists(executable));
+  ConfigManager::inst()->saveConfigFile();
+  auto environment=QProcessEnvironment::systemEnvironment();
+  environment.remove("LMMS_DATA_DIR");environment.remove("LMMS_PLUGIN_DIR");environment.remove("LMMS_SVS_PLUGIN_DIR");
+  environment.remove("QT_PLUGIN_PATH");environment.remove("QT_QPA_PLATFORM_PLUGIN_PATH");
+  environment.insert("PATH",QFileInfo(executable).absolutePath()+";"+QFileInfo(executable).absolutePath()+"/plugins;"+
+   environment.value("SystemRoot")+"/System32;"+environment.value("SystemRoot"));
+  QProcess child;child.setProcessEnvironment(environment);child.setWorkingDirectory(QFileInfo(executable).absolutePath());
+  child.start(executable,{"--config",m_config.filePath("ui-config.xml"),
+   QFileInfo(qEnvironmentVariable("LMMS_UI_FIXTURE")).absolutePath()+"/modernization/modernization.mmp"});
+  QVERIFY(child.waitForStarted(5000));
+  struct WindowSearch { DWORD process; HWND window=nullptr; } search{static_cast<DWORD>(child.processId())};
+  auto findWindow=[&]() {
+   EnumWindows([](HWND window,LPARAM parameter)->BOOL {
+    auto* result=reinterpret_cast<WindowSearch*>(parameter);DWORD process=0;GetWindowThreadProcessId(window,&process);
+    wchar_t title[512]{};GetWindowTextW(window,title,512);
+    if(process==result->process&&IsWindowVisible(window)&&QString::fromWCharArray(title).contains("LMMS")) result->window=window;
+    return TRUE;
+   },reinterpret_cast<LPARAM>(&search));return search.window!=nullptr;
+  };
+  QTRY_VERIFY_WITH_TIMEOUT(findWindow(),15000);
+  ShowWindow(search.window,SW_RESTORE);SetForegroundWindow(search.window);QTest::qWait(2000);
+  QCOMPARE(child.state(),QProcess::Running);
+  const auto image=m_gui->mainWindow()->screen()->grabWindow(reinterpret_cast<WId>(search.window));
+  QVERIFY(!image.isNull());QVERIFY(image.save(m_output+"/S01-installed-executable.png"));
+  PostMessageW(search.window,WM_CLOSE,0,0);
+  QVERIFY(child.waitForFinished(10000));QCOMPARE(child.exitStatus(),QProcess::NormalExit);QCOMPARE(child.exitCode(),0);
+  QFile log(m_output+"/installed-executable.log");QVERIFY(log.open(QIODevice::WriteOnly));
+  log.write(child.readAllStandardOutput()+child.readAllStandardError());
+#else
+  QSKIP("Native Windows installation validation.");
+#endif
  }
  void cleanupTestCase()
  {

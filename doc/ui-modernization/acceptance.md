@@ -18,8 +18,8 @@
 | F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | a2eb86f36，已推送 origin/master |
 | F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 6f90902e7，已推送 origin/master；部署补修见下 |
 | F4 | DONE / MANUAL-PENDING | 52 DLL 原目录编译；核心 3/3 PASS；双 DPI 场景及编辑交互 | PNG 保留；观感/IME/跨屏 DPI MANUAL/PENDING | e5fba8574，已推送 origin/master |
-| F5 | DONE / MANUAL-PENDING | 52 DLL；核心 3/3 PASS；控件双 DPI 各 12 PASS；47 有效面板双 DPI 与预设检查 | 5 外部待验收；私有 PNG 逐项 SKIPPED | 本阶段提交，推送 origin/master |
-| F6 | TODO | — | 人工项不阻塞交付 | — |
+| F5 | DONE / MANUAL-PENDING | 52 DLL；核心 3/3 PASS；控件双 DPI 各 12 PASS；47 有效面板双 DPI 与预设检查 | 5 外部待验收；私有 PNG 逐项 SKIPPED | 93770265d，已推送 origin/master |
+| F6 | IMPLEMENTED / MANUAL-PENDING | 原目录安装；核心 3/3；双 DPI 场景；125%/200% 抽查；独立 PATH 主程序冒烟 | PNG/人工/外部例外见交付审计 | 本阶段提交，推送 origin/master |
 
 ## 实窗证据
 
@@ -119,3 +119,12 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - 实窗审查发现 VST 初始化失败后 isOkay() 仍可能为真，返回零 controls 的空框；仅排除 DummyEffect 不够。测试增加空 VST wrapper 判断，旧 placeholder 截图和旧 48 项记录仅留诊断、不能算最终 PASS。Tool 原截图未显示 MDI 父窗口，现已用实际显示/前置/可见区域检查重跑；S08-unshown-* 仅为旧错误取证，最终 S08-plugin-ladspabrowser/taptempo 含真实控件。
 - 首轮预设比较在 View 绑定前取快照，Eq 构造的既有单选归一化导致差异。当前快照在绑定后获取，准确验证显示操作和预设恢复；该构造归一化作为既有 follow-up，不扩大本阶段音频/预设行为范围。PeakController 按原语义在恢复时重新生成运行时 effectId，仅恢复后的比较排除此字段，显示前后仍完整比较。测试修正日志保留，不把失败算通过。
 - SKIPPED / PNG：逐项保留私有背景、bitmap 图标、嵌入装饰标签与其固定几何；不是已重绘。Monstro 的 artwork_op/artwork_mat 已补入资源清单。宿主纯色框与共享控件已实施；有意义的数据波形/频谱/矩阵保持算法，未修改任何插件 DSP、参数 id 或预设实现。听感、完整中文 UI/IME、真实 DPI 与外观偏好为 MANUAL/PENDING。F6 的安装、125%/200% 有限抽查及最终逐条交付审计尚未完成。
+## F6 检查点
+
+- F6-build.log：主程序、必要测试和 52 个启用插件在原目录编译通过；F6-capture-final-build.log 完成最终安装/缩放测试目标编译。程序仍为 build/Release/lmms.exe。F6 产品实现没有继续扩展，仅补齐交付验证与文档。
+- F6-install.log：在既有 build/Release 前缀完成安装；3250 条安装清单全部位于该目录，没有触及原 Program Files 安装。F6-installed-resources.json 的 CSS/17 SVG 哈希逐项相同，F6-plugin-artifacts.json 为 52 个原 plugins DLL 的当前清单，与 F5 哈希一致。Sid 原地 disabled、GigPlayer 未构建的例外保留。
+- F6-tests.log：核心 3/3 PASS（45.35 秒）；完整 SVSIntegrationTest 59 PASS，ThemeWidgetTest 12 PASS。F6-theme-150-results.txt：直接使用安装资源的原生控件 12 PASS。主题重载、字体/DPR、旧主题回退、DnD 打开乐器、编辑模型与机架交互均保留实际断言。
+- F6-100 / F6-150：安装资源下 S01–S08、五个仪器公共页、标准控件状态和全新进程工程重开，各 5 PASS；实际 build/Release/lmms.exe 通过临时 --config 正常启动/关闭。F6-isolated-launch-results.txt 3 PASS：子程序清除源码数据/插件覆盖变量、Qt 插件路径覆盖，PATH 仅安装目录/plugins 与 Windows 系统目录，仍正常运行。个人工程与配置未改。
+- F6-125 / F6-200：标准控件与最拥挤 SVS 窗口有限抽查，各 4 PASS；200% 工具栏可横向滚动到 Settings/Properties，参数侧栏可纵向滚到 Mode/Gain。所有缩放为 QT_SCALE_FACTOR 模拟，真实跨屏 DPI 仍 MANUAL/PENDING；中文 fixture/标签没有方块字，不把系统 locale 当作完整中文翻译/IME 验收。
+- 第 12.1 节逐条结果、截图索引、安装清单、人工/PNG/外部范围例外和回滚步骤见 [delivery-audit.md](delivery-audit.md)。F0–F2 完成条件和 B/D 历史 follow-on 状态同步为已有实际证据，不增加新功能。经典/现代主题切换只列未来计划。
+- 人工验收、听感、外部编辑器和需要修改 PNG 的项目按用户要求跳过并注明；不能称 ACCEPTED。三个其他任务未提交文件继续保留。完成本检查点提交/推送和远端 SHA 核对后，按用户新增要求制作全量替换包。
