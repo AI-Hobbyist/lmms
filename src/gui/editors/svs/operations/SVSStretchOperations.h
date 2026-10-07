@@ -18,7 +18,10 @@ struct StretchLimits {
  }
 };
 inline void stretchSegments(svs::Note& note,double oldDuration,const StretchLimits* limits) {
- auto segments=note.phonemes["segments"].toArray();
+ // Reading a missing key through mutable operator[] inserts a null override.
+ // Retire that accidental override from notes stretched by older builds too.
+ if(note.phonemes.value("segments").isNull()) note.phonemes.remove("segments");
+ auto segments=note.phonemes.value("segments").toArray();
  if(segments.isEmpty()||oldDuration<=0) return;
  // Leading material is rigid; body material follows the musical duration.
  double previous=-INFINITY;
@@ -62,7 +65,7 @@ inline void stretchNoteUnchecked(QVector<svs::Note>& notes,const QString& id,dou
  for(auto& note:notes) {
   const svs::Note* old=nullptr;for(const auto& item:before) if(item.id==note.id) old=&item;
   if(!old) continue;
-  auto segments=note.phonemes["segments"].toArray();const auto oldSegments=old->phonemes["segments"].toArray();
+  auto segments=note.phonemes.value("segments").toArray();const auto oldSegments=old->phonemes["segments"].toArray();
   if(segments.isEmpty()||oldSegments.isEmpty()) continue;
   const auto oldLast=oldSegments.last().toObject();const auto oldTail=old->tick+oldLast["startTick"].toDouble()+oldLast["durationTicks"].toDouble();
   double oldFill=old->tick+old->duration,newFill=note.tick+note.duration;

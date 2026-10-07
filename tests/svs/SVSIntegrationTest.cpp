@@ -861,6 +861,25 @@ private slots:
    lane.setParameterLane(p);QTest::mouseClick(&lane,Qt::RightButton,Qt::NoModifier,QPoint(300,100));QVERIFY(clip->curves().contains(p.id));QCOMPARE(clip->curves()[p.id].scope,p.scope);QCOMPARE(clip->curves()[p.id].valueAt(120),std::optional<QJsonValue>(p.defaultValue));
   }
  }
+ void automaticNoteStretchRenders() {
+  const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));
+  gui::SVSCanvas canvas(clip);canvas.resize(700,400);canvas.setTool(gui::SVSCanvas::Tool::Pencil);canvas.setQuantization(12);canvas.show();QVERIFY(QTest::qWaitForWindowExposed(&canvas));
+  QTest::mouseClick(&canvas,Qt::LeftButton,Qt::NoModifier,canvas.pointAt(48,60).toPoint()+QPoint(2,6));QCOMPARE(clip->notes().size(),1);QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);const auto original=clip->notes();QCOMPARE(original[0].duration,12.);QVERIFY(original[0].phonemes.isEmpty());
+  for(bool head:{false,true}) {
+   clip->setNotes(original);QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);const auto rect=canvas.noteRect(original[0]);const QPoint from(int(head?rect.left()+2:rect.right()-2),int(rect.center().y()));const auto to=from+QPoint(head?-48:96,0);
+   QTest::mousePress(&canvas,Qt::LeftButton,Qt::NoModifier,from);QTest::mouseMove(&canvas,to);QTest::mouseRelease(&canvas,Qt::LeftButton,Qt::NoModifier,to);QVERIFY(clip->notes()[0].duration>original[0].duration);
+   QTRY_VERIFY_WITH_TIMEOUT(clip->audio()||clip->status().startsWith("Failed:"),10000);QVERIFY2(clip->audio(),qPrintable(clip->status()));QVERIFY(clip->notes()[0].phonemes.isEmpty());QCOMPARE(clip->audio()->feedback["phonemes"].toArray().size(),2);
+  }
+  canvas.close();gui::SVSResultStrip strip(clip);strip.resize(700,36);strip.show();QVERIFY(QTest::qWaitForWindowExposed(&strip));
+  for(bool head:{false,true}) {
+   clip->setNotes(original);QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);const QPoint from(int(60+2*(head?48:60)),6);const auto to=from+QPoint(head?-48:96,0);
+   QTest::mousePress(&strip,Qt::LeftButton,Qt::NoModifier,from);QTest::mouseMove(&strip,to);QTest::mouseRelease(&strip,Qt::LeftButton,Qt::NoModifier,to);QVERIFY(clip->notes()[0].duration>12);
+   QTRY_VERIFY_WITH_TIMEOUT(clip->audio()||clip->status().startsWith("Failed:"),10000);QVERIFY2(clip->audio(),qPrintable(clip->status()));QVERIFY(clip->notes()[0].phonemes.isEmpty());QCOMPARE(clip->audio()->feedback["phonemes"].toArray().size(),2);
+  }
+  // A note saved by the broken build recovers on its next stretch.
+  auto poisoned=original;poisoned[0].phonemes["segments"]=QJsonValue::Null;clip->setNotes(poisoned);QTRY_VERIFY_WITH_TIMEOUT(clip->status().startsWith("Failed:"),10000);
+  QTest::mousePress(&strip,Qt::LeftButton,Qt::NoModifier,QPoint(180,6));QTest::mouseRelease(&strip,Qt::LeftButton,Qt::NoModifier,QPoint(276,6));QTRY_VERIFY_WITH_TIMEOUT(clip->audio(),10000);QVERIFY(clip->notes()[0].phonemes.isEmpty());strip.close();
+ }
  void stretchShortPhonemeRenders() {
   auto* song=Engine::getSong();const auto tempo=song->getTempo();song->tempoModel().setValue(120);auto restore=qScopeGuard([&]{song->tempoModel().setValue(tempo);});
   const auto voice=svs::Registry::instance().voices().first();auto* track=new SVSTrack(song);auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(voice.pluginId,"full");QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);auto* clip=static_cast<SVSClip*>(track->createClip(0));

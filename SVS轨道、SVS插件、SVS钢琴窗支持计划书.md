@@ -457,3 +457,9 @@ PASS：已稳定复现短辅音随音符按比例缩短到声库最短时长以�
 SVS 琴键按原版钢琴窗的白键跨度、叠加黑键、轮廓、宽度比例和随高度缩放字号绘制，默认主题使用原版琴键配色与黑色音名；保留 SVS 区域宽度与交互，不修改普通 PianoRoll。主题 CSS 已同步到既有开发部署目录并核对哈希。
 
 前台 Release 构建通过；开发程序／SVSExample／普通插件仍在原目录。完整 SVS 回归 **63 passed / 0 failed / 0 skipped**，完整 CTest **1/1 通过**；使用实际部署数据和插件的实窗专项 **5 passed / 0 failed / 0 skipped**。真实截图已检查，测试窗口关闭。无 offscreen 或 Computer Use；最终人工手感验收 **MANUAL/PENDING**。详见 `doc/svs/SVS-stretch-phoneme-limits-and-keyboard.md`。
+
+## 30. 自动音素拉长失败的实机复现与修复（2026-10-07）
+
+PASS：Computer Use 在实际 build/Release/lmms.exe 稳定复现新建默认音符尾端拉长后 Failed (2)／音素块消失，保存工程确认自动音素误写 segments:null。共享伸缩改用非插入式 JSON 读取，并在下一次伸缩时清理旧 null；不改变有效手工音素数组或第 29 节时长约束。新增默认鼠标创建音符的画布／音素条首尾伸缩及旧 null 恢复回归，旧代码先失败、修复后通过。
+
+原目录前台 Release 编译通过；Windows 原生完整 SVS 回归 **64 passed / 0 failed / 0 skipped**，CTest **1/1 通过**。Computer Use 实机确认旧／新音符首尾延长、首尾缩短、音素条上半区首尾拉伸及下半区独立交界拖动均正常合成且音素块保留；三条有值只读曲线显示正常。实测窗口已关闭，Computer Use 已结束。未使用 offscreen，未改编译／部署目录。详见 `doc/svs/SVS-automatic-stretch-null-fix.md`。本次验证完成，不扩大范围。
