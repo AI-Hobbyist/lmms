@@ -1,0 +1,140 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/HydrogenImport/Release/hydrogenimport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/HydrogenImport/Release/hydrogenimport.exp
+  hydrogenimport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\hydrogenimport.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MidiImport/Release/midiimport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MidiImport/Release/midiimport.exp
+  midiimport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiimport.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MidiExport/Release/midiexport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MidiExport/Release/midiexport.exp
+  midiexport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiexport.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Performing build step for 'RemoteVstHost64'
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  
+    pluginterfaces.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\pluginterfaces.lib
+    Vst3Factory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3Factory.vst3
+    Vst3FactoryFault1.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault1.vst3
+    Vst3FactoryFault2.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault2.vst3
+    Vst3FactoryFault3.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault3.vst3
+    Vst3FactoryFault4.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault4.vst3
+    Vst3FactoryFault5.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault5.vst3
+    Vst3FactoryFault6.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault6.vst3
+    Vst3FactoryFault7.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault7.vst3
+    Vst3FactoryFault8.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault8.vst3
+    base.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\base.lib
+    sdk_common.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk_common.lib
+    sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk.lib
+    Vst3Native.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3Native.vst3
+    sdk_hosting.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk_hosting.lib
+    LmmsVst3Loader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\LmmsVst3Loader.lib
+    LmmsVst3Module.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\LmmsVst3Module.lib
+    RemoteVstHost.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\RemoteVstHost.exe
+    Vst3CatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3CatalogTest.exe
+    Vst3LifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3LifecycleTest.exe
+    Vst3PresetSdkTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3PresetSdkTest.exe
+    Vst3ProcessingTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3ProcessingTest.exe
+    Vst3RestartEventsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3RestartEventsTest.exe
+    WaveShellInventory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\WaveShellInventory.exe
+  Performing install step for 'RemoteVstHost64'
+  Completed 'RemoteVstHost64'
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Performing build step for 'RemoteVstHost32'
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  
+    pluginterfaces.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\pluginterfaces.lib
+    Vst3Factory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3Factory.vst3
+    Vst3FactoryFault1.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault1.vst3
+    Vst3FactoryFault2.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault2.vst3
+    Vst3FactoryFault3.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault3.vst3
+    Vst3FactoryFault4.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault4.vst3
+    Vst3FactoryFault5.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault5.vst3
+    Vst3FactoryFault6.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault6.vst3
+    Vst3FactoryFault7.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault7.vst3
+    Vst3FactoryFault8.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault8.vst3
+    base.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\base.lib
+    sdk_common.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk_common.lib
+    sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk.lib
+    Vst3Native.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3Native.vst3
+    sdk_hosting.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk_hosting.lib
+    LmmsVst3Loader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\LmmsVst3Loader.lib
+    LmmsVst3Module.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\LmmsVst3Module.lib
+    RemoteVstHost.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\RemoteVstHost.exe
+    Vst3CatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3CatalogTest.exe
+    Vst3LifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3LifecycleTest.exe
+    Vst3PresetSdkTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3PresetSdkTest.exe
+    Vst3ProcessingTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3ProcessingTest.exe
+    Vst3RestartEventsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3RestartEventsTest.exe
+    WaveShellInventory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\WaveShellInventory.exe
+  Performing install step for 'RemoteVstHost32'
+  Completed 'RemoteVstHost32'
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  RemoteVstPlugin64.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteVstPlugin64.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Performing build step for 'RemoteVstPlugin32'
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  
+    RemoteVstPlugin32.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\32\RemoteVstPlugin32.exe
+  No install step for 'RemoteVstPlugin32'
+  Completed 'RemoteVstPlugin32'
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  zynaddsubfx_gui.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\UI\zynaddsubfx_gui.dir\Release\zynaddsubfx_gui.lib
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+LINK : warning LNK4044: 无法识别的选项“/mwindows”；已忽略 [D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\RemoteZynAddSubFx.vcxproj]
+  RemoteZynAddSubFx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\RemoteZynAddSubFx.exe

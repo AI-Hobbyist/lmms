@@ -19,7 +19,7 @@
 | F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 6f90902e7，已推送 origin/master；部署补修见下 |
 | F4 | DONE / MANUAL-PENDING | 52 DLL 原目录编译；核心 3/3 PASS；双 DPI 场景及编辑交互 | PNG 保留；观感/IME/跨屏 DPI MANUAL/PENDING | e5fba8574，已推送 origin/master |
 | F5 | DONE / MANUAL-PENDING | 52 DLL；核心 3/3 PASS；控件双 DPI 各 12 PASS；47 有效面板双 DPI 与预设检查 | 5 外部待验收；私有 PNG 逐项 SKIPPED | 93770265d，已推送 origin/master |
-| F6 | IMPLEMENTED / MANUAL-PENDING | 原目录安装；核心 3/3；双 DPI 场景；125%/200% 抽查；独立 PATH 主程序冒烟 | PNG/人工/外部例外见交付审计 | 本阶段提交，推送 origin/master |
+| F6 | IMPLEMENTED / MANUAL-PENDING | 原目录安装；核心 3/3；双 DPI 场景；125%/200% 抽查；独立 PATH 主程序冒烟 | PNG/人工/外部例外见交付审计 | 7b44c5487，已推送 origin/master |
 
 ## 实窗证据
 
@@ -128,3 +128,7 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - F6-125 / F6-200：标准控件与最拥挤 SVS 窗口有限抽查，各 4 PASS；200% 工具栏可横向滚动到 Settings/Properties，参数侧栏可纵向滚到 Mode/Gain。所有缩放为 QT_SCALE_FACTOR 模拟，真实跨屏 DPI 仍 MANUAL/PENDING；中文 fixture/标签没有方块字，不把系统 locale 当作完整中文翻译/IME 验收。
 - 第 12.1 节逐条结果、截图索引、安装清单、人工/PNG/外部范围例外和回滚步骤见 [delivery-audit.md](delivery-audit.md)。F0–F2 完成条件和 B/D 历史 follow-on 状态同步为已有实际证据，不增加新功能。经典/现代主题切换只列未来计划。
 - 人工验收、听感、外部编辑器和需要修改 PNG 的项目按用户要求跳过并注明；不能称 ACCEPTED。三个其他任务未提交文件继续保留。完成本检查点提交/推送和远端 SHA 核对后，按用户新增要求制作全量替换包。
+
+## 完成后的全量替换包
+
+已制作 `build/packages/lmms-modern-ui-full-7b44c5487-win64.zip`（60,648,335 bytes）。3480 个运行文件、4 个安装/说明文件；ZIP 全 entry 哈希校验、Windows PowerShell 校验/实际原目录覆盖、配置保留检查及覆盖后原生实窗 3 PASS 均完成。详见 [replacement-package.md](replacement-package.md) 与 validation/package-artifact.json。此包不包含个人配置/工程；旧包外插件 DLL 原地停用以避免 ABI 混用，未实际覆盖用户的原安装版。

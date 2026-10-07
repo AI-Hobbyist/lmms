@@ -1,0 +1,37 @@
+{
+  "FileName": "lmms-modern-ui-full-7b44c5487-win64.zip",
+  "Bytes": 60648335,
+  "SHA256": "32489E569E2004B3363E545BC3CE1EFDF75346EDB82A6FF156EB2970720CA802",
+  "RuntimeFiles": 3480,
+  "ExtraPackageFiles": 4,
+  "ProductCommit": "7b44c5487187d241c2dece22630a573479129c44",
+  "UiPluginCount": 52,
+  "ImportExportPluginCount": 3,
+  "ArchitectureChecks": [
+    {
+      "Path": "lmms.exe",
+      "Machine": "0x8664"
+    },
+    {
+      "Path": "plugins/RemoteVstHost64.exe",
+      "Machine": "0x8664"
+    },
+    {
+      "Path": "plugins/RemoteVstPlugin64.exe",
+      "Machine": "0x8664"
+    },
+    {
+      "Path": "plugins/32/RemoteVstHost32.exe",
+      "Machine": "0x014C"
+    },
+    {
+      "Path": "plugins/32/RemoteVstPlugin32.exe",
+      "Machine": "0x014C"
+    }
+  ],
+  "ArchiveHashes": "PASS: all 3484 entries",
+  "WindowsPowerShellInstaller": "PASS: verify and apply in original build/Release",
+  "PersonalConfigPreserved": "PASS: existing .lmmsrc.xml and portable_mode.txt unchanged",
+  "OriginalInstalledLmms": "Not modified",
+  "NativeSmoke": "PASS: 3 QtTest results, original executable, isolated runtime PATH"
+}
