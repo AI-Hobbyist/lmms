@@ -16,6 +16,7 @@ class SVSEditTransaction;
 class SVSCurveGesture;
 class SVSCanvas : public QWidget {
  Q_OBJECT
+ Q_PROPERTY(qreal noteCornerRadius MEMBER m_noteCornerRadius)
 public:
  enum class Tool { Notes,Pencil,Freehand,Anchor,Smooth,Line,Erase };
  explicit SVSCanvas(SVSClip*,QWidget* parent=nullptr);
@@ -73,6 +74,7 @@ protected:
 private:
  enum class Action { None,Frame,Move,LeftEdge,RightEdge,Pan,CreateTail,CurveStroke,CurveReset,CurveFrame,CurveMove,TangentIn,TangentOut };
  QPointer<SVSClip> m_clip;
+ qreal m_noteCornerRadius=0;
  std::unique_ptr<SVSEditTransaction> m_transaction;
  std::unique_ptr<SVSCurveGesture> m_curveGesture;
  QSet<double> m_selectedAnchors,m_initialAnchors,m_dragAnchors;

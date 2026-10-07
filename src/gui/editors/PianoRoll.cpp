@@ -37,6 +37,7 @@
 #include <QMargins>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPointer>
 #include <QPushButton>
 #include <QScrollBar>
@@ -1049,7 +1050,21 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		p.setPen( Qt::NoPen );
 	}
 
-	p.drawRect( x, y, noteWidth, noteHeight );
+	if (m_noteCornerRadius > 0)
+	{
+		const qreal radius = std::min(m_noteCornerRadius, std::min(noteWidth, noteHeight) / 2.0);
+		QPainterPath outline;
+		outline.addRoundedRect(QRectF(x, y, noteWidth, noteHeight), radius, radius);
+		p.save();
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setClipPath(outline, Qt::IntersectClip);
+		// Keep the volume/panning endpoints as two solid data bands.
+		p.fillRect(QRectF(x, y, noteWidth, noteHeight / 2.0), rcol);
+		p.fillRect(QRectF(x, y + noteHeight / 2.0, noteWidth, noteHeight / 2.0), lcol);
+		if (borders) { p.setBrush(Qt::NoBrush); p.drawPath(outline); }
+		p.restore();
+	}
+	else { p.drawRect(x, y, noteWidth, noteHeight); }
 
 	// Draw note key text
 	if (drawNoteName)
@@ -1091,7 +1106,12 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	if( width > 2 )
 	{
 		const int endmarkWidth = 3 - borderWidth;
-		p.drawRect( x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight );
+		if (m_noteCornerRadius > 0)
+		{
+			p.setPen(col);
+			p.drawLine(x + noteWidth - endmarkWidth, y + 1, x + noteWidth - endmarkWidth, y + noteHeight - 1);
+		}
+		else { p.drawRect(x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight); }
 	}
 }
 

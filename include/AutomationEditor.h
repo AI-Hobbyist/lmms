@@ -56,6 +56,7 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
 	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
@@ -294,6 +295,7 @@ private:
 	QColor m_nodeOutValueColor;
 	QColor m_nodeTangentLineColor;
 	QBrush m_scaleColor;
+	bool m_flatStyle = false;
 	QColor m_crossColor;
 	QColor m_backgroundShade;
 	QColor m_ghostNoteColor;

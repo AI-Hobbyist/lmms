@@ -64,6 +64,7 @@ class TimeLineWidget;
 class PianoRoll : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(qreal noteCornerRadius MEMBER m_noteCornerRadius)
 	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
 	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
@@ -379,6 +380,7 @@ private:
 	int resizeGripWidth(const Note& note) const;
 
 	MidiClip* m_midiClip;
+	qreal m_noteCornerRadius = 0;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const

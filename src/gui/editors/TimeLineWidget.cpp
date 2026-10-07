@@ -151,7 +151,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 	// Draw the main loop rectangle (inner fill only)
 	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
-	p.fillRect( outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
+	if (m_flatStyle)
+	{
+		p.save();
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setPen(Qt::NoPen);
+		p.setBrush(loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
+		p.drawRoundedRect(outerRectangle, 3, 3);
+		p.restore();
+	}
+	else { p.fillRect(outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush()); }
 
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
@@ -189,6 +198,13 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Draw the loop rectangle's outer outline
 	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
 	p.setBrush( Qt::NoBrush );
+	if (m_flatStyle)
+	{
+		p.save();p.setRenderHint(QPainter::Antialiasing);
+		p.drawRoundedRect(outerRectangle, 3, 3);p.restore();
+	}
+	else
+	{
 	p.drawRect( outerRectangle );
 
 	// Draw the loop rectangle's inner outline
@@ -196,6 +212,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
+	}
 	
 	// Draw loop handles if necessary
 	const auto handleMode = ConfigManager::inst()->value("app", "loopmarkermode") == "handles";
@@ -218,8 +235,17 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2),
-			height() - marker.height(), marker);
+		if (m_flatStyle)
+		{
+			const qreal x = markerX(m_timeline->pos());
+			const qreal halfWidth = marker.width() / 2.0;
+			p.setRenderHint(QPainter::Antialiasing);
+			p.setPen(Qt::NoPen);
+			p.setBrush(m_isRecording ? palette().link().color() : palette().text().color());
+			p.drawPolygon(QPolygonF{QPointF(x - halfWidth, height() - marker.height()),
+				QPointF(x + halfWidth, height() - marker.height()), QPointF(x, height() - 1)});
+		}
+		else { p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2), height() - marker.height(), marker); }
 	}
 }
 

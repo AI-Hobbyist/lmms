@@ -561,12 +561,17 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	const qreal dpr = devicePixelRatioF();
+	const QSize pixelSize = size() * dpr;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != pixelSize || m_paintPixmap.devicePixelRatio() != dpr)
 	{
-		m_paintPixmap = QPixmap(size());
+		m_paintPixmap = QPixmap(pixelSize);
+		m_paintPixmap.setDevicePixelRatio(dpr);
 	}
 
+	m_paintPixmap.fill(Qt::transparent);
 	QPainter p( &m_paintPixmap );
+	if (cornerRadius() > 0) { p.setClipPath(clipOutline(0)); }
 
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
@@ -841,6 +846,9 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	if( !( fixedClips() && beatClip ) )
 	{
+	if (cornerRadius() > 0) { paintFlatBorder(p, current, 0); }
+	else
+	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
@@ -849,6 +857,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		// outer border
 		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
 		p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	}
 	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted

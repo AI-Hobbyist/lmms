@@ -1071,8 +1071,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		for (int i = 0; i < 2; ++i)
 		{
 			const QString& label = m_clip->firstObject()->displayValue(level[i]);
-			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
-			p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			if (!m_flatStyle)
+			{
+				p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+				p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			}
 			p.setPen(fgColor);
 			p.drawText(0, y[i] - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}
@@ -1091,8 +1094,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		{
 			const QString& label = m_clip->firstObject()->displayValue(level);
 			int y = yCoordOfLevel(level);
-			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
-			p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			if (!m_flatStyle)
+			{
+				p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+				p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			}
 			p.setPen(fgColor);
 			p.drawText(0, y - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}

@@ -53,6 +53,7 @@ class TextFloat;
 class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(bool flatStyle MEMBER m_flatStyle)
 public:
 	Q_PROPERTY( QColor barLineColor READ getBarLineColor WRITE setBarLineColor )
 	Q_PROPERTY( QColor barNumberColor READ getBarNumberColor WRITE setBarNumberColor )
@@ -212,6 +213,7 @@ private:
 
 	int m_loopRectangleVerticalPadding = 1;
 	int m_loopHandleWidth = 5;
+	bool m_flatStyle = false;
 
 	QColor m_barLineColor = QColor{192, 192, 192};
 	QColor m_barNumberColor = m_barLineColor.darker(120);

@@ -28,6 +28,7 @@
 #include <optional>
 
 #include <QVector>
+#include <QPainterPath>
 
 #include "ModelView.h"
 #include "Rubberband.h"
@@ -62,6 +63,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor)
+	Q_PROPERTY(qreal cornerRadius READ cornerRadius WRITE setCornerRadius)
 
 public:
 	const static int BORDER_WIDTH = 2;
@@ -97,6 +99,8 @@ public:
 	QColor textShadowColor() const { return m_textShadowColor; }
 	QColor patternClipBackground() const { return m_patternClipBackground; }
 	bool gradient() const { return m_gradient; }
+	qreal cornerRadius() const { return m_cornerRadius; }
+	void setCornerRadius(qreal radius);
 	QColor markerColor() const { return m_markerColor; }
 	void setMutedColor(const QColor& c) { m_mutedColor = QColor(c); }
 	void setMutedBackgroundColor(const QColor& c) { m_mutedBackgroundColor = QColor(c); }
@@ -157,6 +161,10 @@ public slots:
 	void resetColor();
 
 protected:
+	bool event(QEvent* event) override;
+	QPainterPath clipOutline(int horizontalOffset = 0) const;
+	void paintFlatBorder(QPainter& painter, bool current = false, int horizontalOffset = 0) const;
+	void changeEvent(QEvent* event) override;
 	enum class ContextMenuAction
 	{
 		Remove,
@@ -313,6 +321,7 @@ private:
 	QColor m_textShadowColor;
 	QColor m_patternClipBackground;
 	bool m_gradient;
+	qreal m_cornerRadius = 0;
 	QColor m_markerColor;
 
 	bool m_needsUpdate;

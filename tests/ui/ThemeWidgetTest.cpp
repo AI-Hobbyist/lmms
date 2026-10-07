@@ -16,6 +16,8 @@
 #include <QMimeData>
 #include <QDropEvent>
 #include <QDragEnterEvent>
+#include <QContextMenuEvent>
+#include <QClipboard>
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LcdFloatSpinBox.h"
@@ -28,6 +30,11 @@
 #include "Instrument.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
+#include "MidiClip.h"
+#include "ClipView.h"
+#include "TrackContentWidget.h"
+#include "PianoRoll.h"
+#include "TimeLineWidget.h"
 #include "ProjectJournal.h"
 #include "Graph.h"
 #include "AutomationClip.h"
@@ -158,6 +165,102 @@ private slots:
 				QTRY_VERIFY(!window->isVisible());
 			}
 		}
+	void editorCanvasInteractions()
+	{
+		auto* song = Engine::getSong();
+		auto* track = new InstrumentTrack(song);
+		QVERIFY(track->loadInstrument("tripleoscillator"));
+		auto* clip = static_cast<MidiClip*>(track->createClip(TimePos(192)));
+		clip->changeLength(TimePos(192));
+		auto* editor = m_gui->songEditor()->m_editor;
+		m_gui->songEditor()->show();m_gui->songEditor()->parentWidget()->show();
+		m_gui->songEditor()->parentWidget()->resize(1000,520);m_gui->songEditor()->parentWidget()->raise();
+		lmms::gui::ClipView* view = nullptr;
+		QTRY_VERIFY(([&]{for(auto* candidate:editor->findChildren<lmms::gui::ClipView*>())
+			if(candidate->getClip()==clip) {view=candidate;return true;}return false;})());
+		QTest::qWait(200);
+		QCOMPARE(view->cornerRadius(),qreal(3));
+		const auto geometry = view->geometry();
+		view->setCornerRadius(0);QCOMPARE(view->geometry(),geometry);
+		view->setCornerRadius(3);QCOMPARE(view->geometry(),geometry);
+		auto* content=qobject_cast<TrackContentWidget*>(view->parentWidget());QVERIFY(content);
+		const auto dark=content->darkerColor(),light=content->lighterColor();
+		content->setDarkerColor(QColor("#334455"));content->setLighterColor(QColor("#334455"));
+			m_gui->mainWindow()->raise();m_gui->mainWindow()->activateWindow();QTest::qWait(400);
+		const auto native=m_gui->mainWindow()->screen()->grabWindow(m_gui->mainWindow()->winId());
+		QVERIFY(!native.isNull());const auto image=native.toImage();
+			const auto sample=content->mapTo(m_gui->mainWindow(),QPoint(12,content->height()/2));
+		bool freshTile=false;
+		for(int dx=0;dx<4;++dx) for(int dy=0;dy<4;++dy)
+			freshTile|=image.pixelColor(qRound((sample.x()+dx)*native.devicePixelRatio()),qRound((sample.y()+dy)*native.devicePixelRatio()))==QColor("#334455");
+		QVERIFY(freshTile);content->setDarkerColor(dark);content->setLighterColor(light);
+		auto drag=[](QWidget* widget,QPoint begin,QPoint end,Qt::KeyboardModifiers modifiers=Qt::NoModifier){
+			QTest::mousePress(widget,Qt::LeftButton,modifiers,begin);
+			QMouseEvent move(QEvent::MouseMove,end,widget->mapToGlobal(end),Qt::NoButton,Qt::LeftButton,modifiers);
+			QApplication::sendEvent(widget,&move);
+			QTest::mouseRelease(widget,Qt::LeftButton,modifiers,end);
+		};
+		const int barPixels=qRound(editor->pixelsPerBar());
+		const auto center=QPoint(view->width()/2,view->height()/2);
+		drag(view,center,center+QPoint(barPixels,0));
+		QCOMPARE(int(clip->startPosition()),384);
+		Engine::projectJournal()->undo();QCOMPARE(int(clip->startPosition()),192);
+		const auto right=QPoint(view->width()-1,view->height()/2);
+		drag(view,right,right+QPoint(barPixels,0));QCOMPARE(int(clip->length()),384);
+		Engine::projectJournal()->undo();QCOMPARE(int(clip->length()),192);
+		clip->changeLength(TimePos(384));
+		drag(view,QPoint(1,view->height()/2),QPoint(1+barPixels,view->height()/2));
+		QCOMPARE(int(clip->startPosition()),384);QCOMPARE(int(clip->length()),192);
+		Engine::projectJournal()->undo();QCOMPARE(int(clip->startPosition()),192);
+		clip->changeLength(TimePos(192));
+		QTest::mouseClick(view,Qt::LeftButton,Qt::ControlModifier,center);QVERIFY(view->isSelected());
+		QTest::mouseClick(view,Qt::LeftButton,Qt::ControlModifier,center);QVERIFY(!view->isSelected());
+		capture(m_gui->mainWindow(),"F4-clip-actions");
+		clip->changeLength(TimePos(1));QTest::qWait(100);
+		QVERIFY(view->width()>=3);const auto narrow=view->geometry();
+		view->setCornerRadius(0);QCOMPARE(view->geometry(),narrow);
+		view->setCornerRadius(3);QCOMPARE(view->geometry(),narrow);
+		capture(m_gui->mainWindow(),"F4-short-clip");
+		clip->changeLength(TimePos(192));
+		bool copied=false;
+		QTimer::singleShot(100,[&]{
+			if(auto* menu=qobject_cast<QMenu*>(QApplication::activePopupWidget())) {
+				for(auto* action:menu->actions()) if(action->text()=="Copy"||action->text()=="Copy selection") {
+					action->trigger();copied=true;break;
+				}
+				menu->close();
+			}
+		});
+		QContextMenuEvent copyMenu(QContextMenuEvent::Mouse,view->rect().center(),view->mapToGlobal(view->rect().center()));
+		QApplication::sendEvent(view,&copyMenu);QVERIFY(copied);
+		const auto clipCount=track->getClips().size();
+		QVERIFY(content->pasteSelection(TimePos(576),QApplication::clipboard()->mimeData()));
+		QCOMPARE(track->getClips().size(),clipCount+1);
+		QCOMPARE(int(track->getClip(1)->startPosition()),576);
+		QCOMPARE(int(track->getClip(1)->length()),192);
+		m_gui->pianoRoll()->setCurrentMidiClip(clip);
+		m_gui->pianoRoll()->show();m_gui->pianoRoll()->parentWidget()->show();
+		auto* piano=m_gui->pianoRoll()->findChild<PianoRoll*>();QVERIFY(piano);
+		QTest::qWait(200);QCOMPARE(piano->property("noteCornerRadius").toReal(),qreal(2));
+		const QPoint create(160,200);QTest::mouseClick(piano,Qt::LeftButton,Qt::NoModifier,create);
+		QCOMPARE(clip->notes().size(),size_t(1));
+		auto* note=clip->notes().front();const int tick=note->pos();const int pitch=note->key();
+		auto* timeline=piano->findChild<TimeLineWidget*>();QVERIFY(timeline);
+		const int pianoBar=timeline->markerX(TimePos(192))-timeline->markerX(TimePos(0));
+		drag(piano,create,create+QPoint(pianoBar/4,0));
+		QCOMPARE(int(note->pos()),tick+48);QCOMPARE(note->key(),pitch);
+		QTest::keyClick(piano,Qt::Key_A,Qt::ControlModifier);
+		QTest::keyClick(piano,Qt::Key_C,Qt::ControlModifier);
+		QTest::keyClick(piano,Qt::Key_V,Qt::ControlModifier);QCOMPARE(clip->notes().size(),size_t(2));
+		Engine::projectJournal()->undo();QCOMPARE(clip->notes().size(),size_t(1));
+		note=clip->notes().front();const int beforeResize=note->length();
+		const int noteEndX=timeline->markerX(note->pos()+note->length())-1;
+		drag(piano,QPoint(noteEndX,create.y()),QPoint(noteEndX+pianoBar/4,create.y()));
+		QCOMPARE(int(note->length()),beforeResize+48);
+		Engine::projectJournal()->undo();QCOMPARE(int(clip->notes().front()->length()),beforeResize);
+		capture(m_gui->mainWindow(),"F4-piano-actions");
+		m_gui->pianoRoll()->hide();m_gui->pianoRoll()->parentWidget()->hide();
+	}
 	void groupAndWindowLifecycle()
 	{
 		auto* panel=new QWidget;auto* layout=new QVBoxLayout(panel);

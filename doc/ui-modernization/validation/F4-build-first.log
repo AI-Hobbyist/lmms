@@ -1,0 +1,371 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  mocs_compilation_Release.cpp
+  SVSClip.cpp
+  SVSCanvas.cpp
+  SVSViews.cpp
+  SVSTrack.cpp
+  正在生成代码...
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  mocs_compilation_Release.cpp
+  AutomationClip.cpp
+  Clip.cpp
+  PatternClip.cpp
+  SampleClip.cpp
+  Song.cpp
+  StepRecorder.cpp
+  AutomatableModelView.cpp
+  GuiApplication.cpp
+  MainWindow.cpp
+  SampleTrackWindow.cpp
+  AutomationClipView.cpp
+  ClipView.cpp
+  MidiClipView.cpp
+  PatternClipView.cpp
+  SampleClipView.cpp
+  AutomationEditor.cpp
+  PatternEditor.cpp
+  PianoRoll.cpp
+  SongEditor.cpp
+  正在生成代码...
+  正在编译...
+  TimeLineWidget.cpp
+  TrackContainerView.cpp
+  InstrumentTrackWindow.cpp
+  SetupDialog.cpp
+  AutomationTrackView.cpp
+  InstrumentTrackView.cpp
+  PatternTrackView.cpp
+  SampleTrackView.cpp
+  TrackContentWidget.cpp
+  TrackGrip.cpp
+  TrackLabelButton.cpp
+  TrackOperationsWidget.cpp
+  TrackView.cpp
+  MixerChannelLcdSpinBox.cpp
+  AutomationTrack.cpp
+  InstrumentTrack.cpp
+  MidiClip.cpp
+  PatternTrack.cpp
+  SampleTrack.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  adplug.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\OpulenZ\Release\adplug.lib
+  gme.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\FreeBoy\Release\gme.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\libcarla_native-plugin.dll
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  Automatic UIC for target sf2player
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.exp
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bassbooster.dll
+  oscilloscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\oscilloscope.dll
+  flanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\flanger.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.exp
+  dynamicsprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dynamicsprocessor.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.exp
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\audiofileprocessor.dll
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitinvader.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TripleOscillator/Release/tripleoscillator.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TripleOscillator/Release/tripleoscillator.exp
+  sf2player.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sf2player.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.exp
+  watsyn.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\watsyn.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.exp
+  organic.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\organic.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.exp
+  ladspaeffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspaeffect.dll
+  stereoenhancer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereoenhancer.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.exp
+  granularpitchshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\granularpitchshifter.dll
+  slewdistortion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slewdistortion.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.exp
+  taptempo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\taptempo.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.exp
+  freeboy.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\freeboy.dll
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlabase.dll
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\multitapecho.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.exp
+  lv2effect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2effect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.exp
+  nes.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\nes.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Amplifier/Release/amplifier.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Amplifier/Release/amplifier.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.exp
+  sfxr.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sfxr.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.exp
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitcrush.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll
+  lv2instrument.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2instrument.dll
+  peakcontrollereffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\peakcontrollereffect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.exp
+  frequencyshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\frequencyshifter.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Kicker/Release/kicker.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Kicker/Release/kicker.exp
+  lb302.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lb302.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.exp
+  monstro.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\monstro.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\compressor.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.exp
+  vectorscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vectorscope.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.exp
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.exp
+  patman.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\patman.dll
+  eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\eq.dll
+  ladspabrowser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspabrowser.dll
+  dispersion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dispersion.dll
+  malletsstk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\malletsstk.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.exp
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\delay.dll
+  dualfilter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dualfilter.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.exp
+  lomm.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lomm.dll
+  stereomatrix.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereomatrix.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.exp
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\crossovereq.dll
+  analyzer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\analyzer.dll
+  reverbsc.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\reverbsc.dll
+  xpressive.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\xpressive.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.exp
+  opulenz.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\opulenz.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.exp
+  waveshaper.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\waveshaper.dll
+  slicert.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slicert.dll
+  zynaddsubfx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\zynaddsubfx.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.exp
+  vibedstrings.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vibedstrings.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.exp
+  vsteffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vsteffect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.exp
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.exp
+  vestige.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vestige.dll
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll
+  Automatic MOC for target ThemeWidgetTest
+  ThemeWidgetTest.cpp
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(175,3): error C2872: “ClipView”: 不明确的符号 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      可能是“lmms::ClipView”
+      D:\UserData\Desktop\Project\lmms\include\ClipView.h(52,7):
+      或    “lmms::gui::ClipView”
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(176,3): error C2872: “ClipView”: 不明确的符号 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      可能是“lmms::ClipView”
+      D:\UserData\Desktop\Project\lmms\include\ClipView.h(52,7):
+      或    “lmms::gui::ClipView”
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(176,3): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(179,3): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(180,25): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(180,14): error C2737: “geometry”: 必须初始化 const 对象 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(181,3): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(181,28): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(181,28): error C3536: “geometry”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(182,3): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(182,28): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(190,28): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(190,44): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(191,3): error C2664: “void ThemeWidgetTest::editorCanvasInteractions::<lambda_9>::operator ()(QWidget *,QPoint,QPoint,QFlags<Qt::KeyboardModifier>) const”: 无法将参数 1 从“lmms::ClipView *”转换为“QWidget *” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(191,8):
+      指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(183,103):
+      参见“ThemeWidgetTest::editorCanvasInteractions::<lambda_9>::operator ()”的声明
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(191,3):
+      尝试匹配参数列表“(lmms::ClipView *, const QPoint, QPoint)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(194,27): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(194,43): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(195,3): error C2664: “void ThemeWidgetTest::editorCanvasInteractions::<lambda_9>::operator ()(QWidget *,QPoint,QPoint,QFlags<Qt::KeyboardModifier>) const”: 无法将参数 1 从“lmms::ClipView *”转换为“QWidget *” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(195,8):
+      指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(183,103):
+      参见“ThemeWidgetTest::editorCanvasInteractions::<lambda_9>::operator ()”的声明
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(195,3):
+      尝试匹配参数列表“(lmms::ClipView *, const QPoint, QPoint)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,22): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,19): error C2440: “<function-style-cast>”: 无法从“int”转换为“QPoint” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,19):
+      “QPoint::QPoint”: 没有重载函数可以转换所有参数类型
+          C:\Qt\6.10.3\msvc2022_64\include\QtCore\qpoint.h(119,1):
+          可能是“QPoint::QPoint(QPoint &&)”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,19):
+              “QPoint::QPoint(QPoint &&)”: 无法将参数 1 从“int”转换为“QPoint &&”
+                  D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,20):
+                  原因如下: 无法从“int”转换为“QPoint”
+          C:\Qt\6.10.3\msvc2022_64\include\QtCore\qpoint.h(119,1):
+          或    “QPoint::QPoint(const QPoint &)”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,19):
+              “QPoint::QPoint(const QPoint &)”: 无法将参数 1 从“int”转换为“const QPoint &”
+                  D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,20):
+                  原因如下: 无法从“int”转换为“const QPoint”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,19):
+          尝试匹配参数列表“(int)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,59): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,46): error C2440: “<function-style-cast>”: 无法从“int”转换为“QPoint” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,46):
+      “QPoint::QPoint”: 没有重载函数可以转换所有参数类型
+          C:\Qt\6.10.3\msvc2022_64\include\QtCore\qpoint.h(119,1):
+          可能是“QPoint::QPoint(QPoint &&)”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,46):
+              “QPoint::QPoint(QPoint &&)”: 无法将参数 1 从“int”转换为“QPoint &&”
+                  D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,48):
+                  原因如下: 无法从“int”转换为“QPoint”
+          C:\Qt\6.10.3\msvc2022_64\include\QtCore\qpoint.h(119,1):
+          或    “QPoint::QPoint(const QPoint &)”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,46):
+              “QPoint::QPoint(const QPoint &)”: 无法将参数 1 从“int”转换为“const QPoint &”
+                  D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,48):
+                  原因如下: 无法从“int”转换为“const QPoint”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,46):
+          尝试匹配参数列表“(int)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,3): error C2064: 项不会计算为接受 1 个参数的函数 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,3):
+      类不会将“operator()”或用户定义的转换运算符定义到指向函数的指针或指向函数的引用(它们接受适当数量的参数)
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(198,3):
+      尝试匹配参数列表“(lmms::ClipView *)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,10): error C2665: “QTest::mouseClick”: 没有重载函数可以转换所有参数类型 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      C:\Qt\6.10.3\msvc2022_64\include\QtTest\qtestmouse.h(233,17):
+      可能是“void QTest::mouseClick(QWidget *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,10):
+          “void QTest::mouseClick(QWidget *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”: 无法将参数 1 从“lmms::ClipView *”转换为“QWidget *”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,21):
+              指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      C:\Qt\6.10.3\msvc2022_64\include\QtTest\qtestmouse.h(139,17):
+      或    “void QTest::mouseClick(QWindow *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,10):
+          “void QTest::mouseClick(QWindow *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”: 无法将参数 1 从“lmms::ClipView *”转换为“QWindow *”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,21):
+              指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,10):
+      尝试匹配参数列表“(lmms::ClipView *, Qt::MouseButton, Qt::KeyboardModifier, const QPoint)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(202,69): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,10): error C2665: “QTest::mouseClick”: 没有重载函数可以转换所有参数类型 [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      C:\Qt\6.10.3\msvc2022_64\include\QtTest\qtestmouse.h(233,17):
+      可能是“void QTest::mouseClick(QWidget *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,10):
+          “void QTest::mouseClick(QWidget *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”: 无法将参数 1 从“lmms::ClipView *”转换为“QWidget *”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,21):
+              指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      C:\Qt\6.10.3\msvc2022_64\include\QtTest\qtestmouse.h(139,17):
+      或    “void QTest::mouseClick(QWindow *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”
+          D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,10):
+          “void QTest::mouseClick(QWindow *,Qt::MouseButton,Qt::KeyboardModifiers,QPoint,int)”: 无法将参数 1 从“lmms::ClipView *”转换为“QWindow *”
+              D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,21):
+              指向的类型不相关; 转换需要 reinterpret_cast、C 样式强制转换或带圆括号的函数样式强制转换
+      D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,10):
+      尝试匹配参数列表“(lmms::ClipView *, Qt::MouseButton, Qt::KeyboardModifier, const QPoint)”时
+  
+D:\UserData\Desktop\Project\lmms\tests\ui\ThemeWidgetTest.cpp(203,69): error C2027: 使用了未定义类型“lmms::ClipView” [D:\UserData\Desktop\Project\lmms\build\tests\ThemeWidgetTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\Clip.h(189,15):
+      参见“lmms::ClipView”的声明
+  

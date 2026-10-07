@@ -41,6 +41,7 @@
 #include "SVSTrack.h"
 #include "SVSClip.h"
 #include "SVSViews.h"
+#include "SVSCanvas.h"
 #include "SetupDialog.h"
 #include "ExportProjectDialog.h"
 #include "Mixer.h"
@@ -184,6 +185,13 @@ private slots:
   m_gui->pianoRoll()->setCurrentMidiClip(midi);showEditor(m_gui->pianoRoll(),"S04-piano");
   QVERIFY(automation);m_gui->automationEditor()->setCurrentClip(automation);showEditor(m_gui->automationEditor(),"S04-automation");
   QVERIFY(svsClip);auto* svsEditor=new SVSPianoRoll(svsClip);svsEditor->openIn(m_gui->mainWindow());
+  SVSCanvas* svsCanvas=nullptr;
+  for(auto* canvas:svsEditor->findChildren<SVSCanvas*>()) if(!canvas->isParameterLane()) {svsCanvas=canvas;break;}
+  QVERIFY(svsCanvas);
+  svsCanvas->setScroll(0,67);
+  const auto svsNoteRect=svsCanvas->noteRect(svsClip->notes().first());
+  QCOMPARE(svsCanvas->tickAt(svsNoteRect.center().x()),svsClip->notes().first().tick+svsClip->notes().first().duration/2);
+  QCOMPARE(svsCanvas->pitchAt(svsNoteRect.center().y()),svsClip->notes().first().pitch-.5);
   showEditor(svsEditor,"S05-svs");
   {std::unique_ptr<QDialog> settings(createSVSPluginSettings(static_cast<SVSTrack*>(svsClip->getTrack())));
    capture(settings.get(),"S05-plugin");settings->close();}

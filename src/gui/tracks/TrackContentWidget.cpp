@@ -28,6 +28,7 @@
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QPainter>
+#include <QEvent>
 
 #include "AutomationClip.h"
 #include "Clipboard.h"
@@ -86,6 +87,15 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 
+void TrackContentWidget::changeEvent(QEvent* event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange || event->type() == QEvent::FontChange)
+	{
+		updateBackground();
+	}
+}
+
 void TrackContentWidget::updateBackground()
 {		
 	// use snapSize to determine number of lines to draw
@@ -112,7 +122,8 @@ void TrackContentWidget::updateBackground()
 
 	int w = ppb * BARS_PER_GROUP;
 	int h = height();
-	m_background = QPixmap( w * 2, height() );
+	m_background = QPixmap(QSize(w * 2, height()) * devicePixelRatioF());
+	m_background.setDevicePixelRatio(devicePixelRatioF());
 	QPainter pmp( &m_background );
 
 	pmp.fillRect( 0, 0, w, h, darkerColor() );
@@ -144,6 +155,7 @@ void TrackContentWidget::updateBackground()
 	pmp.drawLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
 
 	pmp.end();
+	m_backgroundDirty = false;
 
 	// Force redraw
 	update();
@@ -541,6 +553,7 @@ void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
 
 void TrackContentWidget::paintEvent( QPaintEvent * pe )
 {
+	if (m_backgroundDirty || m_background.devicePixelRatioF() != devicePixelRatioF()) { updateBackground(); }
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );

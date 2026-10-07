@@ -17,7 +17,7 @@
 | F1 | DONE / MANUAL-PENDING | 原生双 DPI 场景/状态、17 SVG 引用、2/2 必要回归 PASS | 观感与未替换 PNG 图标注明 | 5ad278c44，已推送 origin/master |
 | F2 | DONE / MANUAL-PENDING | 主题属性/代理框、自绘框；模型及 SVS 回归 PASS；ThemeWidgetTest 6 PASS；双 DPI 实窗 | 观感 MANUAL/PENDING | a2eb86f36，已推送 origin/master |
 | F3 | DONE / MANUAL-PENDING | 52 插件编译；模型/SVS PASS；控件实窗双 DPI 各 8 PASS；场景双 DPI PASS | PNG 资产保留；人工项 MANUAL/PENDING | 6f90902e7，已推送 origin/master；部署补修见下 |
-| F4 | TODO | — | — | — |
+| F4 | DONE / MANUAL-PENDING | 52 DLL 原目录编译；核心 3/3 PASS；双 DPI 场景及编辑交互 | PNG 保留；观感/IME/跨屏 DPI MANUAL/PENDING | 本阶段提交，推送 origin/master |
 | F5 | TODO | — | 逐项登记 PNG 例外 | — |
 | F6 | TODO | — | 人工项不阻塞交付 | — |
 
@@ -94,3 +94,13 @@ A01–A11 的标准控件规则已改为纯色、单层边框及明确状态；�
 - 验证改为加载实际部署目录：`F3-plugin-directory-tests.log` 必要回归 3/3 PASS；最终 `F3-plugin-directory-tests-final.log` / `F3-plugin-directory-theme-results.txt` 控件 10 PASS，包含实际 DnD 入口、异步加载后点击轨道标签开关 TripleOscillator/Kicker、浏览器三轮展开/折叠/搜索和事件循环响应。`F3-widgets-100/F3-dropped-*` 与 `F3-instrument-browser.png` 为原生实窗证据。
 - `F3-100-plugins-results.txt` 全面板实窗测试 3 PASS / 0 FAIL；`F3-100/plugin-panels.json` 登记 47 个面板打开与截图，5 个外部环境项 MANUAL/PENDING（Carla Rack/Patchbay、VST effect、LV2 instrument/effect）。这只是运行与截图证据，人工观感仍待验收；未修改 PNG 资产。最初重复 Tee-Object 争用 build.log 的检查已终止并按脚本自身前台日志管线重跑，不能算 PASS。
 - 用户要求已写入 AGENTS.md：沿用原构建/部署目录，插件及支持库直接覆盖原 plugins；验证使用同一目录；核对残留禁用插件。F6 计划也改为沿用原开发前缀。补修独立提交推送后恢复 F4，F4–F6 未提前标完成。
+## F4 检查点
+
+- Song/Pattern/MIDI/Sample/Automation/SVS 片段使用默认主题 3 DIP 圆角路径裁剪和单层边框，最窄片段半径收缩；普通 PianoRoll/SVS 音符最多 2 DIP。缺少现代属性的旧主题继续原矩形/边框绘制。波形、步进、音符预览与原命中矩形保持；普通音符的音量/声像端点使用两条纯色数据带。
+- 统一画布背景 #14181D、细网格/拍线/小节线层级、选择/ghost/静音状态；Automation 坐标标签取消阴影，时间轴循环区纯色单层边框，播放头矢量绘制。原标尺位置、循环手柄、参数分界、曲线求值、头像/立绘和滚动算法未改。
+- clip 缓存按物理像素/DPR 分配，轨道背景在主题属性、字体、palette 或 DPR 改变后重绘。原生窗口像素检查确认修改背景色无需 resize 即生效。
+- F4-build-final.log：主程序、ThemeWidgetTest/UiBaselineCapture、模型/SVS 与 UiPluginCoverage 编译通过。52 个启用插件直接覆盖 build/Release/plugins，路径/时间/哈希见 F4-plugin-artifacts.json；程序仍为 build/Release/lmms.exe。Sid 的旧 DLL 原地停用、GigPlayer 缺依赖例外沿用 F3。
+- F4-tests-final.log：AutomatableModelTest、SVSIntegrationTest、ThemeWidgetTest 3/3 PASS。原生 ThemeWidgetTest 共 11 PASS，增加 clip 移动、两端拉伸、Ctrl 选择、菜单 Copy/粘贴、撤销、最窄片段几何，以及 PianoRoll 创建/移动/右端拉伸/复制粘贴/撤销；模型结果与命中几何有断言。F4-theme-150.log/results 同套原生控件 11 PASS。
+- F4-100 / F4-150：S01–S08、标准状态及 fixture 独立进程重开通过；S03/S04/S05 是实际 Windows 窗口，SVS noteRect 到时间/音高反变换断言通过。截图测试明确选音符画布而非参数画布，并将视口移到 fixture 的 C4，保证音符可见。F4-clip-actions、F4-short-clip、F4-piano-actions 是实际交互后的窗口。100% 中文轨道名正常，无方块字。
+- 初轮编译的 ClipView 命名歧义修正为 lmms::gui::ClipView；150% 像素检查的采样点移入可见轨道，并等待实际主窗激活重绘后通过。失败记录保留，不计 PASS。150% 截图超过当前屏幕可用范围的外围区域不作为布局正确证据；全窗适配继续在 F5/F6 的既定布局检查内处理。
+- SKIPPED / PNG：旧工具栏和私有插件 artwork 位图保持原内容，留待 F5 逐项登记；本阶段未修改 PNG 资产。截图 PNG 是实窗证据。人工观感、真实跨屏 DPI、完整中文 IME 为 MANUAL/PENDING，不阻塞阶段检查点。

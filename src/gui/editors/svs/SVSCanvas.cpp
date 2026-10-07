@@ -278,7 +278,12 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
    }
    auto noteColor=m_selected.contains(note.id)?color("selectedNoteColor",QPalette::Highlight).lighter(125):color("noteColor",QPalette::Highlight);
    if(!noteTool()) noteColor.setAlphaF(.5);
-   painter.fillRect(rectangle.adjusted(0,1,-1,-1),noteColor);
+   const auto body=rectangle.adjusted(0,1,-1,-1);
+   if(m_noteCornerRadius>0&&body.width()>0&&body.height()>0) {
+    painter.save();painter.setRenderHint(QPainter::Antialiasing);painter.setPen(Qt::NoPen);painter.setBrush(noteColor);
+    const auto radius=std::min(m_noteCornerRadius,std::min(body.width(),body.height())/2);
+    painter.drawRoundedRect(body,radius,radius);painter.restore();
+   } else { painter.fillRect(body,noteColor); }
    const auto namedLyric=noteLabel(int(std::floor(note.pitch)))+" · "+note.lyric;
    const auto label=allNoteLabels&&fontMetrics().horizontalAdvance(namedLyric)<=rectangle.width()-6?namedLyric:note.lyric;
    painter.setPen(color("lyricColor",QPalette::HighlightedText)); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter|Qt::AlignLeft,fontMetrics().elidedText(label,Qt::ElideRight,int(rectangle.width()-6)));

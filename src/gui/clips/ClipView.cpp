@@ -148,6 +148,47 @@ void ClipView::update()
 	selectableObject::update();
 }
 
+void ClipView::setCornerRadius(qreal radius)
+{
+	m_cornerRadius = std::max(qreal(0), radius);
+	update();
+}
+
+QPainterPath ClipView::clipOutline(int horizontalOffset) const
+{
+	const QRectF bounds(-horizontalOffset + .5, .5, width() - 1, height() - 1);
+	const qreal radius = std::min(m_cornerRadius, std::min(bounds.width(), bounds.height()) / 2);
+	QPainterPath path;
+	path.addRoundedRect(bounds, radius, radius);
+	return path;
+}
+
+void ClipView::paintFlatBorder(QPainter& painter, bool current, int horizontalOffset) const
+{
+	painter.save();
+	painter.setClipping(false);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setBrush(Qt::NoBrush);
+	painter.setPen(isSelected() || current ? palette().brightText().color() : palette().mid().color());
+	painter.drawPath(clipOutline(horizontalOffset));
+	painter.restore();
+}
+
+bool ClipView::event(QEvent* event)
+{
+	if (event->type() == QEvent::DevicePixelRatioChange) { update(); }
+	return selectableObject::event(event);
+}
+
+void ClipView::changeEvent(QEvent* event)
+{
+	selectableObject::changeEvent(event);
+	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange || event->type() == QEvent::FontChange)
+	{
+		update();
+	}
+}
+
 
 
 bool ClipView::fixedClips()

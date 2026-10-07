@@ -160,9 +160,16 @@ void SVSTrackView::dragEnterEvent(QDragEnterEvent* event) { if(!StringPairDrag::
 void SVSTrackView::dropEvent(QDropEvent* event) { if(StringPairDrag::decodeKey(event)=="svsvoice") { auto value=StringPairDrag::decodeValue(event); auto split=value.lastIndexOf('/'); static_cast<SVSTrack*>(getTrack())->bindVoice(value.left(split),value.mid(split+1)); event->accept(); } else TrackView::dropEvent(event); }
 SVSClipView::SVSClipView(SVSClip* clip,TrackView* view):ClipView(clip,view),m_clip(clip) { connect(clip,&Clip::dataChanged,this,[this]{setToolTip(m_clip->status()); update();}); }
 void SVSClipView::paintEvent(QPaintEvent*) {
- QPainter p(this); p.fillRect(rect(),isSelected()?palette().highlight():palette().button()); p.setClipRect(rect().adjusted(1,1,-1,-1));
+ QPainter p(this);
+ if(cornerRadius()>0) { p.setRenderHint(QPainter::Antialiasing);p.setClipPath(clipOutline()); }
+ const bool muted=m_clip->isMuted()||m_clip->getTrack()->isMuted();
+ const auto background=cornerRadius()>0?(muted?mutedBackgroundColor():isSelected()?selectedColor():palette().button().color()):
+  (isSelected()?palette().highlight().color():palette().button().color());
+ p.fillRect(rect(),background);
+ p.setClipRect(rect().adjusted(1,1,-1,-1),Qt::IntersectClip);
  for(const auto& note:m_clip->notes()) { double x=(note.tick+int(m_clip->startTimeOffset()))/int(m_clip->length())*width(); double w=note.duration/int(m_clip->length())*width(); double y=height()-5-(note.pitch-36)/60*(height()-10); p.fillRect(QRectF(x,y,std::max(1.,w),2),palette().highlight().color()); }
  p.setPen(palette().text().color()); p.drawText(3,12,m_clip->name()); p.drawText(3,height()-3,m_clip->status());
+ if(cornerRadius()>0) { paintFlatBorder(p); }
 }
 void SVSClipView::mouseDoubleClickEvent(QMouseEvent*) {
  if(!getGUI()) return;

@@ -81,20 +81,21 @@ lmms--gui--EnvelopeGraph, lmms--gui--LfoGraph {
 lmms--gui--EnvelopeGraph { qproperty-markerFillColor: #A8B4C0; qproperty-markerOutlineColor: #35414D; }
 
 lmms--gui--AutomationEditor {
+	qproperty-flatStyle: true;
 	color: #ffffff;
-	background-color: #141616;
+	background-color: #14181D;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
-	qproperty-nodeInValueColor: rgba(103, 73, 194, 150);
-	qproperty-nodeOutValueColor: rgba(125, 40, 40, 150);
-	qproperty-nodeTangentLineColor: rgba(200, 200, 200, 255);
-	qproperty-crossColor: rgba(215, 210, 254, 150);
+	qproperty-nodeInValueColor: #77C795;
+	qproperty-nodeOutValueColor: #DAB55A;
+	qproperty-nodeTangentLineColor: #A8B4C0;
+	qproperty-crossColor: #E5EAF0;
 	/* Grid colors */
-	qproperty-lineColor: #292929;
-	qproperty-beatLineColor: #4a3bba;
-	qproperty-barLineColor: #8173fe;
+	qproperty-lineColor: #29323B;
+	qproperty-beatLineColor: #35414D;
+	qproperty-barLineColor: #6F7B87;
 
-	qproperty-graphColor: rgba(69,42,153,180);
-	qproperty-scaleColor: #262b30;
+	qproperty-graphColor: rgba(66,160,101,180);
+	qproperty-scaleColor: #29323B;
 	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
 	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
 	qproperty-ghostSampleColor: rgba(125, 125, 125, 125);
@@ -259,19 +260,20 @@ lmms--gui--PositionLine {
 }
 
 lmms--gui--PianoRoll {
-	background-color: #141616;
+	qproperty-noteCornerRadius: 2;
+	background-color: #14181D;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
 	qproperty-noteModeColor: #0bd556;
-	qproperty-noteColor: #0bd556;
+	qproperty-noteColor: #42A065;
 	qproperty-stepNoteColor: #9b1313;
 	qproperty-currentStepNoteColor: rgb(245, 3, 139);
 	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
-	qproperty-selectedNoteColor: #064d79;
-	qproperty-ghostNoteColor: #1e1e1e;
+	qproperty-selectedNoteColor: #77C795;
+	qproperty-ghostNoteColor: #A8B4C0;
 	qproperty-ghostNoteTextColor: #ffffff;
-	qproperty-ghostNoteOpacity: 60;
+	qproperty-ghostNoteOpacity: 80;
 	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
@@ -279,26 +281,26 @@ lmms--gui--PianoRoll {
 	/* Piano keys */
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;
-	qproperty-whiteKeyActiveTextShadow: #fff;
-	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
+	qproperty-whiteKeyActiveTextShadow: transparent;
+	qproperty-whiteKeyActiveBackground: #77C795;
 	qproperty-whiteKeyInactiveTextColor: #000;
-	qproperty-whiteKeyInactiveTextShadow: #fff;
-	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d6d6d6, stop:1 #e3e3e3);
-	qproperty-whiteKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #a0a0a0, stop:1 #b0b0b0);
+	qproperty-whiteKeyInactiveTextShadow: transparent;
+	qproperty-whiteKeyInactiveBackground: #E5EAF0;
+	qproperty-whiteKeyDisabledBackground: #A8B4C0;
 	qproperty-blackKeyWidth: 48;
-	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
-	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #262626, stop:1 #313131);
-	qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
+	qproperty-blackKeyActiveBackground: #42A065;
+	qproperty-blackKeyInactiveBackground: #20262D;
+	qproperty-blackKeyDisabledBackground: #35414D;
 
 	/* Grid colors */
-	qproperty-lineColor: #292929;
-	qproperty-beatLineColor: #2d6b45;
-	qproperty-barLineColor: #42a065;
+	qproperty-lineColor: #29323B;
+	qproperty-beatLineColor: #35414D;
+	qproperty-barLineColor: #6F7B87;
 
 	/* Text on the white piano keys */
 	qproperty-textColor: #000;
 	qproperty-textColorLight: #0bd556;
-	qproperty-textShadow: #fff;
+	qproperty-textShadow: transparent;
 }
 
 lmms--gui--TabWidget {
@@ -511,15 +513,15 @@ QPushButton:disabled, QPushButton#btn:disabled { background: #20262D; color: #6F
 /* track background config */
 lmms--gui--TrackContentWidget {
 	/* colors */
-	qproperty-darkerColor: #0C0E0F;
-	qproperty-lighterColor: #14151A;
-	qproperty-coarseGridColor: #3C444C;
-	qproperty-fineGridColor: #262B30;
-	qproperty-horizontalColor: #3C444C;
+	qproperty-darkerColor: #14181D;
+	qproperty-lighterColor: #20262D;
+	qproperty-coarseGridColor: #35414D;
+	qproperty-fineGridColor: #29323B;
+	qproperty-horizontalColor: #35414D;
 	qproperty-embossColor: rgba(0, 0, 0, 0);
 	
 	/* line widths */
-	qproperty-coarseGridWidth: 2;
+	qproperty-coarseGridWidth: 1;
 	qproperty-fineGridWidth: 1;
 	qproperty-horizontalWidth: 1;
 	qproperty-embossWidth: 0;
@@ -911,6 +913,7 @@ lmms--gui--Fader {
 }
 
 lmms--gui--TimeLineWidget {
+	qproperty-flatStyle: true;
 	/* font-size only supports px and pt. */
 	font-size: 7pt;
 	/* lengths also support em. This will make sure that the height
@@ -925,15 +928,15 @@ lmms--gui--TimeLineWidget {
 	    - LoopBrush: Brush to paint the main portion of the rectangle
 	    - LoopInnerColor: Color used to paint the inlayed border
 	    - LoopHandleColor: Color used to paint loop marker handles */
-	qproperty-inactiveLoopColor: #3B424A;
-	qproperty-inactiveLoopBrush: #3B424A;
+	qproperty-inactiveLoopColor: #35414D;
+	qproperty-inactiveLoopBrush: #29323B;
 	qproperty-inactiveLoopInnerColor: #3B424A;
 	qproperty-inactiveLoopHandleColor: rgba( 192, 192, 192, 100 );
 
 	/* Properties for the loop indicator rectangle in active state.
 	   See above for detailed description. */
-	qproperty-activeLoopColor: #21A14F;
-	qproperty-activeLoopBrush: #21A14F;
+	qproperty-activeLoopColor: #42A065;
+	qproperty-activeLoopBrush: #244A35;
 	qproperty-activeLoopInnerColor: #21A14F;
 	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
 
@@ -943,8 +946,8 @@ lmms--gui--TimeLineWidget {
 	/* Width of loop marker handles (when handle mode is active) */
 	qproperty-loopHandleWidth: 8;
 
-	qproperty-barLineColor: rgb( 192, 192, 192 );
-	qproperty-barNumberColor: rgb( 192, 192, 192 );
+	qproperty-barLineColor: #6F7B87;
+	qproperty-barNumberColor: #A8B4C0;
 }
 
 lmms--gui--TrackContainerView QLabel
@@ -956,13 +959,14 @@ lmms--gui--TrackContainerView QLabel
 
 /* common clip colors */
 lmms--gui--ClipView   {
+	qproperty-cornerRadius: 3;
 	qproperty-mutedColor: rgba(255,255,255,100);
 	qproperty-mutedBackgroundColor: #373d48;
-	qproperty-selectedColor: #006B65;
+	qproperty-selectedColor: #244A35;
 	qproperty-patternClipBackground: #373d48;
 	qproperty-textColor: #fff;
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 100);
-	qproperty-textShadowColor: rgba(0,0,0,200);
+	qproperty-textShadowColor: transparent;
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
 	qproperty-markerColor: rgb(0, 0, 0);
 	font-size: 11px;
@@ -1309,21 +1313,21 @@ lmms--gui--BarModelEditor {
 
 /* Native SVS editor follows this theme's piano and palette colors. */
 lmms--gui--SVSPianoRoll {
-	qproperty-backgroundColor: #141616;
-	qproperty-gridLineColor: #292929;
-	qproperty-beatLineColor: #2d6b45;
-	qproperty-barLineColor: #42a065;
-	qproperty-noteColor: #0bd556;
-	qproperty-selectedNoteColor: #064d79;
+	qproperty-backgroundColor: #14181D;
+	qproperty-gridLineColor: #29323B;
+	qproperty-beatLineColor: #35414D;
+	qproperty-barLineColor: #6F7B87;
+	qproperty-noteColor: #42A065;
+	qproperty-selectedNoteColor: #77C795;
 	qproperty-lyricColor: #ffffff;
 	qproperty-pronunciationColor: #d1d8e4;
 	qproperty-userPitchColor: #42a065;
 	qproperty-synthesizedPitchColor: #b0c8e0;
 	qproperty-waveformColor: #078f3a;
 	qproperty-phonemeColor: #d1d8e4;
-	qproperty-invalidColor: #8173fe;
+	qproperty-invalidColor: #DAB55A;
 	qproperty-renderingColor: #42a065;
-	qproperty-errorColor: #9b1313;
+	qproperty-errorColor: #E05B65;
 }
 
 lmms--gui--SetupDialog QPushButton#vstSettingsTab { qproperty-icon: url("resources:setup_vst.svg"); qproperty-iconSize: 48px 48px; }
@@ -1361,3 +1365,6 @@ lmms--gui--LmmsPalette {
 	qproperty-highlight: #244A35;
 	qproperty-highlightedText: #E5EAF0;
 }
+
+/* F4 note drawing keeps the existing SVS edit geometry. */
+lmms--gui--SVSCanvas { qproperty-noteCornerRadius: 2; }

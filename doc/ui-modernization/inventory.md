@@ -18,11 +18,11 @@
 | B01 | `LmmsPalette`：include/LmmsPalette.h、src/gui/LmmsPalette.cpp | 现有颜色属性 | 若重载后 palette 未更新，在 M2 修正主题应用入口；不另建颜色文件格式 | F2/F3/F4 | S02–S08 | F2 IMPLEMENTED；F3/F4 follow-on |
 | B02 | `KnobType::Styled`：include/Knob.h、src/gui/widgets/Knob.cpp | 半径、中心、线宽、outerColor、line/arcActive/InactiveColor | 标签、固定尺寸、缓存和非 Styled 分支见 C05 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | B03 | `Fader`：include/Fader.h、src/gui/widgets/Fader.cpp | peakOk/peakWarn/peakClip、unityMarker 等 | 推子帽、边界形状及缓存见 C06 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
-| B04 | 普通 PianoRoll：include/PianoRoll.h、src/gui/editors/PianoRoll.cpp | 音符、选中、ghost、网格、琴键 brush；把琴键渐变改纯色 | 音符圆角或固定几何需要局部 painter 修改；不改手势算法 | F4 | S02–S08 | TODO |
-| B05 | AutomationEditor：include/AutomationEditor.h、src/gui/editors/AutomationEditor.cpp | 网格、节点、切线、曲线、比例尺、ghost 色 | 如有残余硬编码边框，局部补属性；曲线求值保持原样 | F4 | S02–S08 | TODO |
-| B06 | ClipView 及 Midi/Automation/Sample 派生 View | `gradient: false`、选中、静音、文字/文字阴影等 | 默认主题已禁用 gradient；圆角边框、内容裁剪及旧双层边框需要 C08 | F2/F3/F4 | S02–S08 | TODO |
-| B07 | TrackContentWidget、TimeLineWidget | 已有网格、循环区、标尺颜色及部分宽度属性 | 圆角循环范围、位图播放头和边缘命中须按实际 painter 处理 | F4 | S02–S08 | TODO |
-| B08 | SVSPianoRoll：include/SVSViews.h、src/gui/editors/svs/SVSCanvas.cpp | 背景、音符、状态、小节/拍线等现有主题属性 | 音符圆角与参数栏局部布局；保留只读分界、滚动、头像/立绘功能 | F4 | S02–S08 | TODO |
+| B04 | 普通 PianoRoll：include/PianoRoll.h、src/gui/editors/PianoRoll.cpp | 音符、选中、ghost、网格、琴键 brush；把琴键渐变改纯色 | 音符圆角或固定几何需要局部 painter 修改；不改手势算法 | F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| B05 | AutomationEditor：include/AutomationEditor.h、src/gui/editors/AutomationEditor.cpp | 网格、节点、切线、曲线、比例尺、ghost 色 | 如有残余硬编码边框，局部补属性；曲线求值保持原样 | F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| B06 | ClipView 及 Midi/Automation/Sample 派生 View | `gradient: false`、选中、静音、文字/文字阴影等 | 默认主题已禁用 gradient；圆角边框、内容裁剪及旧双层边框需要 C08 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| B07 | TrackContentWidget、TimeLineWidget | 已有网格、循环区、标尺颜色及部分宽度属性 | 圆角循环范围、位图播放头和边缘命中须按实际 painter 处理 | F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
+| B08 | SVSPianoRoll：include/SVSViews.h、src/gui/editors/svs/SVSCanvas.cpp | 背景、音符、状态、小节/拍线等现有主题属性 | 音符圆角与参数栏局部布局；保留只读分界、滚动、头像/立绘功能 | F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | B09 | 自绘 TabWidget、SubWindow、EnvelopeGraph/LfoGraph 等已有主题属性 | 现有颜色/brush | 属性能换色不代表 QSS border-radius 能改变其内部图形；仍按 C/D 检查 | F2/F3/F4 | S02–S08 | F2 Tab/MDI IMPLEMENTED；graphs F3 |
 | C01 | src/gui/widgets/ComboBox.cpp、include/ComboBox.h | 去硬编码阴影与立体分隔；画纯色圆角框、单层文字和 SVG 箭头；补 theme 色/圆角属性 | ComboBoxModel、滚轮、菜单选项、图标、控制器/自动化上下文菜单 | F2/F3/F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C02 | src/gui/widgets/LcdWidget.cpp、include/LcdWidget.h | 为现代默认主题提供 QPainter 文本数字模式，替换数字 sprite；按字体度量安排数字、负号、边距；保留 legacy 位图回退 | LcdSpinBox/LcdFloatSpinBox 的拖动、进位、小数、单位、范围、无缝拼接和输入弹窗；不改数值模型 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
@@ -31,7 +31,7 @@
 | C05 | src/gui/widgets/Knob.cpp、include/Knob.h | 复用 Styled 的矢量弧/指针；补齐标签/尺寸与 disabled/focus；对登记的位图旋钮转现代绘制；尺寸/主题/DPR 变化清缓存 | FloatModelEditorBase、精细拖动、滚轮、双击输入、reset、自动化菜单和对数参数；绘图时不写 model | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C06 | src/gui/widgets/Fader.cpp、include/Fader.h | 矢量纯色推子帽、细槽和电平条；显示尺寸与实际命中几何一致 | 原 dB/线性映射、-inf、峰值保持、0 dB 线、修饰键步进、复制链接及撤销 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C07 | src/gui/widgets/LedCheckBox.cpp、src/gui/widgets/PixmapButton.cpp | 对通用 LED/开关用矢量 indicator 或现代 SVG 状态；必要时新增 opt-in 视觉模式，保持旧 artwork 调用可用 | AutomatableButton、on/off/pressed、只读/禁用、双击和信号次数；不简单换 QCheckBox | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
-| C08 | src/gui/clips/MidiClipView.cpp、AutomationClipView.cpp、SampleClipView.cpp、include/ClipView.h | 引入默认 0 的 clip 圆角属性，默认现代主题设 3 DIP；替换双层矩形边框、按同一圆角路径裁剪内容；检查 Pattern/SVS clip 各自分支 | 波形/步进/音符预览不变；短 clip 半径收缩；原拖动/裁剪命中矩形不缩小；静音和选中仍明显 | F4 | S02–S08 | TODO |
+| C08 | src/gui/clips/MidiClipView.cpp、AutomationClipView.cpp、SampleClipView.cpp、include/ClipView.h | 引入默认 0 的 clip 圆角属性，默认现代主题设 3 DIP；替换双层矩形边框、按同一圆角路径裁剪内容；检查 Pattern/SVS clip 各自分支 | 波形/步进/音符预览不变；短 clip 半径收缩；原拖动/裁剪命中矩形不缩小；静音和选中仍明显 | F4 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C09 | src/gui/widgets/CPULoadWidget.cpp、include/CPULoadWidget.h | 用矢量纯色条与文本替代背景/LED sprite，尺寸从现有工具栏约束计算 | 负载采样、100 ms 刷新、平滑和 tooltip 原样保留；不改 AudioEngineProfiler | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C10 | src/gui/instrument/PianoView.cpp | 替换或扁平化位图琴键，必要时用 QPainter 纯色键；补主题颜色和 DPR 处理 | 黑白键命中、按下/禁用/根音/范围标记与 MIDI 键盘演奏保持一致 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
 | C11 | src/gui/widgets/Graph.cpp 及 M0 清单中的图表 View | 对硬编码背景、框线和 foreground artwork 增加最少主题入口，改平面外框 | 波形/包络/LFO 的数据及拖动算法不变；数据曲线不强制圆角化 | F3 | S02–S08 | IMPLEMENTED / MANUAL-PENDING |
@@ -41,7 +41,7 @@
 | D02 | SetupDialog / TabBar、工具栏、轨道控制区、MixerChannelView、仪器公共页 | 先处理 fixedSize、固定边距与字体度量冲突，再调 QSS padding；保持紧凑模式；容器不足优先使用已有滚动机制 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | D03 | 自有 instrument/effect 插件面板 | M0 从当前启用的构建目标列出面板，逐个记录源码、artwork、绝对定位、共享控件；按组迁移，不能把 TripleOscillator 示例替代全部覆盖 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | D04 | 插件 artwork 中的面板边框、文字、旋钮槽 | 将装饰背景拆成纯色面板；功能标签改成可翻译 QWidget/QPainter 文字；保留有实际内容意义的图像；绝对坐标依赖必须随 View 调整 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
-| D05 | 主题缓存、图标大小和 DPI | 沿用 embed::getIconPixmap / logicalSize；SVG 指定逻辑尺寸；检查 Knob、LCD、CPU/clip 的缓存键或失效路径，避免放大旧 pixmap | 按计划第 7 节 | F1/F5/F6 | S02–S08 | F2 QPixmapCache reload PASS；其他缓存 F3/F4/F6 |
+| D05 | 主题缓存、图标大小和 DPI | 沿用 embed::getIconPixmap / logicalSize；SVG 指定逻辑尺寸；检查 Knob、LCD、CPU/clip 的缓存键或失效路径，避免放大旧 pixmap | 按计划第 7 节 | F1/F5/F6 | S02–S08 | F2 reload、F3 数值控件及 F4 clip/网格 DPR 和主题失效 PASS；F6 最终核对 |
 | D06 | 安装与配置 | 新 CSS/SVG 走现有 data/themes 安装；开发安装保持独立配置；不能依赖源码绝对路径或用户 Desktop 图片 | 按计划第 7 节 | F1/F5/F6 | S02–S08 | TODO |
 | E01 | 第三方 VST/Carla 原生内容、系统对话框 | 仅验证宿主容器、弹出/嵌入、关闭与焦点；截图标注为外部 UI，不虚报已换肤 | 按计划第 7 节 | F5/F6 | S02–S08 | TODO |
 | E02 | 分离后的 Windows 标题栏和系统阴影 | 由系统窗口装饰负责；原生关闭、拖动、缩放优先；不将系统圆角差异列为计划失败 | 按计划第 7 节 | F5/F6 | S02–S08 | TODO |
@@ -148,3 +148,7 @@ A01–A11 的样式路径为 `data/themes/default/style.css`；标准页面入�
 
 本节仅确认 F0 基线；上表的产品实现状态仍为 TODO。后续遇到 PNG 装饰且不能以 SVG 替代时按用户授权记 SKIPPED / PNG；允许 SVG 重绘，保留兼容旧资源。
 
+
+## F4 编辑画布检查点
+
+B04–B08/C08 已实施；D02 编辑器沿用 F1 工具栏密度，宿主/插件布局仍由 F5 处理。片段 3 DIP、音符最多 2 DIP，旧主题属性默认 0；轨道背景和 clip 缓存使用实际 DPR，并在主题更新后刷新。原生命中、移动、两端拉伸、复制粘贴及撤销见 F4-theme-final-results.txt / F4-theme-150-results.txt。实窗证据在 F4-100/F4-150；人工观感、真实跨屏 DPI、完整中文 IME 为 MANUAL/PENDING，未修改 PNG 资产。

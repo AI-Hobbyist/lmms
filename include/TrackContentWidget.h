@@ -130,17 +130,17 @@ public:
 	int embossWidth() const { return m_embossWidth; }
 	int embossOffset() const { return m_embossOffset; }
 
-	void setDarkerColor(const QBrush& c) { m_darkerColor = c; }
-	void setLighterColor(const QBrush& c) { m_lighterColor = c; }
-	void setCoarseGridColor(const QBrush& c) { m_coarseGridColor = c; }
-	void setFineGridColor(const QBrush& c) { m_fineGridColor = c; }
-	void setHorizontalColor(const QBrush& c) { m_horizontalColor = c; }
-	void setEmbossColor(const QBrush& c) { m_embossColor = c; }
-	void setCoarseGridWidth(int c) { m_coarseGridWidth = c; }
-	void setFineGridWidth(int c) { m_fineGridWidth = c; }
-	void setHorizontalWidth(int c) { m_horizontalWidth = c; }
-	void setEmbossWidth(int c) { m_embossWidth = c; }
-	void setEmbossOffset(int c) { m_embossOffset = c; }
+	void setDarkerColor(const QBrush& c) { m_darkerColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setLighterColor(const QBrush& c) { m_lighterColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setCoarseGridColor(const QBrush& c) { m_coarseGridColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setFineGridColor(const QBrush& c) { m_fineGridColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setHorizontalColor(const QBrush& c) { m_horizontalColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setEmbossColor(const QBrush& c) { m_embossColor = c; m_backgroundDirty = true; QWidget::update(); }
+	void setCoarseGridWidth(int c) { m_coarseGridWidth = c; m_backgroundDirty = true; QWidget::update(); }
+	void setFineGridWidth(int c) { m_fineGridWidth = c; m_backgroundDirty = true; QWidget::update(); }
+	void setHorizontalWidth(int c) { m_horizontalWidth = c; m_backgroundDirty = true; QWidget::update(); }
+	void setEmbossWidth(int c) { m_embossWidth = c; m_backgroundDirty = true; QWidget::update(); }
+	void setEmbossOffset(int c) { m_embossOffset = c; m_backgroundDirty = true; QWidget::update(); }
 
 public slots:
 	//! @brief Update ourselves by updating all the ClipViews attached.
@@ -157,6 +157,7 @@ public slots:
 	void updateBackground();
 
 protected:
+	void changeEvent(QEvent* event) override;
 	enum class ContextMenuAction
 	{
 		Paste
@@ -218,6 +219,7 @@ private:
 	clipViewVector m_clipViews;
 
 	QPixmap m_background;
+	bool m_backgroundDirty = true;
 
 	// qproperty fields
 	QBrush m_darkerColor;

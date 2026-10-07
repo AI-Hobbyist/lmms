@@ -225,12 +225,17 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
+	const qreal dpr = devicePixelRatioF();
+	const QSize pixelSize = viewPortRect.size() * dpr;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != pixelSize || m_paintPixmap.devicePixelRatio() != dpr)
 	{
-		m_paintPixmap = QPixmap(viewPortRect.size());
+		m_paintPixmap = QPixmap(pixelSize);
+		m_paintPixmap.setDevicePixelRatio(dpr);
 	}
 
+	m_paintPixmap.fill(Qt::transparent);
 	QPainter p( &m_paintPixmap );
+	if (cornerRadius() > 0) { p.setClipPath(clipOutline(m_paintPixmapXPosition)); }
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
@@ -239,6 +244,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QColor c = painter.background().color();
 	if (muted) { c = c.darker(150); }
 	if (selected) { c = c.darker(150); }
+	if (cornerRadius() > 0) { c = getColorForDisplay(painter.background().color()); }
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -304,6 +310,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
+	if (cornerRadius() > 0) { paintFlatBorder(p, false, m_paintPixmapXPosition); }
+	else
+	{
 	// inner border
 	p.setPen( c.lighter( 135 ) );
 	p.drawRect(
@@ -316,6 +325,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.darker( 200 ) );
 	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 
+	}
 	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
