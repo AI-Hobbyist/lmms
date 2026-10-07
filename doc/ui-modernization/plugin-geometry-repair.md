@@ -11,4 +11,4 @@
 - plugin-geometry-green-results.txt / plugin-geometry-150-results.txt：两个用户截图插件的原生 100%/150% 检查通过；四张 plugin-geometry-*-100/150.png 为真实窗口证据。
 - GeometryFix-100 / GeometryFix-150：以默认窗口尺寸重新打开原生乐器；两组各 3 PASS，47 个有效面板与预设比较通过。既有五项外部环境仍 MANUAL/PENDING，不计完整外部编辑器验收。
 
-失败轮保留且不计 PASS；没有新增离屏路径，没有修改键盘滚动条、PNG 或经典/现代切换功能。修复提交推送后，更新已有 packages 目录中的全量替换包，替代此前 7b44c5487 版本。
+失败轮保留且不计 PASS；没有新增离屏路径，没有修改键盘滚动条、PNG 或经典/现代切换功能。修复 b6b867585 已提交并推送 master；已有 packages 目录中的全量包已更新为 lmms-modern-ui-full-b6b867585-win64.zip，替代此前 7b44c5487 版本。ZIP 全文件哈希、原目录实际覆盖及配置保留检查通过；覆盖后的真实程序窗口 3 PASS。见 replacement-package.md。

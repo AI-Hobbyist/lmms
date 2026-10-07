@@ -1,0 +1,15 @@
+{
+  "FileName": "lmms-modern-ui-full-b6b867585-win64.zip",
+  "Bytes": 60648388,
+  "SHA256": "9591053DC52E00E687DFB3B4F7D18F3CB58E4C36D502684265A0150793542B10",
+  "ProductCommit": "b6b867585f4ce4968c5bbfa310f7ec359600c12d",
+  "RuntimeFiles": 3480,
+  "ExtraPackageFiles": 4,
+  "UiPluginCount": 52,
+  "ArchiveHashes": "PASS: all 3484 entries",
+  "WindowsPowerShellInstaller": "PASS: apply and verify in original build/Release",
+  "PersonalConfigPreserved": "PASS: .lmmsrc.xml and portable_mode.txt hashes unchanged",
+  "NativeSmoke": "PASS: 3 results, real Windows application",
+  "OriginalInstalledLmms": "Not modified",
+  "Supersedes": "lmms-modern-ui-full-7b44c5487-win64.zip"
+}
