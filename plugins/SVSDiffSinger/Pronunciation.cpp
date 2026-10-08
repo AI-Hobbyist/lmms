@@ -102,9 +102,9 @@ std::vector<std::string> Pronunciation::map(const std::vector<std::string>& symb
     }
     return result;
 }
-std::string Pronunciation::type(const std::string& symbol,const std::string& language) const {
+std::string Pronunciation::type(const std::string& symbol,const std::string& language,const std::string& stage) const {
     if(symbol=="SP"||symbol=="AP"||symbol=="ExAP") {return "vowel";}
-    const auto loaded=dictionary("acoustic",language);const auto& dict=*loaded;const auto found=dict.types.find(symbol);
+    const auto loaded=dictionary(stage,language);const auto& dict=*loaded;const auto found=dict.types.find(symbol);
     if(found==dict.types.end()) {return "consonant";}const auto value=lower(found->second);
     return value=="vowel"?"vowel":(value=="semivowel"||value=="liquid"||value=="glide")?"glide":"consonant";
 }

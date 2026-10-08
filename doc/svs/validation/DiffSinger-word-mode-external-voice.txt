@@ -1,0 +1,3 @@
+PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch
+AUDITION external-la-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\fb5bfcb26eb6bc05e4f72c88d2eea4d9356093c7ab5ecc865af12f56352e2c90.wav
+PASS external voice deepseek贝壳 frames=103654 curves=0

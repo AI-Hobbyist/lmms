@@ -1,0 +1,5 @@
+PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch
+PASS actual duration word-mode ONNX inference
+PASS actual variance word-mode ONNX inference
+AUDITION external-la-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\7249385b5b9e4785f596194fe9dad62f8f9a76f5b3de3ab4beea8f4e7798a44f.wav
+PASS external voice deepseek贝壳 frames=103654 curves=0

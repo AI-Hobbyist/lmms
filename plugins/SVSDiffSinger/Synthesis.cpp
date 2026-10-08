@@ -1,5 +1,6 @@
 #include "Synthesis.h"
 #include "Speaker.h"
+#include "WordTiming.h"
 #include "svs_curve.hpp"
 #include <cmath>
 #include <numeric>
@@ -99,7 +100,19 @@ SynthesisResult Synthesis::render(const DurationPlan& plan,const std::vector<Not
     TensorCache cache(fs::u8path(input.value("cacheDirectory",std::string())));
     auto run=[&](const std::string& stage,const std::string& role,const Tensors& inputs) {auto& target=model(stage,role);const auto key=TensorCache::key("CPU/ORT1.23.0/native.v2/seed="+std::to_string(m_seed)+"/pinyin621f8ca9/"+m_voice->fingerprint+"/"+stage+"/"+role,inputs);Tensors out;if(cancelled.load()) {throw std::runtime_error("Cancelled");}if(!cache.load(key,out)) {out=target.run(inputs,cancelled);cache.save(key,out);}if(cancelled.load()) {throw std::runtime_error("Cancelled");}return out;};
     auto tokens=[&](const std::string& stage) {std::vector<int64_t> values;for(const auto& span:spans) {const auto mapped=m_pronunciation.map({span.symbol},span.language,stage);values.push_back(m_voice->stages.at(stage).phonemes.at(mapped.at(0)).get<int64_t>());}return values;};
-    auto linguistic=[&](const std::string& stage) {Tensors in{{"tokens",longs(tokens(stage))},{"ph_dur",longs(durations)}};auto& target=model(stage,"linguistic");if(target.accepts("languages")) {std::vector<int64_t> language;for(const auto& span:spans) {language.push_back(span.symbol=="SP"?0:m_voice->stages.at(stage).languages.at(span.language).get<int64_t>());}in["languages"]=longs(language);}return run(stage,"linguistic",in);};
+    auto linguistic=[&](const std::string& stage) {
+        Tensors in{{"tokens",longs(tokens(stage))}};auto& target=model(stage,"linguistic");
+        if(target.accepts("word_div")||target.accepts("word_dur")) {
+            if(!target.accepts("word_div")||!target.accepts("word_dur")) {throw std::runtime_error(stage+" linguistic requires both word_div and word_dur");}
+            std::vector<bool> vowels;for(const auto& span:spans) {
+                const auto symbol=m_pronunciation.map({span.symbol},span.language,stage).at(0);
+                vowels.push_back(!span.noteId.empty()&&m_pronunciation.type(symbol,span.language,stage)=="vowel");
+            }
+            const auto timing=wordTiming(durations,vowels);
+            in["word_div"]=longs(timing.first);in["word_dur"]=longs(timing.second);
+        }else {in["ph_dur"]=longs(durations);}
+        if(target.accepts("languages")) {std::vector<int64_t> language;for(const auto& span:spans) {language.push_back(span.symbol=="SP"?0:m_voice->stages.at(stage).languages.at(span.language).get<int64_t>());}in["languages"]=longs(language);}return run(stage,"linguistic",in);
+    };
     std::vector<float> pitch(size_t(frames),60.f);std::vector<NoteInput> ordered=notes;std::stable_sort(ordered.begin(),ordered.end(),[](const auto& a,const auto& b){return a.start<b.start;});
     std::vector<float> noteMidi;std::vector<int64_t> noteDuration;std::vector<uint8_t> noteRest;int64_t noteFrame=0;
     auto addNote=[&](double until,float midi,bool rest) {const auto boundary=std::clamp(int64_t(std::floor((until-start)/frameSeconds+1e-7)),noteFrame,frames);noteMidi.push_back(midi);noteDuration.push_back(boundary-noteFrame);noteRest.push_back(rest?1:0);for(auto f=noteFrame;f<boundary;++f) {pitch[size_t(f)]=midi;}noteFrame=boundary;};

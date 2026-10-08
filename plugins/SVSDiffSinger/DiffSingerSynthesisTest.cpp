@@ -1,11 +1,48 @@
 #include "Synthesis.h"
 #include "Hash.h"
+#include "WordTiming.h"
 #include <iostream>
 #include <fstream>
 #include <chrono>
 using namespace diffsinger;
 namespace {
 void require(bool value,const std::string& message) {if(!value) {throw std::runtime_error(message);}}
+void wordTimingFixture() {
+    const std::vector<int64_t> durations{10,3,20,4,21,7,6,10};
+    const auto grouped=wordTiming(durations,{false,false,true,false,true,false,true,false});
+    require(grouped.first==std::vector<int64_t>({2,2,2,2}),"Word divisions differ from OpenUtau vowel boundaries");
+    require(grouped.second==std::vector<int64_t>({13,24,28,16}),"Word durations lost padding/gap/AP frames");
+    const auto noVowels=wordTiming(durations,std::vector<bool>(8,false));
+    require(noVowels.first==std::vector<int64_t>({6,2})&&noVowels.second==std::vector<int64_t>({65,16}),"Consonant-only fallback differs from OpenUtau");
+    const auto zero=wordTiming({0,0,10},{false,true,false});
+    require(zero.first==std::vector<int64_t>({1,2})&&zero.second==std::vector<int64_t>({0,10}),"Zero-frame phone lost alignment");
+    try {wordTiming({1,2,3},{false});throw std::runtime_error("Word duration mismatch accepted");}
+    catch(const std::exception& error) {require(std::string(error.what()).find("matching padded")!=std::string::npos,"Unexpected word timing validation error");}
+    std::cout<<"PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch"<<std::endl;
+}
+void wordModels(Ort::Env& env,const std::shared_ptr<const VoicePackage>& voice) {
+    std::atomic<bool> cancel{false};Pronunciation pronunciation(voice);
+    const std::vector<std::string> symbols{"SP","l","a","l","a","SP","AP","SP"};
+    const std::vector<int64_t> durations{10,3,20,4,21,7,6,10};
+    const auto timing=wordTiming(durations,{false,false,true,false,true,false,true,false});
+    auto longs=[](const std::vector<int64_t>& values){return Tensor::make<int64_t>(ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64,{1,int64_t(values.size())},values);};
+    for(const std::string stage:{"duration","variance"}) {
+        const auto& config=voice->stages.at(stage);CpuModel encoder(env,config.models.at("linguistic"),stage+"/linguistic");
+        require(encoder.accepts("word_div")&&encoder.accepts("word_dur")&&!encoder.accepts("ph_dur"),"Expected actual word-mode ONNX encoder");
+        std::vector<int64_t> tokens;for(const auto& symbol:pronunciation.map(symbols,"zh",stage)) tokens.push_back(config.phonemes.at(symbol).get<int64_t>());
+        Tensors inputs{{"tokens",longs(tokens)},{"word_div",longs(timing.first)},{"word_dur",longs(timing.second)}};
+        if(encoder.accepts("languages")) inputs["languages"]=longs(std::vector<int64_t>(tokens.size(),config.languages.at("zh").get<int64_t>()));
+        const auto encoded=encoder.run(inputs,cancel);require(encoded.at("encoder_out").dimensions.at(1)==int64_t(tokens.size()),"Word encoder lost token alignment");
+        for(const auto value:encoded.at("encoder_out").values<float>()) require(std::isfinite(value),"Non-finite word encoder output");
+        if(stage=="variance") {
+            CpuModel predictor(env,config.models.at("variance"),"variance/variance");
+            auto floats=[](float value){return Tensor::make<float>(ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT,{1,81},std::vector<float>(81,value));};
+            const auto out=predictor.run({{"encoder_out",encoded.at("encoder_out")},{"ph_dur",longs(durations)},{"pitch",floats(60)},{"breathiness",floats(0)},{"retake",Tensor::make<uint8_t>(ONNX_TENSOR_ELEMENT_DATA_TYPE_BOOL,{1,81,1},std::vector<uint8_t>(81,1))},{"steps",Tensor::make<int64_t>(ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64,{}, {5})}},cancel);
+            const auto values=out.at("breathiness_pred").values<float>();require(values.size()==81,"Word-mode variance output frame mismatch");for(const auto value:values) require(std::isfinite(value),"Non-finite word variance output");
+        }
+        std::cout<<"PASS actual "<<stage<<" word-mode ONNX inference"<<std::endl;
+    }
+}
 std::string digest(const std::vector<float>& audio) {Sha256 hash;hash.add(audio.data(),audio.size()*sizeof(float));return hash.finish();}
 void audition(const fs::path& path,const std::vector<float>& audio) {
     std::ostringstream out(std::ios::out|std::ios::binary);auto u16=[&](uint16_t value){out.put(char(value));out.put(char(value>>8));};auto u32=[&](uint32_t value){u16(uint16_t(value));u16(uint16_t(value>>16));};
@@ -22,10 +59,20 @@ void tensorCacheFixture() {
 }
 int run(int argc,char** argv) {
     try {
-        if(argc==5&&std::string(argv[1])=="--voice") {
+        wordTimingFixture();
+        const bool testWords=argc==5&&std::string(argv[1])=="--word-models";
+        if(argc==5&&(std::string(argv[1])=="--voice"||testWords)) {
             initializeRuntime();Ort::Env env{ORT_LOGGING_LEVEL_WARNING,"DiffSingerExternalVoiceTest"};
             const auto catalog=scan({{"engineSettings",{{"diffsinger.voicebankDirectories",Json::array({fs::absolute(fs::u8path(argv[2])).u8string()})},{"diffsinger.vocoderDirectories",Json::array({fs::absolute(fs::u8path(argv[4])).u8string()})}}}},1);
-            require(catalog->voices.size()==1,"Expected one external voice: "+catalog->diagnostics.dump());const auto voice=catalog->voices.front();
+            require(catalog->voices.size()==1,"Expected one external voice: "+catalog->diagnostics.dump());auto voice=catalog->voices.front();
+            if(testWords) {
+                wordModels(env,voice);
+                // In-memory fixture exercises the production shared linguistic
+                // caller through a real pitch/acoustic/vocoder render. No user
+                // configuration or model files are modified.
+                auto fixture=std::make_shared<VoicePackage>(*voice);auto& pitch=fixture->stages.at("pitch");const auto& word=fixture->stages.at("variance");
+                pitch.source=word.source;pitch.phonemes=word.phonemes;pitch.languages=word.languages;pitch.models["linguistic"]=word.models.at("linguistic");fixture->fingerprint+="/word-mode-pitch-fixture";voice=fixture;
+            }
             svs_sdk::TempoMap tempo;require(tempo.setPoints({{0,1./96.}}),"Invalid test tempo");std::atomic<bool> cancel{false};NoteInput note;note.id="external-la";note.lyric="la";note.reading="la";note.language="zh";note.durationTick=96;note.duration=1;note.pitch=60;
             const std::vector<NoteInput> notes{note};Duration duration(env,voice);Synthesis synthesis(env,voice);const auto plan=duration.predict(notes,tempo,0,Json::object(),cancel);
             const Json input{{"cacheDirectory",fs::absolute(fs::u8path(argv[3])).u8string()},{"engineSettings",{{"diffsinger.renderSteps",5}}}};

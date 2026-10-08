@@ -12,7 +12,7 @@ public:
     explicit Pronunciation(std::shared_ptr<const VoicePackage> voice);
     Json resolve(const Json& request) const;
     std::vector<std::string> map(const std::vector<std::string>& symbols,const std::string& language,const std::string& stage) const;
-    std::string type(const std::string& symbol,const std::string& language) const;
+    std::string type(const std::string& symbol,const std::string& language,const std::string& stage="acoustic") const;
 private:
     std::shared_ptr<const VoicePackage> m_voice;
     std::shared_ptr<const Dictionary> dictionary(const std::string& stage,const std::string& language) const;

@@ -60,6 +60,18 @@ A physically present predictor is not executed when the acoustic model consumes
 none of energy, breathiness, voicing or tension. Strict model signature checks
 remain in place for required predictors.
 
+Pitch and variance linguistic encoders select timing inputs from their actual
+ONNX signatures: `word_div` / `word_dur` for word mode, otherwise `ph_dur`.
+Word boundaries follow OpenUtau's real-vowel grouping; grouped frame durations
+include padding and inserted gaps. A consonant-only phrase uses the last real
+phone as its fallback boundary. Acoustic inference and duration prediction keep
+their existing inputs.
+
+`DiffSingerSynthesisTest --word-models <external-voice-root>
+<cache/SVS/DiffSinger> <shared-vocoder-root>` exercises real word-mode duration
+and variance encoders plus variance inference, then a complete synthesis using
+an in-memory word-mode pitch fixture. It does not modify external voice files.
+
 `DiffSingerSynthesisTest --voice <external-voice-root> <cache/SVS/DiffSinger>
 <shared-vocoder-root>` validates one external voice with finite, non-silent audio,
 pitch/variance feedback and cached/uncached seeded replay. All external files are
