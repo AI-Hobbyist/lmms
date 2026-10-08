@@ -79,6 +79,8 @@
 #include <QMimeData>
 #include <QClipboard>
 #include "ProjectJournal.h"
+#include "PluginFactory.h"
+#include "Ladspa2LMMS.h"
 #include <QScopeGuard>
 #include "../../src/gui/editors/svs/operations/SVSCurveGesture.h"
 #include "../../src/gui/editors/svs/operations/SVSFeedbackPitch.h"
@@ -138,6 +140,25 @@ private slots:
  }
  void init() { QTRY_VERIFY_WITH_TIMEOUT(!svs::Registry::instance().scanning(),30000);Engine::projectJournal()->clearJournal(); }
  void cleanupTestCase() { if(m_guiApplication) {delete static_cast<QWidget*>(m_guiApplication->mainWindow());m_guiApplication.reset();}else Engine::destroy(); }
+ void nativeLadspaPluginHost() {
+#ifdef Q_OS_WIN
+  if(!m_guiApplication||qEnvironmentVariable("LMMS_PLUGIN_DIR").isEmpty()) QSKIP("Explicit native development plugin directory and GUI required");
+  QCOMPARE(QGuiApplication::platformName(),QString("windows"));
+  // DLLs import lmms.exe. They must resolve the initialized test Engine,
+  // rather than loading the development executable as a second PE image.
+  QCOMPARE(GetModuleHandleW(L"lmms.exe"),GetModuleHandleW(nullptr));
+  QVERIFY(Engine::getLADSPAManager());
+  const auto plugin=PluginFactory::instance()->pluginInfo("ladspaeffect");QVERIFY(!plugin.isNull());
+  QCOMPARE(plugin.file.canonicalFilePath(),QFileInfo(qEnvironmentVariable("LMMS_PLUGIN_DIR")+"/ladspaeffect.dll").canonicalFilePath());
+  QVERIFY(plugin.descriptor->subPluginFeatures);Plugin::Descriptor::SubPluginFeatures::KeyList keys;
+  plugin.descriptor->subPluginFeatures->listSubPluginKeys(plugin.descriptor,keys);QVERIFY(!keys.isEmpty());
+  auto* window=static_cast<QWidget*>(m_guiApplication->mainWindow());window->show();QVERIFY(QTest::qWaitForWindowExposed(window));QTest::qWait(700);
+  QVERIFY(window->screen()->grabWindow(window->winId()).save("doc/svs/validation/LADSPA-test-native-window.png"));
+  qInfo()<<"LADSPA keys"<<keys.size()<<"native plugin host shares the initialized Engine";
+#else
+  QSKIP("Windows executable import regression");
+#endif
+ }
  void projectExportFileGroupTransaction() {
   QTemporaryDir staging,destination;QVERIFY(staging.isValid());QVERIFY(destination.isValid());QVERIFY(QDir().mkdir(staging.filePath("nested")));
   auto write=[](const QString& path,const QByteArray& bytes){QFile file(path);return file.open(QIODevice::WriteOnly)&&file.write(bytes)==bytes.size();};auto read=[](const QString& path){QFile file(path);return file.open(QIODevice::ReadOnly)?file.readAll():QByteArray{};};

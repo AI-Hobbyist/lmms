@@ -1,0 +1,10 @@
+{
+  "FixedExecutable": "build/tests/Release/lmms.exe",
+  "WrongNameExecutable": "build/tests/Release/SVSIntegrationTest.exe.disabled",
+  "FixedSHA256": "6A2259D781EA616C0D1B28D1EF6254035B2BE929ED532FE7CCF2E26F6DFA897C",
+  "WrongNameSHA256": "6A2259D781EA616C0D1B28D1EF6254035B2BE929ED532FE7CCF2E26F6DFA897C",
+  "IdenticalBytes": true,
+  "WrongNameExitCode": -1073741819,
+  "WrongNameFailure": "Native plugin initialization during initTestCase",
+  "FixedNameResult": "LADSPA-regression-after.txt: 4 passed, 0 failed, 202 LADSPA effects"
+}

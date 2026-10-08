@@ -1,0 +1,39 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe.
+While testing initTestCase
+Function time: 1934ms Total time: 1935ms
+
+Exception address: 0x00007FF7B53DF0EA
+Exception code   : 0xc0000005
+Nearby symbol    : lmms::Lv2SubPluginFeatures::listSubPluginKeys
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FFD64459C00
+#  2: UnhandledExceptionFilter() - 0x00007FFE085BED90
+#  3: strncpy() - 0x00007FFE0B327150
+#  4: _C_specific_handler() - 0x00007FFE0B2E4670
+#  5: _chkstk() - 0x00007FFE0B325460
+#  6: RtlWow64GetCurrentMachine() - 0x00007FFE0B28B6D0
+#  7: KiUserExceptionDispatcher() - 0x00007FFE0B324E10
+#  8: lmms::Lv2SubPluginFeatures::listSubPluginKeys() - 0x00007FF7B53DF0B0
+#  9: lmms::PluginFactory::discoverPlugins() - 0x00007FF71D732E70
+# 10: lmms::PluginFactory::instance() - 0x00007FF71D734B30
+# 11: lmms::gui::ModelView::unsetModel() - 0x00007FF71D7B82D0
+# 12: lmms::gui::ModelView::unsetModel() - 0x00007FF71D7B82D0
+# 13: lmms::gui::Lv2ViewBase::uri() - 0x00007FF71D7A1BA0
+# 14: lmms::gui::GuiApplication::GuiApplication() - 0x00007FF71D79BC20
+# 15: lmms::Note::pos() - 0x00007FF71D661110
+# 16: QMetaMethodInvoker::invokeImpl() - 0x00007FFCD43C3FD0
+# 17: QMetaMethod::invokeImpl() - 0x00007FFCD43C3DB0
+# 18: QTest::ignoreMessage() - 0x00007FFD64435E80
+# 19: QTest::ignoreMessage() - 0x00007FFD64435E80
+# 20: QTest::qRun() - 0x00007FFD6443B310
+# 21: QTest::qExec() - 0x00007FFD64438840
+# 22: lmms::ConfigManager::workingDir() - 0x00007FF71D6C1C50
+# 23: lmms::gui::TabBar::widgetShown() - 0x00007FF71D90C9E0
+# 24: BaseThreadInitThunk() - 0x00007FFE09DACD70
+# 25: RtlUserThreadStart() - 0x00007FFE0B26CAC0

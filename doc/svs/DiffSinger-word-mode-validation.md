@@ -46,10 +46,13 @@ Validation:
   `build/Release/svs/SVSDiffSinger/SVSDiffSinger.dll`, beside the existing
   `build/Release/lmms.exe` deployment.
 
-Optional repeat GUI validation: MANUAL/PENDING. The existing native Windows Qt
-test crashes during `initTestCase`, before entering DiffSinger, at
-`Ladspa2LMMS::getValidEffects` while discovering unrelated plugins. Rebuilding
-the current test target did not resolve that startup failure. The partial native
-Qt report is `validation/DiffSinger-word-mode-native-QtTest.txt`; it is not a PASS.
-No offscreen mode or production GUI workaround was used. There are no GUI
-changes in this compatibility task; this unrelated startup issue is follow-up.
+The original optional repeat GUI validation was MANUAL/PENDING: native plugin
+discovery crashed before entering DiffSinger, and the partial report
+`validation/DiffSinger-word-mode-native-QtTest.txt` remains a historical non-PASS.
+The subsequent authorized LADSPA diagnosis identified the Windows test host's
+executable name as the cause. After fixing that test-only identity, the real
+Windows external-voice editor test passed (see
+`validation/LADSPA-release-and-DiffSinger-after.txt`, 4 passed / 0 failed).
+The actual development Release application also started and closed normally.
+See `LADSPA-windows-test-host-validation.md`. No offscreen mode or production
+GUI workaround was used.

@@ -107,6 +107,10 @@ set_target_properties(UiBaselineCapture PROPERTIES OUTPUT_NAME lmms
 set_tests_properties(UiBaselineCapture PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
 	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/$<CONFIG>/plugins;LMMS_SVS_PLUGIN_DIR=$<TARGET_FILE_DIR:SVSExample>/..;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/ui-baseline;LMMS_UI_SAMPLE=${CMAKE_SOURCE_DIR}/doc/ui-modernization/fixtures/tone.wav;LMMS_UI_FIXTURE=${CMAKE_BINARY_DIR}/ui-fixture.mmp")
 target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
+if(WIN32)
+ # Native plugins import lmms.exe; share this harness's initialized Engine.
+ set_target_properties(SVSIntegrationTest PROPERTIES OUTPUT_NAME lmms)
+endif()
 target_compile_definitions(SVSIntegrationTest PRIVATE LMMS_SVS_PROJECT_RUNTIME="${CMAKE_BINARY_DIR}/Release/svs-project")
 set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
