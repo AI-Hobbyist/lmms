@@ -1,0 +1,130 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  1>Checking Build System
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_yaml-src/CMakeLists.txt
+  graphbuilder.cpp
+  graphbuilderadapter.cpp
+  binary.cpp
+  convert.cpp
+  depthguard.cpp
+  directives.cpp
+  emit.cpp
+  emitfromevents.cpp
+  emitter.cpp
+  emitterstate.cpp
+  emitterutils.cpp
+  exceptions.cpp
+  exp.cpp
+  memory.cpp
+  node.cpp
+  node_data.cpp
+  nodebuilder.cpp
+  nodeevents.cpp
+  null.cpp
+  ostream_wrapper.cpp
+  正在生成代码...
+  正在编译...
+  parse.cpp
+  parser.cpp
+  regex_yaml.cpp
+  scanner.cpp
+  scanscalar.cpp
+  scantag.cpp
+  scantoken.cpp
+  simplekey.cpp
+  singledocparser.cpp
+  stream.cpp
+  tag.cpp
+  正在生成代码...
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/plugins/SVSDiffSinger/CMakeLists.txt
+  CMake is re-running because D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/CMakeFiles/generate.stamp is out-of-date.
+    the file 'D:/UserData/Desktop/Project/lmms/plugins/SVSDiffSinger/CMakeLists.txt'
+    is newer than 'D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/CMakeFiles/generate.stamp.depend'
+    result='-1'
+  -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+  -- Using the multi-header code from D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_json-src/include/
+  CMake Deprecation Warning at D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_yaml-src/CMakeLists.txt:2 (cmake_minimum_required):
+    Compatibility with CMake < 3.10 will be removed from a future version of
+    CMake.
+
+    Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+    to tell CMake that the project requires at least <min> but has been updated
+    to work with policies introduced by <max> or earlier.
+
+
+  -- Configuring done (7.0s)
+  -- Generating done (0.2s)
+  -- Build files have been written to: D:/UserData/Desktop/Project/lmms/build/svs-sdk-external
+  SVSDiffSinger.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\svs\SVSDiffSinger\SVSDiffSinger.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  binary.cpp
+  graphbuilder.cpp
+  graphbuilderadapter.cpp
+  convert.cpp
+  depthguard.cpp
+  directives.cpp
+  emit.cpp
+  emitfromevents.cpp
+  emitter.cpp
+  emitterstate.cpp
+  emitterutils.cpp
+  exceptions.cpp
+  exp.cpp
+  memory.cpp
+  node.cpp
+  node_data.cpp
+  nodebuilder.cpp
+  nodeevents.cpp
+  null.cpp
+  ostream_wrapper.cpp
+  正在生成代码...
+  正在编译...
+  parse.cpp
+  parser.cpp
+  regex_yaml.cpp
+  scanner.cpp
+  scanscalar.cpp
+  scantag.cpp
+  scantoken.cpp
+  simplekey.cpp
+  singledocparser.cpp
+  stream.cpp
+  tag.cpp
+  正在生成代码...
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/plugins/SVSDiffSinger/CMakeLists.txt
+  DiffSingerModelProbe.cpp
+  DiffSingerModelProbe.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerModelProbe.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/plugins/SVSDiffSinger/CMakeLists.txt
+  DiffSingerAbiTest.cpp
+  DiffSingerAbiTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerAbiTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/sdk/svs/tools/CMakeLists.txt
+  SVSConformance.cpp
+  SVSConformance.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\tools\Release\SVSConformance.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/plugins/SVSExample/CMakeLists.txt
+  SVSExample.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/full-example/Release/SVSExample.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/full-example/Release/SVSExample.exp
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\svs\SVSExample\SVSExample.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/sdk/svs/examples/minimal/CMakeLists.txt
+  minimal.c
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/examples/minimal/Release/SVSMinimal.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/examples/minimal/Release/SVSMinimal.exp
+  SVSMinimal.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\examples\minimal\Release\SVSMinimal.dll

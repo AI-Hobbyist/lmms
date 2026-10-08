@@ -1,0 +1,5 @@
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+CMake Error at D:/UserData/Desktop/Project/lmms/plugins/SVSDiffSinger/CMakeLists.txt:6 (message):
+-- Configuring incomplete, errors occurred!
+  DiffSinger requires native ONNX Runtime CPU 1.23.0.  Set LMMS_ONNX_ROOT to
+  the extracted official SDK; no Python/.NET fallback is supported.

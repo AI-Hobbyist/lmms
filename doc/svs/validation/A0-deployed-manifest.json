@@ -1,0 +1,17 @@
+[
+  {
+    "File": "SVSDiffSinger.dll",
+    "Bytes": 17920,
+    "Sha256": "dfca9c2b5f81d52ac36ed9252281bd8326509db472a6b6b0cb30da61249f4521"
+  },
+  {
+    "File": "onnxruntime.dll",
+    "Bytes": 14107168,
+    "Sha256": "b4b7f9aed3cf6b04000f595bddcbdf12e87214bc401d1b81beadae3dbf28d2bd"
+  },
+  {
+    "File": "manifest.json",
+    "Bytes": 271,
+    "Sha256": "95e954fde115432e2b8cbb83f90882467c992425264c48bc6b807986efe09fcf"
+  }
+]

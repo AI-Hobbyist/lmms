@@ -1,0 +1,14 @@
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Using the multi-header code from D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_json-src/include/
+CMake Deprecation Warning at D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_yaml-src/CMakeLists.txt:2 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Configuring done (2.5s)
+-- Generating done (0.3s)
+-- Build files have been written to: D:/UserData/Desktop/Project/lmms/build/svs-sdk-external

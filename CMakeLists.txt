@@ -896,6 +896,12 @@ ADD_CUSTOM_TARGET(uninstall
 	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
 )
 
+# yaml-cpp respects an existing uninstall target; keep LMMS's own target.
+option(LMMS_BUILD_DIFFSINGER "Build the native DiffSinger CPU SVS engine" OFF)
+if(LMMS_BUILD_DIFFSINGER)
+  add_subdirectory(plugins/SVSDiffSinger)
+endif()
+
 #
 # display configuration information
 #

@@ -1,0 +1,6069 @@
+{
+  "schemaVersion": 1,
+  "runtime": "1.23.0",
+  "provider": "CPUExecutionProvider",
+  "purpose": "Signature/session validation only; no inference claim",
+  "voices": [
+    {
+      "root": "fu2_ning2_na4-DiffSinger/fu2_ning2_na4",
+      "configs": {
+        "acoustic": {
+          "acoustic": "fu2_ning2_na4_aco.fu2_ning2_na4.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-19",
+                "15"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "fu2_ning2_na4_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "fu2_ning2_na4_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "fd_dur.phonemes.json",
+          "languages": "fd_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_dur.fu2_ning2_na4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "fd_dur.fu2_ning2_na4.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "fd_pit.phonemes.json",
+          "languages": "fd_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_pit.fu2_ning2_na4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "fd_pit.fu2_ning2_na4.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "fd_var.phonemes.json",
+          "languages": "fd_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_var.fu2_ning2_na4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "fd_var.fu2_ning2_na4.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true",
+          "force_on_cpu": "false"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8",
+          "subbanks": [
+            {
+              "color": "name0",
+              "prefix": "",
+              "suffix": "name0"
+            }
+          ]
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "fu2_ning2_na4_aco.fu2_ning2_na4.onnx",
+          "bytes": 244832075,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.fu2_ning2_na4.linguistic.onnx",
+          "bytes": 25657385,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.fu2_ning2_na4.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.fu2_ning2_na4.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.fu2_ning2_na4.pitch.onnx",
+          "bytes": 49026425,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.fu2_ning2_na4.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.fu2_ning2_na4.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    },
+    {
+      "root": "na4_wei2_lai2_te4-DiffSinger/na4_wei2_lai2_te4",
+      "configs": {
+        "acoustic": {
+          "acoustic": "na4_wei2_lai2_te4_aco.na4_wei2_lai2_te4.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-1",
+                "37"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "na4_wei2_lai2_te4_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "na4_wei2_lai2_te4_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "fd_dur.phonemes.json",
+          "languages": "fd_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_dur.na4_wei2_lai2_te4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "fd_dur.na4_wei2_lai2_te4.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "fd_pit.phonemes.json",
+          "languages": "fd_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_pit.na4_wei2_lai2_te4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "fd_pit.na4_wei2_lai2_te4.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "fd_var.phonemes.json",
+          "languages": "fd_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_var.na4_wei2_lai2_te4.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "fd_var.na4_wei2_lai2_te4.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true",
+          "force_on_cpu": "false"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8"
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "na4_wei2_lai2_te4_aco.na4_wei2_lai2_te4.onnx",
+          "bytes": 244831903,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.na4_wei2_lai2_te4.linguistic.onnx",
+          "bytes": 25657385,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.na4_wei2_lai2_te4.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.na4_wei2_lai2_te4.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.na4_wei2_lai2_te4.pitch.onnx",
+          "bytes": 49026425,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.na4_wei2_lai2_te4.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.na4_wei2_lai2_te4.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    },
+    {
+      "root": "na4_xi1_da2-DiffSinger/na4_xi1_da2",
+      "configs": {
+        "acoustic": {
+          "acoustic": "na4_xi1_da2_aco.na4_xi1_da2.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-18",
+                "21"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "na4_xi1_da2_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "na4_xi1_da2_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "xm_dur.phonemes.json",
+          "languages": "xm_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "xm_dur.na4_xi1_da2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "xm_dur.na4_xi1_da2.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "xm_pit.phonemes.json",
+          "languages": "xm_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "xm_pit.na4_xi1_da2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "xm_pit.na4_xi1_da2.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "xm_var.phonemes.json",
+          "languages": "xm_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "xm_var.na4_xi1_da2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "xm_var.na4_xi1_da2.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true",
+          "force_on_cpu": "false"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8"
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "na4_xi1_da2_aco.na4_xi1_da2.onnx",
+          "bytes": 244832075,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/xm_dur.na4_xi1_da2.linguistic.onnx",
+          "bytes": 25657385,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/xm_dur.na4_xi1_da2.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/xm_pit.na4_xi1_da2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/xm_pit.na4_xi1_da2.pitch.onnx",
+          "bytes": 49026425,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/xm_var.na4_xi1_da2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/xm_var.na4_xi1_da2.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    },
+    {
+      "root": "wen1_di2-DiffSinger/wen1_di2",
+      "configs": {
+        "acoustic": {
+          "acoustic": "wen1_di2_aco.wen1_di2.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-14",
+                "20"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "wen1_di2_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "wen1_di2_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "md_dur.phonemes.json",
+          "languages": "md_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "md_dur.wen1_di2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "md_dur.wen1_di2.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "md_pit.phonemes.json",
+          "languages": "md_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "md_pit.wen1_di2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "md_pit.wen1_di2.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "md_var.phonemes.json",
+          "languages": "md_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "md_var.wen1_di2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "md_var.wen1_di2.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true",
+          "force_on_cpu": "false"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8"
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "wen1_di2_aco.wen1_di2.onnx",
+          "bytes": 244832075,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/md_dur.wen1_di2.linguistic.onnx",
+          "bytes": 25657385,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/md_dur.wen1_di2.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/md_pit.wen1_di2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/md_pit.wen1_di2.pitch.onnx",
+          "bytes": 49026425,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/md_var.wen1_di2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/md_var.wen1_di2.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    },
+    {
+      "root": "xi1_ge2_wen2-DiffSinger/xi1_ge2_wen2",
+      "configs": {
+        "acoustic": {
+          "acoustic": "xi1_ge2_wen2_aco.xi1_ge2_wen2.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-20",
+                "16"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "xi1_ge2_wen2_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "xi1_ge2_wen2_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "fd_dur.phonemes.json",
+          "languages": "fd_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_dur.xi1_ge2_wen2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "fd_dur.xi1_ge2_wen2.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "fd_pit.phonemes.json",
+          "languages": "fd_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_pit.xi1_ge2_wen2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "fd_pit.xi1_ge2_wen2.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "fd_var.phonemes.json",
+          "languages": "fd_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "fd_var.xi1_ge2_wen2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "fd_var.xi1_ge2_wen2.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true",
+          "force_on_cpu": "false"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8"
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "xi1_ge2_wen2_aco.xi1_ge2_wen2.onnx",
+          "bytes": 244832043,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.xi1_ge2_wen2.linguistic.onnx",
+          "bytes": 25657385,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.xi1_ge2_wen2.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.xi1_ge2_wen2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.xi1_ge2_wen2.pitch.onnx",
+          "bytes": 49026425,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.xi1_ge2_wen2.linguistic.onnx",
+          "bytes": 25653613,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.xi1_ge2_wen2.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    },
+    {
+      "root": "xia2_die2-DiffSinger/xia2_die2",
+      "configs": {
+        "acoustic": {
+          "acoustic": "xia2_die2_aco.xia2_die2.onnx",
+          "augmentation_args": {
+            "random_pitch_shifting": {
+              "range": [
+                "-15",
+                "25"
+              ]
+            },
+            "random_time_stretching": {
+              "domain": "log",
+              "range": [
+                "0.2",
+                "3.0"
+              ],
+              "scale": "1.75"
+            }
+          },
+          "fft_size": "2048",
+          "hidden_size": "256",
+          "hop_size": "512",
+          "languages": "xia2_die2_aco.languages.json",
+          "max_depth": "0.6",
+          "mel_base": "e",
+          "mel_fmax": "16000",
+          "mel_fmin": "40",
+          "mel_scale": "slaney",
+          "num_mel_bins": "128",
+          "phonemes": "xia2_die2_aco.phonemes.json",
+          "sample_rate": "44100",
+          "use_breathiness_embed": "true",
+          "use_continuous_acceleration": "true",
+          "use_energy_embed": "false",
+          "use_key_shift_embed": "true",
+          "use_lang_id": "false",
+          "use_speed_embed": "true",
+          "use_tension_embed": "true",
+          "use_variable_depth": "true",
+          "use_voicing_embed": "true",
+          "vocoder": "nsf_hifigan_44.1k_hop512_128bin_2024.02",
+          "win_size": "2048",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "duration": {
+          "phonemes": "sr4_dur.phonemes.json",
+          "languages": "sr4_dur.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "sr4_dur.xia2_die2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "true",
+          "dur": "sr4_dur.xia2_die2.dur.onnx",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "pitch": {
+          "phonemes": "sr4_pit.phonemes.json",
+          "languages": "sr4_pit.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "sr4_pit.xia2_die2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "pitch": "sr4_pit.xia2_die2.pitch.onnx",
+          "use_expr": "true",
+          "use_note_rest": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "variance": {
+          "phonemes": "sr4_var.phonemes.json",
+          "languages": "sr4_var.languages.json",
+          "use_lang_id": "false",
+          "linguistic": "sr4_var.xia2_die2.linguistic.onnx",
+          "hidden_size": "256",
+          "predict_dur": "false",
+          "variance": "sr4_var.xia2_die2.variance.onnx",
+          "predict_energy": "false",
+          "predict_breathiness": "true",
+          "predict_voicing": "true",
+          "predict_tension": "true",
+          "use_continuous_acceleration": "true",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "resolvedLanguageIds": {
+            "en": 1,
+            "ja": 2,
+            "ko": 3,
+            "zh": 4
+          },
+          "phonemeCount": 189
+        },
+        "vocoder": {
+          "name": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin",
+          "model": "kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "sample_rate": "44100",
+          "hop_size": "512",
+          "win_size": "2048",
+          "fft_size": "2048",
+          "num_mel_bins": "128",
+          "mel_fmin": "40",
+          "mel_fmax": "16000",
+          "mel_base": "e",
+          "mel_scale": "slaney",
+          "pitch_controllable": "true"
+        },
+        "character": {
+          "default_phonemizer": "OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer",
+          "portrait": "character.png",
+          "portrait_opacity": "0.67",
+          "singer_type": "diffsinger",
+          "text_file_encoding": "utf-8"
+        }
+      },
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "xia2_die2_aco.xia2_die2.onnx",
+          "bytes": 244831563,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "durations",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "gender",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "velocity",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "depth",
+              "dtype": 1,
+              "rank": 0,
+              "dimensions": []
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/sr4_dur.xia2_die2.linguistic.onnx",
+          "bytes": 25656909,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "word_div",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            },
+            {
+              "name": "word_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_words"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/sr4_dur.xia2_die2.dur.onnx",
+          "bytes": 5420307,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_midi",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "ph_dur_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/sr4_pit.xia2_die2.linguistic.onnx",
+          "bytes": 25653108,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/sr4_pit.xia2_die2.pitch.onnx",
+          "bytes": 49025823,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "note_midi",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_rest",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "note_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_notes"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "expr",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "pitch_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/sr4_var.xia2_die2.linguistic.onnx",
+          "bytes": 25653108,
+          "inputs": [
+            {
+              "name": "tokens",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "x_masks",
+              "dtype": 9,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/sr4_var.xia2_die2.variance.onnx",
+          "bytes": 23438309,
+          "inputs": [
+            {
+              "name": "encoder_out",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                },
+                {
+                  "value": 256,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "ph_dur",
+              "dtype": 7,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_tokens"
+                }
+              ]
+            },
+            {
+              "name": "pitch",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "breathiness",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "retake",
+              "dtype": 9,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 3,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "steps",
+              "dtype": 7,
+              "rank": 0,
+              "dimensions": []
+            }
+          ],
+          "outputs": [
+            {
+              "name": "breathiness_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "voicing_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            },
+            {
+              "name": "tension_pred",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "bytes": 56616583,
+          "inputs": [
+            {
+              "name": "mel",
+              "dtype": 1,
+              "rank": 3,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                },
+                {
+                  "value": 128,
+                  "symbol": ""
+                }
+              ]
+            },
+            {
+              "name": "f0",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_frames"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "waveform",
+              "dtype": 1,
+              "rank": 2,
+              "dimensions": [
+                {
+                  "value": 1,
+                  "symbol": ""
+                },
+                {
+                  "value": -1,
+                  "symbol": "n_samples"
+                }
+              ]
+            }
+          ],
+          "cpuSession": "PASS"
+        }
+      ]
+    }
+  ],
+  "diagnostics": []
+}
