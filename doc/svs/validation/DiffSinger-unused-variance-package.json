@@ -1,0 +1,1518 @@
+{
+  "FileName": "lmms-enhanced-full-20c1225c5-win64.zip",
+  "Bytes": 66040330,
+  "SHA256": "E9076EB274396879B7E461A53AD110F97F91F1A0CE5A9574709DD6FD6721FC7E",
+  "ProductCommit": "20c1225c549cad5bcd7033e0a4db4a71b6a1abed",
+  "RuntimeFiles": 3485,
+  "ZipEntries": 3489,
+  "DefaultTracks": [
+    "TripleOscillator",
+    "Sample track",
+    "Pattern 0",
+    "Automation track"
+  ],
+  "ArchitectureChecks": [
+    {
+      "Path": "api-ms-win-core-console-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-console-l1-2-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-datetime-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-debug-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-errorhandling-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-fibers-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-fibers-l1-1-1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-file-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-file-l1-2-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-file-l2-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-handle-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-heap-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-interlocked-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-kernel32-legacy-l1-1-1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-libraryloader-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-localization-l1-2-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-memory-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-namedpipe-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-processenvironment-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-processthreads-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-processthreads-l1-1-1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-profile-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-rtlsupport-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-string-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-synch-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-synch-l1-2-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-sysinfo-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-sysinfo-l1-2-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-timezone-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-core-util-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-conio-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-convert-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-environment-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-filesystem-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-heap-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-locale-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-math-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-multibyte-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-private-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-process-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-runtime-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-stdio-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-string-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-time-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "api-ms-win-crt-utility-l1-1-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "concrt140.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "D3Dcompiler_47.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "fftw3f.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "FLAC.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "generic/qtuiotouchplugin.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "iconengines/qsvgicon.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "icuuc.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qgif.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qicns.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qico.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qjpeg.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qpdf.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qsvg.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qtga.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qtiff.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qwbmp.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "imageformats/qwebp.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "libmp3lame.DLL",
+      "Machine": 34404
+    },
+    {
+      "Path": "lilv-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "lmms.exe",
+      "Machine": 34404
+    },
+    {
+      "Path": "mpg123.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "msvcp140_1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "msvcp140_2.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "msvcp140_atomic_wait.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "msvcp140_codecvt_ids.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "msvcp140.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "networkinformation/qnetworklistmanager.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "ogg.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "opus.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "platforms/qwindows.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-console-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-console-l1-2-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-datetime-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-debug-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-errorhandling-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-fibers-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-fibers-l1-1-1.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-file-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-file-l1-2-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-file-l2-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-handle-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-heap-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-interlocked-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-kernel32-legacy-l1-1-1.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-libraryloader-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-localization-l1-2-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-memory-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-namedpipe-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-processenvironment-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-processthreads-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-processthreads-l1-1-1.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-profile-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-rtlsupport-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-string-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-synch-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-synch-l1-2-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-sysinfo-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-sysinfo-l1-2-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-timezone-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-core-util-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/API-MS-Win-core-xstate-l2-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-conio-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-convert-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-environment-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-filesystem-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-heap-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-locale-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-math-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-multibyte-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-private-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-process-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-runtime-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-stdio-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-string-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-time-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/api-ms-win-crt-utility-l1-1-0.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/concrt140.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/msvcp140_1.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/msvcp140_2.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/msvcp140_atomic_wait.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/msvcp140_codecvt_ids.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/msvcp140.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/RemoteVstHost32.exe",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/RemoteVstPlugin32.exe",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/ucrtbase.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/vccorlib140.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/vcruntime140_threads.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/32/vcruntime140.dll",
+      "Machine": 332
+    },
+    {
+      "Path": "plugins/amplifier.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/analyzer.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/audiofileprocessor.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/bassbooster.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/bitcrush.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/bitinvader.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/carlabase.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/carlapatchbay.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/carlarack.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/compressor.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/crossovereq.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/delay.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/dispersion.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/dualfilter.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/dynamicsprocessor.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/eq.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/fftw3f.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/FLAC.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/flanger.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/freeboy.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/frequencyshifter.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/granularpitchshifter.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/hydrogenimport.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/kicker.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/alias_1407.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/allpass_1895.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/am_pitchshift_1433.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/amp_1181.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/analogue_osc_1416.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/bandpass_a_iir_1893.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/bandpass_iir_1892.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/bode_shifter_1431.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/bode_shifter_cv_1432.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/butterworth_1902.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/caps.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/chebstortion_1430.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/cmt.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/comb_1190.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/comb_1887.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/comb_splitter_1411.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/const_1909.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/crossover_dist_1404.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/dc_remove_1207.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/debug_1184.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/decay_1886.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/decimator_1202.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/declip_1195.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/delay_1898.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/delayorama_1402.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/diode_1185.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/divider_1186.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/dj_eq_1901.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/dj_flanger_1438.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/dyson_compress_1403.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/fad_delay_1192.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/fast_lookahead_limiter_1913.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/flanger_1191.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/fm_osc_1415.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/foldover_1213.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/foverdrive_1196.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/freq_tracker_1418.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gate_1410.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gate_1921.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/giant_flange_1437.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gong_1424.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gong_beater_1439.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gsm_1215.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/gverb_1216.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/hard_limiter_1413.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/harmonic_gen_1220.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/hermes_filter_1200.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/highpass_iir_1890.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/hilbert_1440.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/imp_1199.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/impulse_1885.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/inv_1429.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/karaoke_1409.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/latency_1914.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/lcr_delay_1436.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/lowpass_iir_1891.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/ls_filter_1908.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/matrix_ms_st_1421.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/matrix_spatialiser_1422.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/matrix_st_ms_1420.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/mbeq_1197.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/mod_delay_1419.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/multivoice_chorus_1201.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/notch_iir_1894.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/phasers_1217.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/pitch_scale_1193.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/pitch_scale_1194.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/plate_1423.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/pointer_cast_1910.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/rate_shifter_1417.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/retro_flange_1208.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/revdelay_1605.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/ringmod_1188.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/satan_maximiser_1408.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sc1_1425.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sc2_1426.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sc3_1427.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sc4_1882.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sc4m_1916.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/se4_1883.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/shaper_1187.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sifter_1210.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sin_cos_1881.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/single_para_1203.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/sinus_wavewrapper_1198.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/smooth_decimate_1414.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/split_1406.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/step_muxer_1212.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/surround_encoder_1401.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/svf_1214.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_autopan.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_chorusflanger.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_deesser.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_doubler.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_dynamics_m.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_dynamics_st.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_echo.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_eq.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_eqbw.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_limiter.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_pinknoise.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_pitch.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_reflector.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_reverb.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_rotspeak.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_sigmoid.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_tremolo.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_tubewarmth.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tap_vibrato.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/tape_delay_1211.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/transient_1206.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/triple_para_1204.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/valve_1209.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/valve_rect_1405.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/veal.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/vocoder_1337.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/vynil_1905.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/wave_terrain_1412.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/xfade_1915.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspa/zm1_1428.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspabrowser.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ladspaeffect.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/lb302.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/libcarla_native-plugin.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/libfluidsynth-3.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/libmp3lame.DLL",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/lomm.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/lv2effect.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/lv2instrument.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/malletsstk.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/midiexport.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/midiimport.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/monstro.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/mpg123.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/msvcp140_atomic_wait.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/msvcp140.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/multitapecho.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/nes.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/ogg.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/optional/libcarla_native-plugin.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/opulenz.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/opus.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/organic.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/oscilloscope.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/patman.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/peakcontrollereffect.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/Qt6Core.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/qt6xml.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/RemoteCatalogIo.exe",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/RemoteVstHost64.exe",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/RemoteVstPlugin64.exe",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/RemoteZynAddSubFx.exe",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/reverbsc.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/sf2player.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/sfxr.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/slewdistortion.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/slicert.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/sndfile.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/stereoenhancer.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/stereomatrix.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/taptempo.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/tripleoscillator.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vcruntime140_1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vcruntime140.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vectorscope.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vestige.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vibedstrings.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vorbis.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vorbisenc.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vstbase.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/vsteffect.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/watsyn.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/waveshaper.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/xpressive.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/z.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "plugins/zynaddsubfx.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "portaudio.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Core.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Gui.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Network.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Pdf.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Svg.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Widgets.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "Qt6Xml.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "samplerate.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "SDL2.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "serd-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "sndfile.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "sord-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "sratom-0.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "styles/qmodernwindowsstyle.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "svs/SVSDiffSinger/onnxruntime.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "svs/SVSDiffSinger/SVSDiffSinger.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "svs/SVSExample/SVSExample.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "tls/qcertonlybackend.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "tls/qschannelbackend.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "ucrtbase.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "vcruntime140_1.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "vcruntime140.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "vorbis.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "vorbisenc.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "vorbisfile.dll",
+      "Machine": 34404
+    },
+    {
+      "Path": "zix-0.dll",
+      "Machine": 34404
+    }
+  ],
+  "DiffSingerFiles": [
+    {
+      "Path": "svs/SVSDiffSinger/data/LICENSE-phrase-pinyin-data",
+      "Bytes": 1066,
+      "SHA256": "89AC55DF747E4776088C3E77531EF61B973A1A59DD8E6A4548A58996DA9A4F70"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/data/LICENSE-pinyin-data",
+      "Bytes": 1076,
+      "SHA256": "9C048697BE2502A16E8BCB282D5D465A07295B2DEF0FFB05A269C5D39DBE1586"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/data/phrases.txt",
+      "Bytes": 1256063,
+      "SHA256": "DCC769607C220B312FEA3E71CB63421298B4B891B1F7356A95AB58F2C96FFF81"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/data/pinyin.txt",
+      "Bytes": 985318,
+      "SHA256": "621F8CA9EFF8519F47E2B17B564FD318161E13BCA07EEA8C8E04993CD5D3B52E"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/licenses/json/LICENSE.MIT",
+      "Bytes": 1076,
+      "SHA256": "46A65CFFD1EA955132D95A8DD921640714A8D6B537D2E4E482D31145AE95B603"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/licenses/onnxruntime/LICENSE",
+      "Bytes": 1094,
+      "SHA256": "C250D6278F0B47A6439FB7592B08B58A55EB9F535AA49A1DB63211C3F982B674"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/licenses/onnxruntime/ThirdPartyNotices.txt",
+      "Bytes": 333022,
+      "SHA256": "E00F828E0A33DE591A355AE6606D2625F5758DA7D2C844DB7821C9DD3E3647B6"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/licenses/tlds-MIT.txt",
+      "Bytes": 1085,
+      "SHA256": "6DECBC0464519F8CC18A1DABAEE9EDF2A0C08A41C19F268C04F7C1A41BBDDD70"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/licenses/yaml-cpp/LICENSE",
+      "Bytes": 1061,
+      "SHA256": "AA6FCC27BE034E41E21DD832F9175BFE694A48491D9E14FF0FA278E19AD14F1B"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/manifest.json",
+      "Bytes": 271,
+      "SHA256": "9948F2C58381D9834F7077F4DAF9CDD91F0C7EFA39BD9DB33E61AB4EC805B13F"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/onnxruntime.dll",
+      "Bytes": 14107168,
+      "SHA256": "B4B7F9AED3CF6B04000F595BDDCBDF12E87214BC401D1B81BEADAE3DBF28D2BD"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/SVSDiffSinger.dll",
+      "Bytes": 775168,
+      "SHA256": "2B6958A0A5FF6209D931935AB5F34E67362DCE98BB8517E7E424F5C41140E824"
+    }
+  ]
+}

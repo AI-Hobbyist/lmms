@@ -56,3 +56,14 @@ unchanged. See `validation/DiffSinger-unused-variance-six-voice-synthesis.txt`.
 The standalone SDK plugin was rebuilt and installed in the existing SDK
 prefix. ABI 1.0–1.3 loading passed (`validation/DiffSinger-unused-variance-sdk-abi.txt`).
 There are no ABI or production host/UI source changes in this fix.
+
+The product fix was committed and pushed as
+`20c1225c549cad5bcd7033e0a4db4a71b6a1abed`. The existing development executable
+`build/Release/lmms.exe` was rebuilt with version `1.3.0-alpha.2.95+20c1225`.
+The replacement package is `build/packages/lmms-enhanced-full-20c1225c5-win64.zip`,
+66,040,330 bytes, SHA-256
+`E9076EB274396879B7E461A53AD110F97F91F1A0CE5A9574709DD6FD6721FC7E`.
+Package validation passed for all 3,485 runtime files plus four package entries,
+360 PE architectures, official default tracks, private-data exclusions, and the
+complete DiffSinger dependency folder. The shared vocoder folder ships its
+README only. See `validation/DiffSinger-unused-variance-package.json`.

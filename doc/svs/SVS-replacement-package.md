@@ -2,10 +2,10 @@
 
 状态：PASS。用于覆盖已有 Windows x64 LMMS 安装，沿用 `build/Release` 和 `build/packages`，未覆盖或打开原 Program Files 安装。
 
-- 文件：`build/packages/lmms-enhanced-full-66063ed0f-win64.zip`。
-- 大小：66,040,011 bytes（约 62.98 MiB），3,485 个运行文件和 4 个安装/说明条目。
-- SHA256：`E02657DF048651BC929D10584BDED808EC51359368611D9DAC61A6FB9FFD3375`，相邻 `.sha256` / `.manifest.json` 可核对。
-- 产品提交：`66063ed0f7b9ca0f9b4f3c976175b5a3b94b681c`，包含分段渲染、英文 README、引擎分类、异步声库扫描、音素别名兼容和全局共享声码器设置。显示版本 `1.3.0-alpha.2.92+66063ed`。后续证据提交不改变产品输入。当前包检查见 `DiffSinger-phoneme-alias-validation.md` 和 `validation/DiffSinger-global-vocoder-package.json`；下方原覆盖测试证据保留。
+- 文件：`build/packages/lmms-enhanced-full-20c1225c5-win64.zip`。
+- 大小：66,040,330 bytes（约 62.98 MiB），3,485 个运行文件和 4 个安装/说明条目。
+- SHA256：`E9076EB274396879B7E461A53AD110F97F91F1A0CE5A9574709DD6FD6721FC7E`，相邻 `.sha256` / `.manifest.json` 可核对。
+- 产品提交：`20c1225c549cad5bcd7033e0a4db4a71b6a1abed`，包含分段渲染、英文 README、引擎分类、异步声库扫描、音素别名兼容、全局共享声码器设置，以及不调用声学模型未使用的可选 variance 阶段的渲染修复。显示版本 `1.3.0-alpha.2.95+20c1225`。后续证据提交不改变产品输入。当前修复和包检查见 `DiffSinger-unused-variance-validation.md` 和 `validation/DiffSinger-unused-variance-package.json`；下方原覆盖测试证据保留。
 
 ## 使用
 
@@ -28,4 +28,3 @@ DiffSinger 为 `svs/SVSDiffSinger` 完整文件夹，含 native DLL、CPU ORT 1.
 - 功能回归见 [分段验收](SVS-segment-rendering-validation.md)：70 passed / 0 failed，以及原生 GUI 专项 5 passed / 0 failed。主体 A0～A4 均已按阶段推送。
 
 这是现有工作区的构建，保留其他任务的 Song.h / Song.cpp / Vst2CompatibilityTest.cpp 修改，不称纯 HEAD 重建。原 Carla 外部运行时警告、听感及人工观感事项沿用既有验收限制；本次没有扩张这些模块。
-
