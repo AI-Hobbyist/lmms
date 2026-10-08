@@ -19,13 +19,16 @@ struct Tensor {
 using Tensors=std::map<std::string,Tensor>;
 class CpuModel {
 public:
-    CpuModel(Ort::Env& environment,const fs::path& path,std::string stage);
+    CpuModel(Ort::Env& environment,const fs::path& path,std::string stage,uint32_t seed=1);
     bool accepts(const std::string& name) const;
     Tensors run(const Tensors& inputs,const std::atomic<bool>& cancelled);
 private:
     struct Port {std::string name;ONNXTensorElementDataType type;std::vector<int64_t> dimensions;};
     std::string m_stage;
     fs::path m_path;
+    Ort::Env& m_environment;
+    std::string m_seededModel;
+    void resetSession();
     Ort::Session m_session{nullptr};
     std::vector<Port> m_inputs,m_outputs;
 };

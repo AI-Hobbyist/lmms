@@ -134,7 +134,13 @@ std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::pa
     }
     std::sort(files.begin(),files.end(),PathLess{});Sha256 fingerprint;
     for(const auto& path:files) {fingerprint.add(path.lexically_relative(root).generic_u8string());fingerprint.add("\n"+hashFile(path)+"\n");}
-    if(!within(vocoder,root)) {fingerprint.add("shared-vocoder-config\n"+hashFile(vocoder));for(const auto& model:voice->stages.at("vocoder").models) {fingerprint.add(model.first+"\n"+hashFile(model.second));}}
+    if(!within(vocoder,root)) {
+        const auto sharedRoot=fs::canonical(vocoder.parent_path());std::vector<fs::path> sharedFiles,sharedQueue{sharedRoot};std::set<fs::path,PathLess> sharedSeen;
+        while(!sharedQueue.empty()) {const auto directory=fs::canonical(sharedQueue.back());sharedQueue.pop_back();if(!within(directory,sharedRoot)||!sharedSeen.insert(directory).second) {continue;}
+            for(const auto& item:fs::directory_iterator(directory)) {if(item.is_directory()) {sharedQueue.push_back(item.path());}else if(item.is_regular_file()) {const auto path=fs::canonical(item.path());if(!within(path,sharedRoot)) {throw std::runtime_error("Shared vocoder file escapes authorized root");}const auto suffix=path.extension().u8string();if(suffix!=".png"&&suffix!=".jpg"&&suffix!=".jpeg"&&suffix!=".svg"&&suffix!=".webp") {sharedFiles.push_back(path);}}if(sharedFiles.size()+sharedQueue.size()>10000) {throw std::runtime_error("Shared vocoder file count exceeds bound");}}
+        }
+        std::sort(sharedFiles.begin(),sharedFiles.end(),PathLess{});for(const auto& path:sharedFiles) {fingerprint.add("shared-vocoder/"+path.lexically_relative(sharedRoot).generic_u8string()+"\n"+hashFile(path)+"\n");}
+    }
     voice->fingerprint=fingerprint.finish();
     for(const auto* key:{"avatar","portrait"}) {const auto filename=string(voice->metadata,key);if(filename.empty()) {continue;}try {const auto path=authorizedPath(root,filename,{root});const auto bytes=read(path,16*1024*1024);const auto suffix=path.extension().u8string();const auto mime=suffix==".png"?"image/png":suffix==".jpg"||suffix==".jpeg"?"image/jpeg":suffix==".webp"?"image/webp":suffix==".svg"?"image/svg+xml":"";if(!*mime) {throw std::runtime_error("Unsupported image format");}auto resource=std::make_shared<Resource>();resource->sha256=hashText(bytes);resource->id="diffsinger-image:"+resource->sha256;resource->mime=mime;resource->bytes.assign(bytes.begin(),bytes.end());voice->resources[key]=resource;}catch(const std::exception& error) {diagnostics.push_back({{"file",filename},{"stage","resource"},{"message",error.what()}});}}
     return voice;

@@ -11,6 +11,7 @@
 /data/locale/*.qm
 Brewfile.lock.json
 /.cache/
+/cache/
 compile_commands.json
 .vscode/
 .vs/

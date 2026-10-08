@@ -1,0 +1,7 @@
+PASS tensor codec / identity / corruption / bounded LRU / audition preservation
+PASS 芙宁娜 frames=101983 sha256=b4592180bc77441e42264237dfa8a06541cd9f71866297fb2317eaad6f55baec
+AUDITION fu2_ning2_na4-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\a85ec9e5b3a4094315844a0f87e4854792eccc293660ef98a6efa636f94458a7.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+[DEBUG-A3-bounds] seed change begin
+[DEBUG-A3-bounds] seed change passed; chunk begin

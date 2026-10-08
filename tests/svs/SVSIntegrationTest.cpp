@@ -1,5 +1,7 @@
 #include <QtTest>
 #include <QJsonDocument>
+#include <QDataStream>
+#include <QCryptographicHash>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
@@ -484,7 +486,7 @@ private slots:
   cache.clearMemory(); loaded=cache.get(key,copy); QVERIFY(loaded); QCOMPARE(loaded->samples,audio->samples); QVERIFY(!loaded->feedback["pronunciations"].toObject().contains("original-note"));
   for(const auto& field:QStringList{"position","tempo","contentOffset","voiceVersion"}) {auto changed=input; changed.document[field]=QString("different"); QVERIFY(svs::Cache::key(changed,"plugin-version")!=key);}
   auto changed=input; changed.notes[0].lyric="la"; QVERIFY(svs::Cache::key(changed,"plugin-version")!=key); changed=input; changed.rate=44100; QVERIFY(svs::Cache::key(changed,"plugin-version")!=key); QVERIFY(svs::Cache::key(input,"other-plugin")!=key);
-  cache.clearMemory(); QFile corrupt(directory.filePath(key+".svscache")); QVERIFY(corrupt.open(QIODevice::ReadWrite)); QVERIFY(corrupt.seek(40)); QVERIFY(corrupt.write("bad")==3); corrupt.close(); QVERIFY(!cache.get(key,copy)); cache.put(key,input,audio); QVERIFY(cache.get(key,copy));
+  cache.clearMemory(); QFile cacheIndex(QDir(cache.engineDirectory(input.document["pluginId"].toString())).filePath(key+".svsmeta"));QVERIFY(cacheIndex.open(QIODevice::ReadOnly));const auto audioHash=QJsonDocument::fromJson(cacheIndex.readAll()).object()["audioSHA256"].toString();cacheIndex.close();QFile corrupt(QDir(cache.engineDirectory(input.document["pluginId"].toString())).filePath(audioHash+".wav")); QVERIFY(corrupt.open(QIODevice::ReadWrite)); QVERIFY(corrupt.seek(40)); QVERIFY(corrupt.write("bad")==3); corrupt.close(); QVERIFY(!cache.get(key,copy)); cache.put(key,input,audio);cache.clearMemory();QVERIFY(cache.get(key,copy));
   for(int i=0;i<6;++i) {auto different=input; different.document["position"]=i*192; cache.put(svs::Cache::key(different,"plugin-version"),different,audio); QVERIFY(cache.memoryBytes()<=9000); QVERIFY(cache.diskBytes()<=25000);}
   QVERIFY(!cache.get("../outside",input));
  }
@@ -1060,6 +1062,41 @@ private slots:
   gui::SVSParameterPanel panel;if(m_guiApplication) {panel.setParent(m_guiApplication->mainWindow());panel.setWindowFlag(Qt::Tool);}
   panel.refresh(cap.parameters,"track",{track->parameters()},{},[&](const QString& key,const QJsonValue& value){track->setParameter(key,value);});panel.resize(350,200);panel.show();QVERIFY(QTest::qWaitForWindowExposed(&panel));auto* speaker=panel.findChild<QComboBox*>("svsParameter.track.diffsinger.speaker");QVERIFY(speaker);QCOMPARE(speaker->currentData().toString(),QString("name0"));QTest::qWait(300);QVERIFY(panel.screen()->grabWindow(panel.winId()).save("doc/svs/validation/A2-native-speaker.png"));panel.close();
   note.phonemes.remove("segments");clip->setNotes({note});QVERIFY(!clip->notes()[0].phonemes.contains("segments"));QCOMPARE(clip->notes()[0].lyric,note.lyric);
+ }
+ void diffSingerCpuAudioPlaybackAndExport() {
+  const auto root=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");if(root.isEmpty()) QSKIP("Explicit external DiffSinger fixture required");
+  auto& registry=svs::Registry::instance();const QString id="org.lmms.svs.diffsinger";QString error;QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{root}},{"diffsinger.renderSteps",5}},error),qPrintable(error));
+  svs::Voice voice;for(const auto& candidate:registry.voices()) if(candidate.pluginId==id&&candidate.name==QString::fromUtf8("芙宁娜")) voice=candidate;QVERIFY(!voice.id.isEmpty());auto* song=Engine::getSong();const auto previousTempo=song->getTempo();song->tempoModel().setValue(120);auto* track=new SVSTrack(song);auto cleanup=qScopeGuard([&]{song->stopExport();delete track;song->tempoModel().setValue(previousTempo);});track->bindVoice(id,voice.id);QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  auto* clip=static_cast<SVSClip*>(track->createClip(192));clip->setAutoResize(false);clip->changeLength(192);svs::Note a;a.id="cpu-a";a.lyric=QString::fromUtf8("你");a.duration=48;a.pitch=60;auto b=a;b.id="cpu-b";b.lyric=QString::fromUtf8("好");b.tick=48;b.pitch=62;clip->setNotes({a,b});QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,180000);const auto audio=clip->audio();double energy=0;for(float value:audio->samples) {QVERIFY(std::isfinite(value));energy+=double(value)*value;}QVERIFY(energy>1e-5);QVERIFY(audio->feedback["pitch"].toArray().size()>10);QVERIFY(!gui::feedbackPitchCurves(audio->feedback["pitch"].toArray(),audio->mapping).isEmpty());QCOMPARE(audio->feedback["curves"].toObject().size(),3);QVERIFY(std::abs(audio->mapping.globalSeconds(0)-2)<1e-9);
+  if(qEnvironmentVariableIsSet("SVS_DIFFSINGER_GUI_EVIDENCE")) {
+   QVERIFY(m_guiApplication);QCOMPARE(QGuiApplication::platformName(),QString("windows"));
+   const auto originalState=clip->editorState();auto restoreState=qScopeGuard([&]{clip->setEditorState(originalState);});
+   for(const auto& name:QStringList{"breathiness","voicing","tension"}) {
+    const QString id="diffsinger."+name,key="feedback:"+id;auto state=originalState;QJsonObject lanes;
+    for(const auto& p:track->capabilities().parameters) lanes["input:"+p.id]=QJsonObject{{"visible",false}};
+    for(const auto& p:track->capabilities().feedbackParameters) {QVERIFY(!p.writable);lanes["feedback:"+p.id]=QJsonObject{{"visible",p.id==id}};}
+    state["lanes"]=lanes;state["selectedParameter"]=key;clip->setEditorState(state);
+    gui::SVSPianoRoll editor(clip);editor.resize(1500,900);editor.show();QVERIFY(QTest::qWaitForWindowExposed(&editor));
+    auto* notes=editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");QVERIFY(notes);notes->setScroll(0,66);notes->setZoom(4,1);
+    auto* tab=editor.findChild<QToolButton*>("svsParameterTab."+key);QVERIFY(tab);QVERIFY(tab->toolTip().contains("Read-only"));
+    auto* tabs=editor.findChild<QScrollArea*>("svsParameterTabs");QVERIFY(tabs);tabs->ensureWidgetVisible(tab);QTest::mouseClick(tab,Qt::LeftButton);
+    auto* lane=editor.findChild<gui::SVSCanvas*>("svsParameterLane."+id+".feedback");QVERIFY(lane);
+    const auto before=clip->curves();lane->setTool(gui::SVSCanvas::Tool::Freehand);QTest::mousePress(lane,Qt::LeftButton,Qt::NoModifier,QPoint(160,60));QTest::mouseRelease(lane,Qt::LeftButton,Qt::NoModifier,QPoint(260,90));QCOMPARE(clip->curves(),before);QCOMPARE(clip->audio(),audio);
+    QTest::qWait(700);QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/A3-native-reference-"+name+".png"));editor.close();
+   }
+  }
+  QTemporaryDir directory;QVERIFY(directory.isValid());const auto path=directory.filePath("diffsinger.wav");const OutputSettings settings(48000,192,OutputSettings::BitDepth::Depth32Bit,OutputSettings::StereoMode::Stereo);{RenderManager manager(settings,ProjectRenderer::ExportFileFormat::Wave,path);QSignalSpy done(&manager,&RenderManager::finished);QSignalSpy failed(&manager,&RenderManager::svsExportFailed);manager.renderProject();QTRY_COMPARE_WITH_TIMEOUT(done.count(),1,180000);QCOMPARE(failed.count(),0);}const auto exported=wavePCM(path);QVERIFY(!exported.isEmpty());double exportEnergy=0;for(float value:exported) {exportEnergy+=double(value)*value;}QVERIFY(exportEnergy>1e-5);QCOMPARE(clip->audio(),audio);
+  QDomDocument saved;auto state=saved.createElement("test");saved.appendChild(state);track->saveState(saved,state);auto* restored=static_cast<SVSTrack*>(Track::create(state.firstChildElement(),song));auto restoredCleanup=qScopeGuard([&]{delete restored;});auto* restoredClip=static_cast<SVSClip*>(restored->getClip(0));QCOMPARE(restoredClip->notes()[0].lyric,a.lyric);QCOMPARE(restoredClip->notes()[1].pitch,b.pitch);QTRY_VERIFY_WITH_TIMEOUT(restoredClip->audio()!=nullptr,180000);QCOMPARE(restoredClip->audio()->samples,audio->samples);
+ }
+ void engineCacheDirectoriesAndLegacyRead() {
+  QTemporaryDir directory,legacy;QVERIFY(directory.isValid());QVERIFY(legacy.isValid());svs::Cache cache(directory.path(),8192,32768,legacy.path());
+  svs::Input input;input.voiceId="cache-voice";input.rate=48000;input.secondsPerTick=.01;input.document={{"pluginId","org.lmms.svs.diffsinger"},{"position",0},{"contentOffset",0}};
+  auto audio=std::make_shared<svs::Audio>();audio->rate=48000;audio->samples.assign(256,.1f);audio->waveform.build(audio->samples);const auto key=svs::Cache::key(input,"native-version");
+  QCOMPARE(cache.engineDirectory(input.document["pluginId"].toString()),QDir(directory.path()).filePath("DiffSinger"));input.document["cacheDirectory"]="other-machine/cache/SVS/DiffSinger";QCOMPARE(svs::Cache::key(input,"native-version"),key);
+  cache.put(key,input,audio);const auto current=QDir(cache.engineDirectory(input.document["pluginId"].toString())).filePath(key+".svsmeta");QFile index(current);QVERIFY(index.open(QIODevice::ReadOnly));const auto info=QJsonDocument::fromJson(index.readAll()).object();index.close();const auto sha=info["audioSHA256"].toString();QFile wave(QDir(cache.engineDirectory(input.document["pluginId"].toString())).filePath(sha+".wav"));QVERIFY(wave.open(QIODevice::ReadOnly));QCOMPARE(QString::fromLatin1(QCryptographicHash::hash(wave.readAll(),QCryptographicHash::Sha256).toHex()),sha);wave.close();QVERIFY(!QFileInfo::exists(directory.filePath(key+".wav")));
+  // A previous-version combined cache remains readable without migration.
+  auto legacyInfo=info;legacyInfo.remove("audioSHA256");const auto metadata=QJsonDocument(legacyInfo).toJson(QJsonDocument::Compact);QByteArray payload;QDataStream stream(&payload,QIODevice::WriteOnly);stream.setVersion(QDataStream::Qt_6_0);stream.setFloatingPointPrecision(QDataStream::SinglePrecision);stream<<quint32(0x53565331)<<quint32(metadata.size());stream.writeRawData(metadata.constData(),metadata.size());stream<<quint64(audio->samples.size());for(float value:audio->samples) stream<<value;QFile old(legacy.filePath(key+".svscache"));QVERIFY(old.open(QIODevice::WriteOnly));const auto checksum=QCryptographicHash::hash(payload,QCryptographicHash::Sha256);QCOMPARE(old.write(checksum),qint64(checksum.size()));QCOMPARE(old.write(payload),qint64(payload.size()));old.close();QVERIFY(QFile::remove(current));cache.clearMemory();QVERIFY(cache.get(key,input));
+  auto example=input;example.document["pluginId"]="org.lmms.svs.example";cache.put(svs::Cache::key(example,"native-version"),example,audio);QVERIFY(cache.engineDirectory(example.document["pluginId"].toString()).endsWith("/SVSExample"));QVERIFY(QFileInfo::exists(legacy.filePath(key+".svscache")));
  }
  void parameterPanelStateAndFocus() {
   const auto& voice=svs::Registry::instance().voices()[0]; auto plugin=svs::Registry::instance().plugin(voice.pluginId);

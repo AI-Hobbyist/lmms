@@ -1,6 +1,6 @@
 # DiffSinger 引擎接入与 AI 声库全局 DirectML 加速支持计划书
 
-编写日期：2026-10-08。状态：A0 自动验收通过，按里程碑检查点提交推送；A1～A4 尚未实施，本次不实施 B。依据当前 LMMS 工作区及 `refs/tl_ref`、`refs/tlds_ref`、`refs/Singers` 的实际内容；不能把参考代码或设置中的占位项当作已完成能力。
+编写日期：2026-10-08。状态：A0～A2 已分别验收、提交和推送；A3 自动验收通过，执行本阶段提交推送检查点；A4 尚未实施，本次不实施 B。依据当前 LMMS 工作区及 `refs/tl_ref`、`refs/tlds_ref`、`refs/Singers` 的实际内容；不能把参考代码或设置中的占位项当作已完成能力。
 
 严格分为两部分：**A：先完成可独立运行的原生 DiffSinger CPU 引擎；B：再完成适用于接入统一推理接口的 AI 引擎的全局 DirectML 后端。** A 全部验收、提交和推送后才实施 B。本计划授权范围为原生 SVS 插件、必要 SDK 增量、独立推理模块及其最小宿主接入，不是普通 LMMS 子系统重构计划。
 
@@ -67,7 +67,7 @@ catalog 发布不可变快照。重新扫描完成后原子替换，对受影响
 | `phonemes.json`、`languages.json`、字典文本/YAML | 音素/语言 ID 映射及实际发音词典，不混入角色元数据，不擅自重排模型 ID |
 | `dsdur`、`dspitch`、`dsvariance` 内 dsconfig | 各阶段模型、词典、speakers 与专属开关，不能误用根配置代替 |
 | `dsvocoder/vocoder.yaml`、共享 Vocoders 配置 | 声码器模型、mel 规格、sample rate、hop、pitch_controllable、force_on_cpu |
-| `comfort.json` 等额外文件 | 明确其真实用途；只接入已识别且会影响此推理链的字段，未支持扩展报告而不误作引擎主配置 |
+| `comfort.json` | 用于声明可用音域、舒适音域、弱点音域；接入 SVS 编辑器琴键，以不同明暗度标注这三类范围，钢琴窗侧栏同时用文字显示对应音域，二者使用同一份声明数据。没有该文件保持默认琴键显示，不添加音域提示、不推测音域；其他未识别扩展报告而不误作引擎主配置 |
 
 字段合并优先级：明确宿主用户覆盖 > 相应角色 JSON 配置 > YAML/YML > TXT > 合理缺省；同角色同时存在 JSON/YAML 时按此稳定选择并诊断冲突。阶段推理配置按其专属目录覆盖该阶段字段；不能用角色显示元数据覆盖模型张量约束。**一个 YAML 文件存在不代表 TXT 无效**：例如 YAML 仅声明立绘、subbanks、默认音素器，TXT 仍提供 name/image/author。别名 image/avatar、portrait、opacity 按明确映射读取。
 
@@ -99,7 +99,11 @@ duration 预测将 ph_seq、note 约束等转为模型要求输入，产生可�
 
 pitch 使用 fractional MIDI 与 Hz 显式转换，模型自动基线与用户覆盖/偏差正确组合；沿用 svs_time.hpp/svs_curve.hpp，不另写宿主曲线插值。variance 的绝对实参覆盖区使用用户终值；自由区使用预测基线加声明的偏差，再按声学单位 clamp，voicing 的线域/dB codec 显式转换。宿主已组合全局基础偏移的有效值不得再次叠加；每个实际声明参数明确是终值还是偏差，不凭同名曲线猜测。自动 pitch/variance 与用户曲线分开，参考模型支持的 energy、breathiness、voicing、tension、key_shift/gender、velocity/speed、expressiveness、speaker mixing 等按能力动态声明。声学不接受的量不展示为可调输入；预测输出可提供各自有值、独立显隐的只读参考曲线。
 
-引擎设置中的真实渲染步数为1–100、默认20；具体模型支持连续steps或离散speedup时说明映射及有效值，冻结并参与身份，不沿用纯AI示例页值。depth/sampling使用声库配置的合法默认，不增加额外引擎设置。随机推理使用稳定seed并进入输入/缓存，既有工程含seed时保留，没有时采用固定版本化默认；不新增第三个引擎设置项。
+引擎设置中的真实渲染步数为1–100、默认20；具体模型支持连续steps或离散speedup时说明映射及有效值，冻结并参与身份，不沿用纯AI示例页值。depth/sampling使用声库配置的合法默认，不增加额外引擎设置。随机推理使用稳定seed并进入输入/缓存，既有工程含seed时保留，没有时采用固定版本化默认；seed 不新增引擎设置项。
+
+用户补充（2026-10-08）：DiffSinger 插件全局设置增加“显示音素语言前缀”布尔开关，默认开启。只控制音素标签是否显示已识别的语言前缀（例如 zh/i），不改实际音素、手工覆盖、推理输入和音频缓存身份。A4 验收开关切换显示效果、设置保存重开，以及切换时已有音频保持有效。
+
+用户补充（2026-10-08）：音符默认在上方显示拼音/对应读音，内部显示原歌词；读音来自已解析的发音结果，不能用原歌词重复冒充拼音，不改写歌词数据。A4 使用实际中文声库的歌词与拼音实窗截图验收，缺少读音时保留歌词并显示既有发音诊断。
 
 模型原生 mono 按既有协议转换为 float32 stereo，重采样到 snapshot.sample_rate；结果 start_seconds 是全局秒，pitch/phoneme feedback 是内容局部秒/曲线局部 tick，正确处理 clip position/contentOffset、负提前量、tempo 变更。检验 finite、帧数和现有 16M 帧结果上限；超长内容在插件内部受限分块或明确说明超过支持上限，不能增加无限结果内存。
 
@@ -107,9 +111,13 @@ submit 完整拷贝输入，推理只读快照；每阶段和块边界检查取�
 
 ### A.5 持久化、缓存、错误与独立运行
 
-实施补充（用户要求，2026-10-08）：音频与 `.tensor` 张量缓存统一使用用户缓存根下 `SVS/<引擎>`，DiffSinger 固定为 `cache/SVS/DiffSinger`；路径由宿主冻结传入，不能另设张量缓存根。目录调整不改变内容身份，清理保持有界且不删除其他引擎缓存。
+实施补充（用户要求，2026-10-08）：音频与 `.tensor` 张量缓存统一使用 LMMS 工作目录下 `cache/SVS/<引擎>`，DiffSinger 固定为 `cache/SVS/DiffSinger`；路径由宿主冻结传入，不能另设张量缓存根。目录调整不改变内容身份，清理保持有界，只处理各自拥有的缓存条目，不删除整个用户缓存目录。
+
+命名与试听补充（用户要求，2026-10-08）：最终音频文件名为完整音频文件字节的 64 位 SHA-256 字符串加扩展名；输入身份/反馈索引单独保存。tensor 文件名同样使用完整 SHA-256，覆盖模型/config/runtime/seed 与输入 tensor 名称、类型、形状和全部字节，避免重名；读取校验损坏并按 miss 恢复。真实音频测试保留试听文件供用户随时播放，不提交私人声库/音频到仓库。
 
 交付补充（用户要求，2026-10-08）：DiffSinger 成品为完整 `SVSDiffSinger` 文件夹，保留引擎、额外依赖 DLL、manifest、发音数据及许可证相对结构；不能以单个插件 DLL 作为完整成品。安装及独立运行验收核对整个文件夹。
+
+最终部署补充（用户要求，2026-10-08）：A0～A4 全部完成后的最终构建统一写入已有 `build/Release`，主程序 `build/Release/lmms.exe`、普通插件 `build/Release/plugins`、DiffSinger 包 `build/Release/svs/SVSDiffSinger`；最终加载测试使用这套真实开发版 Release，核对已启用插件 DLL 原位更新，不能以独立 SDK/测试目录的二进制代替最终加载验收。
 
 工程沿用 SVS XML，保存稳定 voice/speaker ID、模型相关参数、歌词、手工音素/音高/曲线、seed，未知字段原样保留。机器相关扫描绝对路径留用户配置；工程保存可移植 ID/内容指纹与缺失诊断，不写死本机 D: 路径。
 
@@ -125,7 +133,7 @@ submit 完整拷贝输入，推理只读快照；每阶段和块边界检查取�
 | A1 | 递归扫描、字段合并、目录刷新、ID、资源图片和引擎空目录状态 | 六包实际嵌套根全找到；predictor/vocoder零误报；仅渲染步数和多个声库目录两项引擎设置、目录添加/移除/持久化通过；重叠根/重扫去重、冲突、Unicode、YAML+TXT缺省补齐、JSON映射、权限/循环/坏配置fixture通过；刷新不丢用户数据 |
 | A2 | 原生歌词/语言/词典、duration、手工音素与说话人 | 六包对应音素器歌词输入、OOV/延续/休止、手工重置、首尾伸缩、最小时长、说话人持久化测试；自动结果不污染 segments；真实 duration ONNX 推理通过 |
 | A3 | CPU pitch/variance/acoustic/vocoder 全链、曲线与音频反馈 | 六包各用有效歌词 CPU 生成有限非静音 PCM，模型全部阶段/签名校验；有值音高/结果曲线，手工音素/音高/可调量改变输出；tempo/position/offset、分块、取消、缓存、导出通过 |
-| A4 | 原部署安装、SDK 文档/示例、Release 独立性 | 完整既有 SVS 回归与新增回归；开发主题原生实窗完成选择、设置、合成、播放/导出、保存重开；不带 refs/.NET/Python/本机图片/声库亦能启动，用户配置外部声库后可唱；CPU 内容变化导致正确缓存失效 |
+| A4 | 原部署安装、SDK 文档/示例、Release 独立性 | 完整既有 SVS 回归与新增回归；开发主题原生实窗完成选择、设置、合成、播放/导出、保存重开；不带 refs/.NET/Python/本机图片/声库亦能启动，用户配置外部声库后可唱；CPU 内容变化导致正确缓存失效；有 comfort.json 时按真实声明以不同明暗度琴键显示可用/舒适/弱点音域，切换声库同步更新；无此文件时默认琴键显示不变，并留存真实窗口截图 |
 
 A3 六包矩阵包括每个实际 ONNX 模型族和可选阶段组合，不能只验一个包后声称其余可用。少量人工听感项目可 MANUAL/PENDING；真实 CPU 推理和六包适配是必需自动验收，不能以“人工待测”越过进入 B。
 
@@ -214,14 +222,14 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 
 只有 A0→A4、B0→B4 顺序验收并分别提交推送，六包CPU真实推理与递归配置适配通过，至少一台可用设备真实DML推理证据通过、全局策略被第二AI插件消费、传统引擎保持行为、持久化/缓存/取消/独立SDK/Release均验证后，实施任务才完成。必要GPU/模型自动验收不能降格为MANUAL替代。人工听感/布局待验收允许单独标记。完成后停止，不实施计划外重构。
 
-当前 A0 原生骨架、依赖冻结、独立 SDK/旧示例协商和六包 48 模型 CPU session/实际签名检查通过。详细记录见 [A0 验收](doc/svs/DiffSinger-A0-validation.md) 和 [六包矩阵](doc/svs/DiffSinger-six-package-matrix.json)。A1 原生递归声库目录、元数据、身份、资源和设置实窗验收已通过，见 [A1 验收](doc/svs/DiffSinger-A1-validation.md)。A2 六包原生发音和真实 duration 推理已通过，见 [A2 验收](doc/svs/DiffSinger-A2-validation.md)。引擎尚不生成音频，完整 PCM 推理属于 A3；目录与 duration 验收不能替代 A3 全链验收。每阶段提交推送成功才进入下一阶段。
+当前 A0 原生骨架、依赖冻结、独立 SDK/旧示例协商和六包 48 模型 CPU session/实际签名检查通过。详细记录见 [A0 验收](doc/svs/DiffSinger-A0-validation.md) 和 [六包矩阵](doc/svs/DiffSinger-six-package-matrix.json)。A1 原生递归声库目录、元数据、身份、资源和设置实窗验收已通过，见 [A1 验收](doc/svs/DiffSinger-A1-validation.md)。A2 六包原生发音和真实 duration 推理已通过，见 [A2 验收](doc/svs/DiffSinger-A2-validation.md)。A3 六包真实 CPU 全链、反馈、统一 SHA 缓存、分块/tempo/导出及原生只读曲线实窗验收已通过，见 [A3 验收](doc/svs/DiffSinger-A3-validation.md)。目录与 duration 验收不能替代全链验收。每阶段提交推送成功才进入下一阶段。
 
 | 里程碑 | 状态 | 自动证据 | 人工事项 |
 | --- | --- | --- | --- |
 | A0 | PASS | 独立 SDK/原位开发 DLL ABI 1.0/1.1/1.2；旧 full/minimal 示例；缺依赖拒绝；六包 48 ONNX CPU session/签名 | 无本阶段人工项 |
 | A1 | PASS | 六包扫描/配置/身份/权限循环fixture；独立SDK/ABI1.0–1.3/旧示例；两项设置与目录持久化/刷新/资源实窗 | 无本阶段人工项 |
 | A2 | PASS | 六包原生歌词/真实12个 duration ONNX；词典/延续/休止/覆盖重置/最小时长/取消；说话人嵌入fixture和工程持久化；独立SDK/原位DLL/开发主题实窗 | 无本阶段人工项 |
-| A3 | NOT STARTED | — | 听感待实施后验收 |
+| A3 | DONE | 六包 CPU 全链、稳定 seed、SHA 音频/tensor 缓存、受限分块、tempo、导出/重开、只读参考曲线实窗通过；本阶段提交推送后进入 A4 | 已保留六份试听；主观听感 MANUAL/PENDING |
 | A4 | NOT STARTED | — | 体验待实施后验收 |
 | B0 | NOT STARTED | — | — |
 | B1 | NOT STARTED | — | — |

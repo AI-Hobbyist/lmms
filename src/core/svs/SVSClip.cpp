@@ -125,6 +125,7 @@ svs::Input SVSClip::captureInput(uint32_t rate) const {
  input.document["engineSettings"]=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(track->pluginId().toUtf8().toHex())).toUtf8()).object();
  input.document["computeBackend"]="cpu";
  input.document["computeDevice"]="cpu";
+ input.document["cacheDirectory"]=svs::Cache::instance().engineDirectory(track->pluginId());
  input.document["curves"]=svs::curvesToJson(m_curves); input.document["secondsPerTick"]=input.secondsPerTick;
  input.document["language"]=track->language(); input.document["capabilities"]=track->capabilities().original;
  input.document["projectDictionaries"]=m_projectDictionaryData;

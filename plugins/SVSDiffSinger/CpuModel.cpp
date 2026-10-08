@@ -1,4 +1,5 @@
 #include "CpuModel.h"
+#include "ModelSeed.h"
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -17,12 +18,17 @@ size_t count(const std::vector<int64_t>& shape) {
 }
 void finite(const Tensor& tensor) {if(tensor.type==ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT) {for(const auto value:tensor.values<float>()) {if(!std::isfinite(value)) {throw std::runtime_error("Non-finite tensor value");}}}}
 }
-CpuModel::CpuModel(Ort::Env& environment,const fs::path& path,std::string stage):m_stage(std::move(stage)),m_path(path) {
+void CpuModel::resetSession() {
+    m_session=Ort::Session(nullptr);
     Ort::SessionOptions options;options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
     options.SetIntraOpNumThreads(std::max(1u,std::min(4u,std::thread::hardware_concurrency())));options.SetInterOpNumThreads(1);
     options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+    if(m_seededModel.empty()) {m_session=Ort::Session(m_environment,m_path.c_str(),options);}
+    else {options.AddConfigEntry("session.model_external_initializers_file_folder_path",m_path.parent_path().u8string().c_str());m_session=Ort::Session(m_environment,m_seededModel.data(),m_seededModel.size(),options);}
+}
+CpuModel::CpuModel(Ort::Env& environment,const fs::path& path,std::string stage,uint32_t seed):m_stage(std::move(stage)),m_path(path),m_environment(environment) {
     try {
-        m_session=Ort::Session(environment,path.c_str(),options);Ort::AllocatorWithDefaultOptions allocator;
+        m_seededModel=ModelSeed(path,seed).read(path);resetSession();Ort::AllocatorWithDefaultOptions allocator;
         for(size_t i=0;i<m_session.GetInputCount();++i) {const auto name=m_session.GetInputNameAllocated(i,allocator);const auto type=m_session.GetInputTypeInfo(i);const auto info=type.GetTensorTypeAndShapeInfo();m_inputs.push_back({name.get(),info.GetElementType(),info.GetShape()});}
         for(size_t i=0;i<m_session.GetOutputCount();++i) {const auto name=m_session.GetOutputNameAllocated(i,allocator);const auto type=m_session.GetOutputTypeInfo(i);const auto info=type.GetTensorTypeAndShapeInfo();m_outputs.push_back({name.get(),info.GetElementType(),info.GetShape()});}
     }catch(const std::exception& error) {throw std::runtime_error(m_stage+" / "+path.u8string()+": "+error.what());}
@@ -31,6 +37,9 @@ bool CpuModel::accepts(const std::string& name) const {return std::any_of(m_inpu
 Tensors CpuModel::run(const Tensors& inputs,const std::atomic<bool>& cancelled) {
     try {
         if(cancelled.load()) {throw std::runtime_error("Cancelled");}
+        // Reset only stochastic sessions so equal seeded requests do not depend
+        // on how many previous Run calls advanced an operator's RNG.
+        if(!m_seededModel.empty()) {resetSession();}
         if(inputs.size()!=m_inputs.size()) {throw std::runtime_error("Input count does not match model signature");}
         const auto memory=Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,OrtMemTypeDefault);
         std::vector<Ort::Value> values;std::vector<const char*> names,outputs;

@@ -5,6 +5,7 @@
 #include "Pronunciation.h"
 #include "Duration.h"
 #include "Speaker.h"
+#include "Synthesis.h"
 #include <algorithm>
 #include <cstring>
 #include <new>
@@ -26,6 +27,8 @@ struct Session {
     std::vector<diffsinger::NoteInput> notes;
     Json input=Json::object();
     std::unique_ptr<diffsinger::Duration> duration;
+    std::unique_ptr<diffsinger::Synthesis> synthesis;
+    std::vector<float> audio;
     std::atomic<bool> cancelled{false};
     std::mutex mutex;
     std::string error,feedback;
@@ -93,10 +96,11 @@ svs_status SVS_CALL capabilities(svs_engine handle, const char* id, const char*,
         const auto info=voice->declaration();auto phonemes=Json::array();for(auto item=voice->stages.at("acoustic").phonemes.begin();item!=voice->stages.at("acoustic").phonemes.end();++item) {phonemes.push_back(item.key());}
         Json schema{{"schemaVersion",1},{"languages",info["languages"]},{"defaultLanguage",info["defaultLanguage"]},{"noteLanguage",info["languages"].size()>1},
             {"parameters",Json::array()},{"feedbackParameters",Json::array()},{"pronunciation",{{"phonemeSet","diffsinger:"+voice->fingerprint},{"phonemes",phonemes}}},
-            {"synthesis",{{"available",false},{"reason","CPU synthesis is implemented in A2/A3"},{"channels",2},{"format","float32"}}}};
+            {"synthesis",{{"available",true},{"cancel",true},{"concurrent",false},{"channels",2},{"format","float32"},{"backend","CPU"}}}};
         schema["phonemes"]={{"timingEditable",true},{"attributesEditable",false},{"minimumDurationSeconds",.005},{"maximumLeadSeconds",.15}};
         schema["pronunciation"]["parser"]="diffsinger.native.v1";schema["pronunciation"]["continuation"]="-";
         const auto choices=diffsinger::speakerChoices(*voice);if(!choices.empty()) {schema["parameters"].push_back({{"id","diffsinger.speaker"},{"name","Speaker"},{"group","Voice"},{"scope","track"},{"type","enum"},{"default",choices[0]["id"]},{"choices",choices},{"curve",false}});}
+        diffsinger::Synthesis::declareParameters(*voice,schema);
         return text(schema.dump().c_str(),out);
     }catch(...) {return SVS_FAILED;}
 }
@@ -145,6 +149,7 @@ svs_status SVS_CALL submit(svs_session handle,const svs_snapshot* snapshot) {
 }
 svs_status SVS_CALL render(svs_session handle,svs_result* out) {
     if(!handle||!out||out->size<sizeof(*out)) {return SVS_INVALID_INPUT;}auto& session=*static_cast<Session*>(handle);std::lock_guard lock(session.mutex);
+    const char* activeStage="duration";
     try {
         if(!session.submitted) {throw std::runtime_error("No submitted snapshot");}
         svs_sdk::TempoMap tempo;std::vector<svs_sdk::TempoPoint> points;
@@ -155,13 +160,15 @@ svs_status SVS_CALL render(svs_session handle,svs_result* out) {
         const double origin=session.input.value("position",0.)-session.input.value("contentOffset",0.);
         const auto plan=session.duration->predict(session.notes,tempo,origin,session.input.value("trackParameters",Json::object()),session.cancelled);
         Json phones=Json::array();for(const auto& phone:plan.phones) {if(!phone.noteId.empty()) {phones.push_back({{"noteId",phone.noteId},{"symbol",phone.symbol},{"startSeconds",phone.start},{"durationSeconds",phone.end-phone.start}});}}
-        session.feedback=Json{{"phonemes",phones},{"pronunciations",plan.feedback}}.dump();
-        session.error=Json{{"stage","acoustic"},{"voiceId",session.voice->id},{"message","Duration prediction completed; audio synthesis is pending A3"}}.dump();
-        *out={sizeof(*out),session.rate,2,0,tempo.secondsAt(origin),nullptr,session.feedback.c_str(),session.error.c_str(),nullptr};return SVS_UNSUPPORTED;
-    }catch(const std::exception& error) {session.error=Json{{"stage","duration"},{"voiceId",session.voice->id},{"message",error.what()}}.dump();*out={sizeof(*out),session.rate,2,0,0,nullptr,nullptr,session.error.c_str(),nullptr};return session.cancelled?SVS_CANCELLED:SVS_FAILED;}
+        activeStage="synthesis";if(!session.synthesis) {session.synthesis=std::make_unique<diffsinger::Synthesis>(session.engine->environment,session.voice);}
+        auto rendered=session.synthesis->render(plan,session.notes,session.input,tempo,origin,session.rate,session.cancelled);
+        rendered.feedback["phonemes"]=phones;rendered.feedback["pronunciations"]=plan.feedback;
+        session.feedback=rendered.feedback.dump();session.audio=std::move(rendered.stereo);session.error.clear();
+        *out={sizeof(*out),session.rate,2,session.audio.size()/2,tempo.secondsAt(origin)+rendered.start,session.audio.data(),session.feedback.c_str(),nullptr,nullptr};return SVS_OK;
+    }catch(const std::exception& error) {session.error=Json{{"stage",activeStage},{"voiceId",session.voice->id},{"path",session.voice->root.u8string()},{"message",error.what()}}.dump();*out={sizeof(*out),session.rate,2,0,0,nullptr,nullptr,session.error.c_str(),nullptr};return session.cancelled?SVS_CANCELLED:SVS_FAILED;}
 }
 void SVS_CALL cancel(svs_session handle) {if(handle) {static_cast<Session*>(handle)->cancelled=true;}}
-void SVS_CALL releaseResult(svs_session, svs_result* result) {if(result&&result->size>=sizeof(*result)) {*result={};}}
+void SVS_CALL releaseResult(svs_session handle, svs_result* result) {if(handle) {auto& session=*static_cast<Session*>(handle);std::lock_guard lock(session.mutex);session.audio.clear();session.feedback.clear();}if(result&&result->size>=sizeof(*result)) {*result={};}}
 }
 SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major, uint32_t minor, uint32_t size, svs_api* out)
 {

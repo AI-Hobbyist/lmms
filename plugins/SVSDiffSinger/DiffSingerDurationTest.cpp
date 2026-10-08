@@ -48,7 +48,7 @@ void publicApi(const fs::path& plugin,const fs::path& root) {
     svs_note source{sizeof(svs_note),noteId.c_str(),0,48,0,.5,60,lyric.c_str(),"zh","","{}","{}"};
     svs_snapshot snapshot{sizeof(svs_snapshot),"clip",1,2,3,id.c_str(),48000,&source,1,.5,document.c_str()};require(session.submit(snapshot)==SVS_OK,"ABI submit failed");
     lyric="☃";noteId="mutated-note";document="{}";
-    {auto result=session.render();require(result.status()==SVS_UNSUPPORTED,"A2 unexpectedly claims audio synthesis");require(result.value().audio==nullptr&&result.value().frame_count==0,"A2 fabricated PCM");const auto feedback=Json::parse(result.value().feedback_json);require(feedback["phonemes"][0]["noteId"]=="abi-kept-note"&&feedback["phonemes"][0]["symbol"]=="zh/a","Submit did not copy input / project dictionary was overridden");}
+    {auto result=session.render();require(result.status()==SVS_OK,"Native synthesis failed");require(result.value().audio!=nullptr&&result.value().frame_count>0,"Native synthesis produced no PCM");const auto feedback=Json::parse(result.value().feedback_json);require(feedback["phonemes"][0]["noteId"]=="abi-kept-note"&&feedback["phonemes"][0]["symbol"]=="zh/a","Submit did not copy input / project dictionary was overridden");}
     session.cancel();{auto result=session.render();require(result.status()==SVS_CANCELLED,"ABI cancellation ignored");}
     std::cout<<"PASS deployed plugin pronunciation/session snapshot copy/dictionary priority/cancellation/result ownership\n";
 }
