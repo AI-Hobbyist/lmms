@@ -1,0 +1,7 @@
+Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+SVS: SVSExample engine initialized

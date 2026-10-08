@@ -257,3 +257,5 @@ A4 完成证据见 [A4 验收](doc/svs/DiffSinger-A4-validation.md)。本轮 A0�
 用户追加验收：可调参数曲线及标签按参数颜色区分，配对的只读参考曲线保持对应颜色；DiffSinger offset 使用同色系浅色。其他引擎未声明颜色时使用宿主参数配色。完成后同步 SDK 的可选分段能力、参数颜色、缓存/进度/完整导出约定，并通过独立 SDK 构建及旧 ABI 示例验证。
 
 本增量自动验收完成：完整 SVS 70 passed / 0 failed / 2 GUI-only skipped；真实窗口专项 5 passed / 0 failed / 0 skipped；独立 SDK 旧 full/minimal 与 DiffSinger ABI 1.0–1.3 / 六包分段和颜色声明通过。见 doc/svs/SVS-segment-rendering-validation.md。完成本检查点提交推送后，再交付用户追加的英文 README 对比表与安装版全量替换包。
+
+用户追加交付已完成：英文主 README 对比表及 AI 辅助开发/独立分支同步上游说明已在 236c5f3fe 推送，原 README 保留。全量替换包 `build/packages/lmms-enhanced-full-236c5f3fe-win64.zip` 包含完整 DiffSinger 与官方默认四轨模板；ZIP 哈希、360 PE 位数、原开发目录实际覆盖/配置保留、包内运行库实窗启动及实际部署六包 ABI 通过，见 `doc/svs/SVS-replacement-package.md`。个人空白模板已先备份再恢复官方模板，生产初始化代码未修改。B 阶段仍未开始。

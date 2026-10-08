@@ -9,7 +9,7 @@ if (-not $ProductCommit) {
 $runtime = Join-Path $project 'build/Release'
 $output = Join-Path $project 'build/packages'
 if (-not (Test-Path -LiteralPath $runtime -PathType Container) -or -not (Test-Path -LiteralPath $output -PathType Container)) { throw 'Reuse the existing runtime and package directories.' }
-$name = 'lmms-modern-ui-full-' + $ProductCommit.Substring(0, 9) + '-win64.zip'
+$name = 'lmms-enhanced-full-' + $ProductCommit.Substring(0, 9) + '-win64.zip'
 $zipPath = Join-Path $output $name
 if (Test-Path -LiteralPath $zipPath) { throw "Package already exists: $zipPath" }
 $payload = @{}
@@ -29,6 +29,12 @@ foreach ($path in Get-Content -LiteralPath (Join-Path $project 'build/install_ma
 $svsExampleDll = Join-Path $runtime 'svs/SVSExample/SVSExample.dll'
 if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) { throw 'Deployed SVS example DLL missing.' }
 $payload['svs/SVSExample/SVSExample.dll'] = $svsExampleDll
+$diffSingerPackage = Join-Path $runtime 'svs/SVSDiffSinger'
+if (-not (Test-Path -LiteralPath $diffSingerPackage -PathType Container)) { throw 'Deployed DiffSinger package missing.' }
+foreach ($file in Get-ChildItem -LiteralPath $diffSingerPackage -File -Recurse) {
+    if ($file.Name -match '\.(pdb|lib|exp|disabled)$') { continue }
+    $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
+}
 foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imageformats', 'networkinformation', 'platforms', 'styles', 'tls')) {
     $folder = Join-Path $runtime $directory
     if (-not (Test-Path -LiteralPath $folder)) { continue }
@@ -38,6 +44,7 @@ foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imagefo
     }
 }
 $payload['LICENSE.txt'] = Join-Path $project 'LICENSE.txt'
+$payload['README.md'] = Join-Path $project 'README.md'
 $targets = Get-Content -LiteralPath (Join-Path $project 'doc/ui-modernization/validation/plugin-targets.txt')
 if ($targets.Count -ne 52) { throw 'Frozen plugin target count differs.' }
 foreach ($target in $targets) { if (-not $payload.ContainsKey("plugins/$target.dll")) { throw "Missing enabled plugin: $target" } }
@@ -47,6 +54,10 @@ foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', '
 foreach ($required in @('svs/SVSExample/SVSExample.dll', 'svs/SVSExample/manifest.json', 'svs/SVSExample/avatar.svg', 'svs/SVSExample/portrait.svg', 'data/themes/default/svs_track.svg')) {
     if (-not $payload.ContainsKey($required)) { throw "Incomplete SVS runtime: $required" }
 }
+foreach ($required in @('svs/SVSDiffSinger/SVSDiffSinger.dll', 'svs/SVSDiffSinger/onnxruntime.dll', 'svs/SVSDiffSinger/manifest.json', 'data/projects/templates/default.mpt')) {
+    if (-not $payload.ContainsKey($required)) { throw "Incomplete DiffSinger/default template runtime: $required" }
+}
+if ((Get-FileHash -LiteralPath $payload['data/projects/templates/default.mpt']).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project 'data/projects/templates/default.mpt')).Hash) { throw 'Runtime default template differs from the official factory template.' }
 $records = @($payload.Keys | Sort-Object | ForEach-Object {
     $file = Get-Item -LiteralPath $payload[$_]
     if ($file.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "Runtime file is a reparse point: $_" }
@@ -55,7 +66,7 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
 $manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records}
 $manifestText = $manifest | ConvertTo-Json -Depth 5
 $instructions = @'
-LMMS 现代界面全量替换包（Windows x64）
+LMMS 增强分支全量替换包（Windows x64）
 
 1. 关闭 LMMS。将 ZIP 解压到任意临时位置。
 2. 双击 Install-Replace.cmd，输入原安装目录（包含 lmms.exe 的目录）。
@@ -70,15 +81,19 @@ LMMS 现代界面全量替换包（Windows x64）
 
 本包为完整运行文件，并非差分包：主程序、52 个启用 UI 插件、3 个导入导出插件、
 支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与 SVS 示例。
+包含原生 DiffSinger CPU 完整依赖文件夹、空拍分段增量渲染、当前段/总段进度和参数配色；SDK 保持 ABI 1.0–1.3 兼容。
+包含官方默认工程模板：TripleOscillator、Sample track、Pattern 0、Automation track；Pattern Editor 包含 Kicker。
+用户 templates/default.mpt 优先于官方模板。如果此前自行设置了空白模板，请先备份并停用该覆盖文件，再新建工程。
+全部分支增强由 AI 辅助开发；本分支独立维护并同步上游更新。英文功能对比及原版 README 见 README.md。
 Sid（缺 Perl）与 GigPlayer（缺 libgig）未构建。
-本包包含 SVS 自动音素拉伸误写 null、音素时长限制修复与原版风格琴键，SVS 自动回归 64 项通过；开发版实窗首尾伸缩与音素交界拖动已验证。
+本包包含 SVS 自动音素拉伸误写 null、音素时长限制修复与原版风格琴键；回归和真实窗口证据见当前分段渲染验收记录。
 SVS 实窗专项使用实际部署插件与主题通过；最终操作体验和听感待人工验收。
 本机测试头像、立绘及开发版个人配置未打包；示例使用自带 SVG 资源。
 
 构建来源：https://github.com/AI-Hobbyist/lmms
 源代码版本：7b44c5487187d241c2dece22630a573479129c44（F6）
 工作区仍含用户其他任务的 Song.h/Song.cpp 未提交修改；包来自该工作区构建，不称纯提交重建。
-详细证据：仓库 doc/ui-modernization/acceptance.md 与 delivery-audit.md。
+详细证据：仓库 doc/svs/SVS-segment-rendering-validation.md、doc/ui-modernization/acceptance.md 与 delivery-audit.md。
 许可文本：LICENSE.txt；第三方资源随其原有许可。请保留自己的原安装文件作为回滚来源。
 '@
 $instructions = $instructions.Replace('7b44c5487187d241c2dece22630a573479129c44（F6）', $ProductCommit)
