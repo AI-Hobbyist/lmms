@@ -1,0 +1,6 @@
+Expected rejection: Unknown speaker ID: missing
+Expected rejection: Speaker embedding size does not match hidden_size: one
+PASS explicit multi-speaker embedding fixture (not a six-bank multi-speaker claim)
+PASS actual 13.5MB English dictionary: {"text":"hello","source":"voiceDictionary","phonemeSet":"diffsinger:9ef21e28b1292635b4c6bc4b206594f0e646d6df848ae004a867045c2006d437","generated":true,"continuation":false,"phonemes":["en/hh","en/ah","en/l","en/ow"],"diagnostic":""}
+Expected rejection: Non-adjacent continuation note: n3
+Note is too short for minimum phoneme duration: n2

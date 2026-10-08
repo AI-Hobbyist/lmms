@@ -33,6 +33,17 @@
 
 2026-10-08 通过第一方 GitHub commits API 取得上述 SHA。单字格式为 Unicode code point 与逗号分隔候选拼音；词语格式为词语与逐字空格分隔拼音。原生查询优先确定的最长词语，再取单字默认读音；同项多个读音保持稳定选择，用户手工音素可以覆盖。不调用这些仓库的数据生成脚本，不安装 Python；部署固定数据与对应许可，记录哈希。语境分词/多音字效果应独立测试，不能声称与 OpenUtau Pinyin 实现所有输入逐字等价。保留 ü 与去声调规则应按声库实际 grapheme 验证。
 
+A2 部署文件名及 SHA-256（configure 和下载脚本均校验）：
+
+| 文件 | SHA-256 |
+| --- | --- |
+| data/pinyin.txt | `621f8ca9eff8519f47e2b17b564fd318161e13bca07eea8c8e04993cd5d3b52e` |
+| data/phrases.txt | `dcc769607c220b312fea3e71cb63421298b4b891b1f7356a95ab58f2c96fff81` |
+| data/LICENSE-pinyin-data | `9c048697be2502a16e8bcb282d5d465a07295b2def0ffb05a269c5d39dbe1586` |
+| data/LICENSE-phrase-pinyin-data | `89ac55df747e4776088c3e77531ef61b973a1a59dd8e6a4548a58996da9a4f70` |
+
+原生字典/word grouping 移植保留 `licenses/tlds-MIT.txt`。普通配置仍限制 4 MiB/100k YAML 节点；真实英文词典约 13.5 MB，字典单独限制 32 MiB/4M 节点，按所选语言延迟加载。六包中文自动歌词是 A2 验收目标；en/ja/ko 保持声库语言选项，随包词典和明确读音可用，词典未命中且没有对应原生自动算法时返回诊断，不声称具有完整多语言 G2P。
+
 未选用 [cpp-pinyin](https://github.com/wolfgitpr/cpp-pinyin)：它使用 C++17、额外字典资源，并采用 [Apache-2.0](https://raw.githubusercontent.com/wolfgitpr/cpp-pinyin/main/LICENSE)，不是 MIT；其 README 的覆盖范围限制为 U+4E00–U+9FFF。上述 native 数据查询满足当前中文 fixture 需求，无需把它加入本轮依赖。未选用 Python/.NET G2P，也不加载任意声库 C# 音素器。
 
 ## 缺依赖及独立性验收边界

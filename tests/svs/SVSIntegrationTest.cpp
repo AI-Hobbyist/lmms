@@ -1043,6 +1043,24 @@ private slots:
   QTest::qWait(500);QVERIFY(reopened.screen()->grabWindow(reopened.winId()).save("doc/svs/validation/A1-native-settings.png"));
   QTest::mouseClick(reopenedBody->findChild<QPushButton*>("svsDirectoryRemove"),Qt::LeftButton);QTRY_COMPARE_WITH_TIMEOUT(reopenedBody->findChildren<QLineEdit*>("svsDirectoryPath").size(),0,10000);reopened.save();QCOMPARE(QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object()["diffsinger.voicebankDirectories"].toArray().size(),0);reopened.close();
  }
+ void diffSingerPronunciationAndSpeakerPersistence() {
+  const auto root=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");if(root.isEmpty()) QSKIP("Explicit external DiffSinger fixture required");
+  auto& registry=svs::Registry::instance();const QString id="org.lmms.svs.diffsinger";QString error;
+  QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{root}}},error),qPrintable(error));
+  svs::Voice voice;for(const auto& candidate:registry.voices()) if(candidate.pluginId==id&&candidate.name==QString::fromUtf8("芙宁娜")) voice=candidate;QVERIFY(!voice.id.isEmpty());
+  auto plugin=registry.plugin(id);QVERIFY(plugin);svs::Capabilities cap;QVERIFY2(svs::Capabilities::parse(plugin->capabilities(voice.id,{},error),cap,error),qPrintable(error));
+  QCOMPARE(cap.languages.size(),4);QVERIFY(cap.phonemeTiming);QCOMPARE(cap.original["phonemes"].toObject()["minimumDurationSeconds"].toDouble(),.005);QCOMPARE(cap.original["phonemes"].toObject()["maximumLeadSeconds"].toDouble(),.15);
+  const auto automatic=plugin->pronunciation(voice.id,{{"lyric",QString::fromUtf8("你")},{"language","zh"}},error);QVERIFY2(automatic["generated"].toBool(),qPrintable(automatic["diagnostic"].toString()));QCOMPARE(automatic["phonemes"].toArray(),QJsonArray({"zh/n","zh/i"}));
+  const auto oov=plugin->pronunciation(voice.id,{{"lyric",QString::fromUtf8("☃")},{"language","zh"}},error);QVERIFY(!oov["generated"].toBool());QVERIFY(!oov["diagnostic"].toString().isEmpty());
+  auto* track=new SVSTrack(Engine::getSong());auto cleanup=qScopeGuard([&]{delete track;});track->bindVoice(id,voice.id);QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  QVERIFY(track->setParameter("diffsinger.speaker","name0"));QVERIFY(!track->setParameter("diffsinger.speaker","unknown"));
+  auto* clip=static_cast<SVSClip*>(track->createClip(0));svs::Note note;note.id="diffsinger-user-note";note.lyric=QString::fromUtf8("你");note.pronunciation="ni3";note.parameters={{"future",7}};note.phonemes={{"segments",QJsonArray{QJsonObject{{"symbol","zh/n"},{"startTick",-9.6},{"durationTicks",9.6}},QJsonObject{{"symbol","zh/i"},{"startTick",0},{"durationTicks",48}}}}};clip->setNotes({note});
+  QDomDocument saved;auto state=saved.createElement("test");saved.appendChild(state);track->saveState(saved,state);auto* restored=static_cast<SVSTrack*>(Track::create(state.firstChildElement(),Engine::getSong()));auto restoredCleanup=qScopeGuard([&]{delete restored;});
+  QCOMPARE(restored->parameters()["diffsinger.speaker"].toString(),QString("name0"));const auto restoredNote=static_cast<SVSClip*>(restored->getClip(0))->notes()[0];QCOMPARE(restoredNote.phonemes,note.phonemes);QCOMPARE(restoredNote.pronunciation,note.pronunciation);QCOMPARE(restoredNote.parameters,note.parameters);
+  gui::SVSParameterPanel panel;if(m_guiApplication) {panel.setParent(m_guiApplication->mainWindow());panel.setWindowFlag(Qt::Tool);}
+  panel.refresh(cap.parameters,"track",{track->parameters()},{},[&](const QString& key,const QJsonValue& value){track->setParameter(key,value);});panel.resize(350,200);panel.show();QVERIFY(QTest::qWaitForWindowExposed(&panel));auto* speaker=panel.findChild<QComboBox*>("svsParameter.track.diffsinger.speaker");QVERIFY(speaker);QCOMPARE(speaker->currentData().toString(),QString("name0"));QTest::qWait(300);QVERIFY(panel.screen()->grabWindow(panel.winId()).save("doc/svs/validation/A2-native-speaker.png"));panel.close();
+  note.phonemes.remove("segments");clip->setNotes({note});QVERIFY(!clip->notes()[0].phonemes.contains("segments"));QCOMPARE(clip->notes()[0].lyric,note.lyric);
+ }
  void parameterPanelStateAndFocus() {
   const auto& voice=svs::Registry::instance().voices()[0]; auto plugin=svs::Registry::instance().plugin(voice.pluginId);
   QString error; svs::Capabilities cap; QVERIFY(svs::Capabilities::parse(plugin->capabilities("full",{},error),cap,error));

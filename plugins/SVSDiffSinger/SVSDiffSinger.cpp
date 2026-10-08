@@ -1,11 +1,10 @@
-/* Native DiffSinger CPU engine. A1 discovers voices; synthesis arrives in A2/A3. */
+/* Native DiffSinger pronunciation/duration; PCM synthesis is stage A3. */
 #include "svs.h"
 #include "VoiceCatalog.h"
-#ifdef _WIN32
-#define ORT_API_MANUAL_INIT
-#include <windows.h>
-#endif
-#include <onnxruntime_cxx_api.h>
+#include "NativeRuntime.h"
+#include "Pronunciation.h"
+#include "Duration.h"
+#include "Speaker.h"
 #include <algorithm>
 #include <cstring>
 #include <new>
@@ -14,28 +13,6 @@
 
 namespace {
 using diffsinger::Json;
-#ifdef _WIN32
-// Windows may already have its system ORT loaded for unrelated OS services.
-// Bind this plugin's C++ wrapper to its explicitly packaged API table.
-struct NativeRuntime {
-    HMODULE library=nullptr;
-    NativeRuntime() {
-        HMODULE module=nullptr;
-        if(!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,reinterpret_cast<const wchar_t*>(&runtime),&module)) {throw std::runtime_error("Cannot locate DiffSinger runtime package");}
-        wchar_t filename[32768];const auto length=GetModuleFileNameW(module,filename,32768);
-        if(!length||length>=32768) {throw std::runtime_error("Invalid DiffSinger package path");}
-        const auto path=std::filesystem::path(filename).parent_path()/L"onnxruntime.dll";
-        library=LoadLibraryExW(path.c_str(),nullptr,LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR|LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
-        if(!library) {throw std::runtime_error("Cannot load packaged DiffSinger ONNX Runtime: Win32 "+std::to_string(GetLastError()));}
-        using GetBase=const OrtApiBase*(ORT_API_CALL*)();const auto get=reinterpret_cast<GetBase>(GetProcAddress(library,"OrtGetApiBase"));
-        const auto base=get?get():nullptr;
-        if(!base||std::string(base->GetVersionString())!="1.23.0") {FreeLibrary(library);library=nullptr;throw std::runtime_error("DiffSinger requires packaged ONNX Runtime CPU 1.23.0");}
-        const auto api=base->GetApi(ORT_API_VERSION);if(!api) {FreeLibrary(library);library=nullptr;throw std::runtime_error("Packaged ORT API is incompatible");}Ort::InitApi(api);
-    }
-    ~NativeRuntime() {if(library) FreeLibrary(library);}
-    static void runtime() {static NativeRuntime value;}
-};
-#endif
 struct Engine {
     Ort::Env environment{ORT_LOGGING_LEVEL_WARNING, "DiffSinger"};
     std::shared_ptr<const diffsinger::Catalog> catalog=std::make_shared<diffsinger::Catalog>();
@@ -43,6 +20,18 @@ struct Engine {
     Json scanContext;
 };
 struct ResourceHandle {std::shared_ptr<const diffsinger::Resource> resource;};
+struct Session {
+    Engine* engine=nullptr;
+    std::shared_ptr<const diffsinger::VoicePackage> voice;
+    std::vector<diffsinger::NoteInput> notes;
+    Json input=Json::object();
+    std::unique_ptr<diffsinger::Duration> duration;
+    std::atomic<bool> cancelled{false};
+    std::mutex mutex;
+    std::string error,feedback;
+    uint32_t rate=48000;
+    bool submitted=false;
+};
 svs_status text(const char* value, const char** out)
 {
     if (!out) { return SVS_INVALID_INPUT; }
@@ -59,13 +48,7 @@ svs_status SVS_CALL create(const svs_host* host, svs_engine* out)
     if (!out) { return SVS_INVALID_INPUT; }
     *out = nullptr;
     try {
-#ifdef _WIN32
-        NativeRuntime::runtime();
-#else
-        if (std::string(OrtGetApiBase()->GetVersionString()) != "1.23.0") {
-            throw std::runtime_error("DiffSinger requires native ONNX Runtime CPU 1.23.0");
-        }
-#endif
+        diffsinger::initializeRuntime();
         *out = new Engine;
         return SVS_OK;
     } catch (const std::exception& error) {
@@ -108,9 +91,12 @@ svs_status SVS_CALL capabilities(svs_engine handle, const char* id, const char*,
     if(!handle||!id||!out) {return SVS_INVALID_INPUT;}
     try {const auto voice=std::atomic_load(&static_cast<Engine*>(handle)->catalog)->find(id);if(!voice) {return SVS_INVALID_INPUT;}
         const auto info=voice->declaration();auto phonemes=Json::array();for(auto item=voice->stages.at("acoustic").phonemes.begin();item!=voice->stages.at("acoustic").phonemes.end();++item) {phonemes.push_back(item.key());}
-        const Json schema{{"schemaVersion",1},{"languages",info["languages"]},{"defaultLanguage",info["defaultLanguage"]},{"noteLanguage",info["languages"].size()>1},
+        Json schema{{"schemaVersion",1},{"languages",info["languages"]},{"defaultLanguage",info["defaultLanguage"]},{"noteLanguage",info["languages"].size()>1},
             {"parameters",Json::array()},{"feedbackParameters",Json::array()},{"pronunciation",{{"phonemeSet","diffsinger:"+voice->fingerprint},{"phonemes",phonemes}}},
             {"synthesis",{{"available",false},{"reason","CPU synthesis is implemented in A2/A3"},{"channels",2},{"format","float32"}}}};
+        schema["phonemes"]={{"timingEditable",true},{"attributesEditable",false},{"minimumDurationSeconds",.005},{"maximumLeadSeconds",.15}};
+        schema["pronunciation"]["parser"]="diffsinger.native.v1";schema["pronunciation"]["continuation"]="-";
+        const auto choices=diffsinger::speakerChoices(*voice);if(!choices.empty()) {schema["parameters"].push_back({{"id","diffsinger.speaker"},{"name","Speaker"},{"group","Voice"},{"scope","track"},{"type","enum"},{"default",choices[0]["id"]},{"choices",choices},{"curve",false}});}
         return text(schema.dump().c_str(),out);
     }catch(...) {return SVS_FAILED;}
 }
@@ -123,16 +109,59 @@ svs_status SVS_CALL readResource(svs_engine engine,svs_resource handle,uint64_t 
 }
 void SVS_CALL closeResource(svs_engine,svs_resource handle) {delete static_cast<ResourceHandle*>(handle);}
 void SVS_CALL releaseString(svs_engine, const char* value) { delete[] value; }
-svs_status SVS_CALL createSession(svs_engine, const char*, svs_session* out)
-{
-    if (out) { *out = nullptr; }
-    return SVS_INVALID_INPUT;
+svs_status SVS_CALL pronunciation(svs_engine handle,const char* id,const char* request,const char** out) {
+    if(!handle||!id||!out) {return SVS_INVALID_INPUT;}*out=nullptr;
+    try {const auto voice=std::atomic_load(&static_cast<Engine*>(handle)->catalog)->find(id);if(!voice) {return SVS_INVALID_INPUT;}
+        return text(diffsinger::Pronunciation(voice).resolve(Json::parse(request?request:"{}")).dump().c_str(),out);
+    }catch(const std::exception& error) {return text(Json{{"generated",false},{"diagnostic",error.what()},{"phonemes",Json::array()}}.dump().c_str(),out);}
 }
-void SVS_CALL destroySession(svs_session) {}
-svs_status SVS_CALL submit(svs_session, const svs_snapshot*) { return SVS_INVALID_INPUT; }
-svs_status SVS_CALL render(svs_session, svs_result*) { return SVS_UNSUPPORTED; }
-void SVS_CALL cancel(svs_session) {}
-void SVS_CALL releaseResult(svs_session, svs_result*) {}
+svs_status SVS_CALL createSession(svs_engine handle, const char* id, svs_session* out)
+{
+    if(!handle||!id||!out) {return SVS_INVALID_INPUT;}*out=nullptr;
+    try {auto session=std::make_unique<Session>();session->engine=static_cast<Engine*>(handle);session->voice=std::atomic_load(&session->engine->catalog)->find(id);if(!session->voice) {return SVS_INVALID_INPUT;}*out=session.release();return SVS_OK;}catch(...) {return SVS_FAILED;}
+}
+void SVS_CALL destroySession(svs_session handle) {
+    if(!handle) {return;}auto* session=static_cast<Session*>(handle);session->cancelled=true;
+    {std::lock_guard lock(session->mutex);}delete session;
+}
+svs_status SVS_CALL submit(svs_session handle,const svs_snapshot* snapshot) {
+    if(!handle||!snapshot||snapshot->size<sizeof(*snapshot)||snapshot->note_count>4096||(snapshot->note_count&&!snapshot->notes)||snapshot->sample_rate<8000||snapshot->sample_rate>192000) {return SVS_INVALID_INPUT;}
+    auto& session=*static_cast<Session*>(handle);std::lock_guard lock(session.mutex);session.submitted=false;
+    try {
+        if(!snapshot->voice_id||session.voice->id!=snapshot->voice_id) {throw std::runtime_error("Snapshot voice does not match session");}
+        const char* json=snapshot->input_json?snapshot->input_json:"{}";if(std::strlen(json)>16*1024*1024) {throw std::runtime_error("Snapshot exceeds JSON size bound");}
+        auto input=Json::parse(json);if(!input.is_object()) {throw std::runtime_error("Snapshot input must be an object");}
+        std::vector<diffsinger::NoteInput> notes;notes.reserve(snapshot->note_count);
+        for(uint32_t i=0;i<snapshot->note_count;++i) {const auto& source=snapshot->notes[i];if(source.size<sizeof(source)) {throw std::runtime_error("Truncated note ABI");}
+            diffsinger::NoteInput note;note.id=source.id?source.id:"";note.lyric=source.lyric?source.lyric:"";note.language=source.language?source.language:"";note.reading=source.pronunciation?source.pronunciation:"";
+            note.tick=source.tick;note.durationTick=source.duration_tick;note.start=source.start_seconds;note.duration=source.duration_seconds;note.pitch=source.pitch;
+            note.phonemes=Json::parse(source.phonemes_json?source.phonemes_json:"{}");if(!note.phonemes.is_object()) {throw std::runtime_error("Note phonemes must be an object");}
+            if(note.language.empty()) {note.language=input.value("language",session.voice->declaration().value("defaultLanguage",std::string("zh")));}
+            const auto pronunciation=input.value("pronunciations",Json::object());if(pronunciation.contains(note.id)) {note.pronunciation=pronunciation.at(note.id);}
+            notes.push_back(std::move(note));
+        }
+        session.input=std::move(input);session.notes=std::move(notes);session.rate=snapshot->sample_rate;session.cancelled=false;session.error.clear();session.feedback.clear();session.submitted=true;return SVS_OK;
+    }catch(const std::exception& error) {session.error=Json{{"stage","submit"},{"voiceId",session.voice->id},{"message",error.what()}}.dump();return SVS_INVALID_INPUT;}
+}
+svs_status SVS_CALL render(svs_session handle,svs_result* out) {
+    if(!handle||!out||out->size<sizeof(*out)) {return SVS_INVALID_INPUT;}auto& session=*static_cast<Session*>(handle);std::lock_guard lock(session.mutex);
+    try {
+        if(!session.submitted) {throw std::runtime_error("No submitted snapshot");}
+        svs_sdk::TempoMap tempo;std::vector<svs_sdk::TempoPoint> points;
+        const auto map=session.input.value("tempoMap",Json::array());if(!map.is_array()||map.size()>2*1024*1024) {throw std::runtime_error("Invalid tempo map");}
+        for(const auto& point:map) {points.push_back({point.at("tick").get<double>(),point.at("secondsPerTick").get<double>()});}
+        if(points.empty()) {points.push_back({0,session.input.value("secondsPerTick",0.)});}if(!tempo.setPoints(points)) {throw std::runtime_error("Invalid tempo points");}
+        if(!session.duration) {session.duration=std::make_unique<diffsinger::Duration>(session.engine->environment,session.voice);}
+        const double origin=session.input.value("position",0.)-session.input.value("contentOffset",0.);
+        const auto plan=session.duration->predict(session.notes,tempo,origin,session.input.value("trackParameters",Json::object()),session.cancelled);
+        Json phones=Json::array();for(const auto& phone:plan.phones) {if(!phone.noteId.empty()) {phones.push_back({{"noteId",phone.noteId},{"symbol",phone.symbol},{"startSeconds",phone.start},{"durationSeconds",phone.end-phone.start}});}}
+        session.feedback=Json{{"phonemes",phones},{"pronunciations",plan.feedback}}.dump();
+        session.error=Json{{"stage","acoustic"},{"voiceId",session.voice->id},{"message","Duration prediction completed; audio synthesis is pending A3"}}.dump();
+        *out={sizeof(*out),session.rate,2,0,tempo.secondsAt(origin),nullptr,session.feedback.c_str(),session.error.c_str(),nullptr};return SVS_UNSUPPORTED;
+    }catch(const std::exception& error) {session.error=Json{{"stage","duration"},{"voiceId",session.voice->id},{"message",error.what()}}.dump();*out={sizeof(*out),session.rate,2,0,0,nullptr,nullptr,session.error.c_str(),nullptr};return session.cancelled?SVS_CANCELLED:SVS_FAILED;}
+}
+void SVS_CALL cancel(svs_session handle) {if(handle) {static_cast<Session*>(handle)->cancelled=true;}}
+void SVS_CALL releaseResult(svs_session, svs_result* result) {if(result&&result->size>=sizeof(*result)) {*result={};}}
 }
 SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major, uint32_t minor, uint32_t size, svs_api* out)
 {
@@ -151,6 +180,7 @@ SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major, uint32_t minor, uint3
     }
     if(SVS_HAS_FIELD(api,svs_api,query_catalog)&&minor>=3) {api.features|=SVS_FEATURE_CATALOG_QUERY;api.query_catalog=queryCatalog;}
     if(SVS_HAS_FIELD(api,svs_api,close_resource)&&minor>=1) {api.features|=SVS_FEATURE_RESOURCES;api.open_resource=openResource;api.read_resource=readResource;api.close_resource=closeResource;}
+    if(SVS_HAS_FIELD(api,svs_api,pronunciation)&&minor>=1) {api.features|=SVS_FEATURE_PRONUNCIATION;api.pronunciation=pronunciation;}
     std::memcpy(out, &api, api.size);
     return SVS_OK;
 }

@@ -36,8 +36,9 @@ std::string read(const fs::path& path,uint64_t limit=4*1024*1024) {
 }
 // Reject alias expansion before building the YAML tree; bound nodes and depth.
 struct YamlGuard : YAML::EventHandler {
+    unsigned limit=100000;
     unsigned depth=0,nodes=0;
-    void touch() {if(++nodes>100000) {throw std::runtime_error("YAML node limit exceeded");}}
+    void touch() {if(++nodes>limit) {throw std::runtime_error("YAML node limit exceeded");}}
     void begin() {touch();if(++depth>32) {throw std::runtime_error("YAML depth limit exceeded");}}
     void OnDocumentStart(const YAML::Mark&) override {}
     void OnDocumentEnd() override {}
@@ -140,10 +141,10 @@ std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::pa
 }
 std::string newId() {std::random_device random;Sha256 hash;for(unsigned i=0;i<8;++i) {auto value=random();hash.add(&value,sizeof(value));}return "installed-"+hash.finish().substr(0,32);}
 }
-Json readConfiguration(const fs::path& path) {
-    const auto text=read(path);Json result;
+Json readConfiguration(const fs::path& path,uint64_t byteLimit,unsigned nodeLimit) {
+    const auto text=read(path,byteLimit);Json result;
     if(path.extension()==".json") {result=Json::parse(text);}
-    else {std::istringstream stream(text);YAML::Parser parser(stream);YamlGuard guard;if(!parser.HandleNextDocument(guard)) {throw std::runtime_error("Empty YAML config");}if(parser.HandleNextDocument(guard)) {throw std::runtime_error("Multiple YAML documents unsupported");}result=convert(YAML::Load(text));}
+    else {std::istringstream stream(text);YAML::Parser parser(stream);YamlGuard guard;guard.limit=nodeLimit;if(!parser.HandleNextDocument(guard)) {throw std::runtime_error("Empty YAML config");}if(parser.HandleNextDocument(guard)) {throw std::runtime_error("Multiple YAML documents unsupported");}result=convert(YAML::Load(text));}
     result.dump();return result;
 }
 fs::path authorizedPath(const fs::path& base,const std::string& relative,const std::vector<fs::path>& roots) {

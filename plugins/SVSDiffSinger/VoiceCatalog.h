@@ -35,7 +35,7 @@ struct Catalog {
 };
 // Scan input is a frozen list of explicitly authorized roots and host-owned IDs.
 std::shared_ptr<const Catalog> scan(const Json& context, uint64_t revision);
-Json readConfiguration(const fs::path& path);
+Json readConfiguration(const fs::path& path,uint64_t byteLimit=4*1024*1024,unsigned nodeLimit=100000);
 fs::path authorizedPath(const fs::path& base, const std::string& relative, const std::vector<fs::path>& roots);
 Json engineSettings();
 }
