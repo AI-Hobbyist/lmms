@@ -1,6 +1,17 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
+add_executable(SVSProjectProcessTest svs/SVSProjectProcessTest.cpp
+ ../src/core/svs/SVSProjectBridge.cpp ../include/SVSProjectBridge.h)
+target_include_directories(SVSProjectProcessTest PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_compile_features(SVSProjectProcessTest PRIVATE cxx_std_20)
+target_compile_definitions(SVSProjectProcessTest PRIVATE
+ LMMS_SVS_PROJECT_RUNTIME="${CMAKE_BINARY_DIR}/Release/svs-project")
+target_link_libraries(SVSProjectProcessTest PRIVATE ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+add_test(NAME SVSProjectProcessTest COMMAND SVSProjectProcessTest
+ -o "${CMAKE_CURRENT_BINARY_DIR}/SVSProjectProcessTest-results.txt,txt" -o "-,txt")
+set_tests_properties(SVSProjectProcessTest PROPERTIES TIMEOUT 90 LABELS "svs;project;M1")
+
 set(LMMS_TESTS
 	src/core/ArrayVectorTest.cpp
 	src/core/AudioBufferTest.cpp

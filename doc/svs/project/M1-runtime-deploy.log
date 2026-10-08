@@ -1,0 +1,162 @@
+M0 source audit PASS: 40 plugins, 45 suffixes, 36 import / 39 export directions.
+Collecting backports.zstd==1.7.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 1))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\backports_zstd-1.7.0-cp313-cp313-win_amd64.whl
+Collecting cbor2==6.1.5 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 2))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\cbor2-6.1.5-cp313-cp313-win_amd64.whl
+Collecting charset-normalizer==3.5.2 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 3))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\charset_normalizer-3.5.2-cp313-cp313-win_amd64.whl
+Collecting construct-typing==0.8.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 4))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\construct_typing-0.8.1-py3-none-any.whl
+Collecting construct==2.10.70 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 5))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\construct-2.10.70-py3-none-any.whl
+Collecting Jinja2==3.1.6 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 6))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\jinja2-3.1.6-py3-none-any.whl
+Collecting ko-pron==1.3 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 7))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\ko_pron-1.3-py3-none-any.whl
+Collecting loguru==0.7.3 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 8))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\loguru-0.7.3-py3-none-any.whl
+Collecting more-itertools==11.1.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 9))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\more_itertools-11.1.0-py3-none-any.whl
+Collecting packaging==26.3 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 10))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\packaging-26.3-py3-none-any.whl
+Collecting platformdirs==4.12.4 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 11))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\platformdirs-4.12.4-py3-none-any.whl
+Collecting portion==2.6.3 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 12))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\portion-2.6.3-py3-none-any.whl
+Collecting protobuf-py==0.6.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 13))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\protobuf_py-0.6.0-py3-none-any.whl
+Collecting protobuf-py-ext==0.6.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 14))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\protobuf_py_ext-0.6.0-cp311-abi3-win_amd64.whl
+Collecting pydantic==2.14.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 15))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pydantic-2.14.0-py3-none-any.whl
+Collecting pydantic_core==2.50.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 16))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pydantic_core-2.50.0-cp313-cp313-win_amd64.whl
+Collecting pydantic-extra-types==2.11.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 17))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pydantic_extra_types-2.11.1-py3-none-any.whl
+Collecting pydantic-settings==2.15.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 18))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pydantic_settings-2.15.0-py3-none-any.whl
+Collecting pymediainfo==7.0.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 19))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pymediainfo-7.0.1-py3-none-win_amd64.whl
+Collecting pypinyin==0.55.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 20))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pypinyin-0.55.0-py2.py3-none-any.whl
+Collecting pysubs2==1.9.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 21))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pysubs2-1.9.0-py3-none-any.whl
+Collecting PyYAML-ft==8.0.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 22))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pyyaml_ft-8.0.0-cp313-cp313-win_amd64.whl
+Collecting retrie==0.3.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 23))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\retrie-0.3.1-py2.py3-none-any.whl
+Collecting ruamel.yaml==0.19.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 24))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\ruamel_yaml-0.19.1-py3-none-any.whl
+Collecting sortedcontainers==2.4.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 25))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\sortedcontainers-2.4.0-py2.py3-none-any.whl
+Collecting svg.py==1.10.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 26))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\svg_py-1.10.0-py3-none-any.whl
+Collecting TatSu-LTS==5.16.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 27))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\tatsu_lts-5.16.0-py3-none-any.whl
+Collecting universal_pathlib==0.3.10 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 28))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\universal_pathlib-0.3.10-py3-none-any.whl
+Collecting pathlib_abc==0.5.2 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 29))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pathlib_abc-0.5.2-py3-none-any.whl
+Collecting xsdata_pydantic==24.5 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 30))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\xsdata_pydantic-24.5-py3-none-any.whl
+Collecting zhon==2.1.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 31))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\zhon-2.1.1-py3-none-any.whl
+Collecting annotated-types==0.8.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 32))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\annotated_types-0.8.0-py3-none-any.whl
+Collecting arrow==1.4.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 33))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\arrow-1.4.0-py3-none-any.whl
+Collecting bidict==0.24.1 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 34))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\bidict-0.24.1-py3-none-any.whl
+Collecting colorama==0.4.6 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 35))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\colorama-0.4.6-py2.py3-none-any.whl
+Collecting fsspec==2026.9.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 36))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\fsspec-2026.9.0-py3-none-any.whl
+Collecting lxml==6.1.3 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 37))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\lxml-6.1.3-cp313-cp313-win_amd64.whl
+Collecting MarkupSafe==3.0.4 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 38))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\markupsafe-3.0.4-cp313-cp313-win_amd64.whl
+Collecting python-dateutil==2.9.0.post0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 39))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\python_dateutil-2.9.0.post0-py2.py3-none-any.whl
+Collecting python-dotenv==1.2.4 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 40))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\python_dotenv-1.2.4-py3-none-any.whl
+Collecting pyzipper==0.4.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 41))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pyzipper-0.4.0-py3-none-any.whl
+Collecting six==1.17.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 42))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\six-1.17.0-py2.py3-none-any.whl
+Collecting that-depends==4.2.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 43))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\that_depends-4.2.0-py3-none-any.whl
+Collecting typing_extensions==4.16.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 44))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\typing_extensions-4.16.0-py3-none-any.whl
+Collecting typing-inspection==0.4.4 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 45))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\typing_inspection-0.4.4-py3-none-any.whl
+Collecting win32_setctime==1.2.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 46))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\win32_setctime-1.2.0-py3-none-any.whl
+Collecting xsdata==26.2 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 47))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\xsdata-26.2-py3-none-any.whl
+Collecting jyutping==0.3.4 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 48))
+  Using cached jyutping-0.3.4-py2.py3-none-any.whl
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\jyutping-0.3.4-py2.py3-none-any.whl
+Collecting pycryptodomex==3.24.0 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 49))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\pycryptodomex-3.24.0-cp37-abi3-win_amd64.whl
+Collecting tzdata==2026.5 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 50))
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\tzdata-2026.5-py2.py3-none-any.whl
+Collecting wanakana-python==1.2.2 (from -r D:\UserData\Desktop\Project\lmms\build\svs-project-wheels\requirements.txt (line 51))
+  Using cached wanakana_python-1.2.2-py3-none-any.whl
+  File was already downloaded d:\userdata\desktop\project\lmms\build\svs-project-wheels\wanakana_python-1.2.2-py3-none-any.whl
+Processing .\build\svs-project-wheels\annotated_types-0.8.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\arrow-1.4.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\backports_zstd-1.7.0-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\bidict-0.24.1-py3-none-any.whl
+Processing .\build\svs-project-wheels\cbor2-6.1.5-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\charset_normalizer-3.5.2-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\colorama-0.4.6-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\construct-2.10.70-py3-none-any.whl
+Processing .\build\svs-project-wheels\construct_typing-0.8.1-py3-none-any.whl
+Processing .\build\svs-project-wheels\fsspec-2026.9.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\jinja2-3.1.6-py3-none-any.whl
+Processing .\build\svs-project-wheels\jyutping-0.3.4-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\ko_pron-1.3-py3-none-any.whl
+Processing .\build\svs-project-wheels\libresvip-2.9.2-py3-none-any.whl
+Processing .\build\svs-project-wheels\loguru-0.7.3-py3-none-any.whl
+Processing .\build\svs-project-wheels\lxml-6.1.3-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\markupsafe-3.0.4-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\more_itertools-11.1.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\packaging-26.3-py3-none-any.whl
+Processing .\build\svs-project-wheels\pathlib_abc-0.5.2-py3-none-any.whl
+Processing .\build\svs-project-wheels\platformdirs-4.12.4-py3-none-any.whl
+Processing .\build\svs-project-wheels\portion-2.6.3-py3-none-any.whl
+Processing .\build\svs-project-wheels\protobuf_py-0.6.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\protobuf_py_ext-0.6.0-cp311-abi3-win_amd64.whl
+Processing .\build\svs-project-wheels\pycryptodomex-3.24.0-cp37-abi3-win_amd64.whl
+Processing .\build\svs-project-wheels\pydantic-2.14.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\pydantic_core-2.50.0-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\pydantic_extra_types-2.11.1-py3-none-any.whl
+Processing .\build\svs-project-wheels\pydantic_settings-2.15.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\pymediainfo-7.0.1-py3-none-win_amd64.whl
+Processing .\build\svs-project-wheels\pypinyin-0.55.0-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\pysubs2-1.9.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\python_dateutil-2.9.0.post0-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\python_dotenv-1.2.4-py3-none-any.whl
+Processing .\build\svs-project-wheels\pyyaml_ft-8.0.0-cp313-cp313-win_amd64.whl
+Processing .\build\svs-project-wheels\pyzipper-0.4.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\retrie-0.3.1-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\ruamel_yaml-0.19.1-py3-none-any.whl
+Processing .\build\svs-project-wheels\six-1.17.0-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\sortedcontainers-2.4.0-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\svg_py-1.10.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\tatsu_lts-5.16.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\that_depends-4.2.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\typing_extensions-4.16.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\typing_inspection-0.4.4-py3-none-any.whl
+Processing .\build\svs-project-wheels\tzdata-2026.5-py2.py3-none-any.whl
+Processing .\build\svs-project-wheels\universal_pathlib-0.3.10-py3-none-any.whl
+Processing .\build\svs-project-wheels\wanakana_python-1.2.2-py3-none-any.whl
+Processing .\build\svs-project-wheels\win32_setctime-1.2.0-py3-none-any.whl
+Processing .\build\svs-project-wheels\xsdata-26.2-py3-none-any.whl
+Processing .\build\svs-project-wheels\xsdata_pydantic-24.5-py3-none-any.whl
+Processing .\build\svs-project-wheels\zhon-2.1.1-py3-none-any.whl
+Installing collected packages: wanakana-python, sortedcontainers, ko-pron, jyutping, zhon, xsdata-pydantic, xsdata, win32-setctime, universal-pathlib, tzdata, typing-inspection, typing-extensions, that-depends, tatsu-lts, svg-py, six, ruamel-yaml, retrie, pyzipper, pyyaml-ft, python-dotenv, python-dateutil, pysubs2, pypinyin, pymediainfo, pydantic-settings, pydantic-extra-types, pydantic-core, pydantic, pycryptodomex, protobuf-py-ext, protobuf-py, portion, platformdirs, pathlib-abc, packaging, more-itertools, markupsafe, lxml, loguru, libresvip, jinja2, fsspec, construct-typing, construct, colorama, charset-normalizer, cbor2, bidict, backports-zstd, arrow, annotated-types
+
+Successfully installed annotated-types-0.8.0 arrow-1.4.0 backports-zstd-1.7.0 bidict-0.24.1 cbor2-6.1.5 charset-normalizer-3.5.2 colorama-0.4.6 construct-2.10.70 construct-typing-0.8.1 fsspec-2026.9.0 jinja2-3.1.6 jyutping-0.3.4 ko-pron-1.3 libresvip-2.9.2 loguru-0.7.3 lxml-6.1.3 markupsafe-3.0.4 more-itertools-11.1.0 packaging-26.3 pathlib-abc-0.5.2 platformdirs-4.12.4 portion-2.6.3 protobuf-py-0.6.0 protobuf-py-ext-0.6.0 pycryptodomex-3.24.0 pydantic-2.14.0 pydantic-core-2.50.0 pydantic-extra-types-2.11.1 pydantic-settings-2.15.0 pymediainfo-7.0.1 pypinyin-0.55.0 pysubs2-1.9.0 python-dateutil-2.9.0.post0 python-dotenv-1.2.4 pyyaml-ft-8.0.0 pyzipper-0.4.0 retrie-0.3.1 ruamel-yaml-0.19.1 six-1.17.0 sortedcontainers-2.4.0 svg-py-1.10.0 tatsu-lts-5.16.0 that-depends-4.2.0 typing-extensions-4.16.0 typing-inspection-0.4.4 tzdata-2026.5 universal-pathlib-0.3.10 wanakana-python-1.2.2 win32-setctime-1.2.0 xsdata-26.2 xsdata-pydantic-24.5 zhon-2.1.1
+Deployed isolated runtime: 3.13.12 (tags/v3.13.12:1cbe481, Feb  3 2026, 18:22:25) [MSC v.1944 64 bit (AMD64)]
+LibreSVIP 2.9.2

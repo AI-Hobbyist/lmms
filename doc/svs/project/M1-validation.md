@@ -1,0 +1,39 @@
+# M1 转换桥和运行时
+
+2026-10-09。原位目录 `build/Release/svs-project`，CPython 3.13.12 x64、
+LibreSVIP 2.9.2。52 个 wheel 的实际 SHA-256 见 runtime-lock；全部依赖
+精确版本见 requirements-win313。核心源码与上游锁仍按 M0 摘要校验。
+运行时不读取系统 Python 包，不导入用户外部插件管理器。
+
+验收证据：
+
+- `M1-runtime-deploy.log`：内嵌 Python 和所有依赖原位部署，包含许可。
+- `M1-runtime-catalog.json`：全部 40 个插件加载、45 后缀、36 导入与39 导出
+  方向；逐方向有效默认值和选项 schema。
+- `M1-bridge-test.log`：全部目录及方向 schema、JSON/SVP/USTX/TLP 真实双向
+  转换、中日韩路径、损坏输入、只读拒写与压缩包越界拒绝通过。
+- `M1-process-test.log`、`M1-process-QtTest.txt`：Qt QProcess 真进程目录查询、
+  单任务互斥、资源保留/释放、取消、超时、运行时缺失和崩溃清理通过。
+  这是 QCoreApplication 进程测试，不是 GUI 验收，没有使用 offscreen。
+- `M1-configure.log`、`M1-process-build.log`：复用已有 build 与 Qt 6.10.3。
+
+阶段不改变插件 ABI/目标或声库部署；已有开发程序位置为
+`D:/UserData/Desktop/Project/lmms/build/Release/lmms.exe`。插件目录仍为
+`build/Release/plugins`；配置禁用 Sid 的既有 `sid.dll.disabled` 保持退役。
+本阶段没有以旧程序冒记新增菜单 GUI 通过，M2/M4 构建开发程序并验证。
+
+重建运行时命令（在工程根、前台 PowerShell，先加载 SDK 环境）：
+
+```powershell
+. ./buildtools/Enter-LmmsEnvironment.ps1
+& python buildtools/deploy-svs-project-runtime.py 2>&1 | Tee-Object -FilePath build.log
+$buildExitCode = $LASTEXITCODE
+if ($buildExitCode -ne 0) { Get-Content build.log; exit $buildExitCode }
+```
+
+构建工具 Python 必须为 3.13.12。宿主只从部署树启动内嵌 Python，不要求
+最终用户安装 Python 或联网。开发部署装配需要固定源码与 wheel 来源；
+已有缓存重新部署会验证 wheel/hash。CMake install 将同一目录与程序打包，
+未装配运行时时安装失败，不悄悄省略转换支持。
+
+75 项全格式真实样例仍属于 M4，M1 的四种代表格式不能代替 M4 通过。

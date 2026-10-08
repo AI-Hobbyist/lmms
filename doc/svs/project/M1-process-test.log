@@ -1,0 +1,12 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start 7: SVSProjectProcessTest
+1/1 Test #7: SVSProjectProcessTest ............   Passed    4.10 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+M1         =   4.10 sec*proc (1 test)
+project    =   4.10 sec*proc (1 test)
+svs        =   4.10 sec*proc (1 test)
+
+Total Test time (real) =   4.13 sec

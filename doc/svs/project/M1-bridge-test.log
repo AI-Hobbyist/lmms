@@ -1,0 +1,79 @@
+test_all_formats_and_direction_schemas (__main__.BridgeTest.test_all_formats_and_direction_schemas) ... ok
+test_invalid_protocol_and_paths (__main__.BridgeTest.test_invalid_protocol_and_paths) ... ok
+test_representative_roundtrip_unicode (__main__.BridgeTest.test_representative_roundtrip_unicode) ... ok
+Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 170, in main
+
+    response.update(process(request, workspace))
+
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+----------------------------------------------------------------------
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 114, in process
+
+    project = converter.load(source, effective)
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\svp\synthv_studio_converter.py", line 29, in load
+
+    sv_proj = SVProject.model_validate_json(sv_content, context={"path": path})
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\pydantic\main.py", line 845, in model_validate_json
+
+    return cls.__pydantic_validator__.validate_json(
+
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+
+        json_data, strict=strict, extra=extra, context=context, by_alias=by_alias, by_name=by_name
+
+Ran 3 tests in 33.262s
+
+OK
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    )
+
+    ^
+
+pydantic_core._pydantic_core.ValidationError: 1 validation error for SVProject
+
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='corrupted', input_type=str]
+
+    For further information visit https://errors.pydantic.dev/2.14/v/json_invalid
+
+
+Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 170, in main
+
+    response.update(process(request, workspace))
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 129, in process
+
+    raise ValueError("Format is import-only")
+
+ValueError: Format is import-only
+
+
+Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 170, in main
+
+    response.update(process(request, workspace))
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 107, in process
+
+    check_archive(path)
+
+    ~~~~~~~~~~~~~^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 54, in check_archive
+
+    raise ValueError("Unsafe archive resource path: " + name)
+
+ValueError: Unsafe archive resource path: ../escape.wav

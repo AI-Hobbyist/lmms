@@ -1,0 +1,214 @@
+{
+  "python": "3.13.12",
+  "pythonArchiveSha256": "76f238f606250c87c6beac75dccd35ee99070a13490555936abb6cb64ecce3d0",
+  "wheels": [
+    {
+      "file": "annotated_types-0.8.0-py3-none-any.whl",
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0"
+    },
+    {
+      "file": "arrow-1.4.0-py3-none-any.whl",
+      "sha256": "749f0769958ebdc79c173ff0b0670d59051a535fa26e8eba02953dc19eb43205"
+    },
+    {
+      "file": "backports_zstd-1.7.0-cp313-cp313-win_amd64.whl",
+      "sha256": "8086b4a7443bb2863f7ef8edb317b715d5f3ccec6c5512619bd23d57661ba1b7"
+    },
+    {
+      "file": "bidict-0.24.1-py3-none-any.whl",
+      "sha256": "fd3eaa737917d8a14f4baa391670c433c4e3f6f5fd2cd99d4bf436437f432364"
+    },
+    {
+      "file": "cbor2-6.1.5-cp313-cp313-win_amd64.whl",
+      "sha256": "af14089f5fb36f89b3f766acc7d4990cdfba7487ec0249d51bfa3a8caad25f0a"
+    },
+    {
+      "file": "charset_normalizer-3.5.2-cp313-cp313-win_amd64.whl",
+      "sha256": "78456a747de8dc58360ffa581f30a002baf5aa28cb262536545e91f113ed7639"
+    },
+    {
+      "file": "colorama-0.4.6-py2.py3-none-any.whl",
+      "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+    },
+    {
+      "file": "construct-2.10.70-py3-none-any.whl",
+      "sha256": "c80be81ef595a1a821ec69dc16099550ed22197615f4320b57cc9ce2a672cb30"
+    },
+    {
+      "file": "construct_typing-0.8.1-py3-none-any.whl",
+      "sha256": "9b5845dbaf959c9d960f5105f9ab3533227c4da2b76baa57d1f1c0aa2a088cdb"
+    },
+    {
+      "file": "fsspec-2026.9.0-py3-none-any.whl",
+      "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f"
+    },
+    {
+      "file": "jinja2-3.1.6-py3-none-any.whl",
+      "sha256": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"
+    },
+    {
+      "file": "jyutping-0.3.4-py2.py3-none-any.whl",
+      "sha256": "34dd5a5e7c9d29103fc8a8d3ffcc55e838f7e7a0c88d52cef72c00475829fb45"
+    },
+    {
+      "file": "ko_pron-1.3-py3-none-any.whl",
+      "sha256": "72c9ebbdb6c0c5f6981c143cee978158662d12c6302545686a1c4e0fcaad2017"
+    },
+    {
+      "file": "libresvip-2.9.2-py3-none-any.whl",
+      "sha256": "5fbc17fbde097812c0b46ac2021353a1171fe1a478229bdf91ad23625faf9f0b"
+    },
+    {
+      "file": "loguru-0.7.3-py3-none-any.whl",
+      "sha256": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c"
+    },
+    {
+      "file": "lxml-6.1.3-cp313-cp313-win_amd64.whl",
+      "sha256": "e477aca0bc0d19f3b4ae9e4f2a1cfd687c31bf772d78734910658186b40b2477"
+    },
+    {
+      "file": "markupsafe-3.0.4-cp313-cp313-win_amd64.whl",
+      "sha256": "1f1f9477e174582b0a1b583d60b66e1f2cf5d3fe12cee985e4aedf44766600e5"
+    },
+    {
+      "file": "more_itertools-11.1.0-py3-none-any.whl",
+      "sha256": "4b65538ae22f6fed0ce4874efd317463a7489796a0939fa66824dd542125a192"
+    },
+    {
+      "file": "packaging-26.3-py3-none-any.whl",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+    },
+    {
+      "file": "pathlib_abc-0.5.2-py3-none-any.whl",
+      "sha256": "4c9d94cf1b23af417ce7c0417b43333b06a106c01000b286c99de230d95eefbb"
+    },
+    {
+      "file": "platformdirs-4.12.4-py3-none-any.whl",
+      "sha256": "78bfb9db2a8471ed7eebe3c3c932da413911042994e699b384fbb4493fa872d7"
+    },
+    {
+      "file": "portion-2.6.3-py3-none-any.whl",
+      "sha256": "9f5a26de92ff1241c7ba7ab23da0b544e67308187100681512871a50d6d206f1"
+    },
+    {
+      "file": "protobuf_py-0.6.0-py3-none-any.whl",
+      "sha256": "2aba52a2d017487901cb4b8a7983e64a7bd369128c2ca86cafa4dd03da31012e"
+    },
+    {
+      "file": "protobuf_py_ext-0.6.0-cp311-abi3-win_amd64.whl",
+      "sha256": "b5be43ebf9ec28aa7e3734bf07c0ea4ae50c2e7554b9299ea08433549052e8d2"
+    },
+    {
+      "file": "pycryptodomex-3.24.0-cp37-abi3-win_amd64.whl",
+      "sha256": "55f22d72250d7923aac3c2442ec6a1dd8774d2efa3bdcb0f68d5e137d372268e"
+    },
+    {
+      "file": "pydantic-2.14.0-py3-none-any.whl",
+      "sha256": "15fab1bea6f1dc5003b54fc2ecab230c1fd1dbade2acd4addc52d81e32416d4b"
+    },
+    {
+      "file": "pydantic_core-2.50.0-cp313-cp313-win_amd64.whl",
+      "sha256": "4f96ccd9368ecbf6685d8f6981584ab72b4f0ffd20685e747737e7e340277b8d"
+    },
+    {
+      "file": "pydantic_extra_types-2.11.1-py3-none-any.whl",
+      "sha256": "1722ea2bddae5628ace25f2aa685b69978ef533123e5638cfbddb999e0100ec1"
+    },
+    {
+      "file": "pydantic_settings-2.15.0-py3-none-any.whl",
+      "sha256": "0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42"
+    },
+    {
+      "file": "pymediainfo-7.0.1-py3-none-win_amd64.whl",
+      "sha256": "13224fa7590e198763b8baf072e704ea81d334e71aa32a469091460e243893c7"
+    },
+    {
+      "file": "pypinyin-0.55.0-py2.py3-none-any.whl",
+      "sha256": "d53b1e8ad2cdb815fb2cb604ed3123372f5a28c6f447571244aca36fc62a286f"
+    },
+    {
+      "file": "pysubs2-1.9.0-py3-none-any.whl",
+      "sha256": "83f1979cb7e064294f0c8473ef672ca2e5c0a7172bbf8ae9b4337899d5cdf01f"
+    },
+    {
+      "file": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+    },
+    {
+      "file": "python_dotenv-1.2.4-py3-none-any.whl",
+      "sha256": "42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc"
+    },
+    {
+      "file": "pyyaml_ft-8.0.0-cp313-cp313-win_amd64.whl",
+      "sha256": "58e1015098cf8d8aec82f360789c16283b88ca670fe4275ef6c48c5e30b22a96"
+    },
+    {
+      "file": "pyzipper-0.4.0-py3-none-any.whl",
+      "sha256": "aa7b8a0fe741d67aac36ead85f6e735af107b72f84e0775f2ed565fc0d3a2f02"
+    },
+    {
+      "file": "retrie-0.3.1-py2.py3-none-any.whl",
+      "sha256": "cb67a394f93e66d3ee35592c0c65192f8c1d7f36e6a98e73306e439e97bf8d9d"
+    },
+    {
+      "file": "ruamel_yaml-0.19.1-py3-none-any.whl",
+      "sha256": "27592957fedf6e0b62f281e96effd28043345e0e66001f97683aa9a40c667c93"
+    },
+    {
+      "file": "six-1.17.0-py2.py3-none-any.whl",
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
+    },
+    {
+      "file": "sortedcontainers-2.4.0-py2.py3-none-any.whl",
+      "sha256": "a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"
+    },
+    {
+      "file": "svg_py-1.10.0-py3-none-any.whl",
+      "sha256": "54c7470347d5d79b30d059584a4f449da08b462903e8ce262981338bab755560"
+    },
+    {
+      "file": "tatsu_lts-5.16.0-py3-none-any.whl",
+      "sha256": "43b21f741a8d1b03148e84294aa6867ab0607f9c3325d93df8b0cf3ad8ece74b"
+    },
+    {
+      "file": "that_depends-4.2.0-py3-none-any.whl",
+      "sha256": "a06267e60fda353be071d7aa7b8dc452d4f79f067e643de6222c624b640f29c0"
+    },
+    {
+      "file": "typing_extensions-4.16.0-py3-none-any.whl",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+    },
+    {
+      "file": "typing_inspection-0.4.4-py3-none-any.whl",
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147"
+    },
+    {
+      "file": "tzdata-2026.5-py2.py3-none-any.whl",
+      "sha256": "b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"
+    },
+    {
+      "file": "universal_pathlib-0.3.10-py3-none-any.whl",
+      "sha256": "dfaf2fb35683d2eb1287a3ed7b215e4d6016aa6eaf339c607023d22f90821c66"
+    },
+    {
+      "file": "wanakana_python-1.2.2-py3-none-any.whl",
+      "sha256": "3bef6bddb74f561a7cec27e6fa93d3f7ec3ecc694d91fb01cc7b915d237e9a21"
+    },
+    {
+      "file": "win32_setctime-1.2.0-py3-none-any.whl",
+      "sha256": "95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390"
+    },
+    {
+      "file": "xsdata-26.2-py3-none-any.whl",
+      "sha256": "85a591a4405d903416afbd4a917e8dda8ea44641a3e66d72134bc2a31b3c16b0"
+    },
+    {
+      "file": "xsdata_pydantic-24.5-py3-none-any.whl",
+      "sha256": "bb6da7d3445d655640096c65c1b11037153b19df533da89553f24247ef352cd0"
+    },
+    {
+      "file": "zhon-2.1.1-py3-none-any.whl",
+      "sha256": "9ec0d42229ae60708a045270f755ccefb48f2689f2a6ce0bc6597abf6c4a9871"
+    }
+  ]
+}
