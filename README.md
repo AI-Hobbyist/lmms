@@ -1,3 +1,29 @@
+# LMMS enhanced development branch
+
+This fork is maintained as an independent development branch and will continue to sync updates from upstream [LMMS](https://github.com/LMMS/lmms). All branch enhancements listed below were developed with AI assistance.
+
+The comparison uses this fork's inherited upstream baseline (`a2f57e70c`), rather than making claims about future upstream releases. The original upstream README is preserved below.
+
+| Area | Inherited upstream baseline | Enhancements in this branch |
+| --- | --- | --- |
+| Local automation API | Interactive project editing and the existing LMMS command-line workflow | An optional command API for project queries, track/clip/note edits, instruments, mixing, automation, playback and export, with serialized transactions, undo and rollback. [Command reference](data/agent/command-reference.md) |
+| Composition scripts | Existing editing and arrangement tools | Local JSON scripts, built-in composition helpers, reproducible seeds, assertions and dry-run diffs. Scripts use the same project command bus. [Local tools](data/agent/README.md) |
+| MCP access | No branch-specific local MCP endpoint | An optional bearer-authenticated loopback HTTP MCP server, tool discovery and calls, settings controls, audio previews and exports. It is disabled at runtime by default. [MCP guide](data/agent/MCP.md) |
+| Windows VST2 hosting | Existing VST2 instruments/effects and remote helpers | Supervised x86/x64 helper processes, crash/hang containment, bounded realtime communication, shell identities and native editor/parameter lifecycle fixes. [Validation](VST3_SUPPORT_VALIDATION.md) |
+| Windows VST3 hosting and discovery | Existing VST2 instrument/effect entry points | Native VST3 through VeSTige and VstEffect, multiple search roots, categorized discovery, multi-class modules and WaveShell selection; verified Kontakt/editor compatibility fixes. [Progress and scope](VST3_SUPPORT_PROGRESS.md) |
+| Singing voice tracks | MIDI, sample, pattern and automation tracks | A dedicated SVS track, independent piano editor, capability-driven voice/language/parameter controls, pronunciation dictionaries, phoneme editing, pitch curves and read-only synthesis references. [SVS validation](doc/svs/M1-validation.md) |
+| SVS plugin development | No branch-specific SVS plugin ABI | A standalone native C ABI / C++ SDK, optional engine settings and catalog/resource queries, examples and conformance tooling, preserving ABI 1.0–1.3 compatibility. [SDK](sdk/svs/README.md) |
+| DiffSinger | No native DiffSinger engine in this baseline | Native CPU duration, pitch, variance, acoustic and vocoder inference; external voicebank discovery and a complete plugin dependency folder. Six local voicebanks validated. [A0–A4 results](doc/svs/DiffSinger-A4-validation.md) |
+| SVS rendering and cache | Existing general audio rendering | Incremental rendering split at empty beats/rests, reuse of unaffected segments, current/total progress in Song Editor, frozen complete exports, and SHA256-named audio/tensor caches under `cache/SVS`. [Segment validation](doc/svs/SVS-segment-rendering-validation.md) |
+| SVS visual editing | Existing MIDI piano and clip display | Per-parameter curve colors, pronunciation above notes with original lyrics inside, optional voice pitch-range shading/text, phoneme-prefix display controls, thicker note waveforms and optional Song Editor background waveforms. |
+| Interface and themes | Original LMMS controls, canvases and plugin panels | Compact flat controls, vector state assets, rounded clips, modernized editor/host panels and native-window validation, retaining existing fixed instrument artwork. [UI acceptance](doc/ui-modernization/acceptance.md) |
+
+Current release validation targets Windows x64, with x86/x64 VST helpers. DiffSinger currently uses CPU; DirectML acceleration is planned and has not been implemented. The linked records distinguish automated results from pending listening, external-runtime and visual checks.
+
+## Original upstream README
+
+---
+
 <div align="center">
 	<h1>
 	<img src="https://raw.githubusercontent.com/LMMS/artwork/master/Icon%20%26%20Mimetypes/lmms-64x64.svg" alt="LMMS Logo"><br>LMMS
