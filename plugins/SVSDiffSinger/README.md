@@ -39,3 +39,18 @@ The dictionary/language implementation must follow `tlds_ref`: select languages
 from each voice's declared capability, retain each stage's token/language IDs,
 and resolve entries/symbols/replacements in the reference priority order.
 Missing automatic pronunciation support must produce a diagnostic.
+
+Global shared vocoder directories can be set independently of voicebank roots
+using `diffsinger.vocoderDirectories` in the engine-wide settings. Each selected
+directory may contain multiple `<vocoder-name>/vocoder.{json,yaml,yml}` packages
+at any nested depth and their referenced model files. An individual named
+vocoder package directory may also be selected. The name comes from the voicebank acoustic configuration's `vocoder`
+field. Bundled `dsvocoder/vocoder.*` takes priority over shared vocoders; an
+invalid bundled vocoder reports an error instead of silently changing models.
+Explicit global roots are searched in listed order, followed by the existing
+`<voicebank-root>/Vocoders/<vocoder-name>` locations. Configurations and referenced
+files must stay within their authorized packages and match the acoustic mel/audio
+configuration. Applying shared directory changes refreshes the catalog
+asynchronously. Changing shared model contents also changes synthesis cache
+fingerprints on rescan. Missing duration/pitch/variance configurations are optional;
+required acoustic/vocoder resources are not. Phoneme aliases may share token IDs.

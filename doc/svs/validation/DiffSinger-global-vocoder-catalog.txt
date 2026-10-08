@@ -1,0 +1,9 @@
+PASS phoneme aliases / optional predictors absent / shared vocoder setting / bundled priority / shared fingerprint / invalid declarations
+PASS native fixtures: SHA256 / recursive / Unicode / metadata / JSON / IDs / move / conflict / resources / permissions / cycle / bad configuration
+PASS package=fu2_ning2_na4 id=installed-a729b3615ce903773c0a504157d32432 fingerprint=9ef21e28b1292635b4c6bc4b206594f0e646d6df848ae004a867045c2006d437 models/stages/resources/languages
+PASS package=na4_wei2_lai2_te4 id=installed-67751d706272517db312eebb5b7ae28a fingerprint=e6777b150182154aa7877b9f773e865b192cea32032489d9281a3c693a97a914 models/stages/resources/languages
+PASS package=na4_xi1_da2 id=installed-5fbce73d378b2acad25cf3b52f7576a8 fingerprint=aed10f8e8a15e5f5e4b1c0ae156a7683b4f7c9ae1ffe10b94f05d080f5be9daf models/stages/resources/languages
+PASS package=wen1_di2 id=installed-23bc755541eb7283962cbe61cd945dd1 fingerprint=c4e52845a29144b5f02c740f2cd14e359202e1bd8951f2e3f5bfd7d8069278aa models/stages/resources/languages
+PASS package=xi1_ge2_wen2 id=installed-27371e30d6550fd77b5c6b52dc155ebe fingerprint=c0cada432bfc9dc59a28d86e918033a36011f8f0d87d9e472275220f1338f22f models/stages/resources/languages
+PASS package=xia2_die2 id=installed-cfb6328ad3d92d2eb280f09611b35484 fingerprint=647d2a86a3fa37b57429cae0a90fb9b6c5893e5456b255004192a0f666a9758f models/stages/resources/languages
+PASS six-package native catalog, stable rescan, predictors/vocoders=0 false positives

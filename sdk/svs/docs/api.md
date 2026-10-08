@@ -25,6 +25,8 @@ Call declaration functions serially per engine on the host data worker. A synthe
 
 LMMS queues startup voicebank queries, applied directory changes and rescans on a dedicated catalog worker. Existing voices remain available until a successful result is published on the main thread. Only the latest request for an engine may publish its catalog or installation IDs; failed scans retain the last valid host catalog. Closing the settings window does not end the scan. Shutdown discards pending jobs and joins the active callback before unloading the engine. The catalog ABI has no cancellation callback, so an active query must return normally. These host scheduling rules add no ABI fields.
 
+DiffSinger declares `diffsinger.vocoderDirectories` through the existing engine-wide `directory-list` descriptor and receives its values through `engineSettings` in catalog context and snapshots. The deployed engine defaults to `svs/vocoders` beside its package, supports multiple recursively searched roots, and gives bundled vocoders priority. This engine-specific setting does not add ABI fields or a new SDK path API. Shared model content is part of the voice fingerprint; rescan after changing it.
+
 Before shutdown: cancel tasks, join synthesis and declaration workers, discard obsolete queued deliveries, release results/resources, destroy sessions, destroy engines, then unload the library. A completion notification is informational: actual result publication still checks clip ID, generation, revision, and request ID. The callback does not authorize publishing a stale result.
 
 ## Inputs and outputs

@@ -29,6 +29,9 @@ foreach ($path in Get-Content -LiteralPath (Join-Path $project 'build/install_ma
 $svsExampleDll = Join-Path $runtime 'svs/SVSExample/SVSExample.dll'
 if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) { throw 'Deployed SVS example DLL missing.' }
 $payload['svs/SVSExample/SVSExample.dll'] = $svsExampleDll
+$sharedVocoderReadme = Join-Path $runtime 'svs/vocoders/README.md'
+if (-not (Test-Path -LiteralPath $sharedVocoderReadme -PathType Leaf)) { throw 'Default shared vocoder directory instructions missing.' }
+$payload['svs/vocoders/README.md'] = $sharedVocoderReadme
 $diffSingerPackage = Join-Path $runtime 'svs/SVSDiffSinger'
 if (-not (Test-Path -LiteralPath $diffSingerPackage -PathType Container)) { throw 'Deployed DiffSinger package missing.' }
 foreach ($file in Get-ChildItem -LiteralPath $diffSingerPackage -File -Recurse) {

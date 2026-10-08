@@ -1078,6 +1078,22 @@ private slots:
   tree->setParent(nullptr);tree->resize(360,700);tree->show();QVERIFY(QTest::qWaitForWindowExposed(tree));tree->scrollToItem(root,QAbstractItemView::PositionAtTop);QTest::qWait(500);
   QVERIFY(tree->screen()->grabWindow(tree->winId()).save("doc/svs/validation/SVS-browser-engine-groups.png"));tree->close();delete tree;
  }
+ void diffSingerGlobalVocoderSettings() {
+  const QString id="org.lmms.svs.diffsinger",key="engine_"+QString::fromLatin1(id.toUtf8().toHex());auto* config=ConfigManager::inst();const auto previous=config->value("svsEngineSettings",key);
+  auto restore=qScopeGuard([&]{config->setValue("svsEngineSettings",key,previous);});config->setValue("svsEngineSettings",key,"{}");
+  gui::SVSSettingsPage page;page.resize(1100,800);page.show();QVERIFY(QTest::qWaitForWindowExposed(&page));auto* tabs=page.findChild<QTabWidget*>("svsEngineTabs");auto* body=page.findChild<QWidget*>("svsEnginePage."+id);QVERIFY(tabs&&body);tabs->setCurrentWidget(body);
+  QTRY_VERIFY_WITH_TIMEOUT(body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories"),10000);
+  auto* editor=body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories");QCOMPARE(editor->findChildren<QLineEdit*>("svsDirectoryPath").size(),1);const auto defaultRoot=editor->findChild<QLineEdit*>("svsDirectoryPath")->text();QVERIFY(QDir::fromNativeSeparators(defaultRoot).endsWith("/svs/vocoders"));QTest::mouseClick(editor->findChild<QPushButton*>("svsDirectoryAdd"),Qt::LeftButton);
+  QTRY_COMPARE_WITH_TIMEOUT(body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")->findChildren<QLineEdit*>("svsDirectoryPath").size(),2,10000);
+  auto* path=body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")->findChildren<QLineEdit*>("svsDirectoryPath").last();path->setText(m_configuration.path());path->setModified(true);QVERIFY(QMetaObject::invokeMethod(path,"editingFinished"));page.save();
+  QTRY_VERIFY_WITH_TIMEOUT(!svs::Registry::instance().scanning(id),30000);
+  QCOMPARE(QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object()["diffsinger.vocoderDirectories"].toArray(),QJsonArray({defaultRoot,m_configuration.path()}));page.close();
+  gui::SVSSettingsPage reopened;reopened.resize(1100,800);reopened.show();QVERIFY(QTest::qWaitForWindowExposed(&reopened));auto* reopenedBody=reopened.findChild<QWidget*>("svsEnginePage."+id);reopened.findChild<QTabWidget*>("svsEngineTabs")->setCurrentWidget(reopenedBody);
+  QTRY_VERIFY_WITH_TIMEOUT(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories"),10000);
+  QTRY_VERIFY_WITH_TIMEOUT(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")->findChild<QLineEdit*>("svsDirectoryPath"),10000);
+  QCOMPARE(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")->findChildren<QLineEdit*>("svsDirectoryPath").size(),2);QCOMPARE(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")->findChildren<QLineEdit*>("svsDirectoryPath").last()->text(),m_configuration.path());
+  QTest::qWait(500);QVERIFY(reopened.screen()->grabWindow(reopened.winId()).save("doc/svs/validation/DiffSinger-global-vocoder-native-settings.png"));reopened.close();
+ }
  void diffSingerCatalogSettingsAndResources() {
   const auto root=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");if(root.isEmpty()) QSKIP("Explicit external DiffSinger fixture required");
   auto& registry=svs::Registry::instance();const QString id="org.lmms.svs.diffsinger";registry.voices();auto plugin=registry.plugin(id);QVERIFY2(plugin,"Native DiffSinger engine must be deployed");QVERIFY(plugin->hasCatalogQuery());
@@ -1087,10 +1103,10 @@ private slots:
   auto* panel=static_cast<gui::SVSParameterPanel*>(body->findChild<QWidget*>("svsParameterPanel"));QVERIFY(panel);
   QTRY_VERIFY_WITH_TIMEOUT(body->findChild<QDoubleSpinBox*>("svsParameter.track.diffsinger.renderSteps")!=nullptr,10000);
   auto* steps=body->findChild<QDoubleSpinBox*>("svsParameter.track.diffsinger.renderSteps");QCOMPARE(steps->minimum(),1.);QCOMPARE(steps->maximum(),100.);QCOMPARE(steps->value(),20.);
-  const auto declaration=plugin->engineSettings({}, {},error);QCOMPARE(declaration["engineSettings"].toArray().size(),3);
-  auto* add=body->findChild<QPushButton*>("svsDirectoryAdd");QVERIFY(add);QTest::mouseClick(add,Qt::LeftButton);
-  QTRY_COMPARE_WITH_TIMEOUT(body->findChildren<QLineEdit*>("svsDirectoryPath").size(),1,10000);
-  auto* path=body->findChild<QLineEdit*>("svsDirectoryPath");path->setText(root);path->setModified(true);QVERIFY(QMetaObject::invokeMethod(path,"editingFinished"));page.save();
+  const auto declaration=plugin->engineSettings({}, {},error);QCOMPARE(declaration["engineSettings"].toArray().size(),4);
+  auto* directories=body->findChild<QWidget*>("svsParameter.track.diffsinger.voicebankDirectories");QVERIFY(directories);auto* add=directories->findChild<QPushButton*>("svsDirectoryAdd");QVERIFY(add);QTest::mouseClick(add,Qt::LeftButton);
+  QTRY_COMPARE_WITH_TIMEOUT(directories->findChildren<QLineEdit*>("svsDirectoryPath").size(),1,10000);
+  auto* path=directories->findChild<QLineEdit*>("svsDirectoryPath");path->setText(root);path->setModified(true);QVERIFY(QMetaObject::invokeMethod(path,"editingFinished"));page.save();
   QTRY_VERIFY_WITH_TIMEOUT(!registry.scanning(id),30000);
   count=0;svs::Voice selected;for(const auto& voice:registry.voices()) if(voice.pluginId==id) {++count;selected=voice;}QCOMPARE(count,6);QVERIFY(selected.avatar.startsWith("svs-resource:"));
   const auto key="engine_"+QString::fromLatin1(id.toUtf8().toHex());auto* config=ConfigManager::inst();config->saveConfigFile();const auto saved=config->value("svsEngineSettings",key);config->loadConfigFile(m_configuration.filePath("svs-test-config.xml"));QCOMPARE(config->value("svsEngineSettings",key),saved);QCOMPARE(QJsonDocument::fromJson(saved.toUtf8()).object()["diffsinger.voicebankDirectories"].toArray(),QJsonArray{root});
@@ -1100,9 +1116,9 @@ private slots:
   {gui::SVSPianoRoll editor(clip);editor.resize(1200,800);editor.show();QVERIFY(QTest::qWaitForWindowExposed(&editor));QTest::qWait(500);QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/A1-native-voice-images.png"));editor.close();}
   const auto notes=clip->notes();QSignalSpy changes(&registry,&svs::Registry::catalogChanged);QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{m_configuration.path()}}},error),qPrintable(error));QVERIFY(!changes.isEmpty());QCOMPARE(track->voiceId(),selected.id);QCOMPARE(clip->notes()[0].lyric,notes[0].lyric);QCOMPARE(clip->notes()[0].parameters,notes[0].parameters);
   QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{root}}},error),qPrintable(error));QCOMPARE(track->voiceId(),selected.id);QCOMPARE(track->voice().version,selected.version);
-  page.close();gui::SVSSettingsPage reopened;reopened.resize(1000,750);reopened.show();QVERIFY(QTest::qWaitForWindowExposed(&reopened));auto* reopenedTabs=reopened.findChild<QTabWidget*>("svsEngineTabs");auto* reopenedBody=reopened.findChild<QWidget*>("svsEnginePage."+id);reopenedTabs->setCurrentWidget(reopenedBody);QTRY_COMPARE_WITH_TIMEOUT(reopenedBody->findChildren<QLineEdit*>("svsDirectoryPath").size(),1,10000);QCOMPARE(reopenedBody->findChild<QLineEdit*>("svsDirectoryPath")->text(),root);
+  page.close();gui::SVSSettingsPage reopened;reopened.resize(1000,750);reopened.show();QVERIFY(QTest::qWaitForWindowExposed(&reopened));auto* reopenedTabs=reopened.findChild<QTabWidget*>("svsEngineTabs");auto* reopenedBody=reopened.findChild<QWidget*>("svsEnginePage."+id);reopenedTabs->setCurrentWidget(reopenedBody);QTRY_VERIFY_WITH_TIMEOUT(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.voicebankDirectories"),10000);auto* reopenedDirectories=reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.voicebankDirectories");QTRY_COMPARE_WITH_TIMEOUT(reopenedDirectories->findChildren<QLineEdit*>("svsDirectoryPath").size(),1,10000);QCOMPARE(reopenedDirectories->findChild<QLineEdit*>("svsDirectoryPath")->text(),root);
   QTest::qWait(500);QVERIFY(reopened.screen()->grabWindow(reopened.winId()).save("doc/svs/validation/A1-native-settings.png"));
-  QTest::mouseClick(reopenedBody->findChild<QPushButton*>("svsDirectoryRemove"),Qt::LeftButton);QTRY_COMPARE_WITH_TIMEOUT(reopenedBody->findChildren<QLineEdit*>("svsDirectoryPath").size(),0,10000);reopened.save();QCOMPARE(QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object()["diffsinger.voicebankDirectories"].toArray().size(),0);reopened.close();
+  QTest::mouseClick(reopenedDirectories->findChild<QPushButton*>("svsDirectoryRemove"),Qt::LeftButton);QTRY_COMPARE_WITH_TIMEOUT(reopenedDirectories->findChildren<QLineEdit*>("svsDirectoryPath").size(),0,10000);reopened.save();QCOMPARE(QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object()["diffsinger.voicebankDirectories"].toArray().size(),0);reopened.close();
  }
  void diffSingerPronunciationAndSpeakerPersistence() {
   const auto root=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");if(root.isEmpty()) QSKIP("Explicit external DiffSinger fixture required");

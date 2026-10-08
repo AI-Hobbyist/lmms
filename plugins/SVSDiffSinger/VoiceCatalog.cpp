@@ -101,11 +101,31 @@ StageConfig stage(const fs::path& path,const std::vector<fs::path>& roots) {
         else if(value.is_array()&&std::string(key)=="languages") {int id=0;for(const auto& language:value) {if(!language.is_string()) {throw std::runtime_error("Invalid inline language");}map[language.get<std::string>()]=id++;}}
         else {throw std::runtime_error("Invalid "+std::string(key)+" mapping");}
         if(!map.is_object()||map.empty()) {throw std::runtime_error("Empty or invalid "+std::string(key)+" inventory");}
-        std::set<int64_t> ids;for(auto item=map.begin();item!=map.end();++item) {if(item.key().empty()||!item.value().is_number_integer()||item.value().get<int64_t>()<0||!ids.insert(item.value().get<int64_t>()).second) {throw std::runtime_error("Invalid/duplicate "+std::string(key)+" ID");}}
+        // Phoneme spellings may be aliases of the same model token.
+        // Language IDs still identify distinct language embeddings.
+        std::set<int64_t> ids;for(auto item=map.begin();item!=map.end();++item) {if(item.key().empty()||!item.value().is_number_integer()||item.value().get<int64_t>()<0||(std::string(key)=="languages"&&!ids.insert(item.value().get<int64_t>()).second)) {throw std::runtime_error("Invalid/duplicate "+std::string(key)+" ID");}}
     }
     return result;
 }
-std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::path>& roots,Json& diagnostics) {
+fs::path sharedVocoder(const fs::path& root,const std::string& name,Json& diagnostics) {
+    if(!fs::is_directory(root)) {return {};}
+    const auto base=fs::canonical(root);std::vector<fs::path> queue{base};std::set<fs::path,PathLess> visited;
+    while(!queue.empty()) {
+        const auto path=queue.back();queue.pop_back();
+        try {
+            const auto directory=fs::canonical(path);if(!within(directory,base)||!visited.insert(directory).second) {continue;}
+            if(visited.size()>10000) {throw std::runtime_error("Shared vocoder directory limit exceeded");}
+            if(directory.filename()==fs::u8path(name)) {
+                const auto config=selectConfig(directory,"vocoder",diagnostics);
+                if(!config.empty()) {return authorizedPath(base,config.lexically_relative(base).generic_u8string(),{base});}
+            }
+            std::vector<fs::path> children;for(const auto& item:fs::directory_iterator(directory)) {if(item.is_directory()) {children.push_back(item.path());}}
+            std::sort(children.begin(),children.end(),PathLess{});for(auto i=children.rbegin();i!=children.rend();++i) {queue.push_back(*i);}
+        }catch(const std::exception& error) {diagnostics.push_back({{"root",path.u8string()},{"stage","vocoder"},{"message",error.what()}});if(visited.size()>10000) {break;}}
+    }
+    return {};
+}
+std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::path>& roots,const std::vector<fs::path>& vocoderRoots,Json& diagnostics) {
     auto voice=std::make_shared<VoicePackage>();voice->root=root;
     auto acoustic=stage(selectConfig(root,"dsconfig",diagnostics),{root});
     if(!acoustic.models.count("acoustic")&&!acoustic.models.count("fs2")) {throw std::runtime_error("No acoustic model");}
@@ -113,7 +133,15 @@ std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::pa
     voice->stages["acoustic"]=std::move(acoustic);
     for(const auto& role:std::vector<std::pair<std::string,std::string>>{{"duration","dsdur"},{"pitch","dspitch"},{"variance","dsvariance"}}) {const auto path=selectConfig(root/role.second,"dsconfig",diagnostics);if(!path.empty()) {voice->stages[role.first]=stage(path,{root});}}
     auto vocoder=selectConfig(root/"dsvocoder","vocoder",diagnostics);
-    if(vocoder.empty()) {const auto name=string(voice->stages.at("acoustic").values,"vocoder");for(const auto& search:roots) {const auto path=selectConfig(search/"Vocoders"/fs::u8path(name),"vocoder",diagnostics);if(path.empty()) {continue;}if(vocoder.empty()) {vocoder=path;}else {diagnostics.push_back({{"file",path.u8string()},{"message","Shared vocoder shadowed by configured root priority"}});}}}
+    if(vocoder.empty()) {
+        const auto name=string(voice->stages.at("acoustic").values,"vocoder");
+        if(name.empty()||name=="."||name==".."||name.find_first_of("/\\:")!=std::string::npos) {throw std::runtime_error("Missing/invalid shared vocoder name");}
+        std::vector<fs::path> searches=vocoderRoots;for(const auto& search:roots) {searches.push_back(search/"Vocoders");}
+        for(const auto& search:searches) {
+            const auto path=sharedVocoder(search,name,diagnostics);if(path.empty()) {continue;}
+            if(vocoder.empty()) {vocoder=path;}else if(fs::canonical(vocoder)!=path) {diagnostics.push_back({{"file",path.u8string()},{"message","Shared vocoder shadowed by configured root priority"}});}
+        }
+    }
     if(vocoder.empty()) {throw std::runtime_error("Missing bundled/shared vocoder");}
     voice->stages["vocoder"]=stage(vocoder,{fs::canonical(vocoder.parent_path())});
     const auto& a=voice->stages.at("acoustic").values;const auto& v=voice->stages.at("vocoder").values;
@@ -172,12 +200,17 @@ std::shared_ptr<const Catalog> scan(const Json& context,uint64_t revision) {
     if(directories.empty()&&context.contains("defaultVoicebankDirectory")) {directories.push_back(context["defaultVoicebankDirectory"]);}
     std::vector<fs::path> roots;std::set<fs::path,PathLess> rootSet;
     for(const auto& directory:directories) {if(!directory.is_string()) {throw std::runtime_error("Voicebank directory must be a string");}if(directory.get<std::string>().empty()) {continue;}try {const auto path=fs::canonical(fs::u8path(directory.get<std::string>()));if(!fs::is_directory(path)) {throw std::runtime_error("Not a directory");}if(rootSet.insert(path).second) {roots.push_back(path);}}catch(const std::exception& error) {result->diagnostics.push_back({{"root",directory},{"message",error.what()}});}}
+    auto sharedDirectories=settings.value("diffsinger.vocoderDirectories",Json::array());
+    if(!settings.contains("diffsinger.vocoderDirectories")&&context.contains("defaultVocoderDirectory")) {sharedDirectories.push_back(context["defaultVocoderDirectory"]);}
+    if(!sharedDirectories.is_array()||sharedDirectories.size()>128) {throw std::runtime_error("Shared vocoder directories must be a bounded string array");}
+    std::vector<fs::path> vocoderRoots;std::set<fs::path,PathLess> vocoderRootSet;
+    for(const auto& directory:sharedDirectories) {if(!directory.is_string()) {throw std::runtime_error("Shared vocoder directory must be a string");}if(directory.get<std::string>().empty()) {continue;}try {const auto path=fs::canonical(fs::u8path(directory.get<std::string>()));if(!fs::is_directory(path)) {throw std::runtime_error("Not a directory");}if(vocoderRootSet.insert(path).second) {vocoderRoots.push_back(path);}}catch(const std::exception& error) {result->diagnostics.push_back({{"root",directory},{"stage","vocoder"},{"message",error.what()}});}}
     std::set<fs::path,PathLess> visited;std::map<std::string,std::string> ids,fingerprints;
     for(const auto& root:roots) {std::vector<fs::path> queue{root};while(!queue.empty()) {const auto path=queue.back();queue.pop_back();try {const auto canonical=fs::canonical(path);if(!within(canonical,root)||!visited.insert(canonical).second) {continue;}
             if(visited.size()>100000) {throw std::runtime_error("Scan directory limit exceeded");}
             const auto candidate=selectConfig(canonical,"dsconfig",result->diagnostics);
             if(!candidate.empty()) {try {const auto config=readConfiguration(candidate);if(config.is_object()&&(config.contains("acoustic")||config.contains("fs2"))) {
-                auto voice=load(canonical,roots,result->diagnostics);
+                auto voice=load(canonical,roots,vocoderRoots,result->diagnostics);
                 if(fingerprints.count(voice->fingerprint)) {result->diagnostics.push_back({{"root",canonical.u8string()},{"message","Identical package copy deduplicated"}});}
                 else {
                     if(voice->id.empty()) {std::vector<std::string> matches;for(const auto& row:result->installations) {if(!row.is_object()) {throw std::runtime_error("Invalid installation registry row");}if(string(row,"path")==canonical.u8string()) {voice->id=string(row,"id");break;}if(string(row,"fingerprint")==voice->fingerprint&&!string(row,"id").empty()) {matches.push_back(string(row,"id"));}}
@@ -192,9 +225,10 @@ std::shared_ptr<const Catalog> scan(const Json& context,uint64_t revision) {
     }}
     return result;
 }
-Json engineSettings() {return {{"schemaVersion",1},{"name","DiffSinger"},{"engineType","ai"},{"engineSettings",Json::array({
+Json engineSettings(const fs::path& defaultVocoderDirectory) {return {{"schemaVersion",1},{"name","DiffSinger"},{"engineType","ai"},{"engineSettings",Json::array({
     {{"id","diffsinger.renderSteps"},{"name","Rendering steps"},{"type","int"},{"min",1},{"max",100},{"step",1},{"default",20}},
     {{"id","diffsinger.voicebankDirectories"},{"name","Voicebank directories"},{"type","directory-list"},{"default",Json::array()},{"maxItems",128}},
+    {{"id","diffsinger.vocoderDirectories"},{"name","Global shared vocoder directories"},{"type","directory-list"},{"default",defaultVocoderDirectory.empty()?Json::array():Json::array({defaultVocoderDirectory.u8string()})},{"maxItems",128}},
     {{"id","diffsinger.showPhonemeLanguagePrefix"},{"name","Show phoneme language prefixes"},{"type","bool"},{"default",true}}
 })}};}
 }

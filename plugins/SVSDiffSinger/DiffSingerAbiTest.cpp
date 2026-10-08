@@ -51,7 +51,7 @@ int run(const std::filesystem::path& path, const std::filesystem::path& voices)
         require(engine.hasEngineSettings(), "Missing engine declaration");
         const auto settings = nlohmann::json::parse(engine.engineSettings().c_str());
         require(settings.at("name") == "DiffSinger" && settings.at("engineType") == "ai", "Invalid engine declaration");
-        require(settings.at("engineSettings").size()==3, "Engine must declare three settings including the display-only prefix option");
+        require(settings.at("engineSettings").size()==4, "Engine must declare four settings including shared vocoder directories");
         require(engine.hasCatalogQuery(), "Missing optional ABI 1.3 catalog query");
         if (!voices.empty()) {
             const nlohmann::json context{{"rescan",true},{"engineSettings",{{"diffsinger.voicebankDirectories",{std::filesystem::absolute(voices).u8string()}}}}};
@@ -75,7 +75,7 @@ int run(const std::filesystem::path& path, const std::filesystem::path& voices)
             require(table.read_resource(raw,resource,0,bytes.data(),bytes.size(),&count)==SVS_OK&&count==bytes.size(),"Old resource handle did not survive catalog refresh");
             require(table.read_resource(raw,resource,info.byte_count+1,bytes.data(),1,&count)==SVS_INVALID_INPUT,"Out of range resource read accepted");
             table.close_resource(raw,resource);table.destroy_engine(raw);
-            std::cout<<"PASS ABI 1.3 six voices / three settings / rest segmentation and curve colors / resource lifetime and bounds\n";
+            std::cout<<"PASS ABI 1.3 six voices / four settings / rest segmentation and curve colors / resource lifetime and bounds\n";
         }
     }
 #ifdef _WIN32

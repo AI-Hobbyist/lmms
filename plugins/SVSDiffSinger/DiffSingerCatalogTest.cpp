@@ -74,6 +74,34 @@ int run(const fs::path& realRoot,const fs::path& fixtureParent) {
     write(temporary/"alias.yaml","value: &a [1, 2]\ncopy: *a\n");bool rejected=false;try {readConfiguration(temporary/"alias.yaml");}catch(...) {rejected=true;}require(rejected,"YAML alias was accepted");
     auto invalid=context({one});invalid["engineSettings"]["diffsinger.voicebankDirectories"]="single-path";rejected=false;try {scan(invalid,10);}catch(...) {rejected=true;}require(rejected,"Single path accepted as multiple directories");
     const auto empty=scan(context({}),11);require(empty->voices.empty()&&empty->installations.empty(),"Empty catalog not supported");
+    const auto aliases=temporary/"phoneme-aliases";fixture(aliases,"aliases");
+    fs::remove_all(aliases/"dsdur");
+    write(aliases/"phonemes.json",R"({"SP":0,"zh/a":1,"zh/alias":1})");
+    auto aliased=scan(context({aliases}),11);require(aliased->voices.size()==1&&aliased->voices[0]->stages.size()==2,"Phoneme aliases or absent optional predictors rejected");
+    require(aliased->voices[0]->stages.at("acoustic").phonemes.at("zh/a")==aliased->voices[0]->stages.at("acoustic").phonemes.at("zh/alias"),"Alias token IDs changed");
+    write(aliases/"phonemes.json",R"({"SP":0,"zh/a":-1})");
+    auto invalidToken=scan(context({aliases}),11);require(invalidToken->voices.empty()&&!invalidToken->diagnostics.empty(),"Negative phoneme ID accepted");
+    write(aliases/"phonemes.json",R"({"SP":0,"zh/a":1,"zh/alias":1})");
+    fs::remove_all(aliases/"dsvocoder");
+    auto missingVocoder=scan(context({aliases}),11);require(missingVocoder->voices.empty()&&!missingVocoder->diagnostics.empty(),"Missing required vocoder accepted");
+    const auto shared=temporary/"shared-vocoders",sharedBank=shared/"nested"/"test-vocoder";fixture(sharedBank);
+    fs::rename(sharedBank/"dsvocoder/vocoder.json",sharedBank/"vocoder.json");fs::rename(sharedBank/"dsvocoder/vocoder.onnx",sharedBank/"vocoder.onnx");
+    auto acousticConfig=readConfiguration(aliases/"dsconfig.json");acousticConfig["vocoder"]="test-vocoder";write(aliases/"dsconfig.json",acousticConfig.dump());
+    auto sharedContext=context({aliases});sharedContext["engineSettings"]["diffsinger.vocoderDirectories"]=Json::array({shared.u8string()});
+    auto sharedCatalog=scan(sharedContext,11);require(sharedCatalog->voices.size()==1&&sharedCatalog->voices[0]->stages.at("vocoder").source==fs::canonical(sharedBank/"vocoder.json"),"Explicit global shared vocoder was not resolved");
+    auto defaultContext=context({aliases});defaultContext["defaultVocoderDirectory"]=shared.u8string();require(scan(defaultContext,11)->voices.size()==1,"Default shared vocoder directory not applied");
+    defaultContext["engineSettings"]["diffsinger.vocoderDirectories"]=Json::array();require(scan(defaultContext,11)->voices.empty(),"Explicit empty shared directories did not disable default");
+    auto directContext=sharedContext;directContext["engineSettings"]["diffsinger.vocoderDirectories"]=Json::array({sharedBank.u8string()});require(scan(directContext,11)->voices.size()==1,"Individual vocoder package directory not accepted");
+    const auto otherShared=temporary/"other-shared";fs::create_directories(otherShared/"test-vocoder");fs::copy_file(sharedBank/"vocoder.json",otherShared/"test-vocoder/vocoder.json");write(otherShared/"test-vocoder/vocoder.onnx","other shared vocoder");
+    auto priorityContext=sharedContext;priorityContext["engineSettings"]["diffsinger.vocoderDirectories"]=Json::array({otherShared.u8string(),shared.u8string()});auto prioritized=scan(priorityContext,11);require(prioritized->voices.size()==1&&prioritized->voices[0]->stages.at("vocoder").source==fs::canonical(otherShared/"test-vocoder/vocoder.json"),"Multiple shared root priority failed");
+    const auto sharedFingerprint=sharedCatalog->voices[0]->fingerprint;write(sharedBank/"vocoder.onnx","updated shared vocoder");
+    auto sharedChanged=scan(sharedContext,11);require(sharedChanged->voices[0]->fingerprint!=sharedFingerprint,"Shared vocoder content did not invalidate synthesis fingerprint");
+    fs::create_directories(aliases/"dsvocoder");fs::copy_file(sharedBank/"vocoder.json",aliases/"dsvocoder/vocoder.json");write(aliases/"dsvocoder/vocoder.onnx","bundled vocoder");
+    auto bundled=scan(sharedContext,11);require(bundled->voices.size()==1&&bundled->voices[0]->stages.at("vocoder").source==fs::canonical(aliases/"dsvocoder/vocoder.json"),"Global vocoder overrode bundled vocoder");
+    write(aliases/"dsvocoder/vocoder.onnx","bad configuration test");auto brokenBundled=readConfiguration(aliases/"dsvocoder/vocoder.json");brokenBundled["hop_size"]=256;write(aliases/"dsvocoder/vocoder.json",brokenBundled.dump());
+    require(scan(sharedContext,11)->voices.empty(),"Invalid bundled vocoder silently fell back to shared vocoder");
+    sharedContext["engineSettings"]["diffsinger.vocoderDirectories"]="single-path";rejected=false;try {scan(sharedContext,11);}catch(...) {rejected=true;}require(rejected,"Invalid shared directory declaration accepted");
+    std::cout<<"PASS phoneme aliases / optional predictors absent / shared vocoder setting / bundled priority / shared fingerprint / invalid declarations\n";
 #ifdef _WIN32
     const auto locked=temporary/"permission-denied";fs::create_directory(locked);
     {DeniedDirectory denied(locked);auto permissions=scan(context({locked,one}),12);require(permissions->voices.size()==1&&!permissions->diagnostics.empty(),"Permission failure did not preserve valid sibling root/diagnostic");}

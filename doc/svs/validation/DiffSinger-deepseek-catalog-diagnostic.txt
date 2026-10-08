@@ -1,0 +1,12 @@
+{
+  "voices": [],
+  "installations": [],
+  "diagnostics": [
+    {
+      "root": "D:\\AI-Tools\\OpenUtau\\Singers\\deepseek\u8d1d\u58f3",
+      "message": "Missing bundled/shared vocoder"
+    }
+  ],
+  "catalogRevision": 1
+}
+CONFIRMED: discovered acoustic root, rejected missing required vocoder; not a recursion failure

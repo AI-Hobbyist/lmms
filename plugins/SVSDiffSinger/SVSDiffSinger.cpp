@@ -71,16 +71,18 @@ svs_status SVS_CALL queryCatalog(svs_engine handle,const char* request,const cha
 {
     if(!handle||!out) {return SVS_INVALID_INPUT;}*out=nullptr;
     try {
-        auto& engine=*static_cast<Engine*>(handle);const auto context=Json::parse(request?request:"{}");
+        auto& engine=*static_cast<Engine*>(handle);auto context=Json::parse(request?request:"{}");
         if(!context.is_object()) {throw std::runtime_error("Catalog context must be an object");}
+        if(!context.contains("defaultVocoderDirectory")) {context["defaultVocoderDirectory"]=(diffsinger::packageDirectory().parent_path()/"vocoders").u8string();}
         std::lock_guard lock(engine.scanMutex);auto current=std::atomic_load(&engine.catalog);
         const auto settings=context.value("engineSettings",Json::object());
         if(!settings.is_object()) {throw std::runtime_error("Engine settings must be an object");}
         const auto steps=settings.value("diffsinger.renderSteps",Json(20));
         if(!steps.is_number_integer()||steps.get<int64_t>()<1||steps.get<int64_t>()>100) {throw std::runtime_error("Rendering steps must be an integer in 1-100");}
         const auto directories=settings.value("diffsinger.voicebankDirectories",Json::array());
-        if(current->revision==0||context.value("rescan",false)||engine.scanContext.value("directories",Json())!=directories) {
-            auto next=diffsinger::scan(context,current->revision+1);std::atomic_store(&engine.catalog,next);engine.scanContext={{"directories",directories}};current=std::move(next);
+        const auto vocoders=settings.value("diffsinger.vocoderDirectories",Json::array({context["defaultVocoderDirectory"]}));
+        if(current->revision==0||context.value("rescan",false)||engine.scanContext.value("directories",Json())!=directories||engine.scanContext.value("vocoders",Json())!=vocoders) {
+            auto next=diffsinger::scan(context,current->revision+1);std::atomic_store(&engine.catalog,next);engine.scanContext={{"directories",directories},{"vocoders",vocoders}};current=std::move(next);
         }
         return text(current->declaration().dump().c_str(),out);
     }catch(const std::exception& error) {text(Json{{"message",error.what()},{"stage","catalog"}}.dump().c_str(),out);return SVS_INVALID_INPUT;}
@@ -88,7 +90,7 @@ svs_status SVS_CALL queryCatalog(svs_engine handle,const char* request,const cha
 svs_status SVS_CALL settings(svs_engine engine, const char*, const char** out)
 {
     if (!engine) { return SVS_INVALID_INPUT; }
-    try {return text(diffsinger::engineSettings().dump().c_str(),out);}catch(...) {return SVS_FAILED;}
+    try {return text(diffsinger::engineSettings(diffsinger::packageDirectory().parent_path()/"vocoders").dump().c_str(),out);}catch(...) {return SVS_FAILED;}
 }
 svs_status SVS_CALL capabilities(svs_engine handle, const char* id, const char*, const char** out) {
     if(!handle||!id||!out) {return SVS_INVALID_INPUT;}

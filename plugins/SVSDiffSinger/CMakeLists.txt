@@ -119,6 +119,10 @@ add_custom_command(TARGET SVSDiffSinger POST_BUILD
   COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${diffsinger_yaml_SOURCE_DIR}/LICENSE" "$<TARGET_FILE_DIR:SVSDiffSinger>/licenses/yaml-cpp")
 install(DIRECTORY "${pronunciation_root}/" DESTINATION svs/SVSDiffSinger/data)
 install(FILES "licenses/tlds-MIT.txt" DESTINATION svs/SVSDiffSinger/licenses)
+add_custom_command(TARGET SVSDiffSinger POST_BUILD
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:SVSDiffSinger>/../vocoders"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/VOCODERS.md" "$<TARGET_FILE_DIR:SVSDiffSinger>/../vocoders/README.md")
+install(FILES "VOCODERS.md" DESTINATION svs/vocoders RENAME README.md)
 add_executable(DiffSingerDurationTest DiffSingerDurationTest.cpp)
 add_executable(DiffSingerSynthesisTest DiffSingerSynthesisTest.cpp)
 target_link_libraries(DiffSingerSynthesisTest PRIVATE DiffSingerInference)
