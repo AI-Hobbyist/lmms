@@ -48,6 +48,8 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
    error = "Unknown required capability: " + required.toString(); return false;
   }
  }
+ QMap<QString,QString> curveColors;
+ const QStringList defaultCurveColors{"#73B8E5","#73E5C2","#E573A5","#C2E573","#A573E5","#E5AD73","#E5DD73","#E57373"};
  auto readParameters = [&](const QString& key, QVector<Parameter>& result, bool writable) {
   QSet<QString> ids;
   if (!object[key].isArray()) { error = key + " must be an array"; return false; }
@@ -97,6 +99,10 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
    if (!p.accepts(p.defaultValue) || !QStringList{"linear", "hermite", "step"}.contains(p.interpolation)
     || (p.curve && (p.type == "bool" || p.type == "enum" || p.type == "int") && p.interpolation != "step")
     || (p.curve && p.type == "string")) { error = "Invalid default or interpolation: " + identity; return false; }
+   if(p.curve) {
+    if(p.color.isEmpty()) p.color=curveColors.value(p.id,defaultCurveColors[curveColors.size()%defaultCurveColors.size()]);
+    curveColors[p.id]=p.color;
+   }
    result.push_back(p);
   }
   return true;
@@ -121,6 +127,11 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
  if(!parsed.dictionaryResources.isEmpty()&&parsed.phonemeSetId.isEmpty()) { error="Dictionary requires a phoneme set ID"; return false; }
  parsed.phonemeTiming = object["phonemes"].toObject()["timingEditable"].toBool();
  parsed.cancel = object["synthesis"].toObject()["cancel"].toBool(); parsed.concurrent = object["synthesis"].toObject()["concurrent"].toBool();
+ const auto synthesis=object["synthesis"].toObject();
+ if(synthesis.contains("segmented")&&synthesis["segmented"]!=QJsonValue(false)) {
+  const auto segmented=synthesis["segmented"].toObject();const double padding=segmented["paddingSeconds"].toDouble(NAN);
+  if(segmented["split"].toString()!="rests"||segmented["version"].toDouble()!=1||!std::isfinite(padding)||padding<0||padding>2) {error="Invalid segmented synthesis declaration";return false;}
+ }
  output = std::move(parsed); error.clear(); return true;
 }
 

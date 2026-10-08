@@ -3,6 +3,7 @@
 #include "Clip.h"
 #include "SVSModel.h"
 #include "SVSCurve.h"
+#include "SVSSegmentedSynthesis.h"
 #include <atomic>
 #include <QPointer>
 #include <QDomElement>
@@ -65,6 +66,7 @@ private:
  uint64_t m_generation=1,m_request=0;
  std::shared_ptr<const svs::Audio> m_audio;
  std::shared_ptr<svs::RenderControl> m_renderControl;
+ QVector<svs::SynthesisSegment> m_segments;
 };
 }
 #endif

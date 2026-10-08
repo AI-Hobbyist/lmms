@@ -1,0 +1,11 @@
+{
+  "Template": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\lmms-workspace\\templates\\default.mpt",
+  "Backup": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\lmms-workspace\\templates\\default.mpt.before-official-restore.bak",
+  "SHA256": "ADFBE314CD3544253BA8CE3BDE470D52399DDB1347268EAA11CC836B578C831C",
+  "SongTracks": [
+    "TripleOscillator",
+    "Sample track",
+    "Pattern 0",
+    "Automation track"
+  ]
+}

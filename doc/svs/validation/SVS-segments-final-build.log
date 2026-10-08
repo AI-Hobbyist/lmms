@@ -1,0 +1,424 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Automatic MOC for target Vst2FaultEditorHang
+  Automatic MOC for target Vst2FaultEntryHang
+  Automatic MOC for target Vst2FaultEntryCrash
+  Automatic MOC for target Vst2FaultCloseHang
+  Automatic MOC and UIC for target SVSExample
+  Automatic MOC for target Vst2Baseline
+  Performing build step for 'RemoteVstHost64'
+  Automatic MOC for target Vst2FaultAudioCrash
+  Vst2FaultEntryCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultEntryCrash.dll
+  Vst2FaultCloseHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultCloseHang.dll
+  Vst2FaultEntryHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultEntryHang.dll
+  Performing build step for 'RemoteVstHost32'
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  Performing build step for 'RemoteVstPlugin32'
+  Vst2FaultEditorHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultEditorHang.dll
+  Automatic MOC for target Vst2FaultStateCrash
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  Vst2Baseline.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2Baseline.dll
+  
+  Vst2FaultAudioCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultAudioCrash.dll
+  Automatic MOC for target Vst2FaultStateHang
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  Vst2FaultStateCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultStateCrash.dll
+  
+  
+  Automatic MOC for target Vst2Shell
+  Automatic MOC for target Vst2ShellCrash
+  Vst2FaultStateHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultStateHang.dll
+  Vst2Shell.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2Shell.dll
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  Vst2ShellCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2ShellCrash.dll
+  Automatic MOC for target Vst2ShellDuplicate
+  Automatic MOC for target Vst2ShellHang
+    pluginterfaces.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\pluginterfaces.lib
+    Vst3Factory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3Factory.vst3
+  Vst2ShellDuplicate.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2ShellDuplicate.dll
+  Vst2ShellHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2ShellHang.dll
+    pluginterfaces.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\pluginterfaces.lib
+    RemoteVstPlugin32.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\32\RemoteVstPlugin32.exe
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  Performing build step for 'VstBaselineX86'
+    Vst3FactoryFault1.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault1.vst3
+    Vst3Factory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3Factory.vst3
+    Vst3FactoryFault2.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault2.vst3
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+    Vst3FactoryFault1.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault1.vst3
+    Vst3FactoryFault3.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault3.vst3
+    Vst3FactoryFault2.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault2.vst3
+  caps.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\caps.dll
+    Vst3FactoryFault4.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault4.vst3
+  閫傜敤浜?.NET Framework MSBuild 鐗堟湰 18.10.1-1.26427.6+3cd27c13e
+  cmt.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\cmt.dll
+    Vst3FactoryFault5.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault5.vst3
+    Vst3FactoryFault3.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault3.vst3
+  
+  No install step for 'RemoteVstPlugin32'
+    Vst3FactoryFault6.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault6.vst3
+    Vst3FactoryFault4.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault4.vst3
+  Completed 'RemoteVstPlugin32'
+    Vst3FactoryFault5.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault5.vst3
+    Vst3FactoryFault7.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault7.vst3
+    Vst3FactoryFault6.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault6.vst3
+    Vst3FactoryFault8.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3FactoryFault8.vst3
+  SVSCapabilities.cpp
+    Vst3FactoryFault7.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault7.vst3
+    base.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\base.lib
+    Vst3FactoryFault8.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3FactoryFault8.vst3
+    sdk_common.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk_common.lib
+    base.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\base.lib
+    sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk.lib
+  Automatic MOC for target Vst2FaultCloseCrash
+    Vst3Native.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3Native.vst3
+    sdk_common.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk_common.lib
+    Vst2Baseline.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2Baseline.dll
+    sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk.lib
+    Vst2FaultAudioCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultAudioCrash.dll
+    sdk_hosting.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\lib\Release\sdk_hosting.lib
+  Vst2FaultCloseCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultCloseCrash.dll
+    Vst3Native.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3Native.vst3
+    LmmsVst3Loader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\LmmsVst3Loader.lib
+    Vst2FaultAudioHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultAudioHang.dll
+    sdk_hosting.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\lib\Release\sdk_hosting.lib
+    Vst2FaultCloseCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultCloseCrash.dll
+    LmmsVst3Module.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\LmmsVst3Module.lib
+    LmmsVst3Loader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\LmmsVst3Loader.lib
+    Vst2FaultCloseHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultCloseHang.dll
+    RemoteVstHost.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\RemoteVstHost.exe
+    LmmsVst3Module.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\LmmsVst3Module.lib
+    Vst2FaultEditorCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultEditorCrash.dll
+    Vst3CatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3CatalogTest.exe
+    Vst2FaultEditorHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultEditorHang.dll
+    RemoteVstHost.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\RemoteVstHost.exe
+    Vst3LifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3LifecycleTest.exe
+    Vst2FaultEntryCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultEntryCrash.dll
+    Vst3CatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3CatalogTest.exe
+    Vst3PresetSdkTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3PresetSdkTest.exe
+    Vst2FaultEntryHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultEntryHang.dll
+    Vst3ProcessingTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3ProcessingTest.exe
+    Vst3LifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3LifecycleTest.exe
+    Vst2FaultStateCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultStateCrash.dll
+    Vst3PresetSdkTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3PresetSdkTest.exe
+    Vst3RestartEventsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\Vst3RestartEventsTest.exe
+    Vst2FaultStateHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2FaultStateHang.dll
+    Vst3ProcessingTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3ProcessingTest.exe
+    WaveShellInventory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x64\Release\WaveShellInventory.exe
+    Vst2Shell.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2Shell.dll
+    Vst3RestartEventsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\Vst3RestartEventsTest.exe
+    Vst2ShellCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2ShellCrash.dll
+  Performing install step for 'RemoteVstHost64'
+    WaveShellInventory.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-host\x86\Release\WaveShellInventory.exe
+    Vst2ShellDuplicate.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2ShellDuplicate.dll
+  tap_autopan.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_autopan.dll
+  tap_chorusflanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_chorusflanger.dll
+  tap_deesser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_deesser.dll
+  tap_dynamics_m.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_dynamics_m.dll
+  tap_doubler.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_doubler.dll
+    Vst2ShellHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\fixtures\Release\Vst2ShellHang.dll
+    AudioDelayLineTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\AudioDelayLineTest.exe
+  Performing install step for 'RemoteVstHost32'
+  Completed 'RemoteVstHost64'
+    FixedQuantumBufferTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\FixedQuantumBufferTest.exe
+    Vst3MetadataTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\Vst3MetadataTest.exe
+  tap_echo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_echo.dll
+  tap_dynamics_st.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_dynamics_st.dll
+  Completed 'RemoteVstHost32'
+  tap_eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_eq.dll
+  tap_eqbw.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_eqbw.dll
+    VstHostAudioQueue.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostAudioQueue.exe
+  tap_limiter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_limiter.dll
+    VstHostControlChannel.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostControlChannel.exe
+  Automatic MOC for target Vst2FaultEditorCrash
+    VstHostProtocol.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostProtocol.exe
+  tap_pitch.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_pitch.dll
+  tap_pinknoise.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_pinknoise.dll
+    VstHostRealtimeMidi.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostRealtimeMidi.exe
+  tap_reverb.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_reverb.dll
+  tap_rotspeak.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_rotspeak.dll
+  Vst2FaultEditorCrash.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultEditorCrash.dll
+    VstSessionFixture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstSessionFixture.exe
+  Automatic MOC for target Vst2FaultAudioHang
+  tap_reflector.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_reflector.dll
+    VstHostSession.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostSession.exe
+  tap_sigmoid.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_sigmoid.dll
+  tap_tubewarmth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_tubewarmth.dll
+    VstHostSupervisor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x86\Release\VstHostSupervisor.exe
+  tap_tremolo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_tremolo.dll
+  tap_vibrato.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\tap_vibrato.dll
+  Vst2FaultAudioHang.vcxproj -> D:\UserData\Desktop\Project\lmms\build\vst-s0\x64\fixtures\Release\Vst2FaultAudioHang.dll
+  veal.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ladspa\Release\veal.dll
+  No install step for 'VstBaselineX86'
+  Completed 'VstBaselineX86'
+  zynaddsubfx_nio.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\Nio\zynaddsubfx_nio.dir\Release\zynaddsubfx_nio.lib
+  Synthesis.cpp
+  zynaddsubfx_gui.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx\src\UI\zynaddsubfx_gui.dir\Release\zynaddsubfx_gui.lib
+  zynaddsubfx_synth.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\zynaddsubfx_synth.dir\Release\zynaddsubfx_synth.lib
+  SVSClip.cpp
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+  SVSExportSnapshot.cpp
+  SVSSegmentedSynthesis.cpp
+  SVSSynthesisScheduler.cpp
+  SVSSettingsPage.cpp
+  SVSTrack.cpp
+  正在生成代码...
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Engine.cpp
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  carla_native-plugin.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\libcarla_native-plugin.dll
+  adplug.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\OpulenZ\Release\adplug.lib
+  gme.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\FreeBoy\Release\gme.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  ZynAddSubFxCore.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\Release\ZynAddSubFxCore.lib
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Instrument/Release/lv2instrument.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Flanger/Release/flanger.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BassBooster/Release/bassbooster.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/AudioFileProcessor/Release/audiofileprocessor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vibed/Release/vibedstrings.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Compressor/Release/compressor.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstBase/vstbase/Release/vstbase.exp
+  lv2instrument.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2instrument.dll
+  flanger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\flanger.dll
+  audiofileprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\audiofileprocessor.dll
+  bassbooster.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bassbooster.dll
+  vibedstrings.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vibedstrings.dll
+  compressor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\compressor.dll
+  vstbase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vstbase.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaEffect/Release/ladspaeffect.exp
+  ladspaeffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspaeffect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Bitcrush/Release/bitcrush.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LOMM/Release/lomm.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CrossoverEQ/Release/crossovereq.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/WaveShaper/Release/waveshaper.exp
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitinvader.dll
+  bitcrush.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitcrush.dll
+  lomm.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lomm.dll
+  waveshaper.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\waveshaper.dll
+  crossovereq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\crossovereq.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Kicker/Release/kicker.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Kicker/Release/kicker.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SpectrumAnalyzer/Release/analyzer.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vestige/Release/vestige.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MidiImport/Release/midiimport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MidiImport/Release/midiimport.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Delay/Release/delay.exp
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll
+  analyzer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\analyzer.dll
+  vestige.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vestige.dll
+  delay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\delay.dll
+  midiimport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiimport.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.exp
+  Automatic UIC for target sf2player
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\multitapecho.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MidiExport/Release/midiexport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MidiExport/Release/midiexport.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/VstEffect/Release/vsteffect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Dispersion/Release/dispersion.exp
+  midiexport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\midiexport.dll
+  vsteffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vsteffect.dll
+  dispersion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dispersion.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sf2Player/Release/sf2player.exp
+  sf2player.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sf2player.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Patman/Release/patman.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Organic/Release/organic.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/GranularPitchShifter/Release/granularpitchshifter.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DualFilter/Release/dualfilter.exp
+  patman.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\patman.dll
+  granularpitchshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\granularpitchshifter.dll
+  organic.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\organic.dll
+  dualfilter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dualfilter.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoEnhancer/Release/stereoenhancer.exp
+  stereoenhancer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereoenhancer.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlicerT/Release/slicert.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lb302/Release/lb302.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ReverbSC/Release/reverbsc.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/DynamicsProcessor/Release/dynamicsprocessor.exp
+  slicert.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slicert.dll
+  lb302.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lb302.dll
+  dynamicsprocessor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\dynamicsprocessor.dll
+  reverbsc.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\reverbsc.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TapTempo/Release/taptempo.exp
+  taptempo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\taptempo.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Lv2Effect/Release/lv2effect.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/StereoMatrix/Release/stereomatrix.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/ZynAddSubFx/Release/zynaddsubfx.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Eq/Release/eq.exp
+  lv2effect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\lv2effect.dll
+  stereomatrix.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\stereomatrix.dll
+  eq.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\eq.dll
+  zynaddsubfx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\zynaddsubfx.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/TripleOscillator/Release/tripleoscillator.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/TripleOscillator/Release/tripleoscillator.exp
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Monstro/Release/monstro.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Vectorscope/Release/vectorscope.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FrequencyShifter/Release/frequencyshifter.exp
+  monstro.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\monstro.dll
+  vectorscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\vectorscope.dll
+  frequencyshifter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\frequencyshifter.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/OpulenZ/Release/opulenz.exp
+  opulenz.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\opulenz.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Oscilloscope/Release/oscilloscope.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Watsyn/Release/watsyn.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/HydrogenImport/Release/hydrogenimport.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/HydrogenImport/Release/hydrogenimport.exp
+  oscilloscope.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\oscilloscope.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Amplifier/Release/amplifier.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Amplifier/Release/amplifier.exp
+  watsyn.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\watsyn.dll
+  hydrogenimport.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\hydrogenimport.dll
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Sfxr/Release/sfxr.exp
+  sfxr.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\sfxr.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/LadspaBrowser/Release/ladspabrowser.exp
+  ladspabrowser.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\ladspabrowser.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaBase/Release/carlabase.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/FreeBoy/Release/freeboy.exp
+  carlabase.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlabase.dll
+  freeboy.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\freeboy.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Stk/Mallets/Release/malletsstk.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaPatchbay/Release/carlapatchbay.exp
+  malletsstk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\malletsstk.dll
+  carlapatchbay.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/CarlaRack/Release/carlarack.exp
+  carlarack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Nes/Release/nes.exp
+  nes.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\nes.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/PeakControllerEffect/Release/peakcontrollereffect.exp
+  peakcontrollereffect.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\peakcontrollereffect.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SlewDistortion/Release/slewdistortion.exp
+  slewdistortion.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\slewdistortion.dll
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/Xpressive/Release/xpressive.exp
+  xpressive.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\xpressive.dll
+  Automatic MOC for target AutomatableModelTest
+  Automatic MOC for target AudioBufferTest
+  Automatic MOC for target AgentHarness
+  Automatic MOC for target ArrayVectorTest
+  Automatic MOC for target A3CommandsTest
+  Automatic MOC for target AudioDelayLineTest
+  Automatic MOC for target A4CommandsTest
+  Automatic MOC for target AutomationTrackTest
+  AudioDelayLineTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\AudioDelayLineTest.exe
+  Automatic MOC for target RemoteCatalogIoFixture
+  RemoteCatalogIoFixture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\RemoteCatalogIoFixture.exe
+  Automatic MOC for target CatalogJobsTest
+  CatalogJobsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\CatalogJobsTest.exe
+  Automatic MOC for target CommandBusTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/ArrayVectorTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/ArrayVectorTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomatableModelTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AgentHarness.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AgentHarness.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/A4CommandsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/A4CommandsTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AudioBufferTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AudioBufferTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomationTrackTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/AutomationTrackTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/A3CommandsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/A3CommandsTest.exp
+  AutomatableModelTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AutomatableModelTest.exe
+  AgentHarness.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AgentHarness.exe
+  ArrayVectorTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\ArrayVectorTest.exe
+  A4CommandsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\A4CommandsTest.exe
+  AutomationTrackTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AutomationTrackTest.exe
+  AudioBufferTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\AudioBufferTest.exe
+  A3CommandsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\A3CommandsTest.exe
+  Automatic MOC for target CoreCommandsTest
+  DiffSingerAbiTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerAbiTest.exe
+  DiffSingerCatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalogTest.exe
+  DiffSingerModelProbe.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerModelProbe.exe
+  Automatic MOC for target FixedQuantumBufferTest
+  FixedQuantumBufferTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\FixedQuantumBufferTest.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/CommandBusTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/CommandBusTest.exp
+  Automatic MOC for target McpExportLifecycleTest
+  Automatic MOC for target MathTest
+  Automatic MOC for target McpProtocolTest
+  Automatic MOC for target McpQueueTest
+  DiffSingerDurationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerDurationTest.exe
+  DiffSingerSynthesisTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerSynthesisTest.exe
+  Automatic MOC for target McpSecurityTest
+  Automatic MOC for target McpServerLifecycleTest
+  CommandBusTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\CommandBusTest.exe
+  Automatic MOC for target CatalogIoTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/CoreCommandsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/CoreCommandsTest.exp
+  Automatic MOC for target MixAutomationCommandsTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpExportLifecycleTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpExportLifecycleTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/MathTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/MathTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpProtocolTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpProtocolTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpQueueTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpQueueTest.exp
+  CoreCommandsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\CoreCommandsTest.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpSecurityTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpSecurityTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpServerLifecycleTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/McpServerLifecycleTest.exp
+  McpExportLifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\McpExportLifecycleTest.exe
+  MathTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\MathTest.exe
+  RemoteVstPlugin64.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteVstPlugin64.exe
+  McpProtocolTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\McpProtocolTest.exe
+  McpQueueTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\McpQueueTest.exe
+  Automatic MOC for target ProjectVersionTest
+  Automatic MOC for target RelativePathsTest
+  Automatic MOC for target ScanRootsWidgetTest
+  Automatic MOC for target TimelineTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/MixAutomationCommandsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/MixAutomationCommandsTest.exp
+  ScanRootsWidgetTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\ScanRootsWidgetTest.exe
+LINK : warning LNK4044: 无法识别的选项“/mwindows”；已忽略 [D:\UserData\Desktop\Project\lmms\build\plugins\ZynAddSubFx\RemoteZynAddSubFx.vcxproj]
+  McpSecurityTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\McpSecurityTest.exe
+  McpServerLifecycleTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\McpServerLifecycleTest.exe
+  Automatic MOC for target Vst3MetadataTest
+  Automatic MOC for target VstHostAudioQueue
+  Automatic MOC for target VstHostControlChannel
+  RemoteZynAddSubFx.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\Release\RemoteZynAddSubFx.exe
+  Vst3MetadataTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\Vst3MetadataTest.exe
+  Automatic MOC for target VstHostProtocol
+  Automatic MOC for target VstHostRealtimeMidi
+  Automatic MOC for target VstHostSupervisor
+  Automatic MOC for target VstSessionFixture
+  VstHostProtocol.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostProtocol.exe
+  VstHostRealtimeMidi.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostRealtimeMidi.exe
+  MixAutomationCommandsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\MixAutomationCommandsTest.exe
+  VstHostAudioQueue.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostAudioQueue.exe
+  VstSessionFixture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstSessionFixture.exe
+  VstHostSupervisor.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostSupervisor.exe
+  VstHostControlChannel.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostControlChannel.exe
+  Automatic MOC for target VstPathsMigrationTest
+  CatalogIoTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\CatalogIoTest.exe
+  Automatic MOC for target VstHostSession
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/ProjectVersionTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/ProjectVersionTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/RelativePathsTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/RelativePathsTest.exp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/TimelineTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/TimelineTest.exp
+  VstHostSession.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostSession.exe
+  ProjectVersionTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\ProjectVersionTest.exe
+  RelativePathsTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\RelativePathsTest.exe
+  TimelineTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\TimelineTest.exe
+  Automatic MOC for target SVSIntegrationTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/VstPathsMigrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/VstPathsMigrationTest.exp
+  VstPathsMigrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\VstPathsMigrationTest.exe
+  Automatic MOC for target UiBaselineCapture
+  Automatic MOC for target ThemeWidgetTest
+  Automatic MOC for target PluginCatalogTest
+  Automatic MOC for target Vst2ShellTest
+  Vst2ShellTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\Vst2ShellTest.exe
+  PluginCatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\PluginCatalogTest.exe
+  UiBaselineCapture.cpp
+  Automatic MOC for target Vst3HostProxyTest
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/theme/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/theme/Release/lmms.exp
+  Vst3HostProxyTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\Vst3HostProxyTest.exe
+  Automatic MOC for target VstHostVst2Session
+  VstHostVst2Session.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostVst2Session.exe
+  Automatic MOC for target VstHostLegacyBridge
+  VstHostLegacyBridge.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostLegacyBridge.exe
+  Automatic MOC for target Vst2CompatibilityTest
+  ThemeWidgetTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\theme\Release\lmms.exe
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/Vst2CompatibilityTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/Vst2CompatibilityTest.exp
+  Vst2CompatibilityTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\Vst2CompatibilityTest.exe
+  Automatic MOC for target VstHostVst2Faults
+  VstHostVst2Faults.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\Release\VstHostVst2Faults.exe
+  Automatic MOC for target VstEntryPoints
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/vsthost/native/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/vsthost/native/Release/lmms.exp
+  VstEntryPoints.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\vsthost\native\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/ui/Release/lmms.exp
+  UiBaselineCapture.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe

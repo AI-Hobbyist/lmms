@@ -50,6 +50,7 @@ void schema(const example::Json& declaration) {
   for(const auto& parameter:parameters.array) {
    const auto id=parameter["id"].text(),type=parameter["type"].text(),scope=parameter["scope"].text();require(!id.empty()&&ids.insert(id).second,"Duplicate or missing parameter ID: "+id);require(scope=="track"||scope=="clip"||scope=="note"||scope=="phoneme","Invalid parameter scope: "+id);
    const auto& value=parameter["default"];
+   if(parameter["color"].type!=J::Null) {const auto color=parameter["color"].text();require(color.size()==7&&color[0]=='#'&&color.find_first_not_of("0123456789abcdefABCDEF",1)==std::string::npos,"Invalid parameter color: "+id);}
    if(type=="float"||type=="int") {const auto lo=parameter["min"].numeric(NAN),hi=parameter["max"].numeric(NAN),step=parameter["step"].numeric(NAN),initial=value.numeric(NAN);require(std::isfinite(lo)&&std::isfinite(hi)&&lo<hi&&std::isfinite(step)&&step>0&&std::isfinite(initial)&&initial>=lo&&initial<=hi,"Invalid numeric range/default: "+id);if(type=="int") require(std::floor(lo)==lo&&std::floor(hi)==hi&&std::floor(step)==step&&std::floor(initial)==initial,"Invalid integer parameter: "+id);if(parameter["scale"].text()=="log") require(lo>0,"Invalid logarithmic range: "+id);}
    else if(type=="bool") require(value.type==J::Boolean,"Invalid boolean default: "+id);
    else if(type=="string") require(value.type==J::String,"Invalid string default: "+id);
@@ -59,6 +60,8 @@ void schema(const example::Json& declaration) {
    if(parameter["curve"].boolean) {const auto interpolation=parameter["interpolation"].text();require(interpolation=="linear"||interpolation=="hermite"||interpolation=="step","Invalid interpolation: "+id);if(type!="float") require(interpolation=="step","Discrete parameter curve must use step: "+id);}
   }
  }
+ const auto& segmented=declaration["synthesis"]["segmented"];
+ if(segmented.type!=J::Null&&!(segmented.type==J::Boolean&&!segmented.boolean)) {const double padding=segmented["paddingSeconds"].numeric(NAN);require(segmented.type==J::Object&&segmented["split"].text()=="rests"&&segmented["version"].numeric(0)==1&&std::isfinite(padding)&&padding>=0&&padding<=2,"Invalid segmented synthesis declaration");}
 }
 struct Host {
  struct Completion {uint64_t request;svs_status status;std::string diagnostic;};

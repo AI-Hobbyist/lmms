@@ -57,6 +57,12 @@ int run(const std::filesystem::path& path, const std::filesystem::path& voices)
             const nlohmann::json context{{"rescan",true},{"engineSettings",{{"diffsinger.voicebankDirectories",{std::filesystem::absolute(voices).u8string()}}}}};
             const auto catalog=nlohmann::json::parse(engine.catalog(context.dump().c_str()).c_str());
             require(catalog.at("voices").size()==6,"Native ABI catalog did not discover six voices");
+            for(const auto& voice:catalog.at("voices")) {
+                const auto declaration=nlohmann::json::parse(engine.capabilities(voice.at("id").get<std::string>().c_str()).c_str());
+                const auto& segmented=declaration.at("synthesis").at("segmented");
+                require(segmented.at("split")=="rests"&&segmented.at("version")==1&&segmented.at("paddingSeconds")==.65,"Missing rest segmentation contract");
+                for(const auto& parameter:declaration.at("parameters")) if(parameter.value("curve",false)) {require(parameter.contains("color")&&parameter.at("color").get<std::string>().size()==7,"Missing curve color");}
+            }
             const auto id=catalog.at("voices")[0].at("avatar").get<std::string>();
             svs_api table{};require(entry(1,3,sizeof(table),&table)==SVS_OK,"ABI 1.3 negotiation failed");
             svs_engine raw=nullptr;require(table.create_engine(nullptr,&raw)==SVS_OK,"Resource engine failed");
@@ -69,7 +75,7 @@ int run(const std::filesystem::path& path, const std::filesystem::path& voices)
             require(table.read_resource(raw,resource,0,bytes.data(),bytes.size(),&count)==SVS_OK&&count==bytes.size(),"Old resource handle did not survive catalog refresh");
             require(table.read_resource(raw,resource,info.byte_count+1,bytes.data(),1,&count)==SVS_INVALID_INPUT,"Out of range resource read accepted");
             table.close_resource(raw,resource);table.destroy_engine(raw);
-            std::cout<<"PASS ABI 1.3 six voices / three settings / resource lifetime and bounds\n";
+            std::cout<<"PASS ABI 1.3 six voices / three settings / rest segmentation and curve colors / resource lifetime and bounds\n";
         }
     }
 #ifdef _WIN32

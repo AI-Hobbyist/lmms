@@ -99,6 +99,7 @@ svs_status SVS_CALL capabilities(svs_engine handle, const char* id, const char*,
             {"synthesis",{{"available",true},{"cancel",true},{"concurrent",false},{"channels",2},{"format","float32"},{"backend","CPU"}}}};
         schema["phonemes"]={{"timingEditable",true},{"attributesEditable",false},{"minimumDurationSeconds",.005},{"maximumLeadSeconds",.15}};
         schema["pronunciation"]["parser"]="diffsinger.native.v1";schema["pronunciation"]["continuation"]="-";
+        schema["synthesis"]["segmented"]={{"split","rests"},{"version",1},{"paddingSeconds",.65}};
         const auto choices=diffsinger::speakerChoices(*voice);if(!choices.empty()) {schema["parameters"].push_back({{"id","diffsinger.speaker"},{"name","Speaker"},{"group","Voice"},{"scope","track"},{"type","enum"},{"default",choices[0]["id"]},{"choices",choices},{"curve",false}});}
         diffsinger::Synthesis::declareParameters(*voice,schema);
         return text(schema.dump().c_str(),out);

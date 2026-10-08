@@ -32,8 +32,19 @@ void SVSClip::setStartTimeOffset(const TimePos& value) {if((readOnly()&&!m_loadi
 void SVSClip::movePosition(const TimePos& value) {if(!readOnly()||m_loading) Clip::movePosition(value);}
 void SVSClip::changeLength(const TimePos& value) {if(!readOnly()||m_loading) Clip::changeLength(value);}
 SVSClip::~SVSClip() { if(m_renderControl) m_renderControl->cancel(); ++m_revision; ++m_generation; }
-void SVSClip::cancelSynthesis() { if(m_renderControl) svs::SynthesisScheduler::instance().cancel(m_renderControl); ++m_request; m_status="Cancelled"; std::atomic_store(&m_audio,std::shared_ptr<const svs::Audio>{}); emit dataChanged(); }
-void SVSClip::invalidate() { if(m_renderControl) svs::SynthesisScheduler::instance().cancel(m_renderControl); ++m_revision; std::atomic_store(&m_audio,std::shared_ptr<const svs::Audio>{}); m_status=readOnly()?migrationDiagnostic():"Dirty"; emit dataChanged(); }
+void SVSClip::cancelSynthesis() { if(m_renderControl) svs::SynthesisScheduler::instance().cancel(m_renderControl); ++m_request; m_status="Cancelled"; if(m_segments.isEmpty()) std::atomic_store(&m_audio,std::shared_ptr<const svs::Audio>{}); emit dataChanged(); }
+void SVSClip::invalidate() {
+ if(m_renderControl) svs::SynthesisScheduler::instance().cancel(m_renderControl);++m_revision;
+ const auto previous=std::atomic_load(&m_audio);std::shared_ptr<const svs::Audio> retained;
+ if(previous&&!m_segments.isEmpty()&&!readOnly()) {
+  const auto input=captureInput(previous->rate);QString error;auto next=svs::planSynthesisSegments(input,previous->mapping,error);
+  if(error.isEmpty()) {
+   for(auto& segment:next) for(const auto& old:m_segments) if(segment.signature==old.signature&&segment.input.notes==old.input.notes) {segment.audio=old.audio;segment.cached=bool(old.audio);break;}
+   retained=svs::assembleSynthesisSegments(input,previous->mapping,next,error);m_segments=std::move(next);
+  }
+ }
+ if(!retained) m_segments.clear();std::atomic_store(&m_audio,retained);m_status=readOnly()?migrationDiagnostic():"Dirty";emit dataChanged();
+}
 std::shared_ptr<const svs::Audio> SVSClip::audio() const { auto result=std::atomic_load(&m_audio); return result&&result->revision==m_revision.load()?result:nullptr; }
 void SVSClip::setNotes(const QVector<svs::Note>& notes) { setEditorData(notes,m_curves); }
 void SVSClip::setEditorData(const QVector<svs::Note>& notes,const svs::Curves& curves) {
@@ -105,8 +116,8 @@ void SVSClip::synthesize() {
  m_renderControl=svs::SynthesisScheduler::instance().submit(plugin,input,0,[target,current](const QString& state){if(current()){target->m_status=state;emit target->dataChanged();}},[target,current,rate=input.rate,cachedOnly=!plugin](std::shared_ptr<const svs::Audio> result,const QString& error){
   if(!current()) return;
   if(result&&!result->cacheKey.isEmpty()) {target->m_cacheKey=result->cacheKey;target->m_cacheInputHash=result->cacheInputHash;target->m_cacheRate=rate;}
-  std::atomic_store(&target->m_audio,result); target->m_status=result?(cachedOnly?"Missing voice/plugin: cached audio":"Ready"):"Failed: "+error; emit target->dataChanged();
- });
+  if(result||target->m_segments.isEmpty()) std::atomic_store(&target->m_audio,result); target->m_status=result?(cachedOnly?"Missing voice/plugin: cached audio":"Ready"):"Failed: "+error; emit target->dataChanged();
+ },[target,current](std::shared_ptr<const svs::Audio> audio,QVector<svs::SynthesisSegment> segments){if(!current()) return;target->m_segments=std::move(segments);std::atomic_store(&target->m_audio,std::move(audio));emit target->dataChanged();},m_segments);
 }
 bool SVSClip::captureCachedInput(svs::Input& input) const {
  if(readOnly()||m_cacheKey.size()!=64||m_cacheInputHash.size()!=64||m_cacheRate<8000||m_cacheRate>192000) return false;

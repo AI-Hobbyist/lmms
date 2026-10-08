@@ -143,7 +143,7 @@ void ExportSnapshot::declare(int index) {
 void ExportSnapshot::receive(int index,std::shared_ptr<const Audio> audio,const QString& error) {
  if(m_state!=State::Preparing) return;
  auto& region=m_regions[index];
- if(audio&&audio->revision!=region.input.revision) {audio.reset();region.diagnostic="SVS export result version mismatch";}
+ if(audio&&(!audio->complete||audio->revision!=region.input.revision)) {audio.reset();region.diagnostic="SVS export result incomplete or version mismatch";}
  if(!audio) {if(region.diagnostic.isEmpty()) region.diagnostic=error.isEmpty()?"SVS synthesis failed":error;m_diagnostics<<locate(index,region.diagnostic);
   if(!m_ignore) {for(const auto& control:m_controls) control->cancel();finish(State::Failed);return;}
  }

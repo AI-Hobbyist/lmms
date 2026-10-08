@@ -44,6 +44,8 @@ void Synthesis::declareParameters(const VoicePackage& voice,Json& schema) {
     schema["pitch"]={{"input","absolute"},{"feedback",true},{"unit","semitone"}};
     auto parameter=[&](const std::string& id,const std::string& name,const std::string& unit,double minimum,double maximum,double value,bool feedback) {
         Json p{{"id",id},{"name",name},{"group","DiffSinger"},{"scope","clip"},{"type","float"},{"unit",unit},{"min",minimum},{"max",maximum},{"default",value},{"curve",true},{"interpolation","linear"},{"mode","absolute"}};
+        const bool offset=id.find(".offset")!=std::string::npos;
+        p["color"]=id.find("energy")!=std::string::npos?(offset?"#F5A3C5":"#E573A5"):id.find("breathiness")!=std::string::npos?(offset?"#A3F5DB":"#73E5C2"):id.find("voicing")!=std::string::npos?(offset?"#DBF5A3":"#C2E573"):id.find("tension")!=std::string::npos?(offset?"#C5A3F5":"#A573E5"):id=="diffsinger.gender"?"#73B8E5":id=="diffsinger.velocity"?"#E5AD73":"#E5DD73";
         schema["parameters"].push_back(p);if(feedback) {auto reference=p;const auto suffix=reference["name"].get<std::string>().find(" (absolute)");if(suffix!=std::string::npos) {reference["name"]=reference["name"].get<std::string>().substr(0,suffix);}reference["writable"]=false;reference["color"]=id=="diffsinger.energy"?"#E573A5":id=="diffsinger.breathiness"?"#73E5C2":id=="diffsinger.voicing"?"#C2E573":"#A573E5";schema["feedbackParameters"].push_back(reference);}
     };
     const auto& config=voice.stages.at("acoustic").values;
