@@ -2,10 +2,10 @@
 
 状态：PASS。用于覆盖已有 Windows x64 LMMS 安装，沿用 `build/Release` 和 `build/packages`，未覆盖或打开原 Program Files 安装。
 
-- 文件：`build/packages/lmms-enhanced-full-90e92f6cb-win64.zip`。
-- 大小：66,032,783 bytes（约 62.97 MiB），3,484 个运行文件和 4 个安装/说明条目。
-- SHA256：`0B30841B5E669795BCAA03EB360A588103103C02E5A83A3EBB631400039A973B`，相邻 `.sha256` / `.manifest.json` 可核对。
-- 产品提交：`90e92f6cbca9fb89ff77cbcc113678b2f9bbc021`，包含分段渲染、英文 README、SVS 插件浏览器按引擎分类及异步声库扫描。显示版本 `1.3.0-alpha.2.90+90e92f6`。后续证据提交不改变产品输入。异步扫描及当前包检查见 `SVS-async-catalog-validation.md`；下方原覆盖测试证据保留。
+- 文件：`build/packages/lmms-enhanced-full-66063ed0f-win64.zip`。
+- 大小：66,040,011 bytes（约 62.98 MiB），3,485 个运行文件和 4 个安装/说明条目。
+- SHA256：`E02657DF048651BC929D10584BDED808EC51359368611D9DAC61A6FB9FFD3375`，相邻 `.sha256` / `.manifest.json` 可核对。
+- 产品提交：`66063ed0f7b9ca0f9b4f3c976175b5a3b94b681c`，包含分段渲染、英文 README、引擎分类、异步声库扫描、音素别名兼容和全局共享声码器设置。显示版本 `1.3.0-alpha.2.92+66063ed`。后续证据提交不改变产品输入。当前包检查见 `DiffSinger-phoneme-alias-validation.md` 和 `validation/DiffSinger-global-vocoder-package.json`；下方原覆盖测试证据保留。
 
 ## 使用
 
@@ -28,3 +28,4 @@ DiffSinger 为 `svs/SVSDiffSinger` 完整文件夹，含 native DLL、CPU ORT 1.
 - 功能回归见 [分段验收](SVS-segment-rendering-validation.md)：70 passed / 0 failed，以及原生 GUI 专项 5 passed / 0 failed。主体 A0～A4 均已按阶段推送。
 
 这是现有工作区的构建，保留其他任务的 Song.h / Song.cpp / Vst2CompatibilityTest.cpp 修改，不称纯 HEAD 重建。原 Carla 外部运行时警告、听感及人工观感事项沿用既有验收限制；本次没有扩张这些模块。
+

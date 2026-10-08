@@ -74,3 +74,22 @@ No production source outside DiffSinger was changed. SDK API documentation and
 example deployment were updated using the existing SDK build/install directories.
 The replacement package adds only shared-folder instructions, never user vocoder
 models. Historical captures overwritten by existing tests were restored.
+
+## Current replacement package
+
+Product commit: `66063ed0f7b9ca0f9b4f3c976175b5a3b94b681c` (pushed).
+Executable: `build/Release/lmms.exe`, version `1.3.0-alpha.2.92+66063ed`.
+Native plugin: `build/Release/svs/SVSDiffSinger/SVSDiffSinger.dll`.
+Default shared vocoder folder: `build/Release/svs/vocoders`.
+
+Archive: `build/packages/lmms-enhanced-full-66063ed0f-win64.zip`, 66,040,011
+bytes, 3,485 runtime files plus 4 installer/description entries.
+SHA256: `E02657DF048651BC929D10584BDED808EC51359368611D9DAC61A6FB9FFD3375`.
+PASS: all ZIP payload hashes, 360 PE architecture checks, official four-track
+factory template, private data exclusions and the complete DiffSinger folder.
+The global shared folder contains only README instructions.
+See `validation/DiffSinger-global-vocoder-package.json`.
+
+The separately rebuilt and installed SDK DiffSinger binary also passed ABI
+1.0–1.3 loading (`validation/DiffSinger-global-vocoder-sdk-abi.txt`); installed
+API documentation matches the source hash. No ABI version was changed.
