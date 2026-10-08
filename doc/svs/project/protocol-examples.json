@@ -1,0 +1,8 @@
+{
+  "listRequest": {"protocol": 1, "requestId": "catalog-1", "operation": "listFormats"},
+  "importRequest": {"protocol": 1, "requestId": "import-1", "operation": "importProject", "formatId": "svp", "path": "D:/音乐/原工程.svp", "options": {"import_pitch": true, "pitch": "full"}},
+  "exportRequest": {"protocol": 1, "requestId": "export-1", "operation": "exportProject", "formatId": "json", "path": "D:/音乐/输出.json", "options": {}, "project": {"version": "", "song_tempo_list": [{"position": 0, "bpm": 120}], "time_signature_list": [{"bar_index": 0, "numerator": 4, "denominator": 4}], "track_list": [{"type_": "Singing", "title": "声部", "note_list": [{"start_pos": 0, "length": 480, "key_number": 60, "lyric": "你"}], "edited_params": {"pitch": {"points": [[-192000, -100], [1920, -100], [1920, 6000], [2400, 6050], [2400, -100], [1073741823, -100]]}}}]}},
+  "successResponse": {"protocol": 1, "dataVersion": 1, "requestId": "export-1", "formatId": "json", "status": "success", "warnings": [], "losses": [], "files": ["D:/音乐/输出.json"]},
+  "errorResponse": {"protocol": 1, "dataVersion": 1, "requestId": "import-1", "formatId": "svp", "status": "error", "warnings": [], "losses": [], "error": {"code": "invalidInput", "message": "Cannot parse source project", "detail": "Format-specific diagnostic"}},
+  "lossExample": {"formatId": "ust", "track": "伴奏", "field": "audio", "reason": "Target format cannot represent instrumental tracks"}
+}
