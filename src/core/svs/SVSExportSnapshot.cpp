@@ -29,7 +29,9 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song,uint32_t rate
    auto* clip=static_cast<SVSClip*>(item);if(clip->isMuted()) continue;
    Region region;region.track=track;region.trackName=track->name();region.clipName=clip->name();region.position=int(clip->startPosition());region.length=int(clip->length());region.contentOffset=-int(clip->startTimeOffset());region.input=clip->captureInput(rate);region.plugin=Registry::instance().plugin(track->pluginId());
    region.mixContext=mixContext(*track);
-   if(track->voice().id.isEmpty()) region.plugin.reset();
+   region.catalogPending=region.plugin&&track->voice().id.isEmpty()&&Registry::instance().scanning(track->pluginId());
+   if(region.catalogPending) clip->captureCachedInput(region.input);
+   if(track->voice().id.isEmpty()&&!region.catalogPending) region.plugin.reset();
    if(clip->notes().isEmpty()) {}
    else if(clip->readOnly()) region.diagnostic=clip->migrationDiagnostic();
    else if(!region.plugin&&!clip->captureCachedInput(region.input)) region.diagnostic="Missing voice/plugin";
@@ -109,10 +111,20 @@ void ExportSnapshot::prepare(bool ignore) {
   for(int index=0;index<m_regions.size()&&m_state==State::Preparing;++index) {
    const auto& region=m_regions[index];
    if(region.input.notes.isEmpty()) {if(--m_remaining==0) finish(State::Ready);continue;}
+   if(region.catalogPending&&region.diagnostic.isEmpty()) {awaitCatalog(index);continue;}
    if(!region.diagnostic.isEmpty()||(!region.plugin&&!region.input.document.contains("cacheOnlyKey"))) {receive(index,{},region.diagnostic.isEmpty()?"Missing voice/plugin":region.diagnostic);continue;}
    if(region.declarationPending) declare(index);else submit(index,region.input);
   }
  });
+}
+void ExportSnapshot::awaitCatalog(int index) {
+ if(m_state!=State::Preparing) return;auto& region=m_regions[index];const auto id=region.input.document["pluginId"].toString();
+ if(Registry::instance().scanning(id)) {QTimer::singleShot(20,this,[this,index]{awaitCatalog(index);});return;}
+ region.catalogPending=false;
+ for(const auto& voice:Registry::instance().voices()) if(voice.pluginId==id&&voice.id==region.input.voiceId) {
+  region.voicePackage=voice.package;region.input.document.remove("cacheOnlyKey");region.input.document["voiceVersion"]=voice.version;region.input.document["pluginVersion"]=voice.metadata["pluginVersion"];declare(index);return;
+ }
+ region.plugin.reset();if(region.input.document.contains("cacheOnlyKey")) submit(index,region.input);else receive(index,{},"Missing voice/plugin");
 }
 void ExportSnapshot::submit(int index,Input input) {
  if(m_state!=State::Preparing) return;m_regions[index].input=input;QPointer<ExportSnapshot> target(this);

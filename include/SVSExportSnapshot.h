@@ -16,6 +16,7 @@ public:
   std::shared_ptr<Plugin> plugin;
   std::shared_ptr<const Audio> audio;
   bool declarationPending=false;
+  bool catalogPending=false;
   QString voicePackage;
  };
  enum class State { Captured,Preparing,Ready,Failed,Cancelled };
@@ -36,6 +37,7 @@ private:
  void receive(int,std::shared_ptr<const Audio>,const QString&);
  void submit(int,Input);
  void declare(int);
+ void awaitCatalog(int);
  void finish(State);
  QString locate(int,const QString&) const;
  void invalidateActive(const QString&);

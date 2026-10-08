@@ -147,7 +147,7 @@ private slots:
   auto* automation=static_cast<AutomationClip*>(automationTrack->createClip(0));
   automation->addObject(&song->tempoModel());automation->putValue(0,120);automation->putValue(96,140);
   auto* svsTrack=new SVSTrack(song);
-  const auto voices=svs::Registry::instance().voices();QVERIFY(!voices.isEmpty());
+  svs::Registry::instance().voices();QTRY_VERIFY_WITH_TIMEOUT(!svs::Registry::instance().scanning(),30000);const auto voices=svs::Registry::instance().voices();QVERIFY(!voices.isEmpty());
   svsTrack->bindVoice(voices.first().pluginId,voices.first().id);
   auto* svsClip=static_cast<SVSClip*>(svsTrack->createClip(0));
   svs::Note svsNote;svsNote.id="ui-baseline-note";svsNote.duration=96;svsNote.pitch=60;
@@ -400,7 +400,7 @@ private slots:
  {
   auto* song=Engine::getSong();song->createNewProject();
   auto* track=new SVSTrack(song);
-  const auto voices=svs::Registry::instance().voices();QVERIFY(!voices.isEmpty());
+  svs::Registry::instance().voices();QTRY_VERIFY_WITH_TIMEOUT(!svs::Registry::instance().scanning(),30000);const auto voices=svs::Registry::instance().voices();QVERIFY(!voices.isEmpty());
   track->bindVoice(voices.first().pluginId,voices.first().id);
   auto* clip=static_cast<SVSClip*>(track->createClip(0));
   svs::Note note;note.id="scale-spot-check";note.duration=96;note.pitch=60;clip->setNotes({note});

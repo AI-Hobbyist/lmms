@@ -21,6 +21,7 @@
 #include <QScopeGuard>
 #include <QSysInfo>
 #include <QUrl>
+#include <QRunnable>
 namespace lmms::svs {
 namespace {
 // Queued notifications belong to this target and expire when it is destroyed.
@@ -99,18 +100,19 @@ QJsonObject Plugin::pronunciation(const QString& voice, const QJsonObject& conte
  error.clear(); return document.object();
 }
 bool Plugin::hasCatalogQuery() const {return m_impl->api.query_catalog!=nullptr;}
-QVector<Voice> Plugin::voices(const QString& package,const QString& id,const QJsonObject& context,QJsonObject* declaration) {
+QVector<Voice> Plugin::voices(const QString& package,const QString& id,const QJsonObject& context,QJsonObject* declaration,QString* diagnostic) {
+ if(diagnostic) diagnostic->clear();
  QMutexLocker lock(&m_impl->mutex); QVector<Voice> voices; const char* text=nullptr;
  const auto request=QJsonDocument(context).toJson(QJsonDocument::Compact);
  if(!valid()) return voices;
  const auto status=m_impl->api.query_catalog&&!context.isEmpty()?m_impl->api.query_catalog(m_impl->engine,request.constData(),&text):m_impl->api.catalog(m_impl->engine,&text);
- if(status!=SVS_OK||!text) {if(text) {qWarning().noquote()<<"SVS catalog:"<<QString::fromUtf8(text);m_impl->api.release_string(m_impl->engine,text);}return voices;}
+ if(status!=SVS_OK||!text) {if(diagnostic) *diagnostic=text?QString::fromUtf8(text):QString("SVS catalog query failed (%1)").arg(status);if(text) m_impl->api.release_string(m_impl->engine,text);return voices;}
  QJsonParseError error; auto document=QJsonDocument::fromJson(text,&error); m_impl->api.release_string(m_impl->engine,text);
- if(error.error!=QJsonParseError::NoError) { m_impl->error="Invalid voice catalog JSON"; return voices; }
- if(!document.isObject()||!document.object()["voices"].isArray()) {m_impl->error="Invalid voice catalog declaration";return {};}
+ if(error.error!=QJsonParseError::NoError) { if(diagnostic) *diagnostic="Invalid voice catalog JSON"; return voices; }
+ if(!document.isObject()||!document.object()["voices"].isArray()) {if(diagnostic) *diagnostic="Invalid voice catalog declaration";return {};}
  if(declaration) *declaration=document.object();
  QSet<QString> ids;
- for(const auto& item:document.object()["voices"].toArray()) { auto v=item.toObject(); auto voiceId=v["id"].toString(); if(voiceId.isEmpty()||ids.contains(voiceId)) { m_impl->error="Duplicate or missing voice ID"; return {}; } ids.insert(voiceId);
+ for(const auto& item:document.object()["voices"].toArray()) { auto v=item.toObject(); auto voiceId=v["id"].toString(); if(voiceId.isEmpty()||ids.contains(voiceId)) { if(diagnostic) *diagnostic="Duplicate or missing voice ID";if(declaration) *declaration={};return {}; } ids.insert(voiceId);
   auto resource=[&](const QString& key) { auto path=v[key].toString(); if(path.isEmpty()) return QString{};auto resolved=QFileInfo(QDir(package).filePath(path)).canonicalFilePath(); auto root=QFileInfo(package).canonicalFilePath()+"/";if(!resolved.isEmpty()&&resolved.startsWith(root,Qt::CaseInsensitive)) return resolved;if(m_impl->api.open_resource&&m_impl->api.read_resource&&m_impl->api.close_resource) return "svs-resource:"+QString::fromLatin1(QUrl::toPercentEncoding(id))+":"+QString::fromLatin1(QUrl::toPercentEncoding(path));return QString{}; };
   voices.push_back({id,voiceId,v["name"].toString(),v["version"].toString(),v["defaultLanguage"].toString(),v["defaultLyric"].toString(),resource("avatar"),resource("portrait"),package,v});
  } return voices;
@@ -199,6 +201,8 @@ std::shared_ptr<const Audio> Plugin::render(const Input& input,QString& error,co
  } else {error=QString("SVS synthesis failed (%1)").arg(status);if(result.error_json) {const auto diagnostic=QJsonDocument::fromJson(result.error_json).object();const auto message=diagnostic["message"].toString();if(!message.isEmpty()) error+=": "+message;for(const auto* key:{"noteId","parameterId","rangeId"}) if(diagnostic[key].isString()) error+=" ["+QString::fromLatin1(key)+"="+diagnostic[key].toString()+"]";}}
  d.api.release_result(session,&result); d.api.destroy_session(session); return audio;
 }
+Registry::Registry() {m_catalogPool.setMaxThreadCount(1);}
+Registry::~Registry() {for(const auto& generation:m_catalogGenerations) ++*generation;m_catalogPool.clear();m_catalogPool.waitForDone();}
 Registry& Registry::instance() { static Registry registry; return registry; }
 const QVector<Voice>& Registry::voices() {
  if(m_scanned) return m_voices; m_scanned=true;
@@ -221,25 +225,53 @@ const QVector<Voice>& Registry::voices() {
   if(m_plugins.contains(id)) {const auto existing=std::find_if(m_engines.begin(),m_engines.end(),[&](const auto& engine){return engine.id==id;});if(existing==m_engines.end()||QFileInfo(existing->package).canonicalFilePath().compare(QFileInfo(package).canonicalFilePath(),pathSensitivity)!=0) m_diagnostics<<"Duplicate SVS plugin ID: "+id+" in "+package;continue;}
   auto plugin=std::make_shared<Plugin>(package+"/"+entry); if(!plugin->valid()) { m_diagnostics<<id+": "+plugin->error(); continue; }
   m_plugins[id]=plugin;m_engines.push_back({id,manifest["name"].toString(id),manifest["engineType"].toString(),package,manifest});
-  const auto settings=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(id.toUtf8().toHex())).toUtf8()).object();QString error;
-  if(!refreshCatalog(id,settings,error,false)) m_diagnostics<<id+": "+error;
+  const auto settings=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(id.toUtf8().toHex())).toUtf8()).object();
+  refreshCatalogAsync(id,settings,false);
  } return m_voices;
 }
 std::shared_ptr<Plugin> Registry::plugin(const QString& id) { voices(); return m_plugins.value(id); }
+QJsonObject Registry::catalogContext(const QString& id,const QJsonObject& settings,bool rescan) const {
+ const auto key="engine_"+QString::fromLatin1(id.toUtf8().toHex());auto* config=ConfigManager::inst();
+ const auto registry=QJsonDocument::fromJson(config->value("svsInstallations",key).toUtf8()).array();
+ return {{"engineSettings",settings},{"installations",registry},{"rescan",rescan},{"defaultVoicebankDirectory",config->workingDir()+"voicebanks/DiffSinger"}};
+}
 bool Registry::refreshCatalog(const QString& id,const QJsonObject& settings,QString& error,bool rescan) {
  voices();const auto plugin=m_plugins.value(id);const auto found=std::find_if(m_engines.begin(),m_engines.end(),[&](const auto& engine){return engine.id==id;});
  if(!plugin||found==m_engines.end()) {error="SVS engine unavailable";return false;}
- const auto key="engine_"+QString::fromLatin1(id.toUtf8().toHex());auto* config=ConfigManager::inst();
- const auto registry=QJsonDocument::fromJson(config->value("svsInstallations",key).toUtf8()).array();
- const QJsonObject context{{"engineSettings",settings},{"installations",registry},{"rescan",rescan},{"defaultVoicebankDirectory",config->workingDir()+"voicebanks/DiffSinger"}};
- QJsonObject declaration;auto next=plugin->voices(found->package,id,context,&declaration);
- if(!declaration.contains("voices")) {error=plugin->error().isEmpty()?"SVS catalog query failed":plugin->error();return false;}
+ auto& generation=m_catalogGenerations[id];if(!generation) generation=std::make_shared<std::atomic<uint64_t>>(0);++*generation;
+ QJsonObject declaration;auto next=plugin->voices(found->package,id,catalogContext(id,settings,rescan),&declaration,&error);
+ m_scanning.remove(id);
+ if(error.isEmpty()&&!declaration.contains("voices")) error="SVS catalog query failed";
+ if(error.isEmpty()) publishCatalog(id,std::move(next),declaration);
+ emit catalogScanFinished(id,error);return error.isEmpty();
+}
+void Registry::refreshCatalogAsync(const QString& id,const QJsonObject& settings,bool rescan) {
+ voices();const auto plugin=m_plugins.value(id);const auto found=std::find_if(m_engines.begin(),m_engines.end(),[&](const auto& engine){return engine.id==id;});
+ if(!plugin||found==m_engines.end()) {emit catalogScanFinished(id,"SVS engine unavailable");return;}
+ auto& current=m_catalogGenerations[id];if(!current) current=std::make_shared<std::atomic<uint64_t>>(0);
+ const auto generation=current;const auto request=++*generation;const auto package=found->package;const auto context=catalogContext(id,settings,rescan);
+ m_scanning.insert(id);emit catalogScanStarted(id);
+ m_catalogPool.start(QRunnable::create([this,plugin,id,package,context,generation,request]{
+  if(generation->load()!=request) return;
+  QString error;QJsonObject declaration;QVector<Voice> next;
+  try {next=plugin->voices(package,id,context,&declaration,&error);if(error.isEmpty()&&!declaration.contains("voices")) error="SVS catalog query failed";}catch(...) {error="SVS catalog worker exception";}
+  QMetaObject::invokeMethod(this,[this,id,generation,request,next=std::move(next),declaration,error]() mutable {
+   if(generation->load()!=request) return;
+   m_scanning.remove(id);
+   if(error.isEmpty()) publishCatalog(id,std::move(next),declaration);else m_diagnostics<<id+": "+error;
+   emit catalogScanFinished(id,error);
+  },Qt::QueuedConnection);
+ }));
+}
+void Registry::publishCatalog(const QString& id,QVector<Voice> next,const QJsonObject& declaration) {
+ const auto found=std::find_if(m_engines.begin(),m_engines.end(),[&](const auto& engine){return engine.id==id;});
+ if(found==m_engines.end()) return;
  for(auto& voice:next) {voice.metadata["pluginVersion"]=found->manifest["version"];voice.metadata["pluginName"]=found->name;voice.metadata["engineType"]=found->type;}
  for(const auto& diagnostic:declaration["diagnostics"].toArray()) {m_diagnostics<<id+": "+diagnostic.toObject()["message"].toString();}
- if(declaration["installations"].isArray()) config->setValue("svsInstallations",key,QString::fromUtf8(QJsonDocument(declaration["installations"].toArray()).toJson(QJsonDocument::Compact)));
+ if(declaration["installations"].isArray()) ConfigManager::inst()->setValue("svsInstallations","engine_"+QString::fromLatin1(id.toUtf8().toHex()),QString::fromUtf8(QJsonDocument(declaration["installations"].toArray()).toJson(QJsonDocument::Compact)));
  QVector<Voice> previous;for(const auto& voice:m_voices) if(voice.pluginId==id) previous.append(voice);
  m_voices.erase(std::remove_if(m_voices.begin(),m_voices.end(),[&](const auto& voice){return voice.pluginId==id;}),m_voices.end());m_voices+=next;
  bool changed=previous.size()!=next.size();if(!changed) for(int index=0;index<next.size();++index) if(previous[index].metadata!=next[index].metadata) {changed=true;break;}
- error.clear();if(changed) emit catalogChanged(id);return true;
+ if(changed) emit catalogChanged(id);
 }
 }

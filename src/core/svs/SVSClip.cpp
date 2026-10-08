@@ -110,7 +110,7 @@ void SVSClip::synthesize() {
  for(const auto& parameter:track->capabilities().parameters) if(parameter.curve&&m_unparsedCurves.contains(parameter.id)) {m_migrationDiagnostic="Invalid SVS curve "+parameter.id+"; original node preserved";invalidate();return;}
  ++m_request;
  auto input=captureInput(Engine::audioEngine()->outputSampleRate());
- if(!plugin&&!captureCachedInput(input)) {m_status="Missing voice/plugin; no valid cached audio";emit dataChanged();return;}
+ if(!plugin&&!captureCachedInput(input)) {m_status=svs::Registry::instance().scanning(track->pluginId())?"Queued: voicebank scan":"Missing voice/plugin; no valid cached audio";emit dataChanged();return;}
  QPointer<SVSClip> target(this);
  auto current=[target,input]{return target&&target->m_id==input.clipId&&target->m_generation==input.generation&&target->m_revision==input.revision&&target->m_request==input.request;};
  m_renderControl=svs::SynthesisScheduler::instance().submit(plugin,input,0,[target,current](const QString& state){if(current()){target->m_status=state;emit target->dataChanged();}},[target,current,rate=input.rate,cachedOnly=!plugin](std::shared_ptr<const svs::Audio> result,const QString& error){

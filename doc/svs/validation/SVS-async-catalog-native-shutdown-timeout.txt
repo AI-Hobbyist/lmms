@@ -1,0 +1,26 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::asynchronousVoicebankScanning()
+PASS   : SVSIntegrationTest::diffSingerPresentationAndSettings()
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll: ???????????????
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll: ???????????????
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() SVS: SVSExample engine initialized?
+
+FAIL!  : SVSIntegrationTest::diffSingerReleaseWindow() QTestLib: This test case check ("(process.state()) == (QProcess::NotRunning)") failed because the requested timeout (10000 ms) was too short, 10100 ms would have been sufficient this time.
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1216) : failure location
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 4 passed, 1 failed, 0 skipped, 0 blacklisted, 118774ms
+********* Finished testing of SVSIntegrationTest *********

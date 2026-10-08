@@ -1,0 +1,101 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::embeddedWindowLifecycle()
+PASS   : SVSIntegrationTest::sdkResourcesAndServices()
+PASS   : SVSIntegrationTest::releaseDemonstrationAndPerformance()
+PASS   : SVSIntegrationTest::releaseDemonstrationRuntime()
+QDEBUG : SVSIntegrationTest::sdkManifestDiagnostics() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::sdkManifestDiagnostics()
+PASS   : SVSIntegrationTest::sdkMinimalNativeTiming()
+PASS   : SVSIntegrationTest::missingPluginCachedPlayback()
+PASS   : SVSIntegrationTest::cachedRestoreWithoutPlugin()
+QWARN  : SVSIntegrationTest::cachedPlaybackAndTrackExports() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::cachedPlaybackAndTrackExports() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+PASS   : SVSIntegrationTest::cachedPlaybackAndTrackExports()
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+PASS   : SVSIntegrationTest::frozenTrackExportBatch()
+PASS   : SVSIntegrationTest::runningExportContextGuard(mix)
+PASS   : SVSIntegrationTest::runningExportContextGuard(tempo)
+PASS   : SVSIntegrationTest::runningExportContextGuard(delete-track)
+PASS   : SVSIntegrationTest::variableTempoFileExport()
+PASS   : SVSIntegrationTest::deletedTrackExportPreparation()
+PASS   : SVSIntegrationTest::exportContextMutationRejected()
+PASS   : SVSIntegrationTest::nativeSVSFileExport()
+PASS   : SVSIntegrationTest::exportSnapshotPreparation()
+PASS   : SVSIntegrationTest::tempoSnapshotPipelineAndPlayback()
+PASS   : SVSIntegrationTest::immutableTempoAutomationSnapshot()
+PASS   : SVSIntegrationTest::variableTempoMappingAndPlugin()
+PASS   : SVSIntegrationTest::asynchronousVoiceDeclaration()
+QWARN  : SVSIntegrationTest::persistenceAndMigrationProtection() Error loading icon pixmap "piano": "File not found"
+PASS   : SVSIntegrationTest::persistenceAndMigrationProtection()
+PASS   : SVSIntegrationTest::arrangementSplitAndTrackClone()
+PASS   : SVSIntegrationTest::resultOriginAndCopyPosition()
+PASS   : SVSIntegrationTest::cacheIdentityBudgetAndRecovery()
+PASS   : SVSIntegrationTest::schedulerShutdownWaitsForWorkers()
+QDEBUG : SVSIntegrationTest::synthesisCancellationAndBudget() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::synthesisCancellationAndBudget()
+PASS   : SVSIntegrationTest::finalEditorInteractionGates()
+PASS   : SVSIntegrationTest::relativePitchUsesDeclaredReference()
+PASS   : SVSIntegrationTest::continuationChainAndNavigation()
+PASS   : SVSIntegrationTest::noteSplitReparsesPhonemes()
+PASS   : SVSIntegrationTest::portraitResourcesAndPreferences()
+PASS   : SVSIntegrationTest::batchLyricsAndPronunciation()
+PASS   : SVSIntegrationTest::continuousCurves()
+PASS   : SVSIntegrationTest::waveformPyramid()
+PASS   : SVSIntegrationTest::phonemeConstraintsAcrossTempoChanges()
+PASS   : SVSIntegrationTest::phonemeBoundariesAndAttributes()
+PASS   : SVSIntegrationTest::canvasThemeProperties()
+PASS   : SVSIntegrationTest::curveRangeTransactions()
+PASS   : SVSIntegrationTest::freehandMonotonicInterpolation()
+PASS   : SVSIntegrationTest::feedbackPitchInterpolation()
+PASS   : SVSIntegrationTest::pitchDrawingAndPluginEvaluation()
+PASS   : SVSIntegrationTest::curveUndoAndSelectionMove()
+PASS   : SVSIntegrationTest::noteTransactionsAndInlineLyrics()
+PASS   : SVSIntegrationTest::optimizedTuneLabNoteAndToolSemantics()
+PASS   : SVSIntegrationTest::tuneLabStretchAlignmentNativeWindow()
+PASS   : SVSIntegrationTest::optimizedTuneLabParameterResetSemantics()
+PASS   : SVSIntegrationTest::automaticNoteStretchRenders()
+PASS   : SVSIntegrationTest::stretchShortPhonemeRenders()
+PASS   : SVSIntegrationTest::generatedPhonemeDragRenders()
+PASS   : SVSIntegrationTest::readOnlyReferenceNativeWindow()
+PASS   : SVSIntegrationTest::parameterLaneDrawingAndPersistence()
+PASS   : SVSIntegrationTest::noteWaveformAndViewportZoom()
+PASS   : SVSIntegrationTest::globalSidebarVoiceAndRelativeValues()
+PASS   : SVSIntegrationTest::globalParameterCurveAndScrollSynchronization()
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_yellow": "File not found"
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_off": "File not found"
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_green": "File not found"
+PASS   : SVSIntegrationTest::nativePluginVoiceAndImageSettings()
+PASS   : SVSIntegrationTest::compactEditorLayoutAndNoteLabels()
+PASS   : SVSIntegrationTest::asynchronousVoicebankScanning()
+PASS   : SVSIntegrationTest::exportWhileVoicebankScanning()
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "plugins": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "close": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "zoom": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "sample_track": "File not found"
+PASS   : SVSIntegrationTest::svsBrowserEngineGroups()
+QWARN  : SVSIntegrationTest::diffSingerCatalogSettingsAndResources() Error loading icon pixmap "piano": "File not found"
+PASS   : SVSIntegrationTest::diffSingerCatalogSettingsAndResources()
+PASS   : SVSIntegrationTest::diffSingerPronunciationAndSpeakerPersistence()
+PASS   : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport()
+PASS   : SVSIntegrationTest::segmentedPlanDependenciesAndAssembly()
+PASS   : SVSIntegrationTest::diffSingerSegmentedRendering()
+SKIP   : SVSIntegrationTest::diffSingerPresentationAndSettings() Native embedded GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1185) : failure location
+SKIP   : SVSIntegrationTest::diffSingerReleaseWindow() Explicit development Release executable and external voicebanks required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1202) : failure location
+PASS   : SVSIntegrationTest::engineCacheDirectoriesAndLegacyRead()
+PASS   : SVSIntegrationTest::parameterPanelStateAndFocus()
+PASS   : SVSIntegrationTest::capabilitiesAndDictionaries()
+QWARN  : SVSIntegrationTest::verticalSlice() Error loading icon pixmap "piano": "File not found"
+PASS   : SVSIntegrationTest::verticalSlice()
+PASS   : SVSIntegrationTest::renderedParametersAndPersistence()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 73 passed, 0 failed, 2 skipped, 0 blacklisted, 362339ms
+********* Finished testing of SVSIntegrationTest *********

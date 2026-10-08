@@ -11,6 +11,8 @@
 #include <functional>
 #include <mutex>
 #include <QObject>
+#include <QThreadPool>
+#include <QSet>
 #include "svs.h"
 #include "SVSWaveform.h"
 #include "SVSTimeMapping.h"
@@ -49,7 +51,7 @@ public:
  bool valid() const;
  QString error() const;
  QString identity() const;
- QVector<Voice> voices(const QString& package,const QString& id,const QJsonObject& context={},QJsonObject* declaration=nullptr);
+ QVector<Voice> voices(const QString& package,const QString& id,const QJsonObject& context={},QJsonObject* declaration=nullptr,QString* error=nullptr);
  bool hasCatalogQuery() const;
  QJsonObject capabilities(const QString& voice, const QJsonObject& context, QString& error);
  QJsonObject engineSettings(const QString& fallbackVoice,const QJsonObject& context,QString& error);
@@ -62,20 +64,32 @@ private:
 class Registry : public QObject {
  Q_OBJECT
 public:
+ Registry();
+ ~Registry() override;
  static Registry& instance();
  const QVector<Voice>& voices();
  const QVector<InstalledEngine>& engines() {voices();return m_engines;}
+ // Blocking helper for non-UI consumers. Interactive callers queue a scan instead.
  bool refreshCatalog(const QString& id,const QJsonObject& settings,QString& error,bool rescan=true);
+ void refreshCatalogAsync(const QString& id,const QJsonObject& settings,bool rescan=true);
+ bool scanning(const QString& id={}) const {return id.isEmpty()?!m_scanning.isEmpty():m_scanning.contains(id);}
  std::shared_ptr<Plugin> plugin(const QString& id);
  QStringList diagnostics() const { return m_diagnostics; }
 signals:
  void catalogChanged(const QString& pluginId);
+ void catalogScanStarted(const QString& pluginId);
+ void catalogScanFinished(const QString& pluginId,const QString& error);
 private:
+ QJsonObject catalogContext(const QString& id,const QJsonObject& settings,bool rescan) const;
+ void publishCatalog(const QString& id,QVector<Voice> next,const QJsonObject& declaration);
  bool m_scanned=false;
  QVector<Voice> m_voices;
  QVector<InstalledEngine> m_engines;
  QMap<QString,std::shared_ptr<Plugin>> m_plugins;
  QStringList m_diagnostics;
+ QMap<QString,std::shared_ptr<std::atomic<uint64_t>>> m_catalogGenerations;
+ QSet<QString> m_scanning;
+ QThreadPool m_catalogPool;
 };
 }
 #endif

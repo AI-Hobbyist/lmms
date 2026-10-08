@@ -75,7 +75,10 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent):QWidget(parent) {
   auto plugin=svs::Registry::instance().plugin(installed.id);
   if(plugin&&plugin->hasCatalogQuery()) {
    auto* rescan=new QPushButton(tr("Rescan voicebanks"),page);rescan->setObjectName("svsRescanVoicebanks");rescan->setToolTip(tr("Rescan the applied voicebank directories. Apply directory changes first."));pageLayout->insertWidget(pageLayout->count()-1,rescan);
-   connect(rescan,&QPushButton::clicked,this,[this,key=installed.id,status]{const auto settings=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(key.toUtf8().toHex())).toUtf8()).object();QString error;const bool ok=svs::Registry::instance().refreshCatalog(key,settings,error);int count=0;for(const auto& voice:svs::Registry::instance().voices()) if(voice.pluginId==key) ++count;status->setText(ok?tr("Voicebanks found: %1").arg(count):error);});
+   connect(rescan,&QPushButton::clicked,this,[key=installed.id]{const auto settings=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(key.toUtf8().toHex())).toUtf8()).object();svs::Registry::instance().refreshCatalogAsync(key,settings);});
+   connect(&svs::Registry::instance(),&svs::Registry::catalogScanStarted,page,[this,key=installed.id,status,rescan](const QString& id){if(id!=key) return;status->setText(tr("Scanning voicebanks…"));rescan->setEnabled(false);});
+   connect(&svs::Registry::instance(),&svs::Registry::catalogScanFinished,page,[this,key=installed.id,status,rescan](const QString& id,const QString& error){if(id!=key) return;rescan->setEnabled(true);int count=0;for(const auto& voice:svs::Registry::instance().voices()) if(voice.pluginId==key) ++count;status->setText(error.isEmpty()?tr("Voicebanks found: %1").arg(count):error);});
+   rescan->setEnabled(!svs::Registry::instance().scanning(installed.id));
   }
   m_engine->addTab(page,engineLabel(voice));
  }
@@ -111,7 +114,7 @@ void SVSSettingsPage::refreshEngine() {
    target->m_schema=parsed.parameters;auto& values=target->m_values[key];
    for(const auto& parameter:parsed.parameters) if(!parameter.accepts(values[parameter.id])) values[parameter.id]=parameter.defaultValue;
    int count=0;for(const auto& catalogVoice:svs::Registry::instance().voices()) if(catalogVoice.pluginId==key) ++count;
-   target->m_status->setText(count==0?tr("No voicebanks found. Configure directories and apply, then rescan."):parsed.parameters.isEmpty()?tr("This engine does not declare additional options."):tr("Voicebanks found: %1").arg(count));
+   target->m_status->setText(svs::Registry::instance().scanning(key)?tr("Scanning voicebanks…"):count==0?tr("No voicebanks found. Configure directories and apply, then rescan."):parsed.parameters.isEmpty()?tr("This engine does not declare additional options."):tr("Voicebanks found: %1").arg(count));
    target->m_parameters->refresh(parsed.parameters,"track",{values},values,[target,key](const QString& id,const QJsonValue& value){
     if(!target) return;
     target->m_values[key][id]=value;
@@ -130,7 +133,7 @@ void SVSSettingsPage::save() {
  QSet<QString> changed;
  for(auto it=m_values.cbegin();it!=m_values.cend();++it) {
   const auto key="engine_"+QString::fromLatin1(it.key().toUtf8().toHex());const auto json=QString::fromUtf8(QJsonDocument(it.value()).toJson(QJsonDocument::Compact));
-  if(config->value("svsEngineSettings",key)!=json) {auto previous=QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object();auto current=it.value();config->setValue("svsEngineSettings",key,json);auto plugin=svs::Registry::instance().plugin(it.key());if(plugin&&plugin->hasCatalogQuery()) {QString error;svs::Registry::instance().refreshCatalog(it.key(),it.value(),error,false);if(!error.isEmpty()) qWarning().noquote()<<error;previous.remove("diffsinger.voicebankDirectories");current.remove("diffsinger.voicebankDirectories");}if(it.key()=="org.lmms.svs.diffsinger") {previous.remove("diffsinger.showPhonemeLanguagePrefix");current.remove("diffsinger.showPhonemeLanguagePrefix");}if(previous!=current) changed.insert(it.key());}
+  if(config->value("svsEngineSettings",key)!=json) {auto previous=QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object();auto current=it.value();config->setValue("svsEngineSettings",key,json);auto plugin=svs::Registry::instance().plugin(it.key());if(plugin&&plugin->hasCatalogQuery()) {svs::Registry::instance().refreshCatalogAsync(it.key(),it.value(),false);previous.remove("diffsinger.voicebankDirectories");current.remove("diffsinger.voicebankDirectories");}if(it.key()=="org.lmms.svs.diffsinger") {previous.remove("diffsinger.showPhonemeLanguagePrefix");current.remove("diffsinger.showPhonemeLanguagePrefix");}if(previous!=current) changed.insert(it.key());}
  }
  for(auto* base:Engine::getSong()->tracks()) if(base->type()==Track::Type::SVS) {
   auto* track=static_cast<SVSTrack*>(base);if(!changed.contains(track->pluginId())) continue;

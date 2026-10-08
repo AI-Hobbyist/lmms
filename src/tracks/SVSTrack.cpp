@@ -48,6 +48,7 @@ SVSTrack::SVSTrack(TrackContainer* tc):Track(Type::SVS,tc),m_volume(DefaultVolum
   if(contentChanged) {++m_capabilityRequest;m_capabilitiesReady=false;m_capabilities={};m_dictionaries.clear();m_capabilityDiagnostics=next.id.isEmpty()?QStringList{"Voicebank is missing; project data is retained"}:QStringList{};for(auto* base:getClips()) static_cast<SVSClip*>(base)->invalidate();if(!next.id.isEmpty()) refreshCapabilities();}
   emit dataChanged();
  });
+ connect(&svs::Registry::instance(),&svs::Registry::catalogScanFinished,this,[this](const QString& plugin,const QString&){if(plugin==m_pluginId&&m_voice.id.isEmpty()) for(auto* base:getClips()) static_cast<SVSClip*>(base)->synthesize();});
 }
 SVSTrack::~SVSTrack() { Engine::audioEngine()->removePlayHandlesOfTypes(this,PlayHandle::Type::SVSPlayHandle); }
 void SVSTrack::setName(const QString& name) { m_customName=true; Track::setName(name); m_bus.setName(name); }
