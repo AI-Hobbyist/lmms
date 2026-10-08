@@ -20,8 +20,21 @@ void tensorCacheFixture() {
     std::ofstream(root/"audition.wav")<<"preserve";for(int i=0;i<8;++i) {cache.save(TensorCache::key("fixture-"+std::to_string(i),inputs),outputs);}uint64_t bytes=0;for(const auto& entry:fs::directory_iterator(root)) {if(entry.path().extension()==".tensor") {bytes+=entry.file_size();}}require(bytes<=500&&fs::exists(root/"audition.wav"),"Tensor LRU budget crossed its boundary");std::cout<<"PASS tensor codec / identity / corruption / bounded LRU / audition preservation"<<std::endl;
 }
 }
-int main(int argc,char** argv) {
+int run(int argc,char** argv) {
     try {
+        if(argc==5&&std::string(argv[1])=="--voice") {
+            initializeRuntime();Ort::Env env{ORT_LOGGING_LEVEL_WARNING,"DiffSingerExternalVoiceTest"};
+            const auto catalog=scan({{"engineSettings",{{"diffsinger.voicebankDirectories",Json::array({fs::absolute(fs::u8path(argv[2])).u8string()})},{"diffsinger.vocoderDirectories",Json::array({fs::absolute(fs::u8path(argv[4])).u8string()})}}}},1);
+            require(catalog->voices.size()==1,"Expected one external voice: "+catalog->diagnostics.dump());const auto voice=catalog->voices.front();
+            svs_sdk::TempoMap tempo;require(tempo.setPoints({{0,1./96.}}),"Invalid test tempo");std::atomic<bool> cancel{false};NoteInput note;note.id="external-la";note.lyric="la";note.reading="la";note.language="zh";note.durationTick=96;note.duration=1;note.pitch=60;
+            const std::vector<NoteInput> notes{note};Duration duration(env,voice);Synthesis synthesis(env,voice);const auto plan=duration.predict(notes,tempo,0,Json::object(),cancel);
+            const Json input{{"cacheDirectory",fs::absolute(fs::u8path(argv[3])).u8string()},{"engineSettings",{{"diffsinger.renderSteps",5}}}};
+            const auto result=synthesis.render(plan,notes,input,tempo,0,48000,cancel);require(result.stereo.size()>48000,"External PCM too short");double energy=0;for(const auto value:result.stereo) {require(std::isfinite(value),"Non-finite external PCM");energy+=double(value)*value;}require(energy/result.stereo.size()>1e-10,"Silent external PCM");require(result.feedback.at("pitch").size()>10,"Missing external pitch feedback");
+            const auto repeated=synthesis.render(plan,notes,input,tempo,0,48000,cancel);require(digest(result.stereo)==digest(repeated.stereo),"External cached PCM changed");
+            auto uncached=input;uncached.erase("cacheDirectory");require(digest(result.stereo)==digest(synthesis.render(plan,notes,uncached,tempo,0,48000,cancel).stereo),"External uncached seeded PCM changed");
+            Json schema{{"parameters",Json::array()},{"feedbackParameters",Json::array()}};Synthesis::declareParameters(*voice,schema);require(result.feedback.at("curves").size()==schema.at("feedbackParameters").size(),"External variance feedback differs from declared voice capability");
+            audition(fs::absolute(fs::u8path(argv[3]))/"external-la-CPU.wav",result.stereo);std::cout<<"PASS external voice "<<voice->metadata.at("name").get<std::string>()<<" frames="<<result.stereo.size()/2<<" curves="<<result.feedback.at("curves").size()<<std::endl;return 0;
+        }
         if(argc!=3) {throw std::runtime_error("Usage: DiffSingerSynthesisTest <six-package root> <cache/SVS/DiffSinger>");}
         initializeRuntime();tensorCacheFixture();Ort::Env env{ORT_LOGGING_LEVEL_WARNING,"DiffSingerSynthesisTest"};const auto catalog=scan({{"engineSettings",{{"diffsinger.voicebankDirectories",Json::array({fs::absolute(fs::u8path(argv[1])).u8string()})}}}},1);require(catalog->voices.size()==6,"Six voices missing");
         svs_sdk::TempoMap tempo;require(tempo.setPoints({{0,1./96.}}),"Invalid test tempo");std::atomic<bool> cancel{false};
@@ -48,3 +61,10 @@ int main(int argc,char** argv) {
         }return 0;
     }catch(const std::exception& error) {std::cerr<<"FAIL "<<error.what()<<std::endl;return 1;}
 }
+#ifdef _WIN32
+int wmain(int argc,wchar_t** argv) {
+    std::vector<std::string> utf8;std::vector<char*> arguments;for(int i=0;i<argc;++i) {utf8.push_back(fs::path(argv[i]).u8string());}for(auto& value:utf8) {arguments.push_back(value.data());}return run(argc,arguments.data());
+}
+#else
+int main(int argc,char** argv) {return run(argc,argv);}
+#endif

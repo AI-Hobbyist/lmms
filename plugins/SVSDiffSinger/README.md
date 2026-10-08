@@ -54,3 +54,13 @@ configuration. Applying shared directory changes refreshes the catalog
 asynchronously. Changing shared model contents also changes synthesis cache
 fingerprints on rescan. Missing duration/pitch/variance configurations are optional;
 required acoustic/vocoder resources are not. Phoneme aliases may share token IDs.
+
+Optional variance inference is selected from the actual acoustic ONNX inputs.
+A physically present predictor is not executed when the acoustic model consumes
+none of energy, breathiness, voicing or tension. Strict model signature checks
+remain in place for required predictors.
+
+`DiffSingerSynthesisTest --voice <external-voice-root> <cache/SVS/DiffSinger>
+<shared-vocoder-root>` validates one external voice with finite, non-silent audio,
+pitch/variance feedback and cached/uncached seeded replay. All external files are
+read-only; audition WAVs use their complete file SHA-256 as filenames.

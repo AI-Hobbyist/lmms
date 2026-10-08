@@ -1,0 +1,1 @@
+FAIL variance/linguistic / D:\AI-Tools\OpenUtau\Singers\deepseek贝壳\dsvariance\linguistic.onnx: Input count does not match model signature
