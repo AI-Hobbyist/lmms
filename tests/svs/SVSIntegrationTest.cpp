@@ -20,6 +20,7 @@
 #endif
 #include "SVSParameterPanel.h"
 #include "SVSSettingsPage.h"
+#include "PluginBrowser.h"
 #include "SetupDialog.h"
 #include <QTabWidget>
 #include <QTreeWidget>
@@ -1022,6 +1023,27 @@ private slots:
   const auto noteRect=canvas->noteRect(note).toRect();QVERIFY(before.copy(noteRect)!=labeled.copy(noteRect));QCOMPARE(clip->notes(),originalNotes);
   config->setValue("ui","printnotelabels","0");QCoreApplication::processEvents();QCOMPARE(canvas->grab().toImage().copy(noteRect),before.copy(noteRect));
   delete track;
+ }
+ void svsBrowserEngineGroups() {
+  auto& registry=svs::Registry::instance();const QString id="org.lmms.svs.diffsinger";QString error;
+  QVERIFY2(registry.plugin(id),qPrintable(registry.diagnostics().join('\n')));
+  QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{m_configuration.path()}}},error),qPrintable(error));
+  gui::PluginBrowser browser(nullptr);auto* tree=browser.findChild<QTreeWidget*>();QVERIFY(tree);
+  QTreeWidgetItem* root=nullptr;for(int i=0;i<tree->topLevelItemCount();++i) if(tree->topLevelItem(i)->text(0)=="Singing Voice Synthesis") root=tree->topLevelItem(i);QVERIFY(root);QVERIFY(!root->isHidden());
+  auto group=[&]{for(int i=0;i<root->childCount();++i) if(root->child(i)->data(0,Qt::UserRole).toString()==id) return root->child(i);return static_cast<QTreeWidgetItem*>(nullptr);};
+  QVERIFY(!group());
+  const auto fixture=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");QVERIFY2(!fixture.isEmpty(),"Explicit DiffSinger voicebank fixture required");
+  QVERIFY2(registry.refreshCatalog(id,{{"diffsinger.voicebankDirectories",QJsonArray{fixture}}},error),qPrintable(error));
+  QVERIFY(group());QCOMPARE(group()->text(0),QString("DiffSinger"));QCOMPARE(group()->childCount(),6);
+  for(int i=0;i<root->childCount();++i) QVERIFY(!tree->itemWidget(root->child(i),0));
+  QVERIFY(QMetaObject::invokeMethod(&browser,"onFilterChanged",Q_ARG(QString,QString("DiffSinger"))));QVERIFY(!group()->isHidden());
+  for(int i=0;i<group()->childCount();++i) QVERIFY(!group()->child(i)->isHidden());
+  const auto name=static_cast<gui::PluginDescWidget*>(tree->itemWidget(group()->child(0),0))->name();
+  QVERIFY(QMetaObject::invokeMethod(&browser,"onFilterChanged",Q_ARG(QString,name)));QVERIFY(!group()->isHidden());QVERIFY(!group()->child(0)->isHidden());
+  QVERIFY(QMetaObject::invokeMethod(&browser,"onFilterChanged",Q_ARG(QString,QString("no-such-svs-voice"))));QVERIFY(group()->isHidden());
+  QVERIFY(QMetaObject::invokeMethod(&browser,"onFilterChanged",Q_ARG(QString,QString{})));QVERIFY(!group()->isHidden());
+  tree->setParent(nullptr);tree->resize(360,700);tree->show();QVERIFY(QTest::qWaitForWindowExposed(tree));tree->scrollToItem(root,QAbstractItemView::PositionAtTop);QTest::qWait(500);
+  QVERIFY(tree->screen()->grabWindow(tree->winId()).save("doc/svs/validation/SVS-browser-engine-groups.png"));tree->close();delete tree;
  }
  void diffSingerCatalogSettingsAndResources() {
   const auto root=qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");if(root.isEmpty()) QSKIP("Explicit external DiffSinger fixture required");

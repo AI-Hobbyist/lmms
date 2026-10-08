@@ -139,6 +139,18 @@ void PluginBrowser::updateRootVisibilities()
 
 void PluginBrowser::onFilterChanged( const QString & filter )
 {
+	const auto filterItem = [this, &filter](auto&& self, QTreeWidgetItem* item, bool parentMatches) -> bool
+	{
+		const auto* widget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
+		const bool matches = parentMatches || (widget ? widget->name() : item->text(0)).contains(filter, Qt::CaseInsensitive);
+		bool visible = widget ? matches : matches && !item->childCount();
+		for (int index = 0; index < item->childCount(); ++index)
+		{
+			visible = self(self, item->child(index), matches) || visible;
+		}
+		item->setHidden(!visible);
+		return visible;
+	};
 	int rootCount = m_descTree->topLevelItemCount();
 	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex)
 	{
@@ -148,15 +160,7 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
 		{
 			QTreeWidgetItem * item = root->child( itemIndex );
-			auto descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
-			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
-			{
-				item->setHidden( false );
-			}
-			else
-			{
-				item->setHidden( true );
-			}
+			filterItem(filterItem, item, false);
 		}
 	}
 }
@@ -236,7 +240,26 @@ void PluginBrowser::refreshSvsVoices()
 {
 	QTreeWidgetItem* root=nullptr;for(int i=0;i<m_descTree->topLevelItemCount();++i) if(m_descTree->topLevelItem(i)->text(0)=="Singing Voice Synthesis") {root=m_descTree->topLevelItem(i);break;}if(!root) return;
 	qDeleteAll(root->takeChildren());static const PixmapLoader logo("sample_track");static Plugin::Descriptor descriptor{"svs","Singing Voice Synthesis","Native singing voice synthesis","LMMS",1,Plugin::Type::SVS,&logo,"",nullptr};
-	for(const auto& voice:svs::Registry::instance().voices()) {auto* item=new QTreeWidgetItem(root);PluginDescWidget::PluginKey key(&descriptor,voice.name,{{"pluginId",voice.pluginId},{"voiceId",voice.id},{"avatar",voice.avatar}});m_descTree->setItemWidget(item,0,new PluginDescWidget(key,m_descTree));}
+	auto& registry = svs::Registry::instance();
+	QMap<QString, QTreeWidgetItem*> groups;
+	for (const auto& engine : registry.engines())
+	{
+		const auto& voices = registry.voices();
+		if (std::none_of(voices.begin(), voices.end(), [&engine](const auto& voice) { return voice.pluginId == engine.id; })) { continue; }
+		auto* group = new QTreeWidgetItem(root);
+		group->setText(0, engine.name);
+		group->setData(0, Qt::UserRole, engine.id);
+		group->setExpanded(true);
+		groups.insert(engine.id, group);
+	}
+	for (const auto& voice : registry.voices())
+	{
+		auto* group = groups.value(voice.pluginId);
+		if (!group) { continue; }
+		auto* item = new QTreeWidgetItem(group);
+		PluginDescWidget::PluginKey key(&descriptor, voice.name, {{"pluginId", voice.pluginId}, {"voiceId", voice.id}, {"avatar", voice.avatar}});
+		m_descTree->setItemWidget(item, 0, new PluginDescWidget(key, m_descTree));
+	}
 }
 
 PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
