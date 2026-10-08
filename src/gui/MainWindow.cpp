@@ -314,9 +314,7 @@ void MainWindow::finalize()
 	svsProjectMenu->setObjectName("svsProjectMenu");
 	auto* svsProjectController = new SVSProjectController(this);
 	svsProjectMenu->addAction(QStringLiteral("导入SVS工程"), svsProjectController, &SVSProjectController::importProject);
-	// M3 implements and enables the second action after the M2 checkpoint.
-	auto* svsExportAction = svsProjectMenu->addAction(QStringLiteral("导出SVS工程"));
-	svsExportAction->setEnabled(false);
+	svsProjectMenu->addAction(QStringLiteral("导出SVS工程"), svsProjectController, &SVSProjectController::exportProject);
 
 	addAction(project_menu, "project_export", tr("E&xport..."),
 		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);

@@ -29,5 +29,18 @@ private:
  SVSProjectOptionsWidget* m_options;
  svs::ProjectVoice m_selected;
 };
+class SVSProjectExportDialog : public QDialog {
+public:
+ SVSProjectExportDialog(const QJsonObject& format,const QJsonObject& project,QWidget* parent=nullptr);
+ QJsonObject options() const;
+ QJsonObject selection() const;
+private:
+ void refreshSelection();
+ QJsonObject m_policy;
+ QComboBox* m_singing;
+ QComboBox* m_audio;
+ QDialogButtonBox* m_buttons;
+ SVSProjectOptionsWidget* m_options;
+};
 }
 #endif

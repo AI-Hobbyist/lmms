@@ -1,0 +1,11 @@
+test_audio_selection_preserves_original_index_and_names (__main__.ExportPolicyTest.test_audio_selection_preserves_original_index_and_names) ... ok
+test_companions_alone_are_not_a_successful_conversion (__main__.ExportPolicyTest.test_companions_alone_are_not_a_successful_conversion) ... ok
+test_full_catalog_and_all_singing_cardinalities (__main__.ExportPolicyTest.test_full_catalog_and_all_singing_cardinalities) ... ok
+test_legacy_ust_and_named_format_losses (__main__.ExportPolicyTest.test_legacy_ust_and_named_format_losses) ... ok
+test_protocol_preflight_and_unconfirmed_dump_write_nothing (__main__.ExportPolicyTest.test_protocol_preflight_and_unconfirmed_dump_write_nothing) ... ok
+test_real_audio_constraints_and_relative_companions (__main__.ExportPolicyTest.test_real_audio_constraints_and_relative_companions) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.475s
+
+OK

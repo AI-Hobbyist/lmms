@@ -187,9 +187,11 @@ GUI 验证必须依次执行：构建 → 启动开发版真实 Windows Qt 窗�
 | M0 | 已完成 | `doc/svs/project/formats.json` 冻结 40 插件、45 后缀、36 导入/39 导出方向及源码依据、默认选项、依赖和逐方向待补样例；`contract.md` 固定部署、时间/音高/音频映射及协议；`M0-validation.log` 源合同校验通过 |
 | M1 | 已完成 | `doc/svs/project/M1-validation.md`：全部 40 插件加载、36/39 方向及 schema 检查；四种代表格式中文路径往返；Qt 进程互斥、超时/取消/崩溃/清理通过；内嵌 Python 3.13.12 与 52 wheel 原位部署及哈希冻结，模块构建通过 |
 | M2 | 已完成 | M2-final-QtTest.txt 原生窗口导入/菜单/声库/音高断点与颤音数值/编辑撤销/合成/保存重开/失败回滚通过；M2-no-voice-QtTest.txt 与 M2-bridge-regression.txt 通过；完整控制器验证取消、损坏源、音高损失确认、保存失败及双伴奏资源持久化，详见 M2-progress.md |
-| M3 | 未开始 | 依赖 M2 检查点完成 |
+| M3 | 验收完成 | 只读快照、片段/音高/伴奏映射、39 个方向的格式预检、输出选项与损失/覆盖确认、完整文件组回滚及原生 Windows 导出流程通过；本阶段提交推送后才开始 M4，详见 M3-progress.md |
 | M4 | 未开始 | 依赖 M3 检查点完成 |
 
 M0 固定 LibreSVIP 提交 `e33dc2824453a3104ee2b0a9cd836dce8452ce31`，冻结源码和依赖锁摘要。执行 `python buildtools/svs-project-inventory.py --check` 通过；这只是 M0 源合同验收，75 项真实格式方向样例明确 PENDING，留给 M1/M4，不将其冒记为转换或 GUI PASS。阶段提交只包含本任务文件，不带入现有 Song/VST 等工作区修改。后续若发现必须修改全局时间模型、增加新轨道能力或修复无关模块，按范围控制规则列出原因、文件、规模和不实施后果，获得明确批准后再扩展。
 
 M0 检查点：提交 `fa50a8bcd` 已推送 `origin/master` 并核对远端 SHA。M1 验证复用 `build`，转换运行时部署于 `build/Release/svs-project`；GUI 尚未开始，不使用 offscreen。M1 检查点：提交 `74d01e0f9` 已推送 `origin/master` 并核对远端 SHA；随后开始 M2。
+
+M2 检查点：提交 d4541d3983e6315f7fdcf3e94c2a05461a1638c7 已推送 origin/master，远端 SHA 一致；随后开始 M3。

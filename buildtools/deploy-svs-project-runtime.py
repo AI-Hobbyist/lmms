@@ -71,7 +71,7 @@ def main():
                 shutil.copy2(source, target)
     lock = {"python": VERSION, "pythonArchiveSha256": hashlib.sha256(archive.read_bytes()).hexdigest(), "wheels": [{"file": p.name, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(CACHE.glob("*.whl"))]}
     (ROOT / "doc/svs/project/runtime-lock.json").write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
-    for source in (ROOT / "doc/svs/project/formats.json", ROOT / "doc/svs/project/runtime-lock.json", ROOT / "tools/svs-project/bridge.py"):
+    for source in (ROOT / "doc/svs/project/formats.json", ROOT / "doc/svs/project/export-policy.json", ROOT / "doc/svs/project/runtime-lock.json", ROOT / "tools/svs-project/bridge.py"):
         shutil.copy2(source, DEPLOY / source.name)
     run(str(runtime / "python.exe"), "-c", "import sys; print('Deployed isolated runtime:',sys.version); import libresvip; print('LibreSVIP',libresvip.__version__)")
 

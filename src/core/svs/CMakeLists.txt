@@ -9,6 +9,8 @@ add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWav
 target_compile_features(lmmssvs PUBLIC cxx_std_20)
 target_sources(lmmssvs PRIVATE SVSProjectBridge.cpp "${CMAKE_SOURCE_DIR}/include/SVSProjectBridge.h")
 target_sources(lmmssvs PRIVATE SVSProjectMapper.cpp)
+target_sources(lmmssvs PRIVATE SVSProjectExport.cpp)
+target_sources(lmmssvs PRIVATE SVSProjectOutput.cpp)
 target_sources(lmmssvs PRIVATE ../../gui/editors/svs/SVSProjectImportDialog.cpp)
 target_sources(lmmssvs PRIVATE ../../gui/editors/svs/SVSProjectController.cpp)
 target_sources(lmmssvs PRIVATE "${CMAKE_SOURCE_DIR}/include/SVSModel.h")

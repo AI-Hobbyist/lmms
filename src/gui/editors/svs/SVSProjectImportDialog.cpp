@@ -69,4 +69,30 @@ void SVSProjectImportDialog::accept() {
  refreshVoices();m_status->setText(QStringLiteral("所选声库已不可用，请重新选择。"));
 }
 QJsonObject SVSProjectImportDialog::options() const {return m_options->options();}
+
+SVSProjectExportDialog::SVSProjectExportDialog(const QJsonObject& format,const QJsonObject& project,QWidget* parent):QDialog(parent),m_policy(format["exportPolicy"].toObject()) {
+ setObjectName("svsProjectExportDialog");setWindowTitle(QStringLiteral("导出SVS工程"));resize(560,450);
+ auto* layout=new QVBoxLayout(this);auto* explanation=new QLabel(QStringLiteral("导出点击时的工程快照。无需声库或合成音频；受限格式必须选择轨道，省略内容将在下一步列出。"),this);explanation->setWordWrap(true);layout->addWidget(explanation);
+ auto* form=new QFormLayout;m_singing=new QComboBox(this);m_audio=new QComboBox(this);m_singing->setObjectName("svsProjectExportSingingTrack");m_audio->setObjectName("svsProjectExportAudioTrack");
+ m_singing->addItem(QStringLiteral("请选择歌声轨…"),-1);m_audio->addItem(QStringLiteral("请选择伴奏轨…"),-1);
+ const auto tracks=project["track_list"].toArray();for(int index=0;index<tracks.size();++index) {const auto track=tracks[index].toObject();(track["type_"].toString()=="Singing"?m_singing:m_audio)->addItem(QStringLiteral("%1 · %2").arg(index+1).arg(track["title"].toString()),index);}
+ if(m_singing->count()==2) m_singing->setCurrentIndex(1);if(m_audio->count()==2) m_audio->setCurrentIndex(1);
+ form->addRow(QStringLiteral("受限格式的歌声轨"),m_singing);form->addRow(QStringLiteral("受限格式的伴奏轨"),m_audio);layout->addLayout(form);
+ auto* group=new QGroupBox(QStringLiteral("%1 [%2] 输出选项").arg(format["name"].toString(),format["id"].toString()),this);auto* groupLayout=new QVBoxLayout(group);auto* scroll=new QScrollArea(group);scroll->setWidgetResizable(true);
+ m_options=new SVSProjectOptionsWidget(format["outputDefaults"].toObject(),format["outputSchema"].toObject(),scroll);scroll->setWidget(m_options);groupLayout->addWidget(scroll);layout->addWidget(group);
+ // The named selector owns original indices; preflight remaps them after projection.
+ if(auto* index=m_options->findChild<QWidget*>("svsProjectOption_track_index")) {index->setEnabled(false);index->setToolTip(QStringLiteral("由上方轨道选择自动设置。"));}
+ m_buttons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,this);m_buttons->button(QDialogButtonBox::Ok)->setText(QStringLiteral("检查并导出"));m_buttons->button(QDialogButtonBox::Cancel)->setText(QStringLiteral("取消"));layout->addWidget(m_buttons);
+ connect(m_buttons,&QDialogButtonBox::accepted,this,&QDialog::accept);connect(m_buttons,&QDialogButtonBox::rejected,this,&QDialog::reject);
+ connect(m_singing,&QComboBox::currentIndexChanged,this,[this]{refreshSelection();});connect(m_audio,&QComboBox::currentIndexChanged,this,[this]{refreshSelection();});
+ if(auto* version=m_options->findChild<QDoubleSpinBox*>("svsProjectOption_version")) connect(version,&QDoubleSpinBox::valueChanged,this,[this]{refreshSelection();});
+ refreshSelection();
+}
+void SVSProjectExportDialog::refreshSelection() {
+ const bool singing=m_policy["singing"].toInt()==1||(m_policy.contains("legacySinging")&&options()["version"].toDouble(2)<2);
+ const bool audio=m_policy["audio"].toInt()==1;m_singing->setEnabled(singing);m_audio->setEnabled(audio);
+ m_buttons->button(QDialogButtonBox::Ok)->setEnabled((!singing||m_singing->count()==1||m_singing->currentData().toInt()>=0)&&(!audio||m_audio->count()==1||m_audio->currentData().toInt()>=0));
+}
+QJsonObject SVSProjectExportDialog::options() const {auto result=m_options->options();if(result.contains("track_index")) result["track_index"]=-1;return result;}
+QJsonObject SVSProjectExportDialog::selection() const {QJsonObject result;if(m_singing->isEnabled()&&m_singing->currentData().toInt()>=0) result["singingTrack"]=m_singing->currentData().toInt();if(m_audio->isEnabled()&&m_audio->currentData().toInt()>=0) result["audioTrack"]=m_audio->currentData().toInt();return result;}
 }

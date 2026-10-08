@@ -14,6 +14,7 @@ public:
  explicit SVSProjectController(MainWindow* window,QString runtimeDirectory={});
  ~SVSProjectController() override;
  void importProject();
+ void exportProject();
  bool busy() const {return m_task!=Task::Idle;}
  static bool commitImport(const svs::ProjectImport& prepared,Song& song,QString& error);
 private:
@@ -21,6 +22,9 @@ private:
  void chooseSource(const QJsonArray& formats);
  void prepareAudio(const QJsonObject& response);
  void finishImport(const svs::ProjectImport& prepared,const QStringList& warnings);
+ void chooseExport(const QJsonArray& formats);
+ void inspectExport(const QJsonObject& response);
+ void finishExport(const QJsonObject& response);
  void progress(const QString& label);
  void reset();
  MainWindow* m_window;
@@ -31,7 +35,9 @@ private:
  QString m_formatId;
  QString m_resourceDirectory;
  std::atomic<bool> m_cancelled{false};
- enum class Task {Idle,Catalog,Import,Preparation};
+ struct ExportState;
+ std::shared_ptr<ExportState> m_export;
+ enum class Task {Idle,Catalog,Import,Preparation,ExportPreparation,ExportCatalog,ExportInspection,ExportConversion,ExportCommit};
  Task m_task=Task::Idle;
 };
 }
