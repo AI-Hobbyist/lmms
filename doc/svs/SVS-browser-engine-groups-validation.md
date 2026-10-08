@@ -11,3 +11,5 @@
 证据：validation/SVS-browser-engine-groups-QtTest.txt、validation/SVS-browser-engine-groups-native-QtTest.txt。
 
 用户已确认最初的“DiffSinger 不出现”在扫描声库后解决，本次只实现明确要求的分类，不改变加载器或依赖部署。
+
+更新覆盖包：build/packages/lmms-enhanced-full-3f637c6f4-win64.zip，产品提交 3f637c6f4ead1df96266fcecddfa8c5e1a94fc85，版本 1.3.0-alpha.2.88+3f637c6。包含 3,484 个运行文件和 4 个安装/说明条目，共 66,026,243 bytes；全条目 SHA256、360 个 PE 位数、官方默认模板和私人数据排除检查通过。ZIP SHA256：8C4EBFEDD01780F73A84706CDC0ED54F774BBD4C14DE8C5C23A65018E0B4E2C7。证据 validation/SVS-browser-engine-groups-package.json。
