@@ -1,0 +1,16 @@
+{
+  "operation": "importProject",
+  "formatId": "vsq",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\vsq\\export-vsq\\工程_日本語_한국어.vsq",
+  "options": {
+    "import_strength": true,
+    "import_gender": true,
+    "import_breath": true,
+    "import_volume": true,
+    "import_pitch": true,
+    "lyric_encoding": "SHIFT_JIS",
+    "breath": "ignore"
+  },
+  "protocol": 1,
+  "requestId": "f2f9058b0cfa4327813a6ce7722caadb"
+}

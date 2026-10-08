@@ -1,0 +1,13 @@
+{
+  "operation": "importProject",
+  "formatId": "ace",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ace\\export\\多伴奏工程.ace",
+  "options": {
+    "import_strength": true,
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "bpm_source": "automatic"
+  },
+  "protocol": 1,
+  "requestId": "fc2a840838894b188511d3c13363fd50"
+}

@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "dv",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\dv\\export-sk\\工程_日本語_한국어.sk",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "e4b95b7285524eb9ad3b4a73b711e20b"
+}

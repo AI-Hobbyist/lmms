@@ -1,0 +1,22 @@
+{
+  "name": "wanakana-python",
+  "wheel": {
+    "file": "wanakana_python-1.2.2-py3-none-any.whl",
+    "sha256": "3bef6bddb74f561a7cec27e6fa93d3f7ec3ecc694d91fb01cc7b915d237e9a21"
+  },
+  "directory": "wanakana_python-1.2.2.dist-info",
+  "files": [],
+  "status": "conflicting-upstream-declarations-preserved",
+  "upstream": {
+    "Repo": "Starwort/wanakana-py",
+    "Ref": "3e019ac56e86c03ad66f2734c30e234ce64127bb",
+    "Spdx": "MIT",
+    "GitBlob": "176b0d29dc9ed103705de833816722e4126c8a6f",
+    "Url": "https://github.com/Starwort/wanakana-py/blob/3e019ac56e86c03ad66f2734c30e234ce64127bb/LICENCE"
+  },
+  "note": "Locked wheel declares MPL-2.0; upstream pre-release commit supplies MIT. Both declarations are retained without relicensing. Distribution review remains MANUAL/PENDING.",
+  "declaredLicenseText": {
+    "path": "DECLARED-MPL-2.0.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt"
+  }
+}

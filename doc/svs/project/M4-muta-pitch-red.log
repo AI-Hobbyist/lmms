@@ -1,0 +1,15 @@
+test_muta_first_note_pitch_remains_at_its_original_tick (__main__.AdapterTest.test_muta_first_note_pitch_remains_at_its_original_tick) ... FAIL
+
+======================================================================
+FAIL: test_muta_first_note_pitch_remains_at_its_original_tick (__main__.AdapterTest.test_muta_first_note_pitch_remains_at_its_original_tick)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 86, in test_muta_first_note_pitch_remains_at_its_original_tick
+    self.assertIn([1920, 6000], pitch)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [1920, 6000] not found in [[-192000, -100], [3839, -100], [3839, -100], [3839, 6000], [3839, 6050], [3839, 6000], [3839, -100], [1073741823, -100], [1073741823, -100]]
+
+----------------------------------------------------------------------
+Ran 1 test in 4.250s
+
+FAILED (failures=1)

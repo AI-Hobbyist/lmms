@@ -1,0 +1,2740 @@
+[
+  {
+    "id": "ace",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "ace",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ace",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ace",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ace",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ace",
+        "track": "全局",
+        "field": "tempo",
+        "reason": "目标格式只记录一个 BPM；原工程的完整变速事件不能保留。"
+      },
+      {
+        "formatId": "ace",
+        "track": "伴奏_1",
+        "field": "audioMix",
+        "reason": "目标格式全部伴奏共享首条伴奏的音量、静音及独奏状态。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ace\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ace\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_日本語_한국어_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ace\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_日本語_한국어_1",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ace\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "acep",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "固定 ACEP 转换链按一 tick 曲线和模拟基础音高重建；整数音分回读及重采样可改变细小控制，不能承诺 0.5 音分完整往返保真。"
+      },
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定转换链会重算或规范化读音，不能保留独立的原始读音字符串。"
+      },
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "固定 ACEP 转换链按一 tick 曲线和模拟基础音高重建；整数音分回读及重采样可改变细小控制，不能承诺 0.5 音分完整往返保真。"
+      },
+      {
+        "formatId": "acep",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定转换链会重算或规范化读音，不能保留独立的原始读音字符串。"
+      },
+      {
+        "formatId": "acep",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "acep",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\acep\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\acep\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\acep\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\acep\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "aisp",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "固定 AiSingers 转换链每音符使用 500 个采样点，并将采样时间、音分整数化；音符端点与细小控制可能改变。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "固定 AiSingers 转换链每音符使用 500 个采样点，并将采样时间、音分整数化；音符端点与细小控制可能改变。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "aisp",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\aisp\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\aisp\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0 (1)",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\aisp\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1 (1)",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\aisp\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "ccs",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "CeVIO 音高使用 5 毫秒帧；固定转换链把帧位置映射到整数 tick，端点覆盖和细小控制可能改变，不计为 0.5 音分完整往返保真。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "CeVIO 音高使用 5 毫秒帧；固定转换链把帧位置映射到整数 tick，端点覆盖和细小控制可能改变，不计为 0.5 音分完整往返保真。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ccs",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ccs\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ccs\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ccs\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ccs\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "dspx",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "dspx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 DSPX 转换链不能完整往返独立读音字符串。"
+      },
+      {
+        "formatId": "dspx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 DSPX 转换链不能完整往返独立读音字符串。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dspx\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dspx\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dspx\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dspx\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "dv",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "dv",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dv\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dv\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dv\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dv\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "json",
+    "export": "success",
+    "exportError": null,
+    "losses": [],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\json\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\json\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\json\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\json\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "mtp",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "mtp",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\mtp\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\mtp\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "Audio1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\mtp\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "Audio2",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\mtp\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "ppsf",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 PPSF 转换链不能完整往返独立读音字符串。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 PPSF 转换链不能完整往返独立读音字符串。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_1",
+        "field": "mute",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ppsf",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ppsf\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ppsf\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0 1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ppsf\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1 1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ppsf\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "ps_project",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "固定 PocketSinger 解析器将秒轴和相对弯音截断为整数 tick/音分；可能改变细小控制。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 PocketSinger 转换链不能往返独立读音字符串。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "固定 PocketSinger 解析器将秒轴和相对弯音截断为整数 tick/音分；可能改变细小控制。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 PocketSinger 转换链不能往返独立读音字符串。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "伴奏_1",
+        "field": "audio",
+        "reason": "目标格式不支持此轨道，或此次未选择该轨道；将省略。"
+      },
+      {
+        "formatId": "ps_project",
+        "track": "全局",
+        "field": "tempo",
+        "reason": "目标格式只记录一个 BPM；原工程的完整变速事件不能保留。"
+      }
+    ],
+    "fileCount": 2,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ps_project\\task-bzmy67de\\source\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": true,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_日本語_한국어_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ps_project\\task-bzmy67de\\source\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "s5p",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "s5p",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 S5P 转换链不能完整往返独立读音字符串。"
+      },
+      {
+        "formatId": "s5p",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 S5P 转换链不能完整往返独立读音字符串。"
+      },
+      {
+        "formatId": "s5p",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "s5p",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "s5p",
+        "track": "伴奏_1",
+        "field": "audio",
+        "reason": "目标格式不支持此轨道，或此次未选择该轨道；将省略。"
+      }
+    ],
+    "fileCount": 2,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\s5p\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_日本語_한국어_0.wav",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\s5p\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "svip",
+    "export": "success",
+    "exportError": null,
+    "losses": [],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "svip3",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "svip3",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "svip3",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "svip3",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "svip3",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip3\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip3\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.7499999969989259,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip3\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.7499999969989259,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip3\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "svp",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "svp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 SVP 转换链按目标音素规则处理读音，不能完整往返原始读音字符串。"
+      },
+      {
+        "formatId": "svp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 SVP 转换链按目标音素规则处理读音，不能完整往返原始读音字符串。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svp\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svp\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svp\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svp\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "tlp",
+    "export": "success",
+    "exportError": null,
+    "losses": [],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlp\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlp\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlp\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlp\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "tlpx",
+    "export": "success",
+    "exportError": null,
+    "losses": [],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlpx\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlpx\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlpx\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlpx\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "tssln",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_1",
+        "field": "solo",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "VoiSona 音高使用 5 毫秒帧；固定转换链把帧位置映射到整数 tick，端点覆盖和细小控制可能改变。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_2",
+        "field": "mute",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "VoiSona 音高使用 5 毫秒帧；固定转换链把帧位置映射到整数 tick，端点覆盖和细小控制可能改变。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_1",
+        "field": "mute",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "tssln",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tssln\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tssln\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "Audio3 1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tssln\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "Audio4 1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tssln\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "ustx",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "ustx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ustx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "lyric",
+        "reason": "固定 USTX 生成器可能将 pronunciation 作为目标歌词；原歌词与独立读音不能同时完整往返。"
+      },
+      {
+        "formatId": "ustx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ustx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "lyric",
+        "reason": "固定 USTX 生成器可能将 pronunciation 作为目标歌词；原歌词与独立读音不能同时完整往返。"
+      },
+      {
+        "formatId": "ustx",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "ustx",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ustx\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ustx\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ustx\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 0.75,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ustx\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "vfp",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "VOXFactory 音高按 1024/44100 秒帧采样；固定读回可能改变端点覆盖和细小控制。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "VOXFactory 音高按 1024/44100 秒帧采样；固定读回可能改变端点覆盖和细小控制。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vfp",
+        "track": "全局",
+        "field": "tempo",
+        "reason": "目标格式只记录一个 BPM；原工程的完整变速事件不能保留。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vfp\\task-humm5gxh\\source\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": true,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vfp\\task-humm5gxh\\source\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": true,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_日本語_한국어_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vfp\\task-humm5gxh\\source\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_日本語_한국어_1",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": -0.25,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vfp\\task-humm5gxh\\source\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "vpr",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 VPR 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_2",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 VPR 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vpr",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vpr\\task-938f7ia_\\source\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": true,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vpr\\task-938f7ia_\\source\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": true,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vpr\\task-938f7ia_\\source\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vpr\\task-938f7ia_\\source\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "vspx",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pitch",
+        "reason": "固定 VSPX 转换链把基础音高与整数相对音分控制相加重建；音分量化可能改变细小控制。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 VSPX 解析器从目标歌词取得读音，不能保持独立原始读音字符串。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pitch",
+        "reason": "固定 VSPX 转换链把基础音高与整数相对音分控制相加重建；音分量化可能改变细小控制。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 VSPX 解析器从目标歌词取得读音，不能保持独立原始读音字符串。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vspx",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vspx\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vspx\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vspx\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_1",
+        "mute": true,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vspx\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "vsqx",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 VSQX 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_1",
+        "field": "lyric",
+        "reason": "固定 VSQX 写出会按目标音素语言转换不支持的歌词。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 VSQX 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "歌声_日本語_한국어_2",
+        "field": "lyric",
+        "reason": "固定 VSQX 写出会按目标音素语言转换不支持的歌词。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "vsqx",
+        "track": "伴奏_1",
+        "field": "audio",
+        "reason": "目标格式不支持此轨道，或此次未选择该轨道；将省略。"
+      }
+    ],
+    "fileCount": 2,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vsqx\\export\\多伴奏工程.wavparts\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vsqx\\export\\多伴奏工程.wavparts\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  },
+  {
+    "id": "xvsq",
+    "export": "success",
+    "exportError": null,
+    "losses": [
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_1",
+        "field": "pronunciation",
+        "reason": "固定 XVSQ 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_2",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "歌声_日本語_한국어_2",
+        "field": "pronunciation",
+        "reason": "固定 XVSQ 转换链使用目标音素规则，不能往返独立原始读音字符串。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_0",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_0",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_0",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_1",
+        "field": "volume",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_1",
+        "field": "pan",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_1",
+        "field": "mute",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      },
+      {
+        "formatId": "xvsq",
+        "track": "伴奏_1",
+        "field": "title",
+        "reason": "固定版本转换链不能完整往返该轨道字段；写出或读回将使用目标默认值或重建值。"
+      }
+    ],
+    "fileCount": 3,
+    "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+    "import": "success",
+    "importError": null,
+    "resources": [
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\xvsq\\export\\伴奏_日本語_한국어_0.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a"
+      },
+      {
+        "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\xvsq\\export\\伴奏_日本語_한국어_1.wav",
+        "exists": true,
+        "temporary": false,
+        "sha256": "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+      }
+    ],
+    "actualAudioTracks": [
+      {
+        "title": "伴奏_日本語_한국어_0",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\xvsq\\export\\伴奏_日本語_한국어_0.wav",
+        "offset": 240
+      },
+      {
+        "title": "伴奏_日本語_한국어_1",
+        "mute": false,
+        "solo": false,
+        "volume": 1.0,
+        "pan": 0.0,
+        "type_": "Instrumental",
+        "audio_file_path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\xvsq\\export\\伴奏_日本語_한국어_1.wav",
+        "offset": 720
+      }
+    ],
+    "expectedAudioTracks": [
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_0",
+        "audio_file_path": "伴奏_日本語_한국어_0.wav",
+        "offset": 240,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false
+      },
+      {
+        "type_": "Instrumental",
+        "title": "伴奏_1",
+        "audio_file_path": "伴奏_日本語_한국어_1.wav",
+        "offset": 720,
+        "volume": 0.75,
+        "pan": -0.25,
+        "mute": true,
+        "solo": false
+      }
+    ],
+    "sourceAudioHashes": [
+      "8dd7ce8b8f292e214a8099b734173a057271f417e8f3af58a587581ef443aa5a",
+      "2f0139ff53b6b9b705b77c69880695a72d979d424d790cc43006036318583946"
+    ],
+    "offsetsWithinFrozenTolerance": true,
+    "resourceHashesEqual": true
+  }
+]

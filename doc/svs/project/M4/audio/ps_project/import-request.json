@@ -1,0 +1,12 @@
+{
+  "operation": "importProject",
+  "formatId": "ps_project",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ps_project\\export\\多伴奏工程.ps_project",
+  "options": {
+    "extract_audio": true,
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "9797b29c947648eeb18f588294994a8f"
+}

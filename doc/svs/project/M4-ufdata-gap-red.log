@@ -1,0 +1,15 @@
+test_ufdata_silence_marker_is_not_zero_midi_pitch (__main__.AdapterTest.test_ufdata_silence_marker_is_not_zero_midi_pitch) ... FAIL
+
+======================================================================
+FAIL: test_ufdata_silence_marker_is_not_zero_midi_pitch (__main__.AdapterTest.test_ufdata_silence_marker_is_not_zero_midi_pitch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 101, in test_ufdata_silence_marker_is_not_zero_midi_pitch
+    self.assertFalse(any(p[1] == 0 for p in pitch))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 3.708s
+
+FAILED (failures=1)

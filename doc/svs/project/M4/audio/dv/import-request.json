@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "dv",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\dv\\export\\多伴奏工程.dv",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "55e56e5c66814335bd0e2b7e93af7874"
+}

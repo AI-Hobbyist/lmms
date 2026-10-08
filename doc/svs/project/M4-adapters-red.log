@@ -1,0 +1,163 @@
+test_acet_actual_archive_roundtrip (__main__.AdapterTest.test_acet_actual_archive_roundtrip) ... FAIL
+test_ust_existing_utf8_option_preserves_chinese (__main__.AdapterTest.test_ust_existing_utf8_option_preserves_chinese) ... ok
+test_vsq_breakpoints_do_not_create_duplicate_ini_keys (__main__.AdapterTest.test_vsq_breakpoints_do_not_create_duplicate_ini_keys) ... FAIL
+test_vxf_utf8_chunk_boundary_keeps_title (__main__.AdapterTest.test_vxf_utf8_chunk_boundary_keeps_title) ... FAIL
+
+======================================================================
+FAIL: test_acet_actual_archive_roundtrip (__main__.AdapterTest.test_acet_actual_archive_roundtrip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 56, in test_acet_actual_archive_roundtrip
+    self.roundtrip("acep", "acet", self.project())
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 46, in roundtrip
+    self.assertTrue(zipfile.is_zipfile(path), "ACET must be its real archive container")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : ACET must be its real archive container
+
+======================================================================
+FAIL: test_vsq_breakpoints_do_not_create_duplicate_ini_keys (__main__.AdapterTest.test_vsq_breakpoints_do_not_create_duplicate_ini_keys)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 64, in test_vsq_breakpoints_do_not_create_duplicate_ini_keys
+    result = self.roundtrip("vsq", "vsq", self.project())
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 49, in roundtrip
+    imported = self.call(importing, {"operation": "importProject", "formatId": format_id, "path": str(path),
+                                      "options": input_options or {}})
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 31, in call
+    self.assertEqual(response["status"], "success", str(response.get("error")) + result.stderr.decode("utf-8", "replace"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error' != 'success'
+- error
++ success
+ : {'code': 'conversionFailed', 'message': "While reading from '<string>' [line 49]: option '1920' in section 'PitchBendBPList' already exists", 'detail': 'DuplicateOptionError'}Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vsq\vsq_parser.py", line 68, in get_measure_prefix
+
+    master_parser.read_string(text)
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+
+  File "configparser.py", line 763, in read_string
+
+  File "configparser.py", line 758, in read_file
+
+  File "configparser.py", line 1052, in _read
+
+  File "configparser.py", line 1081, in _read_inner
+
+  File "configparser.py", line 1107, in _handle_rest
+
+  File "configparser.py", line 1146, in _handle_option
+
+configparser.DuplicateOptionError: While reading from '<string>' [line 49]: option '1920' in section 'PitchBendBPList' already exists
+
+
+
+During handling of the above exception, another exception occurred:
+
+
+
+Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 319, in main
+
+    response.update(process(request, workspace))
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 223, in process
+
+    project = converter.load(source, effective)
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vsq\vsq_converter.py", line 28, in load
+
+    ).parse_project(vsq_file)
+
+      ~~~~~~~~~~~~~^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vsq\vsq_parser.py", line 48, in parse_project
+
+    measure_prefix = self.get_measure_prefix(tracks_as_text[0])
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vsq\vsq_parser.py", line 70, in get_measure_prefix
+
+    master_parser.read_string(text.rsplit("\n", 1)[0])
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "configparser.py", line 763, in read_string
+
+  File "configparser.py", line 758, in read_file
+
+  File "configparser.py", line 1052, in _read
+
+  File "configparser.py", line 1081, in _read_inner
+
+  File "configparser.py", line 1107, in _handle_rest
+
+  File "configparser.py", line 1146, in _handle_option
+
+configparser.DuplicateOptionError: While reading from '<string>' [line 49]: option '1920' in section 'PitchBendBPList' already exists
+
+
+
+======================================================================
+FAIL: test_vxf_utf8_chunk_boundary_keeps_title (__main__.AdapterTest.test_vxf_utf8_chunk_boundary_keeps_title)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 60, in test_vxf_utf8_chunk_boundary_keeps_title
+    result = self.roundtrip("vxf", "vxf", self.project(title))
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 42, in roundtrip
+    exported = self.call(exporting, {"operation": "exportProject", "formatId": format_id, "path": str(path),
+                                      "project": project, "options": output_options or {}, "acceptLosses": True})
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 31, in call
+    self.assertEqual(response["status"], "success", str(response.get("error")) + result.stderr.decode("utf-8", "replace"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error' != 'success'
+- error
++ success
+ : {'code': 'conversionFailed', 'message': "'utf-8' codec can't decode byte 0xe6 in position 11: unexpected end of data", 'detail': 'UnicodeDecodeError'}Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 319, in main
+
+    response.update(process(request, workspace))
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 281, in process
+
+    converter.dump(path, project, effective)
+
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vxf\vx_beta_converter.py", line 31, in dump
+
+    vx_file = VxBetaGenerator(options_obj).generate_project(project)
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vxf\vx_beta_generator.py", line 35, in generate_project
+
+    if tracks := self.generate_tracks(project.track_list):
+
+                 ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vxf\vx_beta_generator.py", line 90, in generate_tracks
+
+    and (mido_track := self.generate_track(track)) is not None
+
+                       ~~~~~~~~~~~~~~~~~~~^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\vxf\vx_beta_generator.py", line 104, in generate_track
+
+    {"name": encoded_title[i : i + 12].encode("latin-1").decode(), "seq_stat": 0x50}
+
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xe6 in position 11: unexpected end of data
+
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 12.459s
+
+FAILED (failures=3)

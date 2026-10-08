@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "svip3",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\svip3\\export-svip3\\工程_日本語_한국어.svip3",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "123c3195b0704b159c5a846211b95ddb"
+}

@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "tlp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\tlp\\export-tlp\\工程_日本語_한국어.tlp",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "b111af05f71f4ed28474dfff267bf4f4"
+}

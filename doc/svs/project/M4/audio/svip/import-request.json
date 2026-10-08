@@ -1,0 +1,15 @@
+{
+  "operation": "importProject",
+  "formatId": "svip",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\svip\\export\\多伴奏工程.svip",
+  "options": {
+    "import_volume": true,
+    "import_strength": true,
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "import_gender": true,
+    "import_breath": true
+  },
+  "protocol": 1,
+  "requestId": "e47f4daa18844519b8530af9aaeafb22"
+}

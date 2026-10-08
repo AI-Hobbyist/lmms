@@ -1,0 +1,17 @@
+{
+  "operation": "importProject",
+  "formatId": "mid",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\mid\\export-midi\\工程_日本語_한국어.midi",
+  "options": {
+    "import_volume": true,
+    "import_pitch": true,
+    "import_lyrics": true,
+    "lyric_encoding": "utf-8",
+    "import_time_signatures": true,
+    "multi_channel": "first",
+    "channels": "1",
+    "default_bpm": 120.0
+  },
+  "protocol": 1,
+  "requestId": "a4a41077a0b14ffda8a37a6f0678f625"
+}

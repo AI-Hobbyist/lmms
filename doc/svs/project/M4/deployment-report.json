@@ -1,0 +1,1229 @@
+{
+  "python": "3.13.12 (tags/v3.13.12:1cbe481, Feb  3 2026, 18:22:25) [MSC v.1944 64 bit (AMD64)]",
+  "dlls": [
+    {
+      "target": "audiofileprocessor",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\audiofileprocessor.dll",
+      "bytes": 366592,
+      "sha256": "2f9871e66793ed0846f025f4b284ae70f991e76e3b08cc3e7e6efe1e2b886106"
+    },
+    {
+      "target": "kicker",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\kicker.dll",
+      "bytes": 173056,
+      "sha256": "9e89133cb7671e9b8ac613fa9caa66a29507e64ff49ad09cf14996986a04cff3"
+    },
+    {
+      "target": "tripleoscillator",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\tripleoscillator.dll",
+      "bytes": 125440,
+      "sha256": "5466ae721060556f70e07a1705f5fe1039ef791b514e3e945f7fea3d9726a44f"
+    },
+    {
+      "target": "amplifier",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\amplifier.dll",
+      "bytes": 48128,
+      "sha256": "730e75f3457107b80fbe4d3c39b0e5c683140c05adbf65803bc28ae783dd0f5a"
+    },
+    {
+      "target": "bassbooster",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bassbooster.dll",
+      "bytes": 44544,
+      "sha256": "5d44ed7e7b2283fd98b69064dfe5e27319ea4d547f26b71c4cf5e1768e8106fe"
+    },
+    {
+      "target": "bitinvader",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitinvader.dll",
+      "bytes": 180736,
+      "sha256": "abdd632539b4696037d2ba3787df665925b922b596bc182918f44271fa7a8309"
+    },
+    {
+      "target": "bitcrush",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitcrush.dll",
+      "bytes": 56832,
+      "sha256": "c75b5a5ebe8a8dd79d6559705dc1e3ad589e9ade0e7d24a917c0ff93e5b48363"
+    },
+    {
+      "target": "carla_native-plugin",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\libcarla_native-plugin.dll",
+      "bytes": 9728,
+      "sha256": "42baae2d024549fd08f47afaddbd4d55373cd29bffe804670c94375d3804f541"
+    },
+    {
+      "target": "carlabase",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlabase.dll",
+      "bytes": 213504,
+      "sha256": "ea563d6226fc9e7fda9ea6f9218e81bcacbceef45f3e27b25e9b413e03c7a9b3"
+    },
+    {
+      "target": "carlapatchbay",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlapatchbay.dll",
+      "bytes": 22016,
+      "sha256": "661ad3665db860e859fb621045614aeb3684853048294632ed59e2b7646453d2"
+    },
+    {
+      "target": "carlarack",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlarack.dll",
+      "bytes": 22016,
+      "sha256": "e05ed9101e5263855a9db1ca611e87f945e7059cb004d7f463275b8c779287d0"
+    },
+    {
+      "target": "compressor",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\compressor.dll",
+      "bytes": 353280,
+      "sha256": "025d48e9b7b0dc21c89f452b5661b63dde4fa2a9a06a9e0f3470541bd19f537a"
+    },
+    {
+      "target": "crossovereq",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\crossovereq.dll",
+      "bytes": 64000,
+      "sha256": "e6a76fffece247996a2c57801d48cd250b10a261e6e2546db96154e0eb7b43f8"
+    },
+    {
+      "target": "delay",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\delay.dll",
+      "bytes": 57856,
+      "sha256": "79b91efd940d0f3890897469c08327e660cb5be4ad44f127e807ddcd2a504c50"
+    },
+    {
+      "target": "dispersion",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dispersion.dll",
+      "bytes": 47616,
+      "sha256": "b603b02aca3d0660ee7a3348cc2d161a480e6bcf37bba800da9a09910b8c118d"
+    },
+    {
+      "target": "dualfilter",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dualfilter.dll",
+      "bytes": 75264,
+      "sha256": "3e501800ee7836e6f19d339eb923e34e31c07756cde7666d47bdd78057d7d593"
+    },
+    {
+      "target": "dynamicsprocessor",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dynamicsprocessor.dll",
+      "bytes": 78336,
+      "sha256": "8bc724df2f7f078fa2c523c7b9e39f3686d6a16b080a283499cc11e428a1a788"
+    },
+    {
+      "target": "eq",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\eq.dll",
+      "bytes": 193536,
+      "sha256": "c2f814cbe547fd381274e112a2ed23c2fefd5e38bc93c635d824d86286001268"
+    },
+    {
+      "target": "flanger",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\flanger.dll",
+      "bytes": 57344,
+      "sha256": "28d8364b21ea67103b8c49f5b7ba59e86f3740484af2037ed380b175a59bc264"
+    },
+    {
+      "target": "frequencyshifter",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\frequencyshifter.dll",
+      "bytes": 187904,
+      "sha256": "b3a785fc4077b0218cdb7263cec464539682d3fdfac435392c7accffe4a2d824"
+    },
+    {
+      "target": "granularpitchshifter",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\granularpitchshifter.dll",
+      "bytes": 148480,
+      "sha256": "6335ac5fe1ded55e9d4191f92c25733b1d0ec4ee6258c0ffcd013dd7704bbeea"
+    },
+    {
+      "target": "hydrogenimport",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\hydrogenimport.dll",
+      "bytes": 46592,
+      "sha256": "1308d260c36608fe4fa37fbc00bdc4bd9cabc08f7a1a858eec87c81ba01725d1"
+    },
+    {
+      "target": "ladspabrowser",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspabrowser.dll",
+      "bytes": 93696,
+      "sha256": "f4ff6ca5bf9ff0305e4d631d5404787a2094726dd4a099fa9ce8af0058430c84"
+    },
+    {
+      "target": "ladspaeffect",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspaeffect.dll",
+      "bytes": 116736,
+      "sha256": "ea1fe1e678091f5970224122a9cf15427d72b3bb22839855ce5c1928b926a96f"
+    },
+    {
+      "target": "caps",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\caps.dll",
+      "bytes": 905728,
+      "sha256": "9eac4bfb98f8883608c58d52e8acd13837934431d3bbf20d7d1ae1e39e5fe3a8"
+    },
+    {
+      "target": "tap_autopan",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_autopan.dll",
+      "bytes": 27648,
+      "sha256": "7c6e10d448258050cb936ab03414b30952d218e84a28193d9fbacf0f11357434"
+    },
+    {
+      "target": "tap_chorusflanger",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_chorusflanger.dll",
+      "bytes": 44032,
+      "sha256": "41dc6812c747001fcebc0a490873b197c2c0bd551bfd93c70f426f61002f9ef8"
+    },
+    {
+      "target": "tap_deesser",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_deesser.dll",
+      "bytes": 30208,
+      "sha256": "2838a5fca96abb4a299eca5ed42e35db9ba19b98787280ccd4812884290ea89e"
+    },
+    {
+      "target": "tap_doubler",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_doubler.dll",
+      "bytes": 17408,
+      "sha256": "f3b0155ed2f424f837a7a5c63984228801de8ae9d987f928b4c5b3f5900b9c76"
+    },
+    {
+      "target": "tap_dynamics_m",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_m.dll",
+      "bytes": 22016,
+      "sha256": "6fe22ea5f7e72d0f0ace99f5a349f6cef10cf6c1bd432ff28d3a264f102aa4b4"
+    },
+    {
+      "target": "tap_dynamics_st",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_st.dll",
+      "bytes": 25088,
+      "sha256": "77cff60beae6c22df97706356c12350c6a42b3b4bbbac60aac70b51c28f59ffe"
+    },
+    {
+      "target": "tap_echo",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_echo.dll",
+      "bytes": 15360,
+      "sha256": "bb2fcc46686d6beabc02d066c1ee1e1bdf4ced286a1f01a6e7b70bafa4fed13f"
+    },
+    {
+      "target": "tap_eq",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eq.dll",
+      "bytes": 32768,
+      "sha256": "4106b3c13f7877281664c27a14fc830c106435b27f4db3c80084153bb7feba09"
+    },
+    {
+      "target": "tap_eqbw",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eqbw.dll",
+      "bytes": 34816,
+      "sha256": "1ce4d8d4675cb6f3e21a34b512f28467bbdc4f7012c100a376f2e2c6d1a0b739"
+    },
+    {
+      "target": "tap_limiter",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_limiter.dll",
+      "bytes": 14336,
+      "sha256": "0083a93c6fdbd785a0dace4f387ec06eb1bf0482bb31de0abcca080d810b7e99"
+    },
+    {
+      "target": "tap_pinknoise",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pinknoise.dll",
+      "bytes": 12800,
+      "sha256": "ea81a336fc5c6f1e4676ac6422cf86eb0dba9838543b1da32c597804571e4813"
+    },
+    {
+      "target": "tap_pitch",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pitch.dll",
+      "bytes": 30720,
+      "sha256": "ab75c8b6abb1d89f0022a9aaa57215b4870e05d956789b662e0dde3ad1c62ba3"
+    },
+    {
+      "target": "tap_reflector",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reflector.dll",
+      "bytes": 28672,
+      "sha256": "51083ebe13bebfa385d70c41e8f8cc117662904f63c82325484ec6c38c1efa9b"
+    },
+    {
+      "target": "tap_reverb",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reverb.dll",
+      "bytes": 54272,
+      "sha256": "20f9d260673113d13c37e2cf7ff7967d269908112cba7f859b23f3f28c2fa092"
+    },
+    {
+      "target": "tap_rotspeak",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_rotspeak.dll",
+      "bytes": 49664,
+      "sha256": "5fa18b686685929adf08494a3d8d070106482df41ff4a0c38710651b8de5ec3e"
+    },
+    {
+      "target": "tap_sigmoid",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_sigmoid.dll",
+      "bytes": 16896,
+      "sha256": "edfff0f3d37f2cf690a8e4e7b67e8b0c83beb4e4928a6a8e05404a465683f871"
+    },
+    {
+      "target": "tap_tremolo",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tremolo.dll",
+      "bytes": 27136,
+      "sha256": "12ed3259da9e5c92a49f6ea24818a36cbc30ef07be0c54fb18691baa7fa25da2"
+    },
+    {
+      "target": "tap_tubewarmth",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tubewarmth.dll",
+      "bytes": 16384,
+      "sha256": "2ed9da722d7d139ca60dfb3751a587b5fcea9bff8d658865954facae22ac1157"
+    },
+    {
+      "target": "tap_vibrato",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_vibrato.dll",
+      "bytes": 29184,
+      "sha256": "4760ddd442525bc8f9413b95fe17c546645afd676ae30c1f97664fdffa8f28ac"
+    },
+    {
+      "target": "cmt",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\cmt.dll",
+      "bytes": 122368,
+      "sha256": "c5c8c089eb78f28263fd789475db2cbaad1bfcabd28ce24e0c87a688c7dc6fa1"
+    },
+    {
+      "target": "veal",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\veal.dll",
+      "bytes": 768000,
+      "sha256": "0baeea775fff0cb744644b84d60f0a918e49d740f7ad4b6816f06bfc1baa144b"
+    },
+    {
+      "target": "lomm",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lomm.dll",
+      "bytes": 303616,
+      "sha256": "a8e63658dac00325123134a014a4377ea77bcd31c765a18c47a77cf2af8f0d33"
+    },
+    {
+      "target": "lv2effect",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2effect.dll",
+      "bytes": 37888,
+      "sha256": "46a7a0fa497ee7ba4b0493f63f0afbe88d8ec48fc746ec2ddae4560c41626d2d"
+    },
+    {
+      "target": "lv2instrument",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2instrument.dll",
+      "bytes": 42496,
+      "sha256": "c36474b1cec9ce98d902c23d8765b60c6246bd6bbf116231934d623620cb75e5"
+    },
+    {
+      "target": "lb302",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lb302.dll",
+      "bytes": 171008,
+      "sha256": "32719d98ce19efb1028c7ae8730c6bff27864d33969d1fffbf6349d98efa0ffd"
+    },
+    {
+      "target": "midiimport",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\midiimport.dll",
+      "bytes": 119808,
+      "sha256": "cda6ebde8c7618b77ae08c8e74ebadb40577f311e02b039442791f84d6034e62"
+    },
+    {
+      "target": "midiexport",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\midiexport.dll",
+      "bytes": 67584,
+      "sha256": "a045361be880e00b028be3217f19535301e903cd82c9f6266882a449396b3833"
+    },
+    {
+      "target": "multitapecho",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\multitapecho.dll",
+      "bytes": 64512,
+      "sha256": "600f001a5c615830d0966958ef738c30122990888f13785f2d23c1ff0d37c208"
+    },
+    {
+      "target": "monstro",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\monstro.dll",
+      "bytes": 310784,
+      "sha256": "4bf5252920bffc84a987e3c1cf37bd590f0e7f7873c319d12f27dc37f0f9c914"
+    },
+    {
+      "target": "nes",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\nes.dll",
+      "bytes": 192512,
+      "sha256": "680186e0e047506f7db603706925db8f6983a9406e5244c4d99ecbc58ad99772"
+    },
+    {
+      "target": "opulenz",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\opulenz.dll",
+      "bytes": 227840,
+      "sha256": "fc0d505de057dd6f98d9864df7503f17a1aff3ba59e8e2a2b6cc89857d6da0f2"
+    },
+    {
+      "target": "organic",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\organic.dll",
+      "bytes": 127488,
+      "sha256": "03965a51f9b9cba1f7a72d03eaf8c5818a6985cc224d10669afe25dc48c16a68"
+    },
+    {
+      "target": "oscilloscope",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\oscilloscope.dll",
+      "bytes": 61952,
+      "sha256": "33490dd98258dde41451da7a88852ce895d919da21a1b99b98edbc13ecc34ffc"
+    },
+    {
+      "target": "freeboy",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\freeboy.dll",
+      "bytes": 171008,
+      "sha256": "e0156a76e01ca301f22ac9534ee294c67a2b2e9e37a2de8af15e1a0260b12068"
+    },
+    {
+      "target": "patman",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\patman.dll",
+      "bytes": 105984,
+      "sha256": "74e0f8c0b3430540c94f5ad79f1a0aac14cdf43ccfa5231fbb188824a11938a5"
+    },
+    {
+      "target": "peakcontrollereffect",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\peakcontrollereffect.dll",
+      "bytes": 70656,
+      "sha256": "758f3188d74079a994cba25f23d38b309a4f3c7cc49a48642215a9e1197084b5"
+    },
+    {
+      "target": "reverbsc",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\reverbsc.dll",
+      "bytes": 48640,
+      "sha256": "ba7d179fa331f67b049cfdc5bf8992e42c99ebc15927cc7d84b96736cef6809a"
+    },
+    {
+      "target": "sf2player",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sf2player.dll",
+      "bytes": 235520,
+      "sha256": "3d2ac3f11050c302f2f0c538b4a7be6d1724fc70d229661ccb4627417e21ceb1"
+    },
+    {
+      "target": "sfxr",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sfxr.dll",
+      "bytes": 186880,
+      "sha256": "add0b0a3e6b1fa046a2a383633ff83137bcd6be30773cc645d178693f19e053a"
+    },
+    {
+      "target": "slewdistortion",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slewdistortion.dll",
+      "bytes": 270336,
+      "sha256": "ba975aad7b7a0e813d0c26e607c8e26d181d7e948360f1c6d09bb86d0111adc6"
+    },
+    {
+      "target": "slicert",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slicert.dll",
+      "bytes": 131584,
+      "sha256": "74272d2eec4383a220a8f7cdab9c88ac20ce05c60d63c8d27b7271289dd0d111"
+    },
+    {
+      "target": "analyzer",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\analyzer.dll",
+      "bytes": 173056,
+      "sha256": "62b612750a43584d2c066af9e1bc35a77e913bdf6c27e443e38c9ea46cdd53ec"
+    },
+    {
+      "target": "stereoenhancer",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereoenhancer.dll",
+      "bytes": 36864,
+      "sha256": "c7519582e156e58c516e39dd388cfc687af06157d692dc3f03a178c4a86a36cc"
+    },
+    {
+      "target": "stereomatrix",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereomatrix.dll",
+      "bytes": 44544,
+      "sha256": "b57dcab0db613518bd80ab404705868875c2b0171c0ffa02aaedff4220e882ad"
+    },
+    {
+      "target": "malletsstk",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\malletsstk.dll",
+      "bytes": 216576,
+      "sha256": "61b0def8c1db4417e4f4ff02983de0a96ffce08f6cc18e07e34c0a6a1cefa5c7"
+    },
+    {
+      "target": "taptempo",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\taptempo.dll",
+      "bytes": 54784,
+      "sha256": "8608f067ffcf4605bc5ee86c026e06ace9bd6a760b61c75991043879f8af3228"
+    },
+    {
+      "target": "vstbase",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vstbase.dll",
+      "bytes": 371200,
+      "sha256": "62bf6b84cbfe1cd7ccce1179ac58e65ae177ddff93b39e7b4e60d7a8774aa9ed"
+    },
+    {
+      "target": "vestige",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vestige.dll",
+      "bytes": 158208,
+      "sha256": "2f31f35b83f706aef97c22203e9e8adb598f5a3f4d086ac4824facb5679c6449"
+    },
+    {
+      "target": "vsteffect",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vsteffect.dll",
+      "bytes": 167424,
+      "sha256": "6a688b236bca271d41f9b8fc3df106ff1872cef84c3ae198cd6a162188897646"
+    },
+    {
+      "target": "watsyn",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\watsyn.dll",
+      "bytes": 238592,
+      "sha256": "75633c571ffc77cf93ec76ce7f48892f5ce55d377e648dd1dc30243949338fe3"
+    },
+    {
+      "target": "waveshaper",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\waveshaper.dll",
+      "bytes": 64000,
+      "sha256": "edb60e503717210983961a5f229e097e9867fbad32b091072705a91d6dd24946"
+    },
+    {
+      "target": "vectorscope",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vectorscope.dll",
+      "bytes": 53760,
+      "sha256": "9772f301c2c7a8a989eb32be4d0d4c2713f4c43a8f8acf78a0b90490d77f7300"
+    },
+    {
+      "target": "vibedstrings",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vibedstrings.dll",
+      "bytes": 124416,
+      "sha256": "1c7ed0d7386ebdee47d954472511d12f7e4ee9fb33bd49e8144ec626345990a0"
+    },
+    {
+      "target": "xpressive",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\xpressive.dll",
+      "bytes": 2723328,
+      "sha256": "7f8055760b7b20dc1aaf14b5ce0f4085fa0c0c1a5b4f82c65367018f38090aa5"
+    },
+    {
+      "target": "zynaddsubfx",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\zynaddsubfx.dll",
+      "bytes": 534528,
+      "sha256": "79122b8a3db49d6bce0de00a64f19cf8f8cc77da6c9aaf7fe0cab751a87d2a38"
+    },
+    {
+      "target": "SVSDiffSinger",
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSDiffSinger\\SVSDiffSinger.dll",
+      "bytes": 781312,
+      "sha256": "19b26eed03dae203af441f21211b8121cfafdc805b9304517dad62923335075f"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "backports.zstd",
+      "version": "1.7.0"
+    },
+    {
+      "name": "cbor2",
+      "version": "6.1.5"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2"
+    },
+    {
+      "name": "construct-typing",
+      "version": "0.8.1"
+    },
+    {
+      "name": "construct",
+      "version": "2.10.70"
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6"
+    },
+    {
+      "name": "ko-pron",
+      "version": "1.3"
+    },
+    {
+      "name": "loguru",
+      "version": "0.7.3"
+    },
+    {
+      "name": "more-itertools",
+      "version": "11.1.0"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3"
+    },
+    {
+      "name": "platformdirs",
+      "version": "4.12.4"
+    },
+    {
+      "name": "portion",
+      "version": "2.6.3"
+    },
+    {
+      "name": "protobuf-py",
+      "version": "0.6.0"
+    },
+    {
+      "name": "protobuf-py-ext",
+      "version": "0.6.0"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.14.0"
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.50.0"
+    },
+    {
+      "name": "pydantic-extra-types",
+      "version": "2.11.1"
+    },
+    {
+      "name": "pydantic-settings",
+      "version": "2.15.0"
+    },
+    {
+      "name": "pymediainfo",
+      "version": "7.0.1"
+    },
+    {
+      "name": "pypinyin",
+      "version": "0.55.0"
+    },
+    {
+      "name": "pysubs2",
+      "version": "1.9.0"
+    },
+    {
+      "name": "PyYAML-ft",
+      "version": "8.0.0"
+    },
+    {
+      "name": "retrie",
+      "version": "0.3.1"
+    },
+    {
+      "name": "ruamel.yaml",
+      "version": "0.19.1"
+    },
+    {
+      "name": "sortedcontainers",
+      "version": "2.4.0"
+    },
+    {
+      "name": "svg.py",
+      "version": "1.10.0"
+    },
+    {
+      "name": "TatSu-LTS",
+      "version": "5.16.0"
+    },
+    {
+      "name": "universal_pathlib",
+      "version": "0.3.10"
+    },
+    {
+      "name": "pathlib_abc",
+      "version": "0.5.2"
+    },
+    {
+      "name": "xsdata_pydantic",
+      "version": "24.5"
+    },
+    {
+      "name": "zhon",
+      "version": "2.1.1"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0"
+    },
+    {
+      "name": "arrow",
+      "version": "1.4.0"
+    },
+    {
+      "name": "bidict",
+      "version": "0.24.1"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6"
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.9.0"
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.3"
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.4"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0"
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.4"
+    },
+    {
+      "name": "pyzipper",
+      "version": "0.4.0"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0"
+    },
+    {
+      "name": "that-depends",
+      "version": "4.2.0"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.4"
+    },
+    {
+      "name": "win32_setctime",
+      "version": "1.2.0"
+    },
+    {
+      "name": "xsdata",
+      "version": "26.2"
+    },
+    {
+      "name": "jyutping",
+      "version": "0.3.4"
+    },
+    {
+      "name": "pycryptodomex",
+      "version": "3.24.0"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.5"
+    },
+    {
+      "name": "wanakana-python",
+      "version": "1.2.2"
+    }
+  ],
+  "licenseDirectories": [
+    "annotated_types-0.8.0.dist-info",
+    "arrow-1.4.0.dist-info",
+    "backports_zstd-1.7.0.dist-info",
+    "bidict-0.24.1.dist-info",
+    "cbor2-6.1.5.dist-info",
+    "charset_normalizer-3.5.2.dist-info",
+    "colorama-0.4.6.dist-info",
+    "construct-2.10.70.dist-info",
+    "construct_typing-0.8.1.dist-info",
+    "fsspec-2026.9.0.dist-info",
+    "jinja2-3.1.6.dist-info",
+    "jyutping-0.3.4.dist-info",
+    "ko_pron-1.3.dist-info",
+    "libresvip-2.9.2.dist-info",
+    "loguru-0.7.3.dist-info",
+    "lxml-6.1.3.dist-info",
+    "markupsafe-3.0.4.dist-info",
+    "more_itertools-11.1.0.dist-info",
+    "packaging-26.3.dist-info",
+    "pathlib_abc-0.5.2.dist-info",
+    "platformdirs-4.12.4.dist-info",
+    "portion-2.6.3.dist-info",
+    "protobuf_py-0.6.0.dist-info",
+    "protobuf_py_ext-0.6.0.dist-info",
+    "pycryptodomex-3.24.0.dist-info",
+    "pydantic-2.14.0.dist-info",
+    "pydantic_core-2.50.0.dist-info",
+    "pydantic_extra_types-2.11.1.dist-info",
+    "pydantic_settings-2.15.0.dist-info",
+    "pymediainfo-7.0.1.dist-info",
+    "pypinyin-0.55.0.dist-info",
+    "pysubs2-1.9.0.dist-info",
+    "python_dateutil-2.9.0.post0.dist-info",
+    "python_dotenv-1.2.4.dist-info",
+    "pyyaml_ft-8.0.0.dist-info",
+    "pyzipper-0.4.0.dist-info",
+    "retrie-0.3.1.dist-info",
+    "ruamel_yaml-0.19.1.dist-info",
+    "six-1.17.0.dist-info",
+    "sortedcontainers-2.4.0.dist-info",
+    "svg_py-1.10.0.dist-info",
+    "tatsu_lts-5.16.0.dist-info",
+    "that_depends-4.2.0.dist-info",
+    "typing_extensions-4.16.0.dist-info",
+    "typing_inspection-0.4.4.dist-info",
+    "tzdata-2026.5.dist-info",
+    "universal_pathlib-0.3.10.dist-info",
+    "wanakana_python-1.2.2.dist-info",
+    "win32_setctime-1.2.0.dist-info",
+    "xsdata-26.2.dist-info",
+    "xsdata_pydantic-24.5.dist-info",
+    "zhon-2.1.1.dist-info"
+  ],
+  "applicationArtifacts": [
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\lmms.exe",
+      "sha256": "1412f1d26ebf8d2944a1883416a9d568b45dd774e839db814c20ef4be60b434a"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\platforms\\qwindows.dll",
+      "sha256": "cafd5bfdef3d89d176ee26725c8d4759fd6cb007645b645a4cbf6386364a3f36"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSExample\\SVSExample.dll",
+      "sha256": "2fe4366e22c683bbfe19e19687835f28063231472be31419b7ca6885e928abda"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSDiffSinger\\SVSDiffSinger.dll",
+      "sha256": "19b26eed03dae203af441f21211b8121cfafdc805b9304517dad62923335075f"
+    }
+  ],
+  "bridgeSha256": "306ec626acc0d27e85b38e6acc4af4b0220b1a0eb957a254c806e63214fad7b5",
+  "wheelArtifacts": [
+    {
+      "file": "annotated_types-0.8.0-py3-none-any.whl",
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "checkedMembers": 6
+    },
+    {
+      "file": "arrow-1.4.0-py3-none-any.whl",
+      "sha256": "749f0769958ebdc79c173ff0b0670d59051a535fa26e8eba02953dc19eb43205",
+      "checkedMembers": 14
+    },
+    {
+      "file": "backports_zstd-1.7.0-cp313-cp313-win_amd64.whl",
+      "sha256": "8086b4a7443bb2863f7ef8edb317b715d5f3ccec6c5512619bd23d57661ba1b7",
+      "checkedMembers": 30
+    },
+    {
+      "file": "bidict-0.24.1-py3-none-any.whl",
+      "sha256": "fd3eaa737917d8a14f4baa391670c433c4e3f6f5fd2cd99d4bf436437f432364",
+      "checkedMembers": 15
+    },
+    {
+      "file": "cbor2-6.1.5-cp313-cp313-win_amd64.whl",
+      "sha256": "af14089f5fb36f89b3f766acc7d4990cdfba7487ec0249d51bfa3a8caad25f0a",
+      "checkedMembers": 10
+    },
+    {
+      "file": "charset_normalizer-3.5.2-cp313-cp313-win_amd64.whl",
+      "sha256": "78456a747de8dc58360ffa581f30a002baf5aa28cb262536545e91f113ed7639",
+      "checkedMembers": 20
+    },
+    {
+      "file": "colorama-0.4.6-py2.py3-none-any.whl",
+      "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+      "checkedMembers": 16
+    },
+    {
+      "file": "construct-2.10.70-py3-none-any.whl",
+      "sha256": "c80be81ef595a1a821ec69dc16099550ed22197615f4320b57cc9ce2a672cb30",
+      "checkedMembers": 15
+    },
+    {
+      "file": "construct_typing-0.8.1-py3-none-any.whl",
+      "sha256": "9b5845dbaf959c9d960f5105f9ab3533227c4da2b76baa57d1f1c0aa2a088cdb",
+      "checkedMembers": 20
+    },
+    {
+      "file": "fsspec-2026.9.0-py3-none-any.whl",
+      "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f",
+      "checkedMembers": 61
+    },
+    {
+      "file": "jinja2-3.1.6-py3-none-any.whl",
+      "sha256": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67",
+      "checkedMembers": 30
+    },
+    {
+      "file": "jyutping-0.3.4-py2.py3-none-any.whl",
+      "sha256": "34dd5a5e7c9d29103fc8a8d3ffcc55e838f7e7a0c88d52cef72c00475829fb45",
+      "checkedMembers": 7
+    },
+    {
+      "file": "ko_pron-1.3-py3-none-any.whl",
+      "sha256": "72c9ebbdb6c0c5f6981c143cee978158662d12c6302545686a1c4e0fcaad2017",
+      "checkedMembers": 6
+    },
+    {
+      "file": "libresvip-2.9.2-py3-none-any.whl",
+      "sha256": "5fbc17fbde097812c0b46ac2021353a1171fe1a478229bdf91ad23625faf9f0b",
+      "checkedMembers": 640
+    },
+    {
+      "file": "loguru-0.7.3-py3-none-any.whl",
+      "sha256": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c",
+      "checkedMembers": 23
+    },
+    {
+      "file": "lxml-6.1.3-cp313-cp313-win_amd64.whl",
+      "sha256": "e477aca0bc0d19f3b4ae9e4f2a1cfd687c31bf772d78734910658186b40b2477",
+      "checkedMembers": 177
+    },
+    {
+      "file": "markupsafe-3.0.4-cp313-cp313-win_amd64.whl",
+      "sha256": "1f1f9477e174582b0a1b583d60b66e1f2cf5d3fe12cee985e4aedf44766600e5",
+      "checkedMembers": 10
+    },
+    {
+      "file": "more_itertools-11.1.0-py3-none-any.whl",
+      "sha256": "4b65538ae22f6fed0ce4874efd317463a7489796a0939fa66824dd542125a192",
+      "checkedMembers": 10
+    },
+    {
+      "file": "packaging-26.3-py3-none-any.whl",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "checkedMembers": 28
+    },
+    {
+      "file": "pathlib_abc-0.5.2-py3-none-any.whl",
+      "sha256": "4c9d94cf1b23af417ce7c0417b43333b06a106c01000b286c99de230d95eefbb",
+      "checkedMembers": 7
+    },
+    {
+      "file": "platformdirs-4.12.4-py3-none-any.whl",
+      "sha256": "78bfb9db2a8471ed7eebe3c3c932da413911042994e699b384fbb4493fa872d7",
+      "checkedMembers": 17
+    },
+    {
+      "file": "portion-2.6.3-py3-none-any.whl",
+      "sha256": "9f5a26de92ff1241c7ba7ab23da0b544e67308187100681512871a50d6d206f1",
+      "checkedMembers": 10
+    },
+    {
+      "file": "protobuf_py-0.6.0-py3-none-any.whl",
+      "sha256": "2aba52a2d017487901cb4b8a7983e64a7bd369128c2ca86cafa4dd03da31012e",
+      "checkedMembers": 79
+    },
+    {
+      "file": "protobuf_py_ext-0.6.0-cp311-abi3-win_amd64.whl",
+      "sha256": "b5be43ebf9ec28aa7e3734bf07c0ea4ae50c2e7554b9299ea08433549052e8d2",
+      "checkedMembers": 6
+    },
+    {
+      "file": "pycryptodomex-3.24.0-cp37-abi3-win_amd64.whl",
+      "sha256": "55f22d72250d7923aac3c2442ec6a1dd8774d2efa3bdcb0f68d5e137d372268e",
+      "checkedMembers": 351
+    },
+    {
+      "file": "pydantic-2.14.0-py3-none-any.whl",
+      "sha256": "15fab1bea6f1dc5003b54fc2ecab230c1fd1dbade2acd4addc52d81e32416d4b",
+      "checkedMembers": 110
+    },
+    {
+      "file": "pydantic_core-2.50.0-cp313-cp313-win_amd64.whl",
+      "sha256": "4f96ccd9368ecbf6685d8f6981584ab72b4f0ffd20685e747737e7e340277b8d",
+      "checkedMembers": 10
+    },
+    {
+      "file": "pydantic_extra_types-2.11.1-py3-none-any.whl",
+      "sha256": "1722ea2bddae5628ace25f2aa685b69978ef533123e5638cfbddb999e0100ec1",
+      "checkedMembers": 31
+    },
+    {
+      "file": "pydantic_settings-2.15.0-py3-none-any.whl",
+      "sha256": "0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42",
+      "checkedMembers": 26
+    },
+    {
+      "file": "pymediainfo-7.0.1-py3-none-win_amd64.whl",
+      "sha256": "13224fa7590e198763b8baf072e704ea81d334e71aa32a469091460e243893c7",
+      "checkedMembers": 8
+    },
+    {
+      "file": "pypinyin-0.55.0-py2.py3-none-any.whl",
+      "sha256": "d53b1e8ad2cdb815fb2cb604ed3123372f5a28c6f447571244aca36fc62a286f",
+      "checkedMembers": 85
+    },
+    {
+      "file": "pysubs2-1.9.0-py3-none-any.whl",
+      "sha256": "83f1979cb7e064294f0c8473ef672ca2e5c0a7172bbf8ae9b4337899d5cdf01f",
+      "checkedMembers": 27
+    },
+    {
+      "file": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427",
+      "checkedMembers": 24
+    },
+    {
+      "file": "python_dotenv-1.2.4-py3-none-any.whl",
+      "sha256": "42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc",
+      "checkedMembers": 14
+    },
+    {
+      "file": "pyyaml_ft-8.0.0-cp313-cp313-win_amd64.whl",
+      "sha256": "58e1015098cf8d8aec82f360789c16283b88ca670fe4275ef6c48c5e30b22a96",
+      "checkedMembers": 24
+    },
+    {
+      "file": "pyzipper-0.4.0-py3-none-any.whl",
+      "sha256": "aa7b8a0fe741d67aac36ead85f6e735af107b72f84e0775f2ed565fc0d3a2f02",
+      "checkedMembers": 10
+    },
+    {
+      "file": "retrie-0.3.1-py2.py3-none-any.whl",
+      "sha256": "cb67a394f93e66d3ee35592c0c65192f8c1d7f36e6a98e73306e439e97bf8d9d",
+      "checkedMembers": 8
+    },
+    {
+      "file": "ruamel_yaml-0.19.1-py3-none-any.whl",
+      "sha256": "27592957fedf6e0b62f281e96effd28043345e0e66001f97683aa9a40c667c93",
+      "checkedMembers": 38
+    },
+    {
+      "file": "six-1.17.0-py2.py3-none-any.whl",
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274",
+      "checkedMembers": 5
+    },
+    {
+      "file": "sortedcontainers-2.4.0-py2.py3-none-any.whl",
+      "sha256": "a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0",
+      "checkedMembers": 8
+    },
+    {
+      "file": "svg_py-1.10.0-py3-none-any.whl",
+      "sha256": "54c7470347d5d79b30d059584a4f449da08b462903e8ce262981338bab755560",
+      "checkedMembers": 12
+    },
+    {
+      "file": "tatsu_lts-5.16.0-py3-none-any.whl",
+      "sha256": "43b21f741a8d1b03148e84294aa6867ab0607f9c3325d93df8b0cf3ad8ece74b",
+      "checkedMembers": 53
+    },
+    {
+      "file": "that_depends-4.2.0-py3-none-any.whl",
+      "sha256": "a06267e60fda353be071d7aa7b8dc452d4f79f067e643de6222c624b640f29c0",
+      "checkedMembers": 29
+    },
+    {
+      "file": "typing_extensions-4.16.0-py3-none-any.whl",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "checkedMembers": 4
+    },
+    {
+      "file": "typing_inspection-0.4.4-py3-none-any.whl",
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "checkedMembers": 8
+    },
+    {
+      "file": "tzdata-2026.5-py2.py3-none-any.whl",
+      "sha256": "b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac",
+      "checkedMembers": 632
+    },
+    {
+      "file": "universal_pathlib-0.3.10-py3-none-any.whl",
+      "sha256": "dfaf2fb35683d2eb1287a3ed7b215e4d6016aa6eaf339c607023d22f90821c66",
+      "checkedMembers": 36
+    },
+    {
+      "file": "wanakana_python-1.2.2-py3-none-any.whl",
+      "sha256": "3bef6bddb74f561a7cec27e6fa93d3f7ec3ecc694d91fb01cc7b915d237e9a21",
+      "checkedMembers": 21
+    },
+    {
+      "file": "win32_setctime-1.2.0-py3-none-any.whl",
+      "sha256": "95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390",
+      "checkedMembers": 7
+    },
+    {
+      "file": "xsdata-26.2-py3-none-any.whl",
+      "sha256": "85a591a4405d903416afbd4a917e8dda8ea44641a3e66d72134bc2a31b3c16b0",
+      "checkedMembers": 149
+    },
+    {
+      "file": "xsdata_pydantic-24.5-py3-none-any.whl",
+      "sha256": "bb6da7d3445d655640096c65c1b11037153b19df533da89553f24247ef352cd0",
+      "checkedMembers": 14
+    },
+    {
+      "file": "zhon-2.1.1-py3-none-any.whl",
+      "sha256": "9ec0d42229ae60708a045270f755ccefb48f2689f2a6ce0bc6597abf6c4a9871",
+      "checkedMembers": 12
+    }
+  ],
+  "dependenciesWithoutLicenseDirectory": [],
+  "licenseAudit": [],
+  "licenseSupplement": [
+    {
+      "name": "jyutping",
+      "wheel": {
+        "file": "jyutping-0.3.4-py2.py3-none-any.whl",
+        "sha256": "34dd5a5e7c9d29103fc8a8d3ffcc55e838f7e7a0c88d52cef72c00475829fb45"
+      },
+      "directory": "jyutping-0.3.4.dist-info",
+      "files": [
+        {
+          "path": "METADATA",
+          "sha256": "272a97eda040f319551f3ebeb43bbd36f8c8d45584ac9e171249e7e738a6eee8"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "7d75ac8f7c3fa4be35d4f4cfed6a643d4c048115a2aa32bc1eb9170a5bdbb8c3"
+        }
+      ],
+      "status": "metadata-only-upstream-license-file-absent",
+      "note": "Locked release declares MIT. Neither wheel, sdist nor upstream repository supplies a LICENSE notice. No grant or copyright notice has been invented."
+    },
+    {
+      "name": "ko-pron",
+      "wheel": {
+        "file": "ko_pron-1.3-py3-none-any.whl",
+        "sha256": "72c9ebbdb6c0c5f6981c143cee978158662d12c6302545686a1c4e0fcaad2017"
+      },
+      "directory": "ko_pron-1.3.dist-info",
+      "files": [
+        {
+          "path": "METADATA",
+          "sha256": "659633f7044551bb68fda1531b6489e6a7176244378dc6a2b5f2ce039dd2235b"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "3901fa7a40c4a62e4e8b0293a3bbc43990179ae32d30966746c213c60fe9064d"
+        },
+        {
+          "path": "UPSTREAM-LICENSE",
+          "sha256": "70207b93a2888b422547472528a76b4a4fa2911c260ae703ee35038924c8e777"
+        }
+      ],
+      "status": "upstream-notice-preserved",
+      "upstream": {
+        "Repo": "kord123/ko_pron",
+        "Ref": "",
+        "Spdx": "MIT",
+        "GitBlob": "e54eb9d6e825a0ce737d7e3d4593ff959ef8f867",
+        "Url": "https://github.com/kord123/ko_pron/blob/master/LICENSE"
+      }
+    },
+    {
+      "name": "loguru",
+      "wheel": {
+        "file": "loguru-0.7.3-py3-none-any.whl",
+        "sha256": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c"
+      },
+      "directory": "loguru-0.7.3.dist-info",
+      "files": [
+        {
+          "path": "METADATA",
+          "sha256": "3a371f8b089014fdaee055edc440d448242847926ad67613621af402f9975fd9"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "a91e7e1fa169a6b85c38614c095661fbb7244f078214d5db3957104bfd49da8f"
+        },
+        {
+          "path": "UPSTREAM-LICENSE",
+          "sha256": "b35d026cc7aca9d5859a02eb87ddf7a386a24c986838651bd1f283f94e003327"
+        }
+      ],
+      "status": "upstream-notice-preserved",
+      "upstream": {
+        "Repo": "Delgan/loguru",
+        "Ref": "0.7.3",
+        "Spdx": "MIT",
+        "GitBlob": "5285f420ff222526f9afa7acf507362367132f9c",
+        "Url": "https://github.com/Delgan/loguru/blob/0.7.3/LICENSE"
+      }
+    },
+    {
+      "name": "protobuf-py-ext",
+      "wheel": {
+        "file": "protobuf_py_ext-0.6.0-cp311-abi3-win_amd64.whl",
+        "sha256": "b5be43ebf9ec28aa7e3734bf07c0ea4ae50c2e7554b9299ea08433549052e8d2"
+      },
+      "directory": "protobuf_py_ext-0.6.0.dist-info",
+      "files": [
+        {
+          "path": "METADATA",
+          "sha256": "72f9839681742fc35592d67fc0afa144283deadd553ea456dd3294567f07726a"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "625500cc01b2afde5a3e083d91e56c7905a5b32f321ca98cc0348a1b257d9763"
+        },
+        {
+          "path": "UPSTREAM-LICENSE",
+          "sha256": "1c5e374691049b02313a909936cb4b70df33e5d94404688f27766fa42b8088e5"
+        }
+      ],
+      "status": "upstream-notice-preserved",
+      "upstream": {
+        "Repo": "bufbuild/protobuf-py",
+        "Ref": "v0.6.0",
+        "Spdx": "Apache-2.0",
+        "GitBlob": "7e407106a4681757b0234f0a028c2948d9b447e0",
+        "Url": "https://github.com/bufbuild/protobuf-py/blob/v0.6.0/LICENSE"
+      }
+    },
+    {
+      "name": "that-depends",
+      "wheel": {
+        "file": "that_depends-4.2.0-py3-none-any.whl",
+        "sha256": "a06267e60fda353be071d7aa7b8dc452d4f79f067e643de6222c624b640f29c0"
+      },
+      "directory": "that_depends-4.2.0.dist-info",
+      "files": [
+        {
+          "path": "METADATA",
+          "sha256": "3c4a223fe4a99d02d9ca01bf1163697fc58eb25e8bab05dd76c9c213196ddf82"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "dae3e18eecc79561af7c0a14d58d53f2ed07e1295f2c95444a560e7b5c5f4fa5"
+        },
+        {
+          "path": "UPSTREAM-LICENSE",
+          "sha256": "2d1afc97b288b48a770ed5d3ccda4c8467edf33314687775a1c1528b025399d1"
+        }
+      ],
+      "status": "upstream-notice-preserved",
+      "upstream": {
+        "Repo": "modern-python/that-depends",
+        "Ref": "4.2.0",
+        "Spdx": "MIT",
+        "GitBlob": "31534652734c2f3834e58d4043ab27ce68513919",
+        "Url": "https://github.com/modern-python/that-depends/blob/4.2.0/LICENSE"
+      }
+    },
+    {
+      "name": "wanakana-python",
+      "wheel": {
+        "file": "wanakana_python-1.2.2-py3-none-any.whl",
+        "sha256": "3bef6bddb74f561a7cec27e6fa93d3f7ec3ecc694d91fb01cc7b915d237e9a21"
+      },
+      "directory": "wanakana_python-1.2.2.dist-info",
+      "files": [
+        {
+          "path": "DECLARED-MPL-2.0.txt",
+          "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172"
+        },
+        {
+          "path": "METADATA",
+          "sha256": "1bdaed148caf21a9aad7c55e042857ff0513b5ca2298ae2b11f5cc6055a6fff3"
+        },
+        {
+          "path": "PROVENANCE.json",
+          "sha256": "08563a196047b67d5178fc995af446391bd6de6be96eeb6d215743678c279bdd"
+        },
+        {
+          "path": "UPSTREAM-LICENSE",
+          "sha256": "3f42b8f35a73e0d90e72566fe71a8fa7922c3a272ce33462f5fdb39670eab5de"
+        }
+      ],
+      "status": "conflicting-upstream-declarations-preserved",
+      "upstream": {
+        "Repo": "Starwort/wanakana-py",
+        "Ref": "3e019ac56e86c03ad66f2734c30e234ce64127bb",
+        "Spdx": "MIT",
+        "GitBlob": "176b0d29dc9ed103705de833816722e4126c8a6f",
+        "Url": "https://github.com/Starwort/wanakana-py/blob/3e019ac56e86c03ad66f2734c30e234ce64127bb/LICENCE"
+      },
+      "note": "Locked wheel declares MPL-2.0; upstream pre-release commit supplies MIT. Both declarations are retained without relicensing. Distribution review remains MANUAL/PENDING.",
+      "declaredLicenseText": {
+        "path": "DECLARED-MPL-2.0.txt",
+        "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt"
+      }
+    }
+  ],
+  "licenseReviewPending": [
+    "jyutping",
+    "wanakana-python"
+  ],
+  "disabledPlugins": [
+    {
+      "name": "sid",
+      "retiredInPlace": true
+    },
+    {
+      "name": "gigplayer",
+      "retiredInPlace": false
+    }
+  ]
+}

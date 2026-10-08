@@ -1,0 +1,15 @@
+{
+  "operation": "importProject",
+  "formatId": "xvsq",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\xvsq\\export\\多伴奏工程.xvsq",
+  "options": {
+    "import_strength": true,
+    "import_gender": true,
+    "import_breath": true,
+    "import_volume": true,
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "bc9c2b88b4134fcdae6faf0a899e37d5"
+}

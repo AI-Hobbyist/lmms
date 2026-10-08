@@ -1,0 +1,326 @@
+[
+  {
+    "Target": "audiofileprocessor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\audiofileprocessor.dll"
+  },
+  {
+    "Target": "kicker",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\kicker.dll"
+  },
+  {
+    "Target": "tripleoscillator",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\tripleoscillator.dll"
+  },
+  {
+    "Target": "amplifier",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\amplifier.dll"
+  },
+  {
+    "Target": "bassbooster",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bassbooster.dll"
+  },
+  {
+    "Target": "bitinvader",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitinvader.dll"
+  },
+  {
+    "Target": "bitcrush",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\bitcrush.dll"
+  },
+  {
+    "Target": "carla_native-plugin",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\libcarla_native-plugin.dll"
+  },
+  {
+    "Target": "carlabase",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlabase.dll"
+  },
+  {
+    "Target": "carlapatchbay",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlapatchbay.dll"
+  },
+  {
+    "Target": "carlarack",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\carlarack.dll"
+  },
+  {
+    "Target": "compressor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\compressor.dll"
+  },
+  {
+    "Target": "crossovereq",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\crossovereq.dll"
+  },
+  {
+    "Target": "delay",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\delay.dll"
+  },
+  {
+    "Target": "dispersion",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dispersion.dll"
+  },
+  {
+    "Target": "dualfilter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dualfilter.dll"
+  },
+  {
+    "Target": "dynamicsprocessor",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\dynamicsprocessor.dll"
+  },
+  {
+    "Target": "eq",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\eq.dll"
+  },
+  {
+    "Target": "flanger",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\flanger.dll"
+  },
+  {
+    "Target": "frequencyshifter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\frequencyshifter.dll"
+  },
+  {
+    "Target": "granularpitchshifter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\granularpitchshifter.dll"
+  },
+  {
+    "Target": "hydrogenimport",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\hydrogenimport.dll"
+  },
+  {
+    "Target": "ladspabrowser",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspabrowser.dll"
+  },
+  {
+    "Target": "ladspaeffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspaeffect.dll"
+  },
+  {
+    "Target": "caps",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\caps.dll"
+  },
+  {
+    "Target": "tap_autopan",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_autopan.dll"
+  },
+  {
+    "Target": "tap_chorusflanger",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_chorusflanger.dll"
+  },
+  {
+    "Target": "tap_deesser",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_deesser.dll"
+  },
+  {
+    "Target": "tap_doubler",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_doubler.dll"
+  },
+  {
+    "Target": "tap_dynamics_m",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_m.dll"
+  },
+  {
+    "Target": "tap_dynamics_st",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_st.dll"
+  },
+  {
+    "Target": "tap_echo",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_echo.dll"
+  },
+  {
+    "Target": "tap_eq",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eq.dll"
+  },
+  {
+    "Target": "tap_eqbw",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eqbw.dll"
+  },
+  {
+    "Target": "tap_limiter",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_limiter.dll"
+  },
+  {
+    "Target": "tap_pinknoise",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pinknoise.dll"
+  },
+  {
+    "Target": "tap_pitch",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pitch.dll"
+  },
+  {
+    "Target": "tap_reflector",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reflector.dll"
+  },
+  {
+    "Target": "tap_reverb",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reverb.dll"
+  },
+  {
+    "Target": "tap_rotspeak",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_rotspeak.dll"
+  },
+  {
+    "Target": "tap_sigmoid",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_sigmoid.dll"
+  },
+  {
+    "Target": "tap_tremolo",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tremolo.dll"
+  },
+  {
+    "Target": "tap_tubewarmth",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tubewarmth.dll"
+  },
+  {
+    "Target": "tap_vibrato",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_vibrato.dll"
+  },
+  {
+    "Target": "cmt",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\cmt.dll"
+  },
+  {
+    "Target": "veal",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\veal.dll"
+  },
+  {
+    "Target": "lomm",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lomm.dll"
+  },
+  {
+    "Target": "lv2effect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2effect.dll"
+  },
+  {
+    "Target": "lv2instrument",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lv2instrument.dll"
+  },
+  {
+    "Target": "lb302",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\lb302.dll"
+  },
+  {
+    "Target": "midiimport",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\midiimport.dll"
+  },
+  {
+    "Target": "midiexport",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\midiexport.dll"
+  },
+  {
+    "Target": "multitapecho",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\multitapecho.dll"
+  },
+  {
+    "Target": "monstro",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\monstro.dll"
+  },
+  {
+    "Target": "nes",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\nes.dll"
+  },
+  {
+    "Target": "opulenz",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\opulenz.dll"
+  },
+  {
+    "Target": "organic",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\organic.dll"
+  },
+  {
+    "Target": "oscilloscope",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\oscilloscope.dll"
+  },
+  {
+    "Target": "freeboy",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\freeboy.dll"
+  },
+  {
+    "Target": "patman",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\patman.dll"
+  },
+  {
+    "Target": "peakcontrollereffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\peakcontrollereffect.dll"
+  },
+  {
+    "Target": "reverbsc",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\reverbsc.dll"
+  },
+  {
+    "Target": "sf2player",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sf2player.dll"
+  },
+  {
+    "Target": "sfxr",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\sfxr.dll"
+  },
+  {
+    "Target": "slewdistortion",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slewdistortion.dll"
+  },
+  {
+    "Target": "slicert",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\slicert.dll"
+  },
+  {
+    "Target": "analyzer",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\analyzer.dll"
+  },
+  {
+    "Target": "stereoenhancer",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereoenhancer.dll"
+  },
+  {
+    "Target": "stereomatrix",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\stereomatrix.dll"
+  },
+  {
+    "Target": "malletsstk",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\malletsstk.dll"
+  },
+  {
+    "Target": "taptempo",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\taptempo.dll"
+  },
+  {
+    "Target": "vstbase",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vstbase.dll"
+  },
+  {
+    "Target": "vestige",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vestige.dll"
+  },
+  {
+    "Target": "vsteffect",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vsteffect.dll"
+  },
+  {
+    "Target": "watsyn",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\watsyn.dll"
+  },
+  {
+    "Target": "waveshaper",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\waveshaper.dll"
+  },
+  {
+    "Target": "vectorscope",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vectorscope.dll"
+  },
+  {
+    "Target": "vibedstrings",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\vibedstrings.dll"
+  },
+  {
+    "Target": "xpressive",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\xpressive.dll"
+  },
+  {
+    "Target": "zynaddsubfx",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\zynaddsubfx.dll"
+  },
+  {
+    "Target": "SVSDiffSinger",
+    "Path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSDiffSinger\\SVSDiffSinger.dll"
+  }
+]

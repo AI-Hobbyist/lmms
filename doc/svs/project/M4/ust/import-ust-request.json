@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "ust",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\ust\\export-ust\\工程_日本語_한국어.ust",
+  "options": {
+    "import_pitch": true,
+    "encoding": "utf-8"
+  },
+  "protocol": 1,
+  "requestId": "e56ec37b69e64c539827c5af8026770d"
+}

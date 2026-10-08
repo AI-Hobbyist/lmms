@@ -1,0 +1,16 @@
+{
+  "operation": "importProject",
+  "formatId": "vpr",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vpr\\export\\多伴奏工程.vpr",
+  "options": {
+    "extract_audio": true,
+    "import_strength": true,
+    "import_gender": true,
+    "import_breath": true,
+    "import_volume": true,
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "3deb59d84691404bbd8fc5a7b76b660f"
+}

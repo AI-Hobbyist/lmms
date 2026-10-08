@@ -1,0 +1,14 @@
+{
+  "operation": "importProject",
+  "formatId": "ustx",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ustx\\export\\多伴奏工程.ustx",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "plus_handling_mode": "auto",
+    "breath_lyrics": "Asp AP",
+    "silence_lyrics": "R SP"
+  },
+  "protocol": 1,
+  "requestId": "ae32e5e75dc04a2e8310554a6d18b76e"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "loguru",
+  "wheel": {
+    "file": "loguru-0.7.3-py3-none-any.whl",
+    "sha256": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c"
+  },
+  "directory": "loguru-0.7.3.dist-info",
+  "files": [],
+  "status": "upstream-notice-preserved",
+  "upstream": {
+    "Repo": "Delgan/loguru",
+    "Ref": "0.7.3",
+    "Spdx": "MIT",
+    "GitBlob": "5285f420ff222526f9afa7acf507362367132f9c",
+    "Url": "https://github.com/Delgan/loguru/blob/0.7.3/LICENSE"
+  }
+}

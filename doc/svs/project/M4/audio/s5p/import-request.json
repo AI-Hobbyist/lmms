@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "s5p",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\s5p\\export\\多伴奏工程.s5p",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "ef5debb567584d81842e235e28b223ee"
+}

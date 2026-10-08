@@ -69,6 +69,9 @@ def main():
                 target = licenses / dist.name / source.relative_to(dist)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, target)
+    supplement = ROOT / "tools/svs-project/licenses"
+    if supplement.exists():
+        shutil.copytree(supplement, licenses, dirs_exist_ok=True)
     lock = {"python": VERSION, "pythonArchiveSha256": hashlib.sha256(archive.read_bytes()).hexdigest(), "wheels": [{"file": p.name, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(CACHE.glob("*.whl"))]}
     (ROOT / "doc/svs/project/runtime-lock.json").write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
     for source in (ROOT / "doc/svs/project/formats.json", ROOT / "doc/svs/project/export-policy.json", ROOT / "doc/svs/project/runtime-lock.json", ROOT / "tools/svs-project/bridge.py"):

@@ -1,0 +1,12 @@
+{
+  "operation": "importProject",
+  "formatId": "dspx",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\dspx\\export-dspx\\工程_日本語_한국어.dspx",
+  "options": {
+    "import_pitch": true,
+    "pitch_import_mode": "edited-and-original",
+    "vibrato_import_mode": "preserve"
+  },
+  "protocol": 1,
+  "requestId": "0140bf7e9b4f4d81b2e0516c4c685d8b"
+}

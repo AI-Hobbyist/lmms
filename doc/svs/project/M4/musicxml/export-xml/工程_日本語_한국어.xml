@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <encoding>
+      <software>LibreSVIP</software>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>歌声_日本語_한국어_1</part-name>
+    </score-part>
+    <score-part id="P2">
+      <part-name>歌声_日本語_한국어_2</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>960</divisions>
+      <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>2</voice>
+        <notations />
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>你</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>2</voice>
+        <notations />
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>好</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>2</voice>
+        <notations />
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>天</text>
+        </lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <metronome>
+            <beat-unit>quarter</beat-unit>
+            <per-minute>120.0</per-minute>
+          </metronome>
+        </direction-type>
+      <offset>-3840</offset><sound tempo="120.0" /></direction>
+      <direction>
+        <direction-type>
+          <metronome>
+            <beat-unit>quarter</beat-unit>
+            <per-minute>150.0</per-minute>
+          </metronome>
+        </direction-type>
+      <offset>-960</offset><sound tempo="150.0" /></direction>
+      </measure>
+    <measure number="2">
+      <attributes>
+        <divisions>960</divisions>
+      </attributes>
+    <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>2</voice>
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>气</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>2400</duration>
+      </note>
+      </measure>
+  </part>
+  <part id="P2">
+    <measure number="1">
+      <attributes>
+        <divisions>960</divisions>
+      <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <rest />
+        <duration>240</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>3</voice>
+        <notations />
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>你</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>3</voice>
+        <notations />
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>好</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <tie type="start" />
+        <duration>720</duration>
+        <voice>3</voice>
+        <notations>
+          <tied type="start" />
+        </notations>
+        <lyric>
+          <syllabic>begin</syllabic>
+          <text>天</text>
+        </lyric>
+      </note>
+      </measure>
+    <measure number="2">
+      <attributes>
+        <divisions>960</divisions>
+      </attributes>
+    <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <tie type="stop" />
+        <duration>240</duration>
+        <voice>3</voice>
+        <notations>
+          <tied type="stop" />
+        </notations>
+        <lyric>
+          <syllabic>end</syllabic>
+          <text>天</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>480</duration>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>960</duration>
+        <voice>3</voice>
+        <lyric>
+          <syllabic>single</syllabic>
+          <text>气</text>
+        </lyric>
+      </note>
+      <note>
+        <rest />
+        <duration>2160</duration>
+      </note>
+      </measure>
+  </part>
+</score-partwise>

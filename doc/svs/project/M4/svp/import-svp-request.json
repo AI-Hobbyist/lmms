@@ -1,0 +1,19 @@
+{
+  "operation": "importProject",
+  "formatId": "svp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\svp\\export-svp\\工程_日本語_한국어.svp",
+  "options": {
+    "import_volume": true,
+    "import_strength": true,
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "import_gender": true,
+    "import_breath": true,
+    "instant": true,
+    "pitch": "full",
+    "breath": "convert",
+    "group": "split"
+  },
+  "protocol": 1,
+  "requestId": "61485b36b4b440fd988f7a43615069b3"
+}

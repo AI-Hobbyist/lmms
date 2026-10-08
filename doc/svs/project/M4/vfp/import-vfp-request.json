@@ -1,0 +1,12 @@
+{
+  "operation": "importProject",
+  "formatId": "vfp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\vfp\\export-vfp\\工程_日本語_한국어.vfp",
+  "options": {
+    "extract_audio": true,
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "f0c800364b2640b6b0d786ae469d2281"
+}

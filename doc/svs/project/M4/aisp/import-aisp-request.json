@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "aisp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\aisp\\export-aisp\\工程_日本語_한국어.aisp",
+  "options": {
+    "import_instrumental_track": true,
+    "import_pitch": true
+  },
+  "protocol": 1,
+  "requestId": "9aa9bf49f1884410a26276f74a245fef"
+}

@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "ds",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\ds\\export-ds\\工程_日本語_한국어.ds",
+  "options": {
+    "tempo": 120.0,
+    "import_pitch": true
+  },
+  "protocol": 1,
+  "requestId": "18c111e6b4d64e5dabbc22b4cb6e6d7f"
+}

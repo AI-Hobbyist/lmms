@@ -1,0 +1,13 @@
+{
+  "operation": "importProject",
+  "formatId": "ace",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\ace\\export-ace\\工程_日本語_한국어.ace",
+  "options": {
+    "import_strength": true,
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "bpm_source": "automatic"
+  },
+  "protocol": 1,
+  "requestId": "fbb730efcb234e8aab29cfc1c6da11de"
+}

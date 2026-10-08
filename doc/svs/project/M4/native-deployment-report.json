@@ -1,0 +1,16 @@
+{
+  "executable": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\lmms.exe",
+  "platform": "windows",
+  "title": "未标题 - LMMS 1.3.0-alpha.2.100+d4541d3",
+  "window": 30347192,
+  "size": [
+    1280,
+    800
+  ],
+  "exitCode": 0,
+  "screenshot": "deployed-native-main.png",
+  "log": [
+    "Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.",
+    "SVS: SVSExample engine initialized"
+  ]
+}

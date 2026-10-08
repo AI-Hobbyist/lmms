@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scenario Code="7251BC4B6168E7B2992FA620BD3E1E77">
+  <Generation>
+    <Author Version="3.2.21.2"/>
+    <TTS Version="3.1.0">
+      <Dictionary Version="1.0.0"/>
+      <SoundSources/>
+    </TTS>
+    <SVSS Version="3.0.5">
+      <Dictionary Version="1.0.0"/>
+      <SoundSources>
+        <SoundSource Version="1.0.0" Id="A" Name="さとうささら"/>
+      </SoundSources>
+    </SVSS>
+  </Generation>
+  <Sequence Id="">
+    <Scene Id="">
+      <Units>
+        <Unit Version="1.0" Id="" Group="64cc90bd-39f0-4ef8-984b-b2aa17ea2215" StartTime="00:00:00" Duration="00:00:02.500" Category="SingerSong" CastId="A" Language="Japanese">
+          <Song Version="1.02">
+            <Tempo>
+              <Sound Clock="0" Tempo="120.0"/>
+              <Sound Clock="2880" Tempo="150.0"/>
+            </Tempo>
+            <Beat>
+              <Time Clock="0" Beats="4" BeatType="4"/>
+            </Beat>
+            <Score>
+              <Note Clock="0" PitchStep="0" PitchOctave="4" Duration="960" Lyric="你" Phonetic="ni"/>
+              <Note Clock="1440" PitchStep="2" PitchOctave="4" Duration="960" Lyric="好" Phonetic="hao"/>
+              <Note Clock="2880" PitchStep="4" PitchOctave="4" Duration="960" Lyric="天" Phonetic="tian"/>
+              <Note Clock="4320" PitchStep="5" PitchOctave="4" Duration="960" Lyric="气" Phonetic="qi"/>
+            </Score>
+            <Parameter>
+              <LogF0 Length="1000">
+                <Data Index="0" Repeat="2">5.566914341492348</Data>
+                <Data Repeat="2">5.574423435948414</Data>
+                <Data Index="4" Repeat="2">5.57846679450168</Data>
+                <Data Repeat="2">5.57673392655028</Data>
+                <Data Index="8" Repeat="2">5.572112945346547</Data>
+                <Data Repeat="2">5.567491964142814</Data>
+                <Data Index="12" Repeat="3">5.565759096191415</Data>
+                <Data Repeat="2">5.569802454744681</Data>
+                <Data Index="17" Repeat="2">5.577311549200747</Data>
+                <Data Repeat="2">5.584243021006347</Data>
+                <Data Index="21" Repeat="2">5.587708756909146</Data>
+                <Data Repeat="2">5.586553511608213</Data>
+                <Data Index="25" Repeat="2">5.581354907754013</Data>
+                <Data Repeat="2">5.576156303899814</Data>
+                <Data Index="29" Repeat="2">5.574423435948414</Data>
+                <Data Repeat="2">5.577311549200747</Data>
+                <Data Index="33" Repeat="2">5.584243021006347</Data>
+                <Data Repeat="3">5.5911744928119465</Data>
+                <Data Index="38" Repeat="2">5.594062606064279</Data>
+                <Data Repeat="2">5.592329738112879</Data>
+                <Data Index="42" Repeat="2">5.586553511608213</Data>
+                <Data Repeat="2">5.580777285103546</Data>
+                <Data Index="46" Repeat="2">5.57846679450168</Data>
+                <Data Repeat="2">5.580777285103546</Data>
+                <Data Index="50" Repeat="2">5.58713113425868</Data>
+                <Data Repeat="2">5.593484983413813</Data>
+                <Data Index="54" Repeat="2">5.595795474015679</Data>
+                <Data Repeat="2">5.592907360763346</Data>
+                <Data Index="58" Repeat="2">5.586553511608213</Data>
+                <Data Repeat="2">5.58019966245308</Data>
+                <Data Index="62" Repeat="3">5.57673392655028</Data>
+                <Data Repeat="2">5.579044417152147</Data>
+                <Data Index="67" Repeat="2">5.584243021006347</Data>
+                <Data Repeat="2">5.590019247511012</Data>
+                <Data Index="71" Repeat="2">5.591752115462413</Data>
+                <Data Repeat="2">5.588286379559612</Data>
+                <Data Index="75" Repeat="2">5.581354907754013</Data>
+                <Data Repeat="2">5.573845813297948</Data>
+                <Data Index="79" Repeat="2">5.570380077395148</Data>
+                <Data Repeat="2">5.572112945346547</Data>
+                <Data Index="83" Repeat="2">5.577311549200747</Data>
+                <Data Repeat="3">5.58193253040448</Data>
+                <Data Index="88" Repeat="2">5.583087775705414</Data>
+                <Data Repeat="2">5.579622039802613</Data>
+                <Data Index="92" Repeat="2">5.572112945346547</Data>
+                <Data Repeat="2">5.564603850890482</Data>
+                <Data Index="96" Repeat="2">5.561138114987681</Data>
+                <Data Repeat="2">5.562293360288615</Data>
+                <Data Index="150" Repeat="2">5.682438871585672</Data>
+                <Data Repeat="2">5.689947966041738</Data>
+                <Data Index="154" Repeat="2">5.693991324595005</Data>
+                <Data Repeat="2">5.6922584566436045</Data>
+                <Data Index="158" Repeat="2">5.687637475439872</Data>
+                <Data Repeat="2">5.6830164942361385</Data>
+                <Data Index="162" Repeat="3">5.681283626284738</Data>
+                <Data Repeat="2">5.685326984838005</Data>
+                <Data Index="167" Repeat="2">5.6928360792940715</Data>
+                <Data Repeat="2">5.69976755109967</Data>
+                <Data Index="171" Repeat="2">5.703233287002471</Data>
+                <Data Repeat="2">5.7020780417015375</Data>
+                <Data Index="175" Repeat="2">5.696879437847337</Data>
+                <Data Repeat="2">5.6916808339931375</Data>
+                <Data Index="179" Repeat="2">5.689947966041738</Data>
+                <Data Repeat="2">5.6928360792940715</Data>
+                <Data Index="183" Repeat="2">5.69976755109967</Data>
+                <Data Repeat="3">5.70669902290527</Data>
+                <Data Index="188" Repeat="2">5.709587136157603</Data>
+                <Data Repeat="2">5.707854268206203</Data>
+                <Data Index="192" Repeat="2">5.7020780417015375</Data>
+                <Data Repeat="2">5.696301815196871</Data>
+                <Data Index="196" Repeat="2">5.693991324595005</Data>
+                <Data Repeat="2">5.696301815196871</Data>
+                <Data Index="200" Repeat="2">5.702655664352004</Data>
+                <Data Repeat="2">5.709009513507136</Data>
+                <Data Index="204" Repeat="2">5.711320004109003</Data>
+                <Data Repeat="2">5.70843189085667</Data>
+                <Data Index="208" Repeat="2">5.7020780417015375</Data>
+                <Data Repeat="2">5.695724192546404</Data>
+                <Data Index="212" Repeat="3">5.6922584566436045</Data>
+                <Data Repeat="2">5.694568947245471</Data>
+                <Data Index="217" Repeat="2">5.69976755109967</Data>
+                <Data Repeat="2">5.705543777604337</Data>
+                <Data Index="221" Repeat="2">5.707276645555737</Data>
+                <Data Repeat="2">5.703810909652937</Data>
+                <Data Index="225" Repeat="2">5.696879437847337</Data>
+                <Data Repeat="2">5.689370343391271</Data>
+                <Data Index="229" Repeat="2">5.685904607488472</Data>
+                <Data Repeat="2">5.687637475439872</Data>
+                <Data Index="233" Repeat="2">5.6928360792940715</Data>
+                <Data Repeat="3">5.697457060497804</Data>
+                <Data Index="238" Repeat="2">5.698612305798737</Data>
+                <Data Repeat="2">5.695146569895938</Data>
+                <Data Index="242" Repeat="2">5.687637475439872</Data>
+                <Data Repeat="2">5.680128380983806</Data>
+                <Data Index="246" Repeat="2">5.676662645081006</Data>
+                <Data Repeat="2">5.677817890381939</Data>
+                <Data Index="300" Repeat="2">5.797963401678996</Data>
+                <Data>5.805472496135062</Data>
+                <Data Index="303" Repeat="2">5.809515854688329</Data>
+                <Data Repeat="2">5.807782986736929</Data>
+                <Data Index="307">5.803162005533196</Data>
+                <Data Repeat="2">5.798541024329463</Data>
+                <Data Index="310" Repeat="2">5.796808156378063</Data>
+                <Data>5.800851514931329</Data>
+                <Data Index="313" Repeat="2">5.808360609387396</Data>
+                <Data Repeat="2">5.815292081192995</Data>
+                <Data Index="317">5.818757817095794</Data>
+                <Data Repeat="2">5.817602571794861</Data>
+                <Data Index="320" Repeat="2">5.812403967940662</Data>
+                <Data>5.807205364086462</Data>
+                <Data Index="323" Repeat="2">5.805472496135062</Data>
+                <Data Repeat="2">5.808360609387396</Data>
+                <Data Index="327">5.815292081192995</Data>
+                <Data Repeat="2">5.822223552998595</Data>
+                <Data Index="330" Repeat="2">5.825111666250928</Data>
+                <Data>5.823378798299528</Data>
+                <Data Index="333" Repeat="2">5.817602571794861</Data>
+                <Data Repeat="2">5.811826345290195</Data>
+                <Data Index="337">5.809515854688329</Data>
+                <Data Repeat="2">5.811826345290195</Data>
+                <Data Index="340" Repeat="2">5.818180194445327</Data>
+                <Data>5.824534043600461</Data>
+                <Data Index="343" Repeat="2">5.826844534202327</Data>
+                <Data Repeat="2">5.823956420949995</Data>
+                <Data Index="347">5.817602571794861</Data>
+                <Data Repeat="2">5.8112487226397285</Data>
+                <Data Index="350" Repeat="2">5.807782986736929</Data>
+                <Data>5.810093477338795</Data>
+                <Data Index="353" Repeat="2">5.815292081192995</Data>
+                <Data Repeat="2">5.8210683076976615</Data>
+                <Data Index="357">5.822801175649062</Data>
+                <Data Repeat="2">5.819335439746261</Data>
+                <Data Index="360" Repeat="2">5.812403967940662</Data>
+                <Data>5.804894873484596</Data>
+                <Data Index="363" Repeat="2">5.801429137581796</Data>
+                <Data Repeat="2">5.803162005533196</Data>
+                <Data Index="367">5.808360609387396</Data>
+                <Data Repeat="2">5.812981590591129</Data>
+                <Data Index="370" Repeat="2">5.814136835892062</Data>
+                <Data>5.8106710999892615</Data>
+                <Data Index="373" Repeat="2">5.803162005533196</Data>
+                <Data Repeat="2">5.79565291107713</Data>
+                <Data Index="377">5.79218717517433</Data>
+                <Data Repeat="2">5.7933424204752635</Data>
+                <Data Index="420" Repeat="2">5.855725666725658</Data>
+                <Data>5.863234761181724</Data>
+                <Data Index="423" Repeat="2">5.867278119734991</Data>
+                <Data Repeat="2">5.865545251783591</Data>
+                <Data Index="427">5.860924270579859</Data>
+                <Data Repeat="2">5.856303289376125</Data>
+                <Data Index="430" Repeat="2">5.854570421424725</Data>
+                <Data>5.858613779977992</Data>
+                <Data Index="433" Repeat="2">5.866122874434058</Data>
+                <Data Repeat="2">5.873054346239657</Data>
+                <Data Index="437">5.876520082142457</Data>
+                <Data Repeat="2">5.875364836841523</Data>
+                <Data Index="440" Repeat="2">5.870166232987324</Data>
+                <Data>5.864967629133124</Data>
+                <Data Index="443" Repeat="2">5.863234761181724</Data>
+                <Data Repeat="2">5.866122874434058</Data>
+                <Data Index="447">5.873054346239657</Data>
+                <Data Repeat="2">5.879985818045257</Data>
+                <Data Index="450" Repeat="2">5.882873931297589</Data>
+                <Data>5.881141063346189</Data>
+                <Data Index="453" Repeat="2">5.875364836841523</Data>
+                <Data Repeat="2">5.869588610336857</Data>
+                <Data Index="457">5.867278119734991</Data>
+                <Data Repeat="2">5.869588610336857</Data>
+                <Data Index="460" Repeat="2">5.87594245949199</Data>
+                <Data>5.882296308647122</Data>
+                <Data Index="463" Repeat="2">5.884606799248989</Data>
+                <Data Repeat="2">5.881718685996656</Data>
+                <Data Index="467">5.875364836841523</Data>
+                <Data Repeat="2">5.869010987686391</Data>
+                <Data Index="470" Repeat="2">5.865545251783591</Data>
+                <Data>5.867855742385458</Data>
+                <Data Index="473" Repeat="2">5.873054346239657</Data>
+                <Data Repeat="2">5.878830572744324</Data>
+                <Data Index="477">5.880563440695723</Data>
+                <Data Repeat="2">5.877097704792924</Data>
+                <Data Index="480" Repeat="2">5.870166232987324</Data>
+                <Data>5.862657138531258</Data>
+                <Data Index="483" Repeat="2">5.859191402628459</Data>
+                <Data Repeat="2">5.860924270579859</Data>
+                <Data Index="487">5.866122874434058</Data>
+                <Data Repeat="2">5.870743855637791</Data>
+                <Data Index="490" Repeat="2">5.871899100938724</Data>
+                <Data>5.868433365035924</Data>
+                <Data Index="493" Repeat="2">5.860924270579859</Data>
+                <Data Repeat="2">5.853415176123791</Data>
+                <Data Index="497">5.849949440220993</Data>
+                <Data Repeat="2">5.851104685521926</Data>
+              </LogF0>
+            </Parameter>
+          </Song>
+        </Unit>
+        <Unit Version="1.0" Id="" Group="5cf02c97-e720-46d6-a42b-2d000dd2a373" StartTime="00:00:00" Duration="00:00:02.600" Category="SingerSong" CastId="A" Language="Japanese">
+          <Song Version="1.02">
+            <Tempo>
+              <Sound Clock="0" Tempo="120.0"/>
+              <Sound Clock="2880" Tempo="150.0"/>
+            </Tempo>
+            <Beat>
+              <Time Clock="0" Beats="4" BeatType="4"/>
+            </Beat>
+            <Score>
+              <Note Clock="240" PitchStep="0" PitchOctave="4" Duration="960" Lyric="你" Phonetic="ni"/>
+              <Note Clock="1680" PitchStep="2" PitchOctave="4" Duration="960" Lyric="好" Phonetic="hao"/>
+              <Note Clock="3120" PitchStep="4" PitchOctave="4" Duration="960" Lyric="天" Phonetic="tian"/>
+              <Note Clock="4560" PitchStep="5" PitchOctave="4" Duration="960" Lyric="气" Phonetic="qi"/>
+            </Score>
+            <Parameter>
+              <LogF0 Length="1020">
+                <Data Index="25" Repeat="2">5.566914341492348</Data>
+                <Data Repeat="2">5.574423435948414</Data>
+                <Data Index="29" Repeat="2">5.57846679450168</Data>
+                <Data Repeat="2">5.57673392655028</Data>
+                <Data Index="33" Repeat="2">5.572112945346547</Data>
+                <Data Repeat="3">5.567491964142814</Data>
+                <Data Index="38" Repeat="2">5.565759096191415</Data>
+                <Data Repeat="2">5.569802454744681</Data>
+                <Data Index="42" Repeat="2">5.577311549200747</Data>
+                <Data Repeat="2">5.584243021006347</Data>
+                <Data Index="46" Repeat="2">5.587708756909146</Data>
+                <Data Repeat="2">5.586553511608213</Data>
+                <Data Index="50" Repeat="2">5.581354907754013</Data>
+                <Data Repeat="2">5.576156303899814</Data>
+                <Data Index="54" Repeat="2">5.574423435948414</Data>
+                <Data Repeat="2">5.577311549200747</Data>
+                <Data Index="58" Repeat="2">5.584243021006347</Data>
+                <Data Repeat="2">5.5911744928119465</Data>
+                <Data Index="62" Repeat="3">5.594062606064279</Data>
+                <Data Repeat="2">5.592329738112879</Data>
+                <Data Index="67" Repeat="2">5.586553511608213</Data>
+                <Data Repeat="2">5.580777285103546</Data>
+                <Data Index="71" Repeat="2">5.57846679450168</Data>
+                <Data Repeat="2">5.580777285103546</Data>
+                <Data Index="75" Repeat="2">5.58713113425868</Data>
+                <Data Repeat="2">5.593484983413813</Data>
+                <Data Index="79" Repeat="2">5.595795474015679</Data>
+                <Data Repeat="2">5.592907360763346</Data>
+                <Data Index="83" Repeat="2">5.586553511608213</Data>
+                <Data Repeat="3">5.58019966245308</Data>
+                <Data Index="88" Repeat="2">5.57673392655028</Data>
+                <Data Repeat="2">5.579044417152147</Data>
+                <Data Index="92" Repeat="2">5.584243021006347</Data>
+                <Data Repeat="2">5.590019247511012</Data>
+                <Data Index="96" Repeat="2">5.591752115462413</Data>
+                <Data Repeat="2">5.588286379559612</Data>
+                <Data Index="100" Repeat="2">5.581354907754013</Data>
+                <Data Repeat="2">5.573845813297948</Data>
+                <Data Index="104" Repeat="2">5.570380077395148</Data>
+                <Data Repeat="2">5.572112945346547</Data>
+                <Data Index="108" Repeat="2">5.577311549200747</Data>
+                <Data Repeat="2">5.58193253040448</Data>
+                <Data Index="112" Repeat="3">5.583087775705414</Data>
+                <Data Repeat="2">5.579622039802613</Data>
+                <Data Index="117" Repeat="2">5.572112945346547</Data>
+                <Data Repeat="2">5.564603850890482</Data>
+                <Data Index="121" Repeat="2">5.561138114987681</Data>
+                <Data Repeat="2">5.562293360288615</Data>
+                <Data Index="175" Repeat="2">5.682438871585672</Data>
+                <Data Repeat="2">5.689947966041738</Data>
+                <Data Index="179" Repeat="2">5.693991324595005</Data>
+                <Data Repeat="2">5.6922584566436045</Data>
+                <Data Index="183" Repeat="2">5.687637475439872</Data>
+                <Data Repeat="3">5.6830164942361385</Data>
+                <Data Index="188" Repeat="2">5.681283626284738</Data>
+                <Data Repeat="2">5.685326984838005</Data>
+                <Data Index="192" Repeat="2">5.6928360792940715</Data>
+                <Data Repeat="2">5.69976755109967</Data>
+                <Data Index="196" Repeat="2">5.703233287002471</Data>
+                <Data Repeat="2">5.7020780417015375</Data>
+                <Data Index="200" Repeat="2">5.696879437847337</Data>
+                <Data Repeat="2">5.6916808339931375</Data>
+                <Data Index="204" Repeat="2">5.689947966041738</Data>
+                <Data Repeat="2">5.6928360792940715</Data>
+                <Data Index="208" Repeat="2">5.69976755109967</Data>
+                <Data Repeat="2">5.70669902290527</Data>
+                <Data Index="212" Repeat="3">5.709587136157603</Data>
+                <Data Repeat="2">5.707854268206203</Data>
+                <Data Index="217" Repeat="2">5.7020780417015375</Data>
+                <Data Repeat="2">5.696301815196871</Data>
+                <Data Index="221" Repeat="2">5.693991324595005</Data>
+                <Data Repeat="2">5.696301815196871</Data>
+                <Data Index="225" Repeat="2">5.702655664352004</Data>
+                <Data Repeat="2">5.709009513507136</Data>
+                <Data Index="229" Repeat="2">5.711320004109003</Data>
+                <Data Repeat="2">5.70843189085667</Data>
+                <Data Index="233" Repeat="2">5.7020780417015375</Data>
+                <Data Repeat="3">5.695724192546404</Data>
+                <Data Index="238" Repeat="2">5.6922584566436045</Data>
+                <Data Repeat="2">5.694568947245471</Data>
+                <Data Index="242" Repeat="2">5.69976755109967</Data>
+                <Data Repeat="2">5.705543777604337</Data>
+                <Data Index="246" Repeat="2">5.707276645555737</Data>
+                <Data Repeat="2">5.703810909652937</Data>
+                <Data Index="250" Repeat="2">5.696879437847337</Data>
+                <Data Repeat="2">5.689370343391271</Data>
+                <Data Index="254" Repeat="2">5.685904607488472</Data>
+                <Data Repeat="2">5.687637475439872</Data>
+                <Data Index="258" Repeat="2">5.6928360792940715</Data>
+                <Data Repeat="2">5.697457060497804</Data>
+                <Data Index="262" Repeat="3">5.698612305798737</Data>
+                <Data Repeat="2">5.695146569895938</Data>
+                <Data Index="267" Repeat="2">5.687637475439872</Data>
+                <Data Repeat="2">5.680128380983806</Data>
+                <Data Index="271" Repeat="2">5.676662645081006</Data>
+                <Data Repeat="2">5.677817890381939</Data>
+                <Data Index="320" Repeat="2">5.797963401678996</Data>
+                <Data>5.805472496135062</Data>
+                <Data Index="323" Repeat="2">5.809515854688329</Data>
+                <Data Repeat="2">5.807782986736929</Data>
+                <Data Index="327">5.803162005533196</Data>
+                <Data Repeat="2">5.798541024329463</Data>
+                <Data Index="330" Repeat="2">5.796808156378063</Data>
+                <Data>5.800851514931329</Data>
+                <Data Index="333" Repeat="2">5.808360609387396</Data>
+                <Data Repeat="2">5.815292081192995</Data>
+                <Data Index="337">5.818757817095794</Data>
+                <Data Repeat="2">5.817602571794861</Data>
+                <Data Index="340" Repeat="2">5.812403967940662</Data>
+                <Data>5.807205364086462</Data>
+                <Data Index="343" Repeat="2">5.805472496135062</Data>
+                <Data Repeat="2">5.808360609387396</Data>
+                <Data Index="347">5.815292081192995</Data>
+                <Data Repeat="2">5.822223552998595</Data>
+                <Data Index="350" Repeat="2">5.825111666250928</Data>
+                <Data>5.823378798299528</Data>
+                <Data Index="353" Repeat="2">5.817602571794861</Data>
+                <Data Repeat="2">5.811826345290195</Data>
+                <Data Index="357">5.809515854688329</Data>
+                <Data Repeat="2">5.811826345290195</Data>
+                <Data Index="360" Repeat="2">5.818180194445327</Data>
+                <Data>5.824534043600461</Data>
+                <Data Index="363" Repeat="2">5.826844534202327</Data>
+                <Data Repeat="2">5.823956420949995</Data>
+                <Data Index="367">5.817602571794861</Data>
+                <Data Repeat="2">5.8112487226397285</Data>
+                <Data Index="370" Repeat="2">5.807782986736929</Data>
+                <Data>5.810093477338795</Data>
+                <Data Index="373" Repeat="2">5.815292081192995</Data>
+                <Data Repeat="2">5.8210683076976615</Data>
+                <Data Index="377">5.822801175649062</Data>
+                <Data Repeat="2">5.819335439746261</Data>
+                <Data Index="380" Repeat="2">5.812403967940662</Data>
+                <Data>5.804894873484596</Data>
+                <Data Index="383" Repeat="2">5.801429137581796</Data>
+                <Data Repeat="2">5.803162005533196</Data>
+                <Data Index="387">5.808360609387396</Data>
+                <Data Repeat="2">5.812981590591129</Data>
+                <Data Index="390" Repeat="2">5.814136835892062</Data>
+                <Data>5.8106710999892615</Data>
+                <Data Index="393" Repeat="2">5.803162005533196</Data>
+                <Data Repeat="2">5.79565291107713</Data>
+                <Data Index="397">5.79218717517433</Data>
+                <Data Repeat="2">5.7933424204752635</Data>
+                <Data Index="440" Repeat="2">5.855725666725658</Data>
+                <Data>5.863234761181724</Data>
+                <Data Index="443" Repeat="2">5.867278119734991</Data>
+                <Data Repeat="2">5.865545251783591</Data>
+                <Data Index="447">5.860924270579859</Data>
+                <Data Repeat="2">5.856303289376125</Data>
+                <Data Index="450" Repeat="2">5.854570421424725</Data>
+                <Data>5.858613779977992</Data>
+                <Data Index="453" Repeat="2">5.866122874434058</Data>
+                <Data Repeat="2">5.873054346239657</Data>
+                <Data Index="457">5.876520082142457</Data>
+                <Data Repeat="2">5.875364836841523</Data>
+                <Data Index="460" Repeat="2">5.870166232987324</Data>
+                <Data>5.864967629133124</Data>
+                <Data Index="463" Repeat="2">5.863234761181724</Data>
+                <Data Repeat="2">5.866122874434058</Data>
+                <Data Index="467">5.873054346239657</Data>
+                <Data Repeat="2">5.879985818045257</Data>
+                <Data Index="470" Repeat="2">5.882873931297589</Data>
+                <Data>5.881141063346189</Data>
+                <Data Index="473" Repeat="2">5.875364836841523</Data>
+                <Data Repeat="2">5.869588610336857</Data>
+                <Data Index="477">5.867278119734991</Data>
+                <Data Repeat="2">5.869588610336857</Data>
+                <Data Index="480" Repeat="2">5.87594245949199</Data>
+                <Data>5.882296308647122</Data>
+                <Data Index="483" Repeat="2">5.884606799248989</Data>
+                <Data Repeat="2">5.881718685996656</Data>
+                <Data Index="487">5.875364836841523</Data>
+                <Data Repeat="2">5.869010987686391</Data>
+                <Data Index="490" Repeat="2">5.865545251783591</Data>
+                <Data>5.867855742385458</Data>
+                <Data Index="493" Repeat="2">5.873054346239657</Data>
+                <Data Repeat="2">5.878830572744324</Data>
+                <Data Index="497">5.880563440695723</Data>
+                <Data Repeat="2">5.877097704792924</Data>
+                <Data Index="500" Repeat="2">5.870166232987324</Data>
+                <Data>5.862657138531258</Data>
+                <Data Index="503" Repeat="2">5.859191402628459</Data>
+                <Data Repeat="2">5.860924270579859</Data>
+                <Data Index="507">5.866122874434058</Data>
+                <Data Repeat="2">5.870743855637791</Data>
+                <Data Index="510" Repeat="2">5.871899100938724</Data>
+                <Data>5.868433365035924</Data>
+                <Data Index="513" Repeat="2">5.860924270579859</Data>
+                <Data Repeat="2">5.853415176123791</Data>
+                <Data Index="517">5.849949440220993</Data>
+                <Data Repeat="2">5.851104685521926</Data>
+              </LogF0>
+            </Parameter>
+          </Song>
+        </Unit>
+      </Units>
+      <Groups>
+        <Group Version="1.0" Id="64cc90bd-39f0-4ef8-984b-b2aa17ea2215" Category="SingerSong" Name="歌声_日本語_한국어_1" IsSolo="true" IsMuted="false" CastId="A" Language="Japanese"/>
+        <Group Version="1.0" Id="5cf02c97-e720-46d6-a42b-2d000dd2a373" Category="SingerSong" Name="歌声_日本語_한국어_2" IsSolo="false" IsMuted="true" CastId="A" Language="Japanese"/>
+      </Groups>
+      <SoundSetting Rhythm="4/4" Tempo="120.0"/>
+    </Scene>
+  </Sequence>
+</Scenario>

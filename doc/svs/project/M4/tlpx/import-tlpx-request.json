@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "tlpx",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\tlpx\\export-tlpx\\工程_日本語_한국어.tlpx",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "9677c14618e748dda3fe6a7e37061c21"
+}

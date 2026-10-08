@@ -1,0 +1,407 @@
+[
+  {
+    "Target": "audiofileprocessor",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\AudioFileProcessor\\audiofileprocessor.vcxproj"
+  },
+  {
+    "Target": "kicker",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Kicker\\kicker.vcxproj"
+  },
+  {
+    "Target": "tripleoscillator",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\TripleOscillator\\tripleoscillator.vcxproj"
+  },
+  {
+    "Target": "amplifier",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Amplifier\\amplifier.vcxproj"
+  },
+  {
+    "Target": "bassbooster",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\BassBooster\\bassbooster.vcxproj"
+  },
+  {
+    "Target": "bitinvader",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\BitInvader\\bitinvader.vcxproj"
+  },
+  {
+    "Target": "bitcrush",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Bitcrush\\bitcrush.vcxproj"
+  },
+  {
+    "Target": "carla_native-plugin",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\CarlaBase\\carla_native-plugin.vcxproj"
+  },
+  {
+    "Target": "carlabase",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\CarlaBase\\carlabase.vcxproj"
+  },
+  {
+    "Target": "carlapatchbay",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\CarlaPatchbay\\carlapatchbay.vcxproj"
+  },
+  {
+    "Target": "carlarack",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\CarlaRack\\carlarack.vcxproj"
+  },
+  {
+    "Target": "compressor",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Compressor\\compressor.vcxproj"
+  },
+  {
+    "Target": "crossovereq",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\CrossoverEQ\\crossovereq.vcxproj"
+  },
+  {
+    "Target": "delay",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Delay\\delay.vcxproj"
+  },
+  {
+    "Target": "dispersion",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Dispersion\\dispersion.vcxproj"
+  },
+  {
+    "Target": "dualfilter",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\DualFilter\\dualfilter.vcxproj"
+  },
+  {
+    "Target": "dynamicsprocessor",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\DynamicsProcessor\\dynamicsprocessor.vcxproj"
+  },
+  {
+    "Target": "eq",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Eq\\eq.vcxproj"
+  },
+  {
+    "Target": "flanger",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Flanger\\flanger.vcxproj"
+  },
+  {
+    "Target": "frequencyshifter",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\FrequencyShifter\\frequencyshifter.vcxproj"
+  },
+  {
+    "Target": "granularpitchshifter",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\GranularPitchShifter\\granularpitchshifter.vcxproj"
+  },
+  {
+    "Target": "hydrogenimport",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\HydrogenImport\\hydrogenimport.vcxproj"
+  },
+  {
+    "Target": "ladspabrowser",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaBrowser\\ladspabrowser.vcxproj"
+  },
+  {
+    "Target": "ladspaeffect",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\ladspaeffect.vcxproj"
+  },
+  {
+    "Target": "caps",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\caps\\caps.vcxproj"
+  },
+  {
+    "Target": "tap_autopan",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_autopan.vcxproj"
+  },
+  {
+    "Target": "tap_chorusflanger",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_chorusflanger.vcxproj"
+  },
+  {
+    "Target": "tap_deesser",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_deesser.vcxproj"
+  },
+  {
+    "Target": "tap_doubler",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_doubler.vcxproj"
+  },
+  {
+    "Target": "tap_dynamics_m",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_dynamics_m.vcxproj"
+  },
+  {
+    "Target": "tap_dynamics_st",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_dynamics_st.vcxproj"
+  },
+  {
+    "Target": "tap_echo",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_echo.vcxproj"
+  },
+  {
+    "Target": "tap_eq",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_eq.vcxproj"
+  },
+  {
+    "Target": "tap_eqbw",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_eqbw.vcxproj"
+  },
+  {
+    "Target": "tap_limiter",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_limiter.vcxproj"
+  },
+  {
+    "Target": "tap_pinknoise",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_pinknoise.vcxproj"
+  },
+  {
+    "Target": "tap_pitch",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_pitch.vcxproj"
+  },
+  {
+    "Target": "tap_reflector",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_reflector.vcxproj"
+  },
+  {
+    "Target": "tap_reverb",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_reverb.vcxproj"
+  },
+  {
+    "Target": "tap_rotspeak",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_rotspeak.vcxproj"
+  },
+  {
+    "Target": "tap_sigmoid",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_sigmoid.vcxproj"
+  },
+  {
+    "Target": "tap_tremolo",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_tremolo.vcxproj"
+  },
+  {
+    "Target": "tap_tubewarmth",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_tubewarmth.vcxproj"
+  },
+  {
+    "Target": "tap_vibrato",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\tap\\tap_vibrato.vcxproj"
+  },
+  {
+    "Target": "cmt",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\cmt\\cmt.vcxproj"
+  },
+  {
+    "Target": "veal",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LadspaEffect\\calf\\veal.vcxproj"
+  },
+  {
+    "Target": "lomm",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\LOMM\\lomm.vcxproj"
+  },
+  {
+    "Target": "lv2effect",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Lv2Effect\\lv2effect.vcxproj"
+  },
+  {
+    "Target": "lv2instrument",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Lv2Instrument\\lv2instrument.vcxproj"
+  },
+  {
+    "Target": "lb302",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Lb302\\lb302.vcxproj"
+  },
+  {
+    "Target": "midiimport",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\MidiImport\\midiimport.vcxproj"
+  },
+  {
+    "Target": "midiexport",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\MidiExport\\midiexport.vcxproj"
+  },
+  {
+    "Target": "multitapecho",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\MultitapEcho\\multitapecho.vcxproj"
+  },
+  {
+    "Target": "monstro",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Monstro\\monstro.vcxproj"
+  },
+  {
+    "Target": "nes",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Nes\\nes.vcxproj"
+  },
+  {
+    "Target": "opulenz",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\OpulenZ\\opulenz.vcxproj"
+  },
+  {
+    "Target": "organic",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Organic\\organic.vcxproj"
+  },
+  {
+    "Target": "oscilloscope",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Oscilloscope\\oscilloscope.vcxproj"
+  },
+  {
+    "Target": "freeboy",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\FreeBoy\\freeboy.vcxproj"
+  },
+  {
+    "Target": "patman",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Patman\\patman.vcxproj"
+  },
+  {
+    "Target": "peakcontrollereffect",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\PeakControllerEffect\\peakcontrollereffect.vcxproj"
+  },
+  {
+    "Target": "reverbsc",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ReverbSC\\reverbsc.vcxproj"
+  },
+  {
+    "Target": "sf2player",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Sf2Player\\sf2player.vcxproj"
+  },
+  {
+    "Target": "sfxr",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Sfxr\\sfxr.vcxproj"
+  },
+  {
+    "Target": "slewdistortion",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\SlewDistortion\\slewdistortion.vcxproj"
+  },
+  {
+    "Target": "slicert",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\SlicerT\\slicert.vcxproj"
+  },
+  {
+    "Target": "analyzer",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\SpectrumAnalyzer\\analyzer.vcxproj"
+  },
+  {
+    "Target": "stereoenhancer",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\StereoEnhancer\\stereoenhancer.vcxproj"
+  },
+  {
+    "Target": "stereomatrix",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\StereoMatrix\\stereomatrix.vcxproj"
+  },
+  {
+    "Target": "malletsstk",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Stk\\Mallets\\malletsstk.vcxproj"
+  },
+  {
+    "Target": "taptempo",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\TapTempo\\taptempo.vcxproj"
+  },
+  {
+    "Target": "vstbase",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\VstBase\\vstbase\\vstbase.vcxproj"
+  },
+  {
+    "Target": "vestige",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Vestige\\vestige.vcxproj"
+  },
+  {
+    "Target": "vsteffect",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\VstEffect\\vsteffect.vcxproj"
+  },
+  {
+    "Target": "watsyn",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Watsyn\\watsyn.vcxproj"
+  },
+  {
+    "Target": "waveshaper",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\WaveShaper\\waveshaper.vcxproj"
+  },
+  {
+    "Target": "vectorscope",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Vectorscope\\vectorscope.vcxproj"
+  },
+  {
+    "Target": "vibedstrings",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Vibed\\vibedstrings.vcxproj"
+  },
+  {
+    "Target": "xpressive",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\Xpressive\\xpressive.vcxproj"
+  },
+  {
+    "Target": "zynaddsubfx",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ZynAddSubFx\\zynaddsubfx.vcxproj"
+  },
+  {
+    "Target": "SVSDiffSinger",
+    "OutDir": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSDiffSinger\\",
+    "Project": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\SVSDiffSinger\\SVSDiffSinger.vcxproj"
+  }
+]

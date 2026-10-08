@@ -1,0 +1,12 @@
+{
+  "operation": "importProject",
+  "formatId": "musicxml",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\musicxml\\export-xml\\工程_日本語_한국어.xml",
+  "options": {
+    "import_tempo": true,
+    "import_dynamics": true,
+    "apply_fermata_stretch": true
+  },
+  "protocol": 1,
+  "requestId": "756cf8467888447598b05aa1382f4732"
+}

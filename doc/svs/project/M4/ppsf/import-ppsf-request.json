@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "ppsf",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\ppsf\\export-ppsf\\工程_日本語_한국어.ppsf",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "46a0394152fb47b1b3f96d92849a2ebb"
+}

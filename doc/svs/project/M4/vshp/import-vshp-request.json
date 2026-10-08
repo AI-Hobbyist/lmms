@@ -1,0 +1,15 @@
+{
+  "operation": "importProject",
+  "formatId": "vshp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\vshp\\原生样本_日本語_한국어.vshp",
+  "options": {
+    "wave_to_singing": true,
+    "use_edited_pitch": true,
+    "use_edited_dynamics": true,
+    "import_dynamics": false,
+    "import_formant": false,
+    "import_breath": false
+  },
+  "protocol": 1,
+  "requestId": "82c2ad09c8654113a9e1a296bd983b07"
+}

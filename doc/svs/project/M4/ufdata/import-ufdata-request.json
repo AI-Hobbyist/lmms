@@ -1,0 +1,10 @@
+{
+  "operation": "importProject",
+  "formatId": "ufdata",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\ufdata\\export-ufdata\\工程_日本語_한국어.ufdata",
+  "options": {
+    "import_pitch": true
+  },
+  "protocol": 1,
+  "requestId": "f7bb17a476e7405c957776ff7e973c3d"
+}

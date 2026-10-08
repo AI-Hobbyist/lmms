@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "ccs",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\ccs\\export\\多伴奏工程.ccs",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "6e64b5e997b54ed9a131081639b560c9"
+}

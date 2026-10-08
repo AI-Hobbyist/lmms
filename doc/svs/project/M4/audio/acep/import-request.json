@@ -1,0 +1,21 @@
+{
+  "operation": "importProject",
+  "formatId": "acep",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\acep\\export\\多伴奏工程.acep",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "import_gender": true,
+    "import_breath": true,
+    "keep_all_pronunciation": false,
+    "import_tension": true,
+    "import_energy": true,
+    "energy_coefficient": 0.5,
+    "curve_sample_interval": 5,
+    "breath_normalization": "none,0,10,0,0",
+    "tension_normalization": "none,0,10,0,0",
+    "energy_normalization": "none,0,10,0,0"
+  },
+  "protocol": 1,
+  "requestId": "a5eed35e3f7c4ec19d3c881922bf516a"
+}

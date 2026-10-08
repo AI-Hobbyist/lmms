@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "mtp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\mtp\\export\\多伴奏工程.mtp",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "ba0ff0da8a3944c0805ad8145c8a0597"
+}

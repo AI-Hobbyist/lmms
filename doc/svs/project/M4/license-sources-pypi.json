@@ -1,0 +1,44 @@
+[
+  {
+    "Name": "ko-pron",
+    "Version": "1.3",
+    "Sdist": null,
+    "License": "MIT",
+    "Project": "null"
+  },
+  {
+    "Name": "loguru",
+    "Version": "0.7.3",
+    "Sdist": "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz",
+    "License": null,
+    "Project": "{\"Changelog\":\"https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst\",\"Documentation\":\"https://loguru.readthedocs.io/en/stable/index.html\",\"Homepage\":\"https://github.com/Delgan/loguru\"}"
+  },
+  {
+    "Name": "protobuf-py-ext",
+    "Version": "0.6.0",
+    "Sdist": "https://files.pythonhosted.org/packages/b4/6c/a1f6a1a50dfc3f14ddb9e54f9a769bc589b85b5e394bab2bb78f67d2dc42/protobuf_py_ext-0.6.0.tar.gz",
+    "License": null,
+    "Project": "{\"Documentation\":\"https://protobufpy.com/\",\"Homepage\":\"https://github.com/bufbuild/protobuf-py\",\"Issues\":\"https://github.com/bufbuild/protobuf-py/issues\",\"Source\":\"https://github.com/bufbuild/protobuf-py\"}"
+  },
+  {
+    "Name": "that-depends",
+    "Version": "4.2.0",
+    "Sdist": "https://files.pythonhosted.org/packages/cd/55/491e8d5503a805ec3286ee5b91c0959d0413a92b4116656c18a7512c4daf/that_depends-4.2.0.tar.gz",
+    "License": null,
+    "Project": "{\"Changelog\":\"https://github.com/modern-python/that-depends/releases\",\"Documentation\":\"https://that-depends.modern-python.org\",\"Homepage\":\"https://that-depends.modern-python.org\",\"Issues\":\"https://github.com/modern-python/that-depends/issues\",\"Repository\":\"https://github.com/modern-python/that-depends\"}"
+  },
+  {
+    "Name": "jyutping",
+    "Version": "0.3.4",
+    "Sdist": "https://files.pythonhosted.org/packages/57/88/f7c654525aac3422376e8d8df556633c2791724e1c3e7d2f549d913b90d3/jyutping-0.3.4.tar.gz",
+    "License": "MIT",
+    "Project": "{\"Homepage\":\"https://github.com/imdreamrunner/python-jyutping/\"}"
+  },
+  {
+    "Name": "wanakana-python",
+    "Version": "1.2.2",
+    "Sdist": "https://files.pythonhosted.org/packages/7f/e1/8894b11cfb4642e97f0d9df255665a027744b9c9debe6a1abacf2a53a462/wanakana-python-1.2.2.tar.gz",
+    "License": "MPL-2.0",
+    "Project": "{\"Homepage\":\"https://github.com/starwort/wanakana\"}"
+  }
+]

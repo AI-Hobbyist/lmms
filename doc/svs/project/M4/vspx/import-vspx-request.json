@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "vspx",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\vspx\\export-vspx\\工程_日本語_한국어.vspx",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "d29134f873dd47a89a9e3a9aa2732ff7"
+}

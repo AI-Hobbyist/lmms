@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "vxf",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\vxf\\export-vxf\\工程_日本語_한국어.vxf",
+  "options": {
+    "import_pitch": true,
+    "default_bpm": 120.0
+  },
+  "protocol": 1,
+  "requestId": "f91821ff4f0b46b180df416eeef7425d"
+}

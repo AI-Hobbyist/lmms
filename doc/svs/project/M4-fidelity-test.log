@@ -1,0 +1,1 @@
+PASS_WITH_DECLARED_LOSSES : all direction, alias, audio and semantic-loss checks; full pitch results remain separate.

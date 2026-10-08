@@ -1,0 +1,11 @@
+{
+  "name": "jyutping",
+  "wheel": {
+    "file": "jyutping-0.3.4-py2.py3-none-any.whl",
+    "sha256": "34dd5a5e7c9d29103fc8a8d3ffcc55e838f7e7a0c88d52cef72c00475829fb45"
+  },
+  "directory": "jyutping-0.3.4.dist-info",
+  "files": [],
+  "status": "metadata-only-upstream-license-file-absent",
+  "note": "Locked release declares MIT. Neither wheel, sdist nor upstream repository supplies a LICENSE notice. No grant or copyright notice has been invented."
+}

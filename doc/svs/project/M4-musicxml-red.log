@@ -1,0 +1,60 @@
+test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) ... 
+  test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='musicxml') ... FAIL
+  test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='xml') ... FAIL
+  test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='mxl') ... FAIL
+
+======================================================================
+FAIL: test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='musicxml')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 138, in test_musicxml_native_tempo_meter_and_compressed_alias
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'position': 1440, 'bpm': 150.0}] != [{'position': 0, 'bpm': 120}, {'position': 240, 'bpm': 150}]
+
+First differing element 0:
+{'position': 1440, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'position': 240, 'bpm': 150}
+
+- [{'bpm': 150.0, 'position': 1440}]
++ [{'bpm': 120, 'position': 0}, {'bpm': 150, 'position': 240}]
+
+======================================================================
+FAIL: test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='xml')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 138, in test_musicxml_native_tempo_meter_and_compressed_alias
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'position': 1440, 'bpm': 150.0}] != [{'position': 0, 'bpm': 120}, {'position': 240, 'bpm': 150}]
+
+First differing element 0:
+{'position': 1440, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'position': 240, 'bpm': 150}
+
+- [{'bpm': 150.0, 'position': 1440}]
++ [{'bpm': 120, 'position': 0}, {'bpm': 150, 'position': 240}]
+
+======================================================================
+FAIL: test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) (suffix='mxl')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 137, in test_musicxml_native_tempo_meter_and_compressed_alias
+    result = self.roundtrip("musicxml", suffix, project)
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 50, in roundtrip
+    self.assertTrue(zipfile.is_zipfile(path), "MXL must be its real compressed MusicXML container")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : MXL must be its real compressed MusicXML container
+
+----------------------------------------------------------------------
+Ran 1 test in 10.874s
+
+FAILED (failures=3)

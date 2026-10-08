@@ -1,0 +1,12 @@
+{
+  "operation": "importProject",
+  "formatId": "vfp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\vfp\\export\\多伴奏工程.vfp",
+  "options": {
+    "extract_audio": true,
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "58f393ec81724ba3995d7b384536e66c"
+}

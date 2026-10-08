@@ -1,0 +1,57 @@
+test_acet_actual_archive_roundtrip (__main__.AdapterTest.test_acet_actual_archive_roundtrip) ... ok
+test_ccs_pitch_before_early_tempo_change_keeps_first_bar (__main__.AdapterTest.test_ccs_pitch_before_early_tempo_change_keeps_first_bar) ... ok
+test_continuous_controllers_do_not_join_real_note_silence (__main__.AdapterTest.test_continuous_controllers_do_not_join_real_note_silence) ... ok
+test_ds_default_segments_keep_first_note_pitch_and_real_time (__main__.AdapterTest.test_ds_default_segments_keep_first_note_pitch_and_real_time) ... ok
+test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) ... ok
+test_existing_ust_two_track_and_vsqx_three_options (__main__.AdapterTest.test_existing_ust_two_track_and_vsqx_three_options) ... FAIL
+test_loss_preflight_names_pitch_tempo_meter_and_blocks_unaccepted_write (__main__.AdapterTest.test_loss_preflight_names_pitch_tempo_meter_and_blocks_unaccepted_write) ... ok
+test_midi_pitch_bend_semitones_become_cents (__main__.AdapterTest.test_midi_pitch_bend_semitones_become_cents) ... ok
+test_musicxml_native_tempo_meter_and_compressed_alias (__main__.AdapterTest.test_musicxml_native_tempo_meter_and_compressed_alias) ... ok
+test_muta_first_note_pitch_remains_at_its_original_tick (__main__.AdapterTest.test_muta_first_note_pitch_remains_at_its_original_tick) ... ok
+test_nn_bend_is_relative_to_note_key (__main__.AdapterTest.test_nn_bend_is_relative_to_note_key) ... ok
+test_s5p_sparse_edited_pitch_is_not_discarded (__main__.AdapterTest.test_s5p_sparse_edited_pitch_is_not_discarded) ... ok
+test_supported_meter_changes_keep_bar_indices (__main__.AdapterTest.test_supported_meter_changes_keep_bar_indices) ... 
+  test_supported_meter_changes_keep_bar_indices (__main__.AdapterTest.test_supported_meter_changes_keep_bar_indices) (format='svp') ... FAIL
+test_ufdata_silence_marker_is_not_zero_midi_pitch (__main__.AdapterTest.test_ufdata_silence_marker_is_not_zero_midi_pitch) ... ok
+test_ust_existing_utf8_option_preserves_chinese (__main__.AdapterTest.test_ust_existing_utf8_option_preserves_chinese) ... ok
+test_vsq_breakpoints_do_not_create_duplicate_ini_keys (__main__.AdapterTest.test_vsq_breakpoints_do_not_create_duplicate_ini_keys) ... ok
+test_vxf_utf8_chunk_boundary_keeps_title (__main__.AdapterTest.test_vxf_utf8_chunk_boundary_keeps_title) ... ok
+
+======================================================================
+FAIL: test_existing_ust_two_track_and_vsqx_three_options (__main__.AdapterTest.test_existing_ust_two_track_and_vsqx_three_options)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 191, in test_existing_ust_two_track_and_vsqx_three_options
+    self.assertEqual(result["track_list"][0]["note_list"][0]["start_pos"], 2400)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+======================================================================
+FAIL: test_supported_meter_changes_keep_bar_indices (__main__.AdapterTest.test_supported_meter_changes_keep_bar_indices) (format='svp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 180, in test_supported_meter_changes_keep_bar_indices
+    project = self.project()
+            ^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'ba[21 chars]or': 3, 'denominator': 4}] != [{'ba[21 chars]or': 4, 'denominator': 4}, {'bar_index': 1, 'n[27 chars]: 4}]
+
+First differing element 0:
+{'bar_index': 0, 'numerator': 3, 'denominator': 4}
+{'bar_index': 0, 'numerator': 4, 'denominator': 4}
+
+Second list contains 1 additional elements.
+First extra element 1:
+{'bar_index': 1, 'numerator': 3, 'denominator': 4}
+
+- [{'bar_index': 0, 'denominator': 4, 'numerator': 3}]
+?                                                  ^ ^
+
++ [{'bar_index': 0, 'denominator': 4, 'numerator': 4},
+?                                                  ^ ^
+
++  {'bar_index': 1, 'denominator': 4, 'numerator': 3}]
+
+----------------------------------------------------------------------
+Ran 17 tests in 156.265s
+
+FAILED (failures=2)

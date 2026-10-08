@@ -1,0 +1,15 @@
+{
+  "operation": "importProject",
+  "formatId": "svip",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\svip\\export-svip\\工程_日本語_한국어.svip",
+  "options": {
+    "import_volume": true,
+    "import_strength": true,
+    "import_pitch": true,
+    "import_instrumental_track": true,
+    "import_gender": true,
+    "import_breath": true
+  },
+  "protocol": 1,
+  "requestId": "b5d83c434fc84d21960d80a2c2f44d64"
+}

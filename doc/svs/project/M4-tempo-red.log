@@ -1,0 +1,336 @@
+test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) ... 
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='acep') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='s5p') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='svip3') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='svp') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='tlp') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='ustx') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vsq') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vsqx') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vspx') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='xvsq') ... FAIL
+  test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='mtp') ... FAIL
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='acep')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='s5p')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='svip3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='svp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='tlp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='ustx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[17 chars]: 120.0}, {'position': 0, 'bpm': 150.0}, {'pos[23 chars]0.0}] != [{'po[17 chars]: 120}, {'position': 1440, 'bpm': 150}, {'posi[20 chars]100}]
+
+First differing element 1:
+{'position': 0, 'bpm': 150.0}
+{'position': 1440, 'bpm': 150}
+
+- [{'bpm': 120.0, 'position': 0},
+?             --
+
++ [{'bpm': 120, 'position': 0},
+-  {'bpm': 150.0, 'position': 0},
+?             --
+
++  {'bpm': 150, 'position': 1440},
+?                           +++
+
+-  {'bpm': 100.0, 'position': 3360}]
+?             --
+
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vsq')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[17 chars]: 120.0}, {'position': -480, 'bpm': 150.0}, {'[26 chars]0.0}] != [{'po[17 chars]: 120}, {'position': 1440, 'bpm': 150}, {'posi[20 chars]100}]
+
+First differing element 1:
+{'position': -480, 'bpm': 150.0}
+{'position': 1440, 'bpm': 150}
+
+- [{'bpm': 120.0, 'position': 0},
+?             --
+
++ [{'bpm': 120, 'position': 0},
+-  {'bpm': 150.0, 'position': -480},
+?             --              ^ ^
+
++  {'bpm': 150, 'position': 1440},
+?                           ^ ^
+
+-  {'bpm': 100.0, 'position': 1440}]
+?             --              ^^^
+
++  {'bpm': 100, 'position': 3360}]
+?                           ^^^
+
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vsqx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 100.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 2 additional elements.
+First extra element 1:
+{'position': 1440, 'bpm': 150}
+
+- [{'bpm': 100.0, 'position': 0}]
+?           ^^^                 ^
+
++ [{'bpm': 120, 'position': 0},
+?           ^                 ^
+
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='vspx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'po[15 chars]m': 150.0}, {'position': 3360, 'bpm': 100.0}] != [{'po[15 chars]m': 120}, {'position': 1440, 'bpm': 150}, {'po[22 chars]100}]
+
+First differing element 0:
+{'position': 0, 'bpm': 150.0}
+{'position': 0, 'bpm': 120}
+
+Second list contains 1 additional elements.
+First extra element 2:
+{'position': 3360, 'bpm': 100}
+
+- [{'bpm': 150.0, 'position': 0}, {'bpm': 100.0, 'position': 3360}]
++ [{'bpm': 120, 'position': 0},
++  {'bpm': 150, 'position': 1440},
++  {'bpm': 100, 'position': 3360}]
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='xvsq')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 80, in test_early_and_late_tempo_events_remain_on_native_timeline
+    result = self.roundtrip(format_id, format_id, project)
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 42, in roundtrip
+    exported = self.call(exporting, {"operation": "exportProject", "formatId": format_id, "path": str(path),
+                                      "project": project, "options": output_options or {}, "acceptLosses": True})
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 31, in call
+    self.assertEqual(response["status"], "success", str(response.get("error")) + result.stderr.decode("utf-8", "replace"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error' != 'success'
+- error
++ success
+ : {'code': 'conversionFailed', 'message': '1 validation error for TempoTableEntry\ntime\n  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=1.5, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.14/v/int_from_float', 'detail': 'ValidationError'}Traceback (most recent call last):
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 392, in main
+
+    response.update(process(request, workspace))
+
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\bridge.py", line 354, in process
+
+    converter.dump(path, project, effective)
+
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\xvsq\cadencii_converter.py", line 44, in dump
+
+    xvsq_project = CadenciiGenerator(options=options_obj).generate_project(project)
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\xvsq\cadencii_generator.py", line 58, in generate_project
+
+    self.generate_tempos(project.song_tempo_list, tick_prefix)
+
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\libresvip\plugins\xvsq\cadencii_generator.py", line 87, in generate_tempos
+
+    TempoTableEntry(
+
+    ~~~~~~~~~~~~~~~^
+
+        clock=tempo.position,
+
+        ^^^^^^^^^^^^^^^^^^^^^
+
+        tempo=bpm2tempo(tempo.bpm),
+
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        time=tempo.position * 2 / self.first_bar_length,
+
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    )
+
+    ^
+
+  File "D:\UserData\Desktop\Project\lmms\build\Release\svs-project\python\Lib\site-packages\pydantic\main.py", line 280, in __init__
+
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+
+pydantic_core._pydantic_core.ValidationError: 1 validation error for TempoTableEntry
+
+time
+
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=1.5, input_type=float]
+
+    For further information visit https://errors.pydantic.dev/2.14/v/int_from_float
+
+
+
+======================================================================
+FAIL: test_early_and_late_tempo_events_remain_on_native_timeline (__main__.AdapterTest.test_early_and_late_tempo_events_remain_on_native_timeline) (format='mtp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 81, in test_early_and_late_tempo_events_remain_on_native_timeline
+    self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'position': 1920, 'bpm': 120.0}, {'position': 1920, '[42 chars]0.0}] != [{'position': 0, 'bpm': 120}, {'position': 1440, 'bpm':[33 chars]100}]
+
+First differing element 0:
+{'position': 1920, 'bpm': 120.0}
+{'position': 0, 'bpm': 120}
+
+- [{'bpm': 120.0, 'position': 1920},
+?             --              ---
+
++ [{'bpm': 120, 'position': 0},
+-  {'bpm': 150.0, 'position': 1920},
+?             --               ^^
+
++  {'bpm': 150, 'position': 1440},
+?                            ^^
+
+-  {'bpm': 100.0, 'position': 3360}]
+?             --
+
++  {'bpm': 100, 'position': 3360}]
+
+----------------------------------------------------------------------
+Ran 1 test in 37.057s
+
+FAILED (failures=11)

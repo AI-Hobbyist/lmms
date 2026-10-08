@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "tssln",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\tssln\\export-tssln\\工程_日本語_한국어.tssln",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "acb6872018494a348f6c640010e9765f"
+}

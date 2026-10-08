@@ -1,0 +1,17 @@
+{
+  "name": "that-depends",
+  "wheel": {
+    "file": "that_depends-4.2.0-py3-none-any.whl",
+    "sha256": "a06267e60fda353be071d7aa7b8dc452d4f79f067e643de6222c624b640f29c0"
+  },
+  "directory": "that_depends-4.2.0.dist-info",
+  "files": [],
+  "status": "upstream-notice-preserved",
+  "upstream": {
+    "Repo": "modern-python/that-depends",
+    "Ref": "4.2.0",
+    "Spdx": "MIT",
+    "GitBlob": "31534652734c2f3834e58d4043ab27ce68513919",
+    "Url": "https://github.com/modern-python/that-depends/blob/4.2.0/LICENSE"
+  }
+}

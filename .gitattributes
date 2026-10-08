@@ -3,3 +3,8 @@
 data/locale/* linguist-documentation
 * text=auto eol=lf
 *.{bin,bmp,flac,icns,ico,mmpz,ogg,png,xiz,xmz,wav} binary
+
+# Preserve byte hashes of native SVS fixtures and captured upstream notices.
+doc/svs/project/M4/** -text -whitespace
+doc/svs/project/M4-*.log -text -whitespace
+tools/svs-project/licenses/** -text -whitespace

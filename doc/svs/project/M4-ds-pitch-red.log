@@ -1,0 +1,15 @@
+test_ds_default_segments_keep_first_note_pitch_and_real_time (__main__.AdapterTest.test_ds_default_segments_keep_first_note_pitch_and_real_time) ... FAIL
+
+======================================================================
+FAIL: test_ds_default_segments_keep_first_note_pitch_and_real_time (__main__.AdapterTest.test_ds_default_segments_keep_first_note_pitch_and_real_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 124, in test_ds_default_segments_keep_first_note_pitch_and_real_time
+    self.assertTrue(any(p[1] >= 6048 for p in pitch if p[1] != -100))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 3.712s
+
+FAILED (failures=1)

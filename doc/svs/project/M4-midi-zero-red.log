@@ -1,0 +1,15 @@
+test_midi_zero_bend_is_voiced_inside_a_note (__main__.AdapterTest.test_midi_zero_bend_is_voiced_inside_a_note) ... FAIL
+
+======================================================================
+FAIL: test_midi_zero_bend_is_voiced_inside_a_note (__main__.AdapterTest.test_midi_zero_bend_is_voiced_inside_a_note)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\UserData\Desktop\Project\lmms\tests\svs\project-adapter-test.py", line 138, in test_midi_zero_bend_is_voiced_inside_a_note
+    self.assertFalse(any(1920 < p[0] < 2400 and p[1] == -100 for p in pitch))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 3.762s
+
+FAILED (failures=1)

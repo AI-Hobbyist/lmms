@@ -1,0 +1,11 @@
+{
+  "operation": "importProject",
+  "formatId": "tlp",
+  "path": "D:\\UserData\\Desktop\\Project\\lmms\\doc\\svs\\project\\M4\\audio\\tlp\\export\\多伴奏工程.tlp",
+  "options": {
+    "import_pitch": true,
+    "import_instrumental_track": true
+  },
+  "protocol": 1,
+  "requestId": "fad13ee129394078bb548619a7b87411"
+}
