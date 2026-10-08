@@ -10,6 +10,7 @@ namespace lmms::svs {
 
 bool Parameter::accepts(const QJsonValue& value) const
 {
+ if(type=="directory-list") {if(!value.isArray()||value.toArray().size()>maxItems) return false;for(const auto& path:value.toArray()) if(!path.isString()||path.toString().size()>32768) return false;return true;}
  if (type == "bool") return value.isBool();
  if (type == "string") return value.isString() && (resourceIds.isEmpty() || resourceIds.contains(value.toString()));
  if (type == "enum") {
@@ -55,6 +56,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
    Parameter p;
    p.id = value["id"].toString(); p.name = value["name"].toString(); p.translationKey = value["translationKey"].toString();
    p.group = value["group"].toString(); p.order = value["order"].toInt(); p.type = value["type"].toString();
+   p.maxItems=value["maxItems"].toInt(128);
    p.scope = value["scope"].toString(); p.unit = value["unit"].toString(); p.scale = value["scale"].toString("linear");
    p.interpolation = value["interpolation"].toString("step"); p.defaultValue = value["default"];
    p.color = value["color"].toString();
@@ -72,9 +74,10 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
     }
    }
    const QString identity = p.scope + "/" + p.id;
-   if (p.id.isEmpty() || ids.contains(p.id) || !QStringList{"float", "int", "bool", "enum", "string"}.contains(p.type)
+   if (p.id.isEmpty() || ids.contains(p.id) || !QStringList{"float", "int", "bool", "enum", "string", "directory-list"}.contains(p.type)
     || !QStringList{"track", "clip", "note", "phoneme"}.contains(p.scope)) { error = "Invalid or duplicate parameter: " + identity; return false; }
    ids.insert(p.id);
+   if(p.type=="directory-list"&&(p.curve||p.maxItems<1||p.maxItems>128)) {error="Invalid directory list: "+identity;return false;}
    if (p.type == "float" || p.type == "int") {
     if(!value["min"].isDouble()||!value["max"].isDouble()||(value.contains("step")&&!value["step"].isDouble())) { error="Non-numeric range: "+identity; return false; }
     if (!std::isfinite(p.minimum) || !std::isfinite(p.maximum) || !std::isfinite(p.step) || p.maximum < p.minimum || p.step <= 0

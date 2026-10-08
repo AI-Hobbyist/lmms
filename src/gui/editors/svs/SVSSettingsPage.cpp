@@ -1,4 +1,6 @@
 #include "SVSSettingsPage.h"
+#include <QPushButton>
+#include <QDebug>
 #include "ConfigManager.h"
 #include "SVSSynthesisScheduler.h"
 #include "Engine.h"
@@ -62,9 +64,16 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent):QWidget(parent) {
  auto* config=ConfigManager::inst();m_backend->setCurrentIndex(std::max(0,m_backend->findData(config->value("svs","computeBackend","cpu"))));m_device->setCurrentIndex(std::max(0,m_device->findData(config->value("svs","computeDevice","cpu"))));
  auto updateDevice=[this]{const bool cpu=m_backend->currentData().toString()=="cpu";if(cpu) m_device->setCurrentIndex(0);m_device->setEnabled(!cpu);};connect(m_backend,qOverload<int>(&QComboBox::currentIndexChanged),this,[updateDevice](int){updateDevice();});updateDevice();
  m_engine=new QTabWidget(body);m_engine->setObjectName("svsEngineTabs");QSet<QString> seen;
- for(const auto& voice:svs::Registry::instance().voices()) if(!seen.contains(voice.pluginId)) {
+ for(const auto& installed:svs::Registry::instance().engines()) {
+  svs::Voice voice;voice.pluginId=installed.id;voice.package=installed.package;voice.metadata={{"pluginName",installed.name},{"engineType",installed.type}};
+  for(const auto& candidate:svs::Registry::instance().voices()) if(candidate.pluginId==installed.id) {voice.id=candidate.id;break;}
   seen.insert(voice.pluginId);m_voices.append(voice);auto* page=new QWidget(m_engine);page->setObjectName("svsEnginePage."+voice.pluginId);auto* pageLayout=new QVBoxLayout(page);
   auto* status=new QLabel(page);status->setObjectName("svsEngineStatus");status->setWordWrap(true);pageLayout->addWidget(status);pageLayout->addWidget(new SVSParameterPanel(page));pageLayout->addStretch();
+  auto plugin=svs::Registry::instance().plugin(installed.id);
+  if(plugin&&plugin->hasCatalogQuery()) {
+   auto* rescan=new QPushButton(tr("Rescan voicebanks"),page);rescan->setObjectName("svsRescanVoicebanks");rescan->setToolTip(tr("Rescan the applied voicebank directories. Apply directory changes first."));pageLayout->insertWidget(pageLayout->count()-1,rescan);
+   connect(rescan,&QPushButton::clicked,this,[this,key=installed.id,status]{const auto settings=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings","engine_"+QString::fromLatin1(key.toUtf8().toHex())).toUtf8()).object();QString error;const bool ok=svs::Registry::instance().refreshCatalog(key,settings,error);int count=0;for(const auto& voice:svs::Registry::instance().voices()) if(voice.pluginId==key) ++count;status->setText(ok?tr("Voicebanks found: %1").arg(count):error);});
+  }
   m_engine->addTab(page,engineLabel(voice));
  }
  auto* aiExample=new QWidget(m_engine);aiExample->setObjectName("svsEnginePage.aiExample");auto* aiLayout=new QVBoxLayout(aiExample);
@@ -98,7 +107,8 @@ void SVSSettingsPage::refreshEngine() {
    target->m_engine->setTabText(target->m_engine->currentIndex(),engineLabel(namedVoice));
    target->m_schema=parsed.parameters;auto& values=target->m_values[key];
    for(const auto& parameter:parsed.parameters) if(!parameter.accepts(values[parameter.id])) values[parameter.id]=parameter.defaultValue;
-   target->m_status->setText(parsed.parameters.isEmpty()?tr("This engine does not declare additional options."):tr("Additional options are supplied by this SVS engine."));
+   int count=0;for(const auto& catalogVoice:svs::Registry::instance().voices()) if(catalogVoice.pluginId==key) ++count;
+   target->m_status->setText(count==0?tr("No voicebanks found. Configure directories and apply, then rescan."):parsed.parameters.isEmpty()?tr("This engine does not declare additional options."):tr("Voicebanks found: %1").arg(count));
    target->m_parameters->refresh(parsed.parameters,"track",{values},values,[target,key](const QString& id,const QJsonValue& value){
     if(!target) return;
     target->m_values[key][id]=value;
@@ -115,7 +125,7 @@ void SVSSettingsPage::save() {
  QSet<QString> changed;
  for(auto it=m_values.cbegin();it!=m_values.cend();++it) {
   const auto key="engine_"+QString::fromLatin1(it.key().toUtf8().toHex());const auto json=QString::fromUtf8(QJsonDocument(it.value()).toJson(QJsonDocument::Compact));
-  if(config->value("svsEngineSettings",key)!=json) {config->setValue("svsEngineSettings",key,json);changed.insert(it.key());}
+  if(config->value("svsEngineSettings",key)!=json) {auto previous=QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object();auto current=it.value();config->setValue("svsEngineSettings",key,json);auto plugin=svs::Registry::instance().plugin(it.key());if(plugin&&plugin->hasCatalogQuery()) {QString error;svs::Registry::instance().refreshCatalog(it.key(),it.value(),error,false);if(!error.isEmpty()) qWarning().noquote()<<error;previous.remove("diffsinger.voicebankDirectories");current.remove("diffsinger.voicebankDirectories");}if(previous!=current) changed.insert(it.key());}
  }
  for(auto* base:Engine::getSong()->tracks()) if(base->type()==Track::Type::SVS) {
   auto* track=static_cast<SVSTrack*>(base);if(!changed.contains(track->pluginId())) continue;

@@ -6,6 +6,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QFileDialog>
 #include <QSet>
 #include <QApplication>
 #include <algorithm>
@@ -31,7 +33,9 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input,const QStri
   if(!m_rows.contains(id)) {
    Row row; row.type=editorType; row.container=new QWidget(this); auto* layout=new QHBoxLayout(row.container); layout->setContentsMargins(0,0,0,0);
    auto* label=new QLabel(row.container); label->setObjectName("parameterLabel"); layout->addWidget(label);
-   if(descriptor.type=="float"||descriptor.type=="int") {
+   if(descriptor.type=="directory-list") {
+    row.editor=new QWidget(row.container);auto* paths=new QVBoxLayout(row.editor);paths->setContentsMargins(0,0,0,0);
+   } else if(descriptor.type=="float"||descriptor.type=="int") {
     auto* editor=new QDoubleSpinBox(row.container); editor->setKeyboardTracking(false); row.editor=editor;
     connect(editor,qOverload<double>(&QDoubleSpinBox::valueChanged),this,[this,id](double value){ submit(id,value); });
    } else if(descriptor.type=="bool") {
@@ -56,7 +60,18 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input,const QStri
   if(editing) continue;
   const auto value=row.value.state==svs::ValueState::Common?row.value.value:descriptor.defaultValue;
   const auto stateText=row.value.state==svs::ValueState::Mixed?tr("Mixed"):row.value.state==svs::ValueState::Unset?tr("Unset"):QString{};
-  if(auto* editor=qobject_cast<QDoubleSpinBox*>(row.editor)) {
+  if(descriptor.type=="directory-list") {
+   auto* paths=static_cast<QVBoxLayout*>(row.editor->layout());while(auto* item=paths->takeAt(0)) {delete item->widget();delete item;}
+   const auto values=value.toArray();
+   for(int index=0;index<values.size();++index) {
+    auto* body=new QWidget(row.editor);auto* line=new QHBoxLayout(body);line->setContentsMargins(0,0,0,0);auto* path=new QLineEdit(values[index].toString(),body);path->setObjectName("svsDirectoryPath");line->addWidget(path,1);
+    auto change=[this,id,index](const QString& path){auto values=m_rows[id].value.value.toArray();if(index>=values.size()) return;values[index]=path;submit(id,values);};
+    connect(path,&QLineEdit::editingFinished,this,[path,change]{if(path->isModified()) {change(path->text());path->setModified(false);}});
+    auto* browse=new QPushButton(tr("Browse…"),body);browse->setObjectName("svsDirectoryBrowse");line->addWidget(browse);connect(browse,&QPushButton::clicked,this,[this,path,change]{const auto directory=QFileDialog::getExistingDirectory(this,tr("Voicebank directory"),path->text());if(!directory.isEmpty()) {path->setText(directory);change(directory);}});
+    auto* remove=new QPushButton(tr("Remove"),body);remove->setObjectName("svsDirectoryRemove");line->addWidget(remove);connect(remove,&QPushButton::clicked,this,[this,id,index,remove]{remove->clearFocus();auto values=m_rows[id].value.value.toArray();if(index<values.size()) {values.removeAt(index);submit(id,values);}});paths->addWidget(body);
+   }
+   auto* add=new QPushButton(tr("Add directory"),row.editor);add->setObjectName("svsDirectoryAdd");add->setEnabled(values.size()<descriptor.maxItems);paths->addWidget(add);connect(add,&QPushButton::clicked,this,[this,id,add]{add->clearFocus();auto values=m_rows[id].value.value.toArray();values.append("");submit(id,values);});
+  } else if(auto* editor=qobject_cast<QDoubleSpinBox*>(row.editor)) {
    editor->setRange(descriptor.minimum,descriptor.maximum); editor->setSingleStep(descriptor.step); editor->setDecimals(descriptor.type=="int"?0:6);
    editor->setSuffix(descriptor.unit.isEmpty()?QString{}:" "+descriptor.unit); editor->setValue(value.toDouble());
    editor->setToolTip(stateText+(descriptor.scale=="log"?tr("; logarithmic scale"):QString{}));

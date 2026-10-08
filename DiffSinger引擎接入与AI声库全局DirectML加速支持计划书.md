@@ -210,12 +210,12 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 
 只有 A0→A4、B0→B4 顺序验收并分别提交推送，六包CPU真实推理与递归配置适配通过，至少一台可用设备真实DML推理证据通过、全局策略被第二AI插件消费、传统引擎保持行为、持久化/缓存/取消/独立SDK/Release均验证后，实施任务才完成。必要GPU/模型自动验收不能降格为MANUAL替代。人工听感/布局待验收允许单独标记。完成后停止，不实施计划外重构。
 
-当前 A0 原生骨架、依赖冻结、独立 SDK/旧示例协商和六包 48 模型 CPU session/实际签名检查通过。详细记录见 [A0 验收](doc/svs/DiffSinger-A0-validation.md) 和 [六包矩阵](doc/svs/DiffSinger-six-package-matrix.json)。这是模型接口加载验证，不是 A2/A3 的真实合成验收；引擎尚不注册声库或生成音频。每阶段提交推送成功才进入下一阶段。
+当前 A0 原生骨架、依赖冻结、独立 SDK/旧示例协商和六包 48 模型 CPU session/实际签名检查通过。详细记录见 [A0 验收](doc/svs/DiffSinger-A0-validation.md) 和 [六包矩阵](doc/svs/DiffSinger-six-package-matrix.json)。A1 原生递归声库目录、元数据、身份、资源和设置实窗验收已通过，见 [A1 验收](doc/svs/DiffSinger-A1-validation.md)。引擎现在注册外部声库和语言能力，尚不生成音频；模型接口加载和目录验收不能替代 A2/A3 真实推理。每阶段提交推送成功才进入下一阶段。
 
 | 里程碑 | 状态 | 自动证据 | 人工事项 |
 | --- | --- | --- | --- |
 | A0 | PASS | 独立 SDK/原位开发 DLL ABI 1.0/1.1/1.2；旧 full/minimal 示例；缺依赖拒绝；六包 48 ONNX CPU session/签名 | 无本阶段人工项 |
-| A1 | NOT STARTED | — | — |
+| A1 | PASS | 六包扫描/配置/身份/权限循环fixture；独立SDK/ABI1.0–1.3/旧示例；两项设置与目录持久化/刷新/资源实窗 | 无本阶段人工项 |
 | A2 | NOT STARTED | — | — |
 | A3 | NOT STARTED | — | 听感待实施后验收 |
 | A4 | NOT STARTED | — | 体验待实施后验收 |

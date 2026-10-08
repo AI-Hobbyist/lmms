@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "build/Release/lmms.exe",
+      "bytes": 5828608,
+      "sha256": "f693605867924adc8af6348e7fee93cfc97c32c06c7c45a974a6b0a327406235"
+    },
+    {
+      "path": "build/Release/svs/SVSDiffSinger/SVSDiffSinger.dll",
+      "bytes": 464896,
+      "sha256": "c39c24648853ba32b5fdcc5c7bcd66f745723be8e0218758927aa55f9c8089de"
+    },
+    {
+      "path": "build/Release/svs/SVSDiffSinger/onnxruntime.dll",
+      "bytes": 14107168,
+      "sha256": "b4b7f9aed3cf6b04000f595bddcbdf12e87214bc401d1b81beadae3dbf28d2bd"
+    },
+    {
+      "path": "build/Release/svs/SVSDiffSinger/manifest.json",
+      "bytes": 271,
+      "sha256": "9948f2c58381d9834f7077f4daf9cdd91f0c7efa39bd9db33e61ab4ec805b13f"
+    }
+  ],
+  "localOnlyVoiceImage": {
+    "path": "doc/svs/validation/A1-native-voice-images.png",
+    "sha256": "0aea3c4dc78272fca445f1b1e7ed3bb567165aab7bf42f95401854c9d6ec6cc7",
+    "inspection": "Native Windows screenshot: 遐蝶/测试 rendered without tofu; portrait visible; screenshot not committed or packaged"
+  }
+}

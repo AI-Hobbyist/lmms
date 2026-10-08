@@ -47,6 +47,7 @@ private slots:
 
 private:
 	void addPlugins();
+	void refreshSvsVoices();
 	void updateRootVisibility( int index );
 	void updateRootVisibilities();
 

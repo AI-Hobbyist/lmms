@@ -10,6 +10,7 @@ namespace lmms::svs {
 struct Parameter {
  QString id, name, translationKey, group, type, scope, unit, scale, interpolation, disabledReason, color;
  int order = 0;
+ int maxItems = 128;
  QJsonValue defaultValue;
  double minimum = 0, maximum = 1, step = 0.01;
  bool writable = true, curve = false, visible = true, enabled = true;

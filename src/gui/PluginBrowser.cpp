@@ -24,6 +24,7 @@
 
 #include "lmmsconfig.h"
 #include "PluginBrowser.h"
+#include "SVSImageLoader.h"
 #ifdef LMMS_BUILD_WIN32
 #include "vsthost/CatalogJobs.h"
 #include <QTimer>
@@ -96,6 +97,9 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	// Add plugins to the tree
 	addPlugins();
+	connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, this, [this] {
+		refreshSvsVoices();updateRootVisibilities();if(const auto* search=m_view->findChild<QLineEdit*>()) onFilterChanged(search->text());
+	});
 #ifdef LMMS_BUILD_WIN32
 	auto* timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, [this, published = std::uint64_t{0}]() mutable {
@@ -192,15 +196,9 @@ void PluginBrowser::addPlugins()
 	// Add a root node to the tree for native LMMS plugins
 	const auto lmmsRoot = addRoot("LMMS");
 	lmmsRoot->setExpanded(true);
-	static const PixmapLoader svsLogo("sample_track");
-	static Plugin::Descriptor svsDescriptor{"svs", "Singing Voice Synthesis", "Native singing voice synthesis", "LMMS", 1, Plugin::Type::SVS, &svsLogo, "", nullptr};
 	const auto svsRoot = addRoot("Singing Voice Synthesis");
 	svsRoot->setExpanded(true);
-	for (const auto& voice : svs::Registry::instance().voices())
-	{
-		PluginDescWidget::PluginKey key(&svsDescriptor, voice.name, {{"pluginId", voice.pluginId}, {"voiceId", voice.id}, {"avatar", voice.avatar}});
-		addPlugin(key, svsRoot);
-	}
+	refreshSvsVoices();
 
 	// Add all of the descriptors to the tree
 	for (const auto desc : descs)
@@ -234,6 +232,13 @@ void PluginBrowser::addPlugins()
 
 
 
+void PluginBrowser::refreshSvsVoices()
+{
+	QTreeWidgetItem* root=nullptr;for(int i=0;i<m_descTree->topLevelItemCount();++i) if(m_descTree->topLevelItem(i)->text(0)=="Singing Voice Synthesis") {root=m_descTree->topLevelItem(i);break;}if(!root) return;
+	qDeleteAll(root->takeChildren());static const PixmapLoader logo("sample_track");static Plugin::Descriptor descriptor{"svs","Singing Voice Synthesis","Native singing voice synthesis","LMMS",1,Plugin::Type::SVS,&logo,"",nullptr};
+	for(const auto& voice:svs::Registry::instance().voices()) {auto* item=new QTreeWidgetItem(root);PluginDescWidget::PluginKey key(&descriptor,voice.name,{{"pluginId",voice.pluginId},{"voiceId",voice.id},{"avatar",voice.avatar}});m_descTree->setItemWidget(item,0,new PluginDescWidget(key,m_descTree));}
+}
+
 PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 							QWidget * _parent ) :
 	QWidget( _parent ),
@@ -251,6 +256,7 @@ PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 	{
 		QPixmap avatar(_pk.attributes.value("avatar"));
 		if (!avatar.isNull()) { m_logo = avatar; }
+		else if(_pk.attributes.value("avatar").startsWith("svs-resource:")) {auto* loader=new SVSImageLoader(this);loader->changed=[this,loader]{if(!loader->image().isNull()) {m_logo=QPixmap::fromImage(loader->image());update();}};loader->request({},_pk.attributes.value("avatar"),QSize(64,64));}
 	}
 }
 

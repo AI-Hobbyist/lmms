@@ -1,0 +1,9 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JO-ID 8413607 already in use by svsclip!
+JO-ID 8393851 already in use by svstrack!
+JO-ID 8411734 already in use by svsclip!
+JO-ID 8417951 already in use by svstrack!

@@ -41,6 +41,13 @@ private: SVSTrack* m_track; std::shared_ptr<const svs::Audio> m_audio; double m_
 SVSTrack::SVSTrack(TrackContainer* tc):Track(Type::SVS,tc),m_volume(DefaultVolume,MinVolume,MaxVolume,0.1f,this,"Volume"),m_pan(DefaultPanning,PanningLeft,PanningRight,1,this,"Panning"),m_mix(0,0,Engine::mixer()->numChannels()-1,this,"Mixer channel"),m_bus("SVS",true,&m_volume,&m_pan,&m_mutedModel) {
  Track::setName("SVS"); m_pan.setCenterValue(DefaultPanning); connect(&m_mix,&IntModel::dataChanged,this,[this]{m_bus.setNextMixerChannel(m_mix.value());});
  m_portraitSettings={{"visible",ConfigManager::inst()->value("svs","portraitVisible","1")!="0"},{"transparency",std::clamp(ConfigManager::inst()->value("svs","portraitTransparency","70").toInt(),0,100)},{"x",1.},{"y",1.}};
+ connect(&svs::Registry::instance(),&svs::Registry::catalogChanged,this,[this](const QString& plugin){
+  if(plugin!=m_pluginId) return;svs::Voice next;for(const auto& candidate:svs::Registry::instance().voices()) if(candidate.pluginId==plugin&&candidate.id==m_voiceId) {next=candidate;break;}
+  const bool contentChanged=next.version!=m_voice.version||next.id!=m_voice.id;m_voice=next;
+  if(!m_customName&&!next.name.isEmpty()) {Track::setName(next.name);m_bus.setName(name());}
+  if(contentChanged) {++m_capabilityRequest;m_capabilitiesReady=false;m_capabilities={};m_dictionaries.clear();m_capabilityDiagnostics=next.id.isEmpty()?QStringList{"Voicebank is missing; project data is retained"}:QStringList{};for(auto* base:getClips()) static_cast<SVSClip*>(base)->invalidate();if(!next.id.isEmpty()) refreshCapabilities();}
+  emit dataChanged();
+ });
 }
 SVSTrack::~SVSTrack() { Engine::audioEngine()->removePlayHandlesOfTypes(this,PlayHandle::Type::SVSPlayHandle); }
 void SVSTrack::setName(const QString& name) { m_customName=true; Track::setName(name); m_bus.setName(name); }

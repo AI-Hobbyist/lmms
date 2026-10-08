@@ -12,7 +12,7 @@
 #endif
 namespace {
 void require(bool value, const char* message) { if (!value) { throw std::runtime_error(message); } }
-int run(const std::filesystem::path& path)
+int run(const std::filesystem::path& path, const std::filesystem::path& voices)
 {
 #ifdef _WIN32
     auto library = LoadLibraryExW(std::filesystem::absolute(path).c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
@@ -51,6 +51,26 @@ int run(const std::filesystem::path& path)
         require(engine.hasEngineSettings(), "Missing engine declaration");
         const auto settings = nlohmann::json::parse(engine.engineSettings().c_str());
         require(settings.at("name") == "DiffSinger" && settings.at("engineType") == "ai", "Invalid engine declaration");
+        require(settings.at("engineSettings").size()==2, "Engine must declare exactly two settings");
+        require(engine.hasCatalogQuery(), "Missing optional ABI 1.3 catalog query");
+        if (!voices.empty()) {
+            const nlohmann::json context{{"rescan",true},{"engineSettings",{{"diffsinger.voicebankDirectories",{std::filesystem::absolute(voices).u8string()}}}}};
+            const auto catalog=nlohmann::json::parse(engine.catalog(context.dump().c_str()).c_str());
+            require(catalog.at("voices").size()==6,"Native ABI catalog did not discover six voices");
+            const auto id=catalog.at("voices")[0].at("avatar").get<std::string>();
+            svs_api table{};require(entry(1,3,sizeof(table),&table)==SVS_OK,"ABI 1.3 negotiation failed");
+            svs_engine raw=nullptr;require(table.create_engine(nullptr,&raw)==SVS_OK,"Resource engine failed");
+            const char* result=nullptr;require(table.query_catalog(raw,context.dump().c_str(),&result)==SVS_OK,"Resource catalog failed");table.release_string(raw,result);
+            svs_resource resource=nullptr;svs_resource_info info{};info.size=sizeof(info);
+            require(table.open_resource(raw,id.c_str(),&resource,&info)==SVS_OK&&resource&&info.byte_count>0,"Cannot open declared image resource");
+            require(std::strlen(info.sha256)==64,"Resource digest missing");
+            std::vector<unsigned char> bytes(static_cast<size_t>(info.byte_count));uint64_t count=0;
+            require(table.query_catalog(raw,R"({"rescan":true,"engineSettings":{"diffsinger.voicebankDirectories":[]}})",&result)==SVS_OK,"Empty rescan failed");table.release_string(raw,result);
+            require(table.read_resource(raw,resource,0,bytes.data(),bytes.size(),&count)==SVS_OK&&count==bytes.size(),"Old resource handle did not survive catalog refresh");
+            require(table.read_resource(raw,resource,info.byte_count+1,bytes.data(),1,&count)==SVS_INVALID_INPUT,"Out of range resource read accepted");
+            table.close_resource(raw,resource);table.destroy_engine(raw);
+            std::cout<<"PASS ABI 1.3 six voices / exactly two settings / resource lifetime and bounds\n";
+        }
     }
 #ifdef _WIN32
     FreeLibrary(library);
@@ -66,7 +86,7 @@ int wmain(int argc, wchar_t** argv)
 int main(int argc, char** argv)
 #endif
 {
-    if (argc != 2) { std::cerr << "Usage: DiffSingerAbiTest <plugin library>\n"; return 2; }
-    try { return run(std::filesystem::path(argv[1])); }
+    if (argc != 2 && argc != 3) { std::cerr << "Usage: DiffSingerAbiTest <plugin library> [voice root]\n"; return 2; }
+    try { return run(std::filesystem::path(argv[1]),argc==3?std::filesystem::path(argv[2]):std::filesystem::path{}); }
     catch (const std::exception& error) { std::cerr << "FAIL: " << error.what() << '\n'; return 1; }
 }

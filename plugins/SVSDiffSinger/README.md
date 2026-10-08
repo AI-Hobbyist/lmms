@@ -5,10 +5,14 @@ It has no LMMS/Qt, Python, .NET, TuneLab or OpenUtau runtime dependency.
 Dependencies are frozen in `dependencies.lock.json`; voice packages are external
 user resources and are never bundled.
 
-At milestone A0 the engine is a bootstrap only: its catalog is empty and it
-rejects synthesis. Discovery/settings arrive in A1, pronunciation/duration in
-A2, and full CPU inference in A3. No placeholder voice or synthetic success
-audio is registered.
+At milestone A1 the engine discovers external packages recursively and exposes
+resource images and voice capability languages. It rejects synthesis until
+pronunciation/duration in A2 and full CPU inference in A3. No placeholder voice
+or synthetic success audio is registered. Settings contain only rendering steps
+(1–100, default 20) and multiple voicebank directories. Apply refreshes changed
+directories; Rescan reloads applied roots. An empty catalog keeps the engine's
+settings available. Install IDs are host-persisted and models/configuration/
+dictionaries have content fingerprints independent of image bytes.
 
 On Windows, run `buildtools/Get-DiffSingerOnnxSdk.ps1` through the project's
 foreground logging pipeline to provision the SHA-256 checked official SDK in
@@ -21,8 +25,11 @@ enabled engine with missing/wrong-version ORT fails configure clearly.
 
 `SVSDiffSinger` writes its development package directly to
 `build/Release/svs/SVSDiffSinger` beside the existing development installation.
-`DiffSingerAbiTest <plugin DLL>` verifies ABI 1.0/1.1/1.2 negotiation and bootstrap
-state. `DiffSingerModelProbe <fixture root> <matrix.json> <expected package count>`
+`DiffSingerAbiTest <plugin DLL> [external voice root]` verifies ABI 1.0–1.3
+negotiation, empty initial state, catalog refresh and resource lifetimes.
+`DiffSingerCatalogTest <external voice root> <existing build directory>` checks
+native discovery/metadata/identity fixtures and all six development voicebanks.
+`DiffSingerModelProbe <fixture root> <matrix.json> <expected package count>`
 reads configuration and creates CPU sessions one model at a time, recording
 actual names/dtypes/ranks/static and symbolic dimensions. It does not execute
 models or imply synthesis acceptance. A0's six-package matrix is in

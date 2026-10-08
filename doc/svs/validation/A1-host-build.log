@@ -1,0 +1,407 @@
+CMake is re-running because D:/UserData/Desktop/Project/lmms/build/src/CMakeFiles/generate.stamp is out-of-date.
+  the file 'D:/UserData/Desktop/Project/lmms/src/CMakeLists.txt'
+  is newer than 'D:/UserData/Desktop/Project/lmms/build/src/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Running vcpkg install
+Detecting compiler hash for triplet x64-windows...
+Compiler found: D:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe
+The following packages are already installed:
+  * brotli:x64-windows@1.2.0
+  * bzip2[core,tool]:x64-windows@1.0.8#6
+  * dirent:x64-windows@1.26
+  * expat:x64-windows@2.8.3
+    fftw3[core,sse2,sse]:x64-windows@3.3.11
+    fltk:x64-windows@1.3.11#1
+    fluidsynth[core,sndfile]:x64-windows@2.5.7
+  * fontconfig:x64-windows@2.17.1#2
+  * freetype[core,zlib,png,bzip2,brotli]:x64-windows@2.14.3
+  * gcem:x64-windows@1.18.0
+  * gperf:x64-windows@3.3
+    libflac[core,stack-protector]:x64-windows@1.5.0
+  * libjpeg-turbo:x64-windows@3.2.0
+    libogg:x64-windows@1.3.6#1
+  * libpng:x64-windows@1.6.58
+    libsamplerate:x64-windows@0.2.2#1
+    libsndfile[core,mpeg,external-libs]:x64-windows@1.2.2#2
+    libstk:x64-windows@4.6.1#3
+    libvorbis:x64-windows@1.3.7#4
+    lilv:x64-windows@0.28.0
+  * lv2:x64-windows@1.18.10#1
+    mp3lame:x64-windows@3.100#17
+  * mpg123:x64-windows@1.33.7#1
+  * opus:x64-windows@1.6.1
+  * pcre2[core,platform-default-features,jit]:x64-windows@10.47#1
+  * pkgconf:x64-windows@3.0.3
+    portaudio:x64-windows@19.7#9
+    sdl2:x64-windows@2.32.10#1
+  * serd:x64-windows@0.32.10
+  * sord:x64-windows@0.16.22
+  * sratom:x64-windows@0.6.22
+  * vcpkg-cmake:x64-windows@2025-08-07
+  * vcpkg-cmake-config:x64-windows@2026-07-21
+  * vcpkg-cmake-get-vars:x64-windows@2025-05-29
+  * vcpkg-make:x64-windows@2026-07-09
+  * vcpkg-msbuild:x64-windows@2023-08-08
+  * vcpkg-pkgconfig-get-modules:x64-windows@2024-04-03
+  * vcpkg-tool-meson:x64-windows@1.9.0#10
+  * yasm[core,tools]:x64-windows@1.3.0#8
+  * zix:x64-windows@0.8.2
+    zlib:x64-windows@1.3.2#2
+fftw3 provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(FFTW3 CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3)
+
+  find_package(FFTW3f CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3f)
+
+  find_package(FFTW3l CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FFTW3::fftw3l)
+
+fftw3 provides pkg-config modules:
+
+  # fast Fourier transform library
+  fftw3
+
+  # fast Fourier transform library
+  fftw3f
+
+  # fast Fourier transform library
+  fftw3l
+
+zlib is compatible with built-in CMake targets:
+
+  find_package(ZLIB REQUIRED)
+  target_link_libraries(main PRIVATE ZLIB::ZLIB)
+
+zlib provides pkg-config modules:
+
+  # zlib compression library
+  zlib
+
+fltk provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(FLTK CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE fltk fltk_forms fltk_images)
+
+mp3lame provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(mp3lame CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE mp3lame::mp3lame)
+
+libogg provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(Ogg CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE Ogg::ogg)
+
+libogg provides pkg-config modules:
+
+  # ogg is a library for manipulating ogg bitstreams
+  ogg
+
+The package libvorbis provides CMake targets:
+
+    # Vorbis reference encoder and decoder, low-level API
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbis)
+
+    # Audio stream decoding and basic manipulation, high-level API
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+
+    # Convenience API for setting up an encoding environment
+    find_package(Vorbis CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+
+The package libflac provides CMake targets:
+
+    find_package(FLAC CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE FLAC::FLAC)
+
+    # Or use the C++ API
+    find_package(FLAC CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE FLAC::FLAC++)
+
+libsndfile provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(SndFile CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE SndFile::sndfile)
+
+libsndfile provides pkg-config modules:
+
+  # A library for reading and writing audio files
+  sndfile
+
+fluidsynth provides CMake targets:
+
+  find_package(FluidSynth CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE FluidSynth::libfluidsynth)
+  add_custom_command(OUTPUT result COMMAND FluidSynth::fluidsynth ARGS ...)
+
+fluidsynth provides pkg-config modules:
+
+  # Software SoundFont synth
+  fluidsynth
+
+libsamplerate provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(SampleRate CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE SampleRate::samplerate)
+
+libsamplerate provides pkg-config modules:
+
+  # An audio Sample Rate Conversion library
+  samplerate
+
+libstk provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(unofficial-libstk CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE unofficial::libstk::libstk)
+
+lilv provides pkg-config modules:
+
+  # Library for hosting LV2 plugins
+  lilv-0
+
+portaudio provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(portaudio CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE portaudio)
+
+portaudio provides pkg-config modules:
+
+  # Portable audio I/O
+  portaudio-2.0
+
+sdl2 provides CMake targets:
+
+    find_package(SDL2 CONFIG REQUIRED)
+    target_link_libraries(main
+        PRIVATE
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    )
+
+All requested installations completed successfully in: 779 us
+-- Running vcpkg install - done
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+
+Checking submodules...
+-- Checking qt5-x11embed...
+--   Found src/3rdparty/qt5-x11embed/CMakeLists.txt
+-- Checking zynaddsubfx...
+--   Found plugins/ZynAddSubFx/zynaddsubfx/CMakeLists.txt
+-- Checking game-music-emu...
+--   Found plugins/FreeBoy/game-music-emu/CMakeLists.txt
+-- Checking adplug...
+--   Found plugins/OpulenZ/adplug/Makefile.am
+-- Checking veal...
+--   Found plugins/LadspaEffect/calf/veal/CMakeLists.txt
+-- Checking exprtk...
+--   Found plugins/Xpressive/exprtk/Makefile
+-- Checking ladspa...
+--   Found plugins/LadspaEffect/swh/ladspa/Makefile.am
+-- Checking tap-plugins...
+--   Found plugins/LadspaEffect/tap/tap-plugins/Makefile
+-- Checking weakjack...
+--   Found src/3rdparty/weakjack/weakjack/.gitignore
+-- Checking wiki...
+--   Found doc/wiki/Home.md
+-- Checking ringbuffer...
+--   Found src/3rdparty/ringbuffer/CMakeLists.txt
+-- Checking carla...
+--   Found plugins/CarlaBase/carla/Makefile
+-- Checking resid...
+--   Found plugins/Sid/resid/resid/Makefile.am
+-- Checking jack2...
+--   Found src/3rdparty/jack2/.gitignore
+-- Checking cmt...
+--   Found plugins/LadspaEffect/cmt/cmt/.gitignore
+-- Checking hiir...
+--   Found src/3rdparty/hiir/hiir/license.txt
+-- Checking portsmf...
+--   Found plugins/MidiImport/portsmf/CMakeLists.txt
+-- Done validating submodules.
+
+
+Configuring LMMS
+--------------------------
+* Project version             : 1.3.0-alpha.2.80+3bdff9a
+*   Major version             : 1
+*   Minor version             : 3
+*   Release version           : 0
+*   Stage version             : alpha
+*   Build version             : 2
+*
+
+Optional Version Usage:
+--------------------------
+*   Override version:           -DFORCE_VERSION=x.x.x-x
+*   Ignore Git information:     -DFORCE_VERSION=internal
+
+PROCESSOR: AMD64
+-- Target host is 64 bit, Intel
+-- Setting target microarchitecture to 'none'
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)
+-- Using Qt version: 6.10.3
+-- Found Qt translations in C:/Qt/6.10.3/msvc2022_64/translations
+-- Could NOT find Perl (missing: PERL_EXECUTABLE)
+-- Checking for module 'suil-0'
+--   Package 'suil-0' not found
+-- Checking for module 'carla-native-plugin'
+--   Package 'carla-native-plugin' not found
+-- Checking for module 'carla-standalone>=1.9.5'
+--   Package 'carla-standalone' not found
+-- Checking for module 'gig'
+--   Package 'gig' not found
+-- Using Git to generate the CONTRIBUTORS file
+-- Using the multi-header code from D:/UserData/Desktop/Project/lmms/build/_deps/diffsinger_json-src/include/
+CMake Deprecation Warning at build/_deps/diffsinger_yaml-src/CMakeLists.txt:2 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+
+Installation Summary
+--------------------
+* Install Directory           : C:/Program Files/lmms
+
+Supported audio interfaces
+--------------------------
+* ALSA                        : <not supported on this platform>
+* JACK                        : OK (weak linking enabled)
+* Sndio                       : <not supported on this platform>
+* PortAudio                   : OK
+* PulseAudio                  : <not supported on this platform>
+* SDL                         : OK
+
+Supported MIDI interfaces
+-------------------------
+* ALSA                        : <not supported on this platform>
+* Sndio                       : <not supported on this platform>
+* JACK                        : OK (weak linking enabled)
+* WinMM                       : OK
+* AppleMidi                   : <not supported on this platform>
+
+Supported file formats for project export
+-----------------------------------------
+* WAVE                        : OK
+* FLAC                        : OK
+* OGG/VORBIS                  : OK
+* MP3/Lame                    : OK
+
+Optional plugins
+----------------
+* Lv2 plugins                 : OK
+* SUIL for plugin UIs         : not found, install it or set PKG_CONFIG_PATH appropriately
+* ZynAddSubFX instrument      : OK
+* Carla Patchbay & Rack       : OK (weak linking enabled)
+* SoundFont2 player           : OK
+* Sid instrument              : not found, please install perl if you require the Sid instrument
+* Stk Mallets                 : OK
+* VST plugin host             : OK
+  * 32-bit Windows host       : OK
+  * 64-bit Windows host       : OK
+* CALF LADSPA plugins         : OK
+* CAPS LADSPA plugins         : OK
+* CMT LADSPA plugins          : OK
+* TAP LADSPA plugins          : OK
+* SWH LADSPA plugins          : Skipping, perl is missing
+* GIG player                  : not found, libgig needed for decoding .gig files
+
+Developer options
+-----------------------------------------
+* Debug FP exceptions               : Disabled
+* Debug using AddressSanitizer      : Disabled
+* Debug using ThreadSanitizer       : Disabled
+* Debug using MemorySanitizer       : Disabled
+* Debug using UBSanitizer           : Disabled
+* Debug packaging commands          : Disabled
+* Profile using GNU profiler        : Disabled , NOT SUPPORTED BY THIS COMPILER
+* Debug assertions                  : Disabled
+* Experimental Qt6 support          : Enabled
+
+
+-----------------------------------------------------------------
+IMPORTANT:
+after installing missing packages, remove CMakeCache.txt before
+running cmake again!
+-----------------------------------------------------------------
+
+
+
+-- Configuring done (18.0s)
+-- Generating done (14.8s)
+-- Build files have been written to: D:/UserData/Desktop/Project/lmms/build
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSParameterPanel.cpp
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Generating qrc_lmms.cpp
+  mocs_compilation_Release.cpp
+  qrc_lmms.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Automatic MOC and UIC for target SVSExample
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/plugins/SVSExample/CMakeLists.txt
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.cpp
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/SVSExample/Release/SVSExample.lib 和对象 D:/UserData/Desktop/Project/lmms/build/SVSExample/Release/SVSExample.exp
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  Automatic MOC for target SVSIntegrationTest
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/tests/CMakeLists.txt
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/SVSIntegrationTest.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  VoiceCatalog.cpp
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  DiffSingerCatalogTest.cpp
+  DiffSingerCatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalogTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  DiffSingerAbiTest.cpp
+  DiffSingerAbiTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerAbiTest.exe

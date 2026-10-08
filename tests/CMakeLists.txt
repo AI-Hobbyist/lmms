@@ -63,6 +63,9 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 endforeach()
 
 add_dependencies(SVSIntegrationTest SVSExample)
+if(LMMS_BUILD_DIFFSINGER)
+ add_dependencies(SVSIntegrationTest SVSDiffSinger)
+endif()
 add_dependencies(UiBaselineCapture tripleoscillator kicker amplifier SVSExample)
 add_dependencies(ThemeWidgetTest tripleoscillator kicker amplifier SVSExample)
 set_target_properties(ThemeWidgetTest PROPERTIES OUTPUT_NAME lmms

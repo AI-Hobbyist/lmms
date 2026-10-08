@@ -1,0 +1,3 @@
+PASS optional catalog query / returned string ownership
+PASS empty installed-engine catalog (PCM/cancellation not exercised)
+PASS ABI 1.3 voices=0 SDK-only conformance

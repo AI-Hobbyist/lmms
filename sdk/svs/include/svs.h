@@ -1,4 +1,4 @@
-/* SVS SDK ABI 1.2. Public C ABI; no LMMS, Qt or C++ runtime types at this boundary. */
+/* SVS SDK ABI 1.3. Public C ABI; no LMMS, Qt or C++ runtime types at this boundary. */
 #ifndef SVS_API_H
 #define SVS_API_H
 #include <stdint.h>
@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 #define SVS_ABI_MAJOR 1u
-#define SVS_ABI_MINOR 2u
+#define SVS_ABI_MINOR 3u
 typedef void* svs_engine;
 typedef void* svs_session;
 typedef void* svs_resource;
@@ -30,6 +30,7 @@ enum { SVS_OK=0, SVS_BAD_ABI=1, SVS_INVALID_INPUT=2, SVS_CANCELLED=3, SVS_FAILED
 #define SVS_FEATURE_RANGES UINT64_C(4)
 #define SVS_FEATURE_HOST_BUFFERS UINT64_C(8)
 #define SVS_FEATURE_ENGINE_SETTINGS UINT64_C(16)
+#define SVS_FEATURE_CATALOG_QUERY UINT64_C(32)
 #define SVS_ENGINE_TYPE_AI "ai"
 #define SVS_ENGINE_TYPE_CONCATENATIVE "concatenative"
 #define SVS_ENGINE_TYPE_EXAMPLE "example"
@@ -126,6 +127,11 @@ typedef struct svs_api {
        Release the returned string using release_string; values reach submit
        through snapshot input_json, not mutable shared engine state. */
     svs_status (SVS_CALL *query_engine_settings)(svs_engine, const char* context_json, const char** result_json);
+    /* ABI 1.3 optional immutable catalog refresh. Context carries engineSettings,
+       installations (host-owned stable IDs), defaultVoicebankDirectory and rescan.
+       Result includes voices, installations, diagnostics and catalogRevision.
+       Keep catalog() available for older hosts. Strings use release_string. */
+    svs_status (SVS_CALL *query_catalog)(svs_engine, const char* context_json, const char** result_json);
 } svs_api;
 /* Check the complete field before inspecting an optional pointer or host service. */
 #define SVS_HAS_FIELD(value, type, field) ((value).size >= offsetof(type, field) + sizeof((value).field))

@@ -52,6 +52,7 @@ void schema(const example::Json& declaration) {
    if(type=="float"||type=="int") {const auto lo=parameter["min"].numeric(NAN),hi=parameter["max"].numeric(NAN),step=parameter["step"].numeric(NAN),initial=value.numeric(NAN);require(std::isfinite(lo)&&std::isfinite(hi)&&lo<hi&&std::isfinite(step)&&step>0&&std::isfinite(initial)&&initial>=lo&&initial<=hi,"Invalid numeric range/default: "+id);if(type=="int") require(std::floor(lo)==lo&&std::floor(hi)==hi&&std::floor(step)==step&&std::floor(initial)==initial,"Invalid integer parameter: "+id);if(parameter["scale"].text()=="log") require(lo>0,"Invalid logarithmic range: "+id);}
    else if(type=="bool") require(value.type==J::Boolean,"Invalid boolean default: "+id);
    else if(type=="string") require(value.type==J::String,"Invalid string default: "+id);
+   else if(type=="directory-list") {require(value.type==J::Array&&!parameter["curve"].boolean,"Invalid directory-list default: "+id);const auto maximum=parameter["maxItems"].numeric(128);require(maximum>=1&&maximum<=128&&value.array.size()<=maximum,"Invalid directory-list bound: "+id);for(const auto& path:value.array) require(path.type==J::String,"Directory-list path must be a UTF-8 string: "+id);}
    else if(type=="enum") {std::set<std::string> choices;for(const auto& choice:parameter["choices"].array) {const auto key=choice["id"].text();require(!key.empty()&&choices.insert(key).second,"Duplicate/missing enum ID: "+id);}require(value.type==J::String&&choices.count(value.string),"Invalid enum default: "+id);}
    else require(false,"Unsupported parameter type: "+id);
    if(parameter["curve"].boolean) {const auto interpolation=parameter["interpolation"].text();require(interpolation=="linear"||interpolation=="hermite"||interpolation=="step","Invalid interpolation: "+id);if(type!="float") require(interpolation=="step","Discrete parameter curve must use step: "+id);}
@@ -70,7 +71,8 @@ struct Host {
 };
 int run(const std::filesystem::path& path) {
  const auto absolute=std::filesystem::absolute(path);Library library(absolute);auto entry=library.entry();require(entry!=nullptr,"Missing svs_get_api");svs_api rejected{};require(entry(SVS_ABI_MAJOR+1,0,sizeof(rejected),&rejected)==SVS_BAD_ABI,"Plugin accepted incompatible ABI major");require(entry(SVS_ABI_MAJOR,0,SVS_API_REQUIRED_SIZE-1,&rejected)==SVS_BAD_ABI,"Plugin accepted undersized API table");const auto api=svs_sdk::negotiate(entry);
- Host host;const auto services=host.table();svs_sdk::Engine engine(entry,&services);const auto catalog=example::Reader(engine.catalog().c_str()).read();require(catalog["voices"].type==example::Json::Array&&!catalog["voices"].array.empty(),"Empty or invalid voice catalog");std::set<std::string> voices;
+ Host host;const auto services=host.table();svs_sdk::Engine engine(entry,&services);const auto catalog=example::Reader(engine.catalog().c_str()).read();require(catalog["voices"].type==example::Json::Array,"Invalid voice catalog");std::set<std::string> voices;
+ if(engine.hasCatalogQuery()) {const auto refreshed=example::Reader(engine.catalog(R"({"engineSettings":{},"rescan":false})").c_str()).read();require(refreshed["voices"].type==example::Json::Array,"Invalid refreshed catalog");std::cout<<"PASS optional catalog query / returned string ownership\n";}
  if(engine.hasEngineSettings()) {
   const auto settings=example::Reader(engine.engineSettings().c_str()).read();require(settings["schemaVersion"].numeric(0)==1,"Invalid engine settings schema version");require(!settings["name"].text().empty(),"Missing engine name");
   const auto type=settings["engineType"].text();require(type==SVS_ENGINE_TYPE_AI||type==SVS_ENGINE_TYPE_CONCATENATIVE||type==SVS_ENGINE_TYPE_EXAMPLE,"Invalid engine type");require(settings["engineSettings"].type==example::Json::Array,"Engine settings must be an array");
@@ -90,7 +92,7 @@ int run(const std::filesystem::path& path) {
   if(api.features&SVS_FEATURE_HOST_BUFFERS) require(host.progress>0&&!host.completed.empty()&&host.completed.back().request==77&&host.completed.back().status==SVS_CANCELLED,"Missing host progress/completion delivery");
   std::cout<<"PASS voice="<<id<<" sampleRate=32000 energy="<<energy<<" ownership/cancel/origin\n";
  }
- require(host.buffers.empty(),"Outstanding host allocations");std::cout<<"PASS ABI "<<api.major<<'.'<<api.minor<<" voices="<<voices.size()<<" SDK-only conformance\n";return 0;
+ require(host.buffers.empty(),"Outstanding host allocations");if(voices.empty()) std::cout<<"PASS empty installed-engine catalog (PCM/cancellation not exercised)\n";std::cout<<"PASS ABI "<<api.major<<'.'<<api.minor<<" voices="<<voices.size()<<" SDK-only conformance\n";return 0;
 }
 }
 #ifdef _WIN32

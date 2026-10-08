@@ -6,6 +6,7 @@ add_library(lmmssvs STATIC SVSPlugin.cpp SVSCapabilities.cpp SVSCurve.cpp SVSWav
   ../../gui/editors/svs/SVSResultStrip.cpp "${CMAKE_SOURCE_DIR}/include/SVSResultStrip.h"
   "${CMAKE_SOURCE_DIR}/include/SVSClip.h" "${CMAKE_SOURCE_DIR}/include/SVSTrack.h" "${CMAKE_SOURCE_DIR}/include/SVSViews.h" "${CMAKE_SOURCE_DIR}/include/SVSCanvas.h")
 target_compile_features(lmmssvs PUBLIC cxx_std_20)
+target_sources(lmmssvs PRIVATE "${CMAKE_SOURCE_DIR}/include/SVSModel.h")
 target_compile_definitions(lmmssvs PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
 target_include_directories(lmmssvs PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svs/include" "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/src")
 target_link_libraries(lmmssvs PUBLIC ${QT_LIBRARIES})

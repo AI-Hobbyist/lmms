@@ -1,4 +1,4 @@
-# Native SVS SDK 1.2
+# Native SVS SDK 1.3
 
 This SDK builds native Singing Voice Synthesis plugins independently of LMMS. The C ABI requires a matching platform and pointer width. C++17 conveniences are compiled into the caller. No Qt, LMMS internal header, TuneLab, .NET, Libjack, online service or model download is required by the examples.
 

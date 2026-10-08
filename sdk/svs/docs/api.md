@@ -8,6 +8,8 @@ Resolve `svs_get_api`, zero-initialize the caller's `svs_api`, and pass major 1,
 
 `svs_get_api` writes at most the supplied size. The required prefix ends before pronunciation and remains unchanged. Host service extensions follow the old log/progress prefix; plugins copy only the declared complete fields, and use local allocation when host buffer services are absent.
 
+Minor 2 adds `query_engine_settings`; minor 3 appends optional `query_catalog` with `SVS_FEATURE_CATALOG_QUERY`. Catalog refresh uses applied directory settings and host-persisted installation IDs. Engines may be installed with an empty voice catalog. The legacy `catalog` callback returns the current snapshot. See [EngineSettings.md](EngineSettings.md) for context, response and resource lifetime rules. Minor 0–2 callers retain their existing table layout and behavior.
+
 ## Calls and ownership
 
 | Family | Calls | Contract |
