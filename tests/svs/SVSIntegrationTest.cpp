@@ -5,6 +5,16 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QMenu>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QTimer>
+#include "SampleClip.h"
+#include "SampleTrack.h"
+#include "SampleBuffer.h"
+#include "PathUtil.h"
 #include <QLayout>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
@@ -19,6 +29,8 @@
 #include <tlhelp32.h>
 #endif
 #include "SVSParameterPanel.h"
+#include "SVSProjectController.h"
+#include "SVSProjectImportDialog.h"
 #include "SVSSettingsPage.h"
 #include "PluginBrowser.h"
 #include "SetupDialog.h"
@@ -124,6 +136,88 @@ private slots:
  }
  void init() { QTRY_VERIFY_WITH_TIMEOUT(!svs::Registry::instance().scanning(),30000);Engine::projectJournal()->clearJournal(); }
  void cleanupTestCase() { if(m_guiApplication) {delete static_cast<QWidget*>(m_guiApplication->mainWindow());m_guiApplication.reset();}else Engine::destroy(); }
+ void projectImportPersistenceAndRollback() {
+  auto* song=Engine::getSong();song->clearProject();
+  svs::Voice voice;for(const auto& candidate:svs::Registry::instance().voices()) if(candidate.id=="full") {voice=candidate;break;}QVERIFY(!voice.id.isEmpty());
+  const auto project=QJsonDocument::fromJson(R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"中文歌声","note_list":[{"start_pos":961,"length":479,"key_number":60,"lyric":"你","pronunciation":"ni"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2881,-100],[2881,6000],[3121,6050],[3181,5980],[3241,6020],[3301,5980],[3361,5980],[3361,-100],[3600,6400],[3840,6420],[3840,-100],[1073741823,-100]]}}},{"type_":"Singing","title":"日本語 한국어","note_list":[{"start_pos":480,"length":480,"key_number":64,"lyric":"あ"}],"edited_params":{}}]})").object();
+  const svs::ProjectVoice binding{voice.pluginId,voice.id,voice.name,voice.language};const auto imported=svs::ProjectMapper::prepareImport(project,binding,{});QVERIFY2(imported.valid(),qPrintable(imported.error));
+  QString error;QVERIFY2(gui::SVSProjectController::commitImport(imported,*song,error),qPrintable(error));QCOMPARE(song->tracks().size(),size_t(2));QVERIFY(song->isModified());QVERIFY(song->projectFileName().isEmpty());
+  for(auto* base:song->tracks()) {auto* track=dynamic_cast<SVSTrack*>(base);QVERIFY(track);QCOMPARE(track->voice().pluginId,voice.pluginId);QCOMPARE(track->voice().id,voice.id);}
+  auto* track=static_cast<SVSTrack*>(song->tracks().front());auto* clip=static_cast<SVSClip*>(track->getClip(0));QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  QVERIFY(std::abs(clip->notes().first().tick-96.1)<1e-9);QCOMPARE(clip->notes().first().pronunciation,QString("ni"));
+  const auto curve=clip->curves().value("svs.pitch");QVERIFY(std::abs(curve.valueAt(108.1)->toDouble()-60.25)<1e-6);QVERIFY(!curve.valueAt(155));QVERIFY(std::abs(curve.valueAt(126.1)->toDouble()-59.8)<1e-6);QVERIFY(std::abs(curve.valueAt(132.1)->toDouble()-60.2)<1e-6);
+  const auto input=clip->captureInput(48000);QCOMPARE(input.document["curves"].toObject()["svs.pitch"].toObject(),curve.toJson());
+  QTRY_VERIFY_WITH_TIMEOUT(clip->audio()!=nullptr,10000);
+  const auto tempo=svs::TempoSnapshot::capture(*song,song->getTempo());QCOMPARE(tempo->tempoAt(0),120);QCOMPARE(tempo->tempoAt(95),120);QCOMPARE(tempo->tempoAt(96),150);
+  const auto native=m_configuration.filePath(QStringLiteral("导入-日本語-한국어.mmp"));QVERIFY(song->saveProjectFile(native));song->loadProject(native);QVERIFY(!song->hasErrors());
+  track=static_cast<SVSTrack*>(song->tracks().front());clip=static_cast<SVSClip*>(track->getClip(0));QCOMPARE(clip->curves().value("svs.pitch").toJson(),curve.toJson());QVERIFY(std::abs(clip->notes().first().tick-96.1)<1e-9);QCOMPARE(clip->notes().first().lyric,QStringLiteral("你"));
+  auto changed=clip->curves();changed["svs.pitch"].insert(108.1,61.);clip->setEditorData(clip->notes(),changed);QVERIFY(std::abs(clip->curves()["svs.pitch"].valueAt(108.1)->toDouble()-61)<1e-6);Engine::projectJournal()->undo();QCOMPARE(clip->curves().value("svs.pitch").toJson(),curve.toJson());
+  song->setModified(true);const auto fileName=song->projectFileName();const auto beforeName=track->name();auto badProject=project;auto tracks=project["track_list"].toArray();tracks.append(QJsonObject{{"type_","Instrumental"},{"title","missing"},{"audio_file_path","disappeared.wav"},{"offset",0}});badProject["track_list"]=tracks;
+  const auto failed=svs::ProjectMapper::prepareImport(badProject,binding,{{"disappeared.wav",{m_configuration.filePath("disappeared.wav"),96}}});QVERIFY(failed.valid());QVERIFY(!gui::SVSProjectController::commitImport(failed,*song,error));QVERIFY(!error.isEmpty());QCOMPARE(song->tracks().size(),size_t(2));QCOMPARE(song->projectFileName(),fileName);QVERIFY(song->isModified());QCOMPARE(song->tracks().front()->name(),beforeName);QCOMPARE(static_cast<SVSClip*>(song->tracks().front()->getClip(0))->curves().value("svs.pitch").toJson(),curve.toJson());song->clearProject();
+ }
+ void projectImportNativeWindows() {
+  if(!m_guiApplication) {
+   auto environment=QProcessEnvironment::systemEnvironment();environment.insert("SVS_EMBEDDED_GUI_TEST","1");environment.insert("QT_QPA_PLATFORM","windows");
+   const auto report=m_configuration.filePath("project-native-child.txt");QProcess child;child.setProcessEnvironment(environment);child.start(QCoreApplication::applicationFilePath(),{"projectImportNativeWindows","-o",report+",txt","-o","-,txt"});QVERIFY(child.waitForStarted(5000));QVERIFY(child.waitForFinished(30000));QFile result(report);QVERIFY(result.open(QIODevice::ReadOnly));const auto output=result.readAll()+child.readAllStandardError();QVERIFY2(child.exitStatus()==QProcess::NormalExit&&child.exitCode()==0,output.constData());return;
+  }
+  QCOMPARE(QGuiApplication::platformName(),QString("windows"));auto* window=m_guiApplication->mainWindow();window->resize(1280,800);window->show();QVERIFY(QTest::qWaitForWindowExposed(window));
+  auto* menu=window->findChild<QMenu*>("svsProjectMenu");QVERIFY(menu);QCOMPARE(menu->title(),QStringLiteral("SVS 工程"));QCOMPARE(menu->actions().size(),2);QCOMPARE(menu->actions()[0]->text(),QStringLiteral("导入SVS工程"));QCOMPARE(menu->actions()[1]->text(),QStringLiteral("导出SVS工程"));
+  menu->popup(window->mapToGlobal(QPoint(100,80)));QTest::qWait(600);QVERIFY(menu->isVisible());QVERIFY(menu->screen()->grabWindow(menu->winId()).save("doc/svs/project/M2-native-menu.png"));menu->hide();
+  const QJsonObject format{{"id","svp"},{"name","Synthesizer V"},{"inputDefaults",QJsonObject{{"import_pitch",true},{"pitch","full"}}},{"inputSchema",QJsonObject{{"properties",QJsonObject{{"import_pitch",QJsonObject{{"title","Import pitch"},{"type","boolean"}}},{"pitch",QJsonObject{{"title","Pitch mode"},{"enum",QJsonArray{"plain","full"}}}}}}}}};
+  auto* song=Engine::getSong();const bool modified=song->isModified();const auto fileName=song->projectFileName();const auto count=song->tracks().size();
+  gui::SVSProjectImportDialog dialog(format,window);dialog.show();QVERIFY(QTest::qWaitForWindowExposed(&dialog));auto* choices=dialog.findChild<QComboBox*>("svsProjectDefaultVoice");QVERIFY(choices);QVERIFY(choices->count()>0);const auto selected=choices->currentData().toList();QCOMPARE(selected.size(),2);QVERIFY(!choices->currentText().isEmpty());QVERIFY(dialog.options()["import_pitch"].toBool());QCOMPARE(dialog.options()["pitch"].toString(),QString("full"));
+  QTest::qWait(600);QVERIFY(dialog.screen()->grabWindow(dialog.winId()).save("doc/svs/project/M2-native-voice-dialog.png"));dialog.reject();QCOMPARE(song->tracks().size(),count);QCOMPARE(song->projectFileName(),fileName);QCOMPARE(song->isModified(),modified);
+  // Confirming the dialog only selects a stable identity; it never imports tracks.
+  dialog.accept();QCOMPARE(dialog.result(),int(QDialog::Accepted));QCOMPARE(dialog.selectedVoice().pluginId,selected[0].toString());QCOMPARE(dialog.selectedVoice().voiceId,selected[1].toString());QCOMPARE(song->tracks().size(),count);
+  const auto project=QJsonDocument::fromJson(R"({"song_tempo_list":[{"position":0,"bpm":120}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"原工程音高线","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2520,6050],[2640,5980],[2760,6030],[2880,6000],[2880,-100],[3360,6200],[3600,6250],[3600,-100],[1073741823,-100]]}}}]})").object();
+  QString error;const auto prepared=svs::ProjectMapper::prepareImport(project,dialog.selectedVoice(),{});QVERIFY2(gui::SVSProjectController::commitImport(prepared,*song,error),qPrintable(error));auto* track=static_cast<SVSTrack*>(song->tracks().front());auto* clip=static_cast<SVSClip*>(track->getClip(0));QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(),10000);
+  // Exercise the imported curve at a nonzero clip position through production UI.
+  clip->movePosition(192);const auto input=clip->captureInput(48000);QCOMPARE(input.document["position"].toDouble(),192.);const auto original=clip->curves();
+  gui::SVSPianoRoll editor(clip);editor.resize(1100,660);editor.show();QVERIFY(QTest::qWaitForWindowExposed(&editor));QTest::qWait(600);QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/project/M2-native-imported-pitch.png"));
+  auto changed=original;changed["svs.pitch"].insert(60,61.);clip->setEditorData(clip->notes(),changed);QVERIFY(std::abs(clip->curves()["svs.pitch"].valueAt(60)->toDouble()-61)<1e-6);Engine::projectJournal()->undo();QCOMPARE(clip->curves(),original);editor.close();song->clearProject();window->hide();
+ }
+ void projectImportNoVoices() {
+  if(!qEnvironmentVariableIsSet("SVS_PROJECT_NO_VOICES_TEST")) {
+   auto environment=QProcessEnvironment::systemEnvironment();environment.insert("SVS_EMBEDDED_GUI_TEST","1");environment.insert("SVS_PROJECT_NO_VOICES_TEST","1");environment.insert("QT_QPA_PLATFORM","windows");environment.insert("LMMS_SVS_PLUGIN_DIR",m_configuration.filePath("empty-catalog"));
+   const auto report=m_configuration.filePath("project-empty-voices-child.txt");QProcess child;child.setProcessEnvironment(environment);child.start(QCoreApplication::applicationFilePath(),{"projectImportNoVoices","-o",report+",txt","-o","-,txt"});QVERIFY(child.waitForStarted(5000));QVERIFY(child.waitForFinished(30000));QFile result(report);QVERIFY(result.open(QIODevice::ReadOnly));const auto output=result.readAll()+child.readAllStandardError();QVERIFY2(child.exitStatus()==QProcess::NormalExit&&child.exitCode()==0,output.constData());return;
+  }
+  QVERIFY(m_guiApplication);QCOMPARE(QGuiApplication::platformName(),QString("windows"));QVERIFY(svs::Registry::instance().voices().isEmpty());auto* song=Engine::getSong();const auto count=song->tracks().size();const auto modified=song->isModified();const auto fileName=song->projectFileName();
+  gui::SVSProjectImportDialog dialog(QJsonObject{{"name","JSON"}},m_guiApplication->mainWindow());dialog.show();QVERIFY(QTest::qWaitForWindowExposed(&dialog));auto* buttons=dialog.findChild<QDialogButtonBox*>();QVERIFY(buttons);QVERIFY(!buttons->button(QDialogButtonBox::Ok)->isEnabled());QVERIFY(dialog.findChild<QLabel*>("svsProjectVoiceStatus")->text().contains(QStringLiteral("没有可用声库")));dialog.accept();QCOMPARE(dialog.result(),int(QDialog::Rejected));dialog.reject();QCOMPARE(song->tracks().size(),count);QCOMPARE(song->isModified(),modified);QCOMPARE(song->projectFileName(),fileName);
+ }
+ void projectImportControllerFlow() {
+  if(!m_guiApplication) {
+   auto environment=QProcessEnvironment::systemEnvironment();environment.insert("SVS_EMBEDDED_GUI_TEST","1");environment.insert("QT_QPA_PLATFORM","windows");const auto report=m_configuration.filePath("project-controller-child.txt");QProcess child;child.setProcessEnvironment(environment);child.start(QCoreApplication::applicationFilePath(),{"projectImportControllerFlow","-o",report+",txt","-o","-,txt"});QVERIFY(child.waitForStarted(5000));QVERIFY(child.waitForFinished(120000));QFile result(report);QVERIFY(result.open(QIODevice::ReadOnly));const auto output=result.readAll()+child.readAllStandardError();QFile archived("doc/svs/project/M2-controller-child-latest.txt");if(archived.open(QIODevice::WriteOnly)) archived.write(output);QVERIFY2(child.exitStatus()==QProcess::NormalExit&&child.exitCode()==0,output.constData());return;
+  }
+  auto* window=m_guiApplication->mainWindow();window->show();QVERIFY(QTest::qWaitForWindowExposed(window));auto* song=Engine::getSong();song->clearProject();
+  const auto wave=m_configuration.filePath(QStringLiteral("伴奏-日本語-한국어.wav"));QFile audio(wave);QVERIFY(audio.open(QIODevice::WriteOnly));QDataStream stream(&audio);stream.setByteOrder(QDataStream::LittleEndian);stream.writeRawData("RIFF",4);stream<<quint32(96036);stream.writeRawData("WAVEfmt ",8);stream<<quint32(16)<<quint16(1)<<quint16(1)<<quint32(48000)<<quint32(96000)<<quint16(2)<<quint16(16);stream.writeRawData("data",4);stream<<quint32(96000);for(int i=0;i<48000;++i) stream<<qint16(1000*std::sin(i*.03));audio.close();
+  auto project=QJsonDocument::fromJson(R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"完整导入","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2640,6050],[2880,6000],[2880,-100],[1073741823,-100]]}}}]})").object();
+  auto tracks=project["track_list"].toArray();for(const auto offset:{0,960}) tracks.append(QJsonObject{{"type_","Instrumental"},{"title",QString("audio-%1").arg(offset)},{"audio_file_path",wave},{"offset",offset}});project["track_list"]=tracks;
+  const auto source=m_configuration.filePath(QStringLiteral("工程-日本語-한국어.json"));QFile file(source);QVERIFY(file.open(QIODevice::WriteOnly));const auto original=QJsonDocument(project).toJson();file.write(original);file.close();
+  auto* old=new SVSTrack(song);old->setName("original-project");auto* oldClip=static_cast<SVSClip*>(old->createClip(0));svs::Note note;note.id="original-note";oldClip->setNotes({note});song->setModified(true);
+  const QDir resources(ConfigManager::inst()->userSamplesDir()+"/svs-project");const auto resourceBaseline=resources.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
+  gui::SVSProjectController controller(window,QStringLiteral(LMMS_SVS_PROJECT_RUNTIME));QString choice="cancel-unsaved";QString selectedPath=source;int filesShown=0,voicesShown=0,errorsShown=0,unsavedShown=0,lossesShown=0;QTimer automation;QElapsedTimer elapsed;elapsed.start();QString previousModal;
+  connect(&automation,&QTimer::timeout,this,[&]{
+   auto* modal=QApplication::activeModalWidget();if(!modal) return;
+   const auto identity=QString::number(quintptr(modal))+":"+modal->metaObject()->className()+":"+modal->objectName()+":"+modal->windowTitle();if(identity!=previousModal) {previousModal=identity;QFile trace("doc/svs/project/M2-controller-flow-events.txt");if(trace.open(QIODevice::WriteOnly|QIODevice::Append)) trace.write((choice+" "+identity+"\n").toUtf8());}
+   if(elapsed.elapsed()>25000) {if(auto* dialog=qobject_cast<QDialog*>(modal)) dialog->reject();return;}
+   if(auto* picker=qobject_cast<QFileDialog*>(modal)) {if(!picker->property("projectHandled").toBool()) {picker->setProperty("projectHandled",true);++filesShown;for(const auto& filter:picker->nameFilters()) if(filter.contains("[json]")) {picker->selectNameFilter(filter);break;}picker->setDirectory(QFileInfo(selectedPath).absolutePath());}picker->selectFile(QFileInfo(selectedPath).fileName());auto* fileName=picker->findChild<QLineEdit*>("fileNameEdit");if(fileName) fileName->setText(QFileInfo(selectedPath).fileName());if(!picker->property("selectionLogged").toBool()) {picker->setProperty("selectionLogged",true);QFile trace("doc/svs/project/M2-controller-flow-events.txt");if(trace.open(QIODevice::WriteOnly|QIODevice::Append)) trace.write((picker->directory().path()+" | "+picker->selectedNameFilter()+" | "+picker->selectedFiles().join('|')+"\n").toUtf8());}QMetaObject::invokeMethod(picker,"accept",Qt::QueuedConnection);}
+   else if(modal->objectName()=="svsProjectImportDialog") {if(modal->property("projectHandled").toBool()) return;modal->setProperty("projectHandled",true);++voicesShown;auto* buttons=modal->findChild<QDialogButtonBox*>();QVERIFY(buttons);if(choice=="cancel-voice") buttons->button(QDialogButtonBox::Cancel)->click();else buttons->button(QDialogButtonBox::Ok)->click();}
+   else if(auto* message=qobject_cast<QMessageBox*>(modal)) {if(message->standardButtons().testFlag(QMessageBox::Save)) {++unsavedShown;message->button(choice=="cancel-unsaved"?QMessageBox::Cancel:choice=="save-failure"?QMessageBox::Save:QMessageBox::Discard)->click();}else if(message->standardButtons().testFlag(QMessageBox::Yes)) {++lossesShown;QVERIFY(message->text().contains("pitch"));QVERIFY(message->text().contains("json"));QVERIFY(message->text().contains(QStringLiteral("完整导入")));message->button(QMessageBox::Cancel)->click();}else {++errorsShown;message->button(QMessageBox::Ok)?message->button(QMessageBox::Ok)->click():message->reject();}}
+   else if(choice=="cancel-process") {if(auto* progress=qobject_cast<QProgressDialog*>(modal)) QMetaObject::invokeMethod(progress,"canceled",Qt::QueuedConnection);}
+  });automation.start(50);
+  controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(filesShown,1);QCOMPARE(voicesShown,1);QCOMPARE(unsavedShown,1);QCOMPARE(song->tracks().size(),size_t(1));QCOMPARE(song->tracks().front()->name(),QString("original-project"));QVERIFY(song->isModified());
+  choice="cancel-voice";elapsed.restart();controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(unsavedShown,1);QCOMPARE(song->tracks().size(),size_t(1));QVERIFY(song->isModified());
+  QCOMPARE(resources.entryList(QDir::Dirs|QDir::NoDotAndDotDot),resourceBaseline);
+  auto noPitch=project;auto noPitchTracks=noPitch["track_list"].toArray();auto singing=noPitchTracks[0].toObject();singing.remove("edited_params");noPitchTracks[0]=singing;noPitch["track_list"]=noPitchTracks;selectedPath=m_configuration.filePath("missing-pitch.json");QFile noPitchFile(selectedPath);QVERIFY(noPitchFile.open(QIODevice::WriteOnly));noPitchFile.write(QJsonDocument(noPitch).toJson());noPitchFile.close();choice="loss-cancel";elapsed.restart();controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(lossesShown,1);QCOMPARE(song->tracks().size(),size_t(1));QVERIFY(song->isModified());QCOMPARE(resources.entryList(QDir::Dirs|QDir::NoDotAndDotDot),resourceBaseline);selectedPath=source;
+  choice="cancel-process";elapsed.restart();controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(song->tracks().size(),size_t(1));QVERIFY(song->isModified());QCOMPARE(resources.entryList(QDir::Dirs|QDir::NoDotAndDotDot),resourceBaseline);
+  const auto blockedDirectory=m_configuration.filePath("blocked-save");QVERIFY(QDir().mkdir(blockedDirectory));const auto blockedSave=blockedDirectory+"/project.mmp";QVERIFY(song->guiSaveProjectAs(blockedSave));QVERIFY(QDir().rename(blockedDirectory,blockedDirectory+".original"));QFile blockedParent(blockedDirectory);QVERIFY(blockedParent.open(QIODevice::WriteOnly));blockedParent.write("not a directory");blockedParent.close();song->setModified(true);const auto unsavedBeforeSave=unsavedShown;
+  choice="save-failure";elapsed.restart();controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(unsavedShown,unsavedBeforeSave+1);QCOMPARE(song->tracks().size(),size_t(1));QCOMPARE(song->tracks().front()->name(),QString("original-project"));QCOMPARE(song->projectFileName(),blockedSave);QVERIFY(song->isModified());QCOMPARE(resources.entryList(QDir::Dirs|QDir::NoDotAndDotDot),resourceBaseline);QVERIFY(QFile::remove(blockedDirectory));QVERIFY(QDir().rename(blockedDirectory+".original",blockedDirectory));
+  choice="corrupt";elapsed.restart();const auto corrupt=m_configuration.filePath("corrupt.json");QFile broken(corrupt);QVERIFY(broken.open(QIODevice::WriteOnly));broken.write("{broken}");broken.close();selectedPath=corrupt;controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QVERIFY(errorsShown>0);QCOMPARE(song->tracks().size(),size_t(1));QCOMPARE(song->tracks().front()->name(),QString("original-project"));QVERIFY(song->isModified());
+  selectedPath=source;choice="replace";elapsed.restart();controller.importProject();QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(),30000);QCOMPARE(song->tracks().size(),size_t(3));QCOMPARE(song->tracks().front()->name(),QStringLiteral("完整导入"));QVERIFY(song->projectFileName().isEmpty());QVERIFY(song->isModified());
+  auto* first=static_cast<SampleClip*>(song->tracks()[1]->getClip(0));auto* second=static_cast<SampleClip*>(song->tracks()[2]->getClip(0));QCOMPARE(int(first->length()),96);QCOMPARE(int(second->length()),120);QCOMPARE(int(second->startPosition()),96);QCOMPARE(first->sampleFile(),second->sampleFile());QVERIFY(QFileInfo::exists(PathUtil::toAbsolute(first->sampleFile())));QVERIFY(first->sampleFile()!=wave);QCOMPARE(first->sample().sampleSize(),f_cnt_t(48000));
+  const auto native=m_configuration.filePath("durable-audio.mmp");QVERIFY(song->saveProjectFile(native));song->loadProject(native);QVERIFY(!song->hasErrors());first=static_cast<SampleClip*>(song->tracks()[1]->getClip(0));QVERIFY(QFileInfo::exists(PathUtil::toAbsolute(first->sampleFile())));QCOMPARE(first->sample().sampleSize(),f_cnt_t(48000));
+  QFile unchanged(source);QVERIFY(unchanged.open(QIODevice::ReadOnly));QCOMPARE(unchanged.readAll(),original);automation.stop();song->clearProject();window->hide();
+ }
  void embeddedWindowLifecycle() {
   if(!m_guiApplication) {
    auto environment=QProcessEnvironment::systemEnvironment();environment.insert("SVS_EMBEDDED_GUI_TEST","1");

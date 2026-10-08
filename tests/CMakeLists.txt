@@ -12,6 +12,14 @@ add_test(NAME SVSProjectProcessTest COMMAND SVSProjectProcessTest
  -o "${CMAKE_CURRENT_BINARY_DIR}/SVSProjectProcessTest-results.txt,txt" -o "-,txt")
 set_tests_properties(SVSProjectProcessTest PROPERTIES TIMEOUT 90 LABELS "svs;project;M1")
 
+add_executable(SVSProjectMapperTest svs/SVSProjectMapperTest.cpp ../src/core/svs/SVSProjectMapper.cpp)
+target_include_directories(SVSProjectMapperTest PRIVATE "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svs/include")
+target_compile_features(SVSProjectMapperTest PRIVATE cxx_std_20)
+target_link_libraries(SVSProjectMapperTest PRIVATE ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+add_test(NAME SVSProjectMapperTest COMMAND SVSProjectMapperTest
+ -o "${CMAKE_CURRENT_BINARY_DIR}/SVSProjectMapperTest-results.txt,txt" -o "-,txt")
+set_tests_properties(SVSProjectMapperTest PROPERTIES TIMEOUT 30 LABELS "svs;project;M2")
+
 set(LMMS_TESTS
 	src/core/ArrayVectorTest.cpp
 	src/core/AudioBufferTest.cpp
@@ -99,6 +107,7 @@ set_target_properties(UiBaselineCapture PROPERTIES OUTPUT_NAME lmms
 set_tests_properties(UiBaselineCapture PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
 	ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/$<CONFIG>/plugins;LMMS_SVS_PLUGIN_DIR=$<TARGET_FILE_DIR:SVSExample>/..;LMMS_UI_EVIDENCE=${CMAKE_BINARY_DIR}/ui-baseline;LMMS_UI_SAMPLE=${CMAKE_SOURCE_DIR}/doc/ui-modernization/fixtures/tone.wav;LMMS_UI_FIXTURE=${CMAKE_BINARY_DIR}/ui-fixture.mmp")
 target_include_directories(SVSIntegrationTest PRIVATE "${CMAKE_SOURCE_DIR}/sdk/svs/include")
+target_compile_definitions(SVSIntegrationTest PRIVATE LMMS_SVS_PROJECT_RUNTIME="${CMAKE_BINARY_DIR}/Release/svs-project")
 set_tests_properties(SVSIntegrationTest PROPERTIES TIMEOUT 60 LABELS "svs;M1"
  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
  ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=$<TARGET_FILE_DIR:SVSExample>/..")

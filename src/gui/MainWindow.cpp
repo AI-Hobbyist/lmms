@@ -23,6 +23,7 @@
  */
 
 #include "MainWindow.h"
+#include "SVSProjectController.h"
 
 #include <QApplication>
 #include <QCloseEvent>
@@ -308,6 +309,14 @@ void MainWindow::finalize()
 
 	project_menu->addAction(embed::getIconPixmap("project_import"), tr("Import..."),
 		this, &MainWindow::onImportProject);
+
+	auto* svsProjectMenu = project_menu->addMenu(QStringLiteral("SVS 工程"));
+	svsProjectMenu->setObjectName("svsProjectMenu");
+	auto* svsProjectController = new SVSProjectController(this);
+	svsProjectMenu->addAction(QStringLiteral("导入SVS工程"), svsProjectController, &SVSProjectController::importProject);
+	// M3 implements and enables the second action after the M2 checkpoint.
+	auto* svsExportAction = svsProjectMenu->addAction(QStringLiteral("导出SVS工程"));
+	svsExportAction->setEnabled(false);
 
 	addAction(project_menu, "project_export", tr("E&xport..."),
 		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);

@@ -69,8 +69,9 @@ def fixed_catalog():
             if enabled:
                 item[prefix + "Defaults"] = cls().model_dump(mode="json")
                 item[prefix + "Schema"] = cls.model_json_schema()
-        if read and "import_pitch" in item.get("inputDefaults", {}):
-            item["inputDefaults"]["import_pitch"] = True
+        for key in ("import_pitch", "use_edited_pitch"):
+            if read and key in item.get("inputDefaults", {}):
+                item["inputDefaults"][key] = True
         if spec["id"] == "svp":
             item["inputDefaults"]["pitch"] = "full"
         converters[spec["id"]] = converter
@@ -97,7 +98,7 @@ def process(request, workspace):
     if not path.is_absolute():
         raise ValueError("Project path must be absolute")
     from libresvip.core.warning_types import CatchWarnings
-    from libresvip.model.base import InstrumentalTrack, Project
+    from libresvip.model.base import InstrumentalTrack, SingingTrack, Project
     with CatchWarnings() as caught:
         if operation == "importProject":
             if not spec["canImport"]:
@@ -109,11 +110,24 @@ def process(request, workspace):
             source.parent.mkdir()
             shutil.copy2(path, source)
             effective = {**spec["inputDefaults"], **options}
-            if "import_pitch" in effective:
-                effective["import_pitch"] = True
+            for key in ("import_pitch", "use_edited_pitch"):
+                if key in effective:
+                    effective[key] = True
+            if format_id == "svp":
+                effective["pitch"] = "full"
             project = converter.load(source, effective)
             resources = []
-            for track in project.track_list:
+            losses = []
+            for index, track in enumerate(project.track_list):
+                if isinstance(track, SingingTrack) and track.note_list and not any(
+                    point.y != -100 and -192000 < point.x < 1073741823
+                    for point in track.edited_params.pitch.points.root
+                ):
+                    losses.append({
+                        "formatId": format_id, "track": track.title or str(index + 1),
+                        "field": "pitch",
+                        "reason": "解析器未提供原工程的有效音高曲线；如源工程含弯音或颤音，无法确认其已保留。仅音符导入不计为音高保真。",
+                    })
                 if isinstance(track, InstrumentalTrack):
                     audio = pathlib.Path(track.audio_file_path)
                     if not audio.is_absolute():
@@ -123,7 +137,7 @@ def process(request, workspace):
                         audio = path.parent / audio.relative_to(source.parent)
                     track.audio_file_path = str(audio.resolve())
                     resources.append({"path": track.audio_file_path, "temporary": contained(audio, workspace), "exists": audio.is_file()})
-            result = {"project": project.model_dump(mode="json", by_alias=False), "resources": resources}
+            result = {"project": project.model_dump(mode="json", by_alias=False), "resources": resources, "losses": losses}
         elif operation == "exportProject":
             if not spec["canExport"]:
                 raise ValueError("Format is import-only")
