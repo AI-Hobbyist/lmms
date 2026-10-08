@@ -1,0 +1,48 @@
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\Release\SVSIntegrationTest.exe.
+While testing deletedTrackExportPreparation
+Function time: 4ms Total time: 21957ms
+
+Exception address: 0x00007FF6E37F8FB7
+Exception code   : 0xc0000005
+Nearby symbol    : lmms::gui::SimpleTextFloat::tr
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FFDBD929C00
+#  2: UnhandledExceptionFilter() - 0x00007FFE085BED90
+#  3: strncpy() - 0x00007FFE0B327150
+#  4: _C_specific_handler() - 0x00007FFE0B2E4670
+#  5: _chkstk() - 0x00007FFE0B325460
+#  6: RtlWow64GetCurrentMachine() - 0x00007FFE0B28B6D0
+#  7: KiUserExceptionDispatcher() - 0x00007FFE0B324E10
+#  8: lmms::gui::SimpleTextFloat::tr() - 0x00007FF6E37ED1A0
+#  9: lmms::graphModel::qt_static_metacall() - 0x00007FF6E38ED830
+# 10: QMetaCallEvent::placeMetaCall() - 0x00007FFD477A76B0
+# 11: QObject::event() - 0x00007FFD477A5330
+# 12: QWidget::event() - 0x00007FFD5B869690
+# 13: QApplicationPrivate::notify_helper() - 0x00007FFD5B8233D0
+# 14: QApplication::notify() - 0x00007FFD5B8210B0
+# 15: QCoreApplication::notifyInternal2() - 0x00007FFD47759B50
+# 16: QCoreApplicationPrivate::sendPostedEvents() - 0x00007FFD4775C270
+# 17: QWindowsGuiEventDispatcher::sendPostedEvents() - 0x00007FFD48FF57D0
+# 18: QEventDispatcherWin32::processEvents() - 0x00007FFD478F9190
+# 19: QWindowsGuiEventDispatcher::processEvents() - 0x00007FFD48FF5740
+# 20: QCoreApplication::processEvents() - 0x00007FFD4775A520
+# 21: QTest::qWait() - 0x00007FFD477B5AD0
+# 22: lmms::AutomatableModel::controllerConnection() - 0x00007FF6E363BAB0
+# 23: QMetaMethodInvoker::invokeImpl() - 0x00007FFD47763FD0
+# 24: QMetaMethod::invokeImpl() - 0x00007FFD47763DB0
+# 25: QTest::ignoreMessage() - 0x00007FFDBD905E80
+# 26: QTest::ignoreMessage() - 0x00007FFDBD905E80
+# 27: QTest::ignoreMessage() - 0x00007FFDBD905E80
+# 28: QTest::ignoreMessage() - 0x00007FFDBD905E80
+# 29: QTest::qRun() - 0x00007FFDBD90B310
+# 30: QTest::qExec() - 0x00007FFDBD908840
+# 31: lmms::TypedAutomatableModel<int>::value() - 0x00007FF6E36AE280
+# 32: lmms::gui::TabBar::widgetShown() - 0x00007FF6E3900230
+# 33: BaseThreadInitThunk() - 0x00007FFE09DACD70
+# 34: RtlUserThreadStart() - 0x00007FFE0B26CAC0

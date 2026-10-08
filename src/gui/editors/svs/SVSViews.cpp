@@ -4,6 +4,7 @@
 #include "SVSParameterPanel.h"
 #include "SVSCanvas.h"
 #include "SVSResultStrip.h"
+#include "SVSPitchRanges.h"
 #include "SVSLyricEditor.h"
 #include "SVSImageLoader.h"
 #include "ConfigManager.h"
@@ -158,16 +159,25 @@ SVSTrackView::SVSTrackView(SVSTrack* track,TrackContainerView* container):TrackV
 }
 void SVSTrackView::dragEnterEvent(QDragEnterEvent* event) { if(!StringPairDrag::processDragEnterEvent(event,"svsvoice")) TrackView::dragEnterEvent(event); }
 void SVSTrackView::dropEvent(QDropEvent* event) { if(StringPairDrag::decodeKey(event)=="svsvoice") { auto value=StringPairDrag::decodeValue(event); auto split=value.lastIndexOf('/'); static_cast<SVSTrack*>(getTrack())->bindVoice(value.left(split),value.mid(split+1)); event->accept(); } else TrackView::dropEvent(event); }
-SVSClipView::SVSClipView(SVSClip* clip,TrackView* view):ClipView(clip,view),m_clip(clip) { connect(clip,&Clip::dataChanged,this,[this]{setToolTip(m_clip->status()); update();}); }
+SVSClipView::SVSClipView(SVSClip* clip,TrackView* view):ClipView(clip,view),m_clip(clip) { connect(clip,&Clip::dataChanged,this,[this]{setToolTip(m_clip->status()); update();});connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString& key,const QString&){if(group=="svs"&&key=="showBackgroundWaveform") update();}); }
 void SVSClipView::paintEvent(QPaintEvent*) {
  QPainter p(this);
  if(cornerRadius()>0) { p.setRenderHint(QPainter::Antialiasing);p.setClipPath(clipOutline()); }
- const bool muted=m_clip->isMuted()||m_clip->getTrack()->isMuted();
- const auto background=cornerRadius()>0?(muted?mutedBackgroundColor():isSelected()?selectedColor():palette().button().color()):
-  (isSelected()?palette().highlight().color():palette().button().color());
+ const auto background=getColorForDisplay(palette().window().color());
  p.fillRect(rect(),background);
  p.setClipRect(rect().adjusted(1,1,-1,-1),Qt::IntersectClip);
- for(const auto& note:m_clip->notes()) { double x=(note.tick+int(m_clip->startTimeOffset()))/int(m_clip->length())*width(); double w=note.duration/int(m_clip->length())*width(); double y=height()-5-(note.pitch-36)/60*(height()-10); p.fillRect(QRectF(x,y,std::max(1.,w),2),palette().highlight().color()); }
+ if(const auto audio=m_clip->audio();audio&&width()>0&&ConfigManager::inst()->value("svs","showBackgroundWaveform","0").toInt()!=0) {
+  auto tint=palette().text().color();tint.setAlpha(64);p.setPen(tint);
+  const auto length=double(int(m_clip->length())),offset=double(int(m_clip->startTimeOffset()));
+  for(int x=1;x<width()-1;++x) {
+   const auto from=audio->mapping.samplePosition(x*length/width()-offset,audio->startTick,audio->rate),to=audio->mapping.samplePosition((x+1)*length/width()-offset,audio->startTick,audio->rate);
+   if(to<=0||from>=double(audio->samples.size()/2)||to<=from) continue;
+   const auto first=size_t(std::max(0.,from)),end=std::min(audio->samples.size()/2,size_t(std::ceil(std::max(0.,to))));auto peak=audio->waveform.peak(first,end);
+   if(end-first<64) {peak={};for(auto frame=first;frame<end;++frame) {peak.minimum=std::min({peak.minimum,audio->samples[frame*2],audio->samples[frame*2+1]});peak.maximum=std::max({peak.maximum,audio->samples[frame*2],audio->samples[frame*2+1]});}}
+   p.drawLine(QPointF(x,height()*.5-std::clamp(double(peak.maximum),-1.,1.)*(height()-4)*.5),QPointF(x,height()*.5-std::clamp(double(peak.minimum),-1.,1.)*(height()-4)*.5));
+  }
+ }
+ for(const auto& note:m_clip->notes()) { double x=(note.tick+int(m_clip->startTimeOffset()))/int(m_clip->length())*width(); double w=note.duration/int(m_clip->length())*width(); double y=height()-5-(note.pitch-36)/60*(height()-10); p.fillRect(QRectF(x,y,std::max(1.,w),2),palette().text().color()); }
  p.setPen(palette().text().color()); p.drawText(3,12,m_clip->name()); p.drawText(3,height()-3,m_clip->status());
  if(cornerRadius()>0) { paintFlatBorder(p); }
 }
@@ -282,6 +292,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip,QWidget* parent):QWidget(parent) {
  auto* sidebar=new QWidget(sidebarScroll);sidebarScroll->setWidget(sidebar);auto* sidebarLayout=new QVBoxLayout(sidebar);sidebarLayout->addWidget(new QLabel(tr("Singer"),sidebar));auto* singer=new QComboBox(sidebar);singer->setObjectName("svsSinger");sidebarLayout->addWidget(singer);
  auto refreshSingers=[this,track,singer]{QSignalBlocker block(singer);singer->clear();singer->addItem(tr("Select singer"),QString{});for(const auto& voice:svs::Registry::instance().voices()) singer->addItem(voice.name,voice.pluginId+"\n"+voice.id);singer->setCurrentIndex(std::max(0,singer->findData(track->pluginId()+"\n"+track->voiceId())));};refreshSingers();connect(&svs::Registry::instance(),&svs::Registry::catalogChanged,this,refreshSingers);
  connect(singer,qOverload<int>(&QComboBox::activated),this,[track,singer](int index){if(index<=0) return;const auto key=singer->itemData(index).toString().split('\n');if(key.size()==2) track->bindVoice(key[0],key[1]);});
+ auto* rangesLabel=new QLabel(sidebar);rangesLabel->setObjectName("svsPitchRanges");rangesLabel->setWordWrap(true);rangesLabel->setTextFormat(Qt::PlainText);sidebarLayout->addWidget(rangesLabel);
+ auto refreshRanges=[track,rangesLabel]{const auto ranges=SVSPitchRanges::fromMetadata(track->voice().metadata);rangesLabel->setVisible(ranges.present&&ConfigManager::inst()->value("svs","showVoicePitchRanges","1").toInt()!=0);rangesLabel->setText(tr("Available: %1\nComfortable: %2\nWeak spots: %3").arg(ranges.availableText,ranges.comfortableText,ranges.weakText)+(ranges.invalid.isEmpty()?QString{}:tr("\nUnrecognized pitch: %1").arg(ranges.invalid.join(", "))));};connect(track,&Track::dataChanged,this,refreshRanges);connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[refreshRanges](const QString& group,const QString& key,const QString&){if(group=="svs"&&key=="showVoicePitchRanges") refreshRanges();});refreshRanges();
  auto* globalControls=new SVSGlobalControls(sidebar);sidebarLayout->addWidget(globalControls);sidebarLayout->addStretch();
  globalControls->beginGesture=[clip=QPointer<SVSClip>(clip),track=QPointer<SVSTrack>(track)](const svs::Parameter& p)->std::function<void()>{if(!clip||!track) return {};if(p.scope=="track") {track->addJournalCheckPoint();track->saveJournallingState(false);return [track]{if(track) track->restoreJournallingState();};}clip->addJournalCheckPoint();clip->saveJournallingState(false);return [clip]{if(clip) clip->restoreJournallingState();};};
  auto* side=new QDialog(this);side->setObjectName("svsEditorSettings");side->setWindowTitle(tr("SVS editor settings"));auto* controls=new QVBoxLayout(side);

@@ -15,3 +15,15 @@ Version layers are separate: ABI major 1/minor 1; value Schema version 1; projec
 Retain hidden/unknown user parameters, curves and unknown project data on round-trip. A voice change may alter available controls without deleting their stored inputs. Missing plugins preserve editable data and permit compatible cached playback; they cannot synthesize edited content. Cache validity includes plugin binary/version, voice/dictionary versions, full synthesis inputs, tempo mapping and output format. Presentation settings do not affect synthesis identity.
 
 Native plugins execute in process in this release. Normal loader/query failures are isolated to the failing package; a native crash cannot be contained by this ABI. No Qt class, STL object, exception or allocator-owned pointer may cross the C boundary without its explicit corresponding release function.
+
+## Optional voicebank pitch ranges (all engine types)
+
+A catalog voice may provide `metadata.pitchRanges` without changing the C ABI:
+
+```json
+{"pitchRanges":{"available":"C2-C6","comfort":"C3-C5","weak":["F#3","B4-C5"]}}
+```
+
+`available`, `comfort` and `weak` accept standard note names with octaves (`C4` = MIDI 60), sharps/flats, inclusive ranges, and arrays of these strings. Commas separate multiple ranges. Valid MIDI values are 0–127. LMMS preserves the supplied text, reports unrecognized fragments, and does not interpret bare numbers as pitches. Weak pitches take priority over comfortable pitches for key shading.
+
+The SVS global **Show voicebank pitch ranges** option controls keyboard brightness and the matching sidebar text for every engine, including traditional engines. It defaults to enabled; absent declarations or disabled display preserve the normal keyboard. This is presentation metadata and does not change synthesis inputs or cache identity. Engines validate their own optional source files; DiffSinger reads bounded `comfort.json` inside its authorized voice root and maps its fields to this declaration. Other engines can return the same metadata independently of that filename.

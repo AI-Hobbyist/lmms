@@ -125,7 +125,7 @@ std::shared_ptr<VoicePackage> load(const fs::path& root,const std::vector<fs::pa
     if(!voice->metadata.contains("name")) {voice->metadata["name"]=root.filename().u8string();voice->sources["name"]="directory fallback";}
     voice->id=string(a,"voice_id",string(a,"id"));
     if(fs::is_regular_file(root/"package.json")) {auto manifest=readConfiguration(root/"package.json");voice->unknown["package.json"]=manifest;const auto id=string(manifest,"id");if(!id.empty()) {voice->id=id;}}
-    if(fs::is_regular_file(root/"comfort.json")) {voice->unknown["comfort.json"]=readConfiguration(root/"comfort.json");diagnostics.push_back({{"file",(root/"comfort.json").u8string()},{"message","Unsupported comfort extension preserved; not applied to inference"}});}
+    if(fs::is_regular_file(root/"comfort.json")) {try {const auto path=authorizedPath(root,"comfort.json",{root});const auto ranges=readConfiguration(path,65536,4096);if(!ranges.is_object()) {throw std::runtime_error("comfort.json must be an object");}voice->unknown["comfort.json"]=ranges;voice->metadata["pitchRanges"]=ranges;voice->sources["pitchRanges"]="comfort.json";}catch(const std::exception& error) {diagnostics.push_back({{"file",(root/"comfort.json").u8string()},{"stage","pitchRanges"},{"message",error.what()}});}}
     // Hash every model/external-data/config/dictionary/embedding file, excluding
     // visual resources: image display changes do not invalidate synthesis.
     std::vector<fs::path> files;std::set<fs::path,PathLess> seen;
@@ -194,6 +194,7 @@ std::shared_ptr<const Catalog> scan(const Json& context,uint64_t revision) {
 }
 Json engineSettings() {return {{"schemaVersion",1},{"name","DiffSinger"},{"engineType","ai"},{"engineSettings",Json::array({
     {{"id","diffsinger.renderSteps"},{"name","Rendering steps"},{"type","int"},{"min",1},{"max",100},{"step",1},{"default",20}},
-    {{"id","diffsinger.voicebankDirectories"},{"name","Voicebank directories"},{"type","directory-list"},{"default",Json::array()},{"maxItems",128}}
+    {{"id","diffsinger.voicebankDirectories"},{"name","Voicebank directories"},{"type","directory-list"},{"default",Json::array()},{"maxItems",128}},
+    {{"id","diffsinger.showPhonemeLanguagePrefix"},{"name","Show phoneme language prefixes"},{"type","bool"},{"default",true}}
 })}};}
 }

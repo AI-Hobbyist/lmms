@@ -61,7 +61,7 @@ QString Cache::engineDirectory(const QString& pluginId) const {
 QString Cache::path(const QString& key,const Input& input) const {return validKey(key)?QDir(engineDirectory(input.document["pluginId"].toString())).filePath(key+".svsmeta"):QString{};}
 QString Cache::key(const Input& input,const QString& identity) {
  auto document=input.document; document.remove("clipId"); document.remove("queryCapabilities"); document.remove("cacheDirectory");
- if(document["pluginId"].toString()=="org.lmms.svs.diffsinger") {auto settings=document["engineSettings"].toObject();settings.remove("diffsinger.voicebankDirectories");document["engineSettings"]=settings;}
+ if(document["pluginId"].toString()=="org.lmms.svs.diffsinger") {auto settings=document["engineSettings"].toObject();settings.remove("diffsinger.voicebankDirectories");settings.remove("diffsinger.showPhonemeLanguagePrefix");document["engineSettings"]=settings;}
  QJsonArray notes; for(const auto& note:input.notes) notes.append(QJsonObject{{"tick",note.tick},{"duration",note.duration},{"pitch",note.pitch},{"lyric",note.lyric},{"language",note.language},{"pronunciation",note.pronunciation},{"parameters",note.parameters},{"phonemes",note.phonemes}});
  document["notes"]=notes; document["pluginIdentity"]=identity; document["voiceId"]=input.voiceId; document["sampleRate"]=int(input.rate); document["channels"]=2; document["format"]="float32"; document["secondsPerTick"]=input.secondsPerTick; document["durationSeconds"]=input.duration;
  return QString::fromLatin1(QCryptographicHash::hash(QJsonDocument(document).toJson(QJsonDocument::Compact),QCryptographicHash::Sha256).toHex());

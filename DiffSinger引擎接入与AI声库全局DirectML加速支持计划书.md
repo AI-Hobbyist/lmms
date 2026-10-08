@@ -1,6 +1,6 @@
 # DiffSinger 引擎接入与 AI 声库全局 DirectML 加速支持计划书
 
-编写日期：2026-10-08。状态：A0～A2 已分别验收、提交和推送；A3 自动验收通过，执行本阶段提交推送检查点；A4 尚未实施，本次不实施 B。依据当前 LMMS 工作区及 `refs/tl_ref`、`refs/tlds_ref`、`refs/Singers` 的实际内容；不能把参考代码或设置中的占位项当作已完成能力。
+编写日期：2026-10-08。状态：A0～A4 已依次完成必需验收；本次不实施 B。依据当前 LMMS 工作区及 `refs/tl_ref`、`refs/tlds_ref`、`refs/Singers` 的实际内容；不能把参考代码或设置中的占位项当作已完成能力。
 
 严格分为两部分：**A：先完成可独立运行的原生 DiffSinger CPU 引擎；B：再完成适用于接入统一推理接口的 AI 引擎的全局 DirectML 后端。** A 全部验收、提交和推送后才实施 B。本计划授权范围为原生 SVS 插件、必要 SDK 增量、独立推理模块及其最小宿主接入，不是普通 LMMS 子系统重构计划。
 
@@ -68,6 +68,8 @@ catalog 发布不可变快照。重新扫描完成后原子替换，对受影响
 | `dsdur`、`dspitch`、`dsvariance` 内 dsconfig | 各阶段模型、词典、speakers 与专属开关，不能误用根配置代替 |
 | `dsvocoder/vocoder.yaml`、共享 Vocoders 配置 | 声码器模型、mel 规格、sample rate、hop、pitch_controllable、force_on_cpu |
 | `comfort.json` | 用于声明可用音域、舒适音域、弱点音域；接入 SVS 编辑器琴键，以不同明暗度标注这三类范围，钢琴窗侧栏同时用文字显示对应音域，二者使用同一份声明数据。没有该文件保持默认琴键显示，不添加音域提示、不推测音域；其他未识别扩展报告而不误作引擎主配置 |
+
+用户补充（2026-10-08）：音域呈现属于所有 SVS 引擎通用的宿主能力，以可选声库 metadata.pitchRanges 声明 available/comfort/weak 标准音名及范围。DiffSinger 将 comfort.json 转成该声明，其他引擎可通过同一 catalog 元数据提供；SVS 全局增加“显示声库音域”开关，默认开启，统一控制琴键明暗及侧栏文字。没有声明或关闭时保持默认显示，开关不影响实际推理/缓存。无法解析的非标准片段保留原文字并诊断，不推测数字 7 的含义；用户后续重新生成 JSON。A4 验证通用声明、开关持久化及即时显隐、缺失声明默认行为和真实窗口截图。
 
 字段合并优先级：明确宿主用户覆盖 > 相应角色 JSON 配置 > YAML/YML > TXT > 合理缺省；同角色同时存在 JSON/YAML 时按此稳定选择并诊断冲突。阶段推理配置按其专属目录覆盖该阶段字段；不能用角色显示元数据覆盖模型张量约束。**一个 YAML 文件存在不代表 TXT 无效**：例如 YAML 仅声明立绘、subbanks、默认音素器，TXT 仍提供 name/image/author。别名 image/avatar、portrait、opacity 按明确映射读取。
 
@@ -230,7 +232,7 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | A1 | PASS | 六包扫描/配置/身份/权限循环fixture；独立SDK/ABI1.0–1.3/旧示例；两项设置与目录持久化/刷新/资源实窗 | 无本阶段人工项 |
 | A2 | PASS | 六包原生歌词/真实12个 duration ONNX；词典/延续/休止/覆盖重置/最小时长/取消；说话人嵌入fixture和工程持久化；独立SDK/原位DLL/开发主题实窗 | 无本阶段人工项 |
 | A3 | DONE | 六包 CPU 全链、稳定 seed、SHA 音频/tensor 缓存、受限分块、tempo、导出/重开、只读参考曲线实窗通过；本阶段提交推送后进入 A4 | 已保留六份试听；主观听感 MANUAL/PENDING |
-| A4 | NOT STARTED | — | 体验待实施后验收 |
+| A4 | DONE | 既有 Release/58 个插件原位部署、独立 SDK/旧示例、完整 SVS 68/0、原生 GUI 5/0、实际 Release 与空声库启动 3/0；通用音域/背景波形、前缀/拼音/颜色/加粗波形通过，见 A4 验收 | 主观听感 MANUAL/PENDING |
 | B0 | NOT STARTED | — | — |
 | B1 | NOT STARTED | — | — |
 | B2 | NOT STARTED | — | — |
@@ -238,3 +240,8 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | B4 | NOT STARTED | — | 听感/体验待实施后验收 |
 
 计划编制交付检查已在 `05cd61c5f` 完成。本轮授权仅顺序实施 A0～A4，各阶段分别提交推送；B 保持未开始。
+
+A4 用户补充验收：Song Editor 中 SVS 使用默认蓝色片段，沿用主题和已有自定义轨道/片段颜色机制。
+A4 用户补充验收：音符下方波形加粗；SVS 全局可开启 Song Editor 多轨片段半透明背景波形（非钢琴窗背景），默认关闭，适用于所有引擎，显示切换不改音频或缓存。
+
+A4 完成证据见 [A4 验收](doc/svs/DiffSinger-A4-validation.md)。本轮 A0～A4 的 CPU 引擎授权范围完成；B 仍未开始。用户在 A4 收尾时追加的“按空拍分段增量渲染及 Song Editor 当前段/总段进度”在本检查点之后单独实施和提交。

@@ -989,6 +989,12 @@ lmms--gui--SampleClipView {
 	color: #FF8F05;
 }
 
+/* singing voice synthesis clip */
+lmms--gui--SVSClipView {
+	background-color: #3C6DA6;
+	color: #E5EAF0;
+}
+
 /* automation clip */
 lmms--gui--AutomationClipView {
 	background-color: #663DE1;

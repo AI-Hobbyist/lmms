@@ -119,7 +119,7 @@ Json Pronunciation::resolve(const Json& request) const {
         if(text.empty()) {result["source"]="rest";result["generated"]=true;return result;}
         const auto& dict=*loaded;auto entry=dict.entries.find(text);if(entry==dict.entries.end()) {entry=dict.entries.find(lower(text));}
         std::vector<std::string> symbols;
-        if(entry!=dict.entries.end()) {symbols=entry->second;result["source"]="voiceDictionary";}
+        if(entry!=dict.entries.end()) {symbols=entry->second;result["source"]="voiceDictionary";result["text"]=text;}
         else {
             std::vector<std::string> syllables;
             if(!reading.empty()) {syllables=words(text);result["source"]="manualPronunciation";}
@@ -128,7 +128,7 @@ Json Pronunciation::resolve(const Json& request) const {
                 if(language!="zh"||(!phonemizer.empty()&&phonemizer!="OpenUtau.Core.DiffSinger.DiffSingerChinesePhonemizer")) {throw std::runtime_error("No automatic phonemizer for "+language+" / "+phonemizer+"; bank dictionary and explicit readings remain available");}
                 static const Mandarin mandarin;syllables=mandarin.read(text);
             }
-            for(const auto& syllable:syllables) {const auto word=dict.entries.find(syllable);if(word==dict.entries.end()) {throw std::runtime_error("Reading is missing from the voice dictionary: "+syllable);}symbols.insert(symbols.end(),word->second.begin(),word->second.end());}
+            std::string display;for(const auto& syllable:syllables) {const auto word=dict.entries.find(syllable);if(word==dict.entries.end()) {throw std::runtime_error("Reading is missing from the voice dictionary: "+syllable);}symbols.insert(symbols.end(),word->second.begin(),word->second.end());if(!display.empty()) display+=" ";display+=syllable;}result["text"]=display;
         }
         result["phonemes"]=map(symbols,language,"acoustic");result["generated"]=true;
     }catch(const std::exception& error) {result["diagnostic"]=error.what();}

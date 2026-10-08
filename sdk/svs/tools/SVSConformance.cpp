@@ -43,8 +43,9 @@ std::string json(const example::Json& value) {
  }throw std::runtime_error("Invalid JSON type");
 }
 void schema(const example::Json& declaration) {
- using J=example::Json;require(declaration.type==J::Object&&declaration["schemaVersion"].numeric(0)==1,"Invalid capability schema version");require(declaration["languages"].type==J::Array&&!declaration["languages"].array.empty(),"Missing capability languages");std::set<std::string> ids;
+ using J=example::Json;require(declaration.type==J::Object&&declaration["schemaVersion"].numeric(0)==1,"Invalid capability schema version");require(declaration["languages"].type==J::Array&&!declaration["languages"].array.empty(),"Missing capability languages");
  for(const auto* group:{"parameters","feedbackParameters"}) {
+  std::set<std::string> ids;
   const auto& parameters=declaration[group];require(parameters.type==J::Null||parameters.type==J::Array,"Invalid parameter list");
   for(const auto& parameter:parameters.array) {
    const auto id=parameter["id"].text(),type=parameter["type"].text(),scope=parameter["scope"].text();require(!id.empty()&&ids.insert(id).second,"Duplicate or missing parameter ID: "+id);require(scope=="track"||scope=="clip"||scope=="note"||scope=="phoneme","Invalid parameter scope: "+id);

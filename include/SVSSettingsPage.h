@@ -5,6 +5,7 @@ class QComboBox;
 class QLabel;
 class QTabWidget;
 class QSlider;
+class QCheckBox;
 namespace lmms::gui {
 class SVSSettingsPage : public QWidget {
 public:
@@ -16,6 +17,8 @@ private:
  QComboBox* m_backend;
  QComboBox* m_device;
  QSlider* m_aiSteps;
+ QCheckBox* m_pitchRanges;
+ QCheckBox* m_backgroundWaveform;
  QTabWidget* m_engine;
  QLabel* m_status;
  SVSParameterPanel* m_parameters;

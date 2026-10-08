@@ -1,5 +1,7 @@
 #include "SVSResultStrip.h"
 #include "SVSTrack.h"
+#include "ConfigManager.h"
+#include <QJsonDocument>
 #include "ProjectJournal.h"
 #include "Engine.h"
 #include "Song.h"
@@ -23,6 +25,7 @@ SVSResultStrip::SVSResultStrip(SVSClip* clip,QWidget* parent):QWidget(parent),m_
  connect(clip,&Clip::dataChanged,this,[this]{if(m_dragging&&m_clip->notes()!=m_before) cancelOperation(); if(!m_dragging&&!m_selectedNote.isEmpty()) { bool exists=false; for(const auto& cell:cells()) if(cell.note==m_selectedNote&&cell.index==m_selectedIndex) exists=true; if(!exists) { m_selectedNote.clear(); m_selectedIndex=-1; emit selectionChanged(); } } update();});
  connect(clip,&QObject::destroyed,this,[this]{cancelOperation(); setEnabled(false);});
  connect(&svs::TempoSource::forSong(*Engine::getSong()),&svs::TempoSource::changed,this,[this]{cancelOperation();});
+ connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString&,const QString&){if(group=="svsEngineSettings") update();});
 }
 void SVSResultStrip::setViewport(double tick,double zoom) { m_scroll=tick; m_pixelsPerTick=2*zoom; update(); }
 void SVSResultStrip::captureTiming() {m_timing=svs::TempoSource::forSong(*Engine::getSong()).snapshot();m_timingOrigin=int(m_clip->startPosition())+int(m_clip->startTimeOffset());}
@@ -53,10 +56,13 @@ bool SVSResultStrip::setSelectedParameter(const QString& id,const QJsonValue& va
 }
 void SVSResultStrip::paintEvent(QPaintEvent*) {
  QPainter painter(this); painter.fillRect(rect(),color("backgroundColor",QPalette::Base)); if(!m_clip) return;
+ const auto* track=static_cast<SVSTrack*>(m_clip->getTrack());bool showPrefix=true;
+ if(track->pluginId()=="org.lmms.svs.diffsinger") {const auto key="engine_"+QString::fromLatin1(track->pluginId().toUtf8().toHex());showPrefix=QJsonDocument::fromJson(ConfigManager::inst()->value("svsEngineSettings",key).toUtf8()).object()["diffsinger.showPhonemeLanguagePrefix"].toBool(true);}
  painter.save(); painter.setClipRect(QRect(60,0,width()-60,height()));
  for(const auto& cell:cells()) {
   QRectF rectangle(xAt(cell.tick),height()/2.,cell.duration*m_pixelsPerTick,height()/2.-1); if(!rectangle.intersects(rect())) continue;
-  painter.fillRect(rectangle.adjusted(1,1,-1,-1),cell.note==m_selectedNote&&cell.index==m_selectedIndex?palette().highlight():palette().button()); painter.setPen(color("phonemeColor",QPalette::Text)); painter.drawRect(rectangle); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter,fontMetrics().elidedText(cell.symbol,Qt::ElideRight,int(rectangle.width()-6)));
+  const auto slash=cell.symbol.indexOf('/');const auto label=!showPrefix&&slash>0&&track->capabilities().languages.contains(cell.symbol.left(slash))?cell.symbol.mid(slash+1):cell.symbol;
+  painter.fillRect(rectangle.adjusted(1,1,-1,-1),cell.note==m_selectedNote&&cell.index==m_selectedIndex?palette().highlight():palette().button()); painter.setPen(color("phonemeColor",QPalette::Text)); painter.drawRect(rectangle); painter.drawText(rectangle.adjusted(3,0,-3,0),Qt::AlignVCenter,fontMetrics().elidedText(label,Qt::ElideRight,int(rectangle.width()-6)));
  }
  for(const auto& note:m_dragging?m_preview:m_clip->notes()) {painter.setPen(color("phonemeColor",QPalette::Text));painter.drawLine(QPointF(xAt(note.tick),0),QPointF(xAt(note.tick),height()/2.));painter.drawLine(QPointF(xAt(note.tick+note.duration),0),QPointF(xAt(note.tick+note.duration),height()/2.));}
  painter.restore(); painter.fillRect(QRect(0,0,60,height()),palette().window()); painter.setPen(palette().windowText().color()); painter.drawText(QRect(2,2,56,height()-4),Qt::AlignVCenter,tr("Phonemes"));

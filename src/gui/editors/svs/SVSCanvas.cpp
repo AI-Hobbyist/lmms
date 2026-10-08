@@ -1,5 +1,6 @@
 #include "SVSCanvas.h"
 #include "SVSTrack.h"
+#include "SVSPitchRanges.h"
 #include "SVSLyricEditor.h"
 #include "SVSNoteOperations.h"
 #include "ConfigManager.h"
@@ -76,7 +77,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip,QWidget* parent):QWidget(parent),m_clip(clip)
   QSet<QString> valid; if(m_clip) for(const auto& note:m_clip->notes()) if(m_selected.contains(note.id)) valid.insert(note.id);
   if(m_action==Action::None&&valid!=m_selected) { m_selected=valid; emit selectionChanged(); } update();
  });
- connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString& key,const QString&){if(group=="ui"&&key=="printnotelabels") update();});
+ connect(ConfigManager::inst(),&ConfigManager::valueChanged,this,[this](const QString& group,const QString& key,const QString&){if((group=="ui"&&key=="printnotelabels")||(group=="svs"&&key=="showVoicePitchRanges")) update();});
  connect(clip,&QObject::destroyed,this,[this]{cancelOperation(); m_lyric->hide(); setEnabled(false);});
  connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song),&Timeline::positionChanged,this,qOverload<>(&SVSCanvas::update));
  connect(Engine::getSong(),&Song::timeSignatureChanged,this,[this](int,int){update();});
@@ -270,11 +271,11 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   for(const auto& note:displayedNotes()) {
    auto rectangle=noteRect(note);
    // The cached synthesis waveform follows the note's time span and pitch row.
-   const double waveHeight=std::clamp(m_rowHeight*.75,6.,24.);
+   const double waveHeight=std::clamp(m_rowHeight,8.,32.);
    const QRectF wave(rectangle.left(),rectangle.bottom()+2,rectangle.width(),waveHeight);
    if(!rectangle.united(wave).intersects(grid)) continue;
    if(audio&&wave.intersects(grid)) {
-    painter.save(); painter.setClipRect(wave,Qt::IntersectClip); painter.setPen(color("waveformColor",QPalette::Highlight));
+    painter.save(); painter.setClipRect(wave,Qt::IntersectClip); painter.setPen(QPen(color("waveformColor",QPalette::Highlight),2));
     const int left=std::max(KeyboardWidth,int(std::ceil(wave.left()))),right=std::min(width(),int(std::ceil(wave.right())));
     for(int x=left;x<right;++x) {
      const auto from=audio->mapping.samplePosition(std::max(note.tick,tickAt(x)),audio->startTick,audio->rate);
@@ -322,6 +323,7 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
   painter.save();painter.setClipRect(QRect(0,TimelineHeight,KeyboardWidth,height()-TimelineHeight));
   QFont font=painter.font();font.setPixelSize(std::max(1,int(m_rowHeight*.8)));painter.setFont(font);
   const auto white=color("whiteKeyInactiveBackground",QPalette::Light),black=color("blackKeyInactiveBackground",QPalette::Dark);
+  const auto ranges=SVSPitchRanges::fromMetadata(m_clip&&ConfigManager::inst()->value("svs","showVoicePitchRanges","1").toInt()!=0?static_cast<SVSTrack*>(m_clip->getTrack())->voice().metadata:QJsonObject{});
   const auto text=m_colors.contains("whiteKeyInactiveTextColor")?m_colors["whiteKeyInactiveTextColor"]:QColor(white.lightnessF()>.5?Qt::black:Qt::white);
   // Native PianoRoll geometry: small white keys span 1.5 rows, D/G/A
   // span two rows. Draw white keys first, then the shorter black keys.
@@ -332,7 +334,7 @@ void SVSCanvas::paintEvent(QPaintEvent*) {
    const bool big=key==2||key==7||key==9;const auto smallHeight=std::floor(m_rowHeight*1.5);
    const auto correction=isBlack?m_rowHeight:(big||key==0||key==5)?smallHeight:m_rowHeight;
    const auto keyHeight=isBlack?m_rowHeight:big?2*m_rowHeight:smallHeight;
-   painter.setPen(Qt::black);painter.setBrush(isBlack?black:white);painter.drawRect(QRectF(0,y+m_rowHeight-1-correction,isBlack?KeyboardWidth*.75-1:KeyboardWidth-1,keyHeight));
+   painter.setPen(Qt::black);painter.setBrush(ranges.keyColor(isBlack?black:white,pitch));painter.drawRect(QRectF(0,y+m_rowHeight-1-correction,isBlack?KeyboardWidth*.75-1:KeyboardWidth-1,keyHeight));
    if(!isBlack&&(key==0||allNoteLabels)) {painter.setPen(text);painter.drawText(QRectF(0,y,KeyboardWidth-3,m_rowHeight),Qt::AlignRight|Qt::AlignVCenter,noteLabel(pitch));}
   }
   painter.restore();

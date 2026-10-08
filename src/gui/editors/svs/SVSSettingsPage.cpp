@@ -18,6 +18,7 @@
 #include <QSet>
 #include <QTabWidget>
 #include <QSlider>
+#include <QCheckBox>
 #include <algorithm>
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
@@ -62,6 +63,8 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent):QWidget(parent) {
  form->addRow(tr("Device"),m_device);
  auto* hint=new QLabel(tr("Backend and device options apply only to AI voicebanks. CPU is the available backend. Other backends are placeholders for testing device selection; synthesis continues to use CPU."),body);hint->setObjectName("svsComputeHint");hint->setWordWrap(true);controls->addWidget(hint);
  auto* config=ConfigManager::inst();m_backend->setCurrentIndex(std::max(0,m_backend->findData(config->value("svs","computeBackend","cpu"))));m_device->setCurrentIndex(std::max(0,m_device->findData(config->value("svs","computeDevice","cpu"))));
+ m_pitchRanges=new QCheckBox(tr("Show voicebank pitch ranges"),body);m_pitchRanges->setObjectName("svsShowVoicePitchRanges");m_pitchRanges->setChecked(config->value("svs","showVoicePitchRanges","1").toInt()!=0);m_pitchRanges->setToolTip(tr("Mark available, comfortable and weak pitches on the keyboard and show their ranges in the sidebar when the voicebank declares them."));controls->addWidget(m_pitchRanges);
+ m_backgroundWaveform=new QCheckBox(tr("Show translucent background waveform"),body);m_backgroundWaveform->setObjectName("svsShowBackgroundWaveform");m_backgroundWaveform->setChecked(config->value("svs","showBackgroundWaveform","0").toInt()!=0);m_backgroundWaveform->setToolTip(tr("Display the synthesized audio waveform behind SVS clips in the Song Editor."));controls->addWidget(m_backgroundWaveform);
  auto updateDevice=[this]{const bool cpu=m_backend->currentData().toString()=="cpu";if(cpu) m_device->setCurrentIndex(0);m_device->setEnabled(!cpu);};connect(m_backend,qOverload<int>(&QComboBox::currentIndexChanged),this,[updateDevice](int){updateDevice();});updateDevice();
  m_engine=new QTabWidget(body);m_engine->setObjectName("svsEngineTabs");QSet<QString> seen;
  for(const auto& installed:svs::Registry::instance().engines()) {
@@ -122,10 +125,12 @@ void SVSSettingsPage::refreshEngine() {
 void SVSSettingsPage::save() {
  auto* config=ConfigManager::inst();config->setValue("svs","computeBackend",m_backend->currentData().toString());config->setValue("svs","computeDevice",m_backend->currentData().toString()=="cpu"?"cpu":m_device->currentData().toString());
  config->setValue("svs","aiExampleRenderSteps",QString::number(m_aiSteps->value()));
+ config->setValue("svs","showVoicePitchRanges",m_pitchRanges->isChecked()?"1":"0");
+ config->setValue("svs","showBackgroundWaveform",m_backgroundWaveform->isChecked()?"1":"0");
  QSet<QString> changed;
  for(auto it=m_values.cbegin();it!=m_values.cend();++it) {
   const auto key="engine_"+QString::fromLatin1(it.key().toUtf8().toHex());const auto json=QString::fromUtf8(QJsonDocument(it.value()).toJson(QJsonDocument::Compact));
-  if(config->value("svsEngineSettings",key)!=json) {auto previous=QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object();auto current=it.value();config->setValue("svsEngineSettings",key,json);auto plugin=svs::Registry::instance().plugin(it.key());if(plugin&&plugin->hasCatalogQuery()) {QString error;svs::Registry::instance().refreshCatalog(it.key(),it.value(),error,false);if(!error.isEmpty()) qWarning().noquote()<<error;previous.remove("diffsinger.voicebankDirectories");current.remove("diffsinger.voicebankDirectories");}if(previous!=current) changed.insert(it.key());}
+  if(config->value("svsEngineSettings",key)!=json) {auto previous=QJsonDocument::fromJson(config->value("svsEngineSettings",key).toUtf8()).object();auto current=it.value();config->setValue("svsEngineSettings",key,json);auto plugin=svs::Registry::instance().plugin(it.key());if(plugin&&plugin->hasCatalogQuery()) {QString error;svs::Registry::instance().refreshCatalog(it.key(),it.value(),error,false);if(!error.isEmpty()) qWarning().noquote()<<error;previous.remove("diffsinger.voicebankDirectories");current.remove("diffsinger.voicebankDirectories");}if(it.key()=="org.lmms.svs.diffsinger") {previous.remove("diffsinger.showPhonemeLanguagePrefix");current.remove("diffsinger.showPhonemeLanguagePrefix");}if(previous!=current) changed.insert(it.key());}
  }
  for(auto* base:Engine::getSong()->tracks()) if(base->type()==Track::Type::SVS) {
   auto* track=static_cast<SVSTrack*>(base);if(!changed.contains(track->pluginId())) continue;
