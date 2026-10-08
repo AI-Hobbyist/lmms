@@ -2,10 +2,10 @@
 
 状态：PASS。用于覆盖已有 Windows x64 LMMS 安装，沿用 `build/Release` 和 `build/packages`，未覆盖或打开原 Program Files 安装。
 
-- 文件：`build/packages/lmms-enhanced-full-3f637c6f4-win64.zip`。
-- 大小：66,026,243 bytes（约 62.97 MiB），3,484 个运行文件和 4 个安装/说明条目。
-- SHA256：`8C4EBFEDD01780F73A84706CDC0ED54F774BBD4C14DE8C5C23A65018E0B4E2C7`，相邻 `.sha256` / `.manifest.json` 可核对。
-- 产品提交：`3f637c6f4ead1df96266fcecddfa8c5e1a94fc85`，包含分段渲染、英文 README 和 SVS 插件浏览器按引擎分类。显示版本 `1.3.0-alpha.2.88+3f637c6`。后续证据提交不改变产品输入。分类及当前包检查见 `SVS-browser-engine-groups-validation.md`；下方原覆盖测试证据保留。
+- 文件：`build/packages/lmms-enhanced-full-90e92f6cb-win64.zip`。
+- 大小：66,032,783 bytes（约 62.97 MiB），3,484 个运行文件和 4 个安装/说明条目。
+- SHA256：`0B30841B5E669795BCAA03EB360A588103103C02E5A83A3EBB631400039A973B`，相邻 `.sha256` / `.manifest.json` 可核对。
+- 产品提交：`90e92f6cbca9fb89ff77cbcc113678b2f9bbc021`，包含分段渲染、英文 README、SVS 插件浏览器按引擎分类及异步声库扫描。显示版本 `1.3.0-alpha.2.90+90e92f6`。后续证据提交不改变产品输入。异步扫描及当前包检查见 `SVS-async-catalog-validation.md`；下方原覆盖测试证据保留。
 
 ## 使用
 

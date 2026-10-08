@@ -17,3 +17,7 @@
 - 原生 Windows GUI：asynchronousVoicebankScanning 和 diffSingerPresentationAndSettings 分别 PASS，见 validation/SVS-async-catalog-native-QtTest.txt。真实窗口截图 validation/SVS-async-catalog-native-scanning.png 已检查：现有主题下扫描状态清晰、Rescan 禁用，正常显示参数控件。
 - Release 实际窗口：diffSingerReleaseWindow 最终 3 passed / 0 failed / 0 skipped，见 validation/SVS-async-catalog-release-final-QtTest.txt。确认 SVSDiffSinger.dll 和 onnxruntime.dll 的实际模块路径来自 build/Release/svs/SVSDiffSinger，包含声库和空声库启动均正常退出。首次旧 10 秒关闭限时不足（QtTest 报告 10.1 秒足够），按正在扫描的安全退出语义将该用例限时调整为 30 秒后通过；原失败记录保留为 validation/SVS-async-catalog-native-shutdown-timeout.txt。
 - 全程沿用 build/Release/lmms.exe，使用原生 windows Qt 后端，未使用 offscreen。旧验收截图的测试覆盖已还原，私人声库图片不提交。
+
+发布输入：产品提交 90e92f6cbca9fb89ff77cbcc113678b2f9bbc021，Release 版本 1.3.0-alpha.2.90+90e92f6。SDK 线程说明已原位安装到 build/svs-sdk-install，api.md 与源文件 SHA256 相同。
+
+覆盖包：build/packages/lmms-enhanced-full-90e92f6cb-win64.zip，66,032,783 bytes，3,484 个运行文件和 4 个安装/说明条目。全条目 SHA256、360 个 PE 位数、官方四轨默认模板、私人数据排除及完整 DiffSinger 文件夹检查通过，见 validation/SVS-async-catalog-package.json。ZIP SHA256：0B30841B5E669795BCAA03EB360A588103103C02E5A83A3EBB631400039A973B。
