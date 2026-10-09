@@ -617,12 +617,12 @@ void SVCWindow::refreshParameters()
 			slider->setProperty("maximumValue", maximum);
 			auto* edit = new QDoubleSpinBox(row);
 			edit->setObjectName("svcValue_" + id);
-				edit->setDecimals(parameter.value("type") == "integer" ? 0 : 2);
+			edit->setDecimals(parameter.value("type") == "integer" ? 0 : 2);
 			edit->setRange(parameter.value("minimum").toDouble(-1e12), parameter.value("maximum").toDouble(1e12));
 			edit->setSingleStep(step);
 			edit->setKeyboardTracking(false);
 			edit->setValue(initial);
-				edit->setFixedWidth(90);
+			edit->setFixedWidth(90);
 			body->addWidget(slider, 1);
 			body->addWidget(edit);
 			body->addWidget(new QLabel(parameter.value("unit").toString(), row));
