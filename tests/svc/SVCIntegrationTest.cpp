@@ -393,8 +393,10 @@ private slots:
 		{
 			QVERIFY(instrumentTree->topLevelItem(index)->text(0) != "Singing Voice Synthesis");
 		}
-		for (const auto& title : {QString("SVC"), QString("SVS")})
+		int sidebarIndex = 0;
+		for (const auto* page : m_gui->mainWindow()->findChildren<gui::SideBarWidget*>())
 		{
+			const auto title = page->title();
 			QToolButton* tab = nullptr;
 			for (auto* button : m_gui->mainWindow()->findChildren<QToolButton*>())
 			{
@@ -403,10 +405,14 @@ private slots:
 			QVERIFY(tab);
 			if (!tab->isChecked()) { QTest::mouseClick(tab, Qt::LeftButton); }
 			QTest::qWait(300);
+			const auto evidenceName = title == "SVC" || title == "SVS"
+				? title + "-sidebar-main-native.png"
+				: QString("sidebar-header-%1-native.png").arg(sidebarIndex);
+			++sidebarIndex;
 			QVERIFY(m_gui->mainWindow()
 					->screen()
 					->grabWindow(m_gui->mainWindow()->winId())
-					.save("build/tests/svc/" + title + "-sidebar-main-native.png"));
+					.save("build/tests/svc/" + evidenceName));
 			QTest::mouseClick(tab, Qt::LeftButton);
 		}
 		gui::SVSBrowser browser(nullptr);

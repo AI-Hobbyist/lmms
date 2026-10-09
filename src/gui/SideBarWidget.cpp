@@ -68,24 +68,25 @@ void SideBarWidget::paintEvent( QPaintEvent * )
 
 	p.setPen( palette().highlightedText().color() );
 
-	const int tx = m_icon.width() + 8;
-
-	QFontMetrics metrics( f );
-	const int ty = (metrics.ascent() + m_icon.height()) / 2;
-	p.drawText( tx, ty, m_title );
-
-	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
+	constexpr int headerHeight = 27;
+	constexpr int iconSize = 24;
+	constexpr int iconMargin = 2;
+	constexpr int textLeft = iconMargin + iconSize + 6;
+	const auto icon = m_icon.transformed(QTransform().rotate(-90));
+	const auto size = icon.deviceIndependentSize().toSize().scaled(iconSize, iconSize, Qt::KeepAspectRatio);
+	const QRect iconRect(
+		iconMargin + (iconSize - size.width()) / 2, (headerHeight - size.height()) / 2, size.width(), size.height());
+	p.drawPixmap(iconRect, icon);
+	const QRect textRect(textLeft, 0, qMax(0, m_closeBtn->x() - textLeft - 6), headerHeight);
+	p.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, m_title);
 }
-
-
 
 void SideBarWidget::resizeEvent( QResizeEvent * )
 {
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
-	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
+	m_closeBtn->move(width() - m_buttonSize.width() - MARGIN, (27 - m_buttonSize.height()) / 2);
 }
-
 
 } // namespace lmms::gui
