@@ -110,8 +110,8 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createPixmapButton(tr("Mid/Side"), this, 285, 238, &controls->m_midsideModel, "midside_active", "midside_inactive", tr("Compress mid/side channels instead of left/right"));
 	m_lowSideUpwardSuppressButton = createPixmapButton(tr("Suppress upward compression for side band"), this, 106, 180, &controls->m_lowSideUpwardSuppressModel,
 														"lowSideUpwardSuppress_active", "lowSideUpwardSuppress_inactive", tr("Suppress upward compression for side band"));
-	createPixmapButton(tr("Lookahead"), this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active", "lookahead_inactive",
-						tr(("Enable lookahead with fixed " + std::to_string(int(LOMM_MAX_LOOKAHEAD)) + " ms latency").c_str()));
+	createPixmapButton(tr("Lookahead"), this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active",
+		"lookahead_inactive", tr("Enable lookahead with fixed %1 ms latency").arg(int(LOMM_MAX_LOOKAHEAD)));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Lookahead"), this, 214, 2, &controls->m_lookaheadModel, tr("Lookahead length"));
 
 	PixmapButton* initButton = createPixmapButton(tr("Clear all parameters"), this, 84, 237, nullptr, "init_active", "init_inactive", tr("Clear all parameters"));

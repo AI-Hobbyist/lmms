@@ -994,7 +994,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS.</source>
-        <translation type="unfinished"></translation>
+        <translation>古の神 LOMMUS が駆動する上方・下方マルチバンドコンプレッサー。</translation>
     </message>
     <message>
         <source>Oscilloscope plugin to display the incoming audio waveform</source>
@@ -1063,7 +1063,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>%1 (unsupported)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1（非対応）</translation>
     </message>
     <message>
         <source>LADSPA plugins</source>
@@ -1254,43 +1254,43 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;名前：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;File: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;ファイル：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Author: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;作者：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Copyright: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;著作権：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Channels: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;チャンネル：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>%1 in, %2 out</source>
-        <translation type="unfinished"></translation>
+        <translation>入力 %1、出力 %2</translation>
     </message>
     <message>
         <source>&lt;b&gt;Real-time Dependency: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;リアルタイム依存：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must not be cached or subject to significant latency.</source>
-        <translation type="unfinished"></translation>
+        <translation>このプラグインは MIDI デバイスの監視など、リアルタイム処理に依存します。出力のキャッシュや大きな遅延は許されません。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Not Real-time Capable: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;リアルタイム処理非対応：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin is not suitable for use in a &amp;lsquo;hard real-time&amp;rsquo; environment.</source>
-        <translation type="unfinished"></translation>
+        <translation>このプラグインは&amp;lsquo;ハードリアルタイム&amp;rsquo;環境には適しません。</translation>
     </message>
 </context>
 <context>
@@ -3041,179 +3041,179 @@ Continue?</source>
     <name>lmms::LOMMControls</name>
     <message>
         <source>Depth</source>
-        <translation>Depth</translation>
+        <translation>深さ</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <source>Input Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音量</translation>
     </message>
     <message>
         <source>Output Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量</translation>
     </message>
     <message>
         <source>Upward Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>上方圧縮の深さ</translation>
     </message>
     <message>
         <source>Downward Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>下方圧縮の深さ</translation>
     </message>
     <message>
         <source>High/Mid Split</source>
-        <translation type="unfinished"></translation>
+        <translation>高域・中域のクロスオーバー</translation>
     </message>
     <message>
         <source>Mid/Low Split</source>
-        <translation type="unfinished"></translation>
+        <translation>中域・低域のクロスオーバー</translation>
     </message>
     <message>
         <source>Enable High/Mid Split</source>
-        <translation type="unfinished"></translation>
+        <translation>高域・中域の分割を有効化</translation>
     </message>
     <message>
         <source>Enable Mid/Low Split</source>
-        <translation type="unfinished"></translation>
+        <translation>中域・低域の分割を有効化</translation>
     </message>
     <message>
         <source>Enable High Band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域を有効化</translation>
     </message>
     <message>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域を有効化</translation>
     </message>
     <message>
         <source>Enable Low Band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域を有効化</translation>
     </message>
     <message>
         <source>High Input Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の入力音量</translation>
     </message>
     <message>
         <source>Mid Input Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の入力音量</translation>
     </message>
     <message>
         <source>Low Input Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の入力音量</translation>
     </message>
     <message>
         <source>High Output Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の出력音量</translation>
     </message>
     <message>
         <source>Mid Output Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の出력音量</translation>
     </message>
     <message>
         <source>Low Output Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の出력音量</translation>
     </message>
     <message>
         <source>Above Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Below Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Attack High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のアタック</translation>
     </message>
     <message>
         <source>Attack Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のアタック</translation>
     </message>
     <message>
         <source>Attack Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のアタック</translation>
     </message>
     <message>
         <source>Release High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のリリース</translation>
     </message>
     <message>
         <source>Release Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のリリース</translation>
     </message>
     <message>
         <source>Release Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のリリース</translation>
     </message>
     <message>
         <source>RMS Time</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS 時間</translation>
     </message>
     <message>
         <source>Knee</source>
-        <translation type="unfinished"></translation>
+        <translation>ニー幅</translation>
     </message>
     <message>
         <source>Range</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲</translation>
     </message>
     <message>
         <source>Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>バランス</translation>
     </message>
     <message>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>深さに応じて出力音量を調整</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオリンク</translation>
     </message>
     <message>
         <source>Auto Time</source>
-        <translation type="unfinished"></translation>
+        <translation>自動タイム</translation>
     </message>
     <message>
         <source>Mix</source>
@@ -3225,19 +3225,19 @@ Continue?</source>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>ミッド/サイド</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド</translation>
     </message>
     <message>
         <source>Lookahead Length</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド長</translation>
     </message>
     <message>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチャンネルの上方圧縮を抑制</translation>
     </message>
 </context>
 <context>
@@ -8050,7 +8050,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::GranularPitchShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
-        <translation>&lt;div style='text-align: center;'&gt;&lt;b&gt;グラニュラーピッチシフター&lt;/b&gt;&lt;br&gt;&lt;br&gt;プラグイン作者：Lost Robot&lt;br&gt;GUI 作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;グレイン：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - ピッチの移動量。12平均律の半音単位です。&lt;br&gt;&lt;b&gt;サイズ&lt;/b&gt; - 各グレインの長さを Hz で表します。既定ではこの周波数の2倍で新しいグレインを生成します。&lt;br&gt;通常、ピッチを上げるときは高めの周波数に設定し、下げるときはその逆にします。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ランダム：&lt;/h3&gt;&lt;b&gt;位置拡散&lt;/b&gt; - 各グレインの再生位置のランダム変動量。秒単位です。&lt;br&gt;グレインを再生する時刻ではなく、読み取る音声の位置が変わります。&lt;br&gt;例えば0.5秒にすると、各グレインは最大で半秒前の音声を再生できます。&lt;br&gt;通常は少量でも位置拡散を加えることを推奨します。グレインの周期性が崩れ、グラニュラーピッチシフターで生じがちな主なアーティファクトを抑えられます。&lt;br&gt;グレイン同士の相関もなくなるため、形状を2にすると常に最適になります。&lt;br&gt;&lt;b&gt;ピッチ揺らぎ&lt;/b&gt; - 各グレインのピッチのランダム変動量。オクターブ単位です。&lt;br&gt;グレインの生成頻度には影響しません。&lt;br&gt;&lt;b&gt;生成間隔の揺らぎ&lt;/b&gt; - 新しいグレインの生成頻度のランダム変動量。オクターブ単位です。&lt;br&gt;ピッチ揺らぎと生成間隔の揺らぎは同じ乱数を使います。同じ値なら、グレインの生成タイミングはピッチの変化に正確に比例して変わります。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ステレオ：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - 左右チャンネル間のピッチの総距離。12平均律の半音単位です。&lt;br&gt;表示された移動量の半分を右チャンネルに、その逆を左チャンネルに適用します。&lt;br&gt;&lt;b&gt;位置拡散&lt;/b&gt; - ランダム項目の位置拡散で、左右チャンネルのランダムな位置に許容する距離です。&lt;br&gt;1にすると各チャンネルの位置拡散値が完全に独立します。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 各グレインのフェード形状。通常は2が最適で、等電力フェードになります。&lt;br&gt;ただしピッチ移動が小さく大半のパラメーターが既定値の場合、等ゲインフェードとなる1の方が適することがあります。&lt;br&gt;すべてのフェードはグレインの50%重複を前提に設計されています。&lt;br&gt;&lt;b&gt;フェード&lt;/b&gt; - グレインのフェード長。1では最も滑らかにフェードし、グレイン全体にわたります。&lt;br&gt;1未満ではフェードのアーティファクトが聞こえやすくなりますが、フェードはグレインの外縁だけに適用されます。&lt;br&gt;0ではフェードがなくなるため、クリック音が発生します。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ディレイ：&lt;/h3&gt;&lt;b&gt;フィードバック&lt;/b&gt; - ピッチシフターのフィードバック量です。&lt;br&gt;出力の一部を入力バッファーに戻します。大きな値は危険な場合があります。&lt;br&gt;&lt;b&gt;レイテンシー&lt;/b&gt; - ピッチシフターの最小レイテンシーです。&lt;br&gt;設定に応じてレイテンシーを動的に変え、可能な最小値に保ちます。&lt;br&gt;レイテンシーを一定に近づけたい場合は、変化しなくなるまでこの値を増やします。&lt;br&gt;フィードバックの最小ディレイ量の設定にも使えます。&lt;br&gt;レイテンシーを大きくすると、ピッチ移動量を高速に自動化した際の微細な揺れを抑えられます。&lt;br&gt;&lt;h3&gt;その他：&lt;/h3&gt;&lt;b&gt;プリフィルター&lt;/b&gt; - ピッチ移動前に12 dBローパスフィルターを有効にします。カットオフを自動調整し、エイリアシングを大幅に減らします。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - グレインの生成頻度の倍率です。&lt;br&gt;グレインの重複が50%を超えるようになります。&lt;br&gt;ランダム項目のノブを使わないと、耳に痛い鋭い音が発生します。&lt;br&gt;それ以外では、ユニゾンや静的な Paulstretch に似た面白い効果を得られます。&lt;br&gt;値を増やした場合、このノブは他のどのパラメーターよりも多くの CPU を使います。&lt;br&gt;&lt;b&gt;グライド&lt;/b&gt; - ピッチ移動量の補間時間です。&lt;br&gt;少量のグライドでも、時間とともにピッチ移動量を変えた際の多くのアーティファクトを抑えられます。&lt;br&gt;&lt;b&gt;範囲&lt;/b&gt; - 内部リングバッファーの長さです。&lt;br&gt;変更すると一部のパラメーターの最小値と最大値が変わります。対象は各選択肢に記載されています。&lt;br&gt;最短バッファーでは対応できない値が必要なら増やします。それ以外は最小値のままが最適です。&lt;br&gt;</translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;グラニュラーピッチシフター&lt;/b&gt;&lt;br&gt;&lt;br&gt;プラグイン作者：Lost Robot&lt;br&gt;GUI 作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;グレイン：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - ピッチの移動量。12平均律の半音単位です。&lt;br&gt;&lt;b&gt;サイズ&lt;/b&gt; - 各グレインの長さを Hz で表します。既定ではこの周波数の2倍で新しいグレインを生成します。&lt;br&gt;通常、ピッチを上げるときは高めの周波数に設定し、下げるときはその逆にします。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ランダム：&lt;/h3&gt;&lt;b&gt;位置拡散&lt;/b&gt; - 各グレインの再生位置のランダム変動量。秒単位です。&lt;br&gt;グレインを再生する時刻ではなく、読み取る音声の位置が変わります。&lt;br&gt;例えば0.5秒にすると、各グレインは最大で半秒前の音声を再生できます。&lt;br&gt;通常は少量でも位置拡散を加えることを推奨します。グレインの周期性が崩れ、グラニュラーピッチシフターで生じがちな主なアーティファクトを抑えられます。&lt;br&gt;グレイン同士の相関もなくなるため、形状を2にすると常に最適になります。&lt;br&gt;&lt;b&gt;ピッチ揺らぎ&lt;/b&gt; - 各グレインのピッチのランダム変動量。オクターブ単位です。&lt;br&gt;グレインの生成頻度には影響しません。&lt;br&gt;&lt;b&gt;生成間隔の揺らぎ&lt;/b&gt; - 新しいグレインの生成頻度のランダム変動量。オクターブ単位です。&lt;br&gt;ピッチ揺らぎと生成間隔の揺らぎは同じ乱数を使います。同じ値なら、グレインの生成タイミングはピッチの変化に正確に比例して変わります。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ステレオ：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - 左右チャンネル間のピッチの総距離。12平均律の半音単位です。&lt;br&gt;表示された移動量の半分を右チャンネルに、その逆を左チャンネルに適用します。&lt;br&gt;&lt;b&gt;位置拡散&lt;/b&gt; - ランダム項目の位置拡散で、左右チャンネルのランダムな位置に許容する距離です。&lt;br&gt;1にすると各チャンネルの位置拡散値が完全に独立します。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 各グレインのフェード形状。通常は2が最適で、等電力フェードになります。&lt;br&gt;ただしピッチ移動が小さく大半のパラメーターが既定値の場合、等ゲインフェードとなる1の方が適することがあります。&lt;br&gt;すべてのフェードはグレインの50%重複を前提に設計されています。&lt;br&gt;&lt;b&gt;フェード&lt;/b&gt; - グレインのフェード長。1では最も滑らかにフェードし、グレイン全体にわたります。&lt;br&gt;1未満ではフェードのアーティファクトが聞こえやすくなりますが、フェードはグレインの外縁だけに適用されます。&lt;br&gt;0ではフェードがなくなるため、クリック音が発生します。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ディレイ：&lt;/h3&gt;&lt;b&gt;フィードバック&lt;/b&gt; - ピッチシフターのフィードバック量です。&lt;br&gt;出力の一部を入力バッファーに戻します。大きな値は危険な場合があります。&lt;br&gt;&lt;b&gt;レイテンシー&lt;/b&gt; - ピッチシフターの最小レイテンシーです。&lt;br&gt;設定に応じてレイテンシーを動的に変え、可能な最小値に保ちます。&lt;br&gt;レイテンシーを一定に近づけたい場合は、変化しなくなるまでこの値を増やします。&lt;br&gt;フィードバックの最小ディレイ量の設定にも使えます。&lt;br&gt;レイテンシーを大きくすると、ピッチ移動量を高速に自動化した際の微細な揺れを抑えられます。&lt;br&gt;&lt;h3&gt;その他：&lt;/h3&gt;&lt;b&gt;プリフィルター&lt;/b&gt; - ピッチ移動前に12 dBローパスフィルターを有効にします。カットオフを自動調整し、エイリアシングを大幅に減らします。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - グレインの生成頻度の倍率です。&lt;br&gt;グレインの重複が50%を超えるようになります。&lt;br&gt;ランダム項目のノブを使わないと、耳に痛い鋭い音が発生します。&lt;br&gt;それ以外では、ユニゾンや静的な Paulstretch に似た面白い効果を得られます。&lt;br&gt;値を増やした場合、このノブは他のどのパラメーターよりも多くの CPU を使います。&lt;br&gt;&lt;b&gt;グライド&lt;/b&gt; - ピッチ移動量の補間時間です。&lt;br&gt;少量のグライドでも、時間とともにピッチ移動量を変えた際の多くのアーティファクトを抑えられます。&lt;br&gt;&lt;b&gt;範囲&lt;/b&gt; - 内部リングバッファーの長さです。&lt;br&gt;変更すると一部のパラメーターの最小値と最大値が変わります。対象は各選択肢に記載されています。&lt;br&gt;最短バッファーでは対応できない値が必要なら増やします。それ以外は最小値のままが最適です。&lt;br&gt;</translation>
     </message>
     <message>
         <source>Granular Pitch Shifter Help</source>
@@ -8576,7 +8576,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域の圧縮量</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -8584,323 +8584,323 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Attack/release scaling for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域のアタック・リリース時間の倍率</translation>
     </message>
     <message>
         <source>Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音量：</translation>
     </message>
     <message>
         <source>Input volume</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音量</translation>
     </message>
     <message>
         <source>Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量：</translation>
     </message>
     <message>
         <source>Output volume</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量</translation>
     </message>
     <message>
         <source>Upward Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>上方圧縮の深さ：</translation>
     </message>
     <message>
         <source>Upward compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域の上方圧縮量</translation>
     </message>
     <message>
         <source>Downward Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>下方圧縮の深さ：</translation>
     </message>
     <message>
         <source>Downward compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域の下方圧縮量</translation>
     </message>
     <message>
         <source>High/Mid Crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>高域・中域のクロスオーバー</translation>
     </message>
     <message>
         <source>Mid/Low Crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>中域・低域のクロスオーバー</translation>
     </message>
     <message>
         <source>High/mid band split</source>
-        <translation type="unfinished"></translation>
+        <translation>高域・中域のクロスオーバー</translation>
     </message>
     <message>
         <source>Mid/low band split</source>
-        <translation type="unfinished"></translation>
+        <translation>中域・低域のクロスオーバー</translation>
     </message>
     <message>
         <source>Enable High Band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域を有効化</translation>
     </message>
     <message>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域を有効化</translation>
     </message>
     <message>
         <source>Enable Low Band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域を有効化</translation>
     </message>
     <message>
         <source>High Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の入力音量：</translation>
     </message>
     <message>
         <source>Input volume for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の入力音量</translation>
     </message>
     <message>
         <source>Mid Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の入力音量：</translation>
     </message>
     <message>
         <source>Input volume for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の入力音量</translation>
     </message>
     <message>
         <source>Low Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の入力音量：</translation>
     </message>
     <message>
         <source>Input volume for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の入力音量</translation>
     </message>
     <message>
         <source>High Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の出력音量：</translation>
     </message>
     <message>
         <source>Output volume for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の出력音量</translation>
     </message>
     <message>
         <source>Mid Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の出력音量：</translation>
     </message>
     <message>
         <source>Output volume for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の出력音量</translation>
     </message>
     <message>
         <source>Low Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の出력音量：</translation>
     </message>
     <message>
         <source>Output volume for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の出력音量</translation>
     </message>
     <message>
         <source>Above Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Downward compression threshold for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Downward compression threshold for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Downward compression threshold for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮しきい値</translation>
     </message>
     <message>
         <source>Above Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の下方圧縮比率</translation>
     </message>
     <message>
         <source>Below Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Upward compression threshold for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Upward compression threshold for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Upward compression threshold for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮しきい値</translation>
     </message>
     <message>
         <source>Below Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域の上方圧縮比率</translation>
     </message>
     <message>
         <source>Attack High:</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のアタック：</translation>
     </message>
     <message>
         <source>Attack time for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のアタック時間</translation>
     </message>
     <message>
         <source>Attack Mid:</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のアタック：</translation>
     </message>
     <message>
         <source>Attack time for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のアタック時間</translation>
     </message>
     <message>
         <source>Attack Low:</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のアタック：</translation>
     </message>
     <message>
         <source>Attack time for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のアタック時間</translation>
     </message>
     <message>
         <source>Release High:</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のリリース：</translation>
     </message>
     <message>
         <source>Release time for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高域のリリース時間</translation>
     </message>
     <message>
         <source>Release Mid:</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のリリース：</translation>
     </message>
     <message>
         <source>Release time for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中域のリリース時間</translation>
     </message>
     <message>
         <source>Release Low:</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のリリース：</translation>
     </message>
     <message>
         <source>Release time for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低域のリリース時間</translation>
     </message>
     <message>
         <source>RMS Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS 時間：</translation>
     </message>
     <message>
         <source>RMS size for sidechain signal (set to 0 for Peak mode)</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチェーン信号の RMS 窓長（0でピークモード）</translation>
     </message>
     <message>
         <source>Knee:</source>
-        <translation type="unfinished"></translation>
+        <translation>ニー幅：</translation>
     </message>
     <message>
         <source>Knee size for all compressors</source>
-        <translation type="unfinished"></translation>
+        <translation>全コンプレッサーのニー幅</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲：</translation>
     </message>
     <message>
         <source>Maximum gain increase for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域の最大ゲイン増加量</translation>
     </message>
     <message>
         <source>Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>バランス：</translation>
     </message>
     <message>
         <source>Bias input volume towards one channel</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音量を片方のチャンネルに偏らせる</translation>
     </message>
     <message>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>深さに応じて出力音量を調整</translation>
     </message>
     <message>
         <source>Scale output volume with Depth parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>深さパラメーターに応じて出力音量を調整</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオリンク</translation>
     </message>
     <message>
         <source>Apply same gain change to both channels</source>
-        <translation type="unfinished"></translation>
+        <translation>両チャンネルに同じゲイン変化を適用</translation>
     </message>
     <message>
         <source>Auto Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>自動タイム：</translation>
     </message>
     <message>
         <source>Speed up attack and release times when transients occur</source>
-        <translation type="unfinished"></translation>
+        <translation>トランジェント発生時にアタックとリリースを速める</translation>
     </message>
     <message>
         <source>Mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス：</translation>
     </message>
     <message>
         <source>Wet/Dry of all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>全帯域のウェット・ドライ比</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -8908,31 +8908,35 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Use output as sidechain signal instead of input</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ではなく出力をサイドチェーン信号に使用</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>ミッド/サイド</translation>
     </message>
     <message>
         <source>Compress mid/side channels instead of left/right</source>
-        <translation type="unfinished"></translation>
+        <translation>左右ではなくミッド・サイドチャンネルを圧縮</translation>
     </message>
     <message>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチャンネルの上方圧縮を抑制</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド</translation>
+    </message>
+    <message>
+        <source>Enable lookahead with fixed %1 ms latency</source>
+        <translation>固定レイテンシー %1 ms でルックアヘッドを有効化</translation>
     </message>
     <message>
         <source>Lookahead length</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド長</translation>
     </message>
     <message>
         <source>Clear all parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>全パラメーターを初期化</translation>
     </message>
 </context>
 <context>
@@ -9008,7 +9012,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Requires Real Time: </source>
-        <translation type="unfinished"></translation>
+        <translation>リアルタイム処理必須：</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -9020,11 +9024,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Real Time Capable: </source>
-        <translation type="unfinished"></translation>
+        <translation>リアルタイム処理対応：</translation>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation type="unfinished"></translation>
+        <translation>インプレース処理非対応：</translation>
     </message>
     <message>
         <source>Channels In: </source>
@@ -9043,11 +9047,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>リンク</translation>
     </message>
     <message>
         <source>Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル %1</translation>
     </message>
     <message>
         <source>Link channels</source>
@@ -9058,7 +9062,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::LadspaPortDialog</name>
     <message>
         <source>Ports</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <source>Name</source>
@@ -9066,7 +9070,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Rate</source>
-        <translation>Rate</translation>
+        <translation>レート</translation>
     </message>
     <message>
         <source>Direction</source>
@@ -9082,11 +9086,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation>対数</translation>
     </message>
     <message>
         <source>SR Dependent</source>
-        <translation type="unfinished"></translation>
+        <translation>サンプルレート依存</translation>
     </message>
     <message>
         <source>Audio</source>
@@ -9106,7 +9110,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Toggled</source>
-        <translation type="unfinished"></translation>
+        <translation>切り替え型</translation>
     </message>
     <message>
         <source>Integer</source>

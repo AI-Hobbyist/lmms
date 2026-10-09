@@ -1254,43 +1254,43 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;이름: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;File: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;파일: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Author: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;제작자: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Copyright: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;저작권: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Channels: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;채널: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>%1 in, %2 out</source>
-        <translation type="unfinished"></translation>
+        <translation>입력 %1, 출력 %2</translation>
     </message>
     <message>
         <source>&lt;b&gt;Real-time Dependency: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;실시간 의존성: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must not be cached or subject to significant latency.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 플러그인은 MIDI 장치 수신 등 실시간 처리에 의존하므로, 출력을 캐시하거나 큰 지연을 발생시켜서는 안 됩니다.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Not Real-time Capable: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;실시간 처리 미지원: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin is not suitable for use in a &amp;lsquo;hard real-time&amp;rsquo; environment.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 플러그인은 &amp;lsquo;하드 실시간&amp;rsquo; 환경에 적합하지 않습니다.</translation>
     </message>
 </context>
 <context>
@@ -8048,7 +8048,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::GranularPitchShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
-        <translation>&lt;div style='text-align: center;'&gt;&lt;b&gt;그래뉼러 피치 시프터&lt;/b&gt;&lt;br&gt;&lt;br&gt;플러그인 제작: Lost Robot&lt;br&gt;GUI 제작: thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;그레인:&lt;/h3&gt;&lt;b&gt;피치&lt;/b&gt; - 피치 이동량으로, 12평균율 반음 단위입니다.&lt;br&gt;&lt;b&gt;크기&lt;/b&gt; - 각 그레인의 길이를 Hz로 표시합니다. 기본적으로 이 주파수의 두 배로 새 그레인을 생성합니다.&lt;br&gt;일반적으로 피치를 올릴 때는 높은 주파수로 설정하고, 내릴 때는 반대로 설정합니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;무작위:&lt;/h3&gt;&lt;b&gt;위치 분산&lt;/b&gt; - 각 그레인 재생 위치의 무작위 변화량으로, 초 단위입니다.&lt;br&gt;그레인이 재생되는 시점이 아니라, 읽어 오는 오디오 위치가 바뀝니다.&lt;br&gt;예를 들어 0.5초로 설정하면 각 그레인은 최대 반초 전의 오디오를 재생할 수 있습니다.&lt;br&gt;위치 분산을 조금이라도 사용하는 것이 좋습니다. 그레인의 주기성을 깨뜨려 그래뉼러 피치 시프터의 주요 음질 부작용을 줄입니다.&lt;br&gt;그레인 사이의 상관성도 없어져 그레인 모양 값 2가 항상 최적이 됩니다.&lt;br&gt;&lt;b&gt;피치 흔들림&lt;/b&gt; - 각 그레인 피치의 무작위 변화량으로, 옥타브 단위입니다.&lt;br&gt;그레인 생성 빈도에는 영향을 주지 않습니다.&lt;br&gt;&lt;b&gt;생성 간격 흔들림&lt;/b&gt; - 새 그레인 생성 빈도의 무작위 변화량으로, 옥타브 단위입니다.&lt;br&gt;피치 흔들림과 생성 간격 흔들림은 같은 난수를 사용합니다. 값이 같으면 그레인 생성 시점이 피치 변화에 정확히 비례하여 바뀝니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;스테레오:&lt;/h3&gt;&lt;b&gt;피치&lt;/b&gt; - 두 스테레오 채널 사이의 전체 피치 간격으로, 12평균율 반음 단위입니다.&lt;br&gt;표시된 피치 이동량의 절반을 오른쪽 채널에 적용하고, 왼쪽에는 반대 방향으로 적용합니다.&lt;br&gt;&lt;b&gt;위치 분산&lt;/b&gt; - 무작위 범주의 위치 분산 기능에서 각 채널의 무작위 위치 사이에 허용되는 간격입니다.&lt;br&gt;1로 설정하면 각 채널의 위치 분산 값이 완전히 독립적입니다.&lt;br&gt;&lt;h3&gt;모양:&lt;/h3&gt;&lt;b&gt;모양&lt;/b&gt; - 각 그레인의 페이드 모양입니다. 일반적으로 2가 최적이며, 동일 전력 페이드를 제공합니다.&lt;br&gt;다만 피치 이동이 작고 대부분의 매개변수가 기본값이면, 동일 게인 페이드를 제공하는 1이 더 나을 수 있습니다.&lt;br&gt;모든 페이드는 그레인 겹침 50%를 기준으로 설계되었습니다.&lt;br&gt;&lt;b&gt;페이드&lt;/b&gt; - 그레인 페이드 길이입니다. 1은 가장 깨끗한 페이드를 제공하며, 그레인 전체에 걸쳐 적용됩니다.&lt;br&gt;1보다 작으면 페이드의 음질 부작용이 더 잘 들리지만, 페이드는 그레인 가장자리에만 적용됩니다.&lt;br&gt;0은 페이드를 없애므로 클릭 소리가 발생합니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;딜레이:&lt;/h3&gt;&lt;b&gt;피드백&lt;/b&gt; - 피치 시프터의 피드백 양입니다.&lt;br&gt;피치 시프터 출력의 일부를 입력 버퍼로 되돌립니다. 큰 값은 위험할 수 있습니다.&lt;br&gt;&lt;b&gt;지연 시간&lt;/b&gt; - 피치 시프터의 최소 지연 시간입니다.&lt;br&gt;이 그래뉼러 피치 시프터는 설정에 따라 지연을 동적으로 바꾸어 가능한 최솟값을 유지합니다.&lt;br&gt;지연을 더 일정하게 유지하려면 지연이 더 이상 바뀌지 않을 때까지 이 값을 높이세요.&lt;br&gt;이 매개변수로 피드백의 최소 딜레이도 설정할 수 있습니다.&lt;br&gt;지연을 늘리면 피치 이동량을 빠르게 자동화할 때 생기는 미세한 떨림을 제거할 수 있습니다.&lt;br&gt;&lt;h3&gt;기타:&lt;/h3&gt;&lt;b&gt;사전 필터&lt;/b&gt; - 피치 이동 전에 12 dB 저역 통과 필터를 켭니다. 차단 주파수를 자동 조절하여 앨리어싱을 크게 줄입니다.&lt;br&gt;&lt;b&gt;밀도&lt;/b&gt; - 그레인 생성 빈도의 배수입니다.&lt;br&gt;그레인 겹침이 50%를 넘게 됩니다.&lt;br&gt;무작위 범주의 노브를 사용하지 않으면 귀에 고통스러운 날카로운 소리가 발생합니다.&lt;br&gt;그렇지 않으면 유니즌이나 정지된 Paulstretch와 비슷한 흥미로운 효과를 얻을 수 있습니다.&lt;br&gt;이 값을 높이면 플러그인의 다른 어떤 매개변수보다 훨씬 많은 CPU를 사용합니다.&lt;br&gt;&lt;b&gt;글라이드&lt;/b&gt; - 피치 이동량의 보간 시간입니다.&lt;br&gt;약간의 글라이드만으로도 피치 이동량을 시간에 따라 바꿀 때 생기는 여러 음질 부작용을 효과적으로 줄입니다.&lt;br&gt;&lt;b&gt;범위&lt;/b&gt; - 피치 시프터 내부 링 버퍼의 길이입니다.&lt;br&gt;이 값을 바꾸면 일부 다른 매개변수의 최솟값과 최댓값이 바뀝니다. 해당 항목은 각 옵션에 표시되어 있습니다.&lt;br&gt;최소 버퍼 길이에서 지원하지 않는 매개변수 값이 필요하면 이 값을 높이세요. 그 외에는 최솟값으로 유지하는 것이 좋습니다.&lt;br&gt;</translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;그래뉼러 피치 시프터&lt;/b&gt;&lt;br&gt;&lt;br&gt;플러그인 제작: Lost Robot&lt;br&gt;GUI 제작: thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;그레인:&lt;/h3&gt;&lt;b&gt;피치&lt;/b&gt; - 피치 이동량으로, 12평균율 반음 단위입니다.&lt;br&gt;&lt;b&gt;크기&lt;/b&gt; - 각 그레인의 길이를 Hz로 표시합니다. 기본적으로 이 주파수의 두 배로 새 그레인을 생성합니다.&lt;br&gt;일반적으로 피치를 올릴 때는 높은 주파수로 설정하고, 내릴 때는 반대로 설정합니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;무작위:&lt;/h3&gt;&lt;b&gt;위치 분산&lt;/b&gt; - 각 그레인 재생 위치의 무작위 변화량으로, 초 단위입니다.&lt;br&gt;그레인이 재생되는 시점이 아니라, 읽어 오는 오디오 위치가 바뀝니다.&lt;br&gt;예를 들어 0.5초로 설정하면 각 그레인은 최대 반초 전의 오디오를 재생할 수 있습니다.&lt;br&gt;위치 분산을 조금이라도 사용하는 것이 좋습니다. 그레인의 주기성을 깨뜨려 그래뉼러 피치 시프터의 주요 음질 부작용을 줄입니다.&lt;br&gt;그레인 사이의 상관성도 없어져 그레인 모양 값 2가 항상 최적이 됩니다.&lt;br&gt;&lt;b&gt;피치 흔들림&lt;/b&gt; - 각 그레인 피치의 무작위 변화량으로, 옥타브 단위입니다.&lt;br&gt;그레인 생성 빈도에는 영향을 주지 않습니다.&lt;br&gt;&lt;b&gt;생성 간격 흔들림&lt;/b&gt; - 새 그레인 생성 빈도의 무작위 변화량으로, 옥타브 단위입니다.&lt;br&gt;피치 흔들림과 생성 간격 흔들림은 같은 난수를 사용합니다. 값이 같으면 그레인 생성 시점이 피치 변화에 정확히 비례하여 바뀝니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;스테레오:&lt;/h3&gt;&lt;b&gt;피치&lt;/b&gt; - 두 스테레오 채널 사이의 전체 피치 간격으로, 12평균율 반음 단위입니다.&lt;br&gt;표시된 피치 이동량의 절반을 오른쪽 채널에 적용하고, 왼쪽에는 반대 방향으로 적용합니다.&lt;br&gt;&lt;b&gt;위치 분산&lt;/b&gt; - 무작위 범주의 위치 분산 기능에서 각 채널의 무작위 위치 사이에 허용되는 간격입니다.&lt;br&gt;1로 설정하면 각 채널의 위치 분산 값이 완전히 독립적입니다.&lt;br&gt;&lt;h3&gt;모양:&lt;/h3&gt;&lt;b&gt;모양&lt;/b&gt; - 각 그레인의 페이드 모양입니다. 일반적으로 2가 최적이며, 동일 전력 페이드를 제공합니다.&lt;br&gt;다만 피치 이동이 작고 대부분의 매개변수가 기본값이면, 동일 게인 페이드를 제공하는 1이 더 나을 수 있습니다.&lt;br&gt;모든 페이드는 그레인 겹침 50%를 기준으로 설계되었습니다.&lt;br&gt;&lt;b&gt;페이드&lt;/b&gt; - 그레인 페이드 길이입니다. 1은 가장 깨끗한 페이드를 제공하며, 그레인 전체에 걸쳐 적용됩니다.&lt;br&gt;1보다 작으면 페이드의 음질 부작용이 더 잘 들리지만, 페이드는 그레인 가장자리에만 적용됩니다.&lt;br&gt;0은 페이드를 없애므로 클릭 소리가 발생합니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;딜레이:&lt;/h3&gt;&lt;b&gt;피드백&lt;/b&gt; - 피치 시프터의 피드백 양입니다.&lt;br&gt;피치 시프터 출력의 일부를 입력 버퍼로 되돌립니다. 큰 값은 위험할 수 있습니다.&lt;br&gt;&lt;b&gt;지연 시간&lt;/b&gt; - 피치 시프터의 최소 지연 시간입니다.&lt;br&gt;이 그래뉼러 피치 시프터는 설정에 따라 지연을 동적으로 바꾸어 가능한 최솟값을 유지합니다.&lt;br&gt;지연을 더 일정하게 유지하려면 지연이 더 이상 바뀌지 않을 때까지 이 값을 높이세요.&lt;br&gt;이 매개변수로 피드백의 최소 딜레이도 설정할 수 있습니다.&lt;br&gt;지연을 늘리면 피치 이동량을 빠르게 자동화할 때 생기는 미세한 떨림을 제거할 수 있습니다.&lt;br&gt;&lt;h3&gt;기타:&lt;/h3&gt;&lt;b&gt;사전 필터&lt;/b&gt; - 피치 이동 전에 12 dB 저역 통과 필터를 켭니다. 차단 주파수를 자동 조절하여 앨리어싱을 크게 줄입니다.&lt;br&gt;&lt;b&gt;밀도&lt;/b&gt; - 그레인 생성 빈도의 배수입니다.&lt;br&gt;그레인 겹침이 50%를 넘게 됩니다.&lt;br&gt;무작위 범주의 노브를 사용하지 않으면 귀에 고통스러운 날카로운 소리가 발생합니다.&lt;br&gt;그렇지 않으면 유니즌이나 정지된 Paulstretch와 비슷한 흥미로운 효과를 얻을 수 있습니다.&lt;br&gt;이 값을 높이면 플러그인의 다른 어떤 매개변수보다 훨씬 많은 CPU를 사용합니다.&lt;br&gt;&lt;b&gt;글라이드&lt;/b&gt; - 피치 이동량의 보간 시간입니다.&lt;br&gt;약간의 글라이드만으로도 피치 이동량을 시간에 따라 바꿀 때 생기는 여러 음질 부작용을 효과적으로 줄입니다.&lt;br&gt;&lt;b&gt;범위&lt;/b&gt; - 피치 시프터 내부 링 버퍼의 길이입니다.&lt;br&gt;이 값을 바꾸면 일부 다른 매개변수의 최솟값과 최댓값이 바뀝니다. 해당 항목은 각 옵션에 표시되어 있습니다.&lt;br&gt;최소 버퍼 길이에서 지원하지 않는 매개변수 값이 필요하면 이 값을 높이세요. 그 외에는 최솟값으로 유지하는 것이 좋습니다.&lt;br&gt;</translation>
     </message>
     <message>
         <source>Granular Pitch Shifter Help</source>
@@ -8923,6 +8923,10 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>Lookahead</source>
         <translation>룩어헤드</translation>
+    </message>
+    <message>
+        <source>Enable lookahead with fixed %1 ms latency</source>
+        <translation>고정 지연 %1 ms로 룩어헤드 켜기</translation>
     </message>
     <message>
         <source>Lookahead length</source>

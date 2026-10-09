@@ -1,0 +1,20 @@
+[
+    {
+        "plugin": "lomm",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "ladspabrowser",
+        "preset": "N/A: tool panel",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "ladspaeffect",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    }
+]

@@ -151,3 +151,7 @@ M5-03：上一检查点 64ae1368301dc80a01e13ce1d254503f03572272 已推送确认
 M5-04：M5-03 检查点 8e24a7a0431a9f2e4df373d49a87f89150628eb4 已推送确认后开始。GranularPitchShifter、Kicker 及关联浏览器键共 64 键四语质量 PASS。新增粒子变调器帮助正文/标题和 seconds/octaves 单位提示 4 个必要入口，HTML 结构、数值与含义保留；其他有效译文保持原值。全库 3598 键，中/日/韩剩余空译 611/752/38。
 
 四语 QM 生成、granularpitchshifter/UiBaselineCapture 编译通过，开发程序 build/Release/lmms.exe，插件仍在 build/Release/plugins。四语原生 Windows 实窗各 3 PASS、0 FAIL，100% 缩放，覆盖两插件面板、帮助页及预设恢复，中文/日文帮助字形正常。首次测试关闭 GUI 时，原插件静态帮助对象的父对象删除导致堆错误；测试在捕获后解除静态对象的父对象归属，四语完整清理与退出重新通过。仅调整测试清理，不改插件窗口生命周期；该既有生产生命周期风险记为后续事项。缺失 granularpitchshifter/logo 资源也记为后续事项，不扩张本批翻译范围。
+
+M5-05：前批检查点及账本格式修正 0d8ba6ec66d043f944f9747e2a8e62fae0f741b6 已推送确认。LOMM/LadspaBrowser/LadspaEffect 共 197 键四语质量 PASS；新增 LOMM 固定预读延迟的 %1 模板，替代提取器无法处理的动态 tr 拼接，不改数值与算法。补译多段压缩参数及 LADSPA 固定状态/端口说明，第三方插件名称和作者元数据保留。全库 3599 键，中/日/韩剩余空译 473/596/28。
+
+四语 QM、lomm 前台编译成功，DLL 写入 build/Release/plugins/lomm.dll；开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，覆盖 LOMM、LADSPA 浏览器及现有 LADSPA 效果器宿主面板，预设保存/恢复通过，固定说明正常显示。LOMM 英文位图标识保留，长提示实际悬浮验收留 M7，不将位图重绘纳入本批。

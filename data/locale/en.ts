@@ -8908,6 +8908,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Enable lookahead with fixed %1 ms latency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Lookahead length</source>
         <translation type="unfinished"></translation>
     </message>

@@ -1254,43 +1254,43 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;名称：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;File: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;文件：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Author: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;作者：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Copyright: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;版权：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Channels: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;通道：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>%1 in, %2 out</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 输入，%2 输出</translation>
     </message>
     <message>
         <source>&lt;b&gt;Real-time Dependency: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;实时依赖：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must not be cached or subject to significant latency.</source>
-        <translation type="unfinished"></translation>
+        <translation>此插件有实时依赖（例如监听 MIDI 设备），因此其输出不得缓存，也不应有明显延迟。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Not Real-time Capable: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;不支持实时处理：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>This plugin is not suitable for use in a &amp;lsquo;hard real-time&amp;rsquo; environment.</source>
-        <translation type="unfinished"></translation>
+        <translation>此插件不适合用于&amp;lsquo;硬实时&amp;rsquo;环境。</translation>
     </message>
 </context>
 <context>
@@ -3045,7 +3045,7 @@ Continue?</source>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>时间</translation>
     </message>
     <message>
         <source>Input Volume</source>
@@ -3057,43 +3057,43 @@ Continue?</source>
     </message>
     <message>
         <source>Upward Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>向上压缩深度</translation>
     </message>
     <message>
         <source>Downward Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>向下压缩深度</translation>
     </message>
     <message>
         <source>High/Mid Split</source>
-        <translation type="unfinished"></translation>
+        <translation>高/中分频</translation>
     </message>
     <message>
         <source>Mid/Low Split</source>
-        <translation type="unfinished"></translation>
+        <translation>中/低分频</translation>
     </message>
     <message>
         <source>Enable High/Mid Split</source>
-        <translation type="unfinished"></translation>
+        <translation>启用高/中分频</translation>
     </message>
     <message>
         <source>Enable Mid/Low Split</source>
-        <translation type="unfinished"></translation>
+        <translation>启用中/低分频</translation>
     </message>
     <message>
         <source>Enable High Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用高频段</translation>
     </message>
     <message>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用中频段</translation>
     </message>
     <message>
         <source>Enable Low Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用低频段</translation>
     </message>
     <message>
         <source>High Input Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段输入音量</translation>
     </message>
     <message>
         <source>Mid Input Volume</source>
@@ -3117,83 +3117,83 @@ Continue?</source>
     </message>
     <message>
         <source>Above Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩比率</translation>
     </message>
     <message>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩比率</translation>
     </message>
     <message>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩比率</translation>
     </message>
     <message>
         <source>Below Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩比率</translation>
     </message>
     <message>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩比率</translation>
     </message>
     <message>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩比率</translation>
     </message>
     <message>
         <source>Attack High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段起音</translation>
     </message>
     <message>
         <source>Attack Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段起音</translation>
     </message>
     <message>
         <source>Attack Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段起音</translation>
     </message>
     <message>
         <source>Release High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段释放</translation>
     </message>
     <message>
         <source>Release Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段释放</translation>
     </message>
     <message>
         <source>Release Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段释放</translation>
     </message>
     <message>
         <source>RMS Time</source>
-        <translation type="unfinished"></translation>
+        <translation>均方根时间</translation>
     </message>
     <message>
         <source>Knee</source>
-        <translation type="unfinished"></translation>
+        <translation>拐点宽度</translation>
     </message>
     <message>
         <source>Range</source>
@@ -3201,19 +3201,19 @@ Continue?</source>
     </message>
     <message>
         <source>Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>平衡</translation>
     </message>
     <message>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>随深度缩放输出音量</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声联动</translation>
     </message>
     <message>
         <source>Auto Time</source>
-        <translation type="unfinished"></translation>
+        <translation>自动时间</translation>
     </message>
     <message>
         <source>Mix</source>
@@ -3225,19 +3225,19 @@ Continue?</source>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>中/侧</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>预读</translation>
     </message>
     <message>
         <source>Lookahead Length</source>
-        <translation type="unfinished"></translation>
+        <translation>预读时长</translation>
     </message>
     <message>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"></translation>
+        <translation>抑制侧通道的向上压缩</translation>
     </message>
 </context>
 <context>
@@ -8048,7 +8048,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::GranularPitchShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
-        <translation>&lt;div style='text-align: center;'&gt;&lt;b&gt;粒子变调器&lt;/b&gt;&lt;br&gt;&lt;br&gt;插件作者：Lost Robot&lt;br&gt;界面作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;粒子：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 变调量，以十二平均律半音为单位。&lt;br&gt;&lt;b&gt;大小&lt;/b&gt; - 每个粒子的长度，以 Hz 表示。默认以此频率的两倍生成新粒子。&lt;br&gt;通常，向上变调时应设为较高频率，向下变调时则相反。&lt;br&gt;&lt;br&gt;&lt;h3&gt;随机：&lt;/h3&gt;&lt;b&gt;位置散布&lt;/b&gt; - 每个粒子播放位置的随机变化量，以秒为单位。&lt;br&gt;这不会改变粒子的播放时刻，只会改变粒子读取的音频位置。&lt;br&gt;例如，设为 0.5 秒时，每个粒子最多可播放半秒之前的音频。&lt;br&gt;通常建议至少加入少量位置散布，以打破粒子的周期性；周期性通常是粒子变调器产生的主要伪影。&lt;br&gt;这也会使粒子之间不相关，保证粒子形状设为 2 时始终最佳。&lt;br&gt;&lt;b&gt;音高抖动&lt;/b&gt; - 每个粒子音高的随机变化量，以八度为单位。&lt;br&gt;这不会影响粒子的生成频率。&lt;br&gt;&lt;b&gt;生成时序抖动&lt;/b&gt; - 新粒子生成频率的随机变化量，以八度为单位。&lt;br&gt;音高抖动与生成时序抖动使用相同的随机数，因此二者取值相同时，粒子生成时序的变化与音高变化完全成比例。&lt;br&gt;&lt;br&gt;&lt;h3&gt;立体声：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 两个立体声通道的总音高距离，以十二平均律半音为单位。&lt;br&gt;显示变调量的一半应用于右通道，左通道则应用相反方向的变化。&lt;br&gt;&lt;b&gt;位置散布&lt;/b&gt; - 随机区的位置散布功能中，各通道随机位置之间允许的距离。&lt;br&gt;设为 1 时，各通道的位置散布值完全独立。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 每个粒子的淡入淡出形状。通常 2 为最佳值，提供等功率淡化。&lt;br&gt;但在变调很小且大多数参数为默认值时，1 可能更好，提供等增益淡化。&lt;br&gt;所有淡化都按粒子重叠 50% 设计。&lt;br&gt;&lt;b&gt;淡化&lt;/b&gt; - 粒子淡入淡出的长度。1 提供最干净的淡化，淡化覆盖整个粒子。&lt;br&gt;小于 1 时，淡化伪影更容易听见，但淡化只作用于粒子外缘。&lt;br&gt;0 会取消淡化，从而产生咔嗒声。&lt;br&gt;&lt;br&gt;&lt;h3&gt;延迟：&lt;/h3&gt;&lt;b&gt;反馈&lt;/b&gt; - 变调器的反馈量。&lt;br&gt;将部分变调输出送回输入缓冲区。较大的值可能有危险。&lt;br&gt;&lt;b&gt;延迟量&lt;/b&gt; - 变调器的最小延迟量。&lt;br&gt;此粒子变调器根据设置动态调整延迟，使其始终保持在可能的最小值。&lt;br&gt;若希望延迟更可预测，可增大此参数，直到延迟不再变化。&lt;br&gt;也可用此参数设置反馈的最小延迟量。&lt;br&gt;较大的延迟可消除高速自动化变调量时产生的细微颤动伪影。&lt;br&gt;&lt;h3&gt;其他：&lt;/h3&gt;&lt;b&gt;预滤波器&lt;/b&gt; - 变调前启用 12 dB 低通滤波器，自动调整截止频率以大幅减少混叠。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - 粒子生成频率的倍数。&lt;br&gt;这会使粒子的重叠超过 50%。&lt;br&gt;若不使用随机区的任何旋钮，会产生刺耳的尖锐声音。&lt;br&gt;否则可得到类似齐奏或静态 Paulstretch 的有趣效果。&lt;br&gt;请注意，增大此旋钮时，其 CPU 消耗远高于插件的其他参数。&lt;br&gt;&lt;b&gt;滑变&lt;/b&gt; - 变调量的插值时长。&lt;br&gt;少量滑变即可有效消除随时间改变变调量时产生的许多伪影。&lt;br&gt;&lt;b&gt;范围&lt;/b&gt; - 变调器内部环形缓冲区的长度。&lt;br&gt;改变此值会改变其他某些参数的最小值和最大值，各选项中列出了这些参数。&lt;br&gt;若所需参数值超出最小缓冲区长度支持的范围，请增大此值。否则最好保留最小值。&lt;br&gt;</translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;粒子变调器&lt;/b&gt;&lt;br&gt;&lt;br&gt;插件作者：Lost Robot&lt;br&gt;界面作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;粒子：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 变调量，以十二平均律半音为单位。&lt;br&gt;&lt;b&gt;大小&lt;/b&gt; - 每个粒子的长度，以 Hz 表示。默认以此频率的两倍生成新粒子。&lt;br&gt;通常，向上变调时应设为较高频率，向下变调时则相反。&lt;br&gt;&lt;br&gt;&lt;h3&gt;随机：&lt;/h3&gt;&lt;b&gt;位置散布&lt;/b&gt; - 每个粒子播放位置的随机变化量，以秒为单位。&lt;br&gt;这不会改变粒子的播放时刻，只会改变粒子读取的音频位置。&lt;br&gt;例如，设为 0.5 秒时，每个粒子最多可播放半秒之前的音频。&lt;br&gt;通常建议至少加入少量位置散布，以打破粒子的周期性；周期性通常是粒子变调器产生的主要伪影。&lt;br&gt;这也会使粒子之间不相关，保证粒子形状设为 2 时始终最佳。&lt;br&gt;&lt;b&gt;音高抖动&lt;/b&gt; - 每个粒子音高的随机变化量，以八度为单位。&lt;br&gt;这不会影响粒子的生成频率。&lt;br&gt;&lt;b&gt;生成时序抖动&lt;/b&gt; - 新粒子生成频率的随机变化量，以八度为单位。&lt;br&gt;音高抖动与生成时序抖动使用相同的随机数，因此二者取值相同时，粒子生成时序的变化与音高变化完全成比例。&lt;br&gt;&lt;br&gt;&lt;h3&gt;立体声：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 两个立体声通道的总音高距离，以十二平均律半音为单位。&lt;br&gt;显示变调量的一半应用于右通道，左通道则应用相反方向的变化。&lt;br&gt;&lt;b&gt;位置散布&lt;/b&gt; - 随机区的位置散布功能中，各通道随机位置之间允许的距离。&lt;br&gt;设为 1 时，各通道的位置散布值完全独立。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 每个粒子的淡入淡出形状。通常 2 为最佳值，提供等功率淡化。&lt;br&gt;但在变调很小且大多数参数为默认值时，1 可能更好，提供等增益淡化。&lt;br&gt;所有淡化都按粒子重叠 50% 设计。&lt;br&gt;&lt;b&gt;淡化&lt;/b&gt; - 粒子淡入淡出的长度。1 提供最干净的淡化，淡化覆盖整个粒子。&lt;br&gt;小于 1 时，淡化伪影更容易听见，但淡化只作用于粒子外缘。&lt;br&gt;0 会取消淡化，从而产生咔嗒声。&lt;br&gt;&lt;br&gt;&lt;h3&gt;延迟：&lt;/h3&gt;&lt;b&gt;反馈&lt;/b&gt; - 变调器的反馈量。&lt;br&gt;将部分变调输出送回输入缓冲区。较大的值可能有危险。&lt;br&gt;&lt;b&gt;延迟量&lt;/b&gt; - 变调器的最小延迟量。&lt;br&gt;此粒子变调器根据设置动态调整延迟，使其始终保持在可能的最小值。&lt;br&gt;若希望延迟更可预测，可增大此参数，直到延迟不再变化。&lt;br&gt;也可用此参数设置反馈的最小延迟量。&lt;br&gt;较大的延迟可消除高速自动化变调量时产生的细微颤动伪影。&lt;br&gt;&lt;h3&gt;其他：&lt;/h3&gt;&lt;b&gt;预滤波器&lt;/b&gt; - 变调前启用 12 dB 低通滤波器，自动调整截止频率以大幅减少混叠。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - 粒子生成频率的倍数。&lt;br&gt;这会使粒子的重叠超过 50%。&lt;br&gt;若不使用随机区的任何旋钮，会产生刺耳的尖锐声音。&lt;br&gt;否则可得到类似齐奏或静态 Paulstretch 的有趣效果。&lt;br&gt;请注意，增大此旋钮时，其 CPU 消耗远高于插件的其他参数。&lt;br&gt;&lt;b&gt;滑变&lt;/b&gt; - 变调量的插值时长。&lt;br&gt;少量滑变即可有效消除随时间改变变调量时产生的许多伪影。&lt;br&gt;&lt;b&gt;范围&lt;/b&gt; - 变调器内部环形缓冲区的长度。&lt;br&gt;改变此值会改变其他某些参数的最小值和最大值，各选项中列出了这些参数。&lt;br&gt;若所需参数值超出最小缓冲区长度支持的范围，请增大此值。否则最好保留最小值。&lt;br&gt;</translation>
     </message>
     <message>
         <source>Granular Pitch Shifter Help</source>
@@ -8574,7 +8574,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的压缩量</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -8582,323 +8582,323 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Attack/release scaling for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的起音/释放时间缩放</translation>
     </message>
     <message>
         <source>Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>输入音量：</translation>
     </message>
     <message>
         <source>Input volume</source>
-        <translation type="unfinished"></translation>
+        <translation>输入音量</translation>
     </message>
     <message>
         <source>Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>输出音量：</translation>
     </message>
     <message>
         <source>Output volume</source>
-        <translation type="unfinished"></translation>
+        <translation>输出音量</translation>
     </message>
     <message>
         <source>Upward Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>向上压缩深度：</translation>
     </message>
     <message>
         <source>Upward compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的向上压缩量</translation>
     </message>
     <message>
         <source>Downward Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>向下压缩深度：</translation>
     </message>
     <message>
         <source>Downward compression amount for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的向下压缩量</translation>
     </message>
     <message>
         <source>High/Mid Crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>高/中分频</translation>
     </message>
     <message>
         <source>Mid/Low Crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>中/低分频</translation>
     </message>
     <message>
         <source>High/mid band split</source>
-        <translation type="unfinished"></translation>
+        <translation>高/中分频</translation>
     </message>
     <message>
         <source>Mid/low band split</source>
-        <translation type="unfinished"></translation>
+        <translation>中/低分频</translation>
     </message>
     <message>
         <source>Enable High Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用高频段</translation>
     </message>
     <message>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用中频段</translation>
     </message>
     <message>
         <source>Enable Low Band</source>
-        <translation type="unfinished"></translation>
+        <translation>启用低频段</translation>
     </message>
     <message>
         <source>High Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段输入音量：</translation>
     </message>
     <message>
         <source>Input volume for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段的输入音量</translation>
     </message>
     <message>
         <source>Mid Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段输入音量：</translation>
     </message>
     <message>
         <source>Input volume for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段的输入音量</translation>
     </message>
     <message>
         <source>Low Input Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段输入音量：</translation>
     </message>
     <message>
         <source>Input volume for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段的输入音量</translation>
     </message>
     <message>
         <source>High Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段输出音量：</translation>
     </message>
     <message>
         <source>Output volume for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段的输出音量</translation>
     </message>
     <message>
         <source>Mid Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段输出音量：</translation>
     </message>
     <message>
         <source>Output volume for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段的输出音量</translation>
     </message>
     <message>
         <source>Low Output Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段输出音量：</translation>
     </message>
     <message>
         <source>Output volume for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段的输出音量</translation>
     </message>
     <message>
         <source>Above Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Downward compression threshold for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Downward compression threshold for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Downward compression threshold for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩阈值</translation>
     </message>
     <message>
         <source>Above Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向下压缩比率</translation>
     </message>
     <message>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向下压缩比率</translation>
     </message>
     <message>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩比率</translation>
     </message>
     <message>
         <source>Downward compression ratio for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向下压缩比率</translation>
     </message>
     <message>
         <source>Below Threshold High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Upward compression threshold for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Upward compression threshold for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Upward compression threshold for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩阈值</translation>
     </message>
     <message>
         <source>Below Ratio High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段向上压缩比率</translation>
     </message>
     <message>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段向上压缩比率</translation>
     </message>
     <message>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩比率</translation>
     </message>
     <message>
         <source>Upward compression ratio for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段向上压缩比率</translation>
     </message>
     <message>
         <source>Attack High:</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段起音：</translation>
     </message>
     <message>
         <source>Attack time for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段的起音时间</translation>
     </message>
     <message>
         <source>Attack Mid:</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段起音：</translation>
     </message>
     <message>
         <source>Attack time for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段的起音时间</translation>
     </message>
     <message>
         <source>Attack Low:</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段起音：</translation>
     </message>
     <message>
         <source>Attack time for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段的起音时间</translation>
     </message>
     <message>
         <source>Release High:</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段释放：</translation>
     </message>
     <message>
         <source>Release time for high band</source>
-        <translation type="unfinished"></translation>
+        <translation>高频段的释放时间</translation>
     </message>
     <message>
         <source>Release Mid:</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段释放：</translation>
     </message>
     <message>
         <source>Release time for mid band</source>
-        <translation type="unfinished"></translation>
+        <translation>中频段的释放时间</translation>
     </message>
     <message>
         <source>Release Low:</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段释放：</translation>
     </message>
     <message>
         <source>Release time for low band</source>
-        <translation type="unfinished"></translation>
+        <translation>低频段的释放时间</translation>
     </message>
     <message>
         <source>RMS Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>均方根时间：</translation>
     </message>
     <message>
         <source>RMS size for sidechain signal (set to 0 for Peak mode)</source>
-        <translation type="unfinished"></translation>
+        <translation>侧链信号的均方根窗口长度（设为 0 使用峰值模式）</translation>
     </message>
     <message>
         <source>Knee:</source>
-        <translation type="unfinished"></translation>
+        <translation>拐点宽度：</translation>
     </message>
     <message>
         <source>Knee size for all compressors</source>
-        <translation type="unfinished"></translation>
+        <translation>所有压缩器的拐点宽度</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>范围：</translation>
     </message>
     <message>
         <source>Maximum gain increase for all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的最大增益提升</translation>
     </message>
     <message>
         <source>Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>平衡：</translation>
     </message>
     <message>
         <source>Bias input volume towards one channel</source>
-        <translation type="unfinished"></translation>
+        <translation>将输入音量偏向一个通道</translation>
     </message>
     <message>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>随深度缩放输出音量</translation>
     </message>
     <message>
         <source>Scale output volume with Depth parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>随深度参数缩放输出音量</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声联动</translation>
     </message>
     <message>
         <source>Apply same gain change to both channels</source>
-        <translation type="unfinished"></translation>
+        <translation>对两个通道应用相同增益变化</translation>
     </message>
     <message>
         <source>Auto Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>自动时间：</translation>
     </message>
     <message>
         <source>Speed up attack and release times when transients occur</source>
-        <translation type="unfinished"></translation>
+        <translation>出现瞬态时缩短起音和释放时间</translation>
     </message>
     <message>
         <source>Mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>混合：</translation>
     </message>
     <message>
         <source>Wet/Dry of all bands</source>
-        <translation type="unfinished"></translation>
+        <translation>所有频段的干湿混合</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -8906,31 +8906,35 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Use output as sidechain signal instead of input</source>
-        <translation type="unfinished"></translation>
+        <translation>将输出而非输入用作侧链信号</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>中/侧</translation>
     </message>
     <message>
         <source>Compress mid/side channels instead of left/right</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩中/侧通道而非左/右通道</translation>
     </message>
     <message>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"></translation>
+        <translation>抑制侧通道的向上压缩</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>预读</translation>
+    </message>
+    <message>
+        <source>Enable lookahead with fixed %1 ms latency</source>
+        <translation>启用预读，固定延迟 %1 ms</translation>
     </message>
     <message>
         <source>Lookahead length</source>
-        <translation type="unfinished"></translation>
+        <translation>预读时长</translation>
     </message>
     <message>
         <source>Clear all parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>清除所有参数</translation>
     </message>
 </context>
 <context>
@@ -9041,7 +9045,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>联动</translation>
     </message>
     <message>
         <source>Channel %1</source>
