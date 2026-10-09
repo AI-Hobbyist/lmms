@@ -4958,6 +4958,63 @@ private slots:
 		QTest::qWait(700);
 		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
 		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-pencil-curve-native.png"));
+		const QString absoluteId = "diffsinger.voicing";
+		auto* absoluteTab = editor.findChild<QToolButton*>("svsParameterTab.input:" + absoluteId);
+		QVERIFY(absoluteTab);
+		QTest::mouseClick(absoluteTab, Qt::LeftButton);
+		lane = editor.findChild<gui::SVSCanvas*>("svsParameterLane." + absoluteId + ".input");
+		QVERIFY(lane);
+		QVERIFY(!clip->curves().contains(absoluteId));
+		// Hide other overlays to ensure pixels come from the editable default,
+		// rather than the corresponding read-only line underneath it.
+		auto state = clip->editorState();
+		auto laneStates = state["lanes"].toObject();
+		for (auto* button : editor.findChildren<QToolButton*>())
+		{
+			const auto name = button->objectName();
+			if (name.startsWith("svsParameterTab."))
+				laneStates[name.mid(QString("svsParameterTab.").size())]
+					= QJsonObject{{"visible", name == absoluteTab->objectName()}};
+		}
+		state["lanes"] = laneStates;
+		clip->setEditorState(state);
+		QTest::qWait(700);
+		svs::Curve reference;
+		const auto* absolute = track->capabilities().parameter(absoluteId, "clip");
+		QVERIFY(absolute);
+		QVERIFY2(svs::Curve::fromJson(clip->audio()->feedback["curves"].toObject()[absoluteId].toObject(),
+			reference, error, absolute), qPrintable(error));
+		const auto pixels = lane->grab().toImage();
+		const QColor expected(absolute->color);
+		for (double tick : {24., 60., 120.})
+		{
+			const auto value = reference.valueAt(tick);
+			QVERIFY(value);
+			const auto point = lane->curvePointAt(tick, value->toDouble()).toPoint();
+			bool found = false;
+			for (int y = point.y() - 3; y <= point.y() + 3; ++y)
+			{
+				const auto pixel = pixels.pixelColor(point.x(), y);
+				found |= std::abs(pixel.red() - expected.red()) < 20
+					&& std::abs(pixel.green() - expected.green()) < 20
+					&& std::abs(pixel.blue() - expected.blue()) < 20;
+			}
+			QVERIFY2(found, "Editable absolute default must match the read-only reference");
+		}
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-absolute-reference-native.png"));
+		QTest::mousePress(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(48, -10).toPoint());
+		QTest::mouseRelease(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(96, -8).toPoint());
+		const auto authored = clip->curves().value(absoluteId);
+		QVERIFY(authored.valueAt(60));
+		QVERIFY(!authored.valueAt(24));
+		QVERIFY(!authored.valueAt(120));
+		QTRY_VERIFY_WITH_TIMEOUT(clip->status() == "Ready" || clip->status().startsWith("Failed"), 180000);
+		QCOMPARE(clip->status(), QString("Ready"));
+		QTest::mousePress(lane, Qt::RightButton, Qt::NoModifier, lane->curvePointAt(44, -10).toPoint());
+		QTest::mouseRelease(lane, Qt::RightButton, Qt::NoModifier, lane->curvePointAt(100, -8).toPoint());
+		QVERIFY(!clip->curves().value(absoluteId).valueAt(60));
+		QTRY_VERIFY_WITH_TIMEOUT(clip->status() == "Ready" || clip->status().startsWith("Failed"), 180000);
+		QCOMPARE(clip->status(), QString("Ready"));
 		editor.close();
 	}
 	void nativeSidebarLanguages()

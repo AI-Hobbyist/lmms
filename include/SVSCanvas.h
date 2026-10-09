@@ -168,6 +168,7 @@ private:
 	void addPitchActions(QMenu&);
 	svs::Curve pitchCurve() const;
 	svs::Curve parameterCurve(const svs::Parameter&, bool feedback) const;
+	bool parameterUsesReference(const svs::Parameter&) const;
 	void paintParameterOverlays(QPainter&);
 	void beginCurveStroke(const QPointF&);
 	void beginNote(const QPointF&, Qt::KeyboardModifiers);

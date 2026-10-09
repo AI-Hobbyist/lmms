@@ -296,6 +296,22 @@ bool SVSCanvas::curveEditable() const
 	return m_parameter->writable && m_parameter->enabled && parameter && parameter->curve && parameter->writable
 		&& parameter->enabled;
 }
+bool SVSCanvas::parameterUsesReference(const svs::Parameter& parameter) const
+{
+	const auto& capabilities = static_cast<SVSTrack*>(m_clip->getTrack())->capabilities();
+	const auto parameters = capabilities.original["parameters"].toArray();
+	const bool declared = std::any_of(parameters.begin(), parameters.end(), [&](const auto& entry) {
+		const auto object = entry.toObject();
+		return object["id"].toString() == parameter.id && object["scope"].toString() == parameter.scope
+			&& object["mode"].toString() == "absolute";
+	});
+	return declared
+		&& std::any_of(
+			capabilities.feedbackParameters.begin(), capabilities.feedbackParameters.end(), [&](const auto& reference) {
+				return reference.id == parameter.id && reference.scope == parameter.scope
+					&& reference.type == parameter.type && reference.unit == parameter.unit;
+			});
+}
 svs::Curve SVSCanvas::parameterCurve(const svs::Parameter& parameter, bool feedback) const
 {
 	svs::Curve curve;
@@ -328,6 +344,10 @@ svs::Curve SVSCanvas::parameterCurve(const svs::Parameter& parameter, bool feedb
 		const auto& curves = m_transaction->active() ? m_transaction->curves : m_clip->curves();
 		if (curves.contains(parameter.id))
 			return curves[parameter.id];
+		// Predicted absolute values are display defaults, not authored overrides.
+		// Keep an empty source so drawing only stores the edited interval.
+		if (parameterUsesReference(parameter))
+			return curve;
 		const auto base = parameter.type == "float" || parameter.type == "int" ? parameter.defaultValue
 																			   : m_clip->parameterBase(parameter);
 		curve.insert(0, base);
@@ -362,6 +382,8 @@ void SVSCanvas::paintParameterOverlays(QPainter& painter)
 		auto curve = parameterCurve(parameter, entry.second);
 		if (!entry.second)
 			curve = svs::withParameterBase(curve, parameter, m_clip->parameterBase(parameter));
+		const auto reference
+			= !entry.second && parameterUsesReference(parameter) ? parameterCurve(parameter, true) : svs::Curve{};
 		const double minimum = parameter.type == "enum" || parameter.type == "bool" ? 0 : parameter.minimum;
 		const double maximum = parameter.type == "enum" ? std::max(0, int(parameter.choices.size()) - 1)
 			: parameter.type == "bool"					? 1
@@ -370,7 +392,9 @@ void SVSCanvas::paintParameterOverlays(QPainter& painter)
 		bool connected = false;
 		for (double tick = std::max(0., tickAt(KeyboardWidth)); tick <= tickAt(width()); tick += 1 / m_pixelsPerTick)
 		{
-			const auto value = curve.valueAt(tick);
+			auto value = curve.valueAt(tick);
+			if (!value)
+				value = reference.valueAt(tick);
 			if (!value)
 			{
 				connected = false;
@@ -415,13 +439,18 @@ void SVSCanvas::paintPitch(QPainter& painter)
 	const auto displayed = m_parameter && !m_feedback
 		? svs::withParameterBase(curve, *m_parameter, m_clip->parameterBase(*m_parameter))
 		: curve;
+	const auto reference = m_parameter && !m_feedback && parameterUsesReference(*m_parameter)
+		? parameterCurve(*m_parameter, true)
+		: svs::Curve{};
 	QPainterPath path;
 	bool connected = false;
 	const double from = std::max(0., tickAt(KeyboardWidth)), to = tickAt(width());
 	// The visible interval alone determines rendering cost, independent of song length.
 	for (double tick = from; tick <= to; tick += 1 / m_pixelsPerTick)
 	{
-		const auto value = displayed.valueAt(tick);
+		auto value = displayed.valueAt(tick);
+		if (!value)
+			value = reference.valueAt(tick);
 		if (!value)
 		{
 			connected = false;
@@ -877,7 +906,7 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event)
 		m_operationOffset = parameterOffset();
 		m_transaction->begin();
 		m_curveGesture->begin(pitchCurve(), std::max(0., tickAt(event->position().x())), m_parameter->defaultValue,
-			SVSCurveGesture::Kind::Reset);
+			parameterUsesReference(*m_parameter) ? SVSCurveGesture::Kind::Erase : SVSCurveGesture::Kind::Reset);
 		m_action = Action::CurveReset;
 		updateOperation(event->position(), event->modifiers());
 		grabMouse();
