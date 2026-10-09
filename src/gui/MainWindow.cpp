@@ -314,16 +314,16 @@ void MainWindow::finalize()
 	project_menu->addAction(embed::getIconPixmap("project_import"), tr("Import..."),
 		this, &MainWindow::onImportProject);
 
-	auto* svsProjectMenu = project_menu->addMenu(QStringLiteral("SVS 工程"));
+	auto* svsProjectMenu = project_menu->addMenu(QCoreApplication::translate("SVSProjectUI", "SVS project"));
 	svsProjectMenu->setObjectName("svsProjectMenu");
 	auto* svsProjectController = new SVSProjectController(this);
-	svsProjectMenu->addAction(
-		QStringLiteral("导入SVS工程"), svsProjectController, &SVSProjectController::importProject);
-	svsProjectMenu->addAction(
-		QStringLiteral("导出SVS工程"), svsProjectController, &SVSProjectController::exportProject);
+	svsProjectMenu->addAction(QCoreApplication::translate("SVSProjectUI", "Import SVS project"), svsProjectController,
+		&SVSProjectController::importProject);
+	svsProjectMenu->addAction(QCoreApplication::translate("SVSProjectUI", "Export SVS project"), svsProjectController,
+		&SVSProjectController::exportProject);
 
-	addAction(project_menu, "project_export", tr("E&xport..."),
-		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);
+	addAction(project_menu, "project_export", tr("E&xport..."), keySequence(Qt::CTRL, Qt::Key_E),
+		&MainWindow::onExportProject);
 
 	addAction(project_menu, "project_export", tr("Export &Tracks..."),
 		keySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_E), &MainWindow::onExportProjectTracks);

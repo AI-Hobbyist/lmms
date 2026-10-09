@@ -458,10 +458,7 @@ void SVSClip::synthesize()
 			{
 				target->m_status = "Failed: " + error;
 			}
-			else if (preview)
-			{
-				target->m_status = tr("请选择一个歌手");
-			}
+			else if (preview) { target->m_status = tr("Please select a singer"); }
 			else
 			{
 				target->m_status = cachedOnly ? "Missing voice/plugin: cached audio" : "Ready";

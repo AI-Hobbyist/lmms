@@ -2,6 +2,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFormLayout>
 #include <QJsonDocument>
@@ -20,6 +21,7 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "NativePluginTranslation.h"
 #include "SVSClip.h"
 #include "SVSComputePolicy.h"
 #include "SVSSynthesisScheduler.h"
@@ -29,11 +31,13 @@ namespace lmms::gui {
 QString SVSSettingsPage::engineLabel(const svs::Voice& voice)
 {
 	const auto type = voice.metadata["engineType"].toString();
-	const auto category = type == "ai" ? tr("AI")
-		: type == "concatenative"	   ? tr("Traditional concatenation")
-		: type == "example"			   ? tr("Non-AI example")
-									   : tr("Type not declared");
-	return tr("%1 (%2)").arg(voice.metadata["pluginName"].toString(voice.pluginId), category);
+	const auto category = type == "ai" ? QCoreApplication::translate("lmms::gui::SVSSettingsPage", "AI")
+		: type == "concatenative"
+		? QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Traditional concatenation")
+		: type == "example" ? QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Non-AI example")
+							: QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Type not declared");
+	return QCoreApplication::translate("lmms::gui::SVSSettingsPage", "%1 (%2)")
+		.arg(voice.metadata["pluginName"].toString(voice.pluginId), category);
 }
 SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	: QWidget(parent)
@@ -41,7 +45,7 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	setObjectName("svsSettingsPage");
 	auto* layout = new QVBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
-	auto* heading = new QLabel(tr("SVS"), this);
+	auto* heading = new QLabel(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "SVS"), this);
 	auto font = heading->font();
 	font.setBold(true);
 	heading->setFont(font);
@@ -59,8 +63,10 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	m_backend->addItem("CPU", "cpu");
 	m_backend->addItem("DirectML", "directml");
 	for (const auto& name : QStringList{"LibTorch", "Vulkan"})
-		m_backend->addItem(tr("%1 — Coming soon").arg(name), name.toLower());
-	form->addRow(tr("AI voicebank computation engine"), m_backend);
+		m_backend->addItem(
+			QCoreApplication::translate("lmms::gui::SVSSettingsPage", "%1 — Coming soon").arg(name), name.toLower());
+	form->addRow(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "AI voicebank computation engine"), m_backend);
 	m_device = new QComboBox(body);
 	m_device->setObjectName("svsComputeDevice");
 	m_device->addItem("CPU", "cpu");
@@ -73,34 +79,41 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 			m_device->addItem(device["name"].toString(), device["device"].toString());
 		}
 	}
-	form->addRow(tr("Device"), m_device);
+	form->addRow(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Device"), m_device);
 	m_memoryPolicy = new QComboBox(body);
 	m_memoryPolicy->setObjectName("svsComputeMemoryPolicy");
-	m_memoryPolicy->addItem(tr("Release immediately after rendering"), "immediate");
-	m_memoryPolicy->addItem(tr("Release automatically when idle (default)"), "idle");
-	m_memoryPolicy->addItem(tr("Keep models resident"), "resident");
-	form->addRow(tr("AI model memory management"), m_memoryPolicy);
-	m_memoryPolicy->setToolTip(tr("Applies to all AI computation backends: CPU model memory and GPU model video "
-								  "memory. Released models reload when needed."));
+	m_memoryPolicy->addItem(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Release immediately after rendering"), "immediate");
+	m_memoryPolicy->addItem(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Release automatically when idle (default)"), "idle");
+	m_memoryPolicy->addItem(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Keep models resident"), "resident");
+	form->addRow(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "AI model memory management"), m_memoryPolicy);
+	m_memoryPolicy->setToolTip(QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+		"Applies to all AI computation backends: CPU model memory and GPU model video "
+		"memory. Released models reload when needed."));
 	m_idleSeconds = new QSpinBox(body);
 	m_idleSeconds->setObjectName("svsComputeIdleSeconds");
 	m_idleSeconds->setRange(1, 86400);
-	m_idleSeconds->setSuffix(tr(" s"));
-	form->addRow(tr("Idle time before release"), m_idleSeconds);
+	m_idleSeconds->setSuffix(QCoreApplication::translate("lmms::gui::SVSSettingsPage", " s"));
+	form->addRow(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Idle time before release"), m_idleSeconds);
 	m_concurrency = new QSpinBox(body);
 	m_concurrency->setObjectName("svsRenderConcurrency");
 	m_concurrency->setRange(1, 16);
 	m_concurrency->setValue(std::clamp(ConfigManager::inst()->value("svs", "concurrency", "1").toInt(), 1, 16));
-	m_concurrency->setToolTip(
-		tr("Maximum simultaneous SVS renders across all tracks and engines. Default: 1. "
-		   "Other renders wait in the queue. Running renders finish when this limit is reduced."));
-	form->addRow(tr("Simultaneous SVS render threads"), m_concurrency);
+	m_concurrency->setToolTip(QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+		"Maximum simultaneous SVS renders across all tracks and engines. Default: 1. "
+		"Other renders wait in the queue. Running renders finish when this limit is reduced."));
+	form->addRow(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Simultaneous SVS render threads"), m_concurrency);
 	connect(m_memoryPolicy, qOverload<int>(&QComboBox::currentIndexChanged), this, [this] {
 		m_idleSeconds->setEnabled(m_memoryPolicy->currentData().toString() == "idle");
 	});
 	auto* hint = new QLabel(
-		tr("AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. "
-		   "Unavailable devices use CPU and report the reason; unsupported AI engines use CPU."),
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+			"AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. "
+			"Unavailable devices use CPU and report the reason; unsupported AI engines use CPU."),
 		body);
 	hint->setObjectName("svsComputeHint");
 	hint->setWordWrap(true);
@@ -118,20 +131,26 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	const auto savedDevice = config->value("svs", "computeDevice", "cpu");
 	if (m_device->findData(savedDevice) < 0)
 	{
-		m_device->addItem(tr("Unavailable device: %1").arg(savedDevice), savedDevice);
+		m_device->addItem(
+			QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Unavailable device: %1").arg(savedDevice),
+			savedDevice);
 		static_cast<QStandardItemModel*>(m_device->model())->item(m_device->count() - 1)->setEnabled(false);
 	}
 	m_device->setCurrentIndex(std::max(0, m_device->findData(savedDevice)));
-	m_pitchRanges = new QCheckBox(tr("Show voicebank pitch ranges"), body);
+	m_pitchRanges
+		= new QCheckBox(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Show voicebank pitch ranges"), body);
 	m_pitchRanges->setObjectName("svsShowVoicePitchRanges");
 	m_pitchRanges->setChecked(config->value("svs", "showVoicePitchRanges", "1").toInt() != 0);
-	m_pitchRanges->setToolTip(tr("Mark available, comfortable and weak pitches on the keyboard and show their ranges "
-								 "in the sidebar when the voicebank declares them."));
+	m_pitchRanges->setToolTip(QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+		"Mark available, comfortable and weak pitches on the keyboard and show their ranges "
+		"in the sidebar when the voicebank declares them."));
 	controls->addWidget(m_pitchRanges);
-	m_backgroundWaveform = new QCheckBox(tr("Show translucent background waveform"), body);
+	m_backgroundWaveform = new QCheckBox(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Show translucent background waveform"), body);
 	m_backgroundWaveform->setObjectName("svsShowBackgroundWaveform");
 	m_backgroundWaveform->setChecked(config->value("svs", "showBackgroundWaveform", "0").toInt() != 0);
-	m_backgroundWaveform->setToolTip(tr("Display the synthesized audio waveform behind SVS clips in the Song Editor."));
+	m_backgroundWaveform->setToolTip(QCoreApplication::translate(
+		"lmms::gui::SVSSettingsPage", "Display the synthesized audio waveform behind SVS clips in the Song Editor."));
 	controls->addWidget(m_backgroundWaveform);
 	auto updateDevice = [this] {
 		const bool cpu = m_backend->currentData().toString() == "cpu";
@@ -182,9 +201,11 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 		auto plugin = svs::Registry::instance().plugin(installed.id);
 		if (plugin && plugin->hasCatalogQuery())
 		{
-			auto* rescan = new QPushButton(tr("Rescan voicebanks"), page);
+			auto* rescan
+				= new QPushButton(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Rescan voicebanks"), page);
 			rescan->setObjectName("svsRescanVoicebanks");
-			rescan->setToolTip(tr("Rescan the applied voicebank directories. Apply directory changes first."));
+			rescan->setToolTip(QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+				"Rescan the applied voicebank directories. Apply directory changes first."));
 			pageLayout->insertWidget(pageLayout->count() - 1, rescan);
 			connect(rescan, &QPushButton::clicked, this, [key = installed.id] {
 				const auto settings
@@ -199,7 +220,8 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 					[this, key = installed.id, status, rescan](const QString& id) {
 						if (id != key)
 							return;
-						status->setText(tr("Scanning voicebanks…"));
+						status->setText(
+							QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Scanning voicebanks…"));
 						rescan->setEnabled(false);
 					});
 			connect(&svs::Registry::instance(), &svs::Registry::catalogScanFinished, page,
@@ -211,7 +233,10 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 						for (const auto& voice : svs::Registry::instance().voices())
 							if (voice.pluginId == key)
 								++count;
-						status->setText(error.isEmpty() ? tr("Voicebanks found: %1").arg(count) : error);
+						status->setText(error.isEmpty()
+								? QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Voicebanks found: %1")
+									  .arg(count)
+								: error);
 					});
 			rescan->setEnabled(!svs::Registry::instance().scanning(installed.id));
 		}
@@ -221,7 +246,8 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	aiExample->setObjectName("svsEnginePage.aiExample");
 	auto* aiLayout = new QVBoxLayout(aiExample);
 	auto* aiHint = new QLabel(
-		tr("AI engine settings example — layout preview only; no synthesis engine is installed for this example."),
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+			"AI engine settings example — layout preview only; no synthesis engine is installed for this example."),
 		aiExample);
 	aiHint->setWordWrap(true);
 	aiLayout->addWidget(aiHint);
@@ -231,22 +257,24 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	m_aiSteps->setObjectName("svsAiExampleRenderSteps");
 	m_aiSteps->setRange(1, 100);
 	m_aiSteps->setValue(std::clamp(config->value("svs", "aiExampleRenderSteps", "20").toInt(), 1, 100));
-	m_aiSteps->setToolTip(tr("Example rendering steps: 1–100 (default 20)"));
-	m_aiSteps->setAccessibleName(tr("Example rendering steps"));
+	m_aiSteps->setToolTip(
+		QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Example rendering steps: 1–100 (default 20)"));
+	m_aiSteps->setAccessibleName(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Example rendering steps"));
 	auto* stepsValue = new QLabel(QString::number(m_aiSteps->value()), aiExample);
 	stepsValue->setObjectName("svsAiExampleRenderStepsValue");
 	stepsValue->setMinimumWidth(30);
 	stepsRow->addWidget(m_aiSteps);
 	stepsRow->addWidget(stepsValue);
-	stepsForm->addRow(tr("Rendering steps (1–100)"), stepsRow);
+	stepsForm->addRow(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Rendering steps (1–100)"), stepsRow);
 	aiLayout->addLayout(stepsForm);
 	connect(m_aiSteps, &QSlider::valueChanged, stepsValue,
 			[stepsValue](int value) { stepsValue->setText(QString::number(value)); });
 	aiLayout->addStretch();
-	m_engine->addTab(aiExample, tr("AI example (AI)"));
+	m_engine->addTab(aiExample, QCoreApplication::translate("lmms::gui::SVSSettingsPage", "AI example (AI)"));
 	controls->addWidget(m_engine);
 	if (m_voices.isEmpty())
-		controls->addWidget(new QLabel(tr("No SVS engine is installed."), body));
+		controls->addWidget(
+			new QLabel(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "No SVS engine is installed."), body));
 	controls->addStretch();
 	connect(m_engine, &QTabWidget::currentChanged, this, [this](int) { refreshEngine(); });
 	refreshEngine();
@@ -276,7 +304,7 @@ void SVSSettingsPage::refreshEngine()
 							  {"computeBackend", m_backend->currentData().toString()},
 							  {"computeDevice", m_device->currentData().toString()}};
 	auto plugin = svs::Registry::instance().plugin(key);
-	m_status->setText(tr("Loading engine options…"));
+	m_status->setText(QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Loading engine options…"));
 	QPointer<SVSSettingsPage> target(this);
 	svs::SynthesisScheduler::instance().declarationPool().start(
 		QRunnable::create([target, plugin, voice, values, context, request] {
@@ -285,10 +313,10 @@ void SVSSettingsPage::refreshEngine()
 			if (plugin)
 				declaration = plugin->engineSettings(voice.id, context, error);
 			else
-				error = "Engine unavailable";
+				error = QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Engine unavailable");
 			svs::Capabilities parsed;
 			if (declaration.contains("engineSettings") && !declaration["engineSettings"].isArray())
-				error = "Engine settings must be an array";
+				error = QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Engine settings must be an array");
 			auto schema = declaration["engineSettings"].toArray();
 			for (int i = 0; i < schema.size(); ++i)
 			{
@@ -332,27 +360,29 @@ void SVSSettingsPage::refreshEngine()
 					for (const auto& catalogVoice : svs::Registry::instance().voices())
 						if (catalogVoice.pluginId == key)
 							++count;
-					target->m_status->setText(
-						svs::Registry::instance().scanning(key) ? tr("Scanning voicebanks…")
-							: count == 0 ? tr("No voicebanks found. Configure directories and apply, then rescan.")
-							: parsed.parameters.isEmpty() ? tr("This engine does not declare additional options.")
-														  : tr("Voicebanks found: %1").arg(count));
-					target->m_parameters->refresh(parsed.parameters, "track", {values}, values,
-												  [target, key](const QString& id, const QJsonValue& value) {
-													  if (!target)
-														  return;
-													  target->m_values[key][id] = value;
-													  // Refresh after the parameter setter has returned; refreshing
-													  // synchronously replaces the std::function which is currently
-													  // executing this callback.
-													  QMetaObject::invokeMethod(
-														  target,
-														  [target] {
-															  if (target)
-																  target->refreshEngine();
-														  },
-														  Qt::QueuedConnection);
-												  });
+					target->m_status->setText(svs::Registry::instance().scanning(key)
+							? QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Scanning voicebanks…")
+							: count == 0 ? QCoreApplication::translate("lmms::gui::SVSSettingsPage",
+											   "No voicebanks found. Configure directories and apply, then rescan.")
+							: parsed.parameters.isEmpty()
+							? QCoreApplication::translate(
+								  "lmms::gui::SVSSettingsPage", "This engine does not declare additional options.")
+							: QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Voicebanks found: %1")
+								  .arg(count));
+					target->m_parameters->refresh(nativeTranslation::svsParameters(key, parsed.parameters), "track",
+						{values}, values, [target, key](const QString& id, const QJsonValue& value) {
+							if (!target) return;
+							target->m_values[key][id] = value;
+							// Refresh after the parameter setter has returned; refreshing
+							// synchronously replaces the std::function which is currently
+							// executing this callback.
+							QMetaObject::invokeMethod(
+								target,
+								[target] {
+									if (target) target->refreshEngine();
+								},
+								Qt::QueuedConnection);
+						});
 				},
 				Qt::QueuedConnection);
 		}));

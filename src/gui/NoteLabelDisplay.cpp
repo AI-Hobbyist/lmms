@@ -108,7 +108,8 @@ QToolButton* createControls(QWidget* parent)
 	auto* button = new QToolButton(parent);
 	button->setObjectName("noteLabelDisplayButton");
 	button->setPopupMode(QToolButton::InstantPopup);
-	button->setToolTip(QObject::tr("音号显示：与 SVS / 乐器钢琴窗同步；需启用显示所有音号"));
+	button->setToolTip(
+		QObject::tr("Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this"));
 	auto* menu = new QMenu(button);
 	button->setMenu(menu);
 	auto addOptions = [button](QMenu* target, const QStringList& names, const QString& key, const QStringList& values) {
@@ -126,9 +127,10 @@ QToolButton* createControls(QWidget* parent)
 		}
 		return group;
 	};
-	auto* modes = addOptions(
-		menu, {QObject::tr("标准音高 CDEFGAB"), QObject::tr("简谱 1234567")}, "notelabelmode", {"pitch", "numbered"});
-	auto* tonicMenu = menu->addMenu(QObject::tr("简谱调号"));
+	auto* modes
+		= addOptions(menu, {QObject::tr("Standard pitch names CDEFGAB"), QObject::tr("Numbered notation 1234567")},
+			"notelabelmode", {"pitch", "numbered"});
+	auto* tonicMenu = menu->addMenu(QObject::tr("Numbered notation key"));
 	QStringList tonics, tonicValues;
 	for (int index = 0; index < 12; ++index)
 	{
@@ -139,10 +141,12 @@ QToolButton* createControls(QWidget* parent)
 	auto refresh = [button, modes, tonicMenu, tonicsGroup] {
 		button->setEnabled(enabled());
 		button->setText(numbered() ? "123 · 1=" + Names[setting("notelabeltonic", 0, 11)] : "CDE / 123");
-		button->setToolTip(numbered() ? QObject::tr("简谱基准音：%1%2；基准 C 音可在全局设置修改")
-											.arg(Names[setting("notelabeltonic", 0, 11)])
-											.arg(setting("notelabeloctave", 5, 10) - 1)
-									  : QObject::tr("音号显示：与 SVS / 乐器钢琴窗同步；需启用显示所有音号"));
+		button->setToolTip(numbered()
+				? QObject::tr("Numbered notation reference: %1%2; change the reference C in global settings")
+					  .arg(Names[setting("notelabeltonic", 0, 11)])
+					  .arg(setting("notelabeloctave", 5, 10) - 1)
+				: QObject::tr("Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to "
+							  "use this"));
 		tonicMenu->menuAction()->setVisible(numbered());
 		const QList<QPair<QActionGroup*, QString>> choices{
 			{modes, ConfigManager::inst()->value("ui", "notelabelmode", "pitch")},

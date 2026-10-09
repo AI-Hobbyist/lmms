@@ -1,7 +1,7 @@
 #ifndef LMMS_VSTHOST_SCAN_ROOTS_WIDGET_H
 #define LMMS_VSTHOST_SCAN_ROOTS_WIDGET_H
 
-#include "vsthost/ScanRoots.h"
+#include <QCoreApplication>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QLabel>
@@ -9,6 +9,8 @@
 #include <QSignalBlocker>
 #include <QTableWidget>
 #include <QVBoxLayout>
+
+#include "vsthost/ScanRoots.h"
 
 namespace lmms::gui {
 // Edits a local draft. Configuration is committed only by the settings dialog.
@@ -23,7 +25,11 @@ public:
 		auto* layout = new QVBoxLayout(this);
 		m_table = new QTableWidget(0, 5, this);
 		m_table->setObjectName("vstScanRoots");
-		m_table->setHorizontalHeaderLabels({tr("Directory"), tr("Enabled"), tr("Recursive"), tr("VST2"), tr("VST3")});
+		m_table->setHorizontalHeaderLabels({QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Directory"),
+			QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Enabled"),
+			QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Recursive"),
+			QCoreApplication::translate("lmms::gui::ScanRootsWidget", "VST2"),
+			QCoreApplication::translate("lmms::gui::ScanRootsWidget", "VST3")});
 		m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 		for (int column = 1; column < 5; ++column)
 		{
@@ -40,15 +46,17 @@ public:
 			buttons->addWidget(result);
 			return result;
 		};
-		m_add = button(tr("Add"), "vstRootAdd");
-		m_browse = button(tr("Browse"), "vstRootBrowse");
-		m_remove = button(tr("Remove"), "vstRootRemove");
-		m_up = button(tr("Up"), "vstRootUp");
-		m_down = button(tr("Down"), "vstRootDown");
+		m_add = button(QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Add"), "vstRootAdd");
+		m_browse = button(QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Browse"), "vstRootBrowse");
+		m_remove = button(QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Remove"), "vstRootRemove");
+		m_up = button(QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Up"), "vstRootUp");
+		m_down = button(QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Down"), "vstRootDown");
 		layout->addLayout(buttons);
-		auto* help = new QLabel(
-			tr("Edit paths directly to include unavailable directories. Duplicate paths keep the first row's options. This list does not change the directory used by older projects."),
-			this);
+		auto* help
+			= new QLabel(QCoreApplication::translate("lmms::gui::ScanRootsWidget",
+							 "Edit paths directly to include unavailable directories. Duplicate paths keep the first "
+							 "row's options. This list does not change the directory used by older projects."),
+				this);
 		help->setWordWrap(true);
 		layout->addWidget(help);
 		m_error = new QLabel(loadError, this);
@@ -79,8 +87,9 @@ public:
 			{
 				return;
 			}
-			const auto path
-				= QFileDialog::getExistingDirectory(this, tr("VST scan directory"), m_table->item(row, 0)->text());
+			const auto path = QFileDialog::getExistingDirectory(this,
+				QCoreApplication::translate("lmms::gui::ScanRootsWidget", "VST scan directory"),
+				m_table->item(row, 0)->text());
 			if (!path.isEmpty())
 			{
 				m_table->item(row, 0)->setText(QDir::toNativeSeparators(path));

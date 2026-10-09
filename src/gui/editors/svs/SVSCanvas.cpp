@@ -824,7 +824,7 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 				= note.pronunciation.isEmpty() ? readings[note.id].toObject()["text"].toString() : note.pronunciation;
 			const auto recording = m_clip->editorState()["pitchPredictionRequests"].toObject()[note.id].toObject();
 			const auto takeLabel
-				= recording.contains("take") ? tr("重录 %1").arg(recording["take"].toInt()) : QString{};
+				= recording.contains("take") ? tr("Take %1").arg(recording["take"].toInt()) : QString{};
 			const auto labelRectangle = rectangle.translated(0, -m_rowHeight).adjusted(3, 0, -3, 0);
 			const int takeWidth = takeLabel.isEmpty() ? 0 : fontMetrics().horizontalAdvance(takeLabel) + 6;
 			painter.setPen(color("pronunciationColor", QPalette::Text));
@@ -1959,7 +1959,7 @@ void SVSCanvas::addPitchActions(QMenu& menu)
 			ranges.append({note.tick, note.tick + note.duration});
 		}
 	}
-	auto* predict = menu.addAction(tr("音高重录"), this, [this, ranges] {
+	auto* predict = menu.addAction(tr("Re-record pitch"), this, [this, ranges] {
 		cancelOperation();
 		m_clip->regeneratePitch(ranges);
 	});

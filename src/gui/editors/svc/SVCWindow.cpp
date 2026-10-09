@@ -24,6 +24,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Knob.h"
+#include "NativePluginTranslation.h"
 #include "PlayHandle.h"
 #include "SVCCatalog.h"
 #include "SVCClip.h"
@@ -120,7 +121,8 @@ private:
 	double m_position = 0, m_gainA = 0, m_gainB = 0, m_fade = 0;
 };
 
-void choices(QComboBox* combo, const QJsonArray& entries, const QString& selected, bool explicitChoice = false)
+void choices(QComboBox* combo, const QJsonArray& entries, const QString& selected, bool explicitChoice = false,
+	const QString& engine = {}, const QString& parameterId = {})
 {
 	combo->clear();
 	if (explicitChoice && selected.isEmpty() && entries.size() > 1)
@@ -130,13 +132,18 @@ void choices(QComboBox* combo, const QJsonArray& entries, const QString& selecte
 	for (const auto& entry : entries)
 	{
 		const auto option = entry.toObject();
-		combo->addItem(option.value("name").toString(option.value("id").toString()), option.value("id").toVariant());
+		const auto originalName = option.value("name").toString(option.value("id").toString());
+		const bool fixedName = parameterId == "index_mode" || parameterId == "speaker_id"
+			|| (parameterId == "index_id" && option.value("id") == "__automatic__");
+		combo->addItem(fixedName ? nativeTranslation::rvcText(engine, originalName) : originalName,
+			option.value("id").toVariant());
 		const auto available = option.value("available").toBool(true);
 		if (!available)
 		{
 			auto* item = static_cast<QStandardItemModel*>(combo->model())->item(combo->count() - 1);
 			item->setEnabled(false);
-			item->setToolTip(option.value("reason").toString(QObject::tr("Unavailable")));
+			item->setToolTip(
+				nativeTranslation::rvcText(engine, option.value("reason").toString(QObject::tr("Unavailable"))));
 		}
 	}
 	auto index = combo->findData(selected);
@@ -539,12 +546,12 @@ void SVCWindow::refreshChoices()
 	m_updating = true;
 	const auto model = selectedModel(m_track);
 	choices(m_weights, model.value("weights").toArray(), m_track->selection().value("weight_id").toString(),
-		model.value("require_weight_selection").toBool());
+		model.value("require_weight_selection").toBool(), m_engines->currentData().toString());
 	auto selection = m_track->selection();
 	selection.insert("weight_id", m_weights->currentData().toString());
 	if (model.contains("fixed_speaker_id")) { selection.insert("speaker_id", model.value("fixed_speaker_id")); }
 	choices(m_speakers, svc::selectionContext(selection, model).value("speakers").toArray(),
-		selection.value("speaker_id").toString());
+		selection.value("speaker_id").toString(), false, m_engines->currentData().toString(), "speaker_id");
 	for (int index = 0; index < m_speakers->count(); ++index)
 	{
 		m_speakers->setItemIcon(index, embed::getIconPixmap("svc_track.svg"));
@@ -582,6 +589,9 @@ void SVCWindow::refreshParameters()
 	{
 		const auto parameter = entry.toObject();
 		const auto id = parameter.value("id").toString();
+		const auto engine = m_engines->currentData().toString();
+		const auto displayName = nativeTranslation::rvcText(engine, parameter.value("name").toString());
+		const auto displayUnit = nativeTranslation::rvcText(engine, parameter.value("unit").toString());
 		if (!m_parameters.contains(id))
 		{
 			const auto dependent = context.value(parameter.value("default_from").toString());
@@ -595,7 +605,7 @@ void SVCWindow::refreshParameters()
 		if (parameter.value("type") == "enum")
 		{
 			auto* combo = new QComboBox(row);
-			choices(combo, parameter.value("options").toArray(), m_parameters.value(id).toString());
+			choices(combo, parameter.value("options").toArray(), m_parameters.value(id).toString(), false, engine, id);
 			body->addWidget(combo);
 			connect(combo, &QComboBox::currentIndexChanged, this, [this, combo, id] {
 				m_parameters.insert(id, QJsonValue::fromVariant(combo->currentData()));
@@ -625,7 +635,7 @@ void SVCWindow::refreshParameters()
 			edit->setFixedWidth(90);
 			body->addWidget(slider, 1);
 			body->addWidget(edit);
-			body->addWidget(new QLabel(parameter.value("unit").toString(), row));
+			body->addWidget(new QLabel(displayUnit, row));
 			const auto sync = [slider, edit] {
 				const auto value = edit->value();
 				const auto minimum = std::min(slider->property("minimumValue").toDouble(), value);
@@ -677,18 +687,17 @@ void SVCWindow::refreshParameters()
 				};
 				const auto initial = m_parameters.value(id).toDouble();
 				auto model = std::make_unique<FloatModel>(std::clamp(initial, -extent(initial), extent(initial)),
-					-extent(initial), extent(initial), parameter.value("step").toDouble(1), nullptr,
-					parameter.value("name").toString());
+					-extent(initial), extent(initial), parameter.value("step").toDouble(1), nullptr, displayName);
 				auto* knob = new Knob(KnobType::Small17, {}, row, Knob::LabelRendering::WidgetFont);
 				knob->setModel(model.get());
-				knob->setUnit(parameter.value("unit").toString());
+				knob->setUnit(displayUnit);
 				body->addWidget(knob);
 				auto* edit = new QLineEdit(m_parameters.value(id).toVariant().toString(), row);
 				edit->setObjectName("svcUnboundedValue_" + id);
 				body->addWidget(edit);
 				auto* help
 					= new QLabel(tr("%1 — backend range unavailable; enter a value to extend the knob display range")
-									 .arg(parameter.value("unit").toString()),
+									 .arg(displayUnit),
 						row);
 				help->setWordWrap(true);
 				body->addWidget(help);
@@ -717,16 +726,16 @@ void SVCWindow::refreshParameters()
 						}
 					});
 				m_parametersOwned.push_back(std::move(model));
-				form->addRow(parameter.value("name").toString(), row);
+				form->addRow(displayName, row);
 				continue;
 			}
-			auto model = std::make_unique<FloatModel>(m_parameters.value(id).toDouble(),
-				parameter.value("minimum").toDouble(), parameter.value("maximum").toDouble(),
-				parameter.value("step").toDouble(1), nullptr, parameter.value("name").toString());
+			auto model
+				= std::make_unique<FloatModel>(m_parameters.value(id).toDouble(), parameter.value("minimum").toDouble(),
+					parameter.value("maximum").toDouble(), parameter.value("step").toDouble(1), nullptr, displayName);
 			model->setObjectName("svcParameterModel_" + id);
 			auto* knob = new Knob(KnobType::Small17, {}, row, Knob::LabelRendering::WidgetFont);
 			knob->setModel(model.get());
-			const auto unit = parameter.value("unit").toString();
+			const auto unit = displayUnit;
 			knob->setUnit(unit);
 			body->addWidget(knob);
 			auto* value = new QLabel(row);
@@ -743,7 +752,7 @@ void SVCWindow::refreshParameters()
 			});
 			m_parametersOwned.push_back(std::move(model));
 		}
-		form->addRow(parameter.value("name").toString(), row);
+		form->addRow(displayName, row);
 	}
 	saveSelection();
 	refreshParameterAvailability();
@@ -759,7 +768,8 @@ void SVCWindow::refreshParameterAvailability()
 		form->setRowVisible(row, svc::conditionsMatch(metadata.value("visible_when").toObject(), context));
 		row->setEnabled(metadata.value("available").toBool(true)
 			&& svc::conditionsMatch(metadata.value("enabled_when").toObject(), context));
-		row->setToolTip(metadata.value("reason").toString(tr("Unavailable for the selected model or parameters")));
+		row->setToolTip(nativeTranslation::rvcText(m_engines->currentData().toString(),
+			metadata.value("reason").toString(tr("Unavailable for the selected model or parameters"))));
 		if (metadata.value("type") == "enum")
 		{
 			auto* combo = row->findChild<QComboBox*>();
@@ -770,7 +780,8 @@ void SVCWindow::refreshParameterAvailability()
 				auto* item = static_cast<QStandardItemModel*>(combo->model())->item(index);
 				item->setEnabled(option.value("available").toBool()
 					&& svc::conditionsMatch(option.value("enabled_when").toObject(), context));
-				item->setToolTip(option.value("reason").toString(tr("Unavailable for the selected weight")));
+				item->setToolTip(nativeTranslation::rvcText(m_engines->currentData().toString(),
+					option.value("reason").toString(tr("Unavailable for the selected weight"))));
 			}
 		}
 	}

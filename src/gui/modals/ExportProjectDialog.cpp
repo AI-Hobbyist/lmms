@@ -23,25 +23,26 @@
  */
 
 #include "ExportProjectDialog.h"
-#include <QMessageBox>
-#include <algorithm>
-#include "Track.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <algorithm>
 
 #include "Engine.h"
 #include "ProjectRenderer.h"
 #include "Song.h"
+#include "Track.h"
 
 namespace lmms::gui {
 
@@ -56,47 +57,56 @@ constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
 
 ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget* parent)
 	: QDialog(parent)
-	, m_fileFormatLabel(new QLabel(tr("File format:")))
+	, m_fileFormatLabel(new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "File format:")))
 	, m_fileFormatComboBox(new QComboBox())
-	, m_sampleRateLabel(new QLabel(tr("Sampling rate:")))
+	, m_sampleRateLabel(new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Sampling rate:")))
 	, m_sampleRateComboBox(new QComboBox())
-	, m_bitRateLabel(new QLabel(tr("Bit rate:")))
+	, m_bitRateLabel(new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Bit rate:")))
 	, m_bitRateComboBox(new QComboBox())
-	, m_bitDepthLabel(new QLabel(tr("Bit depth:")))
+	, m_bitDepthLabel(new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Bit depth:")))
 	, m_bitDepthComboBox(new QComboBox())
-	, m_stereoModeLabel(new QLabel(("Stereo mode:")))
+	, m_stereoModeLabel(new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Stereo mode:")))
 	, m_stereoModeComboBox(new QComboBox())
-	, m_compressionLevelLabel(new QLabel(tr("Compression level:")))
+	, m_compressionLevelLabel(
+		  new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Compression level:")))
 	, m_compressionLevelComboBox(new QComboBox())
-	, m_fileFormatSettingsGroupBox(new QGroupBox(tr("File format settings")))
+	, m_fileFormatSettingsGroupBox(
+		  new QGroupBox(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "File format settings")))
 	, m_fileFormatSettingsLayout(new QFormLayout(m_fileFormatSettingsGroupBox))
-	, m_exportAsLoopBox(new QCheckBox(tr("Export as loop (remove extra bar)")))
-	, m_exportBetweenLoopMarkersBox(new QCheckBox(tr("Export between loop markers")))
-	, m_loopRepeatLabel(new QLabel(tr("Render looped section:")))
+	, m_exportAsLoopBox(new QCheckBox(
+		  QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export as loop (remove extra bar)")))
+	, m_exportBetweenLoopMarkersBox(
+		  new QCheckBox(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export between loop markers")))
+	, m_loopRepeatLabel(
+		  new QLabel(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Render looped section:")))
 	, m_loopRepeatBox(new QSpinBox())
-	, m_startButton(new QPushButton(tr("Start")))
-	, m_cancelButton(new QPushButton(tr("Cancel")))
+	, m_startButton(new QPushButton(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Start")))
+	, m_cancelButton(new QPushButton(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Cancel")))
 	, m_progressBar(new QProgressBar())
 	, m_path(path)
 	, m_mode(mode)
 {
-	setWindowTitle(tr("Export project"));
+	setWindowTitle(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export project"));
 
 	for (const auto& device : ProjectRenderer::fileEncodeDevices)
 	{
 		if (!device.isAvailable()) { continue; }
-		m_fileFormatComboBox->addItem(tr(device.m_description), static_cast<int>(device.m_fileFormat));
+		m_fileFormatComboBox->addItem(
+			QCoreApplication::translate("ProjectRenderer", device.m_description),
+			static_cast<int>(device.m_fileFormat));
 	}
 
 	for (const auto& sampleRate : SUPPORTED_SAMPLERATES)
 	{
-		const auto str = tr("%1 %2").arg(QString::number(sampleRate), "Hz");
+		const auto str = QCoreApplication::translate("lmms::gui::ExportProjectDialog", "%1 %2")
+							 .arg(QString::number(sampleRate), "Hz");
 		m_sampleRateComboBox->addItem(str, sampleRate);
 	}
 
 	for (const auto& bitRate : SUPPORTED_BITRATES)
 	{
-		const auto str = tr("%1 %2").arg(QString::number(bitRate), "KBit/s");
+		const auto str = QCoreApplication::translate("lmms::gui::ExportProjectDialog", "%1 %2")
+							 .arg(QString::number(bitRate), "KBit/s");
 		m_bitRateComboBox->addItem(str, bitRate);
 	}
 
@@ -105,13 +115,16 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		switch (static_cast<OutputSettings::BitDepth>(i))
 		{
 		case OutputSettings::BitDepth::Depth16Bit:
-			m_bitDepthComboBox->addItem(tr("16 Bit integer"), i);
+			m_bitDepthComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "16 Bit integer"), i);
 			break;
 		case OutputSettings::BitDepth::Depth24Bit:
-			m_bitDepthComboBox->addItem(tr("24 Bit integer"), i);
+			m_bitDepthComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "24 Bit integer"), i);
 			break;
 		case OutputSettings::BitDepth::Depth32Bit:
-			m_bitDepthComboBox->addItem(tr("32 Bit float"), i);
+			m_bitDepthComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "32 Bit float"), i);
 			break;
 		default:
 			assert(false && "invalid or unsupported bit depth");
@@ -124,13 +137,14 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		switch (static_cast<OutputSettings::StereoMode>(i))
 		{
 		case OutputSettings::StereoMode::Mono:
-			m_stereoModeComboBox->addItem(tr("Mono"), i);
+			m_stereoModeComboBox->addItem(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Mono"), i);
 			break;
 		case OutputSettings::StereoMode::Stereo:
-			m_stereoModeComboBox->addItem(tr("Stereo"), i);
+			m_stereoModeComboBox->addItem(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Stereo"), i);
 			break;
 		case OutputSettings::StereoMode::JointStereo:
-			m_stereoModeComboBox->addItem(tr("Joint stereo"), i);
+			m_stereoModeComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Joint stereo"), i);
 			break;
 		default:
 			assert(false && "invalid or unsupported stereo mode");
@@ -144,10 +158,14 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		switch (i)
 		{
 		case 0:
-			m_compressionLevelComboBox->addItem(tr("%1 (Fastest, biggest)").arg(i), compressionValue);
+			m_compressionLevelComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "%1 (Fastest, biggest)").arg(i),
+				compressionValue);
 			break;
 		case maxCompressionLevel:
-			m_compressionLevelComboBox->addItem(tr("%1 (Slowest, smallest)").arg(i), compressionValue);
+			m_compressionLevelComboBox->addItem(
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "%1 (Slowest, smallest)").arg(i),
+				compressionValue);
 			break;
 		default:
 			m_compressionLevelComboBox->addItem(QString::number(i), compressionValue);
@@ -160,12 +178,15 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	loopRepeatLayout->addWidget(m_loopRepeatLabel);
 	loopRepeatLayout->addWidget(m_loopRepeatBox);
 
-	auto exportSettingsGroupBox = new QGroupBox(tr("Export settings"));
+	auto exportSettingsGroupBox
+		= new QGroupBox(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export settings"));
 	auto exportSettingsLayout = new QVBoxLayout{exportSettingsGroupBox};
 	exportSettingsLayout->addWidget(m_exportAsLoopBox);
 	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
 	exportSettingsLayout->addLayout(loopRepeatLayout);
-	m_ignoreFailedSVSBox = new QCheckBox(tr("Export failed SVS regions as silence"), exportSettingsGroupBox);
+	m_ignoreFailedSVSBox = new QCheckBox(
+		QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export failed SVS regions as silence"),
+		exportSettingsGroupBox);
 	const auto& tracks = Engine::getSong()->tracks();
 	m_ignoreFailedSVSBox->setVisible(
 		std::any_of(tracks.begin(), tracks.end(), [](const auto* track) { return track->type() == Track::Type::SVS; }));
@@ -188,7 +209,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	m_progressBar->setValue(0);
 	m_loopRepeatBox->setRange(1, maxLoopRepeat);
 	m_loopRepeatBox->setValue(1);
-	m_loopRepeatBox->setSuffix(tr(" time(s)"));
+	m_loopRepeatBox->setSuffix(QCoreApplication::translate("lmms::gui::ExportProjectDialog", " time(s)"));
 
 	m_fileFormatComboBox->setCurrentIndex(-1);
 	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
@@ -263,8 +284,10 @@ void ExportProjectDialog::onStartButtonClicked()
 	const auto format = static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatComboBox->currentData().toInt());
 	m_renderManager = std::make_unique<RenderManager>(outputSettings, format, m_path);
 	m_renderManager->setIgnoreFailedSVSRegions(m_ignoreFailedSVSBox->isChecked());
-	connect(m_renderManager.get(), &RenderManager::svsExportFailed, this,
-		[this](const QString& reason) { QMessageBox::warning(this, tr("SVS export failed"), reason); });
+	connect(m_renderManager.get(), &RenderManager::svsExportFailed, this, [this](const QString& reason) {
+		QMessageBox::warning(
+			this, QCoreApplication::translate("lmms::gui::ExportProjectDialog", "SVS export failed"), reason);
+	});
 	m_startButton->setEnabled(false);
 
 	Engine::getSong()->setExportLoop(m_exportAsLoopBox->isChecked());
@@ -300,8 +323,6 @@ void ExportProjectDialog::reject()
 }
 
 void ExportProjectDialog::updateTitleBar(int prog)
-{
-	setWindowTitle(tr("Rendering: %1%").arg(prog));
-}
+{ setWindowTitle(QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Rendering: %1%").arg(prog)); }
 
 } // namespace lmms::gui

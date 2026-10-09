@@ -1,16 +1,6 @@
 #include "SVSProjectController.h"
-#include "SVSProjectImportDialog.h"
-#include "SVSProjectExport.h"
-#include "SVSProjectOutput.h"
-#include "SVSModel.h"
-#include "ConfigManager.h"
-#include "DataFile.h"
-#include "Engine.h"
-#include "MainWindow.h"
-#include "FileDialog.h"
-#include "SampleDecoder.h"
-#include "Song.h"
-#include "Track.h"
+
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
@@ -19,12 +9,25 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QSet>
-#include <QThread>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QUuid>
 #include <cmath>
 #include <exception>
 #include <stdexcept>
+
+#include "ConfigManager.h"
+#include "DataFile.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "MainWindow.h"
+#include "SVSModel.h"
+#include "SVSProjectExport.h"
+#include "SVSProjectImportDialog.h"
+#include "SVSProjectOutput.h"
+#include "SampleDecoder.h"
+#include "Song.h"
+#include "Track.h"
 
 namespace lmms::gui {
 struct SVSProjectController::ExportState
@@ -69,9 +72,9 @@ void SVSProjectController::progress(const QString& label)
 {
 	if (!m_progress)
 	{
-		m_progress = new QProgressDialog(label, QStringLiteral("取消"), 0, 0, m_window);
+		m_progress = new QProgressDialog(label, QCoreApplication::translate("SVSProjectUI", "Cancel"), 0, 0, m_window);
 		m_progress->setObjectName("svsProjectProgress");
-		m_progress->setWindowTitle(QStringLiteral("SVS 工程"));
+		m_progress->setWindowTitle(QCoreApplication::translate("SVSProjectUI", "SVS project"));
 		m_progress->setWindowModality(Qt::WindowModal);
 		m_progress->setMinimumDuration(0);
 		m_progress->setAutoClose(false);
@@ -79,7 +82,7 @@ void SVSProjectController::progress(const QString& label)
 			m_cancelled = true;
 			m_bridge.cancel();
 			if (m_progress)
-				m_progress->setLabelText(QStringLiteral("正在取消并清理…"));
+				m_progress->setLabelText(QCoreApplication::translate("SVSProjectUI", "Cancelling and cleaning up…"));
 		});
 	}
 	else
@@ -110,7 +113,7 @@ void SVSProjectController::importProject()
 		return;
 	m_cancelled = false;
 	m_task = Task::Catalog;
-	progress(QStringLiteral("正在读取支持格式…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Reading supported formats…"));
 	m_bridge.start({{"operation", "listFormats"}});
 }
 void SVSProjectController::converted(const QJsonObject& response)
@@ -125,7 +128,7 @@ void SVSProjectController::converted(const QJsonObject& response)
 		const auto error = response["error"].toObject();
 		if (m_progress)
 			m_progress->hide();
-		QMessageBox::critical(m_window, QStringLiteral("SVS 工程转换失败"),
+		QMessageBox::critical(m_window, QCoreApplication::translate("SVSProjectUI", "SVS project conversion failed"),
 			error["message"].toString() + "\n" + error["detail"].toString());
 		reset();
 		return;
@@ -153,7 +156,8 @@ void SVSProjectController::converted(const QJsonObject& response)
 }
 void SVSProjectController::chooseSource(const QJsonArray& formats)
 {
-	FileDialog file(m_window, QStringLiteral("导入SVS工程"), ConfigManager::inst()->userProjectsDir());
+	FileDialog file(m_window, QCoreApplication::translate("SVSProjectUI", "Import SVS project"),
+		ConfigManager::inst()->userProjectsDir());
 	file.setFileMode(QFileDialog::ExistingFile);
 	file.setAcceptMode(QFileDialog::AcceptOpen);
 	QStringList filters;
@@ -178,7 +182,8 @@ void SVSProjectController::chooseSource(const QJsonArray& formats)
 		identities[filter] = format;
 	}
 	supportedSuffixes.removeDuplicates();
-	const auto supportedFilter = QStringLiteral("所有支持格式 (%1)").arg(supportedSuffixes.join(' '));
+	const auto supportedFilter
+		= QCoreApplication::translate("SVSProjectUI", "All supported formats (%1)").arg(supportedSuffixes.join(' '));
 	filters.prepend(supportedFilter);
 	file.setNameFilters(filters);
 	file.selectNameFilter(supportedFilter);
@@ -204,7 +209,8 @@ void SVSProjectController::chooseSource(const QJsonArray& formats)
 	m_voice = {};
 	m_formatId = format["id"].toString();
 	m_task = Task::Import;
-	progress(QStringLiteral("正在解析工程：%1").arg(QFileInfo(file.selectedFiles().first()).fileName()));
+	progress(QCoreApplication::translate("SVSProjectUI", "Parsing project: %1")
+			.arg(QFileInfo(file.selectedFiles().first()).fileName()));
 	m_bridge.start({{"operation", "importProject"}, {"formatId", m_formatId},
 		{"path", QFileInfo(file.selectedFiles().first()).absoluteFilePath()}, {"options", dialog.options()}});
 }
@@ -216,12 +222,13 @@ void SVSProjectController::prepareAudio(const QJsonObject& response)
 	{
 		if (m_progress)
 			m_progress->hide();
-		QMessageBox::critical(m_window, QStringLiteral("SVS 工程预检失败"), initial.error);
+		QMessageBox::critical(
+			m_window, QCoreApplication::translate("SVSProjectUI", "SVS project preflight failed"), initial.error);
 		reset();
 		return;
 	}
 	m_task = Task::Preparation;
-	progress(QStringLiteral("正在验证音频和工程数据…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Validating audio and project data…"));
 	// The UUID directory is the only durable location created/removed by this task.
 	m_resourceDirectory = QDir(ConfigManager::inst()->userSamplesDir())
 							  .filePath("svs-project/" + QUuid::createUuid().toString(QUuid::WithoutBraces));
@@ -236,7 +243,7 @@ void SVSProjectController::prepareAudio(const QJsonObject& response)
 	for (const auto& item : response["losses"].toArray())
 	{
 		const auto loss = item.toObject();
-		prepared->warnings << QStringLiteral("格式 %1，轨道 %2，%3：%4")
+		prepared->warnings << QCoreApplication::translate("SVSProjectUI", "Format %1, track %2, %3: %4")
 								  .arg(loss["formatId"].toString(), loss["track"].toString(), loss["field"].toString(),
 									  loss["reason"].toString());
 	}
@@ -262,13 +269,17 @@ void SVSProjectController::prepareAudio(const QJsonObject& response)
 					continue;
 				if (!QDir().mkpath(directory))
 				{
-					prepared->imported.error = QStringLiteral("不能创建导入音频资源目录：%1").arg(directory);
+					prepared->imported.error = QCoreApplication::translate(
+						"SVSProjectUI", "Could not create the imported audio resource directory: %1")
+												   .arg(directory);
 					return;
 				}
 				const auto target = QDir(directory).filePath(QString::number(++number) + "-" + source.fileName());
 				if (!QFile::copy(path, target))
 				{
-					prepared->imported.error = QStringLiteral("不能保存导入音频资源：%1").arg(path);
+					prepared->imported.error
+						= QCoreApplication::translate("SVSProjectUI", "Could not save the imported audio resource: %1")
+							  .arg(path);
 					return;
 				}
 				const auto decoded = SampleDecoder::decode(target);
@@ -290,7 +301,8 @@ void SVSProjectController::prepareAudio(const QJsonObject& response)
 		}
 		catch (...)
 		{
-			prepared->imported.error = QStringLiteral("工程预检发生未知错误");
+			prepared->imported.error
+				= QCoreApplication::translate("SVSProjectUI", "An unknown error occurred during project preflight");
 		}
 	});
 	connect(m_worker, &QThread::finished, this, [this, prepared] {
@@ -312,14 +324,16 @@ void SVSProjectController::finishImport(const svs::ProjectImport& prepared, cons
 		m_progress->hide();
 	if (!prepared.valid())
 	{
-		QMessageBox::critical(m_window, QStringLiteral("SVS 工程预检失败"), prepared.error);
+		QMessageBox::critical(
+			m_window, QCoreApplication::translate("SVSProjectUI", "SVS project preflight failed"), prepared.error);
 		reset();
 		return;
 	}
 	const auto issues = warnings + prepared.losses;
 	if (!issues.isEmpty()
-		&& QMessageBox::warning(m_window, QStringLiteral("确认有损导入"),
-			   QStringLiteral("格式 %1 的以下内容需要确认：\n%2\n\n继续作为新工程导入？")
+		&& QMessageBox::warning(m_window, QCoreApplication::translate("SVSProjectUI", "Confirm lossy import"),
+			   QCoreApplication::translate("SVSProjectUI",
+				   "Confirm the following content for format %1:\n%2\n\nContinue importing as a new project?")
 				   .arg(m_formatId, issues.join('\n')),
 			   QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
 			!= QMessageBox::Yes)
@@ -339,15 +353,17 @@ void SVSProjectController::finishImport(const svs::ProjectImport& prepared, cons
 			present = true;
 	if (!present)
 	{
-		QMessageBox::critical(
-			m_window, QStringLiteral("声库已不可用"), QStringLiteral("所选声库已移除，原工程未替换。"));
+		QMessageBox::critical(m_window, QCoreApplication::translate("SVSProjectUI", "Voicebank unavailable"),
+			QCoreApplication::translate(
+				"SVSProjectUI", "The selected voicebank was removed. The original project has been preserved."));
 		reset();
 		return;
 	}
 	QString error;
 	if (!commitImport(prepared, *Engine::getSong(), error))
 	{
-		QMessageBox::critical(m_window, QStringLiteral("导入提交失败"), error);
+		QMessageBox::critical(
+			m_window, QCoreApplication::translate("SVSProjectUI", "Could not commit the import"), error);
 		reset();
 		return;
 	}
@@ -361,7 +377,8 @@ void SVSProjectController::exportProject()
 	const auto snapshot = svs::ProjectExport::capture(*Engine::getSong());
 	if (!snapshot.valid())
 	{
-		QMessageBox::critical(m_window, QStringLiteral("SVS 工程导出失败"), snapshot.error);
+		QMessageBox::critical(
+			m_window, QCoreApplication::translate("SVSProjectUI", "SVS project export failed"), snapshot.error);
 		return;
 	}
 	m_cancelled = false;
@@ -371,12 +388,12 @@ void SVSProjectController::exportProject()
 	state->directory = std::make_unique<QTemporaryDir>(QDir::tempPath() + "/lmms-svs-export-audio-XXXXXX");
 	if (!state->directory->isValid())
 	{
-		QMessageBox::critical(
-			m_window, QStringLiteral("SVS 工程导出失败"), QStringLiteral("无法创建导出音频暂存目录。"));
+		QMessageBox::critical(m_window, QCoreApplication::translate("SVSProjectUI", "SVS project export failed"),
+			QCoreApplication::translate("SVSProjectUI", "Could not create the temporary export audio directory."));
 		reset();
 		return;
 	}
-	progress(QStringLiteral("正在准备工程快照和伴奏…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Preparing the project snapshot and accompaniment…"));
 	m_worker = QThread::create([this, snapshot, state] {
 		try
 		{
@@ -391,7 +408,8 @@ void SVSProjectController::exportProject()
 		}
 		catch (...)
 		{
-			state->data.error = QStringLiteral("导出快照准备发生未知错误");
+			state->data.error = QCoreApplication::translate(
+				"SVSProjectUI", "An unknown error occurred while preparing the export snapshot");
 		}
 	});
 	connect(m_worker, &QThread::finished, this, [this, state] {
@@ -407,19 +425,21 @@ void SVSProjectController::exportProject()
 		{
 			if (m_progress)
 				m_progress->hide();
-			QMessageBox::critical(m_window, QStringLiteral("SVS 工程导出失败"), state->data.error);
+			QMessageBox::critical(
+				m_window, QCoreApplication::translate("SVSProjectUI", "SVS project export failed"), state->data.error);
 			reset();
 			return;
 		}
 		m_task = Task::ExportCatalog;
-		progress(QStringLiteral("正在读取输出格式…"));
+		progress(QCoreApplication::translate("SVSProjectUI", "Reading output formats…"));
 		m_bridge.start({{"operation", "listFormats"}});
 	});
 	m_worker->start();
 }
 void SVSProjectController::chooseExport(const QJsonArray& formats)
 {
-	FileDialog file(m_window, QStringLiteral("导出SVS工程"), ConfigManager::inst()->userProjectsDir());
+	FileDialog file(m_window, QCoreApplication::translate("SVSProjectUI", "Export SVS project"),
+		ConfigManager::inst()->userProjectsDir());
 	file.setFileMode(QFileDialog::AnyFile);
 	file.setAcceptMode(QFileDialog::AcceptSave);
 	file.setOption(QFileDialog::DontConfirmOverwrite, true);
@@ -448,13 +468,14 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 			defaultFilter = filter;
 	}
 	supportedSuffixes.removeDuplicates();
-	const auto supportedFilter = QStringLiteral("所有支持格式 (%1)").arg(supportedSuffixes.join(' '));
+	const auto supportedFilter
+		= QCoreApplication::translate("SVSProjectUI", "All supported formats (%1)").arg(supportedSuffixes.join(' '));
 	filters.prepend(supportedFilter);
 	file.setNameFilters(filters);
 	file.selectNameFilter(supportedFilter);
 	const auto defaultSuffix = identities[defaultFilter]["suffixes"].toArray().first().toString();
 	file.setDefaultSuffix(defaultSuffix);
-	file.selectFile(QStringLiteral("SVS工程"));
+	file.selectFile(QCoreApplication::translate("SVSProjectUI", "SVS project"));
 	connect(&file, &QFileDialog::filterSelected, &file, [&file, &identities, &supportedFilter, &defaultSuffix](const QString& filter) {
 		file.setDefaultSuffix(filter == supportedFilter
 			? defaultSuffix : identities[filter]["suffixes"].toArray().first().toString());
@@ -478,8 +499,9 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 		suffixes << suffix.toString();
 	if (!suffixes.contains(QFileInfo(destination).suffix(), Qt::CaseInsensitive))
 	{
-		QMessageBox::critical(m_window, QStringLiteral("输出扩展名不匹配"),
-			QStringLiteral("格式 %1 支持：%2").arg(format["id"].toString(), suffixes.join(", ")));
+		QMessageBox::critical(m_window, QCoreApplication::translate("SVSProjectUI", "Output extension mismatch"),
+			QCoreApplication::translate("SVSProjectUI", "Format %1 supports: %2")
+				.arg(format["id"].toString(), suffixes.join(", ")));
 		reset();
 		return;
 	}
@@ -499,7 +521,7 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 		{"project", m_export->data.project}, {"options", dialog.options()}, {"selection", dialog.selection()},
 		{"assets", assets}};
 	m_task = Task::ExportInspection;
-	progress(QStringLiteral("正在检查格式限制和有损内容…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Checking format restrictions and omitted content…"));
 	m_bridge.start(m_export->request);
 }
 void SVSProjectController::inspectExport(const QJsonObject& response)
@@ -510,13 +532,13 @@ void SVSProjectController::inspectExport(const QJsonObject& response)
 	for (const auto& entry : response["losses"].toArray())
 	{
 		const auto loss = entry.toObject();
-		issues << QStringLiteral("格式 %1，轨道 %2，%3：%4")
+		issues << QCoreApplication::translate("SVSProjectUI", "Format %1, track %2, %3: %4")
 					  .arg(m_formatId, loss["track"].toString(), loss["field"].toString(), loss["reason"].toString());
 	}
 	if (!issues.isEmpty()
-		&& QMessageBox::warning(m_window, QStringLiteral("确认有损导出"),
-			   issues.join('\n') + QStringLiteral("\n\n继续导出？"), QMessageBox::Yes | QMessageBox::Cancel,
-			   QMessageBox::Cancel)
+		&& QMessageBox::warning(m_window, QCoreApplication::translate("SVSProjectUI", "Confirm lossy export"),
+			   issues.join('\n') + QCoreApplication::translate("SVSProjectUI", "\n\nContinue exporting?"),
+			   QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
 			!= QMessageBox::Yes)
 	{
 		reset();
@@ -540,7 +562,7 @@ void SVSProjectController::inspectExport(const QJsonObject& response)
 			assets.append(entry);
 	request["assets"] = assets;
 	m_task = Task::ExportConversion;
-	progress(QStringLiteral("正在转换工程…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Converting project…"));
 	m_bridge.start(request);
 }
 void SVSProjectController::finishExport(const QJsonObject& response)
@@ -551,9 +573,10 @@ void SVSProjectController::finishExport(const QJsonObject& response)
 	for (const auto& entry : response["warnings"].toArray())
 		warnings << entry.toObject()["message"].toString();
 	if (!warnings.isEmpty()
-		&& QMessageBox::warning(m_window, QStringLiteral("确认格式转换警告"),
-			   warnings.join('\n') + QStringLiteral("\n\n继续保存文件组？"), QMessageBox::Yes | QMessageBox::Cancel,
-			   QMessageBox::Cancel)
+		&& QMessageBox::warning(m_window,
+			   QCoreApplication::translate("SVSProjectUI", "Confirm format conversion warnings"),
+			   warnings.join('\n') + QCoreApplication::translate("SVSProjectUI", "\n\nContinue saving the file group?"),
+			   QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
 			!= QMessageBox::Yes)
 	{
 		reset();
@@ -567,13 +590,17 @@ void SVSProjectController::finishExport(const QJsonObject& response)
 	const auto plan = svs::ProjectOutput::prepare(files, staging, directory);
 	if (!plan.valid())
 	{
-		QMessageBox::critical(m_window, QStringLiteral("输出文件组预检失败"), plan.error);
+		QMessageBox::critical(
+			m_window, QCoreApplication::translate("SVSProjectUI", "Output file group preflight failed"), plan.error);
 		reset();
 		return;
 	}
 	if (!plan.overwrites.isEmpty()
-		&& QMessageBox::warning(m_window, QStringLiteral("确认覆盖导出文件组"),
-			   QStringLiteral("将覆盖以下全部文件：\n%1\n\n继续？").arg(plan.overwrites.join('\n')),
+		&& QMessageBox::warning(m_window,
+			   QCoreApplication::translate("SVSProjectUI", "Confirm overwriting the export file group"),
+			   QCoreApplication::translate(
+				   "SVSProjectUI", "All of the following files will be overwritten:\n%1\n\nContinue?")
+				   .arg(plan.overwrites.join('\n')),
 			   QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
 			!= QMessageBox::Yes)
 	{
@@ -581,7 +608,7 @@ void SVSProjectController::finishExport(const QJsonObject& response)
 		return;
 	}
 	m_task = Task::ExportCommit;
-	progress(QStringLiteral("正在保存完整文件组…"));
+	progress(QCoreApplication::translate("SVSProjectUI", "Saving the complete file group…"));
 	struct Result
 	{
 		bool success = false;
@@ -599,7 +626,8 @@ void SVSProjectController::finishExport(const QJsonObject& response)
 		}
 		catch (...)
 		{
-			result->error = QStringLiteral("保存导出文件组发生未知错误");
+			result->error = QCoreApplication::translate(
+				"SVSProjectUI", "An unknown error occurred while saving the export file group");
 		}
 	});
 	connect(m_worker, &QThread::finished, this, [this, plan, result] {
@@ -613,10 +641,12 @@ void SVSProjectController::finishExport(const QJsonObject& response)
 			QStringList paths;
 			for (const auto& file : plan.files)
 				paths << file.target;
-			QMessageBox::information(m_window, QStringLiteral("SVS 工程导出完成"), paths.join('\n'));
+			QMessageBox::information(
+				m_window, QCoreApplication::translate("SVSProjectUI", "SVS project export complete"), paths.join('\n'));
 		}
 		else if (!m_cancelled || !result->error.isEmpty())
-			QMessageBox::critical(m_window, QStringLiteral("输出文件组保存失败"), result->error);
+			QMessageBox::critical(m_window,
+				QCoreApplication::translate("SVSProjectUI", "Could not save the output file group"), result->error);
 		reset();
 	});
 	m_worker->start();
@@ -654,7 +684,7 @@ bool SVSProjectController::commitImport(const svs::ProjectImport& prepared, Song
 	}
 	catch (...)
 	{
-		error = QStringLiteral("工程提交发生未知错误");
+		error = QCoreApplication::translate("SVSProjectUI", "An unknown error occurred while committing the project");
 	}
 	song.restoreProjectState(backup);
 	song.setModified(modified);

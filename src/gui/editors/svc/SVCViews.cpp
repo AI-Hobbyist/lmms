@@ -1,6 +1,7 @@
 #include "SVCViews.h"
 
 #include <QContextMenuEvent>
+#include <QCoreApplication>
 #include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -56,8 +57,10 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override
 	{
 		QMenu menu(this);
-		menu.addAction(tr("Open SVC plugin"), m_view, [this] { m_view->openWindow(); });
-		menu.addAction(tr("Re-render"), static_cast<SVCTrack*>(m_view->getTrack()), &SVCTrack::renderRequested);
+		menu.addAction(QCoreApplication::translate("lmms::gui::SVCLabelButton", "Open SVC plugin"), m_view,
+			[this] { m_view->openWindow(); });
+		menu.addAction(QCoreApplication::translate("lmms::gui::SVCLabelButton", "Re-render"),
+			static_cast<SVCTrack*>(m_view->getTrack()), &SVCTrack::renderRequested);
 		menu.exec(event->globalPos());
 	}
 

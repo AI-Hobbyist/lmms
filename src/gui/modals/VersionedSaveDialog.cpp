@@ -22,7 +22,9 @@
  *
  */
 
+#include "VersionedSaveDialog.h"
 
+#include <QCoreApplication>
 #include <QGroupBox>
 #include <QLayout>
 #include <QLineEdit>
@@ -31,9 +33,7 @@
 #include <QRegularExpression>
 
 #include "DeprecationHelper.h"
-#include "VersionedSaveDialog.h"
 #include "LedCheckBox.h"
-
 
 namespace lmms::gui
 {
@@ -182,11 +182,13 @@ SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	auto *layout = new QVBoxLayout();
 
 	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
-	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
+	m_discardMIDIConnectionsCheckbox->setText(
+		QCoreApplication::translate("lmms::gui::SaveOptionsWidget", "Discard MIDI connections"));
 	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
 
 	m_saveAsProjectBundleCheckbox = new LedCheckBox(nullptr);
-	m_saveAsProjectBundleCheckbox->setText(tr("Save As Project Bundle (with resources)"));
+	m_saveAsProjectBundleCheckbox->setText(
+		QCoreApplication::translate("lmms::gui::SaveOptionsWidget", "Save As Project Bundle (with resources)"));
 	m_saveAsProjectBundleCheckbox->setModel(&saveOptions.saveAsProjectBundle);
 
 	layout->addWidget(m_discardMIDIConnectionsCheckbox);

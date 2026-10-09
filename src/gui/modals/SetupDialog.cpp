@@ -257,10 +257,11 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	addCheckBox(tr("Enable all note labels in piano roll"), guiGroupBox, guiGroupLayout,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
 	auto* referenceRow = new QHBoxLayout;
-	auto* referenceLabel = new QLabel(tr("简谱基准音（1=C）"), guiGroupBox);
+	auto* referenceLabel = new QLabel(tr("Numbered notation reference (1=C)"), guiGroupBox);
 	m_numberedReference = new QComboBox(guiGroupBox);
 	m_numberedReference->setObjectName("numberedNotationReference");
-	m_numberedReference->setToolTip(tr("默认 C4；其他音高自动添加高音点或低音点，仅简谱显示模式生效"));
+	m_numberedReference->setToolTip(
+		tr("Default C4; other pitches automatically add upper or lower octave dots, only in numbered notation mode"));
 	for (int index = 0; index <= 10; ++index)
 	{
 		m_numberedReference->addItem(QString("C%1").arg(index - 1), index);

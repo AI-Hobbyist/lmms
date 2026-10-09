@@ -82,6 +82,19 @@ if ($buildExitCode -ne 0) { Get-Content build.log; exit $buildExitCode }
 | 阶段 | 结果 | 自动验证 | GUI | 提交推送 |
 | --- | --- | --- | --- | --- |
 | M0 | 当前审计、术语、逐键阶段及插件批次、逐项调查账本已建立 | 提取和审计退出码 0；审计边界检查 PASS | 按计划不适用 | 本阶段提交后推送，下一阶段开始前确认远端一致 |
-| M1～M7 | TODO | 未执行 | 未执行 | 未提交 |
+| M1 | 入口统一、英文 source 迁移、四语目录同步完成 | lmms / UiBaselineCapture / SVSIntegrationTest 构建及两组测试 PASS | Windows Qt、100%，四语入口及导出对话框截图 PASS | 本阶段提交推送后确认远端一致 |
+| M2～M7 | TODO | 未执行 | 未执行 | 未提交 |
 
 M0 提取曾因输入列表带双引号被 lupdate 当成文件名失败，移除列表内引号后通过；没有变更任何 TS 或业务代码。
+
+## M1 结果
+
+M0 已提交并推送 `422f305ced7f97e4f8448ccad99558107b23bfd8`，开始 M1 前确认远端 master 一致。M1 修正 12 个告警类及导出对话框的运行时上下文；导出格式使用提取时的 `ProjectRenderer` 上下文。未批量增加 Q_OBJECT。新增自带 SVS/RVC 固定声明映射，仅本地显示副本改变，第三方名称、用户数据、参数 ID、请求和保存数据保持原值。
+
+23 个原始中文键迁移为英文 source；同时把已确认的 SVS 工程导入导出中文固定提示接入 `SVSProjectUI`。迁移映射见 `source-migrations.json`。禁用 sametext/similartext 启发式后同步四语目录，保留已有有效译文；英文全部使用有效英文 source 回退。当前 3563 键，相对 M0 减去 23 个旧键、新增 140 个键，四语缺键均为 0。中/日/韩空译分别 1544/1908/593，原有日文占位符异常 3 项留 M4；后续归属逐键保存在 current-audit.json，本阶段不宣称这些待译项完成。
+
+已确认的硬编码用户提示标为 ENTRY_READY，待所属阶段补译；协议元数据、专有名称和原始日志按理由关闭，其余 682 个候选仍 OPEN，继续沿原调查路径收敛，M6 前必须有逐项结论。固定声明字段已接入可提取映射，不修改插件 ABI。
+
+验证：四语 lrelease 退出码 0；最终前台构建 `lmms UiBaselineCapture SVSIntegrationTest` 通过。开发可执行文件 `build/Release/lmms.exe`；启用的 amplifier/kicker/tripleoscillator DLL 位于 `build/Release/plugins`，SVS 引擎沿既有 `build/Release/svs` 部署。首次编译发现 QJsonArray 代理不能绑定非常量引用，改为索引更新后通过，失败日志保留。
+
+`translationEntryPoints` 和 `unselectedSingerPreview` 各 3 PASS、0 FAIL。前者逐语言验证真实参数窗口的译文命中、Mixed 悬浮提示、固定声明及未知数据回退，并验证导出窗口/格式上下文；后者验证迁移后的声库空状态与菜单。截图均来自真实 Windows QScreen 窗口，100% 缩放；环境为 Qt 6.10.3、Microsoft YaHei UI、默认开发主题。四语截图中 CJK/韩文字形正常。后续尚未补译的导出标签按 M4 处理。测试日志中的 JACK 未运行和测试可执行路径缺少 SVSCompute 属既有运行环境警告，未扩大本阶段修改范围；不把此测试当作计算功能验证。

@@ -23,22 +23,22 @@
  *
  */
 
-#include <array>
+#include "LmmsStyle.h"
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
 #include <QPainter>
-#include <QPainterPath>  // IWYU pragma: keep
+#include <QPainterPath> // IWYU pragma: keep
 #include <QPixmapCache>
 #include <QStyleFactory>
 #include <QStyleOption>
+#include <array>
 
-#include "embed.h"
-#include "LmmsStyle.h"
 #include "LmmsPalette.h"
 #include "TextFloat.h"
-
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -158,12 +158,10 @@ LmmsStyle::LmmsStyle() :
 					*s_palette = themePalette.palette();
 					qApp->setPalette(*s_palette);
 				}
-				TextFloat::displayMessage(
-					tr("Theme updated"),
-					tr("LMMS theme file %1 has been reloaded.").arg(file.fileName()),
-					embed::getIconPixmap("colorize"),
-					3000
-				);
+				TextFloat::displayMessage(QCoreApplication::translate("lmms::gui::LmmsStyle", "Theme updated"),
+					QCoreApplication::translate("lmms::gui::LmmsStyle", "LMMS theme file %1 has been reloaded.")
+						.arg(file.fileName()),
+					embed::getIconPixmap("colorize"), 3000);
 				// Handle delete + overwrite events
 				if (!m_styleReloader.files().contains(path))
 				{

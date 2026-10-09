@@ -1,16 +1,19 @@
 #include "SVSLyricEditor.h"
-#include "SVSTrack.h"
-#include <QPlainTextEdit>
+
 #include <QCheckBox>
-#include <QTableWidget>
-#include <QHeaderView>
-#include <QLabel>
+#include <QCoreApplication>
 #include <QDialogButtonBox>
-#include <QVBoxLayout>
-#include <QJsonDocument>
-#include <QRegularExpression>
+#include <QHeaderView>
 #include <QInputMethodEvent>
+#include <QJsonDocument>
+#include <QLabel>
+#include <QPlainTextEdit>
+#include <QRegularExpression>
+#include <QTableWidget>
+#include <QVBoxLayout>
 #include <algorithm>
+
+#include "SVSTrack.h"
 namespace lmms::gui {
 svs::Pronunciation editorPronunciation(SVSClip* clip, const svs::Note& note, bool candidates)
 {
@@ -66,20 +69,24 @@ SVSLyricEditor::SVSLyricEditor(SVSClip* clip, const QSet<QString>& selection, QW
 	, m_selection(selection)
 {
 	setObjectName("svsBatchLyrics");
-	setWindowTitle(tr("Batch lyrics"));
+	setWindowTitle(QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Batch lyrics"));
 	resize(620, 460);
 	auto* layout = new QVBoxLayout(this);
 	m_text = new QPlainTextEdit(this);
 	m_text->setObjectName("svsBatchLyricText");
 	layout->addWidget(m_text);
-	m_skip = new QCheckBox(tr("Skip voice continuation notes and tokens"), this);
+	m_skip = new QCheckBox(
+		QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Skip voice continuation notes and tokens"), this);
 	m_skip->setObjectName("svsBatchSkipContinuation");
 	m_skip->setChecked(true);
 	layout->addWidget(m_skip);
 	m_table = new QTableWidget(this);
 	m_table->setObjectName("svsBatchLyricPreview");
 	m_table->setColumnCount(4);
-	m_table->setHorizontalHeaderLabels({tr("Tick"), tr("Original"), tr("Preview"), tr("Reading / status")});
+	m_table->setHorizontalHeaderLabels({QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Tick"),
+		QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Original"),
+		QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Preview"),
+		QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Reading / status")});
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	layout->addWidget(m_table, 1);
@@ -129,9 +136,10 @@ void SVSLyricEditor::preview()
 		if (!skip && token < tokens.size())
 			after.lyric = tokens[token++];
 		const auto reading = editorPronunciation(m_clip, after);
-		QString status = skip ? tr("Skipped continuation") : reading.text;
+		QString status
+			= skip ? QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Skipped continuation") : reading.text;
 		if (!after.phonemes.isEmpty() || !after.pronunciation.isEmpty())
-			status += tr(" — manual override retained");
+			status += QCoreApplication::translate("lmms::gui::SVSLyricEditor", " — manual override retained");
 		if (!reading.diagnostic.isEmpty())
 			status += "\n" + reading.diagnostic;
 		const QStringList cells{QString::number(before.tick), before.lyric, after.lyric, status};
@@ -139,8 +147,9 @@ void SVSLyricEditor::preview()
 			m_table->setItem(row, column, new QTableWidgetItem(cells[column]));
 		++row;
 	}
-	m_diagnostic->setText(tr(
-		"%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.")
+	m_diagnostic->setText(QCoreApplication::translate("lmms::gui::SVSLyricEditor",
+		"%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on "
+		"confirmation.")
 			.arg(token)
 			.arg(tokens.size() - token));
 }
@@ -158,8 +167,8 @@ void SVSLyricEditor::accept()
 	}
 	if (m_clip->notes() != m_original)
 	{
-		m_diagnostic->setText(
-			tr("Notes changed while this preview was open. Reopen batch lyrics to review the current notes."));
+		m_diagnostic->setText(QCoreApplication::translate("lmms::gui::SVSLyricEditor",
+			"Notes changed while this preview was open. Reopen batch lyrics to review the current notes."));
 		return;
 	}
 	// QPlainTextEdit keeps IME preedit separate from committed text; confirming a composition never writes a partial lyric.

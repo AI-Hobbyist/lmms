@@ -425,7 +425,7 @@ private slots:
 		QVERIFY(track->pluginId().isEmpty());
 		clip->synthesize();
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
-		QCOMPARE(clip->status(), QStringLiteral("请选择一个歌手"));
+		QCOMPARE(clip->status(), SVSClip::tr("Please select a singer"));
 		const auto audio = clip->audio();
 		const auto auditionDirectory = qEnvironmentVariable("SVS_UNSELECTED_AUDIO_DIR");
 		if (!auditionDirectory.isEmpty())
@@ -461,9 +461,9 @@ private slots:
 		auto* singer = editor.findChild<QComboBox*>("svsSinger");
 		auto* hint = editor.findChild<QLabel*>("svsSelectSingerHint");
 		QVERIFY(singer && hint);
-		QCOMPARE(singer->currentText(), QStringLiteral("未选定"));
+		QCOMPARE(singer->currentText(), gui::SVSPianoRoll::tr("Not selected"));
 		QVERIFY(hint->isVisible());
-		QCOMPARE(hint->text(), QStringLiteral("请选择一个歌手"));
+		QCOMPARE(hint->text(), gui::SVSPianoRoll::tr("Please select a singer"));
 		QVERIFY(!clip->supportsPitchRecording());
 		QTest::qWait(700);
 		QVERIFY(
@@ -476,7 +476,7 @@ private slots:
 			QVERIFY(track->pluginId().isEmpty());
 			QVERIFY(track->voiceId().isEmpty());
 			QVERIFY(hint->isVisible());
-			QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QStringLiteral("请选择一个歌手"), 10000);
+			QTRY_COMPARE_WITH_TIMEOUT(clip->status(), SVSClip::tr("Please select a singer"), 10000);
 		}
 		track->bindVoice("missing-engine", "missing-voice");
 		QVERIFY(!clip->captureInput(48000).document["unselectedVoicePreview"].toBool());
@@ -960,10 +960,10 @@ private slots:
 		QVERIFY(QTest::qWaitForWindowExposed(window));
 		auto* menu = window->findChild<QMenu*>("svsProjectMenu");
 		QVERIFY(menu);
-		QCOMPARE(menu->title(), QStringLiteral("SVS 工程"));
+		QCOMPARE(menu->title(), QCoreApplication::translate("SVSProjectUI", "SVS project"));
 		QCOMPARE(menu->actions().size(), 2);
-		QCOMPARE(menu->actions()[0]->text(), QStringLiteral("导入SVS工程"));
-		QCOMPARE(menu->actions()[1]->text(), QStringLiteral("导出SVS工程"));
+		QCOMPARE(menu->actions()[0]->text(), QCoreApplication::translate("SVSProjectUI", "Import SVS project"));
+		QCOMPARE(menu->actions()[1]->text(), QCoreApplication::translate("SVSProjectUI", "Export SVS project"));
 		menu->popup(window->mapToGlobal(QPoint(100, 80)));
 		QTest::qWait(600);
 		QVERIFY(menu->isVisible());
@@ -1530,7 +1530,8 @@ private slots:
 				}
 				else
 				{
-					if (message->windowTitle().contains(QStringLiteral("导出完成")))
+					if (message->windowTitle()
+						== QCoreApplication::translate("SVSProjectUI", "SVS project export complete"))
 						++completed;
 					else
 						++errors;
@@ -1543,7 +1544,7 @@ private slots:
 			else if (choice == "process-cancel")
 			{
 				if (auto* progress = qobject_cast<QProgressDialog*>(modal))
-					if (progress->labelText() == QStringLiteral("正在转换工程…"))
+					if (progress->labelText() == QCoreApplication::translate("SVSProjectUI", "Converting project…"))
 						QMetaObject::invokeMethod(progress, "canceled", Qt::QueuedConnection);
 			}
 		});

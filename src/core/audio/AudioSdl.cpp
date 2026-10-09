@@ -23,6 +23,9 @@
  */
 
 #include "AudioSdl.h"
+
+#include <QCoreApplication>
+
 #include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SDL
@@ -199,13 +202,14 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 	populatePlaybackDeviceComboBox();
 
-	form->addRow(tr("Playback device"), m_playbackDeviceComboBox);
+	form->addRow(
+		QCoreApplication::translate("lmms::AudioSdl::setupWidget", "Playback device"), m_playbackDeviceComboBox);
 
 	m_inputDeviceComboBox = new QComboBox(this);
 
 	populateInputDeviceComboBox();
 
-	form->addRow(tr("Input device"), m_inputDeviceComboBox);
+	form->addRow(QCoreApplication::translate("lmms::AudioSdl::setupWidget", "Input device"), m_inputDeviceComboBox);
 }
 
 

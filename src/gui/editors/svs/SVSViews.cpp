@@ -1,69 +1,72 @@
 #include "SVSViews.h"
-#include "NoteLabelDisplay.h"
-#include "SVSTrack.h"
-#include "SVSClip.h"
-#include "SVSParameterPanel.h"
-#include "SVSCanvas.h"
-#include "SVSResultStrip.h"
-#include "SVSPitchRanges.h"
-#include "SVSLyricEditor.h"
-#include "SVSImageLoader.h"
-#include "ConfigManager.h"
-#include "TrackLabelButton.h"
-#include "StringPairDrag.h"
-#include "Knob.h"
-#include "MixerChannelLcdSpinBox.h"
-#include "RenameDialog.h"
-#include "EffectRackView.h"
-#include "embed.h"
-#include "Engine.h"
-#include "Song.h"
-#include "SongEditor.h"
-#include "TimeLineWidget.h"
-#include "Timeline.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
-#include "SubWindow.h"
-#include <QDialog>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QComboBox>
-#include <QLabel>
-#include <QPushButton>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QDropEvent>
-#include <QScrollBar>
-#include <QToolButton>
-#include <QToolBar>
+
 #include <QButtonGroup>
-#include <QSignalBlocker>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QUuid>
-#include <QFileDialog>
-#include <QFile>
-#include <QTabWidget>
-#include <QLocale>
-#include <QStyle>
-#include <QStyleOptionToolButton>
-#include <QScrollArea>
-#include <QSplitter>
 #include <QCheckBox>
-#include <QSpinBox>
+#include <QComboBox>
+#include <QDialog>
 #include <QDoubleSpinBox>
-#include <QSlider>
-#include <QFrame>
+#include <QDropEvent>
+#include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QLocale>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSignalBlocker>
+#include <QSlider>
+#include <QSpinBox>
+#include <QSplitter>
+#include <QStyle>
+#include <QStyleOptionToolButton>
+#include <QTabWidget>
+#include <QToolBar>
+#include <QToolButton>
+#include <QUuid>
+#include <QVBoxLayout>
 #include <algorithm>
-#include <memory>
 #include <cmath>
+#include <memory>
+
+#include "ConfigManager.h"
+#include "EffectRackView.h"
+#include "Engine.h"
 #include "FadeButton.h"
-#include "PianoRoll.h"
+#include "GuiApplication.h"
+#include "Knob.h"
+#include "MainWindow.h"
 #include "Mixer.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
+#include "NativePluginTranslation.h"
+#include "NoteLabelDisplay.h"
+#include "PianoRoll.h"
+#include "RenameDialog.h"
+#include "SVSCanvas.h"
+#include "SVSClip.h"
+#include "SVSImageLoader.h"
+#include "SVSLyricEditor.h"
+#include "SVSParameterPanel.h"
+#include "SVSPitchRanges.h"
+#include "SVSResultStrip.h"
+#include "SVSTrack.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
+#include "SubWindow.h"
+#include "TimeLineWidget.h"
+#include "Timeline.h"
+#include "TrackLabelButton.h"
+#include "embed.h"
 
 namespace lmms::gui {
 namespace {
@@ -344,7 +347,7 @@ QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent)
 	auto refreshSpeakers = [track, speakers] {
 		QSignalBlocker block(speakers);
 		speakers->clear();
-		speakers->addItem(QObject::tr("未选定"), QString{});
+		speakers->addItem(QObject::tr("Not selected"), QString{});
 		for (const auto& voice : svs::Registry::instance().voices())
 			speakers->addItem(voice.name, voice.pluginId + "\n" + voice.id);
 		speakers->setCurrentIndex(std::max(0, speakers->findData(track->pluginId() + "\n" + track->voiceId())));
@@ -883,8 +886,9 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	followTimeline->setObjectName("svsFollowSongTimeline");
 	followTimeline->setCheckable(true);
 	followTimeline->setChecked(clip->editorState()["followSongTimeline"].toBool(true));
-	iconButton(followTimeline, "autoscroll_stepped_on", tr("随 Song Editor 滚动"));
-	followTimeline->setToolTip(tr("随 Song Editor 时间轴自动滚动，沿用主编辑器的滚动模式；到达片段边界后停止"));
+	iconButton(followTimeline, "autoscroll_stepped_on", tr("Follow Song Editor scrolling"));
+	followTimeline->setToolTip(
+		tr("Scroll automatically with the Song Editor timeline using its scrolling mode; stop at the clip boundary"));
 	toolbar->insertWidget(2, followTimeline);
 	connect(followTimeline, &QToolButton::toggled, this, [clip](bool enabled) {
 		auto state = clip->editorState();
@@ -1144,7 +1148,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto refreshSingers = [this, track, singer] {
 		QSignalBlocker block(singer);
 		singer->clear();
-		singer->addItem(tr("未选定"), QString{});
+		singer->addItem(tr("Not selected"), QString{});
 		for (const auto& voice : svs::Registry::instance().voices())
 			singer->addItem(voice.name, voice.pluginId + "\n" + voice.id);
 		singer->setCurrentIndex(std::max(0, singer->findData(track->pluginId() + "\n" + track->voiceId())));
@@ -1162,7 +1166,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 			track->bindVoice(key[0], key[1]);
 	});
 	connect(track, &Track::dataChanged, this, refreshSingers);
-	auto* singerHint = new QLabel(tr("请选择一个歌手"), sidebar);
+	auto* singerHint = new QLabel(tr("Please select a singer"), sidebar);
 	singerHint->setObjectName("svsSelectSingerHint");
 	sidebarLayout->addWidget(singerHint);
 	auto refreshSingerHint = [track, singerHint] {
@@ -1200,21 +1204,21 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	recordingLayout->addWidget(recordingStatus);
 	auto* recordings = new QComboBox(recordingPanel);
 	recordings->setObjectName("svsPitchRecordings");
-	recordings->setToolTip(tr("切换到此前的音高重录结果"));
+	recordings->setToolTip(tr("Switch to a previous pitch recording"));
 	recordingLayout->addWidget(recordings);
-	auto* fixedSeed = new QCheckBox(tr("固定当前种子"), recordingPanel);
+	auto* fixedSeed = new QCheckBox(tr("Lock the current seed"), recordingPanel);
 	fixedSeed->setObjectName("svsPitchFixedSeed");
 	auto* seed = new QDoubleSpinBox(recordingPanel);
 	seed->setObjectName("svsPitchRecordingSeed");
 	seed->setDecimals(0);
 	seed->setRange(0, UINT32_MAX);
-	seed->setPrefix(tr("种子: "));
+	seed->setPrefix(tr("Seed: "));
 	const auto recordingOptions = clip->editorState()["pitchRecordingOptions"].toObject();
 	fixedSeed->setChecked(recordingOptions["fixed"].toBool());
 	seed->setValue(recordingOptions["seed"].toDouble());
 	recordingLayout->addWidget(fixedSeed);
 	recordingLayout->addWidget(seed);
-	auto* record = new QPushButton(tr("音高重录"), recordingPanel);
+	auto* record = new QPushButton(tr("Re-record pitch"), recordingPanel);
 	record->setObjectName("svsRecordPitch");
 	recordingLayout->addWidget(record);
 	sidebarLayout->addWidget(recordingPanel);
@@ -1235,7 +1239,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		{
 			const auto entry = value.toObject();
 			recordings->addItem(
-				tr("重录 %1 · 种子 %2").arg(entry["number"].toInt()).arg(entry["seed"].toDouble(), 0, 'f', 0));
+				tr("Take %1 · seed %2").arg(entry["number"].toInt()).arg(entry["seed"].toDouble(), 0, 'f', 0));
 		}
 		const int current
 			= std::clamp(clip->editorState()["pitchRecordingCurrent"].toInt(), 0, std::max(0, int(history.size()) - 1));
@@ -1247,9 +1251,9 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 			*displayedRecording = current;
 		}
 		recordingPanel->setEnabled(!clip->readOnly() && clip->supportsPitchRecording());
-		recordingStatus->setText(!clip->supportsPitchRecording() ? tr("声库不支持自动音高")
-				: history.isEmpty() ? tr("当前: 原始音高 · 尚未重录")
-									: tr("当前: 重录 %1 / %2\n种子: %3")
+		recordingStatus->setText(!clip->supportsPitchRecording() ? tr("This voicebank does not support automatic pitch")
+				: history.isEmpty() ? tr("Current: original pitch · no recording yet")
+									: tr("Current: take %1 / %2\nSeed: %3")
 										  .arg(current)
 										  .arg(history.size() - 1)
 										  .arg(history[current].toObject()["seed"].toDouble(), 0, 'f', 0));
@@ -1440,7 +1444,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		auto context = track->parameters();
 		for (auto i = clip->parameters().begin(); i != clip->parameters().end(); ++i)
 			context[i.key()] = i.value();
-		phonemePanel->refresh(track->capabilities().parameters, "phoneme", {strip->selectedParameters()}, context,
+		phonemePanel->refresh(nativeTranslation::svsParameters(track->pluginId(), track->capabilities().parameters),
+			"phoneme", {strip->selectedParameters()}, context,
 			[strip](const QString& id, const QJsonValue& value) { strip->setSelectedParameter(id, value); });
 		phonemePanel->setEnabled(strip->selectedPhoneme() >= 0
 			&& track->capabilities().original["phonemes"].toObject()["attributesEditable"].toBool());
@@ -1462,8 +1467,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 			context[i.key()] = i.value();
 		singer->setCurrentIndex(std::max(0, singer->findData(track->pluginId() + "\n" + track->voiceId())));
 		singer->setEnabled(!track->readOnly());
-		globalControls->refresh(track->capabilities().parameters, track->parameters(), clip->parameters(),
-			clip->globalParameters(), context,
+		globalControls->refresh(nativeTranslation::svsParameters(track->pluginId(), track->capabilities().parameters),
+			track->parameters(), clip->parameters(), clip->globalParameters(), context,
 			[clip, selectedParameter, updateParameterDisplay](const svs::Parameter& p, const QJsonValue& value) {
 				if (!clip->setGlobalParameter(p.id, value))
 					return;
@@ -1479,9 +1484,11 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 				updateParameterDisplay();
 			});
 		globalControls->setEnabled(!clip->readOnly() && !track->readOnly());
-		trackPanel->refresh(track->capabilities().parameters, "track", {track->parameters()}, context,
+		trackPanel->refresh(nativeTranslation::svsParameters(track->pluginId(), track->capabilities().parameters),
+			"track", {track->parameters()}, context,
 			[track](const QString& id, const QJsonValue& value) { track->setParameter(id, value); });
-		clipPanel->refresh(track->capabilities().parameters, "clip", {clip->parameters()}, context,
+		clipPanel->refresh(nativeTranslation::svsParameters(track->pluginId(), track->capabilities().parameters),
+			"clip", {clip->parameters()}, context,
 			[clip](const QString& id, const QJsonValue& value) { clip->setParameter(id, value); });
 		QVector<QJsonObject> selected;
 		QStringList selectedIds;
@@ -1491,12 +1498,14 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 				selected << note.parameters;
 				selectedIds << note.id;
 			}
-		notePanel->refresh(track->capabilities().parameters, "note", selected, context,
-			[clip, selectedIds](
-				const QString& id, const QJsonValue& value) { clip->setNoteParameter(selectedIds, id, value); });
+		notePanel->refresh(nativeTranslation::svsParameters(track->pluginId(), track->capabilities().parameters),
+			"note", selected, context, [clip, selectedIds](const QString& id, const QJsonValue& value) {
+				clip->setNoteParameter(selectedIds, id, value);
+			});
 		notePanel->setEnabled(!selected.isEmpty());
 		auto audio = clip->audio();
-		feedbackPanel->refresh(track->capabilities().feedbackParameters, "clip",
+		feedbackPanel->refresh(
+			nativeTranslation::svsParameters(track->pluginId(), track->capabilities().feedbackParameters), "clip",
 			audio ? QVector<QJsonObject>{audio->feedback["parameters"].toObject()} : QVector<QJsonObject>{}, context,
 			{});
 		QStringList current;
@@ -1564,7 +1573,8 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 			lane.parameter = parameter;
 			lane.feedback = feedback;
 			lane.available = parameter.isVisible(context);
-			lane.tab->setText((feedback ? tr("Result: ") : QString{}) + parameter.name);
+			lane.tab->setText((feedback ? tr("Result: ") : QString{})
+				+ nativeTranslation::svsText(track->pluginId(), parameter.name));
 			const QColor declared(parameter.color);
 			lane.tab->curveColor = declared.isValid() ? declared : palette().highlight().color();
 			lane.tab->setToolTip((feedback || !parameter.writable ? tr("Read-only result. ")

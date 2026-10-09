@@ -94,7 +94,8 @@ ExportSnapshot::ExportSnapshot(QVector<Region> regions, QObject* parent)
 		{
 			return;
 		}
-		const auto reason = tr("AI compute settings changed; restart SVS export");
+		const auto reason = QCoreApplication::translate(
+			"lmms::svs::ExportSnapshot", "AI compute settings changed; restart SVS export");
 		m_diagnostics << reason;
 		for (const auto& control : m_controls)
 		{
@@ -106,8 +107,10 @@ ExportSnapshot::ExportSnapshot(QVector<Region> regions, QObject* parent)
 			invalidated(reason);
 		}
 	});
-	connect(&TempoSource::forSong(*Engine::getSong()), &TempoSource::changed, this,
-		[this] { invalidateActive(tr("Project tempo changed while rendering SVS export; restart export")); });
+	connect(&TempoSource::forSong(*Engine::getSong()), &TempoSource::changed, this, [this] {
+		invalidateActive(QCoreApplication::translate(
+			"lmms::svs::ExportSnapshot", "Project tempo changed while rendering SVS export; restart export"));
+	});
 	for (int index = 0; index < m_regions.size(); ++index)
 		if (m_regions[index].track)
 		{
@@ -117,8 +120,9 @@ ExportSnapshot::ExportSnapshot(QVector<Region> regions, QObject* parent)
 				// writes are editor/API changes to the live mixer, outside the frozen input.
 				if (QThread::currentThread() != thread())
 					return;
-				invalidateActive(
-					locate(index, tr("SVS mix controls or routing changed while rendering; restart export")));
+				invalidateActive(locate(index,
+					QCoreApplication::translate("lmms::svs::ExportSnapshot",
+						"SVS mix controls or routing changed while rendering; restart export")));
 			};
 			connect(track->volumeModel(), &FloatModel::dataChanged, this, changed, Qt::DirectConnection);
 			connect(track->panningModel(), &FloatModel::dataChanged, this, changed, Qt::DirectConnection);
@@ -133,12 +137,16 @@ ExportSnapshot::ExportSnapshot(QVector<Region> regions, QObject* parent)
 				// were explicitly allowed to become silence.
 				if (m_state == State::Ready && !m_activeTracks.isEmpty())
 				{
-					invalidateActive(locate(index, tr("Track deleted while rendering SVS export")));
+					invalidateActive(locate(index,
+						QCoreApplication::translate(
+							"lmms::svs::ExportSnapshot", "Track deleted while rendering SVS export")));
 					return;
 				}
 				if (m_state != State::Captured && m_state != State::Preparing && m_state != State::Ready)
 					return;
-				m_diagnostics << locate(index, tr("Track deleted while preparing SVS export"));
+				m_diagnostics << locate(index,
+					QCoreApplication::translate(
+						"lmms::svs::ExportSnapshot", "Track deleted while preparing SVS export"));
 				for (const auto& control : m_controls)
 					control->cancel();
 				finish(State::Failed);
@@ -176,11 +184,14 @@ bool ExportSnapshot::activate(Song& song)
 		const auto& region = m_regions[index];
 		QString reason;
 		if (!region.track)
-			reason = tr("Track deleted while preparing SVS export");
+			reason
+				= QCoreApplication::translate("lmms::svs::ExportSnapshot", "Track deleted while preparing SVS export");
 		else if (region.mixContext != mixContext(*region.track))
-			reason = tr("SVS mix controls, routing or effects changed during export preparation; restart export");
+			reason = QCoreApplication::translate("lmms::svs::ExportSnapshot",
+				"SVS mix controls, routing or effects changed during export preparation; restart export");
 		else if (region.input.tempoSnapshot && region.input.tempoSnapshot->toJson() != tempo->toJson())
-			reason = tr("Project tempo changed during SVS export preparation; restart export");
+			reason = QCoreApplication::translate(
+				"lmms::svs::ExportSnapshot", "Project tempo changed during SVS export preparation; restart export");
 		if (!reason.isEmpty())
 		{
 			m_diagnostics << locate(index, reason);
@@ -217,7 +228,7 @@ void ExportSnapshot::deactivate()
 QString ExportSnapshot::locate(int index, const QString& reason) const
 {
 	const auto& region = m_regions[index];
-	return tr("SVS track '%1', clip '%2' (%3), tick %4: %5")
+	return QCoreApplication::translate("lmms::svs::ExportSnapshot", "SVS track '%1', clip '%2' (%3), tick %4: %5")
 		.arg(region.trackName, region.clipName, region.input.clipId)
 		.arg(region.position)
 		.arg(reason);
@@ -243,7 +254,8 @@ void ExportSnapshot::prepare(bool ignore)
 	for (int index = 0; index < m_regions.size(); ++index)
 		if (!m_regions[index].track)
 		{
-			m_diagnostics << locate(index, tr("Track deleted before preparing SVS export"));
+			m_diagnostics << locate(index,
+				QCoreApplication::translate("lmms::svs::ExportSnapshot", "Track deleted before preparing SVS export"));
 			finish(State::Failed);
 			return;
 		}

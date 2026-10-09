@@ -23,6 +23,7 @@
  *
  */
 
+#include <QCoreApplication>
 #include <iostream>
 
 #include "lmmsconfig.h"
@@ -221,7 +222,9 @@ public:
 
 		const auto layout = new QFormLayout{this};
 		layout->addRow(deviceLabel, m_deviceComboBox);
-		layout->addRow(tr("Channels"), m_channelSpinBox);
+		layout->addRow(
+			QCoreApplication::translate("lmms::gui::AudioPortAudioSetupWidget::DeviceSelectorWidget", "Channels"),
+			m_channelSpinBox);
 
 		connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
 			[this](int index) { refreshChannels(m_deviceComboBox->itemData(index).toInt()); });
@@ -273,15 +276,17 @@ private:
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget{AudioPortAudio::name(), parent}
 	, m_backendComboBox{new QComboBox{this}}
-	, m_inputDevice{new DeviceSelectorWidget{tr("Input device"), Direction::Input}}
-	, m_outputDevice(new DeviceSelectorWidget{tr("Output device"), Direction::Output})
+	, m_inputDevice{new DeviceSelectorWidget{
+		  QCoreApplication::translate("lmms::gui::AudioPortAudioSetupWidget", "Input device"), Direction::Input}}
+	, m_outputDevice(new DeviceSelectorWidget{
+		  QCoreApplication::translate("lmms::gui::AudioPortAudioSetupWidget", "Output device"), Direction::Output})
 {
 	constexpr auto formVerticalSpacing = 10;
 	const auto form = new QFormLayout{this};
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 	form->setVerticalSpacing(formVerticalSpacing);
 
-	form->addRow(tr("Backend"), m_backendComboBox);
+	form->addRow(QCoreApplication::translate("lmms::gui::AudioPortAudioSetupWidget", "Backend"), m_backendComboBox);
 	form->addRow(m_outputDevice);
 	form->addRow(m_inputDevice);
 

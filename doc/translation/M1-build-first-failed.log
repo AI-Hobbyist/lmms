@@ -1,0 +1,29 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  SVSClip.cpp
+  SVSExportSnapshot.cpp
+  SVSCanvas.cpp
+  SVSLyricEditor.cpp
+  SVSParameterPanel.cpp
+  SVSProjectController.cpp
+  SVSProjectImportDialog.cpp
+  SVSSettingsPage.cpp
+D:\UserData\Desktop\Project\lmms\include\NativePluginTranslation.h(78,41): error C2440: “初始化”: 无法从“QJsonValueRef”转换为“QJsonValueRef &” [D:\UserData\Desktop\Project\lmms\build\src\core\svs\lmmssvs.vcxproj]
+  (编译源文件“../../../../src/gui/editors/svs/SVSSettingsPage.cpp”)
+      D:\UserData\Desktop\Project\lmms\include\NativePluginTranslation.h(78,41):
+      非常量引用只能绑定到左值
+
+  SVSViews.cpp
+D:\UserData\Desktop\Project\lmms\include\NativePluginTranslation.h(78,41): error C2440: “初始化”: 无法从“QJsonValueRef”转换为“QJsonValueRef &” [D:\UserData\Desktop\Project\lmms\build\src\core\svs\lmmssvs.vcxproj]
+  (编译源文件“../../../../src/gui/editors/svs/SVSViews.cpp”)
+      D:\UserData\Desktop\Project\lmms\include\NativePluginTranslation.h(78,41):
+      非常量引用只能绑定到左值
+
+  正在生成代码...

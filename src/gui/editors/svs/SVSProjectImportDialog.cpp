@@ -1,7 +1,8 @@
 #include "SVSProjectImportDialog.h"
-#include "SVSModel.h"
+
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
@@ -13,6 +14,8 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <limits>
+
+#include "SVSModel.h"
 
 namespace lmms::gui {
 SVSProjectOptionsWidget::SVSProjectOptionsWidget(
@@ -49,7 +52,7 @@ SVSProjectOptionsWidget::SVSProjectOptionsWidget(
 			{
 				check->setChecked(true);
 				check->setEnabled(false);
-				label = QStringLiteral("保留原工程音高线");
+				label = QCoreApplication::translate("SVSProjectUI", "Preserve the original project pitch curve");
 			}
 		}
 		else if (value.isDouble())
@@ -86,13 +89,17 @@ SVSProjectImportDialog::SVSProjectImportDialog(const QJsonObject& format, QWidge
 	: QDialog(parent)
 {
 	setObjectName("svsProjectImportDialog");
-	setWindowTitle(QStringLiteral("导入SVS工程"));
+	setWindowTitle(QCoreApplication::translate("SVSProjectUI", "Import SVS project"));
 	resize(540, 430);
 	auto* layout = new QVBoxLayout(this);
-	auto* explanation = new QLabel(QStringLiteral("作为新工程导入。所有歌声轨均为未选定，使用正弦波试听；导入后请选择一个歌手。"), this);
+	auto* explanation = new QLabel(QCoreApplication::translate("SVSProjectUI",
+									   "Import as a new project. All singing tracks start without a selected singer "
+									   "and use sine-wave preview; select a singer after importing."),
+		this);
 	explanation->setWordWrap(true);
 	layout->addWidget(explanation);
-	auto* group = new QGroupBox(QStringLiteral("%1 输入选项").arg(format["name"].toString()), this);
+	auto* group = new QGroupBox(
+		QCoreApplication::translate("SVSProjectUI", "%1 input options").arg(format["name"].toString()), this);
 	auto* groupLayout = new QVBoxLayout(group);
 	auto* scroll = new QScrollArea(group);
 	scroll->setWidgetResizable(true);
@@ -107,12 +114,13 @@ SVSProjectImportDialog::SVSProjectImportDialog(const QJsonObject& format, QWidge
 		{
 			pitch->setCurrentIndex(pitch->findData(QStringLiteral("full")));
 			pitch->setEnabled(false);
-			pitch->setToolTip(QStringLiteral("完整保留原工程滑音和可解析颤音。"));
+			pitch->setToolTip(QCoreApplication::translate(
+				"SVSProjectUI", "Preserve the original project portamento and supported vibrato in full."));
 		}
 	}
 	m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-	m_buttons->button(QDialogButtonBox::Ok)->setText(QStringLiteral("导入"));
-	m_buttons->button(QDialogButtonBox::Cancel)->setText(QStringLiteral("取消"));
+	m_buttons->button(QDialogButtonBox::Ok)->setText(QCoreApplication::translate("SVSProjectUI", "Import"));
+	m_buttons->button(QDialogButtonBox::Cancel)->setText(QCoreApplication::translate("SVSProjectUI", "Cancel"));
 	layout->addWidget(m_buttons);
 	connect(m_buttons, &QDialogButtonBox::accepted, this, &SVSProjectImportDialog::accept);
 	connect(m_buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -127,12 +135,14 @@ SVSProjectExportDialog::SVSProjectExportDialog(const QJsonObject& format, const 
 	, m_policy(format["exportPolicy"].toObject())
 {
 	setObjectName("svsProjectExportDialog");
-	setWindowTitle(QStringLiteral("导出SVS工程"));
+	setWindowTitle(QCoreApplication::translate("SVSProjectUI", "Export SVS project"));
 	resize(560, 450);
 	auto* layout = new QVBoxLayout(this);
-	auto* explanation = new QLabel(
-		QStringLiteral("导出点击时的工程快照。无需声库或合成音频；受限格式必须选择轨道，省略内容将在下一步列出。"),
-		this);
+	auto* explanation
+		= new QLabel(QCoreApplication::translate("SVSProjectUI",
+						 "Export a snapshot taken when you click Export. No voicebank or synthesized audio is "
+						 "required. Select tracks for restricted formats; omitted content is listed in the next step."),
+			this);
 	explanation->setWordWrap(true);
 	layout->addWidget(explanation);
 	auto* form = new QFormLayout;
@@ -140,8 +150,8 @@ SVSProjectExportDialog::SVSProjectExportDialog(const QJsonObject& format, const 
 	m_audio = new QComboBox(this);
 	m_singing->setObjectName("svsProjectExportSingingTrack");
 	m_audio->setObjectName("svsProjectExportAudioTrack");
-	m_singing->addItem(QStringLiteral("请选择歌声轨…"), -1);
-	m_audio->addItem(QStringLiteral("请选择伴奏轨…"), -1);
+	m_singing->addItem(QCoreApplication::translate("SVSProjectUI", "Select a singing track…"), -1);
+	m_audio->addItem(QCoreApplication::translate("SVSProjectUI", "Select an accompaniment track…"), -1);
 	const auto tracks = project["track_list"].toArray();
 	for (int index = 0; index < tracks.size(); ++index)
 	{
@@ -153,11 +163,12 @@ SVSProjectExportDialog::SVSProjectExportDialog(const QJsonObject& format, const 
 		m_singing->setCurrentIndex(1);
 	if (m_audio->count() == 2)
 		m_audio->setCurrentIndex(1);
-	form->addRow(QStringLiteral("受限格式的歌声轨"), m_singing);
-	form->addRow(QStringLiteral("受限格式的伴奏轨"), m_audio);
+	form->addRow(QCoreApplication::translate("SVSProjectUI", "Singing track for restricted formats"), m_singing);
+	form->addRow(QCoreApplication::translate("SVSProjectUI", "Accompaniment track for restricted formats"), m_audio);
 	layout->addLayout(form);
-	auto* group = new QGroupBox(
-		QStringLiteral("%1 [%2] 输出选项").arg(format["name"].toString(), format["id"].toString()), this);
+	auto* group = new QGroupBox(QCoreApplication::translate("SVSProjectUI", "%1 [%2] output options")
+									.arg(format["name"].toString(), format["id"].toString()),
+		this);
 	auto* groupLayout = new QVBoxLayout(group);
 	auto* scroll = new QScrollArea(group);
 	scroll->setWidgetResizable(true);
@@ -170,11 +181,12 @@ SVSProjectExportDialog::SVSProjectExportDialog(const QJsonObject& format, const 
 	if (auto* index = m_options->findChild<QWidget*>("svsProjectOption_track_index"))
 	{
 		index->setEnabled(false);
-		index->setToolTip(QStringLiteral("由上方轨道选择自动设置。"));
+		index->setToolTip(
+			QCoreApplication::translate("SVSProjectUI", "Set automatically from the track selection above."));
 	}
 	m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-	m_buttons->button(QDialogButtonBox::Ok)->setText(QStringLiteral("检查并导出"));
-	m_buttons->button(QDialogButtonBox::Cancel)->setText(QStringLiteral("取消"));
+	m_buttons->button(QDialogButtonBox::Ok)->setText(QCoreApplication::translate("SVSProjectUI", "Check and export"));
+	m_buttons->button(QDialogButtonBox::Cancel)->setText(QCoreApplication::translate("SVSProjectUI", "Cancel"));
 	layout->addWidget(m_buttons);
 	connect(m_buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(m_buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);

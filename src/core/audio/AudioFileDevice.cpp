@@ -23,9 +23,11 @@
  *
  */
 
+#include "AudioFileDevice.h"
+
+#include <QCoreApplication>
 #include <QMessageBox>
 
-#include "AudioFileDevice.h"
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 
@@ -47,14 +49,15 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
 		QString title, message;
-		title = ExportProjectDialog::tr( "Could not open file" );
-		message = ExportProjectDialog::tr( "Could not open file %1 "
-						"for writing.\nPlease make "
-						"sure you have write "
-						"permission to the file and "
-						"the directory containing the "
-						"file and try again!"
-								).arg( _file );
+		title = QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Could not open file");
+		message = QCoreApplication::translate("lmms::gui::ExportProjectDialog",
+			"Could not open file %1 "
+			"for writing.\nPlease make "
+			"sure you have write "
+			"permission to the file and "
+			"the directory containing the "
+			"file and try again!")
+					  .arg(_file);
 
 		if (outputSettings.interactiveErrors() && gui::getGUI() != nullptr)
 		{

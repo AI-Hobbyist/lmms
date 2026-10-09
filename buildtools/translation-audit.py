@@ -79,11 +79,11 @@ def locations(message, extraction):
 
 def stage_for(paths, source):
     names = " ".join(paths).lower()
-    if "svc" in names:
+    if "svc" in names or re.search(r"\bSVC\b", source):
         return "M3"
     if any(token in names for token in (
         "svs", "notelabeldisplay", "jianpu", "diffsinger"
-    )) or "简谱" in source:
+    )) or re.search(r"\bSVS\b", source) or "简谱" in source or source.startswith(("Numbered notation", "Default C4; other pitches")):
         return "M2"
     if "vst" in names:
         return "M4"
@@ -138,8 +138,10 @@ def audit(extraction, output):
             "id": hashlib.sha256(json.dumps(translation_key, ensure_ascii=False)
                                  .encode()).hexdigest()[:16],
             "key": list(translation_key),
-            "stage": stage_for([item["file"] for item in source_locations],
-                               translation_key[1]),
+            "stage": ("M2" if translation_key[0] == "NativeSVS" else
+                      "M3" if translation_key[0] == "NativeRVC" else
+                      stage_for([item["file"] for item in source_locations],
+                                translation_key[1])),
             "locations": source_locations,
             "status": states,
         })
@@ -162,6 +164,9 @@ def audit(extraction, output):
         size += len(members)
     report = {
         "source_commit": git("rev-parse", "HEAD"),
+        "working_diff_sha256": hashlib.sha256(
+            git("diff", "HEAD", "--", "src", "include", "plugins").encode()
+        ).hexdigest(),
         "extraction": extraction.relative_to(ROOT).as_posix(),
         "input_count": len((output / "sources.txt").read_text(encoding="utf-8-sig")
                            .splitlines()),

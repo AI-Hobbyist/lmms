@@ -1,67 +1,73 @@
-#include <QtTest>
-#include <QScreen>
-#include <QMdiArea>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QTemporaryDir>
+#include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QDomDocument>
 #include <QFile>
+#include <QGridLayout>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QDomDocument>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMdiArea>
 #include <QMenuBar>
 #include <QProcess>
 #include <QProcessEnvironment>
-#include <QGridLayout>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QSpinBox>
 #include <QProgressBar>
-#include <QSlider>
-#include <QToolButton>
 #include <QPushButton>
-#include <QLabel>
+#include <QRadioButton>
+#include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSlider>
+#include <QSpinBox>
+#include <QTemporaryDir>
+#include <QToolButton>
+#include <QTranslator>
+#include <QtTest>
+
 #include "AudioDummy.h"
+#include "AutomationClip.h"
+#include "AutomationEditor.h"
+#include "AutomationTrack.h"
 #include "ConfigManager.h"
+#include "Controller.h"
+#include "ControllerRackView.h"
+#include "DummyEffect.h"
+#include "Effect.h"
+#include "EffectControlDialog.h"
+#include "EffectControls.h"
+#include "ExportProjectDialog.h"
 #include "GuiApplication.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
+#include "InstrumentTrackWindow.h"
+#include "LedCheckBox.h"
 #include "MainWindow.h"
-#include "Song.h"
-#include "SongEditor.h"
+#include "MidiClip.h"
+#include "Mixer.h"
+#include "MixerView.h"
+#include "NativePluginTranslation.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
-#include "InstrumentTrack.h"
-#include "Instrument.h"
-#include "InstrumentTrackView.h"
-#include "InstrumentTrackWindow.h"
-#include "MidiClip.h"
-#include "SampleTrack.h"
-#include "SampleClip.h"
-#include "AutomationTrack.h"
-#include "AutomationClip.h"
 #include "PianoRoll.h"
-#include "AutomationEditor.h"
-#include "SVSTrack.h"
-#include "SVSClip.h"
-#include "SVSViews.h"
-#include "SVSCanvas.h"
-#include "SetupDialog.h"
-#include "ExportProjectDialog.h"
-#include "Mixer.h"
-#include "MixerView.h"
-#include "Effect.h"
-#include "DummyEffect.h"
-#include "EffectControls.h"
-#include "EffectControlDialog.h"
-#include "Controller.h"
-#include "ControllerRackView.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
+#include "SVSCanvas.h"
+#include "SVSClip.h"
+#include "SVSParameterPanel.h"
+#include "SVSProjectImportDialog.h"
+#include "SVSTrack.h"
+#include "SVSViews.h"
+#include "SampleClip.h"
+#include "SampleTrack.h"
+#include "SetupDialog.h"
+#include "Song.h"
+#include "SongEditor.h"
 #include "SubWindow.h"
 #include "TabWidget.h"
-#include "LedCheckBox.h"
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -140,6 +146,71 @@ private slots:
 		QFile metadata(m_output + "/environment.json");
 		QVERIFY(metadata.open(QIODevice::WriteOnly));
 		metadata.write(QJsonDocument(environment).toJson());
+	}
+	void translationEntryPoints()
+	{
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		const QStringList languages{"zh_CN", "ja", "en", "ko"};
+		for (const auto& language : languages)
+		{
+			QTranslator translator;
+			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
+			QCoreApplication::installTranslator(&translator);
+			const auto gain = QCoreApplication::translate("NativeSVS", "Gain");
+			const auto mixed = QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Mixed");
+			if (language != "en")
+			{
+				QVERIFY(gain != "Gain");
+				QVERIFY(mixed != "Mixed");
+			}
+			svs::Parameter parameter;
+			parameter.id = "example.gain";
+			parameter.name = "Gain";
+			parameter.scope = "track";
+			parameter.type = "float";
+			parameter.minimum = 0;
+			parameter.maximum = 2;
+			parameter.defaultValue = 1;
+			const auto original = QVector<svs::Parameter>{parameter};
+			const auto display = nativeTranslation::svsParameters("org.lmms.svs.example", original);
+			QCOMPARE(display.first().id, parameter.id);
+			QCOMPARE(original.first().name, QString("Gain"));
+			QCOMPARE(display.first().name, gain);
+			QCOMPARE(nativeTranslation::svsParameters("third.party", original).first().name, QString("Gain"));
+			QCOMPARE(nativeTranslation::svsText("org.lmms.svs.diffsinger", "Custom singer"), QString("Custom singer"));
+			QCOMPARE(nativeTranslation::rvcText("third.party", "pitch_shift"), QString("pitch_shift"));
+			const auto pitchShift = nativeTranslation::rvcText("RVC", "pitch_shift");
+			QCOMPARE(pitchShift, QCoreApplication::translate("NativeRVC", "Pitch shift"));
+			QVERIFY(pitchShift != "pitch_shift");
+			QWidget window;
+			window.setWindowTitle("LMMS translation entries — " + language);
+			auto* layout = new QVBoxLayout(&window);
+			auto* panel = new SVSParameterPanel(&window);
+			layout->addWidget(panel);
+			panel->refresh(display, "track", {{{parameter.id, 1}}, {{parameter.id, 2}}}, {}, {});
+			QCOMPARE(panel->findChild<QLabel*>("parameterLabel")->text(), gain);
+			QCOMPARE(panel->findChild<QDoubleSpinBox*>()->toolTip(), mixed);
+			layout->addWidget(new QLabel(pitchShift, &window));
+			layout->addWidget(new QLabel(QCoreApplication::translate("SVSProjectUI", "Import SVS project"), &window));
+			window.resize(560, 220);
+			capture(&window, "M1-entries-" + language);
+			QCOMPARE(window.devicePixelRatioF(), 1.0);
+			window.close();
+			ExportProjectDialog exportDialog(
+				m_config.filePath("translation.wav"), ExportProjectDialog::Mode::ExportProject);
+			QCOMPARE(exportDialog.windowTitle(),
+				QCoreApplication::translate("lmms::gui::ExportProjectDialog", "Export project"));
+			bool foundWaveFormat = false;
+			for (const auto* combo : exportDialog.findChildren<QComboBox*>())
+			{
+				foundWaveFormat |= combo->findText(QCoreApplication::translate("ProjectRenderer", "WAV (*.wav)")) >= 0;
+			}
+			QVERIFY(foundWaveFormat);
+			capture(&exportDialog, "M1-export-" + language);
+			exportDialog.close();
+			QCoreApplication::removeTranslator(&translator);
+		}
 	}
 	void scenes()
 	{

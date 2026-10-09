@@ -1,15 +1,17 @@
 #include "SVSParameterPanel.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QDoubleSpinBox>
+
+#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
+#include <QDoubleSpinBox>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QFileDialog>
 #include <QSet>
-#include <QApplication>
+#include <QVBoxLayout>
 #include <algorithm>
 
 namespace lmms::gui {
@@ -123,9 +125,11 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input, const QStr
 		if (editing)
 			continue;
 		const auto value = row.value.state == svs::ValueState::Common ? row.value.value : descriptor.defaultValue;
-		const auto stateText = row.value.state == svs::ValueState::Mixed ? tr("Mixed")
-			: row.value.state == svs::ValueState::Unset					 ? tr("Unset")
-																		 : QString{};
+		const auto stateText = row.value.state == svs::ValueState::Mixed
+			? QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Mixed")
+			: row.value.state == svs::ValueState::Unset
+			? QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Unset")
+			: QString{};
 		if (descriptor.type == "directory-list")
 		{
 			auto* paths = static_cast<QVBoxLayout*>(row.editor->layout());
@@ -157,19 +161,22 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input, const QStr
 						path->setModified(false);
 					}
 				});
-				auto* browse = new QPushButton(tr("Browse…"), body);
+				auto* browse
+					= new QPushButton(QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Browse…"), body);
 				browse->setObjectName("svsDirectoryBrowse");
 				line->addWidget(browse);
 				connect(browse, &QPushButton::clicked, this, [this, path, change] {
-					const auto directory
-						= QFileDialog::getExistingDirectory(this, tr("Voicebank directory"), path->text());
+					const auto directory = QFileDialog::getExistingDirectory(this,
+						QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Voicebank directory"),
+						path->text());
 					if (!directory.isEmpty())
 					{
 						path->setText(directory);
 						change(directory);
 					}
 				});
-				auto* remove = new QPushButton(tr("Remove"), body);
+				auto* remove
+					= new QPushButton(QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Remove"), body);
 				remove->setObjectName("svsDirectoryRemove");
 				line->addWidget(remove);
 				connect(remove, &QPushButton::clicked, this, [this, id, index, remove] {
@@ -183,7 +190,8 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input, const QStr
 				});
 				paths->addWidget(body);
 			}
-			auto* add = new QPushButton(tr("Add directory"), row.editor);
+			auto* add = new QPushButton(
+				QCoreApplication::translate("lmms::gui::SVSParameterPanel", "Add directory"), row.editor);
 			add->setObjectName("svsDirectoryAdd");
 			add->setEnabled(values.size() < descriptor.maxItems);
 			paths->addWidget(add);
@@ -201,7 +209,10 @@ void SVSParameterPanel::refresh(const QVector<svs::Parameter>& input, const QStr
 			editor->setDecimals(descriptor.type == "int" ? 0 : 6);
 			editor->setSuffix(descriptor.unit.isEmpty() ? QString{} : " " + descriptor.unit);
 			editor->setValue(value.toDouble());
-			editor->setToolTip(stateText + (descriptor.scale == "log" ? tr("; logarithmic scale") : QString{}));
+			editor->setToolTip(stateText
+				+ (descriptor.scale == "log"
+						? QCoreApplication::translate("lmms::gui::SVSParameterPanel", "; logarithmic scale")
+						: QString{}));
 			if (row.value.state != svs::ValueState::Common)
 				if (auto* line = editor->findChild<QLineEdit*>())
 				{
