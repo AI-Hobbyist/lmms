@@ -23,6 +23,14 @@ if (Test-Path -LiteralPath $zipPath) {
     throw "Package already exists: $zipPath"
 }
 $payload = @{}
+$removedSvs = @(
+    'svs/SVSExample/SVSExample.dll',
+    'svs/SVSExample/manifest.json',
+    'svs/SVSComputeExample/SVSComputeExample.dll',
+    'svs/SVSComputeExample/manifest.json',
+    'svs/SVSMinimal/SVSMinimal.dll',
+    'svs/SVSMinimal/manifest.json'
+)
 foreach ($file in Get-ChildItem -LiteralPath $runtime -File) {
     if ($file.Name -match '^(concrt140d|msvcp140(_[12])?d(_.*)?|vcruntime140(_1)?d|ucrtbased)\.dll$') {
         continue
@@ -38,17 +46,10 @@ foreach ($path in Get-Content -LiteralPath (Join-Path $project 'build/install_ma
         throw 'Installation manifest points outside the existing runtime.'
     }
     $relative = $full.Substring($runtime.Length + 1).Replace('\', '/')
-    if ($relative -match '^(data|svs)/') {
+    if ($relative -match '^(data|svs)/' -and $relative -notin $removedSvs) {
         $payload[$relative] = $full
     }
 }
-# The SVS example is built directly into the runtime; its DLL may be absent
-# from the top-level install manifest when the nested target is excluded.
-$svsExampleDll = Join-Path $runtime 'svs/SVSExample/SVSExample.dll'
-if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) {
-    throw 'Deployed SVS example DLL missing.'
-}
-$payload['svs/SVSExample/SVSExample.dll'] = $svsExampleDll
 $sharedVocoderReadme = Join-Path $runtime 'svs/vocoders/README.md'
 if (-not (Test-Path -LiteralPath $sharedVocoderReadme -PathType Leaf)) {
     throw 'Default shared vocoder directory instructions missing.'
@@ -133,7 +134,7 @@ foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', '
         throw "Incomplete runtime: $required"
     }
 }
-foreach ($required in @('svs/SVSExample/SVSExample.dll', 'svs/SVSExample/manifest.json', 'svs/SVSExample/avatar.svg', 'svs/SVSExample/portrait.svg', 'data/themes/default/svs_track.svg')) {
+foreach ($required in @('data/themes/default/svs_track.svg')) {
     if (-not $payload.ContainsKey($required)) {
         throw "Incomplete SVS runtime: $required"
     }
@@ -153,7 +154,7 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
         }
         [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
     })
-$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records }
+$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records; RemoveFiles = $removedSvs }
 if ($BaseManifest) {
     $base = Get-Content -LiteralPath $BaseManifest -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($base.Format -ne 1 -or $base.PackageKind -eq 'Incremental' -or -not $base.Files.Count) {
@@ -163,10 +164,12 @@ if ($BaseManifest) {
     foreach ($entry in $base.Files) {
         if ($baseline.ContainsKey($entry.Path)) { throw "Duplicate baseline path: $($entry.Path)" }
         $baseline[$entry.Path] = $entry
-        if (-not $payload.ContainsKey($entry.Path)) { throw "File removal requires a full package: $($entry.Path)" }
+        if (-not $payload.ContainsKey($entry.Path) -and $entry.Path -notin $removedSvs) {
+            throw "Unapproved file removal: $($entry.Path)"
+        }
     }
     $records = @($records | Where-Object { -not $baseline.ContainsKey($_.Path) -or $_.SHA256 -ne $baseline[$_.Path].SHA256 })
-    if (-not $records.Count) { throw 'No runtime changes relative to the full package.' }
+    if (-not $records.Count -and -not $removedSvs.Count) { throw 'No runtime changes relative to the full package.' }
     $manifest.Files = $records
     $manifest.PackageKind = 'Incremental'
     $manifest.BasePackage = [IO.Path]::GetFileName($BaseManifest).Replace('.manifest.json', '')
@@ -190,8 +193,9 @@ LMMS 增强分支全量替换包（Windows x64）
 若现有配置指向自定义主题目录，新默认主题可能不会自动生效；本轮未新增经典/现代切换入口。
 
 本包为完整运行文件，并非差分包：主程序、52 个启用 UI 插件、3 个导入导出插件、
-支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与 SVS 示例。
+支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与可用 DiffSinger 引擎。
 包含原生 DiffSinger CPU/DirectML 完整依赖文件夹、共享计算 worker 与许可；SVS 全局选择实际设备，按阶段显示执行后端。模型内存管理默认空闲 60 秒释放，也可立即释放或常驻；CPU/GPU 通用。SDK 保持旧 ABI 兼容。
+安装器从可加载路径移除 SVSExample、SVSComputeExample、SVSMinimal 的示例 DLL 及扫描 manifest（保留 .disabled 备份）；仓库与独立 SDK 示例代码保留作参考。
 包含官方默认工程模板：TripleOscillator、Sample track、Pattern 0、Automation track；Pattern Editor 包含 Kicker。
 包含 SVS 工程导入导出菜单、隔离 CPython/LibreSVIP 运行时和第三方许可文本；有损格式会在写入前具名提示。
 用户 templates/default.mpt 优先于官方模板。如果此前自行设置了空白模板，请先备份并停用该覆盖文件，再新建工程。
@@ -224,9 +228,11 @@ LMMS 增量覆盖包（Windows x64）
 2. 解压本包，双击 Install-Replace.cmd，选择包含 lmms.exe 的原安装目录。
    Program Files 目录需要以管理员身份运行。
 3. 安装器校验基包未变更文件及增量文件 SHA256，仅覆盖本包列出的文件。
-   原有插件、运行库、个人配置、工程和声库保持原位。
+   从可加载路径移除 SVSExample、SVSComputeExample、SVSMinimal 的示例 DLL 及扫描 manifest（保留 .disabled 备份）。
+   可用引擎、运行库、个人配置、工程和声库保持原位。
 
-包含 SVS 导入/导出文件对话框的“所有支持格式”默认筛选及按扩展名识别。
+包含原生 DiffSinger CPU/DirectML、共享计算依赖和许可、全局模型内存管理（默认空闲 60 秒，可立即释放或常驻）。
+示例引擎代码保留于仓库和独立 SDK；DAW 只部署可用引擎与必要运行库。
 此前已安装此增量时也可再次运行；校验失败时应重新安装全量基包。
 工作区变更：__WORKTREE_STATUS__
 包来自当前工作区构建；存在上述修改时，不称纯提交重建。

@@ -1,0 +1,6 @@
+Exception: D:\UserData\Desktop\Project\lmms\build\packages\B4-IncrementalInstaller.ps1:80
+Line |
+  80 |              throw "Invalid or duplicate example removal: $relative"
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Invalid or duplicate example removal: svs/SVSDiffSinger/SVSDiffSinger.dll
+PASS: unapproved production engine removal rejected; engine hash unchanged.

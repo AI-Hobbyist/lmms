@@ -61,10 +61,26 @@ try {
     if (-not [Environment]::Is64BitOperatingSystem) {
         throw 'This package requires 64-bit Windows.'
     }
-    if ($manifest.Format -ne 1 -or $manifest.Files.Count -lt 1) {
+    $cleanupOnly = $manifest.PackageKind -eq 'Incremental' -and $manifest.RemoveFiles
+    if ($manifest.Format -ne 1 -or ($manifest.Files.Count -lt 1 -and -not $cleanupOnly)) {
         throw 'Unsupported or empty replacement manifest.'
     }
     $names = @{}
+    $removals = @{}
+    $allowedRemovals = @(
+        'svs/SVSExample/SVSExample.dll',
+        'svs/SVSExample/manifest.json',
+        'svs/SVSComputeExample/SVSComputeExample.dll',
+        'svs/SVSComputeExample/manifest.json',
+        'svs/SVSMinimal/SVSMinimal.dll',
+        'svs/SVSMinimal/manifest.json'
+    )
+    foreach ($relative in $manifest.RemoveFiles) {
+        if ($relative -notin $allowedRemovals -or $removals.ContainsKey($relative)) {
+            throw "Invalid or duplicate example removal: $relative"
+        }
+        $removals[$relative] = $true
+    }
     $incremental = $manifest.PackageKind -eq 'Incremental'
     if ($incremental -and (-not $manifest.BaseFiles.Count -or -not $manifest.BasePackage)) {
         throw 'Incremental package baseline missing.'
@@ -73,6 +89,9 @@ try {
         $name = [string]$file.Path
         if ($names.ContainsKey($name)) {
             throw "Duplicate file: $name"
+        }
+        if ($removals.ContainsKey($name)) {
+            throw "Payload conflicts with removal: $name"
         }
         $names[$name] = $true
         if ($name -match '(^|/)(portable_mode\.txt|\.lmmsrc.*|lmms-workspace)(/|$)') {
@@ -118,13 +137,16 @@ try {
     foreach ($file in $manifest.Files) {
         $null = Get-ContainedPath $target $file.Path
     }
+    foreach ($relative in $removals.Keys) {
+        $null = Get-ContainedPath $target $relative
+    }
     if ($incremental) {
         $baselineNames = @{}
         foreach ($file in $manifest.BaseFiles) {
             if ($baselineNames.ContainsKey($file.Path)) { throw "Duplicate baseline file: $($file.Path)" }
             $baselineNames[$file.Path] = $true
             $path = Get-ContainedPath $target $file.Path
-            if ($names.ContainsKey($file.Path)) { continue }
+            if ($names.ContainsKey($file.Path) -or $removals.ContainsKey($file.Path)) { continue }
             if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
                 (Get-Item -LiteralPath $path).Length -ne $file.Bytes -or
                 (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $file.SHA256) {
@@ -136,7 +158,8 @@ try {
         }
     }
     if ($VerifyOnly) {
-        Write-Output "Verified $($manifest.Files.Count) payload files and installation paths. No changes made."; exit 0
+        Write-Output "Verified $($manifest.Files.Count) payload files, $($removals.Count) permitted example removals and installation paths. No changes made."
+        exit 0
     }
     foreach ($process in @(Get-Process -Name lmms -ErrorAction SilentlyContinue)) {
         if (-not $process.Path -or $process.Path.StartsWith($target + '\', [StringComparison]::OrdinalIgnoreCase)) {
@@ -190,7 +213,21 @@ try {
             throw "Installed SHA256 mismatch: $($file.Path)"
         }
     }
-    Write-Output "Replaced and verified $($manifest.Files.Count) files in $target. Personal configuration and projects were preserved."
+    foreach ($relative in $removals.Keys) {
+        $path = Get-ContainedPath $target $relative
+        if (Test-Path -LiteralPath $path -PathType Leaf) {
+            $retired = $path + '.disabled'
+            if (Test-Path -LiteralPath $retired) {
+                $retired += '.' + [Guid]::NewGuid().ToString('N')
+            }
+            Move-Item -LiteralPath $path -Destination $retired
+            Write-Output "Removed from loadable paths: $relative (retained as disabled backup)"
+        }
+        if (Test-Path -LiteralPath $path) {
+            throw "Example removal failed: $relative"
+        }
+    }
+    Write-Output "Replaced and verified $($manifest.Files.Count) files in $target; $($removals.Count) example paths absent. Personal configuration and projects were preserved."
 }
 finally {
     if ($archive) {

@@ -237,7 +237,7 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | B1 | PASS | 原生共享客户端/独立 worker/SDK RAII；六包 CPU 全链、第二 AI 插件、两 GPU LUID/DML 节点、取消/缺库/崩溃 epoch、旧 ABI 通过，见 B1 验收 | 非 Windows 运行未在本机验证 |
 | B2 | PASS | 全局策略/有效缓存身份；第二 AI 实际 DML clip/导出、Apply/Cancel/重启、缺设备/旧结果门禁和传统回归；原生主题设置实窗通过，见 B2 验收 | — |
 | B3 | PASS | 六包 48 模型 DML/CPU 数值与反馈对照、六包 CPU 回归、两 GPU 实际链、CPU 约束/一次回退/取消/并发预算、有效阶段缓存通过，见 B3 验收 | 听感 MANUAL/PENDING |
-| B4 | IN PROGRESS | 独立 SDK/共享运行库安装、完整回归与 Release 实窗验收进行中；包含用户追加的通用模型内存管理 | 听感/体验 MANUAL/PENDING |
+| B4 | PASS | 独立 SDK/共享运行库安装、完整回归与 Release 实窗验收通过；包含用户追加的通用模型内存管理，见 B4 验收 | 听感/体验 MANUAL/PENDING |
 
 计划编制交付检查已在 `05cd61c5f` 完成。本轮授权仅顺序实施 A0～A4，各阶段分别提交推送；B 保持未开始。
 
@@ -280,6 +280,8 @@ B4 必需自动验收已通过，详见 [B4 验收](doc/svs/DiffSinger-B4-valida
 | B1 | 已提交推送 `d65e271ac` |
 | B2 | 已提交推送 `3bb156fee` |
 | B3 | 已提交推送 `d37677308` |
-| B4 | 自动验收完成；本记录所属检查点提交推送后完成 B0～B4 |
+| B4 | 已提交推送 `027ea2e8e` |
 
 用户后续交付要求：B4 检查点完成后，删除 DAW 部署中的 SVS 示例 DLL，仅保留可用引擎及计算依赖；参考代码保留。生成基于已有全量替换包的增量包，安装器同步清理对应示例 DLL/扫描 manifest，另行记录并提交推送交付检查点。
+
+后续交付验收：示例二进制及扫描 manifest 已移出 DAW，参考代码保留。基于 `lmms-enhanced-full-236c5f3fe-win64.zip` 的最终增量包、旧基包兼容性、原位安装/安装后哈希、正式引擎误清理拒绝、生产 Release 实窗通过，详见 [生产增量交付记录](doc/svs/SVS-production-incremental-delivery.md)。本记录所属交付检查点另行提交推送。

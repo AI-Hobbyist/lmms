@@ -1,0 +1,5 @@
+Removed from loadable paths: svs/SVSExample/manifest.json (retained as disabled backup)
+Removed from loadable paths: svs/SVSComputeExample/manifest.json (retained as disabled backup)
+Removed from loadable paths: svs/SVSComputeExample/SVSComputeExample.dll (retained as disabled backup)
+Removed from loadable paths: svs/SVSExample/SVSExample.dll (retained as disabled backup)
+Replaced and verified 3425 files in D:\UserData\Desktop\Project\lmms\build\Release; 6 example paths absent. Personal configuration and projects were preserved.

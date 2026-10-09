@@ -70,3 +70,5 @@ SDK ZIP 按每个 entry 的 SHA256 对照源文件验证：
 主观听感/操作体验：MANUAL/PENDING。非 Windows 实机运行未在本机验证；不将 Windows CPU/DML 验收外推为其他平台实测。
 
 用户后续授权（2026-10-09）：本阶段检查点提交推送后，移除 DAW 部署中的 SVS 示例 DLL，保留 SDK/仓库参考代码，再交付增量替换包。该交付另作检查点，不改变本阶段已执行的旧 ABI/第二 AI 验收证据。原有 Carla/JACK 环境提示不属于 B 阶段改造范围，日志保留，未为此修改对应模块。
+
+B4 检查点已提交推送 `027ea2e8e`。后续生产清理及增量包验收见 [增量交付记录](SVS-production-incremental-delivery.md)；用户最终替换包采用该记录中的增量 ZIP，上述全量包保留为 B4 检查点历史证据。
