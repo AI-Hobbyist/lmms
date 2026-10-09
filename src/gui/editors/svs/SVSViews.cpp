@@ -16,6 +16,9 @@
 #include "embed.h"
 #include "Engine.h"
 #include "Song.h"
+#include "SongEditor.h"
+#include "TimeLineWidget.h"
+#include "Timeline.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
@@ -778,6 +781,63 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		[canvas](int value) { canvas->setScroll(value / 100., canvas->topPitch()); });
 	connect(vertical, &QScrollBar::valueChanged, this,
 		[canvas](int value) { canvas->setScroll(canvas->scrollTick(), 127 - value / 100.); });
+	auto* followTimeline = new QToolButton(this);
+	followTimeline->setObjectName("svsFollowSongTimeline");
+	followTimeline->setCheckable(true);
+	followTimeline->setChecked(clip->editorState()["followSongTimeline"].toBool(true));
+	iconButton(followTimeline, "autoscroll_stepped_on", tr("随 Song Editor 滚动"));
+	followTimeline->setToolTip(tr("随 Song Editor 时间轴自动滚动，沿用主编辑器的滚动模式；到达片段边界后停止"));
+	toolbar->insertWidget(2, followTimeline);
+	connect(followTimeline, &QToolButton::toggled, this, [clip](bool enabled) {
+		auto state = clip->editorState();
+		state["followSongTimeline"] = enabled;
+		clip->setEditorState(state);
+	});
+	auto followPosition = [this, target = QPointer<SVSClip>(clip), canvas, followTimeline] {
+		auto* song = Engine::getSong();
+		if (!target || !isVisible() || !followTimeline->isChecked() || !song->isPlaying()
+			|| song->playMode() != Song::PlayMode::Song)
+		{
+			return;
+		}
+		auto mode = TimeLineWidget::defaultAutoScrollState();
+		if (auto* gui = getGUI(); gui && gui->songEditor())
+		{
+			mode = gui->songEditor()->m_editor->timeLine()->autoScroll();
+		}
+		if (mode == TimeLineWidget::AutoScrollState::Disabled)
+		{
+			return;
+		}
+		const double localTick = song->getTimeline(Song::PlayMode::Song).ticks() - double(int(target->startPosition()))
+			- double(int(target->startTimeOffset()));
+		const double visibleTicks = canvas->tickAt(canvas->width()) - canvas->scrollTick();
+		if (visibleTicks <= 0)
+		{
+			return;
+		}
+		double contentEnd = int(target->length()) - int(target->startTimeOffset());
+		for (const auto& note : target->notes())
+		{
+			contentEnd = std::max(contentEnd, note.tick + note.duration);
+		}
+		double next = canvas->scrollTick();
+		if (mode == TimeLineWidget::AutoScrollState::Continuous)
+		{
+			next = localTick - visibleTicks / 2;
+		}
+		else if (localTick < next || localTick >= next + visibleTicks)
+		{
+			next = localTick;
+		}
+		next = std::clamp(next, 0., std::max(0., contentEnd - visibleTicks));
+		if (next != canvas->scrollTick())
+		{
+			canvas->setScroll(next, canvas->topPitch());
+		}
+	};
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, followPosition);
+	connect(followTimeline, &QToolButton::toggled, this, followPosition);
 	auto* tools = new QButtonGroup(this);
 	canvas->batchLyricsRequested = [this, clip, canvas] {
 		auto* dialog = new SVSLyricEditor(clip, canvas->selectedNotes(), this);

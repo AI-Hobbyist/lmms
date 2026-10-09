@@ -108,6 +108,9 @@
 #include "SampleFrame.h"
 #include "SetupDialog.h"
 #include "Song.h"
+#include "SongEditor.h"
+#include "TimeLineWidget.h"
+#include "Timeline.h"
 #include "SubWindow.h"
 #include "svs.hpp"
 using namespace lmms;
@@ -194,6 +197,102 @@ private slots:
 		}
 		else
 			Engine::destroy();
+	}
+	void svsFollowSongTimelineNative()
+	{
+		QVERIFY(m_guiApplication);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		auto* song = Engine::getSong();
+		song->clearProject();
+		auto* mainTimeline = m_guiApplication->songEditor()->m_editor->timeLine();
+		const auto originalMode = mainTimeline->autoScroll();
+		const auto cleanup = qScopeGuard([&] {
+			song->stop();
+			mainTimeline->setAutoScroll(originalMode);
+			song->clearProject();
+		});
+		auto* track = new SVSTrack(song);
+		track->setMuted(true);
+		auto* clip = static_cast<SVSClip*>(track->createClip(384));
+		clip->setAutoResize(false);
+		clip->changeLength(3072);
+		clip->setStartTimeOffset(-24);
+		svs::Note note;
+		note.id = "follow-timeline";
+		note.lyric = QStringLiteral("跟随时间轴");
+		note.tick = 24;
+		note.duration = 3072;
+		clip->setNotes({note});
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1200, 700);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* follow = editor.findChild<QToolButton*>("svsFollowSongTimeline");
+		gui::SVSCanvas* canvas = nullptr;
+		for (auto* area : editor.findChildren<gui::SVSCanvas*>())
+		{
+			if (!area->isParameterLane())
+			{
+				canvas = area;
+			}
+		}
+		QVERIFY(follow && canvas);
+		QVERIFY(follow->isChecked());
+		QTest::qWait(600);
+		const double visible = canvas->tickAt(canvas->width()) - canvas->scrollTick();
+		const double maximum = 3096 - visible;
+		QVERIFY(maximum > visible);
+		const int origin = 384 - 24;
+		auto& timeline = song->getTimeline(Song::PlayMode::Song);
+		song->playSong();
+		mainTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
+		timeline.setTicks(origin + 1000);
+
+		QTRY_VERIFY(std::abs(canvas->scrollTick() - (1000 - visible / 2)) < .01);
+		QCOMPARE(editor.findChild<QScrollBar*>("svsHorizontalScroll")->value(), int(canvas->scrollTick() * 100));
+		// Both canvases share the same content origin after automatic scrolling.
+		for (auto* area : editor.findChildren<gui::SVSCanvas*>())
+		{
+			QCOMPARE(area->scrollTick(), canvas->scrollTick());
+		}
+		QTest::mouseClick(follow, Qt::LeftButton);
+		const double frozen = canvas->scrollTick();
+		timeline.setTicks(origin + 2000);
+		QCOMPARE(canvas->scrollTick(), frozen);
+		QVERIFY(!clip->editorState()["followSongTimeline"].toBool(true));
+		QTest::mouseClick(follow, Qt::LeftButton);
+		QTRY_VERIFY(std::abs(canvas->scrollTick() - (2000 - visible / 2)) < .01);
+		mainTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Disabled);
+		const double disabled = canvas->scrollTick();
+		timeline.setTicks(origin + 2400);
+		QCOMPARE(canvas->scrollTick(), disabled);
+		QVERIFY(follow->isChecked());
+		mainTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Stepped);
+		canvas->setScroll(0, canvas->topPitch());
+		timeline.setTicks(origin + int(visible / 2));
+		QCOMPARE(canvas->scrollTick(), 0.);
+		timeline.setTicks(origin + int(std::ceil(visible)) + 20);
+		QCOMPARE(canvas->scrollTick(), double(int(std::ceil(visible)) + 20));
+		timeline.setTicks(origin + 10000);
+		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
+		timeline.setTicks(origin + 20000);
+		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
+		timeline.setTicks(0);
+		QCOMPARE(canvas->scrollTick(), 0.);
+		mainTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
+		timeline.setTicks(origin + 10000);
+		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
+		QTest::qWait(700);
+		QVERIFY(
+			editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-follow-song-timeline-native.png"));
+		song->stop();
+		const double stopped = canvas->scrollTick();
+		timeline.setTicks(origin + 1500);
+		QCOMPARE(canvas->scrollTick(), stopped);
+		follow->setChecked(false);
+		editor.close();
+		gui::SVSPianoRoll reopened(clip);
+		QVERIFY(!reopened.findChild<QToolButton*>("svsFollowSongTimeline")->isChecked());
 	}
 	void unselectedSingerPreview()
 	{
