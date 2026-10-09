@@ -72,14 +72,24 @@ namespace lmms
 class VestigeCatalogFeatures final : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VestigeCatalogFeatures() : SubPluginFeatures(Plugin::Type::Instrument) { }
+	VestigeCatalogFeatures()
+		: SubPluginFeatures(Plugin::Type::Instrument)
+	{
+	}
 	void listSubPluginKeys(const Plugin::Descriptor* descriptor, KeyList& keys) const override
 	{
 #ifdef LMMS_BUILD_WIN32
 		if (const auto* jobs = Engine::vstCatalog())
-		{ if (const auto report = jobs->snapshot().report)
-			{ for (const auto& entry : report->entries)
-				{ if (vsthost::isVstInstrument(entry)) { keys.push_back(vsthost::vstCatalogKey(descriptor, entry)); } }
+		{
+			if (const auto report = jobs->snapshot().report)
+			{
+				for (const auto& entry : report->entries)
+				{
+					if (vsthost::isVstInstrument(entry))
+					{
+						keys.push_back(vsthost::vstCatalogKey(descriptor, entry));
+					}
+				}
 			}
 		}
 #endif
@@ -151,7 +161,8 @@ public:
 	void createUI( QWidget *parent ) override
 	{
 		Q_UNUSED(parent);
-		if (!hasEditor() || !gui::getGUI() || embedMethod() == "headless") {
+		if (!hasEditor() || !gui::getGUI() || embedMethod() == "headless")
+		{
 			return;
 		}
 		if ( embedMethod() != "none" ) {
@@ -224,25 +235,34 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 	bool validId = true;
 	const auto shellId = _this.hasAttribute("shellid") ? _this.attribute("shellid").toUInt(&validId) : 0;
 	if (!validId || (_this.hasAttribute("shellid") && !shellId))
-	{ collectErrorForUI(tr("Invalid VST2 shell identity.")); return; }
+	{
+		collectErrorForUI(tr("Invalid VST2 shell identity."));
+		return;
+	}
 	vsthost::CatalogEntry selected;
 	const bool native = _this.attribute("format") == "vst3";
 	if (native)
 	{
 		const auto cid = _this.attribute("classid");
 		const auto architecture = _this.attribute("architecture");
-		if (!QRegularExpression("^[0-9A-Fa-f]{32}$").match(cid).hasMatch() ||
-			(architecture != "32" && architecture != "64") || shellId)
-		{ collectErrorForUI(tr("Invalid VST3 class identity or architecture.")); return; }
+		if (!QRegularExpression("^[0-9A-Fa-f]{32}$").match(cid).hasMatch()
+			|| (architecture != "32" && architecture != "64") || shellId)
+		{
+			collectErrorForUI(tr("Invalid VST3 class identity or architecture."));
+			return;
+		}
 		const auto raw = QByteArray::fromHex(cid.toLatin1());
 		std::memcpy(selected.identity.cid.data(), raw.constData(), 16);
 		selected.identity.architecture = architecture == "32" ? vsthost::Architecture::X86 : vsthost::Architecture::X64;
 		selected.name = _this.attribute("pluginname");
 		selected.vendor = _this.attribute("vendor");
 		QByteArray fingerprint;
-		if (_this.hasAttribute("fingerprint") &&
-			!vsthost::decodeCatalogFingerprint(_this.attribute("fingerprint"), fingerprint))
-		{ collectErrorForUI(tr("Invalid VST3 module fingerprint.")); return; }
+		if (_this.hasAttribute("fingerprint")
+			&& !vsthost::decodeCatalogFingerprint(_this.attribute("fingerprint"), fingerprint))
+		{
+			collectErrorForUI(tr("Invalid VST3 module fingerprint."));
+			return;
+		}
 		selected.locator = {plugin, _this.attribute("binarypath"), _this.attribute("version"), fingerprint};
 	}
 	loadFile(plugin, shellId, native ? &selected : nullptr);
@@ -295,7 +315,9 @@ QMap<QString, AutomatableModel*> VestigeInstrument::parameterModels()
 	if (m_plugin && knobFModel != nullptr)
 	{
 		for (int i = 0; i < paramCount; ++i)
-		{ models.insert(m_plugin->parameterStateKey(i), knobFModel[i]); }
+		{
+			models.insert(m_plugin->parameterStateKey(i), knobFModel[i]);
+		}
 	}
 	return models;
 }
@@ -409,46 +431,79 @@ void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId, co
 		{
 			for (const auto& entry : report->entries)
 			{
-				if (entry.identity.format == vsthost::Format::Vst3 &&
-					vsthost::scanPathKey(PathUtil::toAbsolute(entry.locator.modulePath)) ==
-					vsthost::scanPathKey(PathUtil::toAbsolute(_file)))
-				{ candidates.push_back(entry); }
+				if (entry.identity.format == vsthost::Format::Vst3
+					&& vsthost::scanPathKey(PathUtil::toAbsolute(entry.locator.modulePath))
+						== vsthost::scanPathKey(PathUtil::toAbsolute(_file)))
+				{
+					candidates.push_back(entry);
+				}
 			}
 		}
 		if (candidates.empty())
-		{ collectErrorForUI(tr("Scan the VST3 module before selecting its class: %1").arg(_file)); return; }
+		{
+			collectErrorForUI(tr("Scan the VST3 module before selecting its class: %1").arg(_file));
+			return;
+		}
 		if (candidates.size() > 1)
 		{
 			if (!gui::getGUI())
-			{ collectErrorForUI(tr("VST3 module requires a saved ClassID and architecture selection.")); return; }
+			{
+				collectErrorForUI(tr("VST3 module requires a saved ClassID and architecture selection."));
+				return;
+			}
 			QStringList names;
 			for (const auto& entry : candidates)
-			{ names.append(entry.name + " [" + entry.identity.key() + "]"); }
+			{
+				names.append(entry.name + " [" + entry.identity.key() + "]");
+			}
 			bool accepted = false;
-			const auto choice = QInputDialog::getItem(nullptr, tr("Select VST3 class"), tr("Plugin"), names, 0, false, &accepted);
-			if (!accepted) { return; }
+			const auto choice
+				= QInputDialog::getItem(nullptr, tr("Select VST3 class"), tr("Plugin"), names, 0, false, &accepted);
+			if (!accepted)
+			{
+				return;
+			}
 			selected = candidates[names.indexOf(choice)];
 		}
-		else { selected = candidates.front(); }
+		else
+		{
+			selected = candidates.front();
+		}
 		selection = &selected;
 	}
 	if (!selection && !shellId)
 	{
 		const auto scan = VstPlugin::scanModule(_file);
-		if (!scan.error.isEmpty()) { collectErrorForUI(scan.error); return; }
+		if (!scan.error.isEmpty())
+		{
+			collectErrorForUI(scan.error);
+			return;
+		}
 		if (scan.shell)
 		{
-			if (scan.entries.size() == 1) { shellId = scan.entries.front().id; }
+			if (scan.entries.size() == 1)
+			{
+				shellId = scan.entries.front().id;
+			}
 			else
 			{
 				if (!gui::getGUI())
-				{ collectErrorForUI(tr("VST2 shell %1 requires a saved shellid selection.").arg(_file)); return; }
+				{
+					collectErrorForUI(tr("VST2 shell %1 requires a saved shellid selection.").arg(_file));
+					return;
+				}
 				QStringList names;
-				for (const auto& entry : scan.entries) { names.append(tr("%1 [%2]").arg(entry.name).arg(entry.id)); }
+				for (const auto& entry : scan.entries)
+				{
+					names.append(tr("%1 [%2]").arg(entry.name).arg(entry.id));
+				}
 				bool accepted = false;
-				const auto selected = QInputDialog::getItem(nullptr, tr("Select VST2 shell plugin"),
-					tr("Plugin"), names, 0, false, &accepted);
-				if (!accepted) { return; }
+				const auto selected = QInputDialog::getItem(
+					nullptr, tr("Select VST2 shell plugin"), tr("Plugin"), names, 0, false, &accepted);
+				if (!accepted)
+				{
+					return;
+				}
 				shellId = scan.entries[names.indexOf(selected)].id;
 			}
 		}
@@ -464,9 +519,10 @@ void VestigeInstrument::loadFile(const QString& _file, std::uint32_t shellId, co
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == PathUtil::toShortestRelative( _file ) && m_shellId == shellId &&
-			((!selection && !m_nativeSelection) || (selection && m_nativeSelection &&
-				selection->identity == m_nativeSelection->identity && selection->locator == m_nativeSelection->locator)))
+			m_pluginDLL == PathUtil::toShortestRelative(_file) && m_shellId == shellId
+		&& ((!selection && !m_nativeSelection)
+			|| (selection && m_nativeSelection && selection->identity == m_nativeSelection->identity
+				&& selection->locator == m_nativeSelection->locator)))
 		return;
 
 	if ( m_plugin != nullptr )
@@ -554,7 +610,10 @@ bool VestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 
 void VestigeInstrument::initializeParameterModels()
 {
-	if (!m_plugin || knobFModel) { return; }
+	if (!m_plugin || knobFModel)
+	{
+		return;
+	}
 	const auto& dump = m_plugin->parameterDump();
 	paramCount = dump.size();
 	knobFModel = new FloatModel*[paramCount];
@@ -563,8 +622,9 @@ void VestigeInstrument::initializeParameterModels()
 		const auto value = LocaleHelper::toFloat(dump.value(QString("param%1").arg(i)).section(':', 2));
 		knobFModel[i] = new FloatModel(value, 0.0f, 1.0f, 0.0f, this, QString::number(i));
 		m_plugin->bindParameterModel(i, knobFModel[i]);
-		connect(knobFModel[i], &FloatModel::dataChanged, this,
-			[this, i] { setParameter(knobFModel[i]); }, Qt::DirectConnection);
+		connect(
+			knobFModel[i], &FloatModel::dataChanged, this, [this, i] { setParameter(knobFModel[i]); },
+			Qt::DirectConnection);
 	}
 }
 
@@ -1241,8 +1301,14 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 	auto* scrollArea = m_vi->m_scrollArea;
 	m_vi->m_subWindow = nullptr;
 	m_vi->m_scrollArea = nullptr;
-	if (window) { delete window; }
-	else { delete scrollArea; }
+	if (window)
+	{
+		delete window;
+	}
+	else
+	{
+		delete scrollArea;
+	}
 
 	m_vi->p_subWindow = nullptr;
 }
@@ -1319,17 +1385,29 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Q_DECL_EXPORT Plugin * lmms_plugin_main(Model* m, void* data)
+Q_DECL_EXPORT Plugin* lmms_plugin_main(Model* m, void* data)
 {
 	auto* instrument = new VestigeInstrument(static_cast<InstrumentTrack*>(m));
 	const auto* key = static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data);
 	if (key && key->attributes.contains("file"))
 	{
-		QDomDocument document; auto state = document.createElement("vestige");
-		for (auto it = key->attributes.cbegin(); it != key->attributes.cend(); ++it) { state.setAttribute(it.key(), it.value()); }
-		state.setAttribute("plugin", key->attributes.value("file")); state.setAttribute("pluginname", key->name);
-		if (QThread::currentThread() == QCoreApplication::instance()->thread()) { instrument->loadSettings(state); }
-		else { QMetaObject::invokeMethod(instrument, [instrument, state] { instrument->loadSettings(state); }, Qt::QueuedConnection); }
+		QDomDocument document;
+		auto state = document.createElement("vestige");
+		for (auto it = key->attributes.cbegin(); it != key->attributes.cend(); ++it)
+		{
+			state.setAttribute(it.key(), it.value());
+		}
+		state.setAttribute("plugin", key->attributes.value("file"));
+		state.setAttribute("pluginname", key->name);
+		if (QThread::currentThread() == QCoreApplication::instance()->thread())
+		{
+			instrument->loadSettings(state);
+		}
+		else
+		{
+			QMetaObject::invokeMethod(
+				instrument, [instrument, state] { instrument->loadSettings(state); }, Qt::QueuedConnection);
+		}
 	}
 	return instrument;
 }

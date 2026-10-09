@@ -62,8 +62,8 @@ public:
 	QString nodeName() const override;
 	QMap<QString, AutomatableModel*> parameterModels()
 	{
-		return {{"base", &m_baseModel}, {"speed", &m_speedModel}, {"amount", &m_amountModel},
-			{"phase", &m_phaseModel}, {"wave", &m_waveModel}, {"multiplier", &m_multiplierModel}};
+		return {{"base", &m_baseModel}, {"speed", &m_speedModel}, {"amount", &m_amountModel}, {"phase", &m_phaseModel},
+			{"wave", &m_waveModel}, {"multiplier", &m_multiplierModel}};
 	}
 
 

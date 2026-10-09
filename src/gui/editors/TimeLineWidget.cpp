@@ -160,7 +160,10 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		p.drawRoundedRect(outerRectangle, 3, 3);
 		p.restore();
 	}
-	else { p.fillRect(outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush()); }
+	else
+	{
+		p.fillRect(outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
+	}
 
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
@@ -200,8 +203,10 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setBrush( Qt::NoBrush );
 	if (m_flatStyle)
 	{
-		p.save();p.setRenderHint(QPainter::Antialiasing);
-		p.drawRoundedRect(outerRectangle, 3, 3);p.restore();
+		p.save();
+		p.setRenderHint(QPainter::Antialiasing);
+		p.drawRoundedRect(outerRectangle, 3, 3);
+		p.restore();
 	}
 	else
 	{
@@ -245,7 +250,10 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 			p.drawPolygon(QPolygonF{QPointF(x - halfWidth, height() - marker.height()),
 				QPointF(x + halfWidth, height() - marker.height()), QPointF(x, height() - 1)});
 		}
-		else { p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2), height() - marker.height(), marker); }
+		else
+		{
+			p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2), height() - marker.height(), marker);
+		}
 	}
 }
 

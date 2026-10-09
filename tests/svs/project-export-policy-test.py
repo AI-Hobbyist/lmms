@@ -1,4 +1,5 @@
 """M3 preflight tests against the deployed fixed embedded runtime."""
+
 import copy
 import json
 import os
@@ -12,7 +13,14 @@ import wave
 
 ROOT = pathlib.Path(sys.argv.pop(1)).resolve()
 BRIDGE = runpy.run_path(str(ROOT / "build/Release/svs-project/bridge.py"))
-from libresvip.model.base import InstrumentalTrack, Note, Project, SingingTrack, SongTempo, TimeSignature
+from libresvip.model.base import (
+    InstrumentalTrack,
+    Note,
+    Project,
+    SingingTrack,
+    SongTempo,
+    TimeSignature,
+)
 
 
 class ExportPolicyTest(unittest.TestCase):
@@ -22,15 +30,30 @@ class ExportPolicyTest(unittest.TestCase):
         cls.catalog = {f["id"]: f for f in catalog}
 
     def project(self, audio=None):
-        tracks = [SingingTrack(title="中文 A", note_list=[Note(start_pos=0, length=480, key_number=60, lyric="你")]),
-                  SingingTrack(title="日本語 B", mute=True, solo=True, note_list=[Note(start_pos=480, length=480, key_number=64, lyric="あ")])]
+        tracks = [
+            SingingTrack(
+                title="中文 A", note_list=[Note(start_pos=0, length=480, key_number=60, lyric="你")]
+            ),
+            SingingTrack(
+                title="日本語 B",
+                mute=True,
+                solo=True,
+                note_list=[Note(start_pos=480, length=480, key_number=64, lyric="あ")],
+            ),
+        ]
         if audio:
             tracks.insert(0, InstrumentalTrack(title="伴奏一", audio_file_path=str(audio)))
             tracks.append(InstrumentalTrack(title="伴奏二", audio_file_path=str(audio), offset=960))
-        return Project(track_list=tracks, song_tempo_list=[SongTempo(position=0, bpm=120)], time_signature_list=[TimeSignature(bar_index=0, numerator=4, denominator=4)])
+        return Project(
+            track_list=tracks,
+            song_tempo_list=[SongTempo(position=0, bpm=120)],
+            time_signature_list=[TimeSignature(bar_index=0, numerator=4, denominator=4)],
+        )
 
     def prepare(self, format_id, project, options=None, selection=None, assets=None):
-        return BRIDGE["prepare_export"](project, self.catalog[format_id], options or {}, selection or {}, assets or [])
+        return BRIDGE["prepare_export"](
+            project, self.catalog[format_id], options or {}, selection or {}, assets or []
+        )
 
     def wav(self, directory, rate=44100):
         path = pathlib.Path(directory) / "伴奏.wav"
@@ -53,9 +76,13 @@ class ExportPolicyTest(unittest.TestCase):
                 if limit == 1:
                     with self.assertRaisesRegex(ValueError, "必须显式选择"):
                         self.prepare(spec["id"], project)
-                    projected, options, losses = self.prepare(spec["id"], project, selection={"singingTrack": 1})
+                    projected, options, losses = self.prepare(
+                        spec["id"], project, selection={"singingTrack": 1}
+                    )
                     self.assertEqual([t.title for t in projected.track_list], ["日本語 B"])
-                    self.assertTrue(any(l["track"] == "中文 A" and l["field"] == "track" for l in losses))
+                    self.assertTrue(
+                        any(l["track"] == "中文 A" and l["field"] == "track" for l in losses)
+                    )
                     if "track_index" in options:
                         self.assertEqual(options["track_index"], 0)
                 else:
@@ -128,9 +155,15 @@ class ExportPolicyTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             workspace = pathlib.Path(directory)
             project = self.project()
-            request = {"protocol": 1, "requestId": "M3-policy", "operation": "inspectExport",
-                       "formatId": "lrc", "path": str(workspace / "song.lrc"),
-                       "project": project.model_dump(mode="json"), "selection": {"singingTrack": 1}}
+            request = {
+                "protocol": 1,
+                "requestId": "M3-policy",
+                "operation": "inspectExport",
+                "formatId": "lrc",
+                "path": str(workspace / "song.lrc"),
+                "project": project.model_dump(mode="json"),
+                "selection": {"singingTrack": 1},
+            }
             untouched = copy.deepcopy(request)
             result = BRIDGE["process"](request, workspace)
             self.assertEqual(result["project"]["track_list"][0]["title"], "日本語 B")
@@ -158,20 +191,33 @@ class ExportPolicyTest(unittest.TestCase):
             for track in project.track_list:
                 if isinstance(track, InstrumentalTrack):
                     track.audio_file_path = "audio-1.wav"
+
             class NoOutputConverter:
                 @staticmethod
                 def dump(*args):
                     pass
+
             namespace = BRIDGE["process"].__globals__
             previous_catalog = namespace["fixed_catalog"]
             previous_directory = pathlib.Path.cwd()
-            namespace["fixed_catalog"] = lambda: ({"json": NoOutputConverter}, list(self.catalog.values()))
+            namespace["fixed_catalog"] = lambda: (
+                {"json": NoOutputConverter},
+                list(self.catalog.values()),
+            )
             try:
                 with self.assertRaisesRegex(ValueError, "no project output"):
-                    BRIDGE["process"]({"protocol": 1, "requestId": "empty-dump", "operation": "exportProject",
-                                       "formatId": "json", "path": str(workspace / "song.json"),
-                                       "project": project.model_dump(mode="json"),
-                                       "assets": [{"name": "audio-1.wav", "source": str(audio)}]}, workspace)
+                    BRIDGE["process"](
+                        {
+                            "protocol": 1,
+                            "requestId": "empty-dump",
+                            "operation": "exportProject",
+                            "formatId": "json",
+                            "path": str(workspace / "song.json"),
+                            "project": project.model_dump(mode="json"),
+                            "assets": [{"name": "audio-1.wav", "source": str(audio)}],
+                        },
+                        workspace,
+                    )
             finally:
                 namespace["fixed_catalog"] = previous_catalog
                 os.chdir(previous_directory)

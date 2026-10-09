@@ -6,10 +6,35 @@
 
 static thread_local bool watch = false;
 static thread_local unsigned allocations = 0;
-void* operator new(std::size_t bytes) { if (watch) { ++allocations; } if (auto* p = std::malloc(bytes ? bytes : 1)) { return p; } throw std::bad_alloc(); }
-void operator delete(void* pointer) noexcept { std::free(pointer); }
-void operator delete(void* pointer, std::size_t) noexcept { std::free(pointer); }
-#define CHECK(condition) do { if (!(condition)) { std::cerr << "line " << __LINE__ << ": " << #condition << '\n'; return 1; } } while (0)
+void* operator new(std::size_t bytes)
+{
+	if (watch)
+	{
+		++allocations;
+	}
+	if (auto* p = std::malloc(bytes ? bytes : 1))
+	{
+		return p;
+	}
+	throw std::bad_alloc();
+}
+void operator delete(void* pointer) noexcept
+{
+	std::free(pointer);
+}
+void operator delete(void* pointer, std::size_t) noexcept
+{
+	std::free(pointer);
+}
+#define CHECK(condition) \
+	do \
+	{ \
+		if (!(condition)) \
+		{ \
+			std::cerr << "line " << __LINE__ << ": " << #condition << '\n'; \
+			return 1; \
+		} \
+	} while (0)
 
 int main()
 {
@@ -34,19 +59,27 @@ int main()
 		{
 			const auto count = std::min(sizes[callback++ % sizes.size()], total - cursor);
 			watch = true;
-			const auto processed = delay.process(std::span(input).subspan(cursor, count), std::span(output).subspan(cursor, count));
+			const auto processed
+				= delay.process(std::span(input).subspan(cursor, count), std::span(output).subspan(cursor, count));
 			watch = false;
 			CHECK(processed && allocations == 0);
 			cursor += count;
 		}
-		for (unsigned i = 0; i < total; ++i) { CHECK(output[i] == (i < frames ? Frame{} : input[i - frames])); }
+		for (unsigned i = 0; i < total; ++i)
+		{
+			CHECK(output[i] == (i < frames ? Frame{} : input[i - frames]));
+		}
 		// Exact in-place processing must preserve input before replacing it.
-		delay.reset(); output = input;
+		delay.reset();
+		output = input;
 		watch = true;
 		const auto processed = delay.process(output, output);
 		watch = false;
 		CHECK(processed && allocations == 0);
-		for (unsigned i = 0; i < total; ++i) { CHECK(output[i] == (i < frames ? Frame{} : input[i - frames])); }
+		for (unsigned i = 0; i < total; ++i)
+		{
+			CHECK(output[i] == (i < frames ? Frame{} : input[i - frames]));
+		}
 	}
 	// Repeated publication of an unchanged delay retains queued audio.
 	CHECK(delay.setDelay(17));
@@ -69,5 +102,6 @@ int main()
 	CHECK(delay.capacity() == 0 && delay.delay() == 0 && !delay.setDelay(1));
 	CHECK(delay.process(std::span(&impulse, 1), std::span(&tail, 1)) && tail == impulse);
 	CHECK(delay.process({}, {}));
-	std::cout << "PASS sample delay: multichannel impulses, variable blocks, long delay, in-place, tail drain, boundary reset, capacity rejection and no audio allocation\n";
+	std::cout
+		<< "PASS sample delay: multichannel impulses, variable blocks, long delay, in-place, tail drain, boundary reset, capacity rejection and no audio allocation\n";
 }

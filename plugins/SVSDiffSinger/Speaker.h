@@ -3,6 +3,6 @@
 #include "VoiceCatalog.h"
 namespace diffsinger {
 Json speakerChoices(const VoicePackage&);
-std::vector<float> speakerEmbedding(const VoicePackage&,const StageConfig&,const Json& parameters);
+std::vector<float> speakerEmbedding(const VoicePackage&, const StageConfig&, const Json& parameters);
 }
 #endif

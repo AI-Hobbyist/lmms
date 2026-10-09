@@ -219,7 +219,10 @@ void TrackContainer::moveTrack(Track* track, int indexTo)
 	{
 		QWriteLocker lockTracksAccess(&m_tracksMutex);
 		auto it = std::find(m_tracks.begin(), m_tracks.end(), track);
-		if (it == m_tracks.end() || indexTo < 0 || indexTo >= static_cast<int>(m_tracks.size())) { return; }
+		if (it == m_tracks.end() || indexTo < 0 || indexTo >= static_cast<int>(m_tracks.size()))
+		{
+			return;
+		}
 		m_tracks.erase(it);
 		m_tracks.insert(m_tracks.begin() + indexTo, track);
 	}

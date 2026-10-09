@@ -11,8 +11,7 @@
 
 #include "lmms_export.h"
 
-namespace lmms::agent
-{
+namespace lmms::agent {
 
 enum class Mutability
 {
@@ -36,13 +35,12 @@ struct LMMS_EXPORT CommandResult
 	QString errorMessage;
 	QString errorHint;
 
-	static CommandResult success( QJsonObject data = {} );
-	static CommandResult failure( const QString &code, const QString &message,
-		const QString &hint = {} );
+	static CommandResult success(QJsonObject data = {});
+	static CommandResult failure(const QString& code, const QString& message, const QString& hint = {});
 	QJsonObject toJson() const;
 };
 
-using CommandHandler = std::function<CommandResult( const QJsonObject &arguments )>;
+using CommandHandler = std::function<CommandResult(const QJsonObject& arguments)>;
 
 struct LMMS_EXPORT CommandDescriptor
 {
@@ -59,14 +57,14 @@ struct LMMS_EXPORT CommandDescriptor
 class LMMS_EXPORT CommandBus
 {
 public:
-	static CommandBus & instance();
+	static CommandBus& instance();
 
-	bool registerCommand( const CommandDescriptor &descriptor );
-	CommandResult execute( const QString &name, const QJsonObject &arguments = {} );
+	bool registerCommand(const CommandDescriptor& descriptor);
+	CommandResult execute(const QString& name, const QJsonObject& arguments = {});
 	QList<CommandDescriptor> descriptors() const;
 
-	bool beginBatch( const QString &label );
-	CommandResult endBatch( bool success );
+	bool beginBatch(const QString& label);
+	CommandResult endBatch(bool success);
 	bool isBatchActive() const;
 	int batchDepth() const;
 	CommandResult rollbackBatch();

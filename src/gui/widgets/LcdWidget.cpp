@@ -143,8 +143,14 @@ void LcdWidget::paintEvent( QPaintEvent* )
 		const QRectF display(0.5, 0.5, width() - 1, m_cellHeight + 1);
 		p.setPen(palette().mid().color());
 		p.setBrush(palette().base());
-		if (m_seamlessLeft || m_seamlessRight) { p.fillRect(display, palette().base()); }
-		else { p.drawRoundedRect(display, 4, 4); }
+		if (m_seamlessLeft || m_seamlessRight)
+		{
+			p.fillRect(display, palette().base());
+		}
+		else
+		{
+			p.drawRoundedRect(display, 4, 4);
+		}
 		p.setPen(isEnabled() ? textColor() : palette().color(QPalette::Disabled, QPalette::Text));
 		const int left = m_seamlessLeft ? 0 : m_marginWidth + 1;
 		const int right = m_seamlessRight ? 0 : m_marginWidth + 1;
@@ -288,7 +294,8 @@ void LcdWidget::updateSize()
 				m_cellWidth * m_numDigits + marginX1 + marginX2,
 				QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).horizontalAdvance(m_label)
 			),
-			m_cellHeight + (2 * marginY) + (m_textMode ? QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height() : 9)
+			m_cellHeight + (2 * marginY)
+				+ (m_textMode ? QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height() : 9)
 		);
 	}
 
@@ -297,7 +304,10 @@ void LcdWidget::updateSize()
 
 void LcdWidget::setTextMode(bool enabled)
 {
-	if (m_textMode == enabled) { return; }
+	if (m_textMode == enabled)
+	{
+		return;
+	}
 	m_textMode = enabled;
 	if (!enabled)
 	{
@@ -310,7 +320,10 @@ void LcdWidget::setTextMode(bool enabled)
 void LcdWidget::changeEvent(QEvent* event)
 {
 	QWidget::changeEvent(event);
-	if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange) { updateSize(); }
+	if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange)
+	{
+		updateSize();
+	}
 }
 
 

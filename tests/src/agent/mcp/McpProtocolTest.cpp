@@ -17,31 +17,47 @@ class McpProtocolTest : public QObject
 	{
 		QTcpSocket socket;
 		QEventLoop loop;
-		QTimer deadline; deadline.setSingleShot(true);
+		QTimer deadline;
+		deadline.setSingleShot(true);
 		connect(&deadline, &QTimer::timeout, &loop, &QEventLoop::quit);
 		connect(&socket, &QTcpSocket::connected, &loop, [&] {
-			socket.write(method + " /mcp HTTP/1.1\r\nHost: localhost:" + QByteArray::number(server.port()) +
-				"\r\nAuthorization: Bearer " + token + "\r\nContent-Type: application/json\r\n"
-				"Accept: application/json, text/event-stream\r\n" +
-				(session.isEmpty() ? QByteArray() : "MCP-Session-Id: " + session + "\r\n") + extra +
-				"Content-Length: " + QByteArray::number(body.size()) + "\r\n\r\n" + body);
+			socket.write(method + " /mcp HTTP/1.1\r\nHost: localhost:" + QByteArray::number(server.port())
+				+ "\r\nAuthorization: Bearer " + token
+				+ "\r\nContent-Type: application/json\r\n"
+				  "Accept: application/json, text/event-stream\r\n"
+				+ (session.isEmpty() ? QByteArray() : "MCP-Session-Id: " + session + "\r\n") + extra
+				+ "Content-Length: " + QByteArray::number(body.size()) + "\r\n\r\n" + body);
 		});
 		connect(&socket, &QTcpSocket::disconnected, &loop, &QEventLoop::quit);
-		socket.connectToHost("127.0.0.1", server.port()); deadline.start(2000); loop.exec(); return socket.readAll();
+		socket.connectToHost("127.0.0.1", server.port());
+		deadline.start(2000);
+		loop.exec();
+		return socket.readAll();
 	}
-	QJsonObject body(const QByteArray& response) { return QJsonDocument::fromJson(response.mid(response.indexOf("\r\n\r\n") + 4)).object(); }
+	QJsonObject body(const QByteArray& response)
+	{
+		return QJsonDocument::fromJson(response.mid(response.indexOf("\r\n\r\n") + 4)).object();
+	}
 	QByteArray initialize()
 	{
 		session.clear();
-		const auto response = exchange(R"({"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"future","capabilities":{},"clientInfo":{"name":"test","version":"1"}}})");
+		const auto response = exchange(
+			R"({"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"future","capabilities":{},"clientInfo":{"name":"test","version":"1"}}})");
 		for (const auto& line : response.split('\n'))
 		{
-			if (line.startsWith("MCP-Session-Id: ")) { session = line.mid(16).trimmed(); }
+			if (line.startsWith("MCP-Session-Id: "))
+			{
+				session = line.mid(16).trimmed();
+			}
 		}
 		return response;
 	}
 private slots:
-	void initTestCase() { new McpProtocol(server); QVERIFY(server.start(0, token)); }
+	void initTestCase()
+	{
+		new McpProtocol(server);
+		QVERIFY(server.start(0, token));
+	}
 	void discoveryLifecycle()
 	{
 		const auto response = initialize();
@@ -63,13 +79,21 @@ private slots:
 	{
 		QCOMPARE(body(exchange("{")).value("error").toObject().value("code").toInt(), -32700);
 		for (const auto& input : {QByteArray("[]"), QByteArray(R"({"jsonrpc":"1.0","id":1,"method":"ping"})"),
-			QByteArray(R"({"jsonrpc":"2.0","id":null,"method":"ping"})"), QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","params":[]})"),
-			QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","result":{}})"), QByteArray(R"({"jsonrpc":"2.0","method":"initialize"})")})
+				 QByteArray(R"({"jsonrpc":"2.0","id":null,"method":"ping"})"),
+				 QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","params":[]})"),
+				 QByteArray(R"({"jsonrpc":"2.0","id":1,"method":"ping","result":{}})"),
+				 QByteArray(R"({"jsonrpc":"2.0","method":"initialize"})")})
 		{
 			QVERIFY(exchange(input).startsWith("HTTP/1.1 400"));
 		}
-		QVERIFY(exchange(R"({"jsonrpc":"2.0","id":1,"method":"ping"})", "MCP-Protocol-Version: wrong\r\n").startsWith("HTTP/1.1 400"));
-		QCOMPARE(body(exchange(R"({"jsonrpc":"2.0","id":9,"method":"unknown"})")).value("error").toObject().value("code").toInt(), -32601);
+		QVERIFY(exchange(R"({"jsonrpc":"2.0","id":1,"method":"ping"})", "MCP-Protocol-Version: wrong\r\n")
+				.startsWith("HTTP/1.1 400"));
+		QCOMPARE(body(exchange(R"({"jsonrpc":"2.0","id":9,"method":"unknown"})"))
+					 .value("error")
+					 .toObject()
+					 .value("code")
+					 .toInt(),
+			-32601);
 		const auto old = session;
 		initialize();
 		session = old;
@@ -80,7 +104,8 @@ private slots:
 	void stopInvalidatesSession()
 	{
 		initialize();
-		server.stop(); QVERIFY(server.start(0, token));
+		server.stop();
+		QVERIFY(server.start(0, token));
 		QVERIFY(exchange(R"({"jsonrpc":"2.0","id":1,"method":"ping"})").startsWith("HTTP/1.1 404"));
 	}
 };

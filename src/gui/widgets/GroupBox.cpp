@@ -82,14 +82,20 @@ void GroupBox::setLedButtonShown(bool value)
 
 void GroupBox::setFlatStyle(bool enabled)
 {
-	if (m_flatStyle == enabled) { return; }
+	if (m_flatStyle == enabled)
+	{
+		return;
+	}
 	const int previousHeight = m_titleBarHeight;
 	m_flatStyle = enabled;
 	m_titleBarHeight = enabled ? QFontMetrics(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)).height() + 2 : 11;
 	// Existing panels place children relative to titleBarHeight before polish.
 	for (auto* child : findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly))
 	{
-		if (child != m_led) { child->move(child->x(), child->y() + m_titleBarHeight - previousHeight); }
+		if (child != m_led)
+		{
+			child->move(child->x(), child->y() + m_titleBarHeight - previousHeight);
+		}
 	}
 	m_led->move(3, enabled ? (m_titleBarHeight - m_led->height()) / 2 : 0);
 	update();
@@ -121,8 +127,8 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 		p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 		p.setPen(palette().text().color());
 		const int captionX = ledButtonShown() ? 22 : 6;
-		p.drawText(QRect(captionX, 0, width() - captionX - 4, m_titleBarHeight),
-			Qt::AlignVCenter | Qt::AlignLeft, m_caption);
+		p.drawText(
+			QRect(captionX, 0, width() - captionX - 4, m_titleBarHeight), Qt::AlignVCenter | Qt::AlignLeft, m_caption);
 		return;
 	}
 

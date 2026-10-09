@@ -23,25 +23,19 @@
  *
  */
 
-
 #ifndef LMMS_VSTHOST_VST2_MESSAGES_H
 #define LMMS_VSTHOST_VST2_MESSAGES_H
 
-
 #include "RemotePluginBase.h"
 
-namespace lmms
-{
-
+namespace lmms {
 
 struct VstParameterDumpItem
 {
 	int32_t index;
 	std::string shortLabel;
 	float value;
-} ;
-
-
+};
 
 enum class VstHostLanguage
 {
@@ -52,9 +46,7 @@ enum class VstHostLanguage
 	Spanish,
 	Japanese,
 	Korean
-} ;
-
-
+};
 
 enum VstRemoteMessageIDs
 {
@@ -93,9 +85,7 @@ enum VstRemoteMessageIDs
 	IdVstScanPlugin,
 	IdVstShellEntries,
 	IdVstParameterEdits
-
-} ;
-
+};
 
 } // namespace lmms
 

@@ -103,14 +103,9 @@ public:
 		return m_wetDryModel.value();
 	}
 
-	BoolModel * enabledModel()
-	{
-		return &m_enabledModel;
-	}
+	BoolModel* enabledModel() { return &m_enabledModel; }
 
-	FloatModel * wetDryModel()
-	{
-		return &m_wetDryModel;
+	FloatModel* wetDryModel() { return &m_wetDryModel;
 	}
 
 	inline float dryLevel() const

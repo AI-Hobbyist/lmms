@@ -262,7 +262,10 @@ bool HydrogenImport::readSong()
 		sCategory = LocalFileMng::readXmlString( patternNode, "category", sCategory ,false ,false );
 		int nSize = -1;
 		nSize = LocalFileMng::readXmlInt( patternNode, "size", nSize, false, false );
-		if (nSize <= 0 || nSize > MaxSongLength) { return false; }
+		if (nSize <= 0 || nSize > MaxSongLength)
+		{
+			return false;
+		}
 		if (auto* patternTrack = PatternTrack::findPatternTrack(existing_patterns + pattern_count - 1))
 		{
 			patternTrack->setName(sName);
@@ -283,9 +286,15 @@ bool HydrogenImport::readSong()
 
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + existing_patterns;
-				if (!drum_track.value(instrId) || nPosition < 0 || nPosition >= nSize) { return false; }
+				if (!drum_track.value(instrId) || nPosition < 0 || nPosition >= nSize)
+				{
+					return false;
+				}
 				auto p = dynamic_cast<MidiClip*>(drum_track.value(instrId)->getClip(i));
-				if (!p) { return false; }
+				if (!p)
+				{
+					return false;
+				}
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -317,10 +326,16 @@ bool HydrogenImport::readSong()
 		{
 			QString patId = patternId.firstChild().nodeValue();
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
-			if (!pattern_id.contains(patId)) { return false; }
+			if (!pattern_id.contains(patId))
+			{
+				return false;
+			}
 
 			int i = pattern_id[patId]+song_num_tracks;
-			if (i < 0 || i >= static_cast<int>(s->tracks().size())) { return false; }
+			if (i < 0 || i >= static_cast<int>(s->tracks().size()))
+			{
+				return false;
+			}
 			Track* t = s->tracks().at(i);
 			t->createClip(pos);
 

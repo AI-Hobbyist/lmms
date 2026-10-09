@@ -1,1 +1,19 @@
-{"id":"org.lmms.svs.example","name":"SVS Example","engineType":"example","version":"0.1.0","category":"Singing Voice Synthesis","apiMajor":1,"apiMinor":2,"platform":"@SVS_PLATFORM@","architecture":"@SVS_ARCHITECTURE@","entry":"SVSExample@CMAKE_SHARED_MODULE_SUFFIX@","author":"LMMS SVS contributors","resources":["avatar.svg","portrait.svg","avatar-lite.svg","portrait-lite.svg"]}
+{
+  "id": "org.lmms.svs.example",
+  "name": "SVS Example",
+  "engineType": "example",
+  "version": "0.1.0",
+  "category": "Singing Voice Synthesis",
+  "apiMajor": 1,
+  "apiMinor": 2,
+  "platform": "@SVS_PLATFORM@",
+  "architecture": "@SVS_ARCHITECTURE@",
+  "entry": "SVSExample@CMAKE_SHARED_MODULE_SUFFIX@",
+  "author": "LMMS SVS contributors",
+  "resources": [
+    "avatar.svg",
+    "portrait.svg",
+    "avatar-lite.svg",
+    "portrait-lite.svg"
+  ]
+}

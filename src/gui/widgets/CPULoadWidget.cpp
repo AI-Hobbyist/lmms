@@ -66,7 +66,8 @@ void CPULoadWidget::setFlatStyle(bool enabled)
 {
 	m_flatStyle = enabled;
 	setFixedSize(enabled ? QSize(std::max(m_background.width(), fontMetrics().horizontalAdvance(tr("CPU 100%")) + 40),
-		std::max(m_background.height(), fontMetrics().height() + 4)) : m_background.size());
+							   std::max(m_background.height(), fontMetrics().height() + 4))
+						 : m_background.size());
 	m_changed = true;
 	update();
 }

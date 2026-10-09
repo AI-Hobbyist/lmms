@@ -7,25 +7,27 @@ class QTabWidget;
 class QSlider;
 class QCheckBox;
 namespace lmms::gui {
-class SVSSettingsPage : public QWidget {
+class SVSSettingsPage : public QWidget
+{
 public:
- explicit SVSSettingsPage(QWidget* parent=nullptr);
- void save();
- static QString engineLabel(const svs::Voice& voice);
+	explicit SVSSettingsPage(QWidget* parent = nullptr);
+	void save();
+	static QString engineLabel(const svs::Voice& voice);
+
 private:
- void refreshEngine();
- QComboBox* m_backend;
- QComboBox* m_device;
- QSlider* m_aiSteps;
- QCheckBox* m_pitchRanges;
- QCheckBox* m_backgroundWaveform;
- QTabWidget* m_engine;
- QLabel* m_status;
- SVSParameterPanel* m_parameters;
- QVector<svs::Voice> m_voices;
- QMap<QString,QJsonObject> m_values;
- QVector<svs::Parameter> m_schema;
- unsigned m_request=0;
+	void refreshEngine();
+	QComboBox* m_backend;
+	QComboBox* m_device;
+	QSlider* m_aiSteps;
+	QCheckBox* m_pitchRanges;
+	QCheckBox* m_backgroundWaveform;
+	QTabWidget* m_engine;
+	QLabel* m_status;
+	SVSParameterPanel* m_parameters;
+	QVector<svs::Voice> m_voices;
+	QMap<QString, QJsonObject> m_values;
+	QVector<svs::Parameter> m_schema;
+	unsigned m_request = 0;
 };
 }
 #endif

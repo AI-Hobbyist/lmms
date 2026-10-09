@@ -63,14 +63,8 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	int effectCount() const
-	{
-		return static_cast<int>( m_effects.size() );
-	}
-	Effect * effectAt( int index ) const
-	{
-		return index >= 0 && index < effectCount() ? m_effects[index] : nullptr;
-	}
+	int effectCount() const { return static_cast<int>(m_effects.size()); }
+	Effect* effectAt(int index) const { return index >= 0 && index < effectCount() ? m_effects[index] : nullptr; }
 	bool processAudioBuffer(AudioBuffer& buffer);
 
 	void clear();

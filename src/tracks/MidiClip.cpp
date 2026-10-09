@@ -267,8 +267,6 @@ void MidiClip::updateNotes()
 	emit dataChanged();
 }
 
-
-
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
@@ -413,29 +411,26 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 
 
 
-void MidiClip::setClipType( Type type )
+void MidiClip::setClipType(Type type)
 {
-	if( type != Type::BeatClip && type != Type::MelodyClip )
+	if (type != Type::BeatClip && type != Type::MelodyClip)
 	{
 		return;
 	}
 
 	const auto noteType = type == Type::BeatClip ? Note::Type::Step : Note::Type::Regular;
-	for( auto *note : m_notes )
+	for (auto* note : m_notes)
 	{
-		note->setType( noteType );
+		note->setType(noteType);
 	}
 	m_clipType = type;
 	updateLength();
 	emit dataChanged();
 }
 
-
-
-
-void MidiClip::setSteps( int steps )
+void MidiClip::setSteps(int steps)
 {
-	if( steps < 1 || m_steps == steps )
+	if (steps < 1 || m_steps == steps)
 	{
 		return;
 	}

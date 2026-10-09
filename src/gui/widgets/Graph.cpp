@@ -418,7 +418,10 @@ void Graph::paintEvent( QPaintEvent * )
 		p.setPen(palette().mid().color());
 		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
 	}
-	else { p.drawPixmap(0, 0, m_foreground); }
+	else
+	{
+		p.drawPixmap(0, 0, m_foreground);
+	}
 }
 
 

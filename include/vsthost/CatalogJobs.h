@@ -3,13 +3,12 @@
 #include "vsthost/PluginCatalog.h"
 #include <memory>
 
-namespace lmms::vsthost
-{
+namespace lmms::vsthost {
 class LMMS_EXPORT CatalogJobs
 {
 public:
-	using Executor = std::function<CatalogReport(const std::vector<ScanRoot>&,
-		PluginCatalog::Options, std::stop_token, PluginCatalog::Progress)>;
+	using Executor = std::function<CatalogReport(
+		const std::vector<ScanRoot>&, PluginCatalog::Options, std::stop_token, PluginCatalog::Progress)>;
 	struct Snapshot
 	{
 		std::uint64_t requested = 0, running = 0, published = 0;
@@ -27,6 +26,7 @@ public:
 	std::uint64_t refresh(std::vector<ScanRoot> roots, PluginCatalog::Options options);
 	void cancel();
 	Snapshot snapshot() const;
+
 private:
 	struct Impl;
 	std::unique_ptr<Impl> m_impl;

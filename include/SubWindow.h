@@ -137,7 +137,7 @@ private:
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect * m_shadow = nullptr;
+	QGraphicsDropShadowEffect* m_shadow = nullptr;
 	bool m_hasFocus;
 	bool m_isDetachable;
 

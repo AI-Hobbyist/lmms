@@ -249,7 +249,10 @@ void SampleTrackView::corruptStateUpdate()
 {
 	// A closed view can await deferred deletion after its track has been removed.
 	const auto track = model();
-	if (!track) { return; }
+	if (!track)
+	{
+		return;
+	}
 	if (track->audioBusHandle()->isCorrupted())
 	{
 		m_activityIndicator->setState(FadeButton::State::Corrupted);

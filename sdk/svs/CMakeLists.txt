@@ -1,53 +1,90 @@
 cmake_minimum_required(VERSION 3.16)
-project(SVSSDK VERSION 1.3 LANGUAGES C CXX)
+project(
+	SVSSDK
+	VERSION 1.3
+	LANGUAGES C CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 add_library(svs-sdk INTERFACE)
 add_library(SVSSDK::SDK ALIAS svs-sdk)
 set_target_properties(svs-sdk PROPERTIES EXPORT_NAME SDK)
-target_include_directories(svs-sdk INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/svs>")
+target_include_directories(svs-sdk INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+											 "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/svs>")
 set(svs_examples_default OFF)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(svs_examples_default ON)
+	set(svs_examples_default ON)
 endif()
 option(SVS_SDK_BUILD_EXAMPLES "Build standalone C and full C++ examples" ${svs_examples_default})
 option(SVS_SDK_BUILD_TOOLS "Build SDK-only consistency validation tool" ${svs_examples_default})
 option(SVS_SDK_BUILD_DIFFSINGER "Build the native DiffSinger engine against this independent SDK" OFF)
 if(SVS_SDK_BUILD_DIFFSINGER)
-  set(svs_diffsinger_source "${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/SVSDiffSinger")
-  if(NOT EXISTS "${svs_diffsinger_source}/CMakeLists.txt")
-    set(svs_diffsinger_source "${CMAKE_CURRENT_SOURCE_DIR}/examples/diffsinger")
-  endif()
-  add_subdirectory("${svs_diffsinger_source}" "${CMAKE_CURRENT_BINARY_DIR}/diffsinger")
-  install(DIRECTORY "${svs_diffsinger_source}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/examples/diffsinger" FILES_MATCHING PATTERN "*.cpp" PATTERN "*.h" PATTERN "*.in" PATTERN "*.txt" PATTERN "CMakeLists.txt")
+	set(svs_diffsinger_source "${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/SVSDiffSinger")
+	if(NOT EXISTS "${svs_diffsinger_source}/CMakeLists.txt")
+		set(svs_diffsinger_source "${CMAKE_CURRENT_SOURCE_DIR}/examples/diffsinger")
+	endif()
+	add_subdirectory("${svs_diffsinger_source}" "${CMAKE_CURRENT_BINARY_DIR}/diffsinger")
+	install(
+		DIRECTORY "${svs_diffsinger_source}/"
+		DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/examples/diffsinger"
+		FILES_MATCHING
+		PATTERN "*.cpp"
+		PATTERN "*.h"
+		PATTERN "*.in"
+		PATTERN "*.txt"
+		PATTERN "CMakeLists.txt")
 endif()
 if(SVS_SDK_BUILD_EXAMPLES)
-  add_subdirectory(examples/minimal)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/full/CMakeLists.txt")
-    set(svs_full_example "${CMAKE_CURRENT_SOURCE_DIR}/examples/full")
-  else()
-    set(svs_full_example "${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/SVSExample")
-  endif()
-  set(SVS_SDK_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include" CACHE PATH "Public SVS SDK include directory")
-  add_subdirectory("${svs_full_example}" "${CMAKE_CURRENT_BINARY_DIR}/full-example")
+	add_subdirectory(examples/minimal)
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/full/CMakeLists.txt")
+		set(svs_full_example "${CMAKE_CURRENT_SOURCE_DIR}/examples/full")
+	else()
+		set(svs_full_example "${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/SVSExample")
+	endif()
+	set(SVS_SDK_INCLUDE
+		"${CMAKE_CURRENT_SOURCE_DIR}/include"
+		CACHE PATH "Public SVS SDK include directory")
+	add_subdirectory("${svs_full_example}" "${CMAKE_CURRENT_BINARY_DIR}/full-example")
 endif()
 install(TARGETS svs-sdk EXPORT SVSSDKTargets)
-install(EXPORT SVSSDKTargets NAMESPACE SVSSDK:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")
+install(
+	EXPORT SVSSDKTargets
+	NAMESPACE SVSSDK::
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")
 install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/svs")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/docs")
 install(FILES README.md LICENSE DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk")
 install(DIRECTORY examples/minimal/ DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/examples/minimal")
 set(svs_full_source "${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/SVSExample")
 if(NOT EXISTS "${svs_full_source}/Json.h")
-  set(svs_full_source "${CMAKE_CURRENT_SOURCE_DIR}/examples/full")
+	set(svs_full_source "${CMAKE_CURRENT_SOURCE_DIR}/examples/full")
 endif()
-install(DIRECTORY "${svs_full_source}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/examples/full" FILES_MATCHING PATTERN "*.cpp" PATTERN "*.h" PATTERN "*.in" PATTERN "*.json" PATTERN "*.svg" PATTERN "*.mmp" PATTERN "CMakeLists.txt")
+install(
+	DIRECTORY "${svs_full_source}/"
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/examples/full"
+	FILES_MATCHING
+	PATTERN "*.cpp"
+	PATTERN "*.h"
+	PATTERN "*.in"
+	PATTERN "*.json"
+	PATTERN "*.svg"
+	PATTERN "*.mmp"
+	PATTERN "CMakeLists.txt")
 if(SVS_SDK_BUILD_TOOLS)
-  set(SVS_JSON_INCLUDE "${svs_full_source}")
-  add_subdirectory(tools)
+	set(SVS_JSON_INCLUDE "${svs_full_source}")
+	add_subdirectory(tools)
 endif()
-install(DIRECTORY tools/ DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/tools" FILES_MATCHING PATTERN "*.cpp" PATTERN "CMakeLists.txt")
+install(
+	DIRECTORY tools/
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/tools"
+	FILES_MATCHING
+	PATTERN "*.cpp"
+	PATTERN "CMakeLists.txt")
 install(FILES "${svs_full_source}/Json.h" DESTINATION "${CMAKE_INSTALL_DATADIR}/svs-sdk/tools")
-configure_package_config_file(cmake/SVSSDKConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfig.cmake" INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfigVersion.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfigVersion.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")
+configure_package_config_file(cmake/SVSSDKConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfig.cmake"
+							  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")
+write_basic_package_version_file(
+	"${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfigVersion.cmake"
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY SameMajorVersion)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/SVSSDKConfigVersion.cmake"
+		DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVSSDK")

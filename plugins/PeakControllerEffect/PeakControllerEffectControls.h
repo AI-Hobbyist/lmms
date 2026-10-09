@@ -61,8 +61,8 @@ public:
 	QMap<QString, AutomatableModel*> parameterModels() override
 	{
 		return {{"base", &m_baseModel}, {"amount", &m_amountModel}, {"attack", &m_attackModel},
-			{"decay", &m_decayModel}, {"treshold", &m_tresholdModel}, {"mute", &m_muteModel},
-			{"abs", &m_absModel}, {"amountmult", &m_amountMultModel}};
+			{"decay", &m_decayModel}, {"treshold", &m_tresholdModel}, {"mute", &m_muteModel}, {"abs", &m_absModel},
+			{"amountmult", &m_amountMultModel}};
 	}
 
 

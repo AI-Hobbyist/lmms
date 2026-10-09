@@ -389,49 +389,62 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// General layout ordering.
 #ifdef WANT_AGENT_MCP
-		auto mcpBox = new QGroupBox(tr("Local HTTP MCP server"), generalControls);
-		auto mcpLayout = new QVBoxLayout(mcpBox);
-		auto mcpEnabled = new QCheckBox(tr("Enable HTTP MCP server"), mcpBox);
-		const auto* mcpConfig = ConfigManager::inst();
-		const auto configuredEnabled = mcpConfig->value("agentMcp", "enabled");
-		mcpEnabled->setChecked(configuredEnabled == "1" || configuredEnabled == "true");
-		mcpLayout->addWidget(mcpEnabled);
-		mcpLayout->addWidget(new QLabel(tr("Port (0 assigns an available port)"), mcpBox));
-		auto mcpPort = new QSpinBox(mcpBox);
-		mcpPort->setRange(0, 65535);
-		mcpPort->setValue(mcpConfig->value("agentMcp", "port").toInt());
-		mcpLayout->addWidget(mcpPort);
-		auto mcpTokenEnv = mcpConfig->value("agentMcp", "tokenEnv");
-		if (mcpTokenEnv.isEmpty()) { mcpTokenEnv = "LMMS_MCP_TOKEN"; }
-		auto mcpTokenHint = new QLabel(tr("Bearer token environment variable: %1").arg(mcpTokenEnv), mcpBox);
-		mcpTokenHint->setWordWrap(true); mcpLayout->addWidget(mcpTokenHint);
-		auto mcpStatus = new QLabel(mcpBox); mcpStatus->setWordWrap(true); mcpLayout->addWidget(mcpStatus);
-		auto mcpCopy = new QPushButton(tr("Copy connection address"), mcpBox); mcpLayout->addWidget(mcpCopy);
-		auto mcpApply = new QPushButton(tr("Apply server settings"), mcpBox); mcpLayout->addWidget(mcpApply);
-		auto& mcpServer = agent::mcp::service();
-		const auto refreshMcp = [mcpStatus, mcpCopy, &mcpServer] {
-			mcpStatus->setText(mcpServer.isRunning() ? tr("Running: %1").arg(mcpServer.endpoint()) :
-				mcpServer.errorString().isEmpty() ? tr("Stopped") : tr("Stopped: %1").arg(mcpServer.errorString()));
-			mcpCopy->setEnabled(mcpServer.isRunning());
-		};
-		connect(&mcpServer, &agent::mcp::HttpMcpServer::stateChanged, this, refreshMcp);
-		connect(mcpCopy, &QPushButton::clicked, this, [&mcpServer] { QApplication::clipboard()->setText(mcpServer.endpoint()); });
-		const auto applyMcp = [mcpEnabled, mcpPort] {
-			auto* config = ConfigManager::inst();
-			config->setValue("agentMcp", "enabled", mcpEnabled->isChecked() ? "true" : "false");
-			config->setValue("agentMcp", "port", QString::number(mcpPort->value()));
-			agent::mcp::applyConfiguration();
-			config->saveConfigFile();
-		};
-		connect(mcpApply, &QPushButton::clicked, this, applyMcp);
-		connect(this, &QDialog::accepted, this, [mcpEnabled, mcpPort, applyMcp] {
-			const auto* config = ConfigManager::inst();
-			const auto enabled = config->value("agentMcp", "enabled");
-			if ((enabled == "true" || enabled == "1") != mcpEnabled->isChecked() ||
-				config->value("agentMcp", "port").toInt() != mcpPort->value()) { applyMcp(); }
-		});
-		refreshMcp();
-		generalControlsLayout->addWidget(mcpBox);
+	auto mcpBox = new QGroupBox(tr("Local HTTP MCP server"), generalControls);
+	auto mcpLayout = new QVBoxLayout(mcpBox);
+	auto mcpEnabled = new QCheckBox(tr("Enable HTTP MCP server"), mcpBox);
+	const auto* mcpConfig = ConfigManager::inst();
+	const auto configuredEnabled = mcpConfig->value("agentMcp", "enabled");
+	mcpEnabled->setChecked(configuredEnabled == "1" || configuredEnabled == "true");
+	mcpLayout->addWidget(mcpEnabled);
+	mcpLayout->addWidget(new QLabel(tr("Port (0 assigns an available port)"), mcpBox));
+	auto mcpPort = new QSpinBox(mcpBox);
+	mcpPort->setRange(0, 65535);
+	mcpPort->setValue(mcpConfig->value("agentMcp", "port").toInt());
+	mcpLayout->addWidget(mcpPort);
+	auto mcpTokenEnv = mcpConfig->value("agentMcp", "tokenEnv");
+	if (mcpTokenEnv.isEmpty())
+	{
+		mcpTokenEnv = "LMMS_MCP_TOKEN";
+	}
+	auto mcpTokenHint = new QLabel(tr("Bearer token environment variable: %1").arg(mcpTokenEnv), mcpBox);
+	mcpTokenHint->setWordWrap(true);
+	mcpLayout->addWidget(mcpTokenHint);
+	auto mcpStatus = new QLabel(mcpBox);
+	mcpStatus->setWordWrap(true);
+	mcpLayout->addWidget(mcpStatus);
+	auto mcpCopy = new QPushButton(tr("Copy connection address"), mcpBox);
+	mcpLayout->addWidget(mcpCopy);
+	auto mcpApply = new QPushButton(tr("Apply server settings"), mcpBox);
+	mcpLayout->addWidget(mcpApply);
+	auto& mcpServer = agent::mcp::service();
+	const auto refreshMcp = [mcpStatus, mcpCopy, &mcpServer] {
+		mcpStatus->setText(mcpServer.isRunning()	? tr("Running: %1").arg(mcpServer.endpoint())
+				: mcpServer.errorString().isEmpty() ? tr("Stopped")
+													: tr("Stopped: %1").arg(mcpServer.errorString()));
+		mcpCopy->setEnabled(mcpServer.isRunning());
+	};
+	connect(&mcpServer, &agent::mcp::HttpMcpServer::stateChanged, this, refreshMcp);
+	connect(mcpCopy, &QPushButton::clicked, this,
+		[&mcpServer] { QApplication::clipboard()->setText(mcpServer.endpoint()); });
+	const auto applyMcp = [mcpEnabled, mcpPort] {
+		auto* config = ConfigManager::inst();
+		config->setValue("agentMcp", "enabled", mcpEnabled->isChecked() ? "true" : "false");
+		config->setValue("agentMcp", "port", QString::number(mcpPort->value()));
+		agent::mcp::applyConfiguration();
+		config->saveConfigFile();
+	};
+	connect(mcpApply, &QPushButton::clicked, this, applyMcp);
+	connect(this, &QDialog::accepted, this, [mcpEnabled, mcpPort, applyMcp] {
+		const auto* config = ConfigManager::inst();
+		const auto enabled = config->value("agentMcp", "enabled");
+		if ((enabled == "true" || enabled == "1") != mcpEnabled->isChecked()
+			|| config->value("agentMcp", "port").toInt() != mcpPort->value())
+		{
+			applyMcp();
+		}
+	});
+	refreshMcp();
+	generalControlsLayout->addWidget(mcpBox);
 #endif
 	generalControlsLayout->addStretch();
 	generalControls->setLayout(generalControlsLayout);
@@ -510,7 +523,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* vstControlsLayout = new QVBoxLayout(vstControls);
 	vstScroll->setWidget(vstControls);
 	vst_layout->addWidget(vstScroll);
-	QGroupBox * pluginsBox = new QGroupBox(tr("Plugin windows"), vstControls);
+	QGroupBox* pluginsBox = new QGroupBox(tr("Plugin windows"), vstControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
@@ -916,59 +929,119 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		QString scanError;
 		const auto roots = ConfigManager::inst()->vstScanRoots(&scanError);
 		m_vstScanRoots = new ScanRootsWidget(roots, scanError, scanBox);
-		scanLayout->addWidget(m_vstScanRoots); vstControlsLayout->addWidget(scanBox);
+		scanLayout->addWidget(m_vstScanRoots);
+		vstControlsLayout->addWidget(scanBox);
 #ifdef LMMS_BUILD_WIN32
 		auto* actions = new QHBoxLayout;
 		auto* refresh = new QPushButton(tr("Refresh saved directories"), scanBox);
 		auto* force = new QPushButton(tr("Rescan including failed plugins"), scanBox);
 		auto* cancel = new QPushButton(tr("Cancel scan"), scanBox);
-		refresh->setObjectName("vstCatalogRefresh"); force->setObjectName("vstCatalogForce"); cancel->setObjectName("vstCatalogCancel");
-		actions->addWidget(refresh); actions->addWidget(force); actions->addWidget(cancel); scanLayout->addLayout(actions);
-		auto* status = new QLabel(scanBox); status->setObjectName("vstCatalogStatus"); status->setWordWrap(true); scanLayout->addWidget(status);
-		auto* results = new QTreeWidget(scanBox); results->setObjectName("vstCatalogCategories");
-		results->setHeaderLabels({tr("Plugin"), tr("Format / architecture")}); results->setUniformRowHeights(true);
-		results->setMaximumHeight(180); scanLayout->addWidget(results);
+		refresh->setObjectName("vstCatalogRefresh");
+		force->setObjectName("vstCatalogForce");
+		cancel->setObjectName("vstCatalogCancel");
+		actions->addWidget(refresh);
+		actions->addWidget(force);
+		actions->addWidget(cancel);
+		scanLayout->addLayout(actions);
+		auto* status = new QLabel(scanBox);
+		status->setObjectName("vstCatalogStatus");
+		status->setWordWrap(true);
+		scanLayout->addWidget(status);
+		auto* results = new QTreeWidget(scanBox);
+		results->setObjectName("vstCatalogCategories");
+		results->setHeaderLabels({tr("Plugin"), tr("Format / architecture")});
+		results->setUniformRowHeights(true);
+		results->setMaximumHeight(180);
+		scanLayout->addWidget(results);
 		auto update = [status, results, cancel, refresh, force, published = std::uint64_t{0}]() mutable {
 			const auto* jobs = Engine::vstCatalog();
-			refresh->setEnabled(jobs); force->setEnabled(jobs);
-			if (!jobs) { cancel->setEnabled(false); status->setText(tr("VST catalog is unavailable.")); return; }
-			const auto state = jobs->snapshot(); cancel->setEnabled(state.busy);
-			if (state.busy) { status->setText(tr("Scanning: %1 (%2/%3)").arg(state.path).arg(state.completed).arg(state.total)); }
-			else if (state.report) {
-				const auto instruments = std::count_if(state.report->entries.begin(), state.report->entries.end(), vsthost::isVstInstrument);
-				status->setText(tr("Instrument: %1; Effect: %2; scan failures: %3.%4").arg(instruments)
-					.arg(state.report->entries.size() - instruments).arg(state.report->failures.size())
-					.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : ""));
-				if (published != state.published) {
-					published = state.published; QStringList details;
-					results->setUpdatesEnabled(false); results->clear();
+			refresh->setEnabled(jobs);
+			force->setEnabled(jobs);
+			if (!jobs)
+			{
+				cancel->setEnabled(false);
+				status->setText(tr("VST catalog is unavailable."));
+				return;
+			}
+			const auto state = jobs->snapshot();
+			cancel->setEnabled(state.busy);
+			if (state.busy)
+			{
+				status->setText(tr("Scanning: %1 (%2/%3)").arg(state.path).arg(state.completed).arg(state.total));
+			}
+			else if (state.report)
+			{
+				const auto instruments = std::count_if(
+					state.report->entries.begin(), state.report->entries.end(), vsthost::isVstInstrument);
+				status->setText(tr("Instrument: %1; Effect: %2; scan failures: %3.%4")
+						.arg(instruments)
+						.arg(state.report->entries.size() - instruments)
+						.arg(state.report->failures.size())
+						.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : ""));
+				if (published != state.published)
+				{
+					published = state.published;
+					QStringList details;
+					results->setUpdatesEnabled(false);
+					results->clear();
 					auto* instrumentGroup = new QTreeWidgetItem(results, {tr("Instrument")});
 					auto* effectGroup = new QTreeWidgetItem(results, {tr("Effect")});
-					for (const auto& entry : state.report->entries) {
-						auto* item = new QTreeWidgetItem(vsthost::isVstInstrument(entry) ? instrumentGroup : effectGroup,
-							{entry.name, QString("%1 / %2-bit").arg(entry.identity.format == vsthost::Format::Vst3 ? "VST3" : "VST2")
-								.arg(entry.identity.architecture == vsthost::Architecture::X86 ? 32 : 64)});
-						item->setToolTip(0, entry.vendor + '\n' + entry.locator.version + '\n' + entry.locator.modulePath);
+					for (const auto& entry : state.report->entries)
+					{
+						auto* item
+							= new QTreeWidgetItem(vsthost::isVstInstrument(entry) ? instrumentGroup : effectGroup,
+								{entry.name,
+									QString("%1 / %2-bit")
+										.arg(entry.identity.format == vsthost::Format::Vst3 ? "VST3" : "VST2")
+										.arg(entry.identity.architecture == vsthost::Architecture::X86 ? 32 : 64)});
+						item->setToolTip(
+							0, entry.vendor + '\n' + entry.locator.version + '\n' + entry.locator.modulePath);
 					}
 					results->setUpdatesEnabled(true);
-					for (std::size_t i = 0; i < std::min<std::size_t>(32, state.report->failures.size()); ++i) {
+					for (std::size_t i = 0; i < std::min<std::size_t>(32, state.report->failures.size()); ++i)
+					{
 						const auto& failure = state.report->failures[i];
-						details.append(tr("%1: %2 (error %3)").arg(failure.path, failure.operation).arg(static_cast<unsigned>(failure.error)));
+						details.append(tr("%1: %2 (error %3)")
+								.arg(failure.path, failure.operation)
+								.arg(static_cast<unsigned>(failure.error)));
 					}
-					if (state.report->failures.size() > 32) { details.append(tr("%1 additional failures.").arg(state.report->failures.size() - 32)); }
-					if (!state.report->cacheError.isEmpty()) { details.append(state.report->cacheError); }
+					if (state.report->failures.size() > 32)
+					{
+						details.append(tr("%1 additional failures.").arg(state.report->failures.size() - 32));
+					}
+					if (!state.report->cacheError.isEmpty())
+					{
+						details.append(state.report->cacheError);
+					}
 					status->setToolTip(details.join('\n'));
 				}
-			} else { status->setText(state.cancelled ? tr("Scan cancelled.") : tr("No scan completed.")); }
+			}
+			else
+			{
+				status->setText(state.cancelled ? tr("Scan cancelled.") : tr("No scan completed."));
+			}
 		};
 		auto start = [this, update](bool forced) mutable {
-			QString error; if (!Engine::refreshVstCatalog(&error, forced)) { m_vstScanRoots->showError(error); }
+			QString error;
+			if (!Engine::refreshVstCatalog(&error, forced))
+			{
+				m_vstScanRoots->showError(error);
+			}
 			update();
 		};
 		connect(refresh, &QPushButton::clicked, this, [start]() mutable { start(false); });
 		connect(force, &QPushButton::clicked, this, [start]() mutable { start(true); });
-		connect(cancel, &QPushButton::clicked, this, [update]() mutable { if (auto* jobs = Engine::vstCatalog()) { jobs->cancel(); } update(); });
-		auto* timer = new QTimer(scanBox); connect(timer, &QTimer::timeout, this, update); timer->start(100); update();
+		connect(cancel, &QPushButton::clicked, this, [update]() mutable {
+			if (auto* jobs = Engine::vstCatalog())
+			{
+				jobs->cancel();
+			}
+			update();
+		});
+		auto* timer = new QTimer(scanBox);
+		connect(timer, &QTimer::timeout, this, update);
+		timer->start(100);
+		update();
 #endif
 	}
 	addPathEntry(tr("LADSPA plugins directories"), m_ladspaDir,
@@ -1110,9 +1183,13 @@ void SetupDialog::accept()
 {
 	if (m_vstScanRoots && m_vstScanRoots->changed())
 	{
-		std::vector<vsthost::ScanRoot> roots; QString error;
+		std::vector<vsthost::ScanRoot> roots;
+		QString error;
 		if (!m_vstScanRoots->roots(roots, error) || !ConfigManager::inst()->setVstScanRoots(roots, &error))
-		{ m_vstScanRoots->showError(error); return; }
+		{
+			m_vstScanRoots->showError(error);
+			return;
+		}
 	}
 	/* Hide dialog before setting values. This prevents an obscure bug
 	where non-embedded VST windows would steal focus and prevent LMMS
@@ -1208,7 +1285,10 @@ void SetupDialog::accept()
 	static_cast<SVSSettingsPage*>(m_svsSettings)->save();
 	ConfigManager::inst()->saveConfigFile();
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstScanRoots && m_vstScanRoots->changed()) { Engine::refreshVstCatalog(); }
+	if (m_vstScanRoots && m_vstScanRoots->changed())
+	{
+		Engine::refreshVstCatalog();
+	}
 #endif
 }
 

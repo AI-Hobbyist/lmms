@@ -236,17 +236,30 @@ public:
 	}
 	bool setRealtimeParameter(unsigned index, float value)
 	{
-		if (!m_plugin || index >= static_cast<unsigned>(m_plugin->numParams) || !std::isfinite(value)) { return false; }
+		if (!m_plugin || index >= static_cast<unsigned>(m_plugin->numParams) || !std::isfinite(value))
+		{
+			return false;
+		}
 		HostParameterChange change;
-		m_plugin->setParameter(m_plugin, static_cast<int32_t>(index), value); return true;
+		m_plugin->setParameter(m_plugin, static_cast<int32_t>(index), value);
+		return true;
 	}
 	bool queueParameterEdit(unsigned phase, int index, float value) noexcept
 	{
-		if (m_hostParameterDepth) { return true; }
+		if (m_hostParameterDepth)
+		{
+			return true;
+		}
 		if (!m_plugin || index < 0 || index >= m_plugin->numParams || !std::isfinite(value) || value < 0 || value > 1)
-		{ return false; }
-		if (!m_parameterEdits.push({0, {phase, static_cast<unsigned>(index), std::bit_cast<std::uint32_t>(value), 0, 0}}))
-		{ m_editOverflow.store(true, std::memory_order_release); return false; }
+		{
+			return false;
+		}
+		if (!m_parameterEdits.push(
+				{0, {phase, static_cast<unsigned>(index), std::bit_cast<std::uint32_t>(value), 0, 0}}))
+		{
+			m_editOverflow.store(true, std::memory_order_release);
+			return false;
+		}
 		return true;
 	}
 
@@ -570,25 +583,25 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 
 
-RemoteVstPlugin::RemoteVstPlugin(std::unique_ptr<MessageTransport> transport) :
-	RemotePluginClient(std::move(transport)),
-	m_libInst( nullptr ),
-	m_plugin( nullptr ),
-	m_windowID( 0 ),
-	m_windowWidth( 0 ),
-	m_windowHeight( 0 ),
-	m_initialized( false ),
-	m_resumed( false ),
-	m_processing( false ),
-	m_messageList(),
-	m_shouldGiveIdle( false ),
-	m_inputs( nullptr ),
-	m_outputs( nullptr ),
-	m_shmValid( false ),
-	m_midiEvents(),
-	m_bpm( 0 ),
-	m_currentSamplePos( 0 ),
-	m_currentProgram(-1)
+RemoteVstPlugin::RemoteVstPlugin(std::unique_ptr<MessageTransport> transport)
+	: RemotePluginClient(std::move(transport))
+	, m_libInst(nullptr)
+	, m_plugin(nullptr)
+	, m_windowID(0)
+	, m_windowWidth(0)
+	, m_windowHeight(0)
+	, m_initialized(false)
+	, m_resumed(false)
+	, m_processing(false)
+	, m_messageList()
+	, m_shouldGiveIdle(false)
+	, m_inputs(nullptr)
+	, m_outputs(nullptr)
+	, m_shmValid(false)
+	, m_midiEvents()
+	, m_bpm(0)
+	, m_currentSamplePos(0)
+	, m_currentProgram(-1)
 {
 	__plugin = this;
 	m_midiEvents.reserve(1024);
@@ -670,16 +683,19 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 	switch( _m.id )
 	{
 			case IdVstLoadPlugin:
-				if (_m.argumentCount() == 2)
-				{
-					const auto id = _m.getString(1);
-					const auto parsed = std::from_chars(id.data(), id.data() + id.size(), m_shellId);
-					if (parsed.ec != std::errc{} || parsed.ptr != id.data() + id.size() || !m_shellId) { return false; }
-				}
-				init( _m.getString() );
-				break;
-			case IdVstScanPlugin:
-				return scanPlugin(_m.getString());
+		if (_m.argumentCount() == 2)
+		{
+			const auto id = _m.getString(1);
+			const auto parsed = std::from_chars(id.data(), id.data() + id.size(), m_shellId);
+			if (parsed.ec != std::errc{} || parsed.ptr != id.data() + id.size() || !m_shellId)
+			{
+				return false;
+			}
+		}
+		init(_m.getString());
+		break;
+	case IdVstScanPlugin:
+		return scanPlugin(_m.getString());
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -735,13 +751,12 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( IdSavePresetFile );
 			break;
 
-			case IdVstSetParameter:
-			{
-				HostParameterChange change;
-				m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
-				//sendMessage( IdVstSetParameter );
-				break;
-			}
+			case IdVstSetParameter: {
+		HostParameterChange change;
+		m_plugin->setParameter(m_plugin, _m.getInt(0), _m.getFloat(1));
+		//sendMessage( IdVstSetParameter );
+		break;
+	}
 
 		case IdVstLoadAllParameterDisplays:
 			loadAllParameterDisplays();
@@ -759,21 +774,31 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			updateParameterLabel(_m.getInt());
 			break;
 
-			case IdVstIdleUpdate:
+			case IdVstIdleUpdate: {
+			if (m_editOverflow.load(std::memory_order_acquire))
 			{
-				if (m_editOverflow.load(std::memory_order_acquire)) { return false; }
-				std::vector<vsthost::RealtimeMidiQueue::Event> edits;
-				vsthost::RealtimeMidiQueue::Event event{};
-				for (unsigned i = 0; i < vsthost::RealtimeMidiQueue::Capacity && m_parameterEdits.pop(event); ++i)
-				{ edits.push_back(event); }
-				if (!edits.empty())
+				return false;
+			}
+			std::vector<vsthost::RealtimeMidiQueue::Event> edits;
+			vsthost::RealtimeMidiQueue::Event event{};
+			for (unsigned i = 0; i < vsthost::RealtimeMidiQueue::Capacity && m_parameterEdits.pop(event); ++i)
+			{
+				edits.push_back(event);
+			}
+			if (!edits.empty())
+			{
+				message reply(IdVstParameterEdits);
+				reply.addInt(static_cast<int>(edits.size()));
+				for (const auto& edit : edits)
 				{
-					message reply(IdVstParameterEdits); reply.addInt(static_cast<int>(edits.size()));
-					for (const auto& edit : edits)
-					{ for (unsigned i = 0; i < 3; ++i) { reply.addString(std::to_string(edit.values[i])); } }
-					sendMessage(reply);
+					for (unsigned i = 0; i < 3; ++i)
+					{
+						reply.addString(std::to_string(edit.values[i]));
+					}
 				}
-				int newCurrentProgram = pluginDispatch( effGetProgram );
+				sendMessage(reply);
+			}
+			int newCurrentProgram = pluginDispatch(effGetProgram);
 			if( newCurrentProgram != m_currentProgram )
 			{
 				m_currentProgram = newCurrentProgram;
@@ -817,7 +842,10 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	// VST2 shell category/opcodes are absent in the compatibility SDK header.
 	// Their ABI values are effGetPlugCategory=35, kPlugCategShell=10.
 	if (pluginDispatch(35) == 10 || (m_shellId && static_cast<std::uint32_t>(m_plugin->uniqueID) != m_shellId))
-	{ sendMessage(IdVstFailedLoadingPlugin); return; }
+	{
+		sendMessage(IdVstFailedLoadingPlugin);
+		return;
+	}
 
 	updateInOutCount();
 	updateBufferSize();
@@ -1051,7 +1079,10 @@ void RemoteVstPlugin::destroyEditor()
 
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
-	if (m_libInst || m_plugin) { return false; }
+	if (m_libInst || m_plugin)
+	{
+		return false;
+	}
 #ifndef NATIVE_LINUX_VST
 	if ((m_libInst = LoadLibraryW(toWString(_plugin_file).get())) == nullptr)
 	{
@@ -1125,7 +1156,10 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 bool RemoteVstPlugin::scanPlugin(const std::string& path)
 {
-	if (m_libInst || m_plugin || !load(path)) { return false; }
+	if (m_libInst || m_plugin || !load(path))
+	{
+		return false;
+	}
 	std::vector<std::pair<std::uint32_t, std::string>> entries;
 	const bool shell = pluginDispatch(35) == 10;
 	if (shell)
@@ -1138,42 +1172,84 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 			char name[64]{};
 			const auto id = static_cast<std::uint32_t>(pluginDispatch(70, 0, 0, name));
 			name[63] = 0;
-			if (!id) { break; }
-			if (index == 4096 || !seen.insert(id).second) { return false; }
+			if (!id)
+			{
+				break;
+			}
+			if (index == 4096 || !seen.insert(id).second)
+			{
+				return false;
+			}
 			entries.emplace_back(id, name);
 		}
-		if (entries.empty()) { return false; }
+		if (entries.empty())
+		{
+			return false;
+		}
 	}
-	else { entries.emplace_back(static_cast<std::uint32_t>(m_plugin->uniqueID), pluginName()); }
-	message result(IdVstShellEntries); result.addInt(static_cast<int>(entries.size())).addInt(shell ? 1 : 0);
-	const auto vendorVersion = pluginVersion(); const auto vendor = pluginVendorString();
+	else
+	{
+		entries.emplace_back(static_cast<std::uint32_t>(m_plugin->uniqueID), pluginName());
+	}
+	message result(IdVstShellEntries);
+	result.addInt(static_cast<int>(entries.size())).addInt(shell ? 1 : 0);
+	const auto vendorVersion = pluginVersion();
+	const auto vendor = pluginVendorString();
 	// Classify shell children inside the same supervised scan helper, never in the DAW.
-	using Entry = AEffect* (VST_CALL_CONV*)(audioMasterCallback);
+	using Entry = AEffect*(VST_CALL_CONV*)(audioMasterCallback);
 #ifndef NATIVE_LINUX_VST
 	auto entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "VSTPluginMain"));
-	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "VstPluginMain")); }
-	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "main")); }
+	if (!entryPoint)
+	{
+		entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "VstPluginMain"));
+	}
+	if (!entryPoint)
+	{
+		entryPoint = reinterpret_cast<Entry>(GetProcAddress(m_libInst, "main"));
+	}
 #else
 	auto entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "VSTPluginMain"));
-	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "VstPluginMain")); }
-	if (!entryPoint) { entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "main")); }
+	if (!entryPoint)
+	{
+		entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "VstPluginMain"));
+	}
+	if (!entryPoint)
+	{
+		entryPoint = reinterpret_cast<Entry>(dlsym(m_libInst, "main"));
+	}
 #endif
-	if (!entryPoint) { return false; }
-	if (shell) { pluginDispatch(effClose); m_plugin = nullptr; }
+	if (!entryPoint)
+	{
+		return false;
+	}
+	if (shell)
+	{
+		pluginDispatch(effClose);
+		m_plugin = nullptr;
+	}
 	for (const auto& [id, name] : entries)
 	{
 		if (shell)
 		{
-			m_shellId = id; m_plugin = entryPoint(hostCallback);
-			if (!m_plugin || m_plugin->magic != kEffectMagic || static_cast<std::uint32_t>(m_plugin->uniqueID) != id) { return false; }
+			m_shellId = id;
+			m_plugin = entryPoint(hostCallback);
+			if (!m_plugin || m_plugin->magic != kEffectMagic || static_cast<std::uint32_t>(m_plugin->uniqueID) != id)
+			{
+				return false;
+			}
 			pluginDispatch(effOpen);
 		}
 		const auto flags = static_cast<std::uint32_t>(m_plugin->flags);
 		result.addString(std::to_string(id)).addString(name).addString(std::to_string(flags));
-		if (shell) { pluginDispatch(effClose); m_plugin = nullptr; }
+		if (shell)
+		{
+			pluginDispatch(effClose);
+			m_plugin = nullptr;
+		}
 	}
 	result.addString(vendor).addString(std::to_string(vendorVersion));
-	sendMessage(result); return true;
+	sendMessage(result);
+	return true;
 }
 
 
@@ -1969,7 +2045,10 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 	{
 		case audioMasterAutomate:
 			SHOW_CALLBACK( "amc: audioMasterAutomate\n" );
-			if (__plugin) { __plugin->queueParameterEdit(1, _index, _opt); }
+			if (__plugin)
+			{
+				__plugin->queueParameterEdit(1, _index, _opt);
+			}
 			return 0;
 
 		case audioMasterVersion:
@@ -2686,7 +2765,10 @@ int main( int _argc, char * * _argv )
 	#endif
 		std::string embedMethod = _argv[embedMethodIndex];
 #ifdef LMMS_BUILD_WIN32
-		if (_argc > 2 && std::string(_argv[2]) == "--host-session") { embedMethod = _argv[1]; }
+		if (_argc > 2 && std::string(_argv[2]) == "--host-session")
+		{
+			embedMethod = _argv[1];
+		}
 #endif
 
 		if ( embedMethod == "none" )

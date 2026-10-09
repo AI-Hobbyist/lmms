@@ -7,8 +7,7 @@
 #include <functional>
 #include <stop_token>
 
-namespace lmms::vsthost
-{
+namespace lmms::vsthost {
 struct LMMS_EXPORT PluginIdentity
 {
 	Format format = Format::Vst3;
@@ -67,15 +66,21 @@ public:
 		QString cacheFile, hostVersion;
 		QString ioHelper; // Empty selects RemoteCatalogIo.exe beside the x64 VST3 helper.
 	};
-	struct Options { bool force = false; std::uint32_t timeoutMs = 30000; std::uint32_t ioTimeoutMs = 30000; };
+	struct Options
+	{
+		bool force = false;
+		std::uint32_t timeoutMs = 30000;
+		std::uint32_t ioTimeoutMs = 30000;
+	};
 	using Progress = std::function<void(const QString&, std::size_t, std::size_t)>;
 	explicit PluginCatalog(Configuration configuration);
 	// Blocking control-worker operation, never an audio-thread API. Each call
 	// owns its native scan sessions; reports are immutable snapshots and do not
 	// hold/reconfigure active audio instances. Independent scans may run in
 	// parallel; cache publication is atomic and protected by a short file lock.
-	CatalogReport scan(const std::vector<ScanRoot>& roots, Options options,
-		std::stop_token stop = {}, Progress progress = {}) const;
+	CatalogReport scan(
+		const std::vector<ScanRoot>& roots, Options options, std::stop_token stop = {}, Progress progress = {}) const;
+
 private:
 	Configuration m_configuration;
 };

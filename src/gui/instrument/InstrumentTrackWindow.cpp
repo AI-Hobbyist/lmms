@@ -473,8 +473,9 @@ void InstrumentTrackWindow::updateInstrumentView()
 		int commonWidth = INSTRUMENT_WIDTH;
 		if (LmmsStyle::s_flatFrames)
 		{
-			for (auto* page : {static_cast<QWidget*>(m_ssView), m_instrumentFunctionsView,
-					static_cast<QWidget*>(m_effectView), static_cast<QWidget*>(m_midiView), static_cast<QWidget*>(m_tuningView)})
+			for (auto* page :
+				{static_cast<QWidget*>(m_ssView), m_instrumentFunctionsView, static_cast<QWidget*>(m_effectView),
+					static_cast<QWidget*>(m_midiView), static_cast<QWidget*>(m_tuningView)})
 			{
 				page->ensurePolished();
 				commonWidth = std::max(commonWidth, page->minimumSizeHint().width() + 4);

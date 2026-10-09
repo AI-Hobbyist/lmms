@@ -144,11 +144,13 @@ void FileDialog::accept()
 	{
 		const QFileInfo selected(files.front());
 		if (selected.isDir() && selected.suffix().compare(m_directorySuffix, Qt::CaseInsensitive) == 0)
-		{ QDialog::accept(); return; }
+		{
+			QDialog::accept();
+			return;
+		}
 	}
 	QFileDialog::accept();
 }
-
 
 void FileDialog::clearSelection()
 {

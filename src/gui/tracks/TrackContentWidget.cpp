@@ -90,7 +90,8 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 void TrackContentWidget::changeEvent(QEvent* event)
 {
 	QWidget::changeEvent(event);
-	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange || event->type() == QEvent::FontChange)
+	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange
+		|| event->type() == QEvent::FontChange)
 	{
 		updateBackground();
 	}
@@ -553,7 +554,10 @@ void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
 
 void TrackContentWidget::paintEvent( QPaintEvent * pe )
 {
-	if (m_backgroundDirty || m_background.devicePixelRatioF() != devicePixelRatioF()) { updateBackground(); }
+	if (m_backgroundDirty || m_background.devicePixelRatioF() != devicePixelRatioF())
+	{
+		updateBackground();
+	}
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );

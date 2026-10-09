@@ -44,7 +44,9 @@ class QScrollArea;
 
 namespace lmms
 {
-namespace vsthost { struct CatalogEntry; }
+namespace vsthost {
+struct CatalogEntry;
+}
 
 class FloatModel;
 class VstPlugin;

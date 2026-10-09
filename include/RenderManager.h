@@ -52,7 +52,7 @@ public:
 	void renderTracks();
 
 	void abortProcessing();
-	void setIgnoreFailedSVSRegions(bool ignore) {m_ignoreFailedSVS=ignore;}
+	void setIgnoreFailedSVSRegions(bool ignore) { m_ignoreFailedSVS = ignore; }
 
 signals:
 	void progressChanged( int );
@@ -67,7 +67,7 @@ private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
-	void render( QString outputPath, Track* renderTrack=nullptr );
+	void render(QString outputPath, Track* renderTrack = nullptr);
 
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormat m_format;
@@ -78,7 +78,7 @@ private:
 	std::vector<QPointer<Track>> m_tracksToRender;
 	std::vector<QPointer<Track>> m_unmuted;
 	std::unique_ptr<svs::ExportSnapshot> m_svsBatch;
-	bool m_ignoreFailedSVS=false;
+	bool m_ignoreFailedSVS = false;
 } ;
 
 

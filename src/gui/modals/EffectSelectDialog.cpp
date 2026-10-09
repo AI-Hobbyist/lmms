@@ -74,23 +74,40 @@ void EffectSelectDialog::refreshVstKeys()
 	m_pluginList->selectionModel()->clear();
 	for (auto it = m_effectKeys.begin(); it != m_effectKeys.end();)
 	{
-		if (QString::fromUtf8(it->desc->name) == "vsteffect") { it = m_effectKeys.erase(it); }
-		else { ++it; }
+		if (QString::fromUtf8(it->desc->name) == "vsteffect")
+		{
+			it = m_effectKeys.erase(it);
+		}
+		else
+		{
+			++it;
+		}
 	}
 	for (const auto* descriptor : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
 		if (QString::fromUtf8(descriptor->name) == "vsteffect" && descriptor->subPluginFeatures)
-		{ descriptor->subPluginFeatures->listSubPluginKeys(descriptor, m_effectKeys); }
+		{
+			descriptor->subPluginFeatures->listSubPluginKeys(descriptor, m_effectKeys);
+		}
 	}
-	m_currentSelection = {}; rebuildModel();
+	m_currentSelection = {};
+	rebuildModel();
 	QModelIndex next = m_model.index(0, 0);
 	for (int row = 0; row < m_effectKeys.size(); ++row)
 	{
 		const auto& key = m_effectKeys[row];
 		if (key.desc == selected.desc && key.name == selected.name && key.attributes == selected.attributes)
-		{ const auto candidate = m_model.mapFromSource(m_sourceModel.index(row, 0)); if (candidate.isValid()) { next = candidate; } break; }
+		{
+			const auto candidate = m_model.mapFromSource(m_sourceModel.index(row, 0));
+			if (candidate.isValid())
+			{
+				next = candidate;
+			}
+			break;
+		}
 	}
-	m_pluginList->selectionModel()->setCurrentIndex(next, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	m_pluginList->selectionModel()->setCurrentIndex(
+		next, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 	rowChanged(next, {});
 }
 
@@ -217,14 +234,23 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	updateSelection();
 #ifdef LMMS_BUILD_WIN32
 	auto* timer = new QTimer(this);
-	connect(timer, &QTimer::timeout, this, [this, published = Engine::vstCatalog() ? Engine::vstCatalog()->snapshot().published : 0ULL]() mutable {
-		if (const auto* jobs = Engine::vstCatalog()) {
-			const auto state = jobs->snapshot();
-			if (state.published != published) { published = state.published; refreshVstKeys(); }
-		}
-	});
+	connect(timer, &QTimer::timeout, this,
+		[this, published = Engine::vstCatalog() ? Engine::vstCatalog()->snapshot().published : 0ULL]() mutable {
+			if (const auto* jobs = Engine::vstCatalog())
+			{
+				const auto state = jobs->snapshot();
+				if (state.published != published)
+				{
+					published = state.published;
+					refreshVstKeys();
+				}
+			}
+		});
 	timer->start(100);
-	if (const auto* jobs = Engine::vstCatalog(); jobs && !jobs->snapshot().requested) { Engine::refreshVstCatalog(); }
+	if (const auto* jobs = Engine::vstCatalog(); jobs && !jobs->snapshot().requested)
+	{
+		Engine::refreshVstCatalog();
+	}
 #endif
 	show();
 }

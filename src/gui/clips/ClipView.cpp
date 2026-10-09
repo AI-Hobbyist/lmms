@@ -176,14 +176,18 @@ void ClipView::paintFlatBorder(QPainter& painter, bool current, int horizontalOf
 
 bool ClipView::event(QEvent* event)
 {
-	if (event->type() == QEvent::DevicePixelRatioChange) { update(); }
+	if (event->type() == QEvent::DevicePixelRatioChange)
+	{
+		update();
+	}
 	return selectableObject::event(event);
 }
 
 void ClipView::changeEvent(QEvent* event)
 {
 	selectableObject::changeEvent(event);
-	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange || event->type() == QEvent::FontChange)
+	if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange
+		|| event->type() == QEvent::FontChange)
 	{
 		update();
 	}
@@ -1278,7 +1282,10 @@ bool ClipView::splitClip(const TimePos pos)
 	// Cutting at exactly the start/end position would create a zero length
 	// clip (bad), and a clip the same length as the original one (pointless).
 	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
-	if (auto* svs = dynamic_cast<SVSClip*>(m_clip)) { return svs->splitAt(splitPos) != nullptr; }
+	if (auto* svs = dynamic_cast<SVSClip*>(m_clip))
+	{
+		return svs->splitAt(splitPos) != nullptr;
+	}
 
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);

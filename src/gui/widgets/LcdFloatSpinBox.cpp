@@ -116,7 +116,10 @@ void LcdFloatSpinBox::setTextMode(bool enabled)
 	m_textMode = enabled;
 	m_wholeDisplay.setTextMode(enabled);
 	m_fractionDisplay.setTextMode(enabled);
-	if (!m_dotLabel) { return; }
+	if (!m_dotLabel)
+	{
+		return;
+	}
 	if (enabled)
 	{
 		m_dotLabel->setPixmap(QPixmap());
@@ -279,7 +282,8 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 		if (m_textMode)
 		{
 			p.setPen(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Text));
-			p.drawText(QRect(0, m_wholeDisplay.height(), width(), height() - m_wholeDisplay.height()), Qt::AlignCenter, m_label);
+			p.drawText(QRect(0, m_wholeDisplay.height(), width(), height() - m_wholeDisplay.height()), Qt::AlignCenter,
+				m_label);
 			return;
 		}
 		p.setPen(m_wholeDisplay.textShadowColor());

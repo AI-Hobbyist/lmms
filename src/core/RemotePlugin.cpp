@@ -134,13 +134,18 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin() : RemotePlugin(false) { }
+RemotePlugin::RemotePlugin()
+	: RemotePlugin(false)
+{
+}
 
-RemotePlugin::RemotePlugin(bool supervisedVst) :
+RemotePlugin::RemotePlugin(bool supervisedVst)
+	:
 	QObject(),
 #ifdef SYNC_WITH_SHM_FIFO
 #ifdef LMMS_BUILD_WIN32
-	RemotePluginBase(supervisedVst ? nullptr : new shmFifo(), supervisedVst ? nullptr : new shmFifo()),
+	RemotePluginBase(supervisedVst ? nullptr : new shmFifo(), supervisedVst ? nullptr : new shmFifo())
+	,
 #else
 	RemotePluginBase( new shmFifo(), new shmFifo() ),
 #endif
@@ -204,7 +209,12 @@ RemotePlugin::~RemotePlugin()
 	m_watcher.stop();
 	m_watcher.wait();
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { m_vstBridge->send(IdQuit); m_vstBridge = nullptr; return; }
+	if (m_vstBridge)
+	{
+		m_vstBridge->send(IdQuit);
+		m_vstBridge = nullptr;
+		return;
+	}
 #endif
 
 	if( m_failed == false )
@@ -239,7 +249,10 @@ RemotePlugin::~RemotePlugin()
 bool RemotePlugin::isRunning()
 {
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { return m_vstBridge->running(); }
+	if (m_vstBridge)
+	{
+		return m_vstBridge->running();
+	}
 #endif
 #ifdef DEBUG_REMOTE_PLUGIN
 	return true;
@@ -251,7 +264,10 @@ bool RemotePlugin::isRunning()
 bool RemotePlugin::failed() const
 {
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { return m_failed || m_vstBridge->error() != vsthost::Error::None; }
+	if (m_vstBridge)
+	{
+		return m_failed || m_vstBridge->error() != vsthost::Error::None;
+	}
 #endif
 	return m_failed;
 }
@@ -260,12 +276,22 @@ bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QStr
 {
 #ifdef LMMS_BUILD_WIN32
 	QString executable = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
-	if (const auto* path = std::getenv("LMMS_PLUGIN_DIR")) { executable = QFileInfo(QDir(path), pluginExecutable).absoluteFilePath(); }
-	if (!executable.endsWith(".exe", Qt::CaseInsensitive)) { executable += ".exe"; }
+	if (const auto* path = std::getenv("LMMS_PLUGIN_DIR"))
+	{
+		executable = QFileInfo(QDir(path), pluginExecutable).absoluteFilePath();
+	}
+	if (!executable.endsWith(".exe", Qt::CaseInsensitive))
+	{
+		executable += ".exe";
+	}
 	auto bridge = std::make_unique<vsthost::LegacyHostBridge>([this](const message& reply) { processMessage(reply); });
-	m_vstBridge = bridge.get(); setMessageTransport(std::move(bridge));
+	m_vstBridge = bridge.get();
+	setMessageTransport(std::move(bridge));
 	m_failed = !m_vstBridge->open({executable.toStdWString(), {embedMethod.toStdWString()}, 30000, 100});
-	if (!m_failed) { sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey())); }
+	if (!m_failed)
+	{
+		sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
+	}
 	return failed();
 #else
 	return init(pluginExecutable, false, {embedMethod});
@@ -275,7 +301,11 @@ bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QStr
 bool RemotePlugin::postVstParameter(int index, float value) noexcept
 {
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { m_vstBridge->parameter(static_cast<unsigned>(index), value); return true; }
+	if (m_vstBridge)
+	{
+		m_vstBridge->parameter(static_cast<unsigned>(index), value);
+		return true;
+	}
 #endif
 	return false;
 }
@@ -283,7 +313,11 @@ bool RemotePlugin::postVstParameter(int index, float value) noexcept
 bool RemotePlugin::postVstTempo(unsigned value) noexcept
 {
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { m_vstBridge->tempo(value); return true; }
+	if (m_vstBridge)
+	{
+		m_vstBridge->tempo(value);
+		return true;
+	}
 #endif
 	return false;
 }
@@ -401,8 +435,9 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstBridge)
 	{
-		return m_vstBridge->process(frames, static_cast<unsigned>(m_inputCount.load()), static_cast<unsigned>(m_outputCount.load()),
-			reinterpret_cast<const float*>(_in_buf), reinterpret_cast<float*>(_out_buf),
+		return m_vstBridge->process(frames, static_cast<unsigned>(m_inputCount.load()),
+			static_cast<unsigned>(m_outputCount.load()), reinterpret_cast<const float*>(_in_buf),
+			reinterpret_cast<float*>(_out_buf),
 			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting());
 	}
 #endif
@@ -523,13 +558,14 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 
 
 void RemotePlugin::processMidiEvent( const MidiEvent & _e,
-								const f_cnt_t _offset )
+								const f_cnt_t _offset)
 {
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstBridge)
 	{
 		m_vstBridge->midi({static_cast<std::uint32_t>(_e.type()), static_cast<std::uint32_t>(_e.channel()),
-			static_cast<std::uint32_t>(_e.param(0)), static_cast<std::uint32_t>(_e.param(1)), static_cast<std::uint32_t>(_offset)});
+			static_cast<std::uint32_t>(_e.param(0)), static_cast<std::uint32_t>(_e.param(1)),
+			static_cast<std::uint32_t>(_offset)});
 		return;
 	}
 #endif
@@ -564,7 +600,10 @@ void RemotePlugin::hideUI()
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 #ifdef LMMS_BUILD_WIN32
-	if (m_vstBridge) { return; }
+	if (m_vstBridge)
+	{
+		return;
+	}
 #endif
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	try

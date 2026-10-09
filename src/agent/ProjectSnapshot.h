@@ -5,8 +5,7 @@
 #include <QMap>
 #include <QString>
 
-namespace lmms::agent
-{
+namespace lmms::agent {
 using ProjectFields = QMap<QString, QString>;
 ProjectFields projectFields();
 QJsonObject projectDiff(const QString& command, const ProjectFields& before, const ProjectFields& after);

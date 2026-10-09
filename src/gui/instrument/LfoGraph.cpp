@@ -71,7 +71,10 @@ void LfoGraph::paintEvent(QPaintEvent*)
 		p.setBrush(palette().base());
 		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
 	}
-	else { p.drawPixmap(rect(), m_lfoGraph); }
+	else
+	{
+		p.drawPixmap(rect(), m_lfoGraph);
+	}
 
 	const auto* params = castModel<EnvelopeAndLfoParameters>();
 	if (!params) { return; }

@@ -9,8 +9,7 @@
 #include <memory>
 #include "lmms_export.h"
 
-namespace lmms::agent::mcp
-{
+namespace lmms::agent::mcp {
 struct HttpRequest
 {
 	QByteArray method;
@@ -30,7 +29,13 @@ class LMMS_EXPORT HttpMcpServer : public QObject
 {
 	Q_OBJECT
 public:
-	enum class State { Stopped, Starting, Running, Stopping };
+	enum class State
+	{
+		Stopped,
+		Starting,
+		Running,
+		Stopping
+	};
 	Q_ENUM(State)
 	using Reply = std::function<void(HttpResponse)>;
 	using Handler = std::function<void(const HttpRequest&, Reply)>;

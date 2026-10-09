@@ -9,14 +9,16 @@
 #include "agent/mcp/HttpMcpServer.h"
 
 using namespace lmms::agent::mcp;
-namespace
-{
+namespace {
 const QByteArray TestToken = "test-only-token-0123456789";
 QByteArray authorized(int port, QByteArray wire)
 {
 	wire.replace("Host: localhost\r\n", "Host: localhost:" + QByteArray::number(port) + "\r\n");
 	QByteArray headers = "Authorization: Bearer " + TestToken + "\r\n";
-	if (!wire.contains("\r\nHost:")) { headers += "Host: localhost:" + QByteArray::number(port) + "\r\n"; }
+	if (!wire.contains("\r\nHost:"))
+	{
+		headers += "Host: localhost:" + QByteArray::number(port) + "\r\n";
+	}
 	wire.insert(wire.indexOf("\r\n") + 2, headers);
 	return wire;
 }
@@ -24,7 +26,8 @@ QByteArray request(int port, const QByteArray& wire)
 {
 	QTcpSocket socket;
 	QEventLoop loop;
-	QTimer deadline; deadline.setSingleShot(true);
+	QTimer deadline;
+	deadline.setSingleShot(true);
 	QObject::connect(&deadline, &QTimer::timeout, &loop, &QEventLoop::quit);
 	QObject::connect(&socket, &QTcpSocket::connected, &loop, [&] { socket.write(authorized(port, wire)); });
 	QObject::connect(&socket, &QTcpSocket::disconnected, &loop, &QEventLoop::quit);
@@ -50,7 +53,8 @@ private slots:
 		QCOMPARE(server.endpoint(), QString("http://127.0.0.1:%1/mcp").arg(server.port()));
 		QVERIFY(!server.start(0, TestToken));
 		QVERIFY(!server.errorString().isEmpty());
-		QVERIFY(request(server.port(), "POST /mcp HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2\r\n\r\n{}").startsWith("HTTP/1.1 501"));
+		QVERIFY(request(server.port(), "POST /mcp HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2\r\n\r\n{}")
+				.startsWith("HTTP/1.1 501"));
 		QVERIFY(request(server.port(), "GET /mcp HTTP/1.1\r\nHost: localhost\r\n\r\n").startsWith("HTTP/1.1 405"));
 		QVERIFY(request(server.port(), "GET /other HTTP/1.1\r\nHost: localhost\r\n\r\n").startsWith("HTTP/1.1 404"));
 		const int port = server.port();
@@ -83,34 +87,43 @@ private slots:
 	}
 	void boundsRepliesAndConnections()
 	{
-		HttpMcpServer server; QVERIFY(server.start(0, TestToken));
-		server.setHandler([](const HttpRequest&, HttpMcpServer::Reply reply) { reply({200, {}, QByteArray(8 * 1024 * 1024 + 1, 'x')}); });
+		HttpMcpServer server;
+		QVERIFY(server.start(0, TestToken));
+		server.setHandler([](const HttpRequest&, HttpMcpServer::Reply reply) {
+			reply({200, {}, QByteArray(8 * 1024 * 1024 + 1, 'x')});
+		});
 		QVERIFY(request(server.port(), "POST /mcp HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}").startsWith("HTTP/1.1 503"));
 		QTRY_COMPARE(server.connectionCount(), 0);
 		std::vector<std::unique_ptr<QTcpSocket>> sockets;
 		for (int i = 0; i < 34; ++i)
 		{
-			auto socket = std::make_unique<QTcpSocket>(); socket->connectToHost(QHostAddress::LocalHost, server.port());
+			auto socket = std::make_unique<QTcpSocket>();
+			socket->connectToHost(QHostAddress::LocalHost, server.port());
 			sockets.push_back(std::move(socket));
 		}
 		QTRY_COMPARE(server.connectionCount(), 32);
-		server.stop(); QTRY_COMPARE(server.connectionCount(), 0);
-		for (const auto& socket : sockets) { QTRY_COMPARE(socket->state(), QAbstractSocket::UnconnectedState); }
+		server.stop();
+		QTRY_COMPARE(server.connectionCount(), 0);
+		for (const auto& socket : sockets)
+		{
+			QTRY_COMPARE(socket->state(), QAbstractSocket::UnconnectedState);
+		}
 	}
 	void rejectsAmbiguousOrOversizedRequests()
 	{
 		HttpMcpServer server;
 		QVERIFY(server.start(0, TestToken));
-		for (const auto& wire : {
-			QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: 2\r\nContent-Length: 2\r\n\r\n{}"),
-			QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: -1\r\n\r\n"),
-			QByteArray("POST /mcp HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"),
-			QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: 0\r\n\r\nextra")})
+		for (const auto& wire : {QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: 2\r\nContent-Length: 2\r\n\r\n{}"),
+				 QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: -1\r\n\r\n"),
+				 QByteArray("POST /mcp HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"),
+				 QByteArray("POST /mcp HTTP/1.1\r\nContent-Length: 0\r\n\r\nextra")})
 		{
 			QVERIFY(request(server.port(), wire).startsWith("HTTP/1.1 400"));
 		}
-		QVERIFY(request(server.port(), "POST /mcp HTTP/1.1\r\nContent-Length: 4194305\r\n\r\n").startsWith("HTTP/1.1 413"));
-		QVERIFY(request(server.port(), QByteArray("POST /mcp HTTP/1.1\r\nX-Huge: ") + QByteArray(17000, 'x')).startsWith("HTTP/1.1 431"));
+		QVERIFY(
+			request(server.port(), "POST /mcp HTTP/1.1\r\nContent-Length: 4194305\r\n\r\n").startsWith("HTTP/1.1 413"));
+		QVERIFY(request(server.port(), QByteArray("POST /mcp HTTP/1.1\r\nX-Huge: ") + QByteArray(17000, 'x'))
+				.startsWith("HTTP/1.1 431"));
 	}
 	void closesPartialConnectionsAndIgnoresStaleReplies()
 	{

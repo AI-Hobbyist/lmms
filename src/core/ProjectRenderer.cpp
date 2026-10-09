@@ -135,38 +135,77 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 
 ProjectRenderer::~ProjectRenderer()
 {
-	if(isRunning()) {m_abort=true;wait();}
-	if(m_svsSnapshot) {m_svsSnapshot->completed={};m_svsSnapshot->cancel();m_svsSnapshot->deactivate();}
-	if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
+	if (isRunning())
+	{
+		m_abort = true;
+		wait();
+	}
+	if (m_svsSnapshot)
+	{
+		m_svsSnapshot->completed = {};
+		m_svsSnapshot->cancel();
+		m_svsSnapshot->deactivate();
+	}
+	if (m_exportStarted.exchange(false))
+		Engine::getSong()->stopExport();
 	// The audio engine owns the device after startProcessing transfers it.
-	if (!m_deviceTransferred) { delete m_fileDev; }
+	if (!m_deviceTransferred)
+	{
+		delete m_fileDev;
+	}
 }
 
 void ProjectRenderer::startProcessing()
 {
 	if( isReady() )
 	{
-			if(!m_svsSnapshot) m_svsSnapshot=std::make_unique<svs::ExportSnapshot>(svs::ExportSnapshot::capture(*Engine::getSong(),m_fileDev->sampleRate()));
+			if (!m_svsSnapshot)
+			m_svsSnapshot = std::make_unique<svs::ExportSnapshot>(
+				svs::ExportSnapshot::capture(*Engine::getSong(), m_fileDev->sampleRate()));
 		Engine::audioEngine()->stopProcessing();
-			m_svsSnapshot->freezeTimeline(*Engine::getSong());
-			m_svsSnapshot->invalidated=[this](const QString& reason){m_renderError=reason;m_abort=true;emit svsExportFailed(reason);};
-		Engine::getSong()->startExport();m_exportStarted=true;
-		m_svsSnapshot->completed=[this]{
-				if(m_svsSnapshot->state()==svs::ExportSnapshot::State::Ready&&!m_abort) m_svsSnapshot->activate(*Engine::getSong());
-			if(m_svsSnapshot->state()!=svs::ExportSnapshot::State::Ready||m_abort) {
-				if(!m_abort) m_renderError=m_svsSnapshot->diagnostics().join('\n');
-				const auto path=m_fileDev->outputFile();delete m_fileDev;m_fileDev=nullptr;QFile::remove(path);
-				if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
-				QPointer<ProjectRenderer> target(this);if(!m_renderError.isEmpty()) emit svsExportFailed(m_renderError);if(!target) return;
-				emit finished();return;
-			}
-				startPreparedRender();
+		m_svsSnapshot->freezeTimeline(*Engine::getSong());
+		m_svsSnapshot->invalidated = [this](const QString& reason) {
+			m_renderError = reason;
+			m_abort = true;
+			emit svsExportFailed(reason);
 		};
-		connect(this,&QThread::finished,this,[this]{if(m_svsSnapshot) m_svsSnapshot->deactivate();emit finished();});
+		Engine::getSong()->startExport();
+		m_exportStarted = true;
+		m_svsSnapshot->completed = [this] {
+			if (m_svsSnapshot->state() == svs::ExportSnapshot::State::Ready && !m_abort)
+				m_svsSnapshot->activate(*Engine::getSong());
+			if (m_svsSnapshot->state() != svs::ExportSnapshot::State::Ready || m_abort)
+			{
+				if (!m_abort)
+					m_renderError = m_svsSnapshot->diagnostics().join('\n');
+				const auto path = m_fileDev->outputFile();
+				delete m_fileDev;
+				m_fileDev = nullptr;
+				QFile::remove(path);
+				if (m_exportStarted.exchange(false))
+					Engine::getSong()->stopExport();
+				QPointer<ProjectRenderer> target(this);
+				if (!m_renderError.isEmpty())
+					emit svsExportFailed(m_renderError);
+				if (!target)
+					return;
+				emit finished();
+				return;
+			}
+			startPreparedRender();
+		};
+		connect(this, &QThread::finished, this, [this] {
+			if (m_svsSnapshot)
+				m_svsSnapshot->deactivate();
+			emit finished();
+		});
 		m_svsSnapshot->prepare(m_ignoreFailedSVS);
 	}
 }
-void ProjectRenderer::setSVSSnapshot(std::unique_ptr<svs::ExportSnapshot> snapshot) {m_svsSnapshot=std::move(snapshot);}
+void ProjectRenderer::setSVSSnapshot(std::unique_ptr<svs::ExportSnapshot> snapshot)
+{
+	m_svsSnapshot = std::move(snapshot);
+}
 void ProjectRenderer::startPreparedRender()
 {
 		// Have to do audio engine stuff with GUI-thread affinity in order to
@@ -200,13 +239,16 @@ void ProjectRenderer::run()
 	{
 		const auto buffer = Engine::audioEngine()->renderNextPeriod();
 		m_fileDev->writeBuffer(buffer.data(), buffer.size());
-		if (m_fileDev->hasWriteError()) { break; }
+		if (m_fileDev->hasWriteError())
+		{
+			break;
+		}
 
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)
 		{
 			m_progress = nprog;
-			emit progressChanged( m_progress.load() );
+			emit progressChanged(m_progress.load());
 		}
 	}
 
@@ -214,7 +256,7 @@ void ProjectRenderer::run()
 	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
-	m_exportStarted=false;
+	m_exportStarted = false;
 	m_fileDev->finalize();
 	m_succeeded = !m_abort.load() && !m_fileDev->hasWriteError();
 
@@ -233,11 +275,23 @@ void ProjectRenderer::run()
 void ProjectRenderer::abortProcessing()
 {
 	m_abort = true;
-	if(m_svsSnapshot) {m_svsSnapshot->completed={};m_svsSnapshot->cancel();}
+	if (m_svsSnapshot)
+	{
+		m_svsSnapshot->completed = {};
+		m_svsSnapshot->cancel();
+	}
 	wait();
-	if(m_exportStarted.exchange(false)) Engine::getSong()->stopExport();
-	if(m_svsSnapshot) m_svsSnapshot->deactivate();
-	if(!m_deviceTransferred&&m_fileDev) {const auto path=m_fileDev->outputFile();delete m_fileDev;m_fileDev=nullptr;QFile::remove(path);}
+	if (m_exportStarted.exchange(false))
+		Engine::getSong()->stopExport();
+	if (m_svsSnapshot)
+		m_svsSnapshot->deactivate();
+	if (!m_deviceTransferred && m_fileDev)
+	{
+		const auto path = m_fileDev->outputFile();
+		delete m_fileDev;
+		m_fileDev = nullptr;
+		QFile::remove(path);
+	}
 }
 
 
@@ -257,8 +311,7 @@ void ProjectRenderer::updateConsoleProgress()
 
 	const auto activity = "|/-\\";
 	std::fill(buf.begin(), buf.end(), 0);
-	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress.load(),
-									activity[rot] );
+	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress.load(), activity[rot]);
 	rot = ( rot+1 ) % 4;
 
 	fprintf( stderr, "%s", buf.data() );

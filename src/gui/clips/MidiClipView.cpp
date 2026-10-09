@@ -571,7 +571,10 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	m_paintPixmap.fill(Qt::transparent);
 	QPainter p( &m_paintPixmap );
-	if (cornerRadius() > 0) { p.setClipPath(clipOutline(0)); }
+	if (cornerRadius() > 0)
+	{
+		p.setClipPath(clipOutline(0));
+	}
 
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
@@ -846,9 +849,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	if( !( fixedClips() && beatClip ) )
 	{
-	if (cornerRadius() > 0) { paintFlatBorder(p, current, 0); }
-	else
-	{
+	if (cornerRadius() > 0)
+		{
+			paintFlatBorder(p, current, 0);
+		}
+		else
+		{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,

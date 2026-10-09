@@ -364,8 +364,14 @@ void Mixer::deleteChannel( int index )
 		{
 			auto* model = static_cast<SVSTrack*>(t)->mixerChannelModel();
 			const int value = model->value();
-			if (value == index) { model->setValue(0); }
-			else if (value > index) { model->setValue(value - 1); }
+			if (value == index)
+			{
+				model->setValue(0);
+			}
+			else if (value > index)
+			{
+				model->setValue(value - 1);
+			}
 		}
 		else if( t->type() == Track::Type::Sample )
 		{
@@ -468,8 +474,14 @@ void Mixer::moveChannelLeft( int index )
 			{
 				auto* model = static_cast<SVSTrack*>(track)->mixerChannelModel();
 				const int value = model->value();
-				if (value == a) { model->setValue(b); }
-				else if (value == b) { model->setValue(a); }
+				if (value == a)
+				{
+					model->setValue(b);
+				}
+				else if (value == b)
+				{
+					model->setValue(a);
+				}
 			}
 			else if (track->type() == Track::Type::Sample)
 			{
@@ -934,7 +946,10 @@ bool Mixer::isChannelInUse(int index)
 		}
 		else if (t->type() == Track::Type::SVS)
 		{
-			if (static_cast<SVSTrack*>(t)->mixerChannelModel()->value() == index) { return true; }
+			if (static_cast<SVSTrack*>(t)->mixerChannelModel()->value() == index)
+			{
+				return true;
+			}
 		}
 		else if (t->type() == Track::Type::Sample)
 		{

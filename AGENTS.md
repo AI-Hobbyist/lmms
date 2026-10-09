@@ -19,6 +19,9 @@
 ## Mandatory Build Pipeline & Error Diagnosis Protocol
 
 4. **Strict Foreground Build & Logging Requirement**:
+   - **一律在会话内以前台 PowerShell 交互方式**执行所有编译、构建、打包和测试。无论如何，用户必须能够展开本会话中的折叠执行记录，看到实际 PowerShell 命令及实时、完整的 stdout/stderr；不能只发送计划、口头进度或日志文件路径，让用户干等。
+   - 使用能够将输出流式展示在折叠执行记录中的前台交互执行方式（PTY）。长命令跨工具等待时，必须保持同一个前台执行会话并持续回传新增输出；不得启动后台作业、脱离执行会话运行或静默等待，也不得隐藏、截断或丢弃实际执行日志。
+   - **默认不得额外弹出 PowerShell / Windows Terminal 窗口**，除非用户明确要求。前台执行以会话内可展开的命令和实时输出记录为准，不以是否另开桌面终端窗口为准；Qt GUI 验证仍须遵守本文件的真实 Windows 窗口要求。
    - **MANDATORY**: EVERY compilation, build, package, or test action (regardless of language/tech stack: C++, C#, Java, Rust, Go, Node.js, etc.) MUST run interactively in the foreground using the standard PowerShell pipeline. NEVER run builds in the background or suppress stdout/stderr.
    - ALWAYS route any build command through `2>&1 | Tee-Object -FilePath "build.log" -Encoding utf8`. This guarantees real-time terminal output while silently capturing full log history.
    - ALWAYS capture `$LASTEXITCODE` and check build status immediately.
@@ -31,6 +34,14 @@
    $buildExitCode =$LASTEXITCODE
    if ($buildExitCode -ne 0) { exit$buildExitCode }
    ```
+
+## Mandatory formatting for new feature code
+
+- All feature code added or changed after commit `a2f57e70ce9c3468b4b6d21955bbe65a0989048a`, including future additions, MUST have clear, consistent, readable formatting before delivery.
+- For C/C++, follow the repository `.clang-format`: consistent indentation, brace placement, operator spacing, and sensible line wrapping. Put independent statements on separate lines; expand nontrivial control-flow and lambda bodies instead of compressing them into one line. Separate logical sections with blank lines.
+- Apply equivalent indentation and line wrapping to new scripts, build definitions, and stylesheets using their language conventions. Preserve string contents, generated data, and behavior.
+- Format new files in full. In files inherited from the baseline commit, restrict formatting to feature lines added or changed since that commit. Do not reformat untouched original LMMS code or make unrelated refactors.
+- Before completion, inspect the formatting diff, verify that executable code changes only in layout, and run `git diff --check` on the affected files. Keep pre-existing worktree edits intact.
 
 ## Existing build and plugin deployment directories
 

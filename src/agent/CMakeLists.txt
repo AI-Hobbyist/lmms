@@ -4,7 +4,6 @@ endif()
 
 set(LMMS_SRCS
 	${LMMS_SRCS}
-
 	agent/CommandBus.cpp
 	agent/CommandSchema.cpp
 	agent/CoreCommands.cpp
@@ -14,6 +13,4 @@ set(LMMS_SRCS
 	agent/ProjectSnapshot.cpp
 	agent/ScriptRunner.cpp
 	agent/HighLevelCommands.cpp
-
-	PARENT_SCOPE
-)
+	PARENT_SCOPE)

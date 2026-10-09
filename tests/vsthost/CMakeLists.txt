@@ -58,28 +58,31 @@ if(WIN32)
 endif()
 
 if(WIN32 AND TARGET Vst2CompatibilityTest)
-	add_executable(CatalogJobsTest CatalogJobsTest.cpp ../../src/vsthost/CatalogJobs.cpp ../../src/vsthost/PluginCatalog.cpp ../../src/vsthost/CatalogIo.cpp)
+	add_executable(CatalogJobsTest CatalogJobsTest.cpp ../../src/vsthost/CatalogJobs.cpp
+								   ../../src/vsthost/PluginCatalog.cpp ../../src/vsthost/CatalogIo.cpp)
 	target_compile_features(CatalogJobsTest PRIVATE cxx_std_20)
 	target_compile_definitions(CatalogJobsTest PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
 	target_include_directories(CatalogJobsTest PRIVATE ../../include "${CMAKE_BINARY_DIR}/src" "${CMAKE_BINARY_DIR}")
 	target_link_libraries(CatalogJobsTest PRIVATE Qt6::Core ${QT_QTTEST_LIBRARY} bcrypt)
-	add_test(NAME CatalogJobs COMMAND CatalogJobsTest -o "${CMAKE_CURRENT_BINARY_DIR}/CatalogJobs-results.txt,txt" -o "-,txt")
+	add_test(NAME CatalogJobs COMMAND CatalogJobsTest -o "${CMAKE_CURRENT_BINARY_DIR}/CatalogJobs-results.txt,txt" -o
+									  "-,txt")
 	set_tests_properties(CatalogJobs PROPERTIES LABELS "vsthost;catalog;concurrency" TIMEOUT 15)
 	add_executable(ScanRootsWidgetTest ScanRootsWidgetTest.cpp)
 	target_compile_features(ScanRootsWidgetTest PRIVATE cxx_std_20)
 	target_include_directories(ScanRootsWidgetTest PRIVATE ../../include)
 	target_link_libraries(ScanRootsWidgetTest PRIVATE Qt6::Widgets ${QT_QTTEST_LIBRARY})
-	add_test(NAME ScanRootsWidget COMMAND ScanRootsWidgetTest -platform offscreen
-		-o "${CMAKE_CURRENT_BINARY_DIR}/ScanRootsWidget-results.txt,txt" -o "-,txt")
+	add_test(NAME ScanRootsWidget COMMAND ScanRootsWidgetTest -platform windows -o
+										  "${CMAKE_CURRENT_BINARY_DIR}/ScanRootsWidget-results.txt,txt" -o "-,txt")
 	set_tests_properties(ScanRootsWidget PROPERTIES LABELS "vsthost;settings" TIMEOUT 15)
 	if(TARGET RemoteVstHost64 AND TARGET RemoteVstHost32)
 		target_link_libraries(Vst2CompatibilityTest PRIVATE bcrypt)
 		add_dependencies(Vst2CompatibilityTest RemoteVstHost64 RemoteVstHost32)
 		foreach(architecture x64 x86)
 			add_test(NAME Vst3RestartEvents${architecture}
-				COMMAND "${CMAKE_BINARY_DIR}/vst-host/${architecture}/$<CONFIG>/Vst3RestartEventsTest.exe"
-				"${CMAKE_BINARY_DIR}/vst-host/${architecture}/$<CONFIG>/Vst3Native.vst3")
-			set_tests_properties(Vst3RestartEvents${architecture} PROPERTIES TIMEOUT 15 LABELS "vsthost;vst3;native;realtime")
+					 COMMAND "${CMAKE_BINARY_DIR}/vst-host/${architecture}/$<CONFIG>/Vst3RestartEventsTest.exe"
+							 "${CMAKE_BINARY_DIR}/vst-host/${architecture}/$<CONFIG>/Vst3Native.vst3")
+			set_tests_properties(Vst3RestartEvents${architecture} PROPERTIES TIMEOUT 15 LABELS
+																			 "vsthost;vst3;native;realtime")
 		endforeach()
 		add_test(NAME Vst3PresetSdk64 COMMAND "${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>/Vst3PresetSdkTest.exe")
 		add_test(NAME Vst3PresetSdk32 COMMAND "${CMAKE_BINARY_DIR}/vst-host/x86/$<CONFIG>/Vst3PresetSdkTest.exe")
@@ -91,35 +94,56 @@ if(WIN32 AND TARGET Vst2CompatibilityTest)
 		target_link_libraries(Vst3HostProxyTest PRIVATE bcrypt)
 		add_dependencies(Vst3HostProxyTest RemoteVstHost64 RemoteVstHost32)
 		add_test(NAME Vst3HostProxy64 COMMAND Vst3HostProxyTest "${CMAKE_BINARY_DIR}/plugins/RemoteVstHost64.exe"
-			"${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>/Vst3Native.vst3")
-		add_test(NAME Vst3HostProxyCrossABI COMMAND Vst3HostProxyTest "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstHost32.exe"
-			"${CMAKE_BINARY_DIR}/vst-host/x86/$<CONFIG>/Vst3Native.vst3")
-		set_tests_properties(Vst3HostProxy64 Vst3HostProxyCrossABI PROPERTIES LABELS "vsthost;vst3;proxy;native" TIMEOUT 60)
-		add_executable(RemoteCatalogIoFixture ../../tools/vstcatalog/RemoteCatalogIo.cpp ../../src/vsthost/CatalogFilesystem.cpp)
+											  "${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>/Vst3Native.vst3")
+		add_test(NAME Vst3HostProxyCrossABI
+				 COMMAND Vst3HostProxyTest "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstHost32.exe"
+						 "${CMAKE_BINARY_DIR}/vst-host/x86/$<CONFIG>/Vst3Native.vst3")
+		set_tests_properties(Vst3HostProxy64 Vst3HostProxyCrossABI PROPERTIES LABELS "vsthost;vst3;proxy;native"
+																			  TIMEOUT 60)
+		add_executable(RemoteCatalogIoFixture ../../tools/vstcatalog/RemoteCatalogIo.cpp
+											  ../../src/vsthost/CatalogFilesystem.cpp)
 		target_compile_features(RemoteCatalogIoFixture PRIVATE cxx_std_20)
 		target_compile_definitions(RemoteCatalogIoFixture PRIVATE LMMS_STATIC_DEFINE NOMINMAX LMMS_CATALOG_IO_FIXTURE)
-		target_include_directories(RemoteCatalogIoFixture PRIVATE ../../include ../../src/vsthost "${CMAKE_BINARY_DIR}/src" "${CMAKE_BINARY_DIR}")
+		target_include_directories(RemoteCatalogIoFixture PRIVATE ../../include ../../src/vsthost
+																  "${CMAKE_BINARY_DIR}/src" "${CMAKE_BINARY_DIR}")
 		target_link_libraries(RemoteCatalogIoFixture PRIVATE Qt6::Core)
-		add_executable(CatalogIoTest CatalogIoTest.cpp ../../src/vsthost/CatalogIo.cpp ../../src/vsthost/CatalogJobs.cpp ../../src/vsthost/PluginCatalog.cpp)
+		add_executable(CatalogIoTest CatalogIoTest.cpp ../../src/vsthost/CatalogIo.cpp
+									 ../../src/vsthost/CatalogJobs.cpp ../../src/vsthost/PluginCatalog.cpp)
 		target_compile_features(CatalogIoTest PRIVATE cxx_std_20)
 		target_compile_definitions(CatalogIoTest PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
 		target_include_directories(CatalogIoTest PRIVATE ../../include "${CMAKE_BINARY_DIR}/src" "${CMAKE_BINARY_DIR}")
 		target_link_libraries(CatalogIoTest PRIVATE Qt6::Core bcrypt)
 		add_dependencies(CatalogIoTest RemoteCatalogIo RemoteCatalogIoFixture RemoteVstHost64)
-		add_test(NAME CatalogIo COMMAND CatalogIoTest $<TARGET_FILE:RemoteCatalogIo> $<TARGET_FILE:RemoteCatalogIoFixture>
-			"${CMAKE_BINARY_DIR}/plugins/RemoteVstHost64.exe" "${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>/Vst3Factory.vst3")
+		add_test(
+			NAME CatalogIo
+			COMMAND
+				CatalogIoTest $<TARGET_FILE:RemoteCatalogIo> $<TARGET_FILE:RemoteCatalogIoFixture>
+				"${CMAKE_BINARY_DIR}/plugins/RemoteVstHost64.exe"
+				"${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>/Vst3Factory.vst3")
 		set_tests_properties(CatalogIo PROPERTIES LABELS "vsthost;catalog;filesystem;faults" TIMEOUT 60)
-		add_executable(PluginCatalogTest PluginCatalogTest.cpp ../../src/vsthost/PluginCatalog.cpp ../../src/vsthost/CatalogJobs.cpp ../../src/vsthost/CatalogIo.cpp)
+		add_executable(PluginCatalogTest PluginCatalogTest.cpp ../../src/vsthost/PluginCatalog.cpp
+										 ../../src/vsthost/CatalogJobs.cpp ../../src/vsthost/CatalogIo.cpp)
 		target_compile_features(PluginCatalogTest PRIVATE cxx_std_20)
 		target_compile_definitions(PluginCatalogTest PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
-		target_include_directories(PluginCatalogTest PRIVATE ../../include "${CMAKE_BINARY_DIR}/src" "${CMAKE_BINARY_DIR}")
+		target_include_directories(PluginCatalogTest PRIVATE ../../include "${CMAKE_BINARY_DIR}/src"
+															 "${CMAKE_BINARY_DIR}")
 		target_link_libraries(PluginCatalogTest PRIVATE Qt6::Core bcrypt)
-		add_dependencies(PluginCatalogTest RemoteCatalogIo RemoteVstHost64 RemoteVstHost32 Vst2Shell Vst2Baseline
-			VstBaselineX86 RemoteVstPlugin64 RemoteVstPlugin32)
-		add_test(NAME PluginCatalog COMMAND PluginCatalogTest
-			"${CMAKE_BINARY_DIR}/plugins/RemoteVstHost64.exe" "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstHost32.exe"
-			"${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>" "${CMAKE_BINARY_DIR}/vst-host/x86/$<CONFIG>"
-			"${CMAKE_BINARY_DIR}/plugins" "${CMAKE_BINARY_DIR}/vst-s0")
+		add_dependencies(
+			PluginCatalogTest
+			RemoteCatalogIo
+			RemoteVstHost64
+			RemoteVstHost32
+			Vst2Shell
+			Vst2Baseline
+			VstBaselineX86
+			RemoteVstPlugin64
+			RemoteVstPlugin32)
+		add_test(
+			NAME PluginCatalog
+			COMMAND
+				PluginCatalogTest "${CMAKE_BINARY_DIR}/plugins/RemoteVstHost64.exe"
+				"${CMAKE_BINARY_DIR}/plugins/32/RemoteVstHost32.exe" "${CMAKE_BINARY_DIR}/vst-host/x64/$<CONFIG>"
+				"${CMAKE_BINARY_DIR}/vst-host/x86/$<CONFIG>" "${CMAKE_BINARY_DIR}/plugins" "${CMAKE_BINARY_DIR}/vst-s0")
 		set_tests_properties(PluginCatalog PROPERTIES LABELS "vsthost;catalog;native;faults" TIMEOUT 120)
 	endif()
 	add_executable(Vst2ShellTest Vst2ShellTest.cpp)
@@ -129,12 +153,16 @@ if(WIN32 AND TARGET Vst2CompatibilityTest)
 	target_link_libraries(Vst2ShellTest PRIVATE bcrypt)
 	add_dependencies(Vst2ShellTest VstBaselineX86 RemoteVstPlugin32 RemoteVstPlugin64)
 	foreach(shell_target Vst2Shell Vst2ShellHang Vst2ShellCrash Vst2ShellDuplicate)
-		set_target_properties(${shell_target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>" LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>")
+		set_target_properties(
+			${shell_target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>"
+									   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>")
 		add_dependencies(Vst2ShellTest ${shell_target})
 	endforeach()
 	add_dependencies(Vst2CompatibilityTest Vst2Shell)
-	add_test(NAME Vst2Shell COMMAND Vst2ShellTest "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe" "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>")
-	add_test(NAME Vst2ShellCrossABI COMMAND Vst2ShellTest "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe" "${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>")
+	add_test(NAME Vst2Shell COMMAND Vst2ShellTest "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe"
+									"${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>")
+	add_test(NAME Vst2ShellCrossABI COMMAND Vst2ShellTest "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe"
+											"${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>")
 	set_tests_properties(Vst2Shell Vst2ShellCrossABI PROPERTIES LABELS "vsthost;native;shell;faults" TIMEOUT 30)
 	add_executable(VstHostLegacyBridge LegacyBridgeTest.cpp)
 	target_compile_features(VstHostLegacyBridge PRIVATE cxx_std_20)
@@ -142,23 +170,30 @@ if(WIN32 AND TARGET Vst2CompatibilityTest)
 	target_compile_definitions(VstHostLegacyBridge PRIVATE BUILD_REMOTE_PLUGIN_CLIENT NOMINMAX)
 	target_link_libraries(VstHostLegacyBridge PRIVATE bcrypt)
 	add_dependencies(VstHostLegacyBridge Vst2Baseline VstBaselineX86 RemoteVstPlugin32 RemoteVstPlugin64)
-	add_test(NAME VstHostLegacyBridge COMMAND VstHostLegacyBridge "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe" "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
-	add_test(NAME VstHostLegacyBridgeCrossABI COMMAND VstHostLegacyBridge "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe" "${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
-	set_tests_properties(VstHostLegacyBridge VstHostLegacyBridgeCrossABI PROPERTIES LABELS "vsthost;realtime;native" TIMEOUT 90)
+	add_test(NAME VstHostLegacyBridge COMMAND VstHostLegacyBridge "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe"
+											  "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	add_test(NAME VstHostLegacyBridgeCrossABI
+			 COMMAND VstHostLegacyBridge "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe"
+					 "${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	set_tests_properties(VstHostLegacyBridge VstHostLegacyBridgeCrossABI PROPERTIES LABELS "vsthost;realtime;native"
+																					TIMEOUT 90)
 	add_executable(VstHostVst2Session Vst2SessionTest.cpp)
 	target_compile_features(VstHostVst2Session PRIVATE cxx_std_20)
 	target_include_directories(VstHostVst2Session PRIVATE ../../include ../../plugins/VstBase "${CMAKE_BINARY_DIR}")
 	target_compile_definitions(VstHostVst2Session PRIVATE BUILD_REMOTE_PLUGIN_CLIENT NOMINMAX)
 	target_link_libraries(VstHostVst2Session PRIVATE bcrypt)
 	add_dependencies(VstHostVst2Session Vst2Baseline VstBaselineX86 RemoteVstPlugin32 RemoteVstPlugin64)
-	add_test(NAME VstHostVst2Session COMMAND VstHostVst2Session "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe" "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
-	add_test(NAME VstHostVst2SessionCrossABI COMMAND VstHostVst2Session "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe" "${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	add_test(NAME VstHostVst2Session COMMAND VstHostVst2Session "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe"
+											 "${CMAKE_BINARY_DIR}/vst-s0/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	add_test(NAME VstHostVst2SessionCrossABI
+			 COMMAND VstHostVst2Session "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe"
+					 "${CMAKE_BINARY_DIR}/vst-s0/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
 	set_tests_properties(VstHostVst2Session VstHostVst2SessionCrossABI PROPERTIES LABELS "vsthost;native" TIMEOUT 30)
 	include(ExternalProject)
 	set(VST_BASELINE_ROOT "${CMAKE_BINARY_DIR}/vst-s0")
-	set_target_properties(Vst2Baseline PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>"
-		LIBRARY_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>")
+	set_target_properties(
+		Vst2Baseline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>"
+								LIBRARY_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>")
 	add_executable(VstHostVst2Faults Vst2SessionFaultTest.cpp)
 	target_compile_features(VstHostVst2Faults PRIVATE cxx_std_20)
 	target_include_directories(VstHostVst2Faults PRIVATE ../../include ../../plugins/VstBase "${CMAKE_BINARY_DIR}")
@@ -168,14 +203,28 @@ if(WIN32 AND TARGET Vst2CompatibilityTest)
 	foreach(operation Entry Audio State Editor Close)
 		foreach(mode Crash Hang)
 			set(target Vst2Fault${operation}${mode})
-			set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>" LIBRARY_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>")
+			set_target_properties(
+				${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>"
+									 LIBRARY_OUTPUT_DIRECTORY "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>")
 			add_dependencies(VstHostVst2Faults ${target})
 		endforeach()
 	endforeach()
-	add_test(NAME VstHostVst2Faults COMMAND VstHostVst2Faults "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe" "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>" "${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
-	add_test(NAME VstHostVst2FaultsCrossABI COMMAND VstHostVst2Faults "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe" "${VST_BASELINE_ROOT}/x86/fixtures/$<CONFIG>" "${VST_BASELINE_ROOT}/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
-	set_tests_properties(VstHostVst2Faults VstHostVst2FaultsCrossABI PROPERTIES LABELS "vsthost;native;faults" TIMEOUT 60)
-	ExternalProject_Add(VstBaselineX86
+	add_test(
+		NAME VstHostVst2Faults
+		COMMAND
+			VstHostVst2Faults "${CMAKE_BINARY_DIR}/plugins/RemoteVstPlugin64.exe"
+			"${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>"
+			"${VST_BASELINE_ROOT}/x64/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	add_test(
+		NAME VstHostVst2FaultsCrossABI
+		COMMAND
+			VstHostVst2Faults "${CMAKE_BINARY_DIR}/plugins/32/RemoteVstPlugin32.exe"
+			"${VST_BASELINE_ROOT}/x86/fixtures/$<CONFIG>"
+			"${VST_BASELINE_ROOT}/x86/fixtures/$<CONFIG>/Vst2Baseline.dll")
+	set_tests_properties(VstHostVst2Faults VstHostVst2FaultsCrossABI PROPERTIES LABELS "vsthost;native;faults" TIMEOUT
+																				60)
+	ExternalProject_Add(
+		VstBaselineX86
 		SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
 		BINARY_DIR "${VST_BASELINE_ROOT}/x86"
 		CMAKE_GENERATOR "${CMAKE_GENERATOR}"
@@ -185,30 +234,26 @@ if(WIN32 AND TARGET Vst2CompatibilityTest)
 	add_dependencies(Vst2CompatibilityTest Vst2Baseline VstBaselineX86 RemoteVstPlugin32 RemoteVstPlugin64)
 	add_test(NAME Vst3MetadataX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/Vst3MetadataTest.exe")
 	set_tests_properties(Vst3MetadataX86 PROPERTIES LABELS "vsthost;vst3;protocol" TIMEOUT 10)
-	add_test(NAME VstHostProtocolX86
-		COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostProtocol.exe")
+	add_test(NAME VstHostProtocolX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostProtocol.exe")
 	add_test(NAME VstHostRealtimeMidiX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostRealtimeMidi.exe")
 	add_dependencies(VstHostRealtimeMidi VstBaselineX86)
 	set_tests_properties(VstHostRealtimeMidiX86 PROPERTIES LABELS "vsthost;realtime" TIMEOUT 10)
-	add_test(NAME VstHostSessionX86
-		COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostSession.exe" --helper "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstSessionFixture.exe")
-	add_test(NAME VstHostSessionCrossABI
-		COMMAND VstHostSession --helper "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstSessionFixture.exe")
+	add_test(NAME VstHostSessionX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostSession.exe" --helper
+											"${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstSessionFixture.exe")
+	add_test(NAME VstHostSessionCrossABI COMMAND VstHostSession --helper
+												 "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstSessionFixture.exe")
 	add_dependencies(VstHostSession VstBaselineX86)
 	set_tests_properties(VstHostSessionX86 VstHostSessionCrossABI PROPERTIES LABELS "vsthost;faults" TIMEOUT 90)
-	add_test(NAME VstHostAudioQueueX86
-		COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostAudioQueue.exe")
-	add_test(NAME VstHostSupervisorX86
-		COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostSupervisor.exe")
-	add_test(NAME VstHostControlChannelX86
-		COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostControlChannel.exe")
-	add_test(NAME VstHostControlChannelCrossABI
-		COMMAND VstHostControlChannel --peer "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostControlChannel.exe")
+	add_test(NAME VstHostAudioQueueX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostAudioQueue.exe")
+	add_test(NAME VstHostSupervisorX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostSupervisor.exe")
+	add_test(NAME VstHostControlChannelX86 COMMAND "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostControlChannel.exe")
+	add_test(NAME VstHostControlChannelCrossABI COMMAND VstHostControlChannel --peer
+														"${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostControlChannel.exe")
 	add_dependencies(VstHostControlChannel VstBaselineX86)
 	set_tests_properties(VstHostControlChannelX86 VstHostControlChannelCrossABI PROPERTIES LABELS "vsthost" TIMEOUT 15)
 	set_tests_properties(VstHostSupervisorX86 PROPERTIES LABELS "vsthost;faults" TIMEOUT 30)
-	add_test(NAME VstHostAudioQueueCrossABI
-		COMMAND VstHostAudioQueue --peer "${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostAudioQueue.exe")
+	add_test(NAME VstHostAudioQueueCrossABI COMMAND VstHostAudioQueue --peer
+													"${VST_BASELINE_ROOT}/x86/$<CONFIG>/VstHostAudioQueue.exe")
 	add_dependencies(VstHostAudioQueue VstBaselineX86)
 	set_tests_properties(VstHostAudioQueueCrossABI PROPERTIES LABELS "vsthost" TIMEOUT 15)
 	set_tests_properties(VstHostAudioQueueX86 PROPERTIES LABELS "vsthost" TIMEOUT 10)

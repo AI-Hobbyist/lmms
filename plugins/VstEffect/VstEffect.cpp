@@ -66,7 +66,8 @@ VstEffect::VstEffect( Model * _parent,
 	Effect( &vsteffect_plugin_descriptor, _parent, _key ),
 	m_pluginMutex(),
 	m_key( *_key ),
-	m_nativeEffect(_key->attributes.value("format") == "vst3"),
+	m_nativeEffect(_key->attributes.value("format") == "vst3")
+	,
 	m_vstControls( this )
 {
 	bool loaded = false;
@@ -123,24 +124,40 @@ bool VstEffect::openPlugin(const QString& plugin)
 	bool validId = true;
 	const auto shellId = m_key.attributes.contains("shellid") ? m_key.attributes["shellid"].toUInt(&validId) : 0;
 	if (!validId || (m_key.attributes.contains("shellid") && !shellId))
-	{ delete tf; collectErrorForUI(VstPlugin::tr("Invalid VST2 shell identity.")); return false; }
+	{
+		delete tf;
+		collectErrorForUI(VstPlugin::tr("Invalid VST2 shell identity."));
+		return false;
+	}
 	vsthost::CatalogEntry selected;
 	const bool native = m_key.attributes.value("format") == "vst3";
 	if (native)
 	{
 		const auto cid = m_key.attributes.value("classid");
 		const auto architecture = m_key.attributes.value("architecture");
-		if (!QRegularExpression("^[0-9A-Fa-f]{32}$").match(cid).hasMatch() || (architecture != "32" && architecture != "64") || shellId)
-		{ delete tf; collectErrorForUI(VstPlugin::tr("Invalid VST3 class identity or architecture.")); return false; }
-		const auto raw = QByteArray::fromHex(cid.toLatin1()); std::memcpy(selected.identity.cid.data(), raw.constData(), 16);
+		if (!QRegularExpression("^[0-9A-Fa-f]{32}$").match(cid).hasMatch()
+			|| (architecture != "32" && architecture != "64") || shellId)
+		{
+			delete tf;
+			collectErrorForUI(VstPlugin::tr("Invalid VST3 class identity or architecture."));
+			return false;
+		}
+		const auto raw = QByteArray::fromHex(cid.toLatin1());
+		std::memcpy(selected.identity.cid.data(), raw.constData(), 16);
 		selected.identity.format = vsthost::Format::Vst3;
 		selected.identity.architecture = architecture == "32" ? vsthost::Architecture::X86 : vsthost::Architecture::X64;
 		QByteArray fingerprint;
-		if (m_key.attributes.contains("fingerprint") &&
-			!vsthost::decodeCatalogFingerprint(m_key.attributes.value("fingerprint"), fingerprint))
-		{ delete tf; collectErrorForUI(VstPlugin::tr("Invalid VST3 module fingerprint.")); return false; }
-		selected.locator = {plugin, m_key.attributes.value("binarypath"), m_key.attributes.value("version"), fingerprint};
-		selected.name = m_key.name; selected.vendor = m_key.attributes.value("vendor");
+		if (m_key.attributes.contains("fingerprint")
+			&& !vsthost::decodeCatalogFingerprint(m_key.attributes.value("fingerprint"), fingerprint))
+		{
+			delete tf;
+			collectErrorForUI(VstPlugin::tr("Invalid VST3 module fingerprint."));
+			return false;
+		}
+		selected.locator
+			= {plugin, m_key.attributes.value("binarypath"), m_key.attributes.value("version"), fingerprint};
+		selected.name = m_key.name;
+		selected.vendor = m_key.attributes.value("vendor");
 	}
 	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin, shellId, {}, native ? &selected : nullptr));
 	if( m_plugin->failed() )

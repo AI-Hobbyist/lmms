@@ -1,4 +1,5 @@
 """Static M0 compatibility baseline. Run from any directory; no reference runtime."""
+
 from pathlib import Path
 import re
 
@@ -15,9 +16,25 @@ def enum_names(file):
 def main():
     tracks = enum_names("include/Track.h")
     plugins = enum_names("include/Plugin.h")
-    assert tracks[:7] == ["Instrument", "Pattern", "Sample", "Event", "Video", "Automation", "HiddenAutomation"]
+    assert tracks[:7] == [
+        "Instrument",
+        "Pattern",
+        "Sample",
+        "Event",
+        "Video",
+        "Automation",
+        "HiddenAutomation",
+    ]
     assert tracks[-1] == "Count"
-    assert plugins[:7] == ["Instrument", "Effect", "ImportFilter", "ExportFilter", "Tool", "Library", "Other"]
+    assert plugins[:7] == [
+        "Instrument",
+        "Effect",
+        "ImportFilter",
+        "ExportFilter",
+        "Tool",
+        "Library",
+        "Other",
+    ]
     assert re.search(r"Undefined\s*=\s*255", (ROOT / "include/Plugin.h").read_text())
     required = {
         "src/core/Track.cpp": ["Track::create", "saveTrack", "loadTrack"],
@@ -31,7 +48,18 @@ def main():
         source = (ROOT / name).read_text(encoding="utf-8-sig")
         assert all(s in source for s in symbols), name
     contract = (ROOT / "doc/svs/M0-contract.md").read_text(encoding="utf-8")
-    for term in ["major=1", "minor=0", "contentOffset", "release_result", "generation", "revision", "requestId", "MANUAL/PENDING", "50 ms", "Pronunciation"]:
+    for term in [
+        "major=1",
+        "minor=0",
+        "contentOffset",
+        "release_result",
+        "generation",
+        "revision",
+        "requestId",
+        "MANUAL/PENDING",
+        "50 ms",
+        "Pronunciation",
+    ]:
         assert term in contract, term
     print("M0 PASS: legacy enum values, integration entry points, ABI/time/ownership contract")
 

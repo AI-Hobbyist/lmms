@@ -78,7 +78,10 @@ Clip::Clip(const Clip& other):
 
 Clip::~Clip()
 {
-	if (auto *song = Engine::getSong()) { song->stopPreviewOf(this); }
+	if (auto* song = Engine::getSong())
+	{
+		song->stopPreviewOf(this);
+	}
 	emit destroyedClip();
 
 	if( getTrack() )

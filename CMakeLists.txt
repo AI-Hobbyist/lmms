@@ -290,7 +290,10 @@ endif()
 find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
 if(WANT_AGENT_MCP)
-	find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
+	find_package(
+		Qt${QT_VERSION_MAJOR}
+		COMPONENTS Network
+		REQUIRED)
 endif()
 
 message(STATUS "Using Qt version: ${Qt${QT_VERSION_MAJOR}_VERSION}")
@@ -899,7 +902,7 @@ ADD_CUSTOM_TARGET(uninstall
 # yaml-cpp respects an existing uninstall target; keep LMMS's own target.
 option(LMMS_BUILD_DIFFSINGER "Build the native DiffSinger CPU SVS engine" OFF)
 if(LMMS_BUILD_DIFFSINGER)
-  add_subdirectory(plugins/SVSDiffSinger)
+	add_subdirectory(plugins/SVSDiffSinger)
 endif()
 
 #

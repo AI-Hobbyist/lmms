@@ -97,7 +97,10 @@ bool ImportFilter::openFile()
 {
 	if( m_file.open( QFile::ReadOnly ) == false )
 	{
-		if (!interactive() || gui::getGUI() == nullptr) { return false; }
+		if (!interactive() || gui::getGUI() == nullptr)
+		{
+			return false;
+		}
 		QMessageBox::critical( nullptr,
 			TrackContainer::tr( "Couldn't open file" ),
 			TrackContainer::tr( "Couldn't open file %1 "
@@ -114,12 +117,16 @@ bool ImportFilter::openFile()
 	return true;
 }
 
-bool ImportFilter::tryImportFile(const QString& path, TrackContainer* tc, const QString& plugin, InstrumentTrack* target)
+bool ImportFilter::tryImportFile(
+	const QString& path, TrackContainer* tc, const QString& plugin, InstrumentTrack* target)
 {
 	auto filename = path.toUtf8();
 	unique_ptr<Plugin> instance(Plugin::instantiate(plugin, nullptr, filename.data()));
 	auto* filter = dynamic_cast<ImportFilter*>(instance.get());
-	if (!filter) { return false; }
+	if (!filter)
+	{
+		return false;
+	}
 	filter->m_interactive = false;
 	filter->m_targetTrack = target;
 	struct JournallingGuard

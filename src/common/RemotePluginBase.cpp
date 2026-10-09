@@ -56,7 +56,8 @@ RemotePluginBase::RemotePluginBase() :
 
 
 
-RemotePluginBase::RemotePluginBase(std::unique_ptr<MessageTransport> transport) :
+RemotePluginBase::RemotePluginBase(std::unique_ptr<MessageTransport> transport)
+	:
 #ifdef SYNC_WITH_SHM_FIFO
 	RemotePluginBase(nullptr, nullptr)
 #else
@@ -82,7 +83,10 @@ RemotePluginBase::~RemotePluginBase()
 
 int RemotePluginBase::sendMessage(const message & _m)
 {
-	if (m_transport) { return m_transport->send(_m); }
+	if (m_transport)
+	{
+		return m_transport->send(_m);
+	}
 #ifdef SYNC_WITH_SHM_FIFO
 	m_out->lock();
 	m_out->writeInt(_m.id);
@@ -116,7 +120,10 @@ int RemotePluginBase::sendMessage(const message & _m)
 
 RemotePluginBase::message RemotePluginBase::receiveMessage()
 {
-	if (m_transport) { return m_transport->receive(); }
+	if (m_transport)
+	{
+		return m_transport->receive();
+	}
 #ifdef SYNC_WITH_SHM_FIFO
 	m_in->waitForMessage();
 	m_in->lock();

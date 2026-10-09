@@ -232,7 +232,10 @@ void EffectView::paintEvent( QPaintEvent * )
 		p.setPen(palette().mid().color());
 		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
 	}
-	else { p.drawPixmap(0, 0, m_bg); }
+	else
+	{
+		p.drawPixmap(0, 0, m_bg);
+	}
 
 	QFont f = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
 	f.setBold( true );

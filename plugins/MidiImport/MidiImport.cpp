@@ -151,7 +151,10 @@ public:
 			// Keep LMMS responsive, for now the import runs
 			// in the main thread. This should probably be
 			// removed if that ever changes.
-				if (interactive && gui::getGUI() != nullptr) { qApp->processEvents(); }
+				if (interactive && gui::getGUI() != nullptr)
+			{
+				qApp->processEvents();
+			}
 			at = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, tc));
 		}
 		if (tn != "") { at->setName(tn); }
@@ -202,11 +205,17 @@ public:
 	{
 		if (!it) {
 			// Keep LMMS responsive
-				if (interactive && gui::getGUI() != nullptr) { qApp->processEvents(); }
-				it = target ? target : dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
-				if (target) { it_inst = target->instrument(); }
-				else
-				{
+				if (interactive && gui::getGUI() != nullptr)
+			{
+				qApp->processEvents();
+			}
+			it = target ? target : dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+			if (target)
+			{
+				it_inst = target->instrument();
+			}
+			else
+			{
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument("sf2player");
@@ -232,7 +241,10 @@ public:
 #endif
 				}
 			trackName = tn;
-				if (!target && trackName != "") { it->setName(tn); }
+				if (!target && trackName != "")
+			{
+				it->setName(tn);
+			}
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
 			// Create a default pattern
@@ -293,10 +305,18 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 	std::istringstream stream(readAllData().toStdString());
 	auto seq = new Alg_seq(stream, true);
-	if (seq->get_read_error() != alg_no_error) { delete seq; return false; }
+	if (seq->get_read_error() != alg_no_error)
+	{
+		delete seq;
+		return false;
+	}
 	seq->convert_to_beats();
 
-	if (pd) { pd->setMaximum(seq->tracks() + preTrackSteps); pd->setValue(1); }
+	if (pd)
+	{
+		pd->setMaximum(seq->tracks() + preTrackSteps);
+		pd->setValue(1);
+	}
 
 	// 128 CC + Pitch Bend
 	auto ccs = std::array<smfMidiCC, MIDI_CC_COUNT>{};
@@ -337,7 +357,10 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	timeSigNumeratorPat->updateLength();
 	timeSigDenominatorPat->updateLength();
 
-	if (pd) { pd->setValue(2); }
+	if (pd)
+	{
+		pd->setValue(2);
+	}
 
 	// Tempo stuff
 	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
@@ -384,7 +407,10 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
 		Alg_track* trk = seq->track(t);
-		if (pd) { pd->setValue(t + preTrackSteps); }
+		if (pd)
+		{
+			pd->setValue(t + preTrackSteps);
+		}
 
 		for (auto& cc : ccs) { cc.clear(); }
 

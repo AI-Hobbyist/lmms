@@ -3,8 +3,7 @@
 
 #include "lmms_export.h"
 
-namespace lmms::agent
-{
+namespace lmms::agent {
 class CommandBus;
 
 void registerExportCommands(CommandBus& bus);

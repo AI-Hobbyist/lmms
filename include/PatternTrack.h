@@ -69,7 +69,11 @@ public:
 
 	// Zero keeps the native length derived from the clips in the PatternStore.
 	int explicitLengthBars() const { return m_explicitLengthBars; }
-	void setExplicitLengthBars(int bars) { m_explicitLengthBars = bars; emit dataChanged(); }
+	void setExplicitLengthBars(int bars)
+	{
+		m_explicitLengthBars = bars;
+		emit dataChanged();
+	}
 
 	bool automationDisabled( Track * _track )
 	{

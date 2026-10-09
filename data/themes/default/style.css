@@ -64,21 +64,37 @@ lmms--gui--LcdWidget, lmms--gui--LcdFloatSpinBox {
 	font-family: "Consolas";
 	font-size: 14px;
 }
-lmms--gui--LcdWidget { qproperty-textColor: #E5EAF0; qproperty-textShadowColor: transparent; }
-QLabel#lcdDecimalPoint { color: #E5EAF0; background: #14181D; font-family: "Consolas"; font-size: 14px; }
+lmms--gui--LcdWidget {
+	qproperty-textColor: #E5EAF0;
+	qproperty-textShadowColor: transparent;
+}
+QLabel#lcdDecimalPoint {
+	color: #E5EAF0;
+	background: #14181D;
+	font-family: "Consolas";
+	font-size: 14px;
+}
 lmms--gui--LedCheckBox {
 	qproperty-flatStyle: true;
 	qproperty-warningColor: #DAB55A;
 	qproperty-errorColor: #E05B65;
 }
-lmms--gui--PianoView { qproperty-flatStyle: true; }
-lmms--gui--Graph { qproperty-flatStyle: true; qproperty-graphColor: #42A065; }
+lmms--gui--PianoView {
+	qproperty-flatStyle: true;
+}
+lmms--gui--Graph {
+	qproperty-flatStyle: true;
+	qproperty-graphColor: #42A065;
+}
 lmms--gui--EnvelopeGraph, lmms--gui--LfoGraph {
 	qproperty-flatStyle: true;
 	qproperty-noAmountColor: #6F7B87;
 	qproperty-fullAmountColor: #42A065;
 }
-lmms--gui--EnvelopeGraph { qproperty-markerFillColor: #A8B4C0; qproperty-markerOutlineColor: #35414D; }
+lmms--gui--EnvelopeGraph {
+	qproperty-markerFillColor: #A8B4C0;
+	qproperty-markerOutlineColor: #35414D;
+}
 
 lmms--gui--AutomationEditor {
 	qproperty-flatStyle: true;
@@ -102,59 +118,237 @@ lmms--gui--AutomationEditor {
 }
 
 /* Shared standard controls. Compact track buttons keep the explicit sizes below. */
-QPushButton { background: #29323B; color: #E5EAF0; border: 1px solid #35414D; border-radius: 4px; padding: 3px 6px; }
-QPushButton:hover { background: #35414D; }
-QPushButton:checked { background: #244A35; border-color: #42A065; }
-QPushButton:pressed { background: #20262D; border-color: #42A065; }
-QDialogButtonBox QPushButton { min-height: 20px; min-width: 64px; }
-QDialog QLineEdit, QDialog QComboBox, QDialog QSpinBox, QDialog QDoubleSpinBox { min-height: 20px; }
-lmms--gui--SetupDialog QPushButton { padding: 3px 6px; }
-QCheckBox, QRadioButton { spacing: 6px; color: #E5EAF0; }
-QCheckBox:disabled, QRadioButton:disabled { color: #6F7B87; }
-QCheckBox::indicator, QRadioButton::indicator { width: 14px; height: 14px; background: #29323B; border: 1px solid #6F7B87; }
-QCheckBox::indicator { border-radius: 4px; }
-QRadioButton::indicator { border-radius: 7px; }
-QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color: #A8B4C0; }
-QCheckBox::indicator:checked { image: url("resources:ui-check.svg"); background: #244A35; border-color: #42A065; }
-QCheckBox::indicator:indeterminate { image: url("resources:ui-minus.svg"); background: #244A35; border-color: #42A065; }
-QRadioButton::indicator:checked { image: url("resources:ui-dot.svg"); background: #244A35; border-color: #42A065; }
-QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background: #20262D; border-color: #35414D; }
-QCheckBox::indicator:checked:disabled { image: url("resources:ui-check-disabled.svg"); }
-QCheckBox::indicator:indeterminate:disabled { image: url("resources:ui-minus-disabled.svg"); }
-QRadioButton::indicator:checked:disabled { image: url("resources:ui-dot-disabled.svg"); }
-QCheckBox:focus, QRadioButton:focus { color: #42A065; }
-QMenuBar { background: #20262D; color: #E5EAF0; }
-QMenuBar::item { padding: 3px 6px; border-radius: 4px; }
-QMenuBar::item:selected { background: #35414D; }
-QMenuBar::item:pressed { background: #244A35; }
-QMenu::right-arrow { image: url("resources:ui-right.svg"); width: 10px; height: 10px; }
-QHeaderView::section { background: #29323B; color: #A8B4C0; border: none; border-right: 1px solid #35414D; border-bottom: 1px solid #35414D; padding: 4px; }
-QHeaderView::up-arrow { image: url("resources:ui-up.svg"); width: 10px; height: 10px; }
-QHeaderView::down-arrow { image: url("resources:ui-down.svg"); width: 10px; height: 10px; }
-QListView { background: #20262D; color: #E5EAF0; border: 1px solid #35414D; border-radius: 4px; }
-QListView::item { padding: 3px 4px; border-radius: 4px; }
-QListView::item:hover { background: #35414D; }
-QListView::item:selected { background: #244A35; color: #E5EAF0; }
-QListView::item:selected:!active, QTreeView::item:selected:!active { background: #29323B; color: #A8B4C0; }
-QTabWidget::pane { border: 1px solid #35414D; border-radius: 6px; background: #20262D; }
-QTabBar::tab { background: #29323B; color: #A8B4C0; border: 1px solid #35414D; border-top-left-radius: 4px; border-top-right-radius: 4px; padding: 4px 8px; }
-QTabBar::tab:selected { background: #244A35; color: #E5EAF0; border-color: #42A065; }
-QTabBar::tab:hover { background: #35414D; }
-QTabBar::tab:disabled { color: #6F7B87; }
-QGroupBox { border: 1px solid #35414D; border-radius: 6px; margin-top: 10px; padding: 8px 4px 4px; }
-QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; left: 8px; padding: 0 4px; color: #A8B4C0; }
-QScrollArea { border: 1px solid #35414D; border-radius: 6px; background: #20262D; }
-QScrollArea > QWidget > QWidget { background: #20262D; }
-QFrame[frameShape="4"], QFrame[frameShape="5"] { color: #35414D; }
-QProgressBar { border: 1px solid #35414D; border-radius: 4px; background: #20262D; color: #E5EAF0; text-align: center; }
-QProgressBar::chunk { background: #42A065; border-radius: 3px; }
-QSlider::groove:horizontal { background: #35414D; height: 4px; border-radius: 2px; }
-QSlider::groove:vertical { background: #35414D; width: 4px; border-radius: 2px; }
-QSlider::handle:horizontal { background: #A8B4C0; border: 1px solid #35414D; border-radius: 4px; width: 12px; margin: -4px 0; }
-QSlider::handle:vertical { background: #A8B4C0; border: 1px solid #35414D; border-radius: 4px; height: 12px; margin: 0 -4px; }
-QSlider::handle:hover { background: #E5EAF0; }
-QSlider::handle:pressed { background: #42A065; }
-QSlider::handle:disabled { background: #6F7B87; }
+QPushButton {
+	background: #29323B;
+	color: #E5EAF0;
+	border: 1px solid #35414D;
+	border-radius: 4px;
+	padding: 3px 6px;
+}
+QPushButton:hover {
+	background: #35414D;
+}
+QPushButton:checked {
+	background: #244A35;
+	border-color: #42A065;
+}
+QPushButton:pressed {
+	background: #20262D;
+	border-color: #42A065;
+}
+QDialogButtonBox QPushButton {
+	min-height: 20px;
+	min-width: 64px;
+}
+QDialog QLineEdit, QDialog QComboBox, QDialog QSpinBox, QDialog QDoubleSpinBox {
+	min-height: 20px;
+}
+lmms--gui--SetupDialog QPushButton {
+	padding: 3px 6px;
+}
+QCheckBox, QRadioButton {
+	spacing: 6px;
+	color: #E5EAF0;
+}
+QCheckBox:disabled, QRadioButton:disabled {
+	color: #6F7B87;
+}
+QCheckBox::indicator, QRadioButton::indicator {
+	width: 14px;
+	height: 14px;
+	background: #29323B;
+	border: 1px solid #6F7B87;
+}
+QCheckBox::indicator {
+	border-radius: 4px;
+}
+QRadioButton::indicator {
+	border-radius: 7px;
+}
+QCheckBox::indicator:hover, QRadioButton::indicator:hover {
+	border-color: #A8B4C0;
+}
+QCheckBox::indicator:checked {
+	image: url("resources:ui-check.svg");
+	background: #244A35;
+	border-color: #42A065;
+}
+QCheckBox::indicator:indeterminate {
+	image: url("resources:ui-minus.svg");
+	background: #244A35;
+	border-color: #42A065;
+}
+QRadioButton::indicator:checked {
+	image: url("resources:ui-dot.svg");
+	background: #244A35;
+	border-color: #42A065;
+}
+QCheckBox::indicator:disabled, QRadioButton::indicator:disabled {
+	background: #20262D;
+	border-color: #35414D;
+}
+QCheckBox::indicator:checked:disabled {
+	image: url("resources:ui-check-disabled.svg");
+}
+QCheckBox::indicator:indeterminate:disabled {
+	image: url("resources:ui-minus-disabled.svg");
+}
+QRadioButton::indicator:checked:disabled {
+	image: url("resources:ui-dot-disabled.svg");
+}
+QCheckBox:focus, QRadioButton:focus {
+	color: #42A065;
+}
+QMenuBar {
+	background: #20262D;
+	color: #E5EAF0;
+}
+QMenuBar::item {
+	padding: 3px 6px;
+	border-radius: 4px;
+}
+QMenuBar::item:selected {
+	background: #35414D;
+}
+QMenuBar::item:pressed {
+	background: #244A35;
+}
+QMenu::right-arrow {
+	image: url("resources:ui-right.svg");
+	width: 10px;
+	height: 10px;
+}
+QHeaderView::section {
+	background: #29323B;
+	color: #A8B4C0;
+	border: none;
+	border-right: 1px solid #35414D;
+	border-bottom: 1px solid #35414D;
+	padding: 4px;
+}
+QHeaderView::up-arrow {
+	image: url("resources:ui-up.svg");
+	width: 10px;
+	height: 10px;
+}
+QHeaderView::down-arrow {
+	image: url("resources:ui-down.svg");
+	width: 10px;
+	height: 10px;
+}
+QListView {
+	background: #20262D;
+	color: #E5EAF0;
+	border: 1px solid #35414D;
+	border-radius: 4px;
+}
+QListView::item {
+	padding: 3px 4px;
+	border-radius: 4px;
+}
+QListView::item:hover {
+	background: #35414D;
+}
+QListView::item:selected {
+	background: #244A35;
+	color: #E5EAF0;
+}
+QListView::item:selected:!active, QTreeView::item:selected:!active {
+	background: #29323B;
+	color: #A8B4C0;
+}
+QTabWidget::pane {
+	border: 1px solid #35414D;
+	border-radius: 6px;
+	background: #20262D;
+}
+QTabBar::tab {
+	background: #29323B;
+	color: #A8B4C0;
+	border: 1px solid #35414D;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	padding: 4px 8px;
+}
+QTabBar::tab:selected {
+	background: #244A35;
+	color: #E5EAF0;
+	border-color: #42A065;
+}
+QTabBar::tab:hover {
+	background: #35414D;
+}
+QTabBar::tab:disabled {
+	color: #6F7B87;
+}
+QGroupBox {
+	border: 1px solid #35414D;
+	border-radius: 6px;
+	margin-top: 10px;
+	padding: 8px 4px 4px;
+}
+QGroupBox::title {
+	subcontrol-origin: margin;
+	subcontrol-position: top left;
+	left: 8px;
+	padding: 0 4px;
+	color: #A8B4C0;
+}
+QScrollArea {
+	border: 1px solid #35414D;
+	border-radius: 6px;
+	background: #20262D;
+}
+QScrollArea > QWidget > QWidget {
+	background: #20262D;
+}
+QFrame[frameShape="4"], QFrame[frameShape="5"] {
+	color: #35414D;
+}
+QProgressBar {
+	border: 1px solid #35414D;
+	border-radius: 4px;
+	background: #20262D;
+	color: #E5EAF0;
+	text-align: center;
+}
+QProgressBar::chunk {
+	background: #42A065;
+	border-radius: 3px;
+}
+QSlider::groove:horizontal {
+	background: #35414D;
+	height: 4px;
+	border-radius: 2px;
+}
+QSlider::groove:vertical {
+	background: #35414D;
+	width: 4px;
+	border-radius: 2px;
+}
+QSlider::handle:horizontal {
+	background: #A8B4C0;
+	border: 1px solid #35414D;
+	border-radius: 4px;
+	width: 12px;
+	margin: -4px 0;
+}
+QSlider::handle:vertical {
+	background: #A8B4C0;
+	border: 1px solid #35414D;
+	border-radius: 4px;
+	height: 12px;
+	margin: 0 -4px;
+}
+QSlider::handle:hover {
+	background: #E5EAF0;
+}
+QSlider::handle:pressed {
+	background: #42A065;
+}
+QSlider::handle:disabled {
+	background: #6F7B87;
+}
 
 /* Standard inputs: fixed border width keeps focus geometry stable. */
 QLineEdit, QTextEdit, QPlainTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {
@@ -167,9 +361,13 @@ QLineEdit, QTextEdit, QPlainTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {
  selection-color: #E5EAF0;
 }
 QLineEdit:hover, QTextEdit:hover, QPlainTextEdit:hover,
-QComboBox:hover, QSpinBox:hover, QDoubleSpinBox:hover { border-color: #6F7B87; }
+QComboBox:hover, QSpinBox:hover, QDoubleSpinBox:hover {
+	border-color: #6F7B87;
+}
 QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus,
-QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus { border-color: #42A065; }
+QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+	border-color: #42A065;
+}
 QLineEdit:read-only, QTextEdit:read-only, QPlainTextEdit:read-only {
  background: #20262D;
  color: #A8B4C0;
@@ -180,18 +378,63 @@ QComboBox:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled {
  background: #20262D;
  border-color: #29323B;
 }
-QComboBox { padding-right: 24px; }
-QComboBox::drop-down { width: 20px; border: none; subcontrol-origin: padding; subcontrol-position: top right; }
-QComboBox::down-arrow { image: url("resources:ui-down.svg"); width: 10px; height: 10px; }
-QComboBox QAbstractItemView { background: #20262D; color: #E5EAF0; selection-background-color: #244A35; selection-color: #E5EAF0; border: 1px solid #35414D; }
-QSpinBox, QDoubleSpinBox { padding-right: 20px; }
-QSpinBox::up-button, QDoubleSpinBox::up-button { subcontrol-origin: border; subcontrol-position: top right; width: 18px; border: none; }
-QSpinBox::down-button, QDoubleSpinBox::down-button { subcontrol-origin: border; subcontrol-position: bottom right; width: 18px; border: none; }
+QComboBox {
+	padding-right: 24px;
+}
+QComboBox::drop-down {
+	width: 20px;
+	border: none;
+	subcontrol-origin: padding;
+	subcontrol-position: top right;
+}
+QComboBox::down-arrow {
+	image: url("resources:ui-down.svg");
+	width: 10px;
+	height: 10px;
+}
+QComboBox QAbstractItemView {
+	background: #20262D;
+	color: #E5EAF0;
+	selection-background-color: #244A35;
+	selection-color: #E5EAF0;
+	border: 1px solid #35414D;
+}
+QSpinBox, QDoubleSpinBox {
+	padding-right: 20px;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+	subcontrol-origin: border;
+	subcontrol-position: top right;
+	width: 18px;
+	border: none;
+}
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+	subcontrol-origin: border;
+	subcontrol-position: bottom right;
+	width: 18px;
+	border: none;
+}
 QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
-QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover { background: #35414D; }
-QSpinBox::up-arrow, QDoubleSpinBox::up-arrow { image: url("resources:ui-up.svg"); width: 8px; height: 8px; }
-QSpinBox::down-arrow, QDoubleSpinBox::down-arrow { image: url("resources:ui-down.svg"); width: 8px; height: 8px; }
-QToolTip { border: 1px solid #35414D; border-radius: 4px; background: #20262D; color: #E5EAF0; padding: 4px; }
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+	background: #35414D;
+}
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+	image: url("resources:ui-up.svg");
+	width: 8px;
+	height: 8px;
+}
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+	image: url("resources:ui-down.svg");
+	width: 8px;
+	height: 8px;
+}
+QToolTip {
+	border: 1px solid #35414D;
+	border-radius: 4px;
+	background: #20262D;
+	color: #E5EAF0;
+	padding: 4px;
+}
 
 lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 	background: #040506;
@@ -463,16 +706,36 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
 	margin-left: 3px;
 }
 
-QScrollBar::left-arrow:horizontal { background-image: url("resources:ui-left.svg");}
-QScrollBar::right-arrow:horizontal { background-image: url("resources:ui-right.svg");}
-QScrollBar::up-arrow:vertical { background-image: url("resources:ui-up.svg");}
-QScrollBar::down-arrow:vertical { background-image: url("resources:ui-down.svg");}
-QScrollBar::left-arrow:horizontal:disabled { background-image: url("resources:ui-left-disabled.svg");}
-QScrollBar::right-arrow:horizontal:disabled { background-image: url("resources:ui-right-disabled.svg");}
-QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:ui-up-disabled.svg");}
-QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:ui-down-disabled.svg");}
-lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url("resources:ui-up.svg");}
-lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url("resources:ui-down.svg");}
+QScrollBar::left-arrow:horizontal {
+	background-image: url("resources:ui-left.svg");
+}
+QScrollBar::right-arrow:horizontal {
+	background-image: url("resources:ui-right.svg");
+}
+QScrollBar::up-arrow:vertical {
+	background-image: url("resources:ui-up.svg");
+}
+QScrollBar::down-arrow:vertical {
+	background-image: url("resources:ui-down.svg");
+}
+QScrollBar::left-arrow:horizontal:disabled {
+	background-image: url("resources:ui-left-disabled.svg");
+}
+QScrollBar::right-arrow:horizontal:disabled {
+	background-image: url("resources:ui-right-disabled.svg");
+}
+QScrollBar::up-arrow:vertical:disabled {
+	background-image: url("resources:ui-up-disabled.svg");
+}
+QScrollBar::down-arrow:vertical:disabled {
+	background-image: url("resources:ui-down-disabled.svg");
+}
+lmms--gui--EffectRackView QScrollBar::up-arrow:vertical:disabled {
+	background-image: url("resources:ui-up.svg");
+}
+lmms--gui--EffectRackView QScrollBar::down-arrow:vertical:disabled {
+	background-image: url("resources:ui-down.svg");
+}
 
 /* background for song editor and pattern editor */
 
@@ -505,8 +768,14 @@ QPushButton#btn:checked {
 	background: #244A35;
 }
 
-QPushButton:focus, QPushButton#btn:focus { border-color: #42A065; }
-QPushButton:disabled, QPushButton#btn:disabled { background: #20262D; color: #6F7B87; border-color: #29323B; }
+QPushButton:focus, QPushButton#btn:focus {
+	border-color: #42A065;
+}
+QPushButton:disabled, QPushButton#btn:disabled {
+	background: #20262D;
+	color: #6F7B87;
+	border-color: #29323B;
+}
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
@@ -765,7 +1034,9 @@ QToolButton:checked {
 	background: #244A35;
 }
 
-QToolButton:focus { border-color: #42A065; }
+QToolButton:focus {
+	border-color: #42A065;
+}
 QToolButton:disabled, QToolButton:checked:disabled {
 	background: #20262D;
 	color: #6F7B87;
@@ -1339,22 +1610,52 @@ lmms--gui--SVSPianoRoll {
 	qproperty-errorColor: #E05B65;
 }
 
-lmms--gui--SetupDialog QPushButton#vstSettingsTab { qproperty-icon: url("resources:setup_vst.svg"); qproperty-iconSize: 48px 48px; }
-lmms--gui--SetupDialog QPushButton#svsSettingsTab { qproperty-icon: url("resources:svs_track.svg"); qproperty-iconSize: 48px 48px; }
+lmms--gui--SetupDialog QPushButton#vstSettingsTab {
+	qproperty-icon: url("resources:setup_vst.svg");
+	qproperty-iconSize: 48px 48px;
+}
+lmms--gui--SetupDialog QPushButton#svsSettingsTab {
+	qproperty-icon: url("resources:svs_track.svg");
+	qproperty-iconSize: 48px 48px;
+}
 
 /* White SVG tools; the track's missing-avatar fallback uses svs_track.svg. */
-lmms--gui--SVSPianoRoll QToolButton#svsPlayButton { qproperty-icon: url("resources:ui-play.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsStopButton { qproperty-icon: url("resources:ui-stop.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsParameterAreaVisible { qproperty-icon: url("resources:ui-curves.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsEditorSettingsButton { qproperty-icon: url("resources:gear.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsBatchLyricsButton { qproperty-icon: url("resources:svs_lyrics.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool0 { qproperty-icon: url("resources:svs_tool_select.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool1 { qproperty-icon: url("resources:svs_tool_pencil.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool2 { qproperty-icon: url("resources:svs_tool_pitch.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool3 { qproperty-icon: url("resources:svs_tool_anchor.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool4 { qproperty-icon: url("resources:svs_tool_smooth.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool5 { qproperty-icon: url("resources:svs_tool_line.svg"); }
-lmms--gui--SVSPianoRoll QToolButton#svsTool6 { qproperty-icon: url("resources:svs_tool_erase.svg"); }
+lmms--gui--SVSPianoRoll QToolButton#svsPlayButton {
+	qproperty-icon: url("resources:ui-play.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsStopButton {
+	qproperty-icon: url("resources:ui-stop.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsParameterAreaVisible {
+	qproperty-icon: url("resources:ui-curves.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsEditorSettingsButton {
+	qproperty-icon: url("resources:gear.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsBatchLyricsButton {
+	qproperty-icon: url("resources:svs_lyrics.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool0 {
+	qproperty-icon: url("resources:svs_tool_select.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool1 {
+	qproperty-icon: url("resources:svs_tool_pencil.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool2 {
+	qproperty-icon: url("resources:svs_tool_pitch.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool3 {
+	qproperty-icon: url("resources:svs_tool_anchor.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool4 {
+	qproperty-icon: url("resources:svs_tool_smooth.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool5 {
+	qproperty-icon: url("resources:svs_tool_line.svg");
+}
+lmms--gui--SVSPianoRoll QToolButton#svsTool6 {
+	qproperty-icon: url("resources:svs_tool_erase.svg");
+}
 
 QWidget#svsVoicePanel {
 	background-color: palette(window);
@@ -1376,4 +1677,6 @@ lmms--gui--LmmsPalette {
 }
 
 /* F4 note drawing keeps the existing SVS edit geometry. */
-lmms--gui--SVSCanvas { qproperty-noteCornerRadius: 2; }
+lmms--gui--SVSCanvas {
+	qproperty-noteCornerRadius: 2;
+}

@@ -47,7 +47,9 @@ RenderManager::RenderManager(
 
 RenderManager::~RenderManager()
 {
-	abortProcessing();m_activeRenderer.reset();m_svsBatch.reset();
+	abortProcessing();
+	m_activeRenderer.reset();
+	m_svsBatch.reset();
 	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
 }
 
@@ -77,25 +79,34 @@ void RenderManager::renderNextTrack()
 		// pop the next track from our rendering queue
 		Track* renderTrack = m_tracksToRender.back();
 		m_tracksToRender.pop_back();
-		if(!renderTrack) {m_tracksToRender.clear();restoreMutedState();emit svsExportFailed(tr("Track deleted during SVS batch export"));emit finished();return;}
+		if (!renderTrack)
+		{
+			m_tracksToRender.clear();
+			restoreMutedState();
+			emit svsExportFailed(tr("Track deleted during SVS batch export"));
+			emit finished();
+			return;
+		}
 
 		// mute everything but the track we are about to render
 		for (auto track : m_unmuted)
 		{
-			if(track) track->setMuted(track != renderTrack);
+			if (track)
+				track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		render( pathForTrack(renderTrack, trackNum),renderTrack );
+		render(pathForTrack(renderTrack, trackNum), renderTrack);
 	}
 }
 
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	m_svsBatch=std::make_unique<svs::ExportSnapshot>(svs::ExportSnapshot::capture(*Engine::getSong(),m_outputSettings.getSampleRate()));
+	m_svsBatch = std::make_unique<svs::ExportSnapshot>(
+		svs::ExportSnapshot::capture(*Engine::getSong(), m_outputSettings.getSampleRate()));
 	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
@@ -105,7 +116,7 @@ void RenderManager::renderTracks()
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample || type == Track::Type::SVS ) )
+				(type == Track::Type::Instrument || type == Track::Type::Sample || type == Track::Type::SVS))
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -137,12 +148,22 @@ void RenderManager::renderProject()
 	render( m_outputPath );
 }
 
-void RenderManager::render(QString outputPath,Track* renderTrack)
+void RenderManager::render(QString outputPath, Track* renderTrack)
 {
 	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, outputPath);
 	m_activeRenderer->setIgnoreFailedSVSRegions(m_ignoreFailedSVS);
-	if(m_svsBatch) {QVector<svs::ExportSnapshot::Region> regions;for(const auto& region:m_svsBatch->regions()) if(region.track==renderTrack) regions.push_back(region);m_activeRenderer->setSVSSnapshot(std::make_unique<svs::ExportSnapshot>(std::move(regions)));}
-	connect(m_activeRenderer.get(),&ProjectRenderer::svsExportFailed,this,[this](const QString& reason){m_tracksToRender.clear();emit svsExportFailed(reason);});
+	if (m_svsBatch)
+	{
+		QVector<svs::ExportSnapshot::Region> regions;
+		for (const auto& region : m_svsBatch->regions())
+			if (region.track == renderTrack)
+				regions.push_back(region);
+		m_activeRenderer->setSVSSnapshot(std::make_unique<svs::ExportSnapshot>(std::move(regions)));
+	}
+	connect(m_activeRenderer.get(), &ProjectRenderer::svsExportFailed, this, [this](const QString& reason) {
+		m_tracksToRender.clear();
+		emit svsExportFailed(reason);
+	});
 
 	if( m_activeRenderer->isReady() )
 	{
@@ -171,7 +192,8 @@ void RenderManager::restoreMutedState()
 	{
 		Track* restoreTrack = m_unmuted.back();
 		m_unmuted.pop_back();
-			if(restoreTrack) restoreTrack->setMuted( false );
+			if (restoreTrack)
+			restoreTrack->setMuted(false);
 	}
 }
 

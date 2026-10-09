@@ -70,15 +70,24 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 
 void TabWidget::setFlatStyle(bool enabled)
 {
-	if (m_flatStyle == enabled) { return; }
+	if (m_flatStyle == enabled)
+	{
+		return;
+	}
 	m_flatStyle = enabled;
 	m_tabbarHeight = m_usePixmap ? GRAPHIC_TAB_HEIGHT : TEXT_TAB_HEIGHT;
-	if (enabled) { m_tabbarHeight = std::max<int>(m_tabbarHeight, fontMetrics().height() + 4); }
+	if (enabled)
+	{
+		m_tabbarHeight = std::max<int>(m_tabbarHeight, fontMetrics().height() + 4);
+	}
 	m_tabheight = m_tabbarHeight - (m_caption.isEmpty() ? 3 : 4);
 	for (const auto& widget : m_widgets)
 	{
 		widget.w->move(2, m_tabbarHeight - 1);
-		if (!m_resizable) { widget.w->setFixedSize(width() - 4, height() - m_tabbarHeight); }
+		if (!m_resizable)
+		{
+			widget.w->setFixedSize(width() - 4, height() - m_tabbarHeight);
+		}
 	}
 	updateGeometry();
 	update();
@@ -157,7 +166,10 @@ int TabWidget::findTabAtPos(const QPoint& pos)
 {
 	const auto rectangles = tabRects();
 	for (auto it = rectangles.cbegin(); it != rectangles.cend(); ++it)
-		if (it.value().contains(pos)) { return it.key(); }
+		if (it.value().contains(pos))
+		{
+			return it.key();
+		}
 	return -1;
 }
 
@@ -237,7 +249,8 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 		if (!m_caption.isEmpty())
 		{
 			p.setPen(tabTitleText());
-			p.drawText(QRect(5, 1, fontMetrics().horizontalAdvance(m_caption) + 4, m_tabbarHeight - 2), Qt::AlignVCenter, m_caption);
+			p.drawText(QRect(5, 1, fontMetrics().horizontalAdvance(m_caption) + 4, m_tabbarHeight - 2),
+				Qt::AlignVCenter, m_caption);
 		}
 		const auto rectangles = tabRects();
 		for (auto it = m_widgets.cbegin(); it != m_widgets.cend(); ++it)
@@ -245,13 +258,16 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 			const auto tabRect = rectangles.value(it.key());
 			if (it.key() == m_activeTab)
 			{
-				p.setPen(Qt::NoPen); p.setBrush(tabSelected());
-				p.drawRoundedRect(QRectF(tabRect).adjusted(.5, 0, -.5, 0), std::min(m_cornerRadius, tabRect.height() / 2.0), std::min(m_cornerRadius, tabRect.height() / 2.0));
+				p.setPen(Qt::NoPen);
+				p.setBrush(tabSelected());
+				p.drawRoundedRect(QRectF(tabRect).adjusted(.5, 0, -.5, 0),
+					std::min(m_cornerRadius, tabRect.height() / 2.0), std::min(m_cornerRadius, tabRect.height() / 2.0));
 			}
 			if (m_usePixmap)
 			{
 				const auto artwork = embed::getIconPixmap(it->pixmap);
-				p.drawPixmap(tabRect.center().x() - artwork.width() / 2, (m_tabbarHeight - artwork.height()) / 2, artwork);
+				p.drawPixmap(
+					tabRect.center().x() - artwork.width() / 2, (m_tabbarHeight - artwork.height()) / 2, artwork);
 			}
 			else
 			{
@@ -345,14 +361,23 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 	we->accept();
 	const bool next = we->angleDelta().y() < 0;
 	auto it = m_widgets.constFind(m_activeTab);
-	if (it == m_widgets.cend()) { return; }
+	if (it == m_widgets.cend())
+	{
+		return;
+	}
 	if (next)
 	{
-		if (++it == m_widgets.cend()) { return; }
+		if (++it == m_widgets.cend())
+		{
+			return;
+		}
 	}
 	else
 	{
-		if (it == m_widgets.cbegin()) { return; }
+		if (it == m_widgets.cbegin())
+		{
+			return;
+		}
 		--it;
 	}
 	setActiveTab(it.key());

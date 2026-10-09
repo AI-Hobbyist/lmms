@@ -65,7 +65,10 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 		else
 		{
 			qWarning("%s", message.toUtf8().constData());
-			if (outputSettings.interactiveErrors()) { exit(EXIT_FAILURE); }
+			if (outputSettings.interactiveErrors())
+			{
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 }
@@ -85,8 +88,11 @@ int AudioFileDevice::writeData( const void* data, int len )
 {
 	if( m_outputFile.isOpen() )
 	{
-		const auto written = m_outputFile.write( (const char *) data, len );
-		if (written != len) { reportWriteFailure(); }
+		const auto written = m_outputFile.write((const char*)data, len);
+		if (written != len)
+		{
+			reportWriteFailure();
+		}
 		return written;
 	}
 

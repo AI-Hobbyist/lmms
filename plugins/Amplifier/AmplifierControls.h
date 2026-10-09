@@ -54,8 +54,7 @@ public:
 	int controlCount() override { return 4; }
 	QMap<QString, AutomatableModel*> parameterModels() override
 	{
-		return {{"volume", &m_volumeModel}, {"pan", &m_panModel},
-			{"left", &m_leftModel}, {"right", &m_rightModel}};
+		return {{"volume", &m_volumeModel}, {"pan", &m_panModel}, {"left", &m_leftModel}, {"right", &m_rightModel}};
 	}
 
 private:

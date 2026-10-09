@@ -297,7 +297,11 @@ void SubWindow::setActiveColor( const QBrush & b )
 void SubWindow::setTextShadowColor( const QColor & c )
 {
 	m_textShadowColor = c;
-	if (m_shadow) { m_shadow->setColor(c); m_shadow->setEnabled(c.alpha() != 0); }
+	if (m_shadow)
+	{
+		m_shadow->setColor(c);
+		m_shadow->setEnabled(c.alpha() != 0);
+	}
 }
 
 

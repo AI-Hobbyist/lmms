@@ -2,6 +2,7 @@
 
 This offline step never invents a license grant or resolves conflicting notices.
 """
+
 import base64
 import hashlib
 import json
@@ -17,7 +18,9 @@ for filename in ("license-github-responses.json", "license-extra-responses.json"
     for source in json.loads((evidence / filename).read_text(encoding="utf-8-sig")):
         if source.get("Content"):
             sources[source["Package"]] = source
-source = json.loads((evidence / "license-wanakana-release-response.json").read_text(encoding="utf-8-sig"))
+source = json.loads(
+    (evidence / "license-wanakana-release-response.json").read_text(encoding="utf-8-sig")
+)
 sources[source["Package"]] = source
 missing = {"ko-pron", "loguru", "protobuf-py-ext", "that-depends", "jyutping", "wanakana-python"}
 lock = json.loads((root / "doc/svs/project/runtime-lock.json").read_text(encoding="utf-8"))
@@ -35,26 +38,44 @@ for wheel in lock["wheels"]:
         directory = destination / metadata_path.split("/")[0]
         directory.mkdir(exist_ok=True)
         (directory / "METADATA").write_bytes(metadata)
-        record = {"name": name, "wheel": wheel, "directory": directory.name,
-                  "files": [], "status": "upstream-notice-preserved"}
+        record = {
+            "name": name,
+            "wheel": wheel,
+            "directory": directory.name,
+            "files": [],
+            "status": "upstream-notice-preserved",
+        }
         if name in sources:
             source = sources[name]
             content = base64.b64decode(source["Content"])
             blob = hashlib.sha1(b"blob " + str(len(content)).encode() + b"\0" + content).hexdigest()
             assert blob == source["GitBlob"], "Captured Git blob differs from upstream response"
             (directory / "UPSTREAM-LICENSE").write_bytes(content)
-            record["upstream"] = {key: source[key] for key in ("Repo", "Ref", "Spdx", "GitBlob", "Url")}
+            record["upstream"] = {
+                key: source[key] for key in ("Repo", "Ref", "Spdx", "GitBlob", "Url")
+            }
         if name == "jyutping":
             record["status"] = "metadata-only-upstream-license-file-absent"
-            record["note"] = "Locked release declares MIT. Neither wheel, sdist nor upstream repository supplies a LICENSE notice. No grant or copyright notice has been invented."
+            record["note"] = (
+                "Locked release declares MIT. Neither wheel, sdist nor upstream repository supplies a LICENSE notice. No grant or copyright notice has been invented."
+            )
         if name == "wanakana-python":
             record["status"] = "conflicting-upstream-declarations-preserved"
-            record["note"] = "Locked wheel declares MPL-2.0; upstream pre-release commit supplies MIT. Both declarations are retained without relicensing. Distribution review remains MANUAL/PENDING."
-            record["declaredLicenseText"] = {"path": "DECLARED-MPL-2.0.txt", "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt"}
+            record["note"] = (
+                "Locked wheel declares MPL-2.0; upstream pre-release commit supplies MIT. Both declarations are retained without relicensing. Distribution review remains MANUAL/PENDING."
+            )
+            record["declaredLicenseText"] = {
+                "path": "DECLARED-MPL-2.0.txt",
+                "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt",
+            }
             assert (directory / "DECLARED-MPL-2.0.txt").is_file()
-        (directory / "PROVENANCE.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+        (directory / "PROVENANCE.json").write_text(
+            json.dumps(record, indent=2) + "\n", encoding="utf-8"
+        )
         for file in sorted(directory.iterdir()):
-            record["files"].append({"path": file.name, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()})
+            record["files"].append(
+                {"path": file.name, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
+            )
         report.append(record)
 assert {item["name"] for item in report} == missing
 (destination / "sources.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

@@ -8,30 +8,49 @@
 #include <vector>
 #include <windows.h>
 
-namespace lmms::vsthost
-{
+namespace lmms::vsthost {
 // Control-thread lifetime object. Restart creates a new supervisor/job so an old
 // process tree can never share the new generation's resources.
 class ProcessSupervisor
 {
 public:
-	enum class Stage : std::uint32_t { Startup, Scan, Initialize, Control, Audio, Shutdown };
-	struct Fault { Error error; Stage stage; DWORD nativeCode; };
+	enum class Stage : std::uint32_t
+	{
+		Startup,
+		Scan,
+		Initialize,
+		Control,
+		Audio,
+		Shutdown
+	};
+	struct Fault
+	{
+		Error error;
+		Stage stage;
+		DWORD nativeCode;
+	};
 	ProcessSupervisor()
 	{
 		m_job = CreateJobObjectW(nullptr, nullptr);
-		if (!m_job) { fail(Error::InitializationFailed, GetLastError()); return; }
+		if (!m_job)
+		{
+			fail(Error::InitializationFailed, GetLastError());
+			return;
+		}
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
 		limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 		if (!SetInformationJobObject(m_job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
-		{ fail(Error::InitializationFailed, GetLastError()); return; }
-		m_watcher = std::jthread([this](std::stop_token stop)
 		{
+			fail(Error::InitializationFailed, GetLastError());
+			return;
+		}
+		m_watcher = std::jthread([this](std::stop_token stop) {
 			while (!stop.stop_requested())
 			{
 				const auto requested = m_requestedError.exchange(Error::None, std::memory_order_acq_rel);
 				const auto source = m_audioFaultSource.load(std::memory_order_acquire);
-				const auto audioRequested = source ? source->exchange(Error::None, std::memory_order_acq_rel) : Error::None;
+				const auto audioRequested
+					= source ? source->exchange(Error::None, std::memory_order_acq_rel) : Error::None;
 				if (requested != Error::None || audioRequested != Error::None)
 				{
 					m_stage.store(Stage::Audio, std::memory_order_relaxed);
@@ -50,7 +69,8 @@ public:
 				const auto process = m_process.load(std::memory_order_acquire);
 				if (process && WaitForSingleObject(process, 0) == WAIT_OBJECT_0)
 				{
-					DWORD code = 0; GetExitCodeProcess(process, &code);
+					DWORD code = 0;
+					GetExitCodeProcess(process, &code);
 					if (!m_expectedExit.load(std::memory_order_acquire))
 					{
 						fail(code ? Error::ProcessCrashed : Error::Disconnected, code);
@@ -67,36 +87,64 @@ public:
 	{
 		close(0);
 		m_watcher.request_stop();
-		if (m_watcher.joinable()) { m_watcher.join(); }
-		if (const auto process = m_process.load()) { CloseHandle(process); }
-		if (m_job) { CloseHandle(m_job); }
+		if (m_watcher.joinable())
+		{
+			m_watcher.join();
+		}
+		if (const auto process = m_process.load())
+		{
+			CloseHandle(process);
+		}
+		if (m_job)
+		{
+			CloseHandle(m_job);
+		}
 	}
 	ProcessSupervisor(const ProcessSupervisor&) = delete;
 	ProcessSupervisor& operator=(const ProcessSupervisor&) = delete;
 
-	bool start(const std::wstring& executable, const std::vector<std::wstring>& arguments,
-		DWORD startupTimeoutMs = 30000)
+	bool start(
+		const std::wstring& executable, const std::vector<std::wstring>& arguments, DWORD startupTimeoutMs = 30000)
 	{
-		if (!m_job || m_process.load() || fault().error != Error::None) { return false; }
+		if (!m_job || m_process.load() || fault().error != Error::None)
+		{
+			return false;
+		}
 		arm(Stage::Startup, startupTimeoutMs);
 		std::wstring command = quote(executable);
-		for (const auto& argument : arguments) { command += L" " + quote(argument); }
-		STARTUPINFOW startup{}; startup.cb = sizeof(startup);
+		for (const auto& argument : arguments)
+		{
+			command += L" " + quote(argument);
+		}
+		STARTUPINFOW startup{};
+		startup.cb = sizeof(startup);
 		PROCESS_INFORMATION process{};
 		// Associate the child before any plugin code or descendant creation runs.
 		if (!CreateProcessW(executable.c_str(), command.data(), nullptr, nullptr, FALSE,
-			CREATE_SUSPENDED | CREATE_NO_WINDOW, nullptr, nullptr, &startup, &process))
-		{ fail(Error::MissingHelper, GetLastError()); disarm(); return false; }
+				CREATE_SUSPENDED | CREATE_NO_WINDOW, nullptr, nullptr, &startup, &process))
+		{
+			fail(Error::MissingHelper, GetLastError());
+			disarm();
+			return false;
+		}
 		m_process.store(process.hProcess, std::memory_order_release);
 		m_pid = process.dwProcessId;
 		bool assigned = AssignProcessToJobObject(m_job, process.hProcess) != FALSE;
-		if (!assigned) { fail(Error::InitializationFailed, GetLastError()); }
+		if (!assigned)
+		{
+			fail(Error::InitializationFailed, GetLastError());
+		}
 		if (!assigned || fault().error != Error::None || ResumeThread(process.hThread) == DWORD(-1))
 		{
-			if (fault().error == Error::None) { fail(Error::InitializationFailed, GetLastError()); }
+			if (fault().error == Error::None)
+			{
+				fail(Error::InitializationFailed, GetLastError());
+			}
 			TerminateProcess(process.hProcess, static_cast<UINT>(Error::InitializationFailed));
 			TerminateJobObject(m_job, static_cast<UINT>(Error::InitializationFailed));
-			CloseHandle(process.hThread); disarm(); return false;
+			CloseHandle(process.hThread);
+			disarm();
+			return false;
 		}
 		CloseHandle(process.hThread);
 		// Startup stays armed until the caller verifies a protocol handshake.
@@ -112,7 +160,10 @@ public:
 	void terminate(Error reason, DWORD nativeCode = 0) noexcept
 	{
 		fail(reason, nativeCode);
-		if (m_job) { TerminateJobObject(m_job, static_cast<UINT>(reason)); }
+		if (m_job)
+		{
+			TerminateJobObject(m_job, static_cast<UINT>(reason));
+		}
 		disarm();
 	}
 	// Audio callbacks only publish a fault request. OS process termination and
@@ -125,7 +176,9 @@ public:
 	// Source must outlive the supervisor. It is read even while the control
 	// dispatcher is blocked awaiting a plugin's state or editor reply.
 	void setAudioFaultSource(std::atomic<Error>* source) noexcept
-	{ m_audioFaultSource.store(source, std::memory_order_release); }
+	{
+		m_audioFaultSource.store(source, std::memory_order_release);
+	}
 	void expectExit() noexcept
 	{
 		m_expectedExit.store(true, std::memory_order_release);
@@ -133,12 +186,19 @@ public:
 	}
 	void close(DWORD graceMs = 2000) noexcept
 	{
-		expectExit(); disarm();
+		expectExit();
+		disarm();
 		const auto process = m_process.load(std::memory_order_acquire);
 		if (process && WaitForSingleObject(process, graceMs) != WAIT_OBJECT_0)
-		{ TerminateJobObject(m_job, 0); WaitForSingleObject(process, 2000); }
+		{
+			TerminateJobObject(m_job, 0);
+			WaitForSingleObject(process, 2000);
+		}
 		// Even a normally exited root may have left descendants.
-		if (m_job) { TerminateJobObject(m_job, 0); }
+		if (m_job)
+		{
+			TerminateJobObject(m_job, 0);
+		}
 	}
 	bool running() const noexcept
 	{
@@ -148,20 +208,29 @@ public:
 	DWORD pid() const noexcept { return m_pid; }
 	HANDLE processHandle() const noexcept { return m_process.load(std::memory_order_acquire); }
 	Fault fault() const noexcept
-	{ return {m_error.load(std::memory_order_acquire), m_faultStage.load(), m_nativeCode.load()}; }
+	{
+		return {m_error.load(std::memory_order_acquire), m_faultStage.load(), m_nativeCode.load()};
+	}
 	static std::wstring quote(const std::wstring& argument)
 	{
 		std::wstring result = L"\"";
 		std::size_t backslashes = 0;
 		for (const auto character : argument)
 		{
-			if (character == L'\\') { ++backslashes; continue; }
+			if (character == L'\\')
+			{
+				++backslashes;
+				continue;
+			}
 			result.append(character == L'"' ? 2 * backslashes + 1 : backslashes, L'\\');
-			backslashes = 0; result += character;
+			backslashes = 0;
+			result += character;
 		}
-		result.append(2 * backslashes, L'\\'); result += L'"';
+		result.append(2 * backslashes, L'\\');
+		result += L'"';
 		return result;
 	}
+
 private:
 	void fail(Error error, DWORD nativeCode) noexcept
 	{

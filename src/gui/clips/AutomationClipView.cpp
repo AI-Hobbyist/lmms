@@ -245,7 +245,10 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 	m_paintPixmap.fill(Qt::transparent);
 	QPainter p( &m_paintPixmap );
-	if (cornerRadius() > 0) { p.setClipPath(clipOutline(0)); }
+	if (cornerRadius() > 0)
+	{
+		p.setClipPath(clipOutline(0));
+	}
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
@@ -383,7 +386,10 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// clip name
 	paintTextLabel(m_clip->name(), p);
 
-	if (cornerRadius() > 0) { paintFlatBorder(p, current, 0); }
+	if (cornerRadius() > 0)
+	{
+		paintFlatBorder(p, current, 0);
+	}
 	else
 	{
 	// inner border

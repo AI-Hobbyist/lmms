@@ -166,10 +166,11 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	// Count number of instrument (and PatternStore) tracks
 	const auto numTracks = std::ranges::count_if(tracks, [](const Track* t) {
 		return t->type() == Track::Type::Instrument;
-	}) + std::ranges::count_if(patternStoreTracks, [](const Track* t) {
-		return t->type() == Track::Type::Instrument;
-	});
-	if (numTracks > 65535) { return false; }
+	}) + std::ranges::count_if(patternStoreTracks, [](const Track* t) { return t->type() == Track::Type::Instrument; });
+	if (numTracks > 65535)
+	{
+		return false;
+	}
 	m_channel = 0;
 	m_plists.clear();
 
@@ -298,9 +299,15 @@ void MidiExport::writePatternClip(Clip& clip, const QDomElement& clipElem,
 	Q_UNUSED(clipElem)
 	// Workaround for nested PatternClips
 	tick_t pos = 0;
-	if (patternIdx >= m_plists.size()) { return; }
+	if (patternIdx >= m_plists.size())
+	{
+		return;
+	}
 	tick_t len = Engine::patternStore()->lengthOfPattern(static_cast<int>(patternIdx)) * TimePos::ticksPerBar();
-	if (len <= 0) { return; }
+	if (len <= 0)
+	{
+		return;
+	}
 
 	// Iterate through PatternClip pairs of current list
 	// TODO: This *may* need some corrections?

@@ -296,9 +296,11 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::patternStore()->lengthOfCurrentPattern(), 0});
 			}
-			else if ((m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip) && previewClip() && m_loopMidiClip && !loopEnabled)
+			else if ((m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip) && previewClip()
+				&& m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(-previewClip()->startTimeOffset(), previewClip()->length() - previewClip()->startTimeOffset());
+				enforceLoop(
+					-previewClip()->startTimeOffset(), previewClip()->length() - previewClip()->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -382,28 +384,35 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_c
 	}
 		break;
 	case PlayMode::AutomationClip:
-		if (!m_automationClipToPlay) { return; }
-		break;
+			if (!m_automationClipToPlay)
+			{
+				return;
+			}
+			break;
 	default:
 		return;
 	}
 
 	if (m_playMode == PlayMode::AutomationClip)
-	{
-		values = automatedValuesFromTracks(tracklist, timeStart + m_automationClipToPlay->startPosition(),
-			m_automationClipToPlay->getTrack()->getClipNum(m_automationClipToPlay));
-	}
-	else { values = container->automatedValuesAt(timeStart, clipNum); }
+		{
+			values = automatedValuesFromTracks(tracklist, timeStart + m_automationClipToPlay->startPosition(),
+				m_automationClipToPlay->getTrack()->getClipNum(m_automationClipToPlay));
+		}
+		else
+		{
+			values = container->automatedValuesAt(timeStart, clipNum);
+		}
 	const TrackList& tracks = container->tracks();
 
 	Track::clipVector clips;
 	TimePos recordingTime = timeStart;
 	if (m_playMode == PlayMode::AutomationClip)
 	{
-		clips.push_back(const_cast<AutomationClip *>(m_automationClipToPlay));
+		clips.push_back(const_cast<AutomationClip*>(m_automationClipToPlay));
 		recordingTime += m_automationClipToPlay->startPosition();
 	}
-	else for (Track* track : tracks)
+	else
+		for (Track* track : tracks)
 	{
 		if (track->type() == Track::Type::Automation) {
 			track->getClipsInRange(clips, 0, timeStart);
@@ -469,7 +478,10 @@ void Song::processMetronome(size_t bufferOffset)
 		|| currentPlayMode == PlayMode::Song
 		|| currentPlayMode == PlayMode::Pattern;
 
-	if (!supported || m_exporting) { return; }
+	if (!supported || m_exporting)
+	{
+		return;
+	}
 	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
@@ -517,14 +529,23 @@ int Song::getExportProgress() const
 	return (float)pos/(float)m_exportEffectiveLength*100.0f;
 }
 
-bool Song::setPlayMode(PlayMode mode, const Clip *clip)
+bool Song::setPlayMode(PlayMode mode, const Clip* clip)
 {
-	if (static_cast<int>(mode) < 0 || mode >= PlayMode::Count) { return false; }
-	const auto *midi = dynamic_cast<const MidiClip *>(clip);
-	const auto *automation = dynamic_cast<const AutomationClip *>(clip);
-	if ((mode == PlayMode::MidiClip && !midi) || (mode == PlayMode::AutomationClip && !automation)) { return false; }
+	if (static_cast<int>(mode) < 0 || mode >= PlayMode::Count)
+	{
+		return false;
+	}
+	const auto* midi = dynamic_cast<const MidiClip*>(clip);
+	const auto* automation = dynamic_cast<const AutomationClip*>(clip);
+	if ((mode == PlayMode::MidiClip && !midi) || (mode == PlayMode::AutomationClip && !automation))
+	{
+		return false;
+	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
-	if (!isStopped()) { stop(); }
+	if (!isStopped())
+	{
+		stop();
+	}
 	m_playMode = mode;
 	m_midiClipToPlay = mode == PlayMode::MidiClip ? midi : nullptr;
 	m_automationClipToPlay = mode == PlayMode::AutomationClip ? automation : nullptr;
@@ -533,10 +554,16 @@ bool Song::setPlayMode(PlayMode mode, const Clip *clip)
 	return true;
 }
 
-const Clip *Song::previewClip() const
+const Clip* Song::previewClip() const
 {
-	if (m_playMode == PlayMode::MidiClip) { return m_midiClipToPlay; }
-	if (m_playMode == PlayMode::AutomationClip) { return m_automationClipToPlay; }
+	if (m_playMode == PlayMode::MidiClip)
+	{
+		return m_midiClipToPlay;
+	}
+	if (m_playMode == PlayMode::AutomationClip)
+	{
+		return m_automationClipToPlay;
+	}
 	return nullptr;
 }
 
@@ -554,19 +581,26 @@ void Song::restorePlaybackState(const PlaybackState& state)
 	m_recording = state.recording;
 	m_loopMidiClip = state.loopPreview;
 	m_midiClipToPlay = state.mode == PlayMode::MidiClip ? dynamic_cast<const MidiClip*>(state.clip) : nullptr;
-	m_automationClipToPlay = state.mode == PlayMode::AutomationClip ? dynamic_cast<const AutomationClip*>(state.clip) : nullptr;
+	m_automationClipToPlay
+		= state.mode == PlayMode::AutomationClip ? dynamic_cast<const AutomationClip*>(state.clip) : nullptr;
 	m_vstSyncController.setPlaybackState(m_playing && !m_paused);
 	emit playbackStateChanged();
 }
 
-void Song::stopPreviewOf(const Clip *clip)
+void Song::stopPreviewOf(const Clip* clip)
 {
-	if (clip && previewClip() == clip) { stop(); }
+	if (clip && previewClip() == clip)
+	{
+		stop();
+	}
 }
 
-void Song::playAutomationClip(const AutomationClip *clip, bool loop)
+void Song::playAutomationClip(const AutomationClip* clip, bool loop)
 {
-	if (!setPlayMode(PlayMode::AutomationClip, clip)) { return; }
+	if (!setPlayMode(PlayMode::AutomationClip, clip))
+	{
+		return;
+	}
 	m_loopMidiClip = loop;
 	m_playing = true;
 	m_paused = false;
@@ -832,7 +866,8 @@ void Song::startExport()
 		getTimeline(PlayMode::Song).setTicks(0);
 	}
 
-	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin)
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin)
+		+ (m_exportLoopEnd - m_exportLoopBegin)
 		* m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
 	m_loopRenderRemaining = m_loopRenderCount;
 
@@ -1083,70 +1118,68 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 
 
 
-void Song::saveProjectState( DataFile &dataFile )
+void Song::saveProjectState(DataFile& dataFile)
 {
 	using gui::getGUI;
 
 	// Transient state belongs in journal snapshots, never in saved project files.
-	auto runtime = dataFile.createElement( "journalRuntime" );
-	runtime.setAttribute( "mode", static_cast<int>( m_playMode ) );
-	runtime.setAttribute( "playing", m_playing );
-	runtime.setAttribute( "paused", m_paused );
-	runtime.setAttribute( "recording", m_recording );
-	runtime.setAttribute( "fileName", m_fileName );
-	runtime.setAttribute( "oldFileName", m_oldFileName );
-	runtime.setAttribute( "loopMidiClip", m_loopMidiClip );
-	runtime.setAttribute( "currentPattern", Engine::patternStore()->currentPattern() );
-	if( const auto *clip = previewClip() )
+	auto runtime = dataFile.createElement("journalRuntime");
+	runtime.setAttribute("mode", static_cast<int>(m_playMode));
+	runtime.setAttribute("playing", m_playing);
+	runtime.setAttribute("paused", m_paused);
+	runtime.setAttribute("recording", m_recording);
+	runtime.setAttribute("fileName", m_fileName);
+	runtime.setAttribute("oldFileName", m_oldFileName);
+	runtime.setAttribute("loopMidiClip", m_loopMidiClip);
+	runtime.setAttribute("currentPattern", Engine::patternStore()->currentPattern());
+	if (const auto* clip = previewClip())
 	{
-		const auto *track = clip->getTrack();
-		const auto *container = track->trackContainer();
-		const auto &containerTracks = container->tracks();
-		const auto &clips = track->getClips();
-		runtime.setAttribute( "previewParent", container == this ? "song" : "pattern" );
-		runtime.setAttribute( "previewTrack", static_cast<int>( std::distance( containerTracks.begin(),
-			std::find( containerTracks.begin(), containerTracks.end(), track ) ) ) );
-		runtime.setAttribute( "previewClip", static_cast<int>( std::distance( clips.begin(),
-			std::find( clips.begin(), clips.end(), clip ) ) ) );
+		const auto* track = clip->getTrack();
+		const auto* container = track->trackContainer();
+		const auto& containerTracks = container->tracks();
+		const auto& clips = track->getClips();
+		runtime.setAttribute("previewParent", container == this ? "song" : "pattern");
+		runtime.setAttribute("previewTrack",
+			static_cast<int>(std::distance(
+				containerTracks.begin(), std::find(containerTracks.begin(), containerTracks.end(), track))));
+		runtime.setAttribute(
+			"previewClip", static_cast<int>(std::distance(clips.begin(), std::find(clips.begin(), clips.end(), clip))));
 	}
-	for( std::size_t index = 0; index < PlayModeCount; ++index )
+	for (std::size_t index = 0; index < PlayModeCount; ++index)
 	{
-		const auto &timeline = m_timelines[index];
-		auto position = dataFile.createElement( "position" );
-		position.setAttribute( "mode", static_cast<int>( index ) );
-		position.setAttribute( "ticks", timeline.ticks() );
-		position.setAttribute( "frameOffset", timeline.frameOffset() );
-		position.setAttribute( "seconds", QString::number( timeline.getElapsedSeconds(), 'g', 17 ) );
-		position.setAttribute( "playStart", timeline.playStartPosition().getTicks() );
-		runtime.appendChild( position );
+		const auto& timeline = m_timelines[index];
+		auto position = dataFile.createElement("position");
+		position.setAttribute("mode", static_cast<int>(index));
+		position.setAttribute("ticks", timeline.ticks());
+		position.setAttribute("frameOffset", timeline.frameOffset());
+		position.setAttribute("seconds", QString::number(timeline.getElapsedSeconds(), 'g', 17));
+		position.setAttribute("playStart", timeline.playStartPosition().getTicks());
+		runtime.appendChild(position);
 	}
-	dataFile.content().appendChild( runtime );
+	dataFile.content().appendChild(runtime);
 
-	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
-	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
-	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
-	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+	m_tempoModel.saveSettings(dataFile, dataFile.head(), "bpm");
+	m_timeSigModel.saveSettings(dataFile, dataFile.head(), "timesig");
+	m_masterVolumeModel.saveSettings(dataFile, dataFile.head(), "mastervol");
+	m_masterPitchModel.saveSettings(dataFile, dataFile.head(), "masterpitch");
 
-	saveState( dataFile, dataFile.content() );
-	Engine::mixer()->saveState( dataFile, dataFile.content() );
-	getTimeline( PlayMode::Song ).saveState( dataFile, dataFile.content() );
-	if( getGUI() != nullptr )
+	saveState(dataFile, dataFile.content());
+	Engine::mixer()->saveState(dataFile, dataFile.content());
+	getTimeline(PlayMode::Song).saveState(dataFile, dataFile.content());
+	if (getGUI() != nullptr)
 	{
-		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );
-		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
-		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
-		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		getGUI()->getControllerRackView()->saveState(dataFile, dataFile.content());
+		getGUI()->pianoRoll()->saveState(dataFile, dataFile.content());
+		getGUI()->automationEditor()->m_editor->saveState(dataFile, dataFile.content());
+		getGUI()->getProjectNotes()->SerializingObject::saveState(dataFile, dataFile.content());
 	}
 
-	saveControllerStates( dataFile, dataFile.content() );
-	saveScaleStates( dataFile, dataFile.content() );
-	saveKeymapStates( dataFile, dataFile.content() );
+	saveControllerStates(dataFile, dataFile.content());
+	saveScaleStates(dataFile, dataFile.content());
+	saveKeymapStates(dataFile, dataFile.content());
 }
 
-
-
-
-void Song::restoreProjectState( DataFile &dataFile )
+void Song::restoreProjectState(DataFile& dataFile)
 {
 	using gui::getGUI;
 
@@ -1155,85 +1188,90 @@ void Song::restoreProjectState( DataFile &dataFile )
 	clearErrors();
 	Engine::audioEngine()->requestChangeInModel();
 
-	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
-	m_timeSigModel.loadSettings( dataFile.head(), "timesig" );
-	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
-	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
-	getTimeline( PlayMode::Song ).setLoopEnabled( false );
+	m_tempoModel.loadSettings(dataFile.head(), "bpm");
+	m_timeSigModel.loadSettings(dataFile.head(), "timesig");
+	m_masterVolumeModel.loadSettings(dataFile.head(), "mastervol");
+	m_masterPitchModel.loadSettings(dataFile.head(), "masterpitch");
+	getTimeline(PlayMode::Song).setLoopEnabled(false);
 	PeakController::initGetControllerBySetting();
 
-	node = dataFile.content().firstChildElement( Engine::mixer()->nodeName() );
-	if( !node.isNull() )
+	node = dataFile.content().firstChildElement(Engine::mixer()->nodeName());
+	if (!node.isNull())
 	{
-		Engine::mixer()->restoreState( node.toElement() );
-		if( getGUI() != nullptr )
+		Engine::mixer()->restoreState(node.toElement());
+		if (getGUI() != nullptr)
 		{
 			getGUI()->mixerView()->refreshDisplay();
 		}
 	}
 
 	node = dataFile.content().firstChild();
-	QDomNodeList trackContainers = dataFile.content().elementsByTagName( "trackcontainer" );
+	QDomNodeList trackContainers = dataFile.content().elementsByTagName("trackcontainer");
 	m_nLoadingTrack = 0;
-	for( int index = 0, count = trackContainers.count(); index < count; ++index )
+	for (int index = 0, count = trackContainers.count(); index < count; ++index)
 	{
-		QDomNode trackNode = trackContainers.at( index ).firstChild();
-		while( !trackNode.isNull() )
+		QDomNode trackNode = trackContainers.at(index).firstChild();
+		while (!trackNode.isNull())
 		{
-			if( trackNode.isElement() && trackNode.nodeName() == "track" )
+			if (trackNode.isElement() && trackNode.nodeName() == "track")
 			{
 				++m_nLoadingTrack;
-				if( static_cast<Track::Type>( trackNode.toElement().attribute( "type" ).toInt() ) == Track::Type::Pattern )
+				if (static_cast<Track::Type>(trackNode.toElement().attribute("type").toInt()) == Track::Type::Pattern)
 				{
-					count += trackNode.toElement().elementsByTagName( "patterntrack" ).at( 0 )
-						.toElement().firstChildElement().childNodes().count();
+					count += trackNode.toElement()
+								 .elementsByTagName("patterntrack")
+								 .at(0)
+								 .toElement()
+								 .firstChildElement()
+								 .childNodes()
+								 .count();
 				}
 			}
 			trackNode = trackNode.nextSibling();
 		}
 	}
 
-	while( !node.isNull() )
+	while (!node.isNull())
 	{
-		if( node.isElement() )
+		if (node.isElement())
 		{
-			if( node.nodeName() == "trackcontainer" )
+			if (node.nodeName() == "trackcontainer")
 			{
-				static_cast<JournallingObject *>( this )->restoreState( node.toElement() );
+				static_cast<JournallingObject*>(this)->restoreState(node.toElement());
 			}
-			else if( node.nodeName() == "controllers" )
+			else if (node.nodeName() == "controllers")
 			{
-				restoreControllerStates( node.toElement() );
+				restoreControllerStates(node.toElement());
 			}
-			else if( node.nodeName() == "scales" )
+			else if (node.nodeName() == "scales")
 			{
-				restoreScaleStates( node.toElement() );
+				restoreScaleStates(node.toElement());
 			}
-			else if( node.nodeName() == "keymaps" )
+			else if (node.nodeName() == "keymaps")
 			{
-				restoreKeymapStates( node.toElement() );
+				restoreKeymapStates(node.toElement());
 			}
-			else if( node.nodeName() == getTimeline( PlayMode::Song ).nodeName() )
+			else if (node.nodeName() == getTimeline(PlayMode::Song).nodeName())
 			{
-				getTimeline( PlayMode::Song ).restoreState( node.toElement() );
+				getTimeline(PlayMode::Song).restoreState(node.toElement());
 			}
-			else if( getGUI() != nullptr )
+			else if (getGUI() != nullptr)
 			{
-				if( node.nodeName() == getGUI()->getControllerRackView()->nodeName() )
+				if (node.nodeName() == getGUI()->getControllerRackView()->nodeName())
 				{
-					getGUI()->getControllerRackView()->restoreState( node.toElement() );
+					getGUI()->getControllerRackView()->restoreState(node.toElement());
 				}
-				else if( node.nodeName() == getGUI()->pianoRoll()->nodeName() )
+				else if (node.nodeName() == getGUI()->pianoRoll()->nodeName())
 				{
-					getGUI()->pianoRoll()->restoreState( node.toElement() );
+					getGUI()->pianoRoll()->restoreState(node.toElement());
 				}
-				else if( node.nodeName() == getGUI()->automationEditor()->m_editor->nodeName() )
+				else if (node.nodeName() == getGUI()->automationEditor()->m_editor->nodeName())
 				{
-					getGUI()->automationEditor()->m_editor->restoreState( node.toElement() );
+					getGUI()->automationEditor()->m_editor->restoreState(node.toElement());
 				}
-				else if( node.nodeName() == getGUI()->getProjectNotes()->nodeName() )
+				else if (node.nodeName() == getGUI()->getProjectNotes()->nodeName())
 				{
-					getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+					getGUI()->getProjectNotes()->SerializingObject::restoreState(node.toElement());
 				}
 			}
 		}
@@ -1242,64 +1280,74 @@ void Song::restoreProjectState( DataFile &dataFile )
 
 	Engine::patternStore()->fixIncorrectPositions();
 	ControllerConnection::finalizeConnections();
-	m_controllers.erase( std::remove_if( m_controllers.begin(), m_controllers.end(),
-		[]( Controller *controller ) { return controller->type() == Controller::ControllerType::Dummy; } ),
-		m_controllers.end() );
+	m_controllers.erase(
+		std::remove_if(m_controllers.begin(), m_controllers.end(),
+			[](Controller* controller) { return controller->type() == Controller::ControllerType::Dummy; }),
+		m_controllers.end());
 	AutomationClip::resolveAllIDs();
 
-	const auto runtime = dataFile.content().firstChildElement( "journalRuntime" );
-	if( !runtime.isNull() )
+	const auto runtime = dataFile.content().firstChildElement("journalRuntime");
+	if (!runtime.isNull())
 	{
-		for( auto position = runtime.firstChildElement( "position" ); !position.isNull();
-			position = position.nextSiblingElement( "position" ) )
+		for (auto position = runtime.firstChildElement("position"); !position.isNull();
+			position = position.nextSiblingElement("position"))
 		{
-			const int mode = position.attribute( "mode" ).toInt();
-			if( mode >= 0 && mode < static_cast<int>( PlayModeCount ) )
+			const int mode = position.attribute("mode").toInt();
+			if (mode >= 0 && mode < static_cast<int>(PlayModeCount))
 			{
-				m_timelines[mode].restorePlaybackPosition( position.attribute( "ticks" ).toInt(),
-					position.attribute( "frameOffset" ).toFloat(), position.attribute( "seconds" ).toDouble(),
-					TimePos( position.attribute( "playStart" ).toInt() ) );
+				m_timelines[mode].restorePlaybackPosition(position.attribute("ticks").toInt(),
+					position.attribute("frameOffset").toFloat(), position.attribute("seconds").toDouble(),
+					TimePos(position.attribute("playStart").toInt()));
 			}
 		}
-		setProjectFileName( runtime.attribute( "fileName" ) );
-		m_oldFileName = runtime.attribute( "oldFileName" );
-		m_playMode = static_cast<PlayMode>( runtime.attribute( "mode" ).toInt() );
-		m_playing = runtime.attribute( "playing" ).toInt() != 0;
-		m_paused = runtime.attribute( "paused" ).toInt() != 0;
-		m_recording = runtime.attribute( "recording" ).toInt() != 0;
-		m_loopMidiClip = runtime.attribute( "loopMidiClip" ).toInt() != 0;
-		const int pattern = runtime.attribute( "currentPattern" ).toInt();
-		if( pattern >= 0 && pattern < Engine::patternStore()->numOfPatterns() )
+		setProjectFileName(runtime.attribute("fileName"));
+		m_oldFileName = runtime.attribute("oldFileName");
+		m_playMode = static_cast<PlayMode>(runtime.attribute("mode").toInt());
+		m_playing = runtime.attribute("playing").toInt() != 0;
+		m_paused = runtime.attribute("paused").toInt() != 0;
+		m_recording = runtime.attribute("recording").toInt() != 0;
+		m_loopMidiClip = runtime.attribute("loopMidiClip").toInt() != 0;
+		const int pattern = runtime.attribute("currentPattern").toInt();
+		if (pattern >= 0 && pattern < Engine::patternStore()->numOfPatterns())
 		{
-			Engine::patternStore()->setCurrentPattern( pattern );
+			Engine::patternStore()->setCurrentPattern(pattern);
 		}
 		m_midiClipToPlay = nullptr;
 		m_automationClipToPlay = nullptr;
-		if( m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip )
+		if (m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip)
 		{
-			const auto &previewTracks = runtime.attribute( "previewParent" ) == "song" ? tracks() : Engine::patternStore()->tracks();
-			const int trackIndex = runtime.attribute( "previewTrack", "-1" ).toInt();
-			const int clipIndex = runtime.attribute( "previewClip", "-1" ).toInt();
-			if( trackIndex >= 0 && trackIndex < static_cast<int>( previewTracks.size() ) )
+			const auto& previewTracks
+				= runtime.attribute("previewParent") == "song" ? tracks() : Engine::patternStore()->tracks();
+			const int trackIndex = runtime.attribute("previewTrack", "-1").toInt();
+			const int clipIndex = runtime.attribute("previewClip", "-1").toInt();
+			if (trackIndex >= 0 && trackIndex < static_cast<int>(previewTracks.size()))
 			{
-				const auto &clips = previewTracks[trackIndex]->getClips();
-				if( clipIndex >= 0 && clipIndex < static_cast<int>( clips.size() ) )
+				const auto& clips = previewTracks[trackIndex]->getClips();
+				if (clipIndex >= 0 && clipIndex < static_cast<int>(clips.size()))
 				{
-					if( m_playMode == PlayMode::MidiClip ) { m_midiClipToPlay = dynamic_cast<MidiClip *>( clips[clipIndex] ); }
-					else { m_automationClipToPlay = dynamic_cast<AutomationClip *>( clips[clipIndex] ); }
+					if (m_playMode == PlayMode::MidiClip)
+					{
+						m_midiClipToPlay = dynamic_cast<MidiClip*>(clips[clipIndex]);
+					}
+					else
+					{
+						m_automationClipToPlay = dynamic_cast<AutomationClip*>(clips[clipIndex]);
+					}
 				}
 			}
-			if( previewClip() == nullptr ) { m_playing = false; m_paused = false; m_playMode = PlayMode::None; }
+			if (previewClip() == nullptr)
+			{
+				m_playing = false;
+				m_paused = false;
+				m_playMode = PlayMode::None;
+			}
 		}
-		m_vstSyncController.setPlaybackState( m_playing && !m_paused );
+		m_vstSyncController.setPlaybackState(m_playing && !m_paused);
 		emit playbackStateChanged();
 	}
 	Engine::audioEngine()->doneChangeInModel();
 	updateLength();
 }
-
-
-
 
 // load given song
 void Song::loadProject( const QString & fileName )

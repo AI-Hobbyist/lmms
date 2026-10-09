@@ -108,7 +108,10 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 void VstEffectControls::initializeParameterModels()
 {
-	if (!m_effect->m_plugin || !knobFModel.empty()) { return; }
+	if (!m_effect->m_plugin || !knobFModel.empty())
+	{
+		return;
+	}
 	const auto& dump = m_effect->m_plugin->parameterDump();
 	paramCount = dump.size();
 	knobFModel.resize(paramCount);
@@ -117,8 +120,9 @@ void VstEffectControls::initializeParameterModels()
 		const auto value = LocaleHelper::toFloat(dump.value(QString("param%1").arg(i)).section(':', 2));
 		knobFModel[i] = new FloatModel(value, 0.0f, 1.0f, 0.0f, this, QString::number(i));
 		m_effect->m_plugin->bindParameterModel(i, knobFModel[i]);
-		connect(knobFModel[i], &FloatModel::dataChanged, this,
-			[this, i] { setParameter(knobFModel[i]); }, Qt::DirectConnection);
+		connect(
+			knobFModel[i], &FloatModel::dataChanged, this, [this, i] { setParameter(knobFModel[i]); },
+			Qt::DirectConnection);
 	}
 }
 
@@ -129,7 +133,9 @@ QMap<QString, AutomatableModel*> VstEffectControls::parameterModels()
 	if (m_effect->m_plugin && !knobFModel.empty())
 	{
 		for (int i = 0; i < static_cast<int>(knobFModel.size()); ++i)
-		{ models.insert(m_effect->m_plugin->parameterStateKey(i), knobFModel[i]); }
+		{
+			models.insert(m_effect->m_plugin->parameterStateKey(i), knobFModel[i]);
+		}
 	}
 	return models;
 }
@@ -540,8 +546,14 @@ ManageVSTEffectView::~ManageVSTEffectView()
 	auto* scrollArea = m_vi2->m_scrollArea;
 	m_vi2->m_subWindow = nullptr;
 	m_vi2->m_scrollArea = nullptr;
-	if (window) { delete window; }
-	else { delete scrollArea; }
+	if (window)
+	{
+		delete window;
+	}
+	else
+	{
+		delete scrollArea;
+	}
 
 }
 

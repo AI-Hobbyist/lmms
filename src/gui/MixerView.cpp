@@ -255,7 +255,7 @@ void MixerView::updateMaxChannelSelector()
 			}
 			else if (track->type() == Track::Type::SVS)
 			{
-				static_cast<SVSTrack*>(track)->mixerChannelModel()->setRange(0, m_mixerChannelViews.size()-1, 1);
+				static_cast<SVSTrack*>(track)->mixerChannelModel()->setRange(0, m_mixerChannelViews.size() - 1, 1);
 			}
 			else if (track->type() == Track::Type::Sample)
 			{

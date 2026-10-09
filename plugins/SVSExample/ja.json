@@ -1,1 +1,51 @@
-{"schemaVersion":1,"id":"example.ja","version":"1","language":"ja","phonemeSet":"example.multilingual.v1","entries":[{"text":"ら","candidates":[{"reading":"ra","phonemes":["l","a"]}]},{"text":"ラ","candidates":[{"reading":"ra","phonemes":["l","a"]}]},{"text":"こんにちは","candidates":[{"reading":"konnichiwa","phonemes":["k","o","n","n","i","ch","i","a"]}]}]}
+{
+  "schemaVersion": 1,
+  "id": "example.ja",
+  "version": "1",
+  "language": "ja",
+  "phonemeSet": "example.multilingual.v1",
+  "entries": [
+    {
+      "text": "ら",
+      "candidates": [
+        {
+          "reading": "ra",
+          "phonemes": [
+            "l",
+            "a"
+          ]
+        }
+      ]
+    },
+    {
+      "text": "ラ",
+      "candidates": [
+        {
+          "reading": "ra",
+          "phonemes": [
+            "l",
+            "a"
+          ]
+        }
+      ]
+    },
+    {
+      "text": "こんにちは",
+      "candidates": [
+        {
+          "reading": "konnichiwa",
+          "phonemes": [
+            "k",
+            "o",
+            "n",
+            "n",
+            "i",
+            "ch",
+            "i",
+            "a"
+          ]
+        }
+      ]
+    }
+  ]
+}

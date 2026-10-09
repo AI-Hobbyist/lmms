@@ -1,4 +1,5 @@
 """Small real-process regressions for fixed-converter integration defects."""
+
 import json
 import pathlib
 import subprocess
@@ -14,21 +15,52 @@ RUNTIME = ROOT / "build/Release/svs-project"
 
 class AdapterTest(unittest.TestCase):
     def project(self, title="test"):
-        return {"song_tempo_list": [{"position": 0, "bpm": 120}],
-                "time_signature_list": [{"bar_index": 0, "numerator": 4, "denominator": 4}],
-                "track_list": [{"type_": "Singing", "title": title,
-                                "note_list": [{"start_pos": 0, "length": 480, "key_number": 60, "lyric": "la"}],
-                                "edited_params": {"pitch": {"points": [[-192000, -100], [1920, -100],
-                                                                         [1920, 6000], [2160, 6050],
-                                                                         [2400, 6000], [2400, -100], [1073741823, -100]]}}}]}
+        return {
+            "song_tempo_list": [{"position": 0, "bpm": 120}],
+            "time_signature_list": [{"bar_index": 0, "numerator": 4, "denominator": 4}],
+            "track_list": [
+                {
+                    "type_": "Singing",
+                    "title": title,
+                    "note_list": [{"start_pos": 0, "length": 480, "key_number": 60, "lyric": "la"}],
+                    "edited_params": {
+                        "pitch": {
+                            "points": [
+                                [-192000, -100],
+                                [1920, -100],
+                                [1920, 6000],
+                                [2160, 6050],
+                                [2400, 6000],
+                                [2400, -100],
+                                [1073741823, -100],
+                            ]
+                        }
+                    },
+                }
+            ],
+        }
 
     def call(self, workspace, request, expect_status="success"):
         request = {**request, "protocol": 1, "requestId": uuid.uuid4().hex}
-        result = subprocess.run([str(RUNTIME / "python/python.exe"), "-I", str(RUNTIME / "bridge.py"),
-                                 "--workspace", str(workspace)], input=json.dumps(request).encode(),
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+        result = subprocess.run(
+            [
+                str(RUNTIME / "python/python.exe"),
+                "-I",
+                str(RUNTIME / "bridge.py"),
+                "--workspace",
+                str(workspace),
+            ],
+            input=json.dumps(request).encode(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
         response = json.loads(result.stdout)
-        self.assertEqual(response["status"], expect_status, str(response.get("error")) + result.stderr.decode("utf-8", "replace"))
+        self.assertEqual(
+            response["status"],
+            expect_status,
+            str(response.get("error")) + result.stderr.decode("utf-8", "replace"),
+        )
         return response
 
     def roundtrip(self, format_id, suffix, project, output_options=None, input_options=None):
@@ -39,21 +71,42 @@ class AdapterTest(unittest.TestCase):
             exporting.mkdir()
             importing.mkdir()
             path = exporting / "output" / ("工程_日本語_한국어." + suffix)
-            exported = self.call(exporting, {"operation": "exportProject", "formatId": format_id, "path": str(path),
-                                              "project": project, "options": output_options or {}, "acceptLosses": True})
+            exported = self.call(
+                exporting,
+                {
+                    "operation": "exportProject",
+                    "formatId": format_id,
+                    "path": str(path),
+                    "project": project,
+                    "options": output_options or {},
+                    "acceptLosses": True,
+                },
+            )
             self.assertTrue(path.is_file())
             if suffix == "acet":
                 self.assertTrue(zipfile.is_zipfile(path), "ACET must be its real archive container")
                 with zipfile.ZipFile(path) as archive:
                     self.assertTrue(any(name.endswith(".acep") for name in archive.namelist()))
             if suffix == "mxl":
-                self.assertTrue(zipfile.is_zipfile(path), "MXL must be its real compressed MusicXML container")
+                self.assertTrue(
+                    zipfile.is_zipfile(path), "MXL must be its real compressed MusicXML container"
+                )
                 with zipfile.ZipFile(path) as archive:
                     self.assertIn("META-INF/container.xml", archive.namelist())
-            imported = self.call(importing, {"operation": "importProject", "formatId": format_id, "path": str(path),
-                                              "options": input_options or {}})
+            imported = self.call(
+                importing,
+                {
+                    "operation": "importProject",
+                    "formatId": format_id,
+                    "path": str(path),
+                    "options": input_options or {},
+                },
+            )
             self.assertTrue(exported["files"])
-            self.assertEqual(len(imported["project"]["track_list"][0]["note_list"]), len(project["track_list"][0]["note_list"]))
+            self.assertEqual(
+                len(imported["project"]["track_list"][0]["note_list"]),
+                len(project["track_list"][0]["note_list"]),
+            )
             return imported["project"]
 
     def test_acet_actual_archive_roundtrip(self):
@@ -77,9 +130,27 @@ class AdapterTest(unittest.TestCase):
 
     def test_early_and_late_tempo_events_remain_on_native_timeline(self):
         project = self.project()
-        project["song_tempo_list"] = [{"position": 0, "bpm": 120}, {"position": 1440, "bpm": 150},
-                                      {"position": 3360, "bpm": 100}]
-        for format_id in ("acep", "s5p", "svip3", "svp", "tlp", "ustx", "vsq", "vsqx", "vspx", "xvsq", "mtp", "ufdata", "tssln", "tsmsln"):
+        project["song_tempo_list"] = [
+            {"position": 0, "bpm": 120},
+            {"position": 1440, "bpm": 150},
+            {"position": 3360, "bpm": 100},
+        ]
+        for format_id in (
+            "acep",
+            "s5p",
+            "svip3",
+            "svp",
+            "tlp",
+            "ustx",
+            "vsq",
+            "vsqx",
+            "vspx",
+            "xvsq",
+            "mtp",
+            "ufdata",
+            "tssln",
+            "tsmsln",
+        ):
             with self.subTest(format=format_id):
                 result = self.roundtrip(format_id, format_id, project)
                 self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
@@ -97,7 +168,7 @@ class AdapterTest(unittest.TestCase):
         result = self.roundtrip("s5p", "s5p", project)
         pitch = result["track_list"][0]["edited_params"]["pitch"]["points"]
         actual = next(p[1] for p in pitch if p[0] == 1930 and p[1] != -100)
-        self.assertLessEqual(abs(actual - 6137), .5)
+        self.assertLessEqual(abs(actual - 6137), 0.5)
 
     def test_ufdata_silence_marker_is_not_zero_midi_pitch(self):
         result = self.roundtrip("ufdata", "ufdata", self.project())
@@ -143,7 +214,7 @@ class AdapterTest(unittest.TestCase):
         result = self.roundtrip("ds", "ds", project)
         pitch = result["track_list"][0]["edited_params"]["pitch"]["points"]
         self.assertTrue(any(p[1] >= 6048 for p in pitch if p[1] != -100))
-        self.assertLessEqual(abs(result["track_list"][0]["note_list"][0]["length"] - 480), .5)
+        self.assertLessEqual(abs(result["track_list"][0]["note_list"][0]["length"] - 480), 0.5)
 
     def test_musicxml_native_tempo_meter_and_compressed_alias(self):
         project = self.project()
@@ -160,7 +231,7 @@ class AdapterTest(unittest.TestCase):
         project["song_tempo_list"].append({"position": 240, "bpm": 150})
         project["time_signature_list"].append({"bar_index": 2, "numerator": 3, "denominator": 4})
         track = project["track_list"][0]
-        track["volume"] = .75
+        track["volume"] = 0.75
         track["note_list"][0]["start_pos"] = 1
         track["note_list"][0]["pronunciation"] = "la"
         with tempfile.TemporaryDirectory() as directory:
@@ -169,10 +240,16 @@ class AdapterTest(unittest.TestCase):
             request = {"formatId": "nn", "path": str(path), "project": project}
             inspected = self.call(workspace, {**request, "operation": "inspectExport"})
             fields = {loss["field"] for loss in inspected["losses"]}
-            self.assertTrue({"pitch", "tempo", "meter", "noteTime", "pronunciation", "volume"} <= fields)
-            self.assertTrue(all(loss["formatId"] == "nn" and loss["reason"] for loss in inspected["losses"]))
+            self.assertTrue(
+                {"pitch", "tempo", "meter", "noteTime", "pronunciation", "volume"} <= fields
+            )
+            self.assertTrue(
+                all(loss["formatId"] == "nn" and loss["reason"] for loss in inspected["losses"])
+            )
             self.assertFalse(path.exists())
-            rejected = self.call(workspace, {**request, "operation": "exportProject", "acceptLosses": False}, "error")
+            rejected = self.call(
+                workspace, {**request, "operation": "exportProject", "acceptLosses": False}, "error"
+            )
             self.assertIn("损失", rejected["error"]["message"])
             self.assertFalse(path.exists())
 
@@ -197,15 +274,24 @@ class AdapterTest(unittest.TestCase):
         self.assertEqual(result["song_tempo_list"], project["song_tempo_list"])
         project["track_list"].append(json.loads(json.dumps(project["track_list"][0])))
         project["track_list"][1]["title"] = "第二轨"
-        result = self.roundtrip("ust", "ust", project, {"version": 2, "encoding": "utf-8"}, {"encoding": "utf-8"})
+        result = self.roundtrip(
+            "ust", "ust", project, {"version": 2, "encoding": "utf-8"}, {"encoding": "utf-8"}
+        )
         self.assertEqual(len(result["track_list"]), 2)
 
     def test_continuous_controllers_do_not_join_real_note_silence(self):
         project = self.project()
         track = project["track_list"][0]
-        track["note_list"].append({"start_pos": 720, "length": 480, "key_number": 62, "lyric": "la"})
-        track["edited_params"]["pitch"]["points"][-1:-1] = [[2640, -100], [2640, 6200],
-                                                               [2880, 6250], [3120, 6200], [3120, -100]]
+        track["note_list"].append(
+            {"start_pos": 720, "length": 480, "key_number": 62, "lyric": "la"}
+        )
+        track["edited_params"]["pitch"]["points"][-1:-1] = [
+            [2640, -100],
+            [2640, 6200],
+            [2880, 6250],
+            [3120, 6200],
+            [3120, -100],
+        ]
         for format_id in ("dv", "mid", "svp", "ustx", "vpr", "vspx", "vsq", "vsqx", "xvsq"):
             with self.subTest(format=format_id):
                 result = self.roundtrip(format_id, format_id, project)

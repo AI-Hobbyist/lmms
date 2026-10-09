@@ -7,8 +7,7 @@
 #include <deque>
 #include "agent/mcp/HttpMcpServer.h"
 
-namespace lmms::agent::mcp
-{
+namespace lmms::agent::mcp {
 // One local client session, reset on initialization or server stop. No project/session isolation.
 class LMMS_EXPORT McpProtocol : public QObject
 {
@@ -17,6 +16,7 @@ public:
 	static QString version();
 	// Protocol seam: callers supply parsed HTTP; the transport enforces connection authorization.
 	void handle(const HttpRequest& request, HttpMcpServer::Reply reply);
+
 private:
 	void reset();
 	void drain();

@@ -235,7 +235,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	m_paintPixmap.fill(Qt::transparent);
 	QPainter p( &m_paintPixmap );
-	if (cornerRadius() > 0) { p.setClipPath(clipOutline(m_paintPixmapXPosition)); }
+	if (cornerRadius() > 0)
+	{
+		p.setClipPath(clipOutline(m_paintPixmapXPosition));
+	}
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
@@ -244,7 +247,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QColor c = painter.background().color();
 	if (muted) { c = c.darker(150); }
 	if (selected) { c = c.darker(150); }
-	if (cornerRadius() > 0) { c = getColorForDisplay(painter.background().color()); }
+	if (cornerRadius() > 0)
+	{
+		c = getColorForDisplay(painter.background().color());
+	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -310,7 +316,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
-	if (cornerRadius() > 0) { paintFlatBorder(p, false, m_paintPixmapXPosition); }
+	if (cornerRadius() > 0)
+	{
+		paintFlatBorder(p, false, m_paintPixmapXPosition);
+	}
 	else
 	{
 	// inner border

@@ -210,7 +210,7 @@ public:
 		return m_playMode;
 	}
 
-	bool setPlayMode(PlayMode mode, const Clip *clip = nullptr);
+	bool setPlayMode(PlayMode mode, const Clip* clip = nullptr);
 	struct PlaybackState
 	{
 		PlayMode mode;
@@ -224,8 +224,8 @@ public:
 	void restorePlaybackState(const PlaybackState& state);
 	bool exportLoop() const { return m_exportLoop; }
 	bool renderBetweenMarkers() const { return m_renderBetweenMarkers; }
-	const Clip *previewClip() const;
-	void stopPreviewOf(const Clip *clip);
+	const Clip* previewClip() const;
+	void stopPreviewOf(const Clip* clip);
 
 	const TimePos& getPlayPos(PlayMode pm) const
 	{
@@ -333,19 +333,13 @@ public:
 		return m_tempoModel;
 	}
 
-	IntModel& masterVolumeModel()
-	{
-		return m_masterVolumeModel;
-	}
+	IntModel& masterVolumeModel() { return m_masterVolumeModel; }
 
-	IntModel& masterPitchModel()
-	{
-		return m_masterPitchModel;
-	}
+	IntModel& masterPitchModel() { return m_masterPitchModel; }
 
 	void exportProjectMidi(const std::filesystem::path& filePath) const;
-	void saveProjectState( DataFile &dataFile );
-	void restoreProjectState( DataFile &dataFile );
+	void saveProjectState(DataFile& dataFile);
+	void restoreProjectState(DataFile& dataFile);
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
 	SaveOptions &getSaveOptions() {
@@ -369,7 +363,7 @@ public slots:
 	void playAndRecord();
 	void playPattern();
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
-	void playAutomationClip(const lmms::AutomationClip *clip, bool loop = true);
+	void playAutomationClip(const lmms::AutomationClip* clip, bool loop = true);
 	void togglePause();
 	void stop();
 

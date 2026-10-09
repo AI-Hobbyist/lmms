@@ -19,8 +19,7 @@
 #include <optional>
 #include <unordered_map>
 
-namespace lmms::vsthost
-{
+namespace lmms::vsthost {
 // Single native instance. The helper serializes DSP and control mutations;
 // native GUI dispatch stays on its main thread without blocking DSP. Destruction
 // occurs after DSP joins and before module unloading; native calls are bounded.
@@ -54,6 +53,7 @@ public:
 	Steinberg::int32 sampleSize() const noexcept { return m_sampleSize; }
 	std::uint32_t latency() const noexcept { return m_latency; }
 	const std::vector<Steinberg::Vst::ParameterInfo>& parameters() const noexcept { return m_parameters; }
+
 private:
 	struct Buffers
 	{
@@ -83,7 +83,11 @@ private:
 	Steinberg::IPtr<Vst3ComponentHandler> m_handler;
 	Steinberg::IPtr<Vst3Editor> m_editor;
 	std::unique_ptr<Vst3ParameterChanges> m_inputChanges, m_outputChanges;
-	struct PendingParameter { double value = 0; bool dirty = false; };
+	struct PendingParameter
+	{
+		double value = 0;
+		bool dirty = false;
+	};
 	std::vector<PendingParameter> m_pendingParameters;
 	std::vector<PendingParameter> m_controllerParameters;
 	std::unordered_map<Steinberg::Vst::ParamID, std::size_t> m_parameterIndices;
@@ -97,7 +101,11 @@ private:
 	std::vector<Vst3OutputEvent> m_midiFeedback, m_blockMidiFeedback;
 	std::vector<Steinberg::int32> m_eventInputs;
 	std::vector<Vst3BusInfo> m_eventBuses;
-	struct MidiAssignment { Steinberg::Vst::ParamID id = 0; bool assigned = false; };
+	struct MidiAssignment
+	{
+		Steinberg::Vst::ParamID id = 0;
+		bool assigned = false;
+	};
 	std::vector<MidiAssignment> m_midiAssignments;
 	Steinberg::IPtr<Steinberg::Vst::ConnectionProxy> m_componentConnection, m_controllerConnection;
 	std::vector<Steinberg::Vst::ParameterInfo> m_parameters;

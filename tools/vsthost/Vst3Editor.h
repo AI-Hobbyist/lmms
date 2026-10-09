@@ -5,8 +5,7 @@
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include <windows.h>
 
-namespace lmms::vsthost
-{
+namespace lmms::vsthost {
 class Vst3Editor final : public Steinberg::U::Implements<Steinberg::U::Directly<Steinberg::IPlugFrame>>
 {
 public:
@@ -16,6 +15,7 @@ public:
 	void show(bool visible);
 	HWND window() const noexcept { return m_window; }
 	Steinberg::tresult PLUGIN_API resizeView(Steinberg::IPlugView* view, Steinberg::ViewRect* rectangle) override;
+
 private:
 	static LRESULT CALLBACK windowProcedure(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
 	Steinberg::IPtr<Steinberg::IPlugView> m_view;

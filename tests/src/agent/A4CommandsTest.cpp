@@ -14,8 +14,7 @@
 
 using namespace lmms;
 using namespace lmms::agent;
-namespace
-{
+namespace {
 QJsonObject step(const QString& command, const QJsonObject& arguments = {})
 {
 	return {{"cmd", command}, {"args", arguments}};
@@ -87,10 +86,10 @@ private slots:
 	}
 	void failureRollsBack()
 	{
-		for (const auto& failure : QJsonArray{step("does.notExist"),
-			QJsonObject{{"assert", QJsonObject{{"expr", false}, {"msg", "stop"}}}},
-			step("song.setTempo", {{"bpm", QJsonObject{{"expr", "1 / 0"}}}}),
-			step("config.set", {{"group", "app"}, {"key", "foo"}, {"value", "bar"}})})
+		for (const auto& failure :
+			QJsonArray{step("does.notExist"), QJsonObject{{"assert", QJsonObject{{"expr", false}, {"msg", "stop"}}}},
+				step("song.setTempo", {{"bpm", QJsonObject{{"expr", "1 / 0"}}}}),
+				step("config.set", {{"group", "app"}, {"key", "foo"}, {"value", "bar"}})})
 		{
 			const auto result = run({step("track.create", {{"type", "Instrument"}}), failure});
 			QVERIFY(!result.ok);
@@ -103,8 +102,7 @@ private slots:
 	void expressionsAndControlFlow()
 	{
 		const auto expression = [](const QString& text) { return QJsonObject{{"expr", text}}; };
-		const QJsonArray steps{
-			QJsonObject{{"let", "sum"}, {"value", 0}},
+		const QJsonArray steps{QJsonObject{{"let", "sum"}, {"value", 0}},
 			QJsonObject{{"loop", QJsonObject{{"var", "n"}, {"from", 0}, {"to", 4}}},
 				{"steps", QJsonArray{QJsonObject{{"let", "sum"}, {"value", expression("$sum + $n")}}}}},
 			QJsonObject{{"foreach", QJsonObject{{"var", "n"}, {"in", QJsonArray{2, 3}}}},
@@ -116,8 +114,7 @@ private slots:
 			QJsonObject{{"let", "array"}, {"value", QJsonArray{1, 2, 3}}},
 			QJsonObject{{"let", "picked"}, {"value", expression("$array[1 + 1]")}},
 			QJsonObject{{"random", QJsonObject{{"var", "random"}, {"a", 0}, {"b", 1}}}},
-			QJsonObject{{"let", "shuffled"}, {"value", expression("shuffle([1,2,3,4])")}}
-		};
+			QJsonObject{{"let", "shuffled"}, {"value", expression("shuffle([1,2,3,4])")}}};
 		const auto result = run(steps, false, 42);
 		QVERIFY2(result.ok, qPrintable(result.errorMessage));
 		QCOMPARE(Engine::getSong()->getTempo(), 131);
@@ -132,11 +129,11 @@ private slots:
 	{
 		const QJsonArray invalid{
 			QJsonObject{{"loop", QJsonObject{{"var", "n"}, {"from", 0}, {"to", 513}}}, {"steps", QJsonArray{}}},
-			QJsonObject{{"loop", QJsonObject{{"var", "n"}, {"from", 0}, {"to", 2}, {"step", 0}}}, {"steps", QJsonArray{}}},
+			QJsonObject{
+				{"loop", QJsonObject{{"var", "n"}, {"from", 0}, {"to", 2}, {"step", 0}}}, {"steps", QJsonArray{}}},
 			QJsonObject{{"cmd", "song.setTempo"}, {"assert", QJsonObject{{"expr", true}}}},
 			QJsonObject{{"let", "n"}, {"value", QJsonObject{{"expr", "$unknown"}}}},
-			step("agent.runScript", {{"script", "four_on_floor"}})
-		};
+			step("agent.runScript", {{"script", "four_on_floor"}})};
 		for (const auto& node : invalid)
 		{
 			QVERIFY(!run({node}).ok);
@@ -146,7 +143,8 @@ private slots:
 	}
 	void builtInComposition()
 	{
-		for (const auto& name : {"four_on_floor_drums", "pop_chord_progression", "arpeggio_16th", "bassline_root_octave"})
+		for (const auto& name :
+			{"four_on_floor_drums", "pop_chord_progression", "arpeggio_16th", "bassline_root_octave"})
 		{
 			const auto result = CommandBus::instance().execute("agent.runScript", {{"script", name}});
 			QVERIFY2(result.ok, qPrintable(result.errorMessage + " " + result.data.value("location").toString()));
@@ -185,8 +183,10 @@ private slots:
 	}
 	void nestedCalls()
 	{
-		const auto result = run({QJsonObject{{"call", QJsonObject{{"script", "four_on_floor"}, {"params", QJsonObject{{"bars", 1}}}}},
-			{"let", "section"}}, QJsonObject{{"assert", QJsonObject{{"expr", "$section.track.index == 0"}}}}});
+		const auto result
+			= run({QJsonObject{{"call", QJsonObject{{"script", "four_on_floor"}, {"params", QJsonObject{{"bars", 1}}}}},
+					   {"let", "section"}},
+				QJsonObject{{"assert", QJsonObject{{"expr", "$section.track.index == 0"}}}}});
 		QVERIFY2(result.ok, qPrintable(result.errorMessage));
 		QCOMPARE(Engine::getSong()->tracks().size(), std::size_t(1));
 		QVERIFY(CommandBus::instance().execute("history.undo").ok);
@@ -235,22 +235,32 @@ private slots:
 		QTemporaryDir directory;
 		QFile file(directory.filePath("source.wav"));
 		QVERIFY(file.open(QIODevice::WriteOnly));
-		QDataStream data(&file); data.setByteOrder(QDataStream::LittleEndian);
-		file.write("RIFF", 4); data << quint32(36 + 352800); file.write("WAVEfmt ", 8);
-		data << quint32(16) << quint16(1) << quint16(1) << quint32(44100) << quint32(88200) << quint16(2) << quint16(16);
-		file.write("data", 4); data << quint32(352800);
-		for (int frame = 0; frame < 176400; ++frame) { data << qint16(8000 * std::sin(6.283185307179586 * 440 * frame / 44100)); }
+		QDataStream data(&file);
+		data.setByteOrder(QDataStream::LittleEndian);
+		file.write("RIFF", 4);
+		data << quint32(36 + 352800);
+		file.write("WAVEfmt ", 8);
+		data << quint32(16) << quint16(1) << quint16(1) << quint32(44100) << quint32(88200) << quint16(2)
+			 << quint16(16);
+		file.write("data", 4);
+		data << quint32(352800);
+		for (int frame = 0; frame < 176400; ++frame)
+		{
+			data << qint16(8000 * std::sin(6.283185307179586 * 440 * frame / 44100));
+		}
 		file.close();
 		auto& bus = CommandBus::instance();
 		QVERIFY(bus.execute("import.sampleToTrack", {{"path", file.fileName()}}).ok);
 		QVERIFY(bus.execute("arrange.duplicateSection", {{"startBar", 1}, {"endBar", 2}, {"destinationBar", 0}}).ok);
 		QVERIFY(bus.execute("clip.remove", {{"track", 0}, {"clip", 0}}).ok);
 		const auto history = bus.execute("history.status").data;
-		const auto preview = bus.execute("agent.runScript", {{"script", "render_preview"}, {"vars", QJsonObject{{"end", 192}}}});
+		const auto preview
+			= bus.execute("agent.runScript", {{"script", "render_preview"}, {"vars", QJsonObject{{"end", 192}}}});
 		QVERIFY2(preview.ok, qPrintable(preview.errorMessage));
 		const auto task = preview.data.value("lastResult").toObject().value("task").toString();
 		QVERIFY(!task.isEmpty());
-		QTRY_VERIFY_WITH_TIMEOUT(bus.execute("export.status", {{"task", task}}).data.value("status").toString() != "running", 15000);
+		QTRY_VERIFY_WITH_TIMEOUT(
+			bus.execute("export.status", {{"task", task}}).data.value("status").toString() != "running", 15000);
 		const auto status = bus.execute("export.status", {{"task", task}});
 		QCOMPARE(status.data.value("status").toString(), QString("completed"));
 		const auto path = status.data.value("path").toString();

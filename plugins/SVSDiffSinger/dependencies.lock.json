@@ -24,8 +24,14 @@
     "implementation": "Native C++ dictionary / romanization adapter; A2 implementation pending",
     "dictionaryReference": "refs/tlds_ref/DiffSingerPredictor.cs",
     "languageSelection": "voice capability language keys",
-    "pinyin-data": {"revision": "9193766130af24d2ac54230be979b2e98ac66223", "license": "MIT"},
-    "phrase-pinyin-data": {"revision": "cee0ed6e6e4898580cafd2bd5e3723e20b214aa0", "license": "MIT"}
+    "pinyin-data": {
+      "revision": "9193766130af24d2ac54230be979b2e98ac66223",
+      "license": "MIT"
+    },
+    "phrase-pinyin-data": {
+      "revision": "cee0ed6e6e4898580cafd2bd5e3723e20b214aa0",
+      "license": "MIT"
+    }
   },
   "fixtureResourcesRedistributed": false
 }

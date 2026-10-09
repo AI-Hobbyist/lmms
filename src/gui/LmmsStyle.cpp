@@ -153,7 +153,11 @@ LmmsStyle::LmmsStyle() :
 				QPixmapCache::clear();
 				qApp->setStyleSheet(file.readAll());
 				LmmsPalette themePalette(nullptr, this);
-				if (s_palette) { *s_palette = themePalette.palette(); qApp->setPalette(*s_palette); }
+				if (s_palette)
+				{
+					*s_palette = themePalette.palette();
+					qApp->setPalette(*s_palette);
+				}
 				TextFloat::displayMessage(
 					tr("Theme updated"),
 					tr("LMMS theme file %1 has been reloaded.").arg(file.fileName()),
@@ -234,8 +238,7 @@ void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		const QStyleOption *option, QPainter *painter,
 		const QWidget *widget) const
 {
-	if (s_flatFrames &&
-		(element == PE_Frame || element == PE_FrameLineEdit || element == PE_PanelLineEdit))
+	if (s_flatFrames && (element == PE_Frame || element == PE_FrameLineEdit || element == PE_PanelLineEdit))
 	{
 		// Styled standard controls own their QSS border; unstyled frames get one flat line.
 		painter->save();
@@ -374,7 +377,10 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 			return 24;
 
 		case QStyle::PM_MdiSubWindowFrameWidth:
-			if (s_flatFrames) { return 1; }
+			if (s_flatFrames)
+			{
+				return 1;
+			}
 			return QProxyStyle::pixelMetric(_metric, _option, _widget);
 
 		default:

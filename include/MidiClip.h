@@ -93,12 +93,9 @@ public:
 	{
 		return m_clipType;
 	}
-	int steps() const
-	{
-		return m_steps;
-	}
-	void setClipType( Type type );
-	void setSteps( int steps );
+	int steps() const { return m_steps; }
+	void setClipType(Type type);
+	void setSteps(int steps);
 
 
 	// next/previous track based on position in the containing track

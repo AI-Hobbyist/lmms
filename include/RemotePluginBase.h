@@ -460,7 +460,10 @@ public:
 
 	inline bool isInvalid() const
 	{
-		if (m_transport) { return m_transport->invalid(); }
+		if (m_transport)
+		{
+			return m_transport->invalid();
+		}
 #ifdef SYNC_WITH_SHM_FIFO
 		return !m_in || !m_out || m_in->isInvalid() || m_out->isInvalid();
 #else
@@ -516,7 +519,10 @@ public:
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	inline bool messagesLeft()
 	{
-		if (m_transport) { return m_transport->pending(); }
+		if (m_transport)
+		{
+			return m_transport->pending();
+		}
 #ifdef SYNC_WITH_SHM_FIFO
 		return m_in->messagesLeft();
 #else
@@ -565,7 +571,11 @@ protected:
 
 	inline void invalidate()
 	{
-		if (m_transport) { m_transport->invalidate(); return; }
+		if (m_transport)
+		{
+			m_transport->invalidate();
+			return;
+		}
 #ifdef SYNC_WITH_SHM_FIFO
 		m_in->invalidate();
 		m_out->invalidate();

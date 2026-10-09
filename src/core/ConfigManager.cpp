@@ -244,7 +244,10 @@ void ConfigManager::setVSTDir(const QString & vstDir)
 std::vector<vsthost::ScanRoot> ConfigManager::vstScanRoots(QString* error) const
 {
 	const auto json = value("vst", "scanroots", QString{});
-	if (error) { error->clear(); }
+	if (error)
+	{
+		error->clear();
+	}
 	if (json.isNull())
 	{
 		QStringList standard;
@@ -252,23 +255,37 @@ std::vector<vsthost::ScanRoot> ConfigManager::vstScanRoots(QString* error) const
 		for (const auto* variable : {"CommonProgramW6432", "CommonProgramFiles", "CommonProgramFiles(x86)"})
 		{
 			const auto path = qEnvironmentVariable(variable);
-			if (!path.isEmpty()) { standard.append(path + "/VST3"); }
+			if (!path.isEmpty())
+			{
+				standard.append(path + "/VST3");
+			}
 		}
 #endif
 		return vsthost::migrateScanRoots(m_vstDir, standard);
 	}
-	std::vector<vsthost::ScanRoot> roots; QString failure;
+	std::vector<vsthost::ScanRoot> roots;
+	QString failure;
 	vsthost::decodeScanRoots(json.toUtf8(), roots, failure);
-	if (error) { *error = failure; }
+	if (error)
+	{
+		*error = failure;
+	}
 	return roots;
 }
 
 bool ConfigManager::setVstScanRoots(const std::vector<vsthost::ScanRoot>& roots, QString* error)
 {
-	QByteArray json; QString failure;
+	QByteArray json;
+	QString failure;
 	const bool valid = vsthost::encodeScanRoots(roots, json, failure);
-	if (error) { *error = failure; }
-	if (valid) { setValue("vst", "scanroots", QString::fromUtf8(json)); }
+	if (error)
+	{
+		*error = failure;
+	}
+	if (valid)
+	{
+		setValue("vst", "scanroots", QString::fromUtf8(json));
+	}
 	return valid;
 }
 
@@ -592,7 +609,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
 	}
-	if (value("vst", "scanroots", QString{}).isNull()) { setVstScanRoots(vstScanRoots()); }
+	if (value("vst", "scanroots", QString{}).isNull())
+	{
+		setVstScanRoots(vstScanRoots());
+	}
 
 	if(m_ladspaDir.isEmpty() )
 	{

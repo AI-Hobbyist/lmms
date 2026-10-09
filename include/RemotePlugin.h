@@ -35,7 +35,9 @@
 
 namespace lmms
 {
-	namespace vsthost { class LegacyHostBridge; }
+	namespace vsthost {
+class LegacyHostBridge;
+}
 
 class MidiEvent;
 class RemotePlugin;

@@ -36,7 +36,9 @@
 
 namespace lmms
 {
-namespace svs {class ExportSnapshot;}
+namespace svs {
+class ExportSnapshot;
+}
 
 
 class LMMS_EXPORT ProjectRenderer : public QThread
@@ -65,11 +67,11 @@ public:
 
 	ProjectRenderer(const OutputSettings& _os, ExportFileFormat _file_format, const QString& _out_file);
 		~ProjectRenderer() override;
-		int progressPercent() const { return m_progress.load(); }
-		bool renderSucceeded() const { return m_succeeded.load(); }
-		QString renderError() const {return m_renderError;}
-		void setIgnoreFailedSVSRegions(bool ignore) {m_ignoreFailedSVS=ignore;}
-			void setSVSSnapshot(std::unique_ptr<svs::ExportSnapshot>);
+	int progressPercent() const { return m_progress.load(); }
+	bool renderSucceeded() const { return m_succeeded.load(); }
+	QString renderError() const { return m_renderError; }
+	void setIgnoreFailedSVSRegions(bool ignore) { m_ignoreFailedSVS = ignore; }
+	void setSVSSnapshot(std::unique_ptr<svs::ExportSnapshot>);
 
 	bool isReady() const
 	{
@@ -93,7 +95,7 @@ public slots:
 signals:
 	void progressChanged( int );
 		void finished();
-		void svsExportFailed(const QString& reason);
+	void svsExportFailed(const QString& reason);
 
 
 private:
@@ -103,13 +105,13 @@ private:
 	AudioFileDevice * m_fileDev;
 
 		std::atomic_int m_progress;
-		std::atomic_bool m_abort;
-		std::atomic_bool m_succeeded{false};
-		bool m_deviceTransferred = false;
-			bool m_ignoreFailedSVS = false;
-			std::atomic_bool m_exportStarted{false};
-			QString m_renderError;
-			std::unique_ptr<svs::ExportSnapshot> m_svsSnapshot;
+	std::atomic_bool m_abort;
+	std::atomic_bool m_succeeded{false};
+	bool m_deviceTransferred = false;
+	bool m_ignoreFailedSVS = false;
+	std::atomic_bool m_exportStarted{false};
+	QString m_renderError;
+	std::unique_ptr<svs::ExportSnapshot> m_svsSnapshot;
 
 } ;
 

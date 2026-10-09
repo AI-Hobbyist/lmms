@@ -55,7 +55,8 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 {
 	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
 	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"], _parent );
-	if (_key->attributes.contains("architecture")) {
+	if (_key->attributes.contains("architecture"))
+	{
 		new QLabel(QWidget::tr("Architecture: %1-bit").arg(_key->attributes["architecture"]), _parent);
 		new QLabel(QWidget::tr("Vendor: %1").arg(_key->attributes["vendor"]), _parent);
 		new QLabel(QWidget::tr("Version: %1").arg(_key->attributes["version"]), _parent);
@@ -70,12 +71,21 @@ void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 {
 #ifdef LMMS_BUILD_WIN32
 	const auto* jobs = Engine::vstCatalog();
-	if (!jobs) { return; }
+	if (!jobs)
+	{
+		return;
+	}
 	const auto report = jobs->snapshot().report;
-	if (!report) { return; }
+	if (!report)
+	{
+		return;
+	}
 	for (const auto& entry : report->entries)
 	{
-		if (!vsthost::isVstInstrument(entry)) { _kl.push_back(vsthost::vstCatalogKey(_desc, entry)); }
+		if (!vsthost::isVstInstrument(entry))
+		{
+			_kl.push_back(vsthost::vstCatalogKey(_desc, entry));
+		}
 	}
 #else
 	QStringList dlls;
@@ -87,7 +97,11 @@ void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 		am["file"] = file;
 #ifdef LMMS_BUILD_WIN32
 		const auto scan = VstPlugin::scanModule(QDir(ConfigManager::inst()->vstDir()).absoluteFilePath(file));
-		if (!scan.error.isEmpty()) { qWarning().noquote() << scan.error; continue; }
+		if (!scan.error.isEmpty())
+		{
+			qWarning().noquote() << scan.error;
+			continue;
+		}
 		if (scan.shell)
 		{
 			for (const auto& entry : scan.entries)

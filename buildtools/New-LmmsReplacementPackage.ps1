@@ -4,69 +4,111 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $project = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 if (-not $ProductCommit) {
     $ProductCommit = & git -C $project rev-parse HEAD
-    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the product source commit.' }
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Cannot identify the product source commit.'
+    }
 }
 $runtime = Join-Path $project 'build/Release'
 $output = Join-Path $project 'build/packages'
-if (-not (Test-Path -LiteralPath $runtime -PathType Container) -or -not (Test-Path -LiteralPath $output -PathType Container)) { throw 'Reuse the existing runtime and package directories.' }
+if (-not (Test-Path -LiteralPath $runtime -PathType Container) -or -not (Test-Path -LiteralPath $output -PathType Container)) {
+    throw 'Reuse the existing runtime and package directories.'
+}
 $name = 'lmms-enhanced-full-' + $ProductCommit.Substring(0, 9) + '-win64.zip'
 $zipPath = Join-Path $output $name
-if (Test-Path -LiteralPath $zipPath) { throw "Package already exists: $zipPath" }
+if (Test-Path -LiteralPath $zipPath) {
+    throw "Package already exists: $zipPath"
+}
 $payload = @{}
 foreach ($file in Get-ChildItem -LiteralPath $runtime -File) {
-    if ($file.Name -match '^(concrt140d|msvcp140(_[12])?d(_.*)?|vcruntime140(_1)?d|ucrtbased)\.dll$') { continue }
-    if ($file.Extension -eq '.dll' -or $file.Name -in @('lmms.exe', 'lmms.exe.manifest', 'lmms.VisualElementsManifest.xml')) { $payload[$file.Name] = $file.FullName }
+    if ($file.Name -match '^(concrt140d|msvcp140(_[12])?d(_.*)?|vcruntime140(_1)?d|ucrtbased)\.dll$') {
+        continue
+    }
+    if ($file.Extension -eq '.dll' -or $file.Name -in @('lmms.exe', 'lmms.exe.manifest', 'lmms.VisualElementsManifest.xml')) {
+        $payload[$file.Name] = $file.FullName
+    }
 }
 # Only installed data/voices enter the package, never a local workspace/config.
 foreach ($path in Get-Content -LiteralPath (Join-Path $project 'build/install_manifest.txt')) {
     $full = [IO.Path]::GetFullPath($path)
-    if (-not $full.StartsWith($runtime + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Installation manifest points outside the existing runtime.' }
+    if (-not $full.StartsWith($runtime + '\', [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Installation manifest points outside the existing runtime.'
+    }
     $relative = $full.Substring($runtime.Length + 1).Replace('\', '/')
-    if ($relative -match '^(data|svs)/') { $payload[$relative] = $full }
+    if ($relative -match '^(data|svs)/') {
+        $payload[$relative] = $full
+    }
 }
 # The SVS example is built directly into the runtime; its DLL may be absent
 # from the top-level install manifest when the nested target is excluded.
 $svsExampleDll = Join-Path $runtime 'svs/SVSExample/SVSExample.dll'
-if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) { throw 'Deployed SVS example DLL missing.' }
+if (-not (Test-Path -LiteralPath $svsExampleDll -PathType Leaf)) {
+    throw 'Deployed SVS example DLL missing.'
+}
 $payload['svs/SVSExample/SVSExample.dll'] = $svsExampleDll
 $sharedVocoderReadme = Join-Path $runtime 'svs/vocoders/README.md'
-if (-not (Test-Path -LiteralPath $sharedVocoderReadme -PathType Leaf)) { throw 'Default shared vocoder directory instructions missing.' }
+if (-not (Test-Path -LiteralPath $sharedVocoderReadme -PathType Leaf)) {
+    throw 'Default shared vocoder directory instructions missing.'
+}
 $payload['svs/vocoders/README.md'] = $sharedVocoderReadme
 $diffSingerPackage = Join-Path $runtime 'svs/SVSDiffSinger'
-if (-not (Test-Path -LiteralPath $diffSingerPackage -PathType Container)) { throw 'Deployed DiffSinger package missing.' }
+if (-not (Test-Path -LiteralPath $diffSingerPackage -PathType Container)) {
+    throw 'Deployed DiffSinger package missing.'
+}
 foreach ($file in Get-ChildItem -LiteralPath $diffSingerPackage -File -Recurse) {
-    if ($file.Name -match '\.(pdb|lib|exp|disabled)$') { continue }
+    if ($file.Name -match '\.(pdb|lib|exp|disabled)$') {
+        continue
+    }
     $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
 }
 foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imageformats', 'networkinformation', 'platforms', 'styles', 'tls')) {
     $folder = Join-Path $runtime $directory
-    if (-not (Test-Path -LiteralPath $folder)) { continue }
+    if (-not (Test-Path -LiteralPath $folder)) {
+        continue
+    }
     foreach ($file in Get-ChildItem -LiteralPath $folder -File -Recurse) {
-        if ($file.Name -match '\.(disabled|pdb|lib|exp)$' -or $file.Name -like '*.disabled.*') { continue }
+        if ($file.Name -match '\.(disabled|pdb|lib|exp)$' -or $file.Name -like '*.disabled.*') {
+            continue
+        }
         $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
     }
 }
 $payload['LICENSE.txt'] = Join-Path $project 'LICENSE.txt'
 $payload['README.md'] = Join-Path $project 'README.md'
 $targets = Get-Content -LiteralPath (Join-Path $project 'doc/ui-modernization/validation/plugin-targets.txt')
-if ($targets.Count -ne 52) { throw 'Frozen plugin target count differs.' }
-foreach ($target in $targets) { if (-not $payload.ContainsKey("plugins/$target.dll")) { throw "Missing enabled plugin: $target" } }
+if ($targets.Count -ne 52) {
+    throw 'Frozen plugin target count differs.'
+}
+foreach ($target in $targets) {
+    if (-not $payload.ContainsKey("plugins/$target.dll")) {
+        throw "Missing enabled plugin: $target"
+    }
+}
 foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'data/themes/default/style.css', 'plugins/midiimport.dll', 'plugins/midiexport.dll', 'plugins/hydrogenimport.dll', 'plugins/vstbase.dll', 'plugins/RemoteCatalogIo.exe', 'plugins/RemoteVstHost64.exe', 'plugins/32/RemoteVstHost32.exe', 'plugins/RemoteVstPlugin64.exe', 'plugins/32/RemoteVstPlugin32.exe', 'plugins/RemoteZynAddSubFx.exe')) {
-    if (-not $payload.ContainsKey($required)) { throw "Incomplete runtime: $required" }
+    if (-not $payload.ContainsKey($required)) {
+        throw "Incomplete runtime: $required"
+    }
 }
 foreach ($required in @('svs/SVSExample/SVSExample.dll', 'svs/SVSExample/manifest.json', 'svs/SVSExample/avatar.svg', 'svs/SVSExample/portrait.svg', 'data/themes/default/svs_track.svg')) {
-    if (-not $payload.ContainsKey($required)) { throw "Incomplete SVS runtime: $required" }
+    if (-not $payload.ContainsKey($required)) {
+        throw "Incomplete SVS runtime: $required"
+    }
 }
 foreach ($required in @('svs/SVSDiffSinger/SVSDiffSinger.dll', 'svs/SVSDiffSinger/onnxruntime.dll', 'svs/SVSDiffSinger/manifest.json', 'data/projects/templates/default.mpt')) {
-    if (-not $payload.ContainsKey($required)) { throw "Incomplete DiffSinger/default template runtime: $required" }
+    if (-not $payload.ContainsKey($required)) {
+        throw "Incomplete DiffSinger/default template runtime: $required"
+    }
 }
-if ((Get-FileHash -LiteralPath $payload['data/projects/templates/default.mpt']).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project 'data/projects/templates/default.mpt')).Hash) { throw 'Runtime default template differs from the official factory template.' }
+if ((Get-FileHash -LiteralPath $payload['data/projects/templates/default.mpt']).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project 'data/projects/templates/default.mpt')).Hash) {
+    throw 'Runtime default template differs from the official factory template.'
+}
 $records = @($payload.Keys | Sort-Object | ForEach-Object {
-    $file = Get-Item -LiteralPath $payload[$_]
-    if ($file.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "Runtime file is a reparse point: $_" }
-    [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash}
-})
-$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records}
+        $file = Get-Item -LiteralPath $payload[$_]
+        if ($file.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+            throw "Runtime file is a reparse point: $_"
+        }
+        [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
+    })
+$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records }
 $manifestText = $manifest | ConvertTo-Json -Depth 5
 $instructions = @'
 LMMS 增强分支全量替换包（Windows x64）
@@ -107,9 +149,19 @@ function Add-TextEntry([string]$Name, [string]$Value) {
     $bytes = [Text.Encoding]::UTF8.GetBytes($Value)
     $entry = $archive.CreateEntry($Name, [IO.Compression.CompressionLevel]::Optimal)
     $stream = $entry.Open()
-    try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+    try {
+        $stream.Write($bytes, 0, $bytes.Length)
+    }
+    finally {
+        $stream.Dispose()
+    }
     $sha = [Security.Cryptography.SHA256]::Create()
-    try { $expected[$Name] = ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '') } finally { $sha.Dispose() }
+    try {
+        $expected[$Name] = ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '')
+    }
+    finally {
+        $sha.Dispose()
+    }
 }
 try {
     foreach ($file in $records) {
@@ -120,17 +172,34 @@ try {
     Add-TextEntry 'README-覆盖安装.txt' $instructions
     Add-TextEntry 'Install-Replace.cmd' $cmd
     Add-TextEntry 'Install-Replace.ps1' (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Install-LmmsReplacement.ps1') -Raw)
-} finally { $archive.Dispose() }
+}
+finally {
+    $archive.Dispose()
+}
 $archive = [IO.Compression.ZipFile]::OpenRead($zipPath)
 try {
-    if ($archive.Entries.Count -ne $expected.Count) { throw 'Archive entry count differs.' }
-    foreach ($entry in $archive.Entries) {
-        if (-not $expected.ContainsKey($entry.FullName)) { throw "Unexpected archive entry: $($entry.FullName)" }
-        $stream = $entry.Open(); $sha = [Security.Cryptography.SHA256]::Create()
-        try { $hash = ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-', '') } finally { $stream.Dispose(); $sha.Dispose() }
-        if ($hash -ne $expected[$entry.FullName]) { throw "Archive SHA256 mismatch: $($entry.FullName)" }
+    if ($archive.Entries.Count -ne $expected.Count) {
+        throw 'Archive entry count differs.'
     }
-} finally { $archive.Dispose() }
+    foreach ($entry in $archive.Entries) {
+        if (-not $expected.ContainsKey($entry.FullName)) {
+            throw "Unexpected archive entry: $($entry.FullName)"
+        }
+        $stream = $entry.Open(); $sha = [Security.Cryptography.SHA256]::Create()
+        try {
+            $hash = ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-', '')
+        }
+        finally {
+            $stream.Dispose(); $sha.Dispose()
+        }
+        if ($hash -ne $expected[$entry.FullName]) {
+            throw "Archive SHA256 mismatch: $($entry.FullName)"
+        }
+    }
+}
+finally {
+    $archive.Dispose()
+}
 $manifestText | Set-Content -LiteralPath ($zipPath + '.manifest.json') -Encoding UTF8
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
 "$hash  $name" | Set-Content -LiteralPath ($zipPath + '.sha256') -Encoding ASCII

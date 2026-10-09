@@ -54,7 +54,7 @@ ProjectJournal::ProjectJournal() :
 
 void ProjectJournal::undo()
 {
-	if( hasActiveTransaction() )
+	if (hasActiveTransaction())
 	{
 		return;
 	}
@@ -67,39 +67,39 @@ void ProjectJournal::undo()
 		if( jo )
 		{
 			const bool prev = isJournalling();
-			setJournalling( false );
-			auto *song = dynamic_cast<Song *>( jo );
-			DataFile curState( c.projectSnapshot ? DataFile::Type::SongProject : DataFile::Type::JournalData );
-			if( c.projectSnapshot && song != nullptr )
+			setJournalling(false);
+			auto* song = dynamic_cast<Song*>(jo);
+			DataFile curState(c.projectSnapshot ? DataFile::Type::SongProject : DataFile::Type::JournalData);
+			if (c.projectSnapshot && song != nullptr)
 			{
-				song->saveProjectState( curState );
+				song->saveProjectState(curState);
 			}
 			else
 			{
-				jo->saveState( curState, curState.content() );
+				jo->saveState(curState, curState.content());
 			}
-			m_redoCheckPoints.push( CheckPoint( c.joID, curState, c.projectSnapshot,
-				song != nullptr && song->isModified() ) );
+			m_redoCheckPoints.push(
+				CheckPoint(c.joID, curState, c.projectSnapshot, song != nullptr && song->isModified()));
 
-			if( c.projectSnapshot && song != nullptr )
+			if (c.projectSnapshot && song != nullptr)
 			{
 				m_restoringProject = true;
-				song->restoreProjectState( c.data );
+				song->restoreProjectState(c.data);
 				m_restoringProject = false;
-				song->setModified( c.modified );
+				song->setModified(c.modified);
 			}
 			else
 			{
-				jo->restoreState( c.data.content().firstChildElement() );
+				jo->restoreState(c.data.content().firstChildElement());
 			}
 			setJournalling( prev );
-			if( !c.projectSnapshot )
+			if (!c.projectSnapshot)
 			{
 				Engine::getSong()->setModified();
 			}
 
 			// loading AutomationClip connections correctly
-			if( !c.projectSnapshot && !c.data.content().elementsByTagName( "automationclip" ).isEmpty() )
+			if (!c.projectSnapshot && !c.data.content().elementsByTagName("automationclip").isEmpty())
 			{
 				AutomationClip::resolveAllIDs();
 			}
@@ -112,7 +112,7 @@ void ProjectJournal::undo()
 
 void ProjectJournal::redo()
 {
-	if( hasActiveTransaction() )
+	if (hasActiveTransaction())
 	{
 		return;
 	}
@@ -125,33 +125,33 @@ void ProjectJournal::redo()
 		if( jo )
 		{
 			const bool prev = isJournalling();
-			setJournalling( false );
-			auto *song = dynamic_cast<Song *>( jo );
-			DataFile curState( c.projectSnapshot ? DataFile::Type::SongProject : DataFile::Type::JournalData );
-			if( c.projectSnapshot && song != nullptr )
+			setJournalling(false);
+			auto* song = dynamic_cast<Song*>(jo);
+			DataFile curState(c.projectSnapshot ? DataFile::Type::SongProject : DataFile::Type::JournalData);
+			if (c.projectSnapshot && song != nullptr)
 			{
-				song->saveProjectState( curState );
+				song->saveProjectState(curState);
 			}
 			else
 			{
-				jo->saveState( curState, curState.content() );
+				jo->saveState(curState, curState.content());
 			}
-			m_undoCheckPoints.push( CheckPoint( c.joID, curState, c.projectSnapshot,
-				song != nullptr && song->isModified() ) );
+			m_undoCheckPoints.push(
+				CheckPoint(c.joID, curState, c.projectSnapshot, song != nullptr && song->isModified()));
 
-			if( c.projectSnapshot && song != nullptr )
+			if (c.projectSnapshot && song != nullptr)
 			{
 				m_restoringProject = true;
-				song->restoreProjectState( c.data );
+				song->restoreProjectState(c.data);
 				m_restoringProject = false;
-				song->setModified( c.modified );
+				song->setModified(c.modified);
 			}
 			else
 			{
-				jo->restoreState( c.data.content().firstChildElement() );
+				jo->restoreState(c.data.content().firstChildElement());
 			}
 			setJournalling( prev );
-			if( !c.projectSnapshot )
+			if (!c.projectSnapshot)
 			{
 				Engine::getSong()->setModified();
 			}
@@ -189,85 +189,72 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	}
 }
 
-
-
-
-bool ProjectJournal::beginTransaction( Song *song )
+bool ProjectJournal::beginTransaction(Song* song)
 {
-	if( song == nullptr || !song->isJournalling() )
+	if (song == nullptr || !song->isJournalling())
 	{
 		return false;
 	}
 
-	DataFile dataFile( DataFile::Type::SongProject );
+	DataFile dataFile(DataFile::Type::SongProject);
 	const bool journalling = isJournalling();
-	setJournalling( false );
-	song->saveProjectState( dataFile );
-	m_transactions.push_back( Transaction{ CheckPoint( song->id(), dataFile, true, song->isModified() ), journalling } );
-	setJournalling( false );
+	setJournalling(false);
+	song->saveProjectState(dataFile);
+	m_transactions.push_back(Transaction{CheckPoint(song->id(), dataFile, true, song->isModified()), journalling});
+	setJournalling(false);
 	return true;
 }
 
-
-
-
 bool ProjectJournal::commitTransaction()
 {
-	if( !hasActiveTransaction() )
+	if (!hasActiveTransaction())
 	{
 		return false;
 	}
 
-	if( m_transactions.size() == 1 )
+	if (m_transactions.size() == 1)
 	{
 		m_redoCheckPoints.clear();
-		m_undoCheckPoints.push( m_transactions.back().checkpoint );
-		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
+		m_undoCheckPoints.push(m_transactions.back().checkpoint);
+		if (m_undoCheckPoints.size() > MAX_UNDO_STATES)
 		{
-			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
+			m_undoCheckPoints.remove(0, m_undoCheckPoints.size() - MAX_UNDO_STATES);
 		}
 	}
 
 	const bool journalling = m_transactions.back().journalling;
 	m_transactions.pop_back();
-	setJournalling( journalling );
+	setJournalling(journalling);
 	return true;
 }
 
-
-
-
-
 bool ProjectJournal::rollbackTransaction()
 {
-	if( !hasActiveTransaction() )
+	if (!hasActiveTransaction())
 	{
 		return false;
 	}
 
 	auto checkpoint = m_transactions.back().checkpoint;
 	const bool journalling = m_transactions.back().journalling;
-	auto *song = dynamic_cast<Song *>( m_joIDs.value( checkpoint.joID, nullptr ) );
-	if( song == nullptr || !checkpoint.projectSnapshot )
+	auto* song = dynamic_cast<Song*>(m_joIDs.value(checkpoint.joID, nullptr));
+	if (song == nullptr || !checkpoint.projectSnapshot)
 	{
 		m_transactions.pop_back();
-		setJournalling( journalling );
+		setJournalling(journalling);
 		return false;
 	}
 
-	setJournalling( false );
+	setJournalling(false);
 	m_restoringProject = true;
-	song->restoreProjectState( checkpoint.data );
+	song->restoreProjectState(checkpoint.data);
 	m_restoringProject = false;
-	song->setModified( checkpoint.modified );
+	song->setModified(checkpoint.modified);
 
 	m_transactions.pop_back();
-	setJournalling( journalling );
+	setJournalling(journalling);
 	return true;
 }
-
-
-
 
 bool ProjectJournal::hasActiveTransaction() const
 {
@@ -311,7 +298,7 @@ jo_id_t ProjectJournal::idFromSave( jo_id_t id )
 
 void ProjectJournal::clearJournal()
 {
-	if( m_restoringProject || hasActiveTransaction() )
+	if (m_restoringProject || hasActiveTransaction())
 	{
 		return;
 	}

@@ -58,13 +58,13 @@ public:
 	bool canRedo() const;
 
 	void addJournalCheckPoint( JournallingObject *jo );
-	bool beginTransaction( Song *song );
+	bool beginTransaction(Song* song);
 	bool commitTransaction();
 	bool rollbackTransaction();
 	bool hasActiveTransaction() const;
 	int undoDepth() const { return m_undoCheckPoints.size(); }
 	int redoDepth() const { return m_redoCheckPoints.size(); }
-	int transactionDepth() const { return static_cast<int>( m_transactions.size() ); }
+	int transactionDepth() const { return static_cast<int>(m_transactions.size()); }
 
 	bool isJournalling() const
 	{
@@ -114,12 +114,13 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ),
-			bool initProjectSnapshot = false, bool initModified = false ) :
+		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::Type::JournalData),
+			bool initProjectSnapshot = false, bool initModified = false)
+			:
 			joID( initID ),
-			data( initData ),
-			projectSnapshot( initProjectSnapshot ),
-			modified( initModified )
+			data(initData)
+			, projectSnapshot(initProjectSnapshot)
+			, modified(initModified)
 		{
 		}
 		jo_id_t joID;

@@ -1061,10 +1061,17 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		// Keep the volume/panning endpoints as two solid data bands.
 		p.fillRect(QRectF(x, y, noteWidth, noteHeight / 2.0), rcol);
 		p.fillRect(QRectF(x, y + noteHeight / 2.0, noteWidth, noteHeight / 2.0), lcol);
-		if (borders) { p.setBrush(Qt::NoBrush); p.drawPath(outline); }
+		if (borders)
+		{
+			p.setBrush(Qt::NoBrush);
+			p.drawPath(outline);
+		}
 		p.restore();
 	}
-	else { p.drawRect(x, y, noteWidth, noteHeight); }
+	else
+	{
+		p.drawRect(x, y, noteWidth, noteHeight);
+	}
 
 	// Draw note key text
 	if (drawNoteName)
@@ -1111,7 +1118,10 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			p.setPen(col);
 			p.drawLine(x + noteWidth - endmarkWidth, y + 1, x + noteWidth - endmarkWidth, y + noteHeight - 1);
 		}
-		else { p.drawRect(x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight); }
+		else
+		{
+			p.drawRect(x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight);
+		}
 	}
 }
 

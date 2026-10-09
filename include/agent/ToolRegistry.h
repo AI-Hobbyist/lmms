@@ -7,8 +7,7 @@
 
 #include "lmms_export.h"
 
-namespace lmms::agent
-{
+namespace lmms::agent {
 class CommandBus;
 
 class LMMS_EXPORT ToolRegistry

@@ -94,7 +94,10 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		case Type::Pattern: t = new class PatternTrack( tc ); break;
 		case Type::Sample: t = new class SampleTrack( tc ); break;
 		case Type::SVS:
-			if (tc != Engine::patternStore()) { t = new SVSTrack(tc); }
+			if (tc != Engine::patternStore())
+			{
+				t = new SVSTrack(tc);
+			}
 			break;
 //		case Type::Event:
 //		case Type::Video:
@@ -445,7 +448,10 @@ bar_t Track::length() const
 {
 	if (type() == Type::SVS && Engine::getSong()->isExporting())
 	{
-		if (const auto frozen = static_cast<const SVSTrack*>(this)->frozenExportLength()) { return *frozen; }
+		if (const auto frozen = static_cast<const SVSTrack*>(this)->frozenExportLength())
+		{
+			return *frozen;
+		}
 	}
 	// find last end-position
 	tick_t last = 0;

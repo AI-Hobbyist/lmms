@@ -42,7 +42,9 @@ class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
 #ifdef LMMS_BUILD_WIN32
-namespace vsthost { class CatalogJobs; }
+namespace vsthost {
+class CatalogJobs;
+}
 #endif
 
 namespace gui

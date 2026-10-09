@@ -113,7 +113,10 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 		p.setBrush(palette().base());
 		p.drawRoundedRect(QRectF(rect()).adjusted(.5, .5, -.5, -.5), 4, 4);
 	}
-	else { p.drawPixmap(rect(), m_envGraph); }
+	else
+	{
+		p.drawPixmap(rect(), m_envGraph);
+	}
 
 	const auto* params = castModel<EnvelopeAndLfoParameters>();
 	if (!params) { return; }

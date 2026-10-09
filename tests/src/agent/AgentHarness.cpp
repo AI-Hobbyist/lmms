@@ -17,8 +17,7 @@
 #endif
 
 using namespace lmms::agent;
-namespace
-{
+namespace {
 // Match the application's note-handle cache lifetime for native MIDI rendering.
 struct NoteCacheLifetime
 {
@@ -51,11 +50,21 @@ int main(int argc, char** argv)
 	{
 		bool valid = true;
 		const int duration = option("--duration").toInt(&valid);
-		if (!valid || duration < 1 || duration > 3600) { error << "--mcp requires --duration 1..3600 seconds.\n"; return 2; }
+		if (!valid || duration < 1 || duration > 3600)
+		{
+			error << "--mcp requires --duration 1..3600 seconds.\n";
+			return 2;
+		}
 		lmms::Engine::init(true);
 		auto& server = lmms::agent::mcp::service();
-		if (!server.start(0, qgetenv("LMMS_MCP_TOKEN"))) { error << server.errorString() << '\n'; lmms::Engine::destroy(); return 1; }
-		output << server.endpoint() << '\n'; output.flush();
+		if (!server.start(0, qgetenv("LMMS_MCP_TOKEN")))
+		{
+			error << server.errorString() << '\n';
+			lmms::Engine::destroy();
+			return 1;
+		}
+		output << server.endpoint() << '\n';
+		output.flush();
 		QTimer::singleShot(duration * 1000, &application, &QCoreApplication::quit);
 		const int result = application.exec();
 		lmms::Engine::destroy();
@@ -66,16 +75,28 @@ int main(int argc, char** argv)
 	if (args.contains("--script"))
 	{
 		QFile file(option("--script"));
-		if (!file.open(QIODevice::ReadOnly)) { error << "Cannot open script.\n"; return 2; }
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			error << "Cannot open script.\n";
+			return 2;
+		}
 		QJsonParseError parse;
 		const auto document = QJsonDocument::fromJson(file.readAll(), &parse);
-		if (parse.error != QJsonParseError::NoError || !document.isObject()) { error << "Invalid script JSON.\n"; return 2; }
+		if (parse.error != QJsonParseError::NoError || !document.isObject())
+		{
+			error << "Invalid script JSON.\n";
+			return 2;
+		}
 		script = document.object();
 	}
-	else { script = ScriptRunner::loadBuiltIn(option("--builtin")); }
+	else
+	{
+		script = ScriptRunner::loadBuiltIn(option("--builtin"));
+	}
 	if (script.isEmpty())
 	{
-		error << "Usage: AgentHarness --tools | --manual | (--script FILE | --builtin NAME) [--vars JSON] [--seed INT] [--dry-run]\n";
+		error
+			<< "Usage: AgentHarness --tools | --manual | (--script FILE | --builtin NAME) [--vars JSON] [--seed INT] [--dry-run]\n";
 		return 2;
 	}
 	QJsonObject variables;
@@ -83,12 +104,20 @@ int main(int argc, char** argv)
 	{
 		QJsonParseError parse;
 		const auto document = QJsonDocument::fromJson(option("--vars").toUtf8(), &parse);
-		if (parse.error != QJsonParseError::NoError || !document.isObject()) { error << "Invalid vars JSON.\n"; return 2; }
+		if (parse.error != QJsonParseError::NoError || !document.isObject())
+		{
+			error << "Invalid vars JSON.\n";
+			return 2;
+		}
 		variables = document.object();
 	}
 	bool validSeed = true;
 	const int seed = args.contains("--seed") ? option("--seed").toInt(&validSeed) : script.value("seed").toInt();
-	if (!validSeed) { error << "seed must be a 32-bit integer.\n"; return 2; }
+	if (!validSeed)
+	{
+		error << "seed must be a 32-bit integer.\n";
+		return 2;
+	}
 	lmms::Engine::init(true);
 	const auto result = ScriptRunner::run(script, variables, seed, args.contains("--dry-run"));
 	output << QJsonDocument(result.toJson()).toJson(QJsonDocument::Indented);
@@ -97,7 +126,8 @@ int main(int argc, char** argv)
 	const auto task = result.data.value("lastResult").toObject().value("task").toString();
 	if (ok && !task.isEmpty() && !args.contains("--dry-run"))
 	{
-		QElapsedTimer timeout; timeout.start();
+		QElapsedTimer timeout;
+		timeout.start();
 		for (;;)
 		{
 			QCoreApplication::processEvents();
@@ -106,12 +136,15 @@ int main(int argc, char** argv)
 			if (!status.ok || state == "completed" || state == "failed" || state == "cancelled")
 			{
 				output << QJsonDocument(status.toJson()).toJson(QJsonDocument::Indented);
-				ok = status.ok && state == "completed"; break;
+				ok = status.ok && state == "completed";
+				break;
 			}
 			if (timeout.elapsed() >= 60000)
 			{
 				CommandBus::instance().execute("export.cancel", {{"task", task}});
-				error << "Export timed out.\n"; ok = false; break;
+				error << "Export timed out.\n";
+				ok = false;
+				break;
 			}
 			QThread::msleep(10);
 		}

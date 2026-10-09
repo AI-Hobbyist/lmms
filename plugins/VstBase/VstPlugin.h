@@ -44,7 +44,9 @@ namespace lmms
 {
 
 class FloatModel;
-namespace vsthost { struct CatalogEntry; }
+namespace vsthost {
+struct CatalogEntry;
+}
 
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
@@ -52,7 +54,7 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 	Q_OBJECT
 public:
 	VstPlugin(const QString& plugin, std::uint32_t shellId = 0, const QString& embedMethod = {},
-			const vsthost::CatalogEntry* selection = nullptr);
+		const vsthost::CatalogEntry* selection = nullptr);
 	bool failed() const;
 	bool isRunning();
 	bool process(const SampleFrame* input, SampleFrame* output);
@@ -61,7 +63,11 @@ public:
 	void processMidiEvent(const MidiEvent& event, f_cnt_t offset);
 	int isUIVisible();
 	std::uint32_t shellId() const noexcept { return m_shellId; }
-	struct ScanEntry { std::uint32_t id; QString name; };
+	struct ScanEntry
+	{
+		std::uint32_t id;
+		QString name;
+	};
 	struct ScanResult
 	{
 		QString error;

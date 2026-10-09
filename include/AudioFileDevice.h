@@ -49,9 +49,13 @@ public:
 
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 		bool hasWriteError() const { return m_writeFailed || m_outputFile.error() != QFileDevice::NoError; }
-		virtual void finalize() {}
-			// Called only after encoding has stopped and been finalized.
-			void discardOutput() { m_outputFile.close(); m_outputFile.remove(); }
+	virtual void finalize() {}
+	// Called only after encoding has stopped and been finalized.
+	void discardOutput()
+	{
+		m_outputFile.close();
+		m_outputFile.remove();
+	}
 
 	//! Write `size` sample frames from `buf` into the output file.
 	virtual void writeBuffer(const SampleFrame* buf, const f_cnt_t frames) = 0;

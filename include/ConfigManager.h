@@ -39,7 +39,9 @@
 namespace lmms
 {
 
-namespace vsthost { struct ScanRoot; }
+namespace vsthost {
+struct ScanRoot;
+}
 
 
 const QString PROJECTS_PATH = "projects/";

@@ -564,8 +564,8 @@ void Fader::paintEvent(QPaintEvent* ev)
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(palette().mid().color());
 		painter.setBrush(palette().base());
-		painter.drawRoundedRect(QRectF(width() / 2.0 - 1, m_knobSize.height() / 2.0, 2,
-			height() - m_knobSize.height()), 1, 1);
+		painter.drawRoundedRect(
+			QRectF(width() / 2.0 - 1, m_knobSize.height() / 2.0, 2, height() - m_knobSize.height()), 1, 1);
 		const QRectF cap((width() - m_knobSize.width()) / 2.0 + .5,
 			calculateKnobPosYFromModel() - m_knobSize.height() + .5, m_knobSize.width() - 1, m_knobSize.height() - 1);
 		painter.setPen(hasFocus() ? palette().brightText().color() : palette().mid().color());
@@ -574,7 +574,11 @@ void Fader::paintEvent(QPaintEvent* ev)
 		painter.setPen(palette().base().color());
 		painter.drawLine(QPointF(cap.left() + 3, cap.center().y()), QPointF(cap.right() - 3, cap.center().y()));
 	}
-	else { painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob); }
+	else
+	{
+		painter.drawPixmap(
+			(width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob);
+	}
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
@@ -668,11 +672,19 @@ void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 				const int warningY = valuesToWindowCoordinates.map(mapper(dbfsToAmp(-6)));
 				const int clipY = valuesToWindowCoordinates.map(mappedUnity);
 				const auto level = computeLevelRect(meter, peak);
-				painter.fillRect(level.intersected(QRect(meter.x(), meter.y(), meter.width(), warningY - meter.y())), m_peakWarn);
-				painter.fillRect(level.intersected(QRect(meter.x(), meter.y(), meter.width(), clipY - meter.y())), m_peakClip);
+				painter.fillRect(
+					level.intersected(QRect(meter.x(), meter.y(), meter.width(), warningY - meter.y())), m_peakWarn);
+				painter.fillRect(
+					level.intersected(QRect(meter.x(), meter.y(), meter.width(), clipY - meter.y())), m_peakClip);
 			}
-			if (persistent > mappedMinPeak) { painter.fillRect(computePeakRect(meter, persistent), palette().text()); }
-			if (getRenderUnityLine()) { painter.fillRect(computeLevelMarkerRect(meter, mappedUnity), m_unityMarker); }
+			if (persistent > mappedMinPeak)
+			{
+				painter.fillRect(computePeakRect(meter, persistent), palette().text());
+			}
+			if (getRenderUnityLine())
+			{
+				painter.fillRect(computeLevelMarkerRect(meter, mappedUnity), m_unityMarker);
+			}
 		}
 		painter.restore();
 		return;

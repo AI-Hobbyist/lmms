@@ -94,7 +94,11 @@ AudioFileOgg::~AudioFileOgg()
 
 void AudioFileOgg::finalize()
 {
-	if (m_initialized && !m_finalized) { writeBuffer(nullptr, 0); m_finalized = true; }
+	if (m_initialized && !m_finalized)
+	{
+		writeBuffer(nullptr, 0);
+		m_finalized = true;
+	}
 }
 
 void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)

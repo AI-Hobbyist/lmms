@@ -60,8 +60,8 @@ public:
 		AudioSettings,
 		MidiSettings,
 			PathsSettings,
-			VstSettings,
-			SvsSettings
+		VstSettings,
+		SvsSettings
 	};
 
 	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);

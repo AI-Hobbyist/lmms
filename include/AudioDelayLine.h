@@ -6,12 +6,11 @@
 #include <span>
 #include <vector>
 
-namespace lmms
-{
+namespace lmms {
 // One audio owner. Reserve storage while processing is quiescent; changing
 // delay at a block boundary clears old history. An unsupported delay is rejected
 // rather than silently truncated. Frame{} must represent silence.
-template<class Frame> class AudioDelayLine
+template <class Frame> class AudioDelayLine
 {
 public:
 	void prepare(std::size_t maximumDelay)
@@ -23,7 +22,10 @@ public:
 	}
 	bool setDelay(std::size_t frames) noexcept
 	{
-		if (frames > m_history.size()) { return false; }
+		if (frames > m_history.size())
+		{
+			return false;
+		}
 		if (frames != m_delay)
 		{
 			m_delay = frames;
@@ -49,7 +51,10 @@ public:
 		}
 		if (!m_delay)
 		{
-			if (input.data() != output.data()) { std::copy(input.begin(), input.end(), output.begin()); }
+			if (input.data() != output.data())
+			{
+				std::copy(input.begin(), input.end(), output.begin());
+			}
 			return true;
 		}
 		for (std::size_t frame = 0; frame < input.size(); ++frame)
@@ -57,10 +62,14 @@ public:
 			const auto incoming = input[frame];
 			output[frame] = m_history[m_position];
 			m_history[m_position] = incoming;
-			if (++m_position == m_delay) { m_position = 0; }
+			if (++m_position == m_delay)
+			{
+				m_position = 0;
+			}
 		}
 		return true;
 	}
+
 private:
 	std::vector<Frame> m_history;
 	std::size_t m_delay = 0;

@@ -57,9 +57,14 @@ public:
 	RemotePluginClient( const char * socketPath );
 #endif
 	~RemotePluginClient() override;
-	explicit RemotePluginClient(std::unique_ptr<MessageTransport> transport) :
-		RemotePluginBase(std::move(transport)), m_inputCount(0), m_outputCount(0),
-		m_sampleRate(44100), m_bufferSize(512) { }
+	explicit RemotePluginClient(std::unique_ptr<MessageTransport> transport)
+		: RemotePluginBase(std::move(transport))
+		, m_inputCount(0)
+		, m_outputCount(0)
+		, m_sampleRate(44100)
+		, m_bufferSize(512)
+	{
+	}
 
 	const VstSyncData* getVstSyncData();
 
@@ -240,7 +245,10 @@ RemotePluginClient::~RemotePluginClient()
 
 const VstSyncData* RemotePluginClient::getVstSyncData()
 {
-	if (m_vstSyncData) { return m_vstSyncData.get(); }
+	if (m_vstSyncData)
+	{
+		return m_vstSyncData.get();
+	}
 	m_fallbackSync.sampleRate = m_sampleRate;
 	m_fallbackSync.bufferSize = m_bufferSize;
 	m_fallbackSync.bpm = 120;

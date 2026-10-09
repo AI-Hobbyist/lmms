@@ -5,27 +5,28 @@
 #include <optional>
 
 namespace lmms::svs {
-class Curve {
+class Curve
+{
 public:
- QString id, unit, scope="clip", type="float", mode, interpolation="linear";
- svs_sdk::Curve evaluator;
- QJsonObject extra;
- std::optional<QJsonValue> valueAt(double tick) const;
- double derivativeAt(double tick) const;
- void insert(double tick,const QJsonValue& value);
- void erase(double start,double end);
- void connect(double start,double end);
- void pinTangents();
- void replaceRange(double start,double end,const Curve& localSource);
- Curve slice(double start,double end) const;
- QJsonObject toJson() const;
- static bool fromJson(const QJsonObject&,Curve&,QString& error,const Parameter* descriptor=nullptr);
- bool operator==(const Curve& other) const { return toJson()==other.toJson(); }
+	QString id, unit, scope = "clip", type = "float", mode, interpolation = "linear";
+	svs_sdk::Curve evaluator;
+	QJsonObject extra;
+	std::optional<QJsonValue> valueAt(double tick) const;
+	double derivativeAt(double tick) const;
+	void insert(double tick, const QJsonValue& value);
+	void erase(double start, double end);
+	void connect(double start, double end);
+	void pinTangents();
+	void replaceRange(double start, double end, const Curve& localSource);
+	Curve slice(double start, double end) const;
+	QJsonObject toJson() const;
+	static bool fromJson(const QJsonObject&, Curve&, QString& error, const Parameter* descriptor = nullptr);
+	bool operator==(const Curve& other) const { return toJson() == other.toJson(); }
 };
-Curve withParameterBase(const Curve&,const Parameter&,const QJsonValue& base);
-using Curves=QMap<QString,Curve>;
+Curve withParameterBase(const Curve&, const Parameter&, const QJsonValue& base);
+using Curves = QMap<QString, Curve>;
 QJsonObject curvesToJson(const Curves&);
-Curves curvesFromJson(const QJsonObject&,QStringList* diagnostics=nullptr);
- bool absolutePitchToOffset(const Curve& absolute,const Curve& reference,Curve& output,QString& error);
+Curves curvesFromJson(const QJsonObject&, QStringList* diagnostics = nullptr);
+bool absolutePitchToOffset(const Curve& absolute, const Curve& reference, Curve& output, QString& error);
 }
 #endif
