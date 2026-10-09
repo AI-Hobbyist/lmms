@@ -10,6 +10,7 @@
 #include <QTreeWidget>
 #include <QtEndian>
 #include <QtTest>
+#include <cmath>
 
 #include "AudioDummy.h"
 #include "ConfigManager.h"
@@ -299,12 +300,44 @@ private slots:
 			const auto* root = tree->topLevelItem(0);
 			QVERIFY(root);
 			QCOMPARE(root->child(0)->child(0)->childCount(), 0); // Single speaker has no redundant level.
-			QCOMPARE(root->child(1)->child(0)->childCount(), 2);
+			const QTreeWidgetItem* fixture = nullptr;
+			for (int index = 0; index < root->childCount(); ++index)
+			{
+				if (root->child(index)->text(0) == profile.name) { fixture = root->child(index); }
+			}
+			QVERIFY(fixture);
+			QCOMPARE(fixture->child(0)->childCount(), 2);
 			QTest::qWait(250);
 			const auto screenshot = window.screen()->grabWindow(window.winId());
 			QVERIFY(!screenshot.isNull());
 			QVERIFY(screenshot.save(
 				"build/tests/svc/SVC-M3-controls-native" + qEnvironmentVariable("LMMS_SVC_DPI_SUFFIX") + ".png"));
+			auto metadata = profile.capabilities.value("models").toArray().first().toObject();
+			metadata.insert("require_weight_selection", true);
+			metadata.insert("weights",
+				QJsonArray{
+					QJsonObject{{"id", "w1"}, {"name", "权重甲"}, {"supports_f0", false}, {"index_rate_enabled", false},
+						{"speakers", QJsonArray{QJsonObject{{"id", "0"}, {"name", "说话人 0"}}}}},
+					QJsonObject{{"id", "w2"}, {"name", "权重乙"}, {"supports_f0", true}, {"index_rate_enabled", true},
+						{"speakers", metadata.value("speakers")}}});
+			profile.capabilities.insert("models", QJsonArray{metadata});
+			QVERIFY(svc::Catalog::instance().install(profile).isEmpty());
+			weights->setCurrentIndex(0);
+			QCOMPARE(speakers->count(), 1);
+			QVERIFY(!speakers->isVisible());
+			QVERIFY(!svc::selectionContext(track->selection(), metadata).value("supports_f0").toBool());
+			weights->setCurrentIndex(1);
+			QCOMPARE(speakers->count(), 2);
+			QVERIFY(speakers->isVisible());
+			QVERIFY(svc::selectionContext(track->selection(), metadata).value("supports_f0").toBool());
+			QVERIFY(track->setSelection({{"engine_id", "fixture"}, {"model_id", "multi"}, {"speaker_id", "0"}}));
+			QVERIFY(svc::Catalog::instance().install(profile).isEmpty());
+			QVERIFY(weights->currentData().toString().isEmpty());
+			svc::Catalog::instance().requestSelection(track->selection(), error);
+			QVERIFY(!error.isEmpty());
+			weights->setCurrentIndex(weights->findData("w2"));
+			svc::Catalog::instance().requestSelection(track->selection(), error);
+			QVERIFY(error.isEmpty());
 			window.close();
 		}
 		QVERIFY(svc::setChunkDefaults({-65, 24, 8}).isEmpty());
@@ -375,6 +408,76 @@ private slots:
 		}
 		delete track;
 		QTest::qWait(30);
+	}
+
+	void rvcLiveHost()
+	{
+		if (!qEnvironmentVariableIsSet("LMMS_SVC_LIVE")) { QSKIP("Set LMMS_SVC_LIVE for the local RVC host test"); }
+		auto& catalog = svc::Catalog::instance();
+		QVERIFY2(!catalog.engine("RVC").id.isEmpty(), "RVC module must be deployed beside development LMMS");
+		QVERIFY(catalog.setConnection("RVC", {"http://127.0.0.1:8000", "", false}).isEmpty());
+		QTRY_VERIFY_WITH_TIMEOUT(catalog.engine("RVC").api != nullptr, 15000);
+		const auto profile = catalog.engine("RVC");
+		QJsonObject model;
+		for (const auto& value : profile.capabilities.value("models").toArray())
+		{
+			if (value.toObject().value("id") == "芙宁娜") { model = value.toObject(); }
+		}
+		QVERIFY(!model.isEmpty());
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		track->setName(QString::fromUtf8("RVC 芙宁娜 · 实际 API"));
+		auto data = wave(16000, 64000, 0);
+		for (uint32_t i = 0; i < 64000; ++i)
+		{
+			qToLittleEndian<int16_t>(
+				int16_t(6000 * std::sin(i * 6.28318530718 * 220 / 16000)), data.data() + 44 + i * 2);
+		}
+		const auto path = m_working.filePath("rvc-live.wav");
+		QFile input(path);
+		QVERIFY(input.open(QIODevice::WriteOnly));
+		QCOMPARE(input.write(data), data.size());
+		input.close();
+		auto* clip = static_cast<SVCClip*>(track->createClip(0));
+		QVERIFY(clip->setSourceFile(path));
+		QVERIFY(track->setSelection({{"engine_id", "RVC"}, {"model_id", "芙宁娜"},
+			{"weight_id", model.value("weights").toArray().first().toObject().value("id")}, {"speaker_id", "0"},
+			{"parameters", QJsonObject{{"index_mode", "off"}, {"chunk_seconds", 1}, {"f0_method", "rmvpe"}}}}));
+		bool progressive = false;
+		connect(clip, &SVCClip::dataChanged, this, [&] {
+			if (!clip->playback()->snapshot()->rendered.empty() && !clip->playback()->finished())
+			{
+				progressive = true;
+				Engine::audioEngine()->renderNextPeriod();
+			}
+		});
+		{
+			gui::SVCWindow window(track, m_gui->mainWindow());
+			window.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&window));
+			auto* pitch = window.findChild<QWidget*>("svcParameter_pitch_shift")->findChild<gui::Knob*>();
+			QVERIFY(pitch);
+			QCOMPARE(pitch->model()->minValue(), -24.f);
+			QCOMPARE(pitch->model()->maxValue(), 24.f);
+			QTest::mouseClick(window.findChild<QPushButton*>("svcReRender"), Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete() || clip->conversionFailed(), 120000);
+			QVERIFY2(clip->conversionComplete(), qPrintable(clip->status()));
+			QVERIFY(progressive);
+			QVERIFY(clip->playback()->finished());
+			QDomDocument saved;
+			auto root = saved.createElement("clip");
+			clip->saveState(saved, root);
+			auto* copy = static_cast<SVCClip*>(track->createClip(0));
+			copy->restoreState(root.firstChildElement());
+			QVERIFY(copy->conversionComplete());
+			QCOMPARE(
+				copy->playback()->snapshot()->trackSample(1000, 0), clip->playback()->snapshot()->trackSample(1000, 0));
+			delete copy;
+			QTest::qWait(300);
+			QVERIFY(window.screen()->grabWindow(window.winId()).save("build/tests/svc/SVC-M4-RVC-native.png"));
+			window.close();
+		}
+		delete track;
+		QTest::qWait(50);
 	}
 
 	void cleanupTestCase()

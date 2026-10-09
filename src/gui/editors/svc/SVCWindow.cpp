@@ -7,15 +7,18 @@
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QSignalBlocker>
 #include <QSlider>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -24,6 +27,7 @@
 #include "SVCCatalog.h"
 #include "SVCClip.h"
 #include "SVCConversion.h"
+#include "SVCSettingsPage.h"
 #include "SVCTrack.h"
 #include "Song.h"
 #include "embed.h"
@@ -115,9 +119,13 @@ private:
 	double m_position = 0, m_gainA = 0, m_gainB = 0, m_fade = 0;
 };
 
-void choices(QComboBox* combo, const QJsonArray& entries, const QString& selected)
+void choices(QComboBox* combo, const QJsonArray& entries, const QString& selected, bool explicitChoice = false)
 {
 	combo->clear();
+	if (explicitChoice && selected.isEmpty() && entries.size() > 1)
+	{
+		combo->addItem(QObject::tr("Select a weight"), QString{});
+	}
 	for (const auto& entry : entries)
 	{
 		const auto option = entry.toObject();
@@ -259,6 +267,21 @@ SVCWindow::SVCWindow(SVCTrack* track, QWidget* parent)
 	buttons->addWidget(import);
 	buttons->addWidget(render);
 	buttons->addWidget(cancel);
+	auto* connection = new QPushButton(tr("SVC settings"), this);
+	buttons->addWidget(connection);
+	connect(connection, &QPushButton::clicked, this, [this] {
+		QDialog dialog(this);
+		dialog.setWindowTitle(tr("SVC settings"));
+		auto* layout = new QVBoxLayout(&dialog);
+		auto* settings = new SVCSettingsPage(&dialog);
+		layout->addWidget(settings);
+		auto* save = new QPushButton(tr("Save"), &dialog);
+		layout->addWidget(save);
+		connect(save, &QPushButton::clicked, &dialog, [&] {
+			if (settings->save()) { dialog.accept(); }
+		});
+		dialog.exec();
+	});
 	layout->addLayout(buttons);
 	connect(import, &QPushButton::clicked, this, &SVCWindow::importAudio);
 	connect(render, &QPushButton::clicked, this, [this] {
@@ -399,7 +422,14 @@ SVCWindow::SVCWindow(SVCTrack* track, QWidget* parent)
 		m_track->setSelection(selection);
 		refreshChoices();
 	});
-	for (auto* combo : {m_weights, m_speakers})
+	connect(m_weights, &QComboBox::currentIndexChanged, this, [this] {
+		if (!m_updating)
+		{
+			saveSelection();
+			refreshChoices();
+		}
+	});
+	for (auto* combo : {m_speakers})
 	{
 		connect(combo, &QComboBox::currentIndexChanged, this, [this] {
 			if (!m_updating)
@@ -486,7 +516,9 @@ void SVCWindow::refreshEngines()
 	}
 	choices(m_engines, engines, m_track->selection().value("engine_id").toString());
 	m_updating = false;
-	saveSelection();
+	auto selection = m_track->selection();
+	selection.insert("engine_id", m_engines->currentData().toString());
+	m_track->setSelection(selection);
 	refreshModels();
 }
 void SVCWindow::refreshModels()
@@ -496,15 +528,21 @@ void SVCWindow::refreshModels()
 		svc::Catalog::instance().engine(m_engines->currentData().toString()).capabilities.value("models").toArray(),
 		m_track->selection().value("model_id").toString());
 	m_updating = false;
-	saveSelection();
+	auto selection = m_track->selection();
+	if (m_models->currentIndex() >= 0) { selection.insert("model_id", m_models->currentData().toString()); }
+	m_track->setSelection(selection);
 	refreshChoices();
 }
 void SVCWindow::refreshChoices()
 {
 	m_updating = true;
 	const auto model = selectedModel(m_track);
-	choices(m_weights, model.value("weights").toArray(), m_track->selection().value("weight_id").toString());
-	choices(m_speakers, model.value("speakers").toArray(), m_track->selection().value("speaker_id").toString());
+	choices(m_weights, model.value("weights").toArray(), m_track->selection().value("weight_id").toString(),
+		model.value("require_weight_selection").toBool());
+	auto selection = m_track->selection();
+	selection.insert("weight_id", m_weights->currentData().toString());
+	choices(m_speakers, svc::selectionContext(selection, model).value("speakers").toArray(),
+		selection.value("speaker_id").toString());
 	auto* form = qobject_cast<QFormLayout*>(m_weights->parentWidget()->layout()->itemAt(0)->layout());
 	if (form)
 	{
@@ -533,11 +571,16 @@ void SVCWindow::refreshParameters()
 	auto* form = new QFormLayout(m_parameterBody);
 	m_parameters = m_track->selection().value("parameters").toObject();
 	const auto profile = svc::Catalog::instance().engine(m_engines->currentData().toString());
-	for (const auto& entry : profile.capabilities.value("parameters").toArray())
+	const auto context = svc::selectionContext(m_track->selection(), selectedModel(m_track));
+	for (const auto& entry : svc::parameterDefinitions(profile, selectedModel(m_track)))
 	{
 		const auto parameter = entry.toObject();
 		const auto id = parameter.value("id").toString();
-		if (!m_parameters.contains(id)) { m_parameters.insert(id, parameter.value("default")); }
+		if (!m_parameters.contains(id))
+		{
+			const auto dependent = context.value(parameter.value("default_from").toString());
+			m_parameters.insert(id, dependent.isUndefined() ? parameter.value("default") : dependent);
+		}
 		auto* row = new QWidget(m_parameterBody);
 		row->setObjectName("svcParameter_" + id);
 		row->setProperty("capability", parameter);
@@ -558,10 +601,51 @@ void SVCWindow::refreshParameters()
 		{
 			if (!parameter.contains("minimum") || !parameter.contains("maximum"))
 			{
-				body->addWidget(new QLabel(
-					tr("%1 %2 — numeric range metadata unavailable")
-						.arg(m_parameters.value(id).toVariant().toString(), parameter.value("unit").toString()),
-					row));
+				const auto extent = [](double value) {
+					return std::min(std::max(24., std::abs(value)), double(std::numeric_limits<float>::max()) * .25);
+				};
+				const auto initial = m_parameters.value(id).toDouble();
+				auto model = std::make_unique<FloatModel>(std::clamp(initial, -extent(initial), extent(initial)),
+					-extent(initial), extent(initial), parameter.value("step").toDouble(1), nullptr,
+					parameter.value("name").toString());
+				auto* knob = new Knob(KnobType::Small17, {}, row, Knob::LabelRendering::WidgetFont);
+				knob->setModel(model.get());
+				knob->setUnit(parameter.value("unit").toString());
+				body->addWidget(knob);
+				auto* edit = new QLineEdit(m_parameters.value(id).toVariant().toString(), row);
+				edit->setObjectName("svcUnboundedValue_" + id);
+				body->addWidget(edit);
+				auto* help
+					= new QLabel(tr("%1 — backend range unavailable; enter a value to extend the knob display range")
+									 .arg(parameter.value("unit").toString()),
+						row);
+				help->setWordWrap(true);
+				body->addWidget(help);
+				connect(model.get(), &FloatModel::dataChanged, this, [this, edit, id, model = model.get()] {
+					m_parameters.insert(id, model->value());
+					edit->setText(QString::number(model->value(), 'g', 7));
+					saveSelection();
+				});
+				connect(
+					edit, &QLineEdit::editingFinished, this, [this, edit, id, parameter, extent, model = model.get()] {
+						bool valid;
+						const auto value = edit->text().toDouble(&valid);
+						if (valid && std::isfinite(value)
+							&& (parameter.value("type") != "integer" || value == std::floor(value)))
+						{
+							QSignalBlocker blocked(model);
+							model->setRange(-extent(value), extent(value), parameter.value("step").toDouble(1));
+							model->setValue(std::clamp(value, -extent(value), extent(value)));
+							m_parameters.insert(id, value);
+							saveSelection();
+						}
+						else
+						{
+							edit->setText(m_parameters.value(id).toVariant().toString());
+							edit->setToolTip(tr("Enter a finite value of the declared numeric type"));
+						}
+					});
+				m_parametersOwned.push_back(std::move(model));
 				form->addRow(parameter.value("name").toString(), row);
 				continue;
 			}
@@ -605,6 +689,19 @@ void SVCWindow::refreshParameterAvailability()
 		row->setEnabled(metadata.value("available").toBool(true)
 			&& svc::conditionsMatch(metadata.value("enabled_when").toObject(), context));
 		row->setToolTip(metadata.value("reason").toString(tr("Unavailable for the selected model or parameters")));
+		if (metadata.value("type") == "enum")
+		{
+			auto* combo = row->findChild<QComboBox*>();
+			const auto options = metadata.value("options").toArray();
+			for (int index = 0; combo && index < options.size(); ++index)
+			{
+				const auto option = options[index].toObject();
+				auto* item = static_cast<QStandardItemModel*>(combo->model())->item(index);
+				item->setEnabled(option.value("available").toBool()
+					&& svc::conditionsMatch(option.value("enabled_when").toObject(), context));
+				item->setToolTip(option.value("reason").toString(tr("Unavailable for the selected weight")));
+			}
+		}
 	}
 }
 void SVCWindow::refreshStatus()

@@ -74,6 +74,9 @@ SVCTrack::SVCTrack(TrackContainer* container)
 	m_pan.setCenterValue(DefaultPanning);
 	connect(&m_mix, &IntModel::dataChanged, this, [this]() { m_bus.setNextMixerChannel(m_mix.value()); });
 	connect(this, &SVCTrack::renderRequested, this, [this] { svc::ConversionService::instance().render(this); });
+	connect(&svc::Catalog::instance(), &svc::Catalog::connectionChanged, this, [this](const QString& id) {
+		if (m_selection.value("engine_id") == id) { svc::ConversionService::instance().cancel(this); }
+	});
 }
 
 SVCTrack::~SVCTrack()

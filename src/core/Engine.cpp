@@ -36,6 +36,7 @@
 #include "Song.h"
 #include "SVSSynthesisScheduler.h"
 #include "SVCConversion.h"
+#include "SVCCatalog.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 #ifdef LMMS_BUILD_WIN32
@@ -183,6 +184,7 @@ void Engine::destroy()
 	s_audioEngine->stopProcessing();
 	svs::SynthesisScheduler::instance().shutdown();
 	svc::ConversionService::instance().shutdown();
+	svc::Catalog::instance().shutdown();
 
 	PresetPreviewPlayHandle::cleanup();
 

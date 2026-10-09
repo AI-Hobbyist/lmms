@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <array>
 
@@ -71,6 +72,18 @@ SVCSettingsPage::SVCSettingsPage(QWidget* parent)
 		form->addRow(tr("Bearer token (optional)"), entry.token);
 		form->addRow(entry.remember);
 		form->addRow(entry.status);
+		if (!builtin)
+		{
+			auto* refresh = new QPushButton(tr("Test connection / refresh"), group);
+			form->addRow(refresh);
+			connect(refresh, &QPushButton::clicked, this, [entry] {
+				entry.status->setText(svc::Catalog::instance().setConnection(
+					entry.id, {entry.address->text(), entry.token->text(), entry.remember->isChecked()}));
+			});
+			const auto update = [entry] { entry.status->setText(svc::Catalog::instance().status(entry.id)); };
+			connect(&svc::Catalog::instance(), &svc::Catalog::changed, this, update);
+			update();
+		}
 		layout->addWidget(group);
 		m_entries.push_back(entry);
 	}

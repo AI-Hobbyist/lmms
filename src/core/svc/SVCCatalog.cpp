@@ -8,11 +8,15 @@
 
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QLibrary>
 #include <QRegularExpression>
+#include <QTimer>
+#include <QUrl>
 #include <algorithm>
 #include <cmath>
 
 #include "ConfigManager.h"
+#include "PluginFactory.h"
 
 namespace lmms::svc {
 ChunkConfig chunkDefaults()
@@ -38,7 +42,11 @@ bool conditionsMatch(const QJsonObject& conditions, const QJsonObject& values)
 {
 	for (auto it = conditions.begin(); it != conditions.end(); ++it)
 	{
-		if (values.value(it.key()) != it.value()) { return false; }
+		if (it.value().isArray() ? !it.value().toArray().contains(values.value(it.key()))
+								 : values.value(it.key()) != it.value())
+		{
+			return false;
+		}
 	}
 	return true;
 }
@@ -46,6 +54,15 @@ bool conditionsMatch(const QJsonObject& conditions, const QJsonObject& values)
 QJsonObject selectionContext(const QJsonObject& selection, const QJsonObject& model)
 {
 	auto context = model;
+	for (const auto& entry : model.value("weights").toArray())
+	{
+		const auto weight = entry.toObject();
+		if (weight.value("id") != selection.value("weight_id")) { continue; }
+		for (auto it = weight.begin(); it != weight.end(); ++it)
+		{
+			context.insert(it.key(), it.value());
+		}
+	}
 	for (auto it = selection.begin(); it != selection.end(); ++it)
 	{
 		context.insert(it.key(), it.value());
@@ -56,6 +73,12 @@ QJsonObject selectionContext(const QJsonObject& selection, const QJsonObject& mo
 		context.insert(it.key(), it.value());
 	}
 	return context;
+}
+
+QJsonArray parameterDefinitions(const EngineProfile& profile, const QJsonObject& model)
+{
+	return model.contains("parameters") ? model.value("parameters").toArray()
+										: profile.capabilities.value("parameters").toArray();
 }
 
 Catalog::Catalog()
@@ -70,6 +93,107 @@ Catalog::Catalog()
 	reference.inputRate = 16000;
 	reference.inputIsPcm = true;
 	install(std::move(reference));
+	for (const auto& info : getPluginFactory()->pluginInfos())
+	{
+		if (info.descriptor->type != Plugin::Type::SVC) { continue; }
+		const auto entry = reinterpret_cast<svc_plugin_entry>(info.library->resolve("svc_plugin_entry_v1"));
+		const auto* plugin = entry ? entry(SVC_ABI_VERSION) : nullptr;
+		if (!plugin || plugin->size < sizeof(svc_plugin) || !plugin->engine || !plugin->create_context
+			|| !plugin->destroy_context || !plugin->error || !plugin->engine->capabilities)
+		{
+			continue;
+		}
+		EngineProfile profile;
+		profile.id = QString::fromUtf8(plugin->engine->engine_id);
+		profile.name = QString::fromUtf8(plugin->name);
+		profile.defaultAddress = QString::fromUtf8(plugin->default_address);
+		profile.capabilities
+			= {{"schema_version", 1}, {"engine_id", profile.id}, {"models", QJsonArray{}}, {"parameters", QJsonArray{}},
+				{"limits", QJsonObject{{"min_seconds", 1}, {"max_seconds", 1}, {"max_upload_bytes", 1}}}};
+		if (!install(profile).isEmpty()) { continue; }
+		m_modules.insert(profile.id, {plugin, info.library});
+		m_status.insert(profile.id, tr("Not connected"));
+		QTimer::singleShot(0, this, [this, id = profile.id] { refresh(id); });
+	}
+}
+
+Catalog::~Catalog()
+{ shutdown(); }
+void Catalog::shutdown()
+{
+	{
+		std::lock_guard lock(m_mutex);
+		m_stopping = true;
+		m_discoveries.clear();
+	}
+	m_wake.notify_all();
+	if (m_worker.joinable()) { m_worker.join(); }
+}
+void Catalog::refresh(const QString& id)
+{
+	if (!m_modules.contains(id)) { return; }
+	const auto frozen = connection(id);
+	const auto version = ++m_versions[id];
+	auto offline = engine(id);
+	offline.api = nullptr;
+	offline.context.reset();
+	install(std::move(offline));
+	m_status.insert(id, tr("Discovering backend capabilities"));
+	emit changed();
+	std::lock_guard lock(m_mutex);
+	if (m_stopping) { return; }
+	m_discoveries.erase(
+		std::remove_if(m_discoveries.begin(), m_discoveries.end(), [&](const auto& d) { return d.id == id; }),
+		m_discoveries.end());
+	m_discoveries.push_back({id, frozen, version, m_modules.value(id)});
+	if (!m_worker.joinable())
+	{
+		m_worker = std::thread([this] { discover(); });
+	}
+	m_wake.notify_all();
+}
+void Catalog::discover()
+{
+	for (;;)
+	{
+		Discovery item;
+		{
+			std::unique_lock lock(m_mutex);
+			m_wake.wait(lock, [&] { return m_stopping || !m_discoveries.empty(); });
+			if (m_stopping) { return; }
+			item = m_discoveries.front();
+			m_discoveries.erase(m_discoveries.begin());
+		}
+		const auto address = item.connection.address.toUtf8(), token = item.connection.token.toUtf8();
+		const auto* api = item.module.api;
+		std::shared_ptr<void> context(
+			api->create_context(address.constData(), token.constData()), [api, library = item.module.library](void* p) {
+				if (p) { api->destroy_context(p); }
+			});
+		const auto* json = context ? api->engine->capabilities(context.get()) : nullptr;
+		const auto capabilities = json ? QJsonDocument::fromJson(json).object() : QJsonObject{};
+		auto error = json ? QString{}
+			: context	  ? QString::fromUtf8(api->error(context.get()))
+						  : tr("Cannot create SVC engine context");
+		if (!token.isEmpty()) { error.replace(QString::fromUtf8(token), "[redacted]"); }
+		QMetaObject::invokeMethod(
+			this,
+			[this, item, context, capabilities, error, api] {
+				if (m_stopping || m_versions.value(item.id) != item.version) { return; }
+				QString result = error;
+				if (result.isEmpty())
+				{
+					auto profile = engine(item.id);
+					profile.api = api->engine;
+					profile.context = context;
+					profile.capabilities = capabilities;
+					result = install(std::move(profile));
+				}
+				m_status.insert(item.id, result.isEmpty() ? tr("Connected") : tr("Offline: %1").arg(result));
+				emit changed();
+			},
+			Qt::QueuedConnection);
+	}
 }
 
 Catalog& Catalog::instance()
@@ -140,6 +264,16 @@ Connection Catalog::connection(const QString& id) const
 QString Catalog::setConnection(const QString& id, const Connection& connection)
 {
 	if (engine(id).id.isEmpty()) { return tr("Unknown SVC engine"); }
+	if (!engine(id).defaultAddress.startsWith("builtin:"))
+	{
+		const QUrl url(connection.address.trimmed());
+		if (!url.isValid() || (url.scheme() != "http" && url.scheme() != "https") || url.host().isEmpty()
+			|| !url.userInfo().isEmpty() || url.hasQuery() || url.hasFragment())
+		{
+			return tr("Use an HTTP(S) API address without embedded credentials, query or fragment");
+		}
+	}
+	const auto previous = this->connection(id);
 #ifdef _WIN32
 	const auto target = (QString("LMMS/SVC/") + id).toStdWString();
 	if (connection.remembered && !connection.token.isEmpty())
@@ -162,7 +296,11 @@ QString Catalog::setConnection(const QString& id, const Connection& connection)
 #endif
 	m_sessionTokens.insert(id, connection.token);
 	ConfigManager::inst()->setValue("svcConnections", id + "_address", connection.address.trimmed());
-	emit connectionChanged(id);
+	if (previous.address != connection.address.trimmed() || previous.token != connection.token)
+	{
+		emit connectionChanged(id);
+	}
+	refresh(id);
 	return {};
 }
 
@@ -181,9 +319,9 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 		return {};
 	}
 	auto selection = saved;
-	for (const auto& pair : {std::pair{"speaker_id", "speakers"}, std::pair{"weight_id", "weights"}})
+	for (const auto& pair : {std::pair{"weight_id", "weights"}, std::pair{"speaker_id", "speakers"}})
 	{
-		const auto entries = model.value(pair.second).toArray();
+		const auto entries = selectionContext(selection, model).value(pair.second).toArray();
 		if (entries.isEmpty())
 		{
 			selection.remove(pair.first);
@@ -202,8 +340,17 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 		}
 	}
 	QJsonObject parameters;
-	const auto context = selectionContext(selection, model);
-	for (const auto& entry : profile.capabilities.value("parameters").toArray())
+	auto context = selectionContext(selection, model);
+	const auto definitions = parameterDefinitions(profile, model);
+	for (const auto& entry : definitions)
+	{
+		const auto parameter = entry.toObject();
+		const auto id = parameter.value("id").toString();
+		if (context.contains(id)) { continue; }
+		const auto dependent = context.value(parameter.value("default_from").toString());
+		context.insert(id, dependent.isUndefined() ? parameter.value("default") : dependent);
+	}
+	for (const auto& entry : definitions)
 	{
 		const auto parameter = entry.toObject();
 		if (!conditionsMatch(parameter.value("visible_when").toObject(), context)
@@ -214,7 +361,9 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 		}
 		const auto id = parameter.value("id").toString();
 		const auto value = saved.value("parameters").toObject().value(id).isUndefined()
-			? parameter.value("default")
+			? context.value(parameter.value("default_from").toString()).isUndefined()
+				? parameter.value("default")
+				: context.value(parameter.value("default_from").toString())
 			: saved.value("parameters").toObject().value(id);
 		if (parameter.value("type") == "enum")
 		{
@@ -222,7 +371,8 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 			for (const auto& entry : parameter.value("options").toArray())
 			{
 				const auto option = entry.toObject();
-				found |= option.value("id") == value && option.value("available").toBool();
+				found |= option.value("id") == value && option.value("available").toBool()
+					&& conditionsMatch(option.value("enabled_when").toObject(), context);
 			}
 			if (!found)
 			{
@@ -239,6 +389,13 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 			return {};
 		}
 		parameters.insert(id, value);
+		const auto excluded = parameter.value("excluded_range").toArray();
+		if (excluded.size() == 2 && value.toDouble() >= excluded[0].toDouble()
+			&& value.toDouble() <= excluded[1].toDouble())
+		{
+			error = tr("Invalid special-value range: %1").arg(parameter.value("name").toString());
+			return {};
+		}
 	}
 	selection.insert("parameters", parameters);
 	return selection;

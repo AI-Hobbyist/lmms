@@ -1,6 +1,6 @@
 # LMMS SVC API 支持计划书
 
-日期：2026-10-09。状态：M0～M3 已实现并通过自动化验证；M4～M5 待实施。进度见 doc/svc/ImplementationProgress.md。
+日期：2026-10-09。状态：M0～M4 已实现并通过自动化验证；M4 人工人声 A/B 听感为 MANUAL/PENDING；M5 待实施并包含增量替换包。进度见 doc/svc/ImplementationProgress.md。
 
 本计划实现独立的 Singing Voice Conversion（SVC）轨道与插件工作流：导入音频，选择 API 返回的模型与说话人，设置参数，分块转换并立即替换对应区间，显示进度，通过 A/B 波形和独立增益比较原音与转换音。先完成通用 SVC SDK，再接入 RVC。当前交付仅为文档；完成后提交并推送文档。
 
@@ -188,7 +188,7 @@ RMVPE 已有 ONNX 执行路径，但 mel、padding、音高解码仍需核对全
 
 M0～M3 用参考后端完成通用功能，再进入 M4 RVC。每阶段只做表中交付及必要支撑；验收通过即完成，不持续扩大 Definition of Done。每阶段完成后依次更新记录、检查 git status/diff、提交本阶段、推送当前分支并确认成功，再开始下一阶段。非阻塞人工观感验收可记 `MANUAL/PENDING`。
 
-所有编译/测试/打包前先通过 Codex 任务列表检查同工程是否有其他任务运行；有则标记 `PENDING（同工程其他任务运行中）`，按仓库规则只提交并推送本任务改动。实际命令必须在会话内前台 PowerShell PTY 中运行，先 dot-source `./buildtools/Enter-LmmsEnvironment.ps1`，输出完整经 `2>&1 | Tee-Object -FilePath "build.log" -Encoding utf8`，立即保存并检查 `$LASTEXITCODE`，失败阅读日志诊断。
+按用户后续明确要求，编译/测试/打包前不再查询其他任务运行状态，以避免查询的内存开销。实际命令必须在会话内前台 PowerShell PTY 中运行，先 dot-source `./buildtools/Enter-LmmsEnvironment.ps1`，输出完整经 `2>&1 | Tee-Object -FilePath "build.log" -Encoding utf8`，立即保存并检查 `$LASTEXITCODE`，失败阅读日志诊断。
 
 复用现有构建与部署目录；目标为 `build/Release/lmms.exe`，Windows 开发插件及支持库直接输出到 `build/Release/plugins`。禁用插件的旧 DLL 需就地停用并记录，不创建第二套部署目录。
 
@@ -198,5 +198,5 @@ GUI 验证遵循“构建 → 启动真实 Windows Qt 窗口 → 稳定渲染 �
 
 - 已覆盖用户要求及补充的默认值、分块即时替换、进度、独立代码/颜色、主题 SVG、随机哈希同名缓存与全 ONNX 取舍。
 - 已将当前 RVC API 参考标准独立写入 SDK 文档，并附原生可行性研究。
-- M0～M3 已实现并通过自动化验证；M4～M5 待实施。实施记录见 [ImplementationProgress.md](doc/svc/ImplementationProgress.md)。后端仅作参考与 API 测试，不修改。
+- M0～M4 已实现并通过自动化验证；M4 人工人声 A/B 听感为 MANUAL/PENDING；M5 待实施并包含增量替换包。实施记录见 [ImplementationProgress.md](doc/svc/ImplementationProgress.md)。后端仅作参考与 API 测试，不修改。
 - 文档检查包括需求逐项核对、链接/路径核对及 `git diff --check`；提交仅包含本计划及其两份配套文档，其他工作区文件保持原状。

@@ -57,18 +57,23 @@ void SVCBrowser::refresh()
 	for (const auto& engine : svc::Catalog::instance().engines())
 	{
 		auto* branch = new QTreeWidgetItem(root, {engine.name});
+		branch->setToolTip(0, svc::Catalog::instance().status(engine.id));
 		for (const auto& value : engine.capabilities.value("models").toArray())
 		{
 			const auto model = value.toObject();
 			auto* leaf = new QTreeWidgetItem(branch, {model.value("name").toString(model.value("id").toString())});
 			QJsonObject selection{{"engine_id", engine.id}, {"model_id", model.value("id")}};
 			const auto weights = model.value("weights").toArray();
-			if (!weights.isEmpty()) { selection.insert("weight_id", weights.first().toObject().value("id")); }
+			if (!weights.isEmpty() && (weights.size() == 1 || !model.contains("parameters")))
+			{
+				selection.insert("weight_id", weights.first().toObject().value("id"));
+			}
 			const auto speakers = model.value("speakers").toArray();
 			if (speakers.size() <= 1)
 			{
 				if (!speakers.isEmpty()) { selection.insert("speaker_id", speakers.first().toObject().value("id")); }
 				attach(leaf, selection, model);
+				if (!engine.api) { leaf->setDisabled(true); }
 			}
 			else
 			{
@@ -80,6 +85,7 @@ void SVCBrowser::refresh()
 					auto* child
 						= new QTreeWidgetItem(leaf, {speaker.value("name").toString(speaker.value("id").toString())});
 					attach(child, selection, speaker);
+					if (!engine.api) { child->setDisabled(true); }
 				}
 			}
 		}

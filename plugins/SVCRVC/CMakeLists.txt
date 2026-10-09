@@ -1,0 +1,16 @@
+find_package(Qt6 REQUIRED COMPONENTS Network)
+add_library(SVCRVC MODULE Http.cpp RVC.cpp)
+target_link_libraries(SVCRVC PRIVATE svc-sdk Qt6::Core Qt6::Network Qt6::Widgets Qt6::Xml)
+target_compile_features(SVCRVC PRIVATE cxx_std_17)
+target_compile_definitions(SVCRVC PRIVATE SVC_LMMS_MODULE)
+target_include_directories(SVCRVC PRIVATE "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/src")
+set_target_properties(SVCRVC PROPERTIES OUTPUT_NAME svcrvc PREFIX ""
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/plugins"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/plugins")
+install(TARGETS SVCRVC LIBRARY DESTINATION plugins RUNTIME DESTINATION plugins)
+add_executable(SVCRVCTest "${CMAKE_SOURCE_DIR}/tests/svc/SVCRVCTest.cpp")
+target_link_libraries(SVCRVCTest PRIVATE svc-sdk Qt6::Core Qt6::Network)
+target_compile_features(SVCRVCTest PRIVATE cxx_std_17)
+add_dependencies(SVCRVCTest SVCRVC)
+add_test(NAME SVCRVCTest COMMAND SVCRVCTest "$<TARGET_FILE:SVCRVC>")
+set_tests_properties(SVCRVCTest PROPERTIES TIMEOUT 90 LABELS "svc;M4")

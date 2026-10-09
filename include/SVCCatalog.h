@@ -1,13 +1,18 @@
 #pragma once
 
 #include <QHash>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QObject>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include "SVCChunking.h"
 #include "svc.h"
+#include "svc_plugin.h"
 
 namespace lmms::svc {
 struct EngineProfile
@@ -40,6 +45,10 @@ public:
 	Connection connection(const QString& id) const;
 	QString setConnection(const QString& id, const Connection& connection);
 	QJsonObject requestSelection(const QJsonObject& saved, QString& error) const;
+	void refresh(const QString& id);
+	QString status(const QString& id) const { return m_status.value(id); }
+	void shutdown();
+	~Catalog() override;
 
 signals:
 	void changed();
@@ -49,10 +58,32 @@ private:
 	Catalog();
 	std::vector<EngineProfile> m_engines;
 	QHash<QString, QString> m_sessionTokens;
+	struct Module
+	{
+		const svc_plugin* api;
+		std::shared_ptr<void> library;
+	};
+	QHash<QString, Module> m_modules;
+	QHash<QString, QString> m_status;
+	QHash<QString, uint64_t> m_versions;
+	struct Discovery
+	{
+		QString id;
+		Connection connection;
+		uint64_t version;
+		Module module;
+	};
+	std::vector<Discovery> m_discoveries;
+	std::thread m_worker;
+	std::mutex m_mutex;
+	std::condition_variable m_wake;
+	bool m_stopping = false;
+	void discover();
 };
 
 bool conditionsMatch(const QJsonObject& conditions, const QJsonObject& values);
 QJsonObject selectionContext(const QJsonObject& selection, const QJsonObject& model);
+QJsonArray parameterDefinitions(const EngineProfile& profile, const QJsonObject& model);
 ChunkConfig chunkDefaults();
 QString setChunkDefaults(const ChunkConfig& config);
 } // namespace lmms::svc

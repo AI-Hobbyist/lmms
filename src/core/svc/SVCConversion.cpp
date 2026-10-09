@@ -26,6 +26,7 @@ struct ConversionService::Task
 	QJsonObject selection;
 	ChunkConfig config;
 	QString working;
+	QString connectionIdentity;
 	uint64_t generation = 0;
 	std::atomic<unsigned> pending{0};
 };
@@ -112,6 +113,7 @@ void ConversionService::render(SVCTrack* track)
 		task->clip = clip;
 		task->playback = clip->playback();
 		task->engine = Catalog::instance().engine(selection.value("engine_id").toString());
+		task->connectionIdentity = Catalog::instance().connection(task->engine.id).address;
 		task->selection = selection;
 		task->config = track->chunkConfig();
 		task->working = ConfigManager::inst()->workingDir();
@@ -215,6 +217,7 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 			writeInput(
 				prepared, *source, range, task->engine.inputRate ? task->engine.inputRate : source->rate, cancelled);
 			auto snapshot = task->selection;
+			snapshot.insert("connection_identity", task->connectionIdentity);
 			snapshot.insert("segment", mapping(range));
 			snapshot.insert("chunking",
 				QJsonObject{{"silenceThresholdDbfs", task->config.silenceThresholdDbfs},
@@ -232,6 +235,7 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 				std::shared_ptr<Task> task;
 				CachePair* cache;
 				bool invalid = false;
+				QString error;
 			} context{this, task, cache.get()};
 			const auto selection = QJsonDocument(task->selection).toJson(QJsonDocument::Compact);
 			svc_request request{};
@@ -267,12 +271,31 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 						context.service->post(
 							context.task, [metadata](SVCClip* clip) { clip->publishStatus(metadata); });
 					}
+					else if (event->type == SVC_ERROR)
+					{
+						context.error = QString::fromUtf8(reinterpret_cast<const char*>(event->bytes),
+							std::min<size_t>(event->byte_count, SVC_MAX_HEADER));
+					}
 					else if (event->type == SVC_START || event->type == SVC_PROGRESS || event->type == SVC_DONE)
 					{
-						const auto stage = event->type == SVC_DONE
-							? QObject::tr("Audio received; validating completion")
-							: event->type == SVC_START ? QObject::tr("Backend preprocessing")
-													   : QObject::tr("Backend processing");
+						auto stage = event->type == SVC_DONE ? QObject::tr("Audio received; validating completion")
+							: event->type == SVC_START		 ? QObject::tr("Backend preprocessing")
+															 : QObject::tr("Backend processing");
+						if (event->bytes && event->byte_count <= SVC_MAX_HEADER)
+						{
+							const auto progress = QJsonDocument::fromJson(
+								QByteArray(reinterpret_cast<const char*>(event->bytes), event->byte_count))
+													  .object();
+							if (progress.value("stage") == "upload")
+							{
+								stage = QObject::tr("Uploading: %1 bytes")
+											.arg(progress.value("uploaded_bytes").toDouble(), 0, 'f', 0);
+							}
+							else if (progress.value("stage") == "preprocessing")
+							{
+								stage = QObject::tr("Upload complete; backend preprocessing");
+							}
+						}
 						context.service->post(context.task, [stage](SVCClip* clip) { clip->setStatus(stage); });
 					}
 					return 0;
@@ -307,9 +330,14 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 			const QJsonObject reference = terminal == SVC_COMPLETE
 				? QJsonObject{{"engine", task->engine.id}, {"hash", cache->hash()}}
 				: QJsonObject{};
-			post(task, [generation = task->generation, segment, terminal, reference](SVCClip* clip) {
-				clip->finishSegment(generation, segment, terminal, reference, true);
-			});
+			post(task,
+				[generation = task->generation, segment, terminal, reference, error = context.error](SVCClip* clip) {
+					clip->finishSegment(generation, segment, terminal, reference, true);
+					if (!error.isEmpty())
+					{
+						clip->setStatus(QObject::tr("Failed: %1; partial result retained").arg(error));
+					}
+				});
 			if (terminal != SVC_COMPLETE) { break; }
 		}
 		catch (const std::exception& exception)

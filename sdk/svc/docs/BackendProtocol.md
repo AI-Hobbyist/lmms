@@ -6,6 +6,19 @@
 
 本项目以 `D:\AI-Tools\RVC20260718Nvidia50x0\rvc_api` 当前 API 定义为后端参考标准。已核对 README.md、app.py、schemas.py、registry.py、protocol.py 和 client.py；本文件将协议写入 SVC SDK，使实现者不必只依赖机器上的绝对路径。后续实现需固定该参考快照，发生差异时记录版本变更，不悄悄修改契约。
 
+M4 参考快照（2026-10-09，SHA-256）：
+
+| 文件 | 摘要 |
+| --- | --- |
+| app.py | `63f1a31aafcc7972d9c392226676f58897b4572b2db7786c6d7810d146b7fbf0` |
+| schemas.py | `847654cb3213e8ca71ed181a453f747c80bb31dd0e5eb065b2e83011f64dc9f6` |
+| registry.py | `bd21a4b8d3e003ee28f20b49a65e2de6031cf0cc1ffccc3450d86a71515ce81f` |
+| protocol.py | `f58bb0efed61c951dc5380265bc9d0e8f77bef0fdbe6eae6579c12cc86a3a9b2` |
+
+LMMS 的 `SVCRVC` 模块通过 `svc_plugin_entry_v1` 导出通用 SDK 引擎。发现工作线程调用 `/api/v1/init`，将权重对应的说话人、F0 支持和兼容索引转换为声明式能力；宿主不解析 RVC 参数名。转换工作线程使用 HTTP/1.1 chunked 上传原始 WAV 字节，先去除响应的 HTTP transfer chunk framing，再将 multipart 数据按最多 64 KiB 喂给 SDK 解析器。下载、上传及 GUI 通知均有界，所有文件和网络操作位于非实时线程。
+
+本地测试地址为 `http://127.0.0.1:8000`，当前服务声明 `auth_required=false`。空 token 不发送 Authorization。非空 token 只用于当前连接的 Bearer 头；重定向被拒绝，HTTPS 使用系统证书验证。生产环境建议开启 Bearer token 校验，并通过 SVC 设置页及操作系统凭据存储配置，不把凭据写入工程或缓存。
+
 通用 SDK 提供能力发现、输入字节流、输出音频块、进度、终态、取消和错误抽象。RVC profile 采用本文列出的 HTTP 路由与 multipart/mixed 事件。RVC 专有字段不成为所有引擎的固定旋钮；其他引擎通过适配器提供统一描述。本文后半的前端分块/缓存/区间发布是 LMMS 新增宿主契约，不冒充现有 RVC 已实现的功能。
 
 ## 2. 连接与发现
