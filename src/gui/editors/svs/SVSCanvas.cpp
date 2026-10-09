@@ -8,6 +8,7 @@
 #include "Song.h"
 #include "ProjectJournal.h"
 #include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "operations/SVSEditTransaction.h"
 #include "operations/SVSCurveGesture.h"
 #include "operations/SVSFeedbackPitch.h"
@@ -115,6 +116,23 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	m_pixelsPerTick = 2 * state["horizontalZoom"].toDouble(1);
 	m_rowHeight = 12 * state["verticalZoom"].toDouble(2);
 	m_quantization = state["quantization"].toDouble(12);
+	m_timelineBegin = TimePos(int(m_scrollTick));
+	m_timeLine = new TimeLineWidget(KeyboardWidth, 0, m_pixelsPerTick * TimePos::ticksPerBar(),
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), m_timelineBegin, this);
+	m_timeLine->setObjectName("svsClipTimeline");
+	m_timeLine->setFixedHeight(TimelineHeight);
+	m_timeLine->setSnapSize(m_quantization / TimePos::ticksPerBar());
+	connect(this, &SVSCanvas::viewportChanged, this, [this] {
+		m_timelineBegin = TimePos(int(m_scrollTick));
+		m_timeLine->setPixelsPerBar(m_pixelsPerTick * TimePos::ticksPerBar());
+		m_timeLine->setFixedWidth(width());
+	});
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionChanged, this,
+		qOverload<>(&SVSCanvas::update));
+	connect(Engine::getSong(), &Song::playbackStateChanged, this, [this] {
+		m_timeLine->setPlayheadVisible(!Engine::getSong()->isPlaying() || Engine::getSong()->previewClip() == m_clip);
+		update();
+	});
 	m_lyric = new QLineEdit(this);
 	m_lyric->setObjectName("svsInlineLyric");
 	m_lyric->hide();
@@ -575,6 +593,7 @@ void SVSCanvas::setTool(Tool value)
 void SVSCanvas::setQuantization(double value)
 {
 	m_quantization = std::max(0., value);
+	m_timeLine->setSnapSize(value / TimePos::ticksPerBar());
 	rememberViewport();
 	update();
 }
@@ -628,6 +647,16 @@ void SVSCanvas::resizeEvent(QResizeEvent* event)
 	QWidget::resizeEvent(event);
 	emit portraitSizeChanged();
 	emit viewportChanged();
+}
+double SVSCanvas::playbackTick() const
+{
+	auto* song = Engine::getSong();
+	if (song->isPlaying() && song->playMode() == Song::PlayMode::Song && m_clip)
+	{
+		return song->getTimeline(Song::PlayMode::Song).ticks() - int(m_clip->startPosition())
+			- int(m_clip->startTimeOffset());
+	}
+	return song->getTimeline(Song::PlayMode::MidiClip).ticks();
 }
 void SVSCanvas::paintEvent(QPaintEvent*)
 {
@@ -864,12 +893,13 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 	}
 	if (m_clip)
 	{
-		const double local = Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks() - int(m_clip->startPosition())
-			- int(m_clip->startTimeOffset());
+		const double local = playbackTick();
 		const auto x = pointAt(local, 0).x();
 		const auto projectTick = Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks();
 		const bool inClip = projectTick >= int(m_clip->startPosition()) && projectTick < int(m_clip->endPosition());
-		if (x >= KeyboardWidth && x <= width() && (!Engine::getSong()->isPlaying() || inClip))
+		if (x >= KeyboardWidth && x <= width()
+			&& (!Engine::getSong()->isPlaying() || Engine::getSong()->previewClip() == m_clip
+				|| (Engine::getSong()->playMode() == Song::PlayMode::Song && inClip)))
 		{
 			painter.setPen(color("userPitchColor", QPalette::Highlight));
 			painter.drawLine(QPointF(x, 0), QPointF(x, height()));
@@ -921,9 +951,7 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event)
 		const double begin = std::max(0, -int(m_clip->startTimeOffset()));
 		const double end = int(m_clip->length()) - int(m_clip->startTimeOffset());
 		const auto local = std::clamp(snap(tickAt(event->position().x()), event->modifiers()), begin, end);
-		Engine::getSong()
-			->getTimeline(Song::PlayMode::Song)
-			.setTicks(std::max(0, int(local + int(m_clip->startPosition()) + int(m_clip->startTimeOffset()))));
+		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setTicks(int(local));
 		update();
 		return;
 	}
@@ -1689,6 +1717,19 @@ void SVSCanvas::keyPressEvent(QKeyEvent* event)
 {
 	if (!m_clip)
 		return;
+	if (event->key() == Qt::Key_Space
+		&& !(event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
+	{
+		auto* song = Engine::getSong();
+		if (song->previewClip() != m_clip) { song->playSVSClip(m_clip); }
+		else if (event->modifiers().testFlag(Qt::ShiftModifier)) { song->togglePause(); }
+		else
+		{
+			song->stop();
+		}
+		event->accept();
+		return;
+	}
 	if (event->modifiers() == Qt::NoModifier && event->key() >= Qt::Key_1 && event->key() <= Qt::Key_5)
 	{
 		const Tool tools[]{Tool::Notes, Tool::Pencil, Tool::Freehand, Tool::Anchor, Tool::Smooth};
@@ -1728,8 +1769,7 @@ void SVSCanvas::keyPressEvent(QKeyEvent* event)
 	}
 	if (event->matches(QKeySequence::Paste))
 	{
-		const auto local = Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks() - int(m_clip->startPosition())
-			- int(m_clip->startTimeOffset());
+		const auto local = playbackTick();
 		pasteSelection(local);
 		return;
 	}

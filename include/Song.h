@@ -51,6 +51,7 @@ class Clip;
 class DataFile;
 class Keymap;
 class MidiClip;
+class SVSClip;
 class ProjectJournal;
 class Scale;
 
@@ -363,6 +364,7 @@ public slots:
 	void playAndRecord();
 	void playPattern();
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
+	void playSVSClip(const lmms::SVSClip* clip, bool loop = true);
 	void playAutomationClip(const lmms::AutomationClip* clip, bool loop = true);
 	void togglePause();
 	void stop();
@@ -471,7 +473,7 @@ private:
 	PlayMode m_playMode;
 	bar_t m_length;
 
-	const MidiClip* m_midiClipToPlay;
+	const Clip* m_noteClipToPlay;
 	const AutomationClip* m_automationClipToPlay = nullptr;
 	bool m_loopMidiClip;
 

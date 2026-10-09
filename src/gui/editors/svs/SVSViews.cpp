@@ -35,6 +35,7 @@
 #include <QDropEvent>
 #include <QScrollBar>
 #include <QToolButton>
+#include <QToolBar>
 #include <QButtonGroup>
 #include <QSignalBlocker>
 #include <QInputDialog>
@@ -655,6 +656,13 @@ void SVSPianoRoll::openIn(MainWindow* mainWindow)
 SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	: QWidget(parent)
 {
+	auto* song = Engine::getSong();
+	if (!song->isPlaying())
+	{
+		auto& timeline = song->getTimeline(Song::PlayMode::MidiClip);
+		timeline.setTicks(std::clamp(timeline.ticks(), std::max(0, -int(clip->startTimeOffset())),
+			int(clip->length()) - int(clip->startTimeOffset())));
+	}
 	setWindowIcon(embed::getIconPixmap("piano"));
 	setWindowTitle(tr("SVS Piano Roll — LMMS"));
 	resize(1100, 740);
@@ -684,9 +692,20 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	};
 	auto* play = new QToolButton(this);
 	play->setObjectName("svsPlayButton");
-	iconButton(play, "play", tr("Play song"));
+	iconButton(play, "play", tr("Play / Pause clip"));
 	toolbar->addWidget(play);
-	connect(play, &QToolButton::clicked, Engine::getSong(), &Song::playSong);
+	connect(play, &QToolButton::clicked, clip, [clip] {
+		auto* song = Engine::getSong();
+		if (song->previewClip() == clip) { song->togglePause(); }
+		else
+		{
+			song->playSVSClip(clip);
+		}
+	});
+	connect(Engine::getSong(), &Song::playbackStateChanged, this, [play, target = QPointer<SVSClip>(clip), nativeIcon] {
+		auto* song = Engine::getSong();
+		play->setIcon(nativeIcon(song->isPlaying() && song->previewClip() == target ? "pause" : "play"));
+	});
 	auto* stop = new QToolButton(this);
 	stop->setObjectName("svsStopButton");
 	iconButton(stop, "stop", tr("Stop"));
@@ -720,6 +739,10 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	grid->setContentsMargins(0, 0, 0, 0);
 	auto* canvas = new SVSCanvas(clip, noteArea);
 	m_canvas = canvas;
+	auto* timelineTools = new QToolBar(this);
+	timelineTools->setObjectName("svsTimelineTools");
+	canvas->timeLine()->addToolButtons(timelineTools);
+	toolbar->addWidget(timelineTools);
 	canvas->setThemeColors(m_colors);
 	grid->addWidget(canvas, 0, 0);
 	auto* parameterBody = new QWidget(splitter);
@@ -856,13 +879,14 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	});
 	auto followPosition = [this, target = QPointer<SVSClip>(clip), canvas, followTimeline] {
 		auto* song = Engine::getSong();
-		if (!target || !isVisible() || !followTimeline->isChecked() || !song->isPlaying()
-			|| song->playMode() != Song::PlayMode::Song)
+		if (!target || !isVisible() || !song->isPlaying()
+			|| (song->playMode() != Song::PlayMode::Song && song->previewClip() != target))
 		{
 			return;
 		}
-		auto mode = TimeLineWidget::defaultAutoScrollState();
-		if (auto* gui = getGUI(); gui && gui->songEditor())
+		if (song->playMode() == Song::PlayMode::Song && !followTimeline->isChecked()) { return; }
+		auto mode = canvas->timeLine()->autoScroll();
+		if (auto* gui = getGUI(); song->playMode() == Song::PlayMode::Song && gui && gui->songEditor())
 		{
 			mode = gui->songEditor()->m_editor->timeLine()->autoScroll();
 		}
@@ -871,9 +895,14 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 			return;
 		}
 		const auto projectTick = song->getTimeline(Song::PlayMode::Song).ticks();
-		if (projectTick < int(target->startPosition()) || projectTick >= int(target->endPosition())) { return; }
-		const double localTick
-			= projectTick - double(int(target->startPosition())) - double(int(target->startTimeOffset()));
+		if (song->playMode() == Song::PlayMode::Song
+			&& (projectTick < int(target->startPosition()) || projectTick >= int(target->endPosition())))
+		{
+			return;
+		}
+		const double localTick = song->playMode() == Song::PlayMode::Song
+			? projectTick - double(int(target->startPosition())) - double(int(target->startTimeOffset()))
+			: song->getTimeline(Song::PlayMode::MidiClip).ticks();
 		const double visibleTicks = canvas->tickAt(canvas->width()) - canvas->scrollTick();
 		if (visibleTicks <= 0)
 		{
@@ -891,15 +920,20 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		}
 		else if (localTick < next || localTick >= next + visibleTicks)
 		{
-			next = localTick;
+			next = song->playMode() == Song::PlayMode::Song
+				? localTick
+				: std::floor(localTick / TimePos::ticksPerBar()) * TimePos::ticksPerBar();
 		}
-		next = std::clamp(next, 0., std::max(0., contentEnd - visibleTicks));
+		next = song->playMode() == Song::PlayMode::Song ? std::clamp(next, 0., std::max(0., contentEnd - visibleTicks))
+														: std::max(0., next);
 		if (next != canvas->scrollTick())
 		{
 			canvas->setScroll(next, canvas->topPitch());
 		}
 	};
 	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, followPosition);
+	connect(
+		&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionChanged, this, followPosition);
 	connect(followTimeline, &QToolButton::toggled, this, followPosition);
 	auto* tools = new QButtonGroup(this);
 	canvas->batchLyricsRequested = [this, clip, canvas] {

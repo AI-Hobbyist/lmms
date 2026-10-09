@@ -52,6 +52,7 @@
 #include "SVSClip.h"
 #include "SVSCanvas.h"
 #include "Timeline.h"
+#include "TimeLineWidget.h"
 #include "SVSTrack.h"
 #include "SVSViews.h"
 #include "SampleBuffer.h"
@@ -801,15 +802,126 @@ private slots:
 			clip->movePosition(577);
 			QTest::qWait(50);
 			QCOMPARE(canvas->grab(QRect(0, 0, canvas->width(), 24)).toImage(), ruler);
-			QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(37, 60).x()), 12));
-			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 577 - 24 + 36);
-			QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(0, 60).x()), 12));
-			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 577);
+			QTest::mouseClick(
+				canvas->timeLine(), Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(37, 60).x()), 12));
+			QCOMPARE(song->getTimeline(Song::PlayMode::MidiClip).ticks(), 37);
+			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 0);
+			QTest::mouseClick(
+				canvas->timeLine(), Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(0, 60).x()), 12));
+			QCOMPARE(song->getTimeline(Song::PlayMode::MidiClip).ticks(), 0);
+			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 0);
 			QTest::qWait(100);
 			QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-clip-timeline-native.png"));
 			editor.close();
 		}
 		delete track;
+		QTest::qWait(30);
+	}
+
+	void svsInternalTransportNative()
+	{
+		auto* song = Engine::getSong();
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
+		QTest::qWait(50);
+		auto* clip = static_cast<SVSClip*>(track->createClip(576));
+		clip->setAutoResize(false);
+		clip->changeLength(96);
+		clip->setStartTimeOffset(-24);
+		svs::Note note;
+		note.id = "preview";
+		note.tick = 24;
+		note.duration = 96;
+		clip->setNotes({note});
+		auto* other = static_cast<SVSClip*>(track->createClip(576));
+		other->setNotes({note});
+		QSignalSpy starts(track, &SVSTrack::noteStarted);
+		auto& main = song->getTimeline(Song::PlayMode::Song);
+		auto& local = song->getTimeline(Song::PlayMode::MidiClip);
+		main.setTicks(321);
+		main.setFrameOffset(3);
+		local.setLoopEnabled(false);
+		local.setStopBehaviour(Timeline::StopBehaviour::BackToStart);
+		local.setTicks(24);
+		{
+			gui::SVSPianoRoll editor(clip);
+			editor.resize(1000, 650);
+			editor.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&editor));
+			auto* play = editor.findChild<QToolButton*>("svsPlayButton");
+			auto* stop = editor.findChild<QToolButton*>("svsStopButton");
+			QVERIFY(play && stop && editor.findChild<gui::TimeLineWidget*>("svsClipTimeline"));
+			QTest::mouseClick(play, Qt::LeftButton);
+			QCOMPARE(song->playMode(), Song::PlayMode::MidiClip);
+			QCOMPARE(song->previewClip(), static_cast<const Clip*>(clip));
+			for (int period = 0; local.ticks() < 48 && period < 1000; ++period)
+			{
+				Engine::audioEngine()->renderNextPeriod();
+			}
+			QVERIFY(local.ticks() >= 48);
+			QCOMPARE(starts.count(), 1); // Only the selected overlapping clip contributes.
+			QCOMPARE(main.ticks(), 321);
+			QCOMPARE(main.frameOffset(), 3.f);
+			const auto pausedTick = local.ticks();
+			QTest::mouseClick(play, Qt::LeftButton);
+			QVERIFY(song->isPaused());
+			Engine::audioEngine()->renderNextPeriod();
+			QCOMPARE(local.ticks(), pausedTick);
+			QTest::mouseClick(play, Qt::LeftButton);
+			QVERIFY(song->isPlaying());
+			local.setTicks(119);
+			for (int period = 0; local.ticks() >= 119 && period < 1000; ++period)
+			{
+				Engine::audioEngine()->renderNextPeriod();
+			}
+			QVERIFY(local.ticks() >= 24 && local.ticks() < 119);
+			QTest::mouseClick(stop, Qt::LeftButton);
+			QCOMPARE(local.ticks(), 24);
+			QCOMPARE(main.ticks(), 321);
+			local.setStopBehaviour(Timeline::StopBehaviour::BackToZero);
+			local.setTicks(48);
+			QTest::mouseClick(play, Qt::LeftButton);
+			QTest::mouseClick(stop, Qt::LeftButton);
+			QCOMPARE(local.ticks(), 24); // Cropped clip beginning, same as MIDI.
+			local.setStopBehaviour(Timeline::StopBehaviour::KeepPosition);
+			local.setTicks(60);
+			QTest::mouseClick(play, Qt::LeftButton);
+			local.setTicks(72);
+			QTest::mouseClick(stop, Qt::LeftButton);
+			QCOMPARE(local.ticks(), 72);
+			QCOMPARE(main.ticks(), 321);
+			gui::SVSCanvas* canvas = nullptr;
+			for (auto* area : editor.findChildren<gui::SVSCanvas*>())
+			{
+				if (!area->isParameterLane()) { canvas = area; }
+			}
+			QVERIFY(canvas);
+			QTest::keyClick(canvas, Qt::Key_Space);
+			QCOMPARE(song->previewClip(), static_cast<const Clip*>(clip));
+			QTest::keyClick(canvas, Qt::Key_Space, Qt::ShiftModifier);
+			QVERIFY(song->isPaused());
+			QTest::keyClick(canvas, Qt::Key_Space, Qt::ShiftModifier);
+			QVERIFY(song->isPlaying());
+			QTest::keyClick(canvas, Qt::Key_Space);
+			QVERIFY(song->isStopped());
+			QCOMPARE(main.ticks(), 321);
+			QTest::qWait(100);
+			QVERIFY(
+				editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-internal-transport-native.png"));
+			editor.close();
+		}
+		// Switching away from running Song playback preserves its marker too.
+		main.setStopBehaviour(Timeline::StopBehaviour::BackToZero);
+		song->playSong();
+		main.setTicks(400);
+		song->playSVSClip(clip);
+		QCOMPARE(main.ticks(), 400);
+		delete clip; // Removing the preview target stops playback safely.
+		QVERIFY(song->isStopped());
+		song->playSVSClip(other);
+		delete track; // Stop before the derived track's activity state is destroyed.
+		QVERIFY(song->isStopped());
+		local.setStopBehaviour(Timeline::StopBehaviour::BackToStart);
+		main.setStopBehaviour(Timeline::StopBehaviour::BackToStart);
 		QTest::qWait(30);
 	}
 

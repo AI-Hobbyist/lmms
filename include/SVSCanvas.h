@@ -13,6 +13,7 @@ class QLineEdit;
 class QTimer;
 class QMenu;
 namespace lmms::gui {
+class TimeLineWidget;
 class SVSEditTransaction;
 class SVSCurveGesture;
 class SVSCanvas : public QWidget
@@ -43,6 +44,7 @@ public:
 	void setZoom(double horizontal, double vertical);
 	void setScroll(double tick, double topPitch);
 	double scrollTick() const { return m_scrollTick; }
+	TimeLineWidget* timeLine() const { return m_timeLine; }
 	double topPitch() const { return m_topPitch; }
 	double horizontalZoom() const { return m_pixelsPerTick / 2; }
 	double verticalZoom() const { return m_rowHeight / 12; }
@@ -110,6 +112,9 @@ protected:
 	bool eventFilter(QObject*, QEvent*) override;
 
 private:
+	TimePos m_timelineBegin;
+	TimeLineWidget* m_timeLine = nullptr;
+	double playbackTick() const;
 	enum class Action
 	{
 		None,

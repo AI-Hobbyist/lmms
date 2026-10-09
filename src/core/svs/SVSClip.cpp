@@ -104,6 +104,7 @@ void SVSClip::changeLength(const TimePos& value)
 }
 SVSClip::~SVSClip()
 {
+	Engine::getSong()->stopPreviewOf(this);
 	if (m_renderControl)
 		m_renderControl->cancel();
 	++m_revision;

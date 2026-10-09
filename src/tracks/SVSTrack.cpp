@@ -128,6 +128,8 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 }
 SVSTrack::~SVSTrack()
 {
+	const auto* preview = Engine::getSong()->previewClip();
+	if (preview && preview->getTrack() == this) { Engine::getSong()->stopPreviewOf(preview); }
 	Engine::audioEngine()->removePlayHandlesOfTypes(this, PlayHandle::Type::SVSPlayHandle);
 }
 void SVSTrack::setName(const QString& name)
@@ -337,11 +339,10 @@ void SVSTrack::clearNoteActivity()
 }
 bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
-	if (clipNum >= 0 || isMuted() || !tryLock())
-		return false;
+	if (isMuted() || !tryLock()) return false;
 	bool played = false;
 	QSet<QPair<quintptr, int>> activeNotes;
-	const double tick = int(start) + Engine::getSong()->getTimeline().frameOffset() / Engine::framesPerTick();
+	double playTick = int(start);
 	if (m_lastActivityTick >= 0 && (int(start) < m_lastActivityTick || int(start) > m_lastActivityTick + 1))
 	{
 		for (int i = 0; i < m_activeNotes.size(); ++i)
@@ -352,18 +353,16 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 	}
 	m_lastActivityTick = int(start);
 	auto playRegion = [&](std::shared_ptr<const svs::Audio> audio, double position, double end, double contentOffset) {
-		if (!audio || int(start) >= end)
-			return false;
+		if (!audio || playTick >= end) return false;
 		const auto& mapping = audio->mapping;
 		const double begin = contentOffset == 0 ? std::min(position, mapping.projectTick(audio->startTick)) : position;
-		if (int(start) < begin)
-			return false;
-		double localTick = mapping.localTick(int(start));
+		if (playTick < begin) return false;
+		double localTick = mapping.localTick(playTick);
 		const double remainder = Engine::getSong()->getTimeline().frameOffset();
 		double sampleStart = mapping.samplePosition(localTick, audio->startTick, audio->rate)
 			+ remainder * audio->rate / Engine::audioEngine()->outputSampleRate();
 		auto bounded = f_cnt_t(std::ceil(std::max(
-			0., std::min(double(Engine::framesPerTick()), (end - int(start)) * Engine::framesPerTick()) - remainder)));
+			0., std::min(double(Engine::framesPerTick()), (end - playTick) * Engine::framesPerTick()) - remainder)));
 		return Engine::audioEngine()->addPlayHandle(
 			new SVSPlaybackHandle(this, std::move(audio), sampleStart, bounded, offset));
 	};
@@ -378,6 +377,9 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 		for (auto* base : getClips())
 		{
 			auto* clip = static_cast<SVSClip*>(base);
+			if (clipNum >= 0 && getClipNum(clip) != clipNum) { continue; }
+			playTick = int(start) + (clipNum >= 0 ? int(clip->startPosition()) + int(clip->startTimeOffset()) : 0);
+			const double tick = playTick + Engine::getSong()->getTimeline().frameOffset() / Engine::framesPerTick();
 			if (!clip->isMuted() && tick >= int(clip->startPosition()) && tick < int(clip->endPosition()))
 			{
 				svs::TimeMapping mapping;

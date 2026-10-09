@@ -46,6 +46,7 @@
 #include "Keymap.h"
 #include "NotePlayHandle.h"
 #include "MidiClip.h"
+#include "SVSClip.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
@@ -90,7 +91,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( PlayMode::None ),
 	m_length( 0 ),
-	m_midiClipToPlay( nullptr ),
+	m_noteClipToPlay( nullptr ),
 	m_loopMidiClip( false ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1),
@@ -234,10 +235,10 @@ void Song::processNextBuffer()
 			break;
 
 		case PlayMode::MidiClip:
-			if (m_midiClipToPlay)
+			if (m_noteClipToPlay)
 			{
-				clipNum = m_midiClipToPlay->getTrack()->getClipNum(m_midiClipToPlay);
-				trackList.push_back(m_midiClipToPlay->getTrack());
+				clipNum = m_noteClipToPlay->getTrack()->getClipNum(m_noteClipToPlay);
+				trackList.push_back(m_noteClipToPlay->getTrack());
 			}
 			break;
 		case PlayMode::AutomationClip:
@@ -535,9 +536,9 @@ bool Song::setPlayMode(PlayMode mode, const Clip* clip)
 	{
 		return false;
 	}
-	const auto* midi = dynamic_cast<const MidiClip*>(clip);
+	const bool noteClip = dynamic_cast<const MidiClip*>(clip) || dynamic_cast<const SVSClip*>(clip);
 	const auto* automation = dynamic_cast<const AutomationClip*>(clip);
-	if ((mode == PlayMode::MidiClip && !midi) || (mode == PlayMode::AutomationClip && !automation))
+	if ((mode == PlayMode::MidiClip && !noteClip) || (mode == PlayMode::AutomationClip && !automation))
 	{
 		return false;
 	}
@@ -547,7 +548,7 @@ bool Song::setPlayMode(PlayMode mode, const Clip* clip)
 		stop();
 	}
 	m_playMode = mode;
-	m_midiClipToPlay = mode == PlayMode::MidiClip ? midi : nullptr;
+	m_noteClipToPlay = mode == PlayMode::MidiClip ? clip : nullptr;
 	m_automationClipToPlay = mode == PlayMode::AutomationClip ? automation : nullptr;
 	m_recording = false;
 	emit playbackStateChanged();
@@ -556,10 +557,7 @@ bool Song::setPlayMode(PlayMode mode, const Clip* clip)
 
 const Clip* Song::previewClip() const
 {
-	if (m_playMode == PlayMode::MidiClip)
-	{
-		return m_midiClipToPlay;
-	}
+	if (m_playMode == PlayMode::MidiClip) { return m_noteClipToPlay; }
 	if (m_playMode == PlayMode::AutomationClip)
 	{
 		return m_automationClipToPlay;
@@ -580,7 +578,10 @@ void Song::restorePlaybackState(const PlaybackState& state)
 	m_paused = state.paused;
 	m_recording = state.recording;
 	m_loopMidiClip = state.loopPreview;
-	m_midiClipToPlay = state.mode == PlayMode::MidiClip ? dynamic_cast<const MidiClip*>(state.clip) : nullptr;
+	m_noteClipToPlay = state.mode == PlayMode::MidiClip
+			&& (dynamic_cast<const MidiClip*>(state.clip) || dynamic_cast<const SVSClip*>(state.clip))
+		? state.clip
+		: nullptr;
 	m_automationClipToPlay
 		= state.mode == PlayMode::AutomationClip ? dynamic_cast<const AutomationClip*>(state.clip) : nullptr;
 	m_vstSyncController.setPlaybackState(m_playing && !m_paused);
@@ -593,6 +594,29 @@ void Song::stopPreviewOf(const Clip* clip)
 	{
 		stop();
 	}
+}
+
+void Song::playSVSClip(const SVSClip* clip, bool loop)
+{
+	if (!clip) { return; }
+	// Reuse the note-clip preview timeline while preserving the Song marker on mode switches.
+	auto& main = getTimeline(PlayMode::Song);
+	const auto position = main.ticks();
+	const auto frame = main.frameOffset();
+	const auto elapsed = main.getElapsedSeconds();
+	const auto playStart = main.playStartPosition();
+	const bool wasSong = m_playMode == PlayMode::Song;
+	if (!setPlayMode(PlayMode::MidiClip, clip)) { return; }
+	if (wasSong) { main.restorePlaybackPosition(position, frame, elapsed, playStart); }
+	auto& timeline = getTimeline(PlayMode::MidiClip);
+	timeline.setTicks(std::clamp(timeline.ticks(), std::max(0, -int(clip->startTimeOffset())),
+		int(clip->length()) - int(clip->startTimeOffset())));
+	m_loopMidiClip = loop;
+	m_playing = true;
+	m_paused = false;
+	m_vstSyncController.setPlaybackState(true);
+	savePlayStartPosition();
+	emit playbackStateChanged();
 }
 
 void Song::playAutomationClip(const AutomationClip* clip, bool loop)
@@ -678,10 +702,10 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 		stop();
 	}
 
-	m_midiClipToPlay = midiClipToPlay;
+	m_noteClipToPlay = midiClipToPlay;
 	m_loopMidiClip = loop;
 
-	if( m_midiClipToPlay != nullptr )
+	if (m_noteClipToPlay != nullptr)
 	{
 		m_playMode = PlayMode::MidiClip;
 		m_playing = true;
@@ -1312,7 +1336,7 @@ void Song::restoreProjectState(DataFile& dataFile)
 		{
 			Engine::patternStore()->setCurrentPattern(pattern);
 		}
-		m_midiClipToPlay = nullptr;
+		m_noteClipToPlay = nullptr;
 		m_automationClipToPlay = nullptr;
 		if (m_playMode == PlayMode::MidiClip || m_playMode == PlayMode::AutomationClip)
 		{
@@ -1327,7 +1351,10 @@ void Song::restoreProjectState(DataFile& dataFile)
 				{
 					if (m_playMode == PlayMode::MidiClip)
 					{
-						m_midiClipToPlay = dynamic_cast<MidiClip*>(clips[clipIndex]);
+						m_noteClipToPlay
+							= dynamic_cast<MidiClip*>(clips[clipIndex]) || dynamic_cast<SVSClip*>(clips[clipIndex])
+							? clips[clipIndex]
+							: nullptr;
 					}
 					else
 					{
