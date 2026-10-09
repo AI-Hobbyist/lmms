@@ -1,4 +1,4 @@
-add_library(svc-host STATIC SVCChunking.cpp SVCCache.cpp)
+add_library(svc-host STATIC SVCChunking.cpp SVCCache.cpp SVCPlayback.cpp)
 target_compile_features(svc-host PUBLIC cxx_std_17)
 target_include_directories(svc-host PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svc/include")
 target_link_libraries(svc-host PUBLIC Qt6::Core)
@@ -10,3 +10,8 @@ add_executable(SVCChunkCacheTest "${CMAKE_SOURCE_DIR}/tests/svc/SVCChunkCacheTes
 target_link_libraries(SVCChunkCacheTest PRIVATE svc-host)
 add_test(NAME SVCChunkCacheTest COMMAND SVCChunkCacheTest)
 set_tests_properties(SVCChunkCacheTest PROPERTIES TIMEOUT 30 LABELS "svc;M1")
+
+add_executable(SVCPlaybackTest "${CMAKE_SOURCE_DIR}/tests/svc/SVCPlaybackTest.cpp")
+target_link_libraries(SVCPlaybackTest PRIVATE svc-host)
+add_test(NAME SVCPlaybackTest COMMAND SVCPlaybackTest)
+set_tests_properties(SVCPlaybackTest PROPERTIES TIMEOUT 30 LABELS "svc;M2")

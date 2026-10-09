@@ -29,6 +29,8 @@
 #include "Song.h"
 #include "PerfLog.h"
 #include "SVSExportSnapshot.h"
+#include "SVCClip.h"
+#include "SVCTrack.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -159,6 +161,25 @@ void ProjectRenderer::startProcessing()
 {
 	if( isReady() )
 	{
+		for (const auto* track : Engine::getSong()->tracks())
+		{
+			if (track->type() != Track::Type::SVC || track->isMuted()) { continue; }
+			for (const auto* clip : track->getClips())
+			{
+				const auto* svcClip = static_cast<const SVCClip*>(clip);
+				if (clip->isMuted() || svcClip->conversionComplete()) { continue; }
+				m_renderError = tr("SVC track '%1': '%2' needs a successful re-render before export.")
+					.arg(track->name(), clip->name());
+				const auto path = m_fileDev->outputFile();
+				delete m_fileDev;
+				m_fileDev = nullptr;
+				QFile::remove(path);
+				QPointer<ProjectRenderer> target(this);
+				emit svsExportFailed(m_renderError);
+				if (target) { emit finished(); }
+				return;
+			}
+		}
 			if (!m_svsSnapshot)
 			m_svsSnapshot = std::make_unique<svs::ExportSnapshot>(
 				svs::ExportSnapshot::capture(*Engine::getSong(), m_fileDev->sampleRate()));

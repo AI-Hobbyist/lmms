@@ -26,6 +26,7 @@
 
 
 #include <QLayout>
+#include <QPointer>
 #include <QScrollBar>
 #include <QWheelEvent>
 
@@ -117,9 +118,25 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(realignTracks()));
-	connect( m_tc, SIGNAL(trackAdded(lmms::Track*)),
-			this, SLOT(createTrackView(lmms::Track*)),
-			Qt::QueuedConnection );
+	connect(
+		m_tc, &TrackContainer::trackAdded, this,
+		[this](Track* track) {
+			if (track->type() == Track::Type::SVC)
+			{
+				const QPointer<Track> guarded(track);
+				QMetaObject::invokeMethod(
+					this,
+					[this, guarded]() {
+						if (guarded) { createTrackView(guarded.data()); }
+					},
+					Qt::QueuedConnection);
+			}
+			else
+			{
+				QMetaObject::invokeMethod(this, "createTrackView", Qt::QueuedConnection, Q_ARG(lmms::Track*, track));
+			}
+		},
+		Qt::DirectConnection);
 }
 
 

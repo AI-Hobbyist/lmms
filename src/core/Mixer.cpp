@@ -36,6 +36,7 @@
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "SVSTrack.h"
+#include "SVCTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 namespace lmms
@@ -360,9 +361,10 @@ void Mixer::deleteChannel( int index )
 				inst->mixerChannelModel()->setValue(val-1);
 			}
 		}
-		else if (t->type() == Track::Type::SVS)
+		else if (t->type() == Track::Type::SVS || t->type() == Track::Type::SVC)
 		{
-			auto* model = static_cast<SVSTrack*>(t)->mixerChannelModel();
+			auto* model = t->type() == Track::Type::SVC ? static_cast<SVCTrack*>(t)->mixerChannelModel()
+														: static_cast<SVSTrack*>(t)->mixerChannelModel();
 			const int value = model->value();
 			if (value == index)
 			{
@@ -470,9 +472,10 @@ void Mixer::moveChannelLeft( int index )
 					inst->mixerChannelModel()->setValue(a);
 				}
 			}
-			else if (track->type() == Track::Type::SVS)
+			else if (track->type() == Track::Type::SVS || track->type() == Track::Type::SVC)
 			{
-				auto* model = static_cast<SVSTrack*>(track)->mixerChannelModel();
+				auto* model = track->type() == Track::Type::SVC ? static_cast<SVCTrack*>(track)->mixerChannelModel()
+																: static_cast<SVSTrack*>(track)->mixerChannelModel();
 				const int value = model->value();
 				if (value == a)
 				{
@@ -944,12 +947,11 @@ bool Mixer::isChannelInUse(int index)
 				return true;
 			}
 		}
-		else if (t->type() == Track::Type::SVS)
+		else if (t->type() == Track::Type::SVS || t->type() == Track::Type::SVC)
 		{
-			if (static_cast<SVSTrack*>(t)->mixerChannelModel()->value() == index)
-			{
-				return true;
-			}
+			const auto* model = t->type() == Track::Type::SVC ? static_cast<SVCTrack*>(t)->mixerChannelModel()
+															  : static_cast<SVSTrack*>(t)->mixerChannelModel();
+			if (model->value() == index) { return true; }
 		}
 		else if (t->type() == Track::Type::Sample)
 		{

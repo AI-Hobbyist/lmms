@@ -220,6 +220,13 @@ bool CachePair::complete(svc_status validatedTerminal)
 		fail();
 		return false;
 	}
+	QCryptographicHash outputDigest(QCryptographicHash::Sha256);
+	if (!m_output.seek(0) || !outputDigest.addData(&m_output))
+	{
+		fail();
+		return false;
+	}
+	m_metadata.insert("output_digest", QString::fromLatin1(outputDigest.result().toHex()));
 	m_output.close();
 	const auto final = outputPath();
 	if (!QFile::rename(partialPath(), final))

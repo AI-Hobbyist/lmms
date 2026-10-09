@@ -52,7 +52,8 @@ public:
 		InstrumentPlayHandle = 0x02,
 		SamplePlayHandle = 0x04,
 		PresetPreviewHandle = 0x08,
-		SVSPlayHandle = 0x10
+		SVSPlayHandle = 0x10,
+		SVCPlayHandle = 0x20
 	} ;
 	using Types = Flags<Type>;
 

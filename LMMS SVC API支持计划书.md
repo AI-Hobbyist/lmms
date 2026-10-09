@@ -1,6 +1,6 @@
 # LMMS SVC API 支持计划书
 
-日期：2026-10-09。状态：M0～M1 已实现并通过自动化验证；M2～M5 待实施。进度见 doc/svc/ImplementationProgress.md。
+日期：2026-10-09。状态：M0～M2 已实现并通过自动化验证；M3～M5 待实施。进度见 doc/svc/ImplementationProgress.md。
 
 本计划实现独立的 Singing Voice Conversion（SVC）轨道与插件工作流：导入音频，选择 API 返回的模型与说话人，设置参数，分块转换并立即替换对应区间，显示进度，通过 A/B 波形和独立增益比较原音与转换音。先完成通用 SVC SDK，再接入 RVC。当前交付仅为文档；完成后提交并推送文档。
 
@@ -198,5 +198,5 @@ GUI 验证遵循“构建 → 启动真实 Windows Qt 窗口 → 稳定渲染 �
 
 - 已覆盖用户要求及补充的默认值、分块即时替换、进度、独立代码/颜色、主题 SVG、随机哈希同名缓存与全 ONNX 取舍。
 - 已将当前 RVC API 参考标准独立写入 SDK 文档，并附原生可行性研究。
-- M0～M1 已实现并通过自动化验证；M2～M5 待实施。实施记录见 [ImplementationProgress.md](doc/svc/ImplementationProgress.md)。后端仅作参考与 API 测试，不修改。
+- M0～M2 已实现并通过自动化验证；M3～M5 待实施。实施记录见 [ImplementationProgress.md](doc/svc/ImplementationProgress.md)。后端仅作参考与 API 测试，不修改。
 - 文档检查包括需求逐项核对、链接/路径核对及 `git diff --check`；提交仅包含本计划及其两份配套文档，其他工作区文件保持原状。

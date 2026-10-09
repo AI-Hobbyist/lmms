@@ -31,6 +31,7 @@ set(LMMS_TESTS
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 	svs/SVSIntegrationTest.cpp
+	svc/SVCIntegrationTest.cpp
 	ui/UiBaselineCapture.cpp
 	ui/ThemeWidgetTest.cpp
 )
@@ -80,6 +81,12 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
 	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)
 endforeach()
+
+set_target_properties(SVCIntegrationTest PROPERTIES OUTPUT_NAME lmms
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests/svc/$<CONFIG>")
+set_tests_properties(SVCIntegrationTest PROPERTIES TIMEOUT 90 RUN_SERIAL TRUE LABELS "svc;M2"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    ENVIRONMENT "QT_QPA_PLATFORM=windows;LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_PLUGIN_DIR=${CMAKE_BINARY_DIR}/$<CONFIG>/plugins;LMMS_SVC_EVIDENCE=${CMAKE_BINARY_DIR}/tests/svc/SVC-M2-native.png")
 
 add_dependencies(SVSIntegrationTest SVSExample)
 if(LMMS_BUILD_DIFFSINGER)

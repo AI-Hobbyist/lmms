@@ -116,7 +116,8 @@ void RenderManager::renderTracks()
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				(type == Track::Type::Instrument || type == Track::Type::Sample || type == Track::Type::SVS))
+				(type == Track::Type::Instrument || type == Track::Type::Sample || type == Track::Type::SVS
+					|| type == Track::Type::SVC))
 		{
 			m_unmuted.push_back(tk);
 		}

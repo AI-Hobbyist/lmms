@@ -38,6 +38,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "SVSTrack.h"
+#include "SVCTrack.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleTrack.h"
@@ -93,6 +94,12 @@ Track * Track::create( Type tt, TrackContainer * tc )
 		case Type::Instrument: t = new class InstrumentTrack( tc ); break;
 		case Type::Pattern: t = new class PatternTrack( tc ); break;
 		case Type::Sample: t = new class SampleTrack( tc ); break;
+		case Type::SVC:
+			if (tc != Engine::patternStore())
+			{
+				t = new SVCTrack(tc);
+			}
+			break;
 		case Type::SVS:
 			if (tc != Engine::patternStore())
 			{

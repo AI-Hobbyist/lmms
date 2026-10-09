@@ -858,6 +858,7 @@ ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(sdk/svs)
 add_subdirectory(sdk/svc)
 add_subdirectory(src/core/svc)
+target_static_libraries(lmmsobjs svc-host)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)

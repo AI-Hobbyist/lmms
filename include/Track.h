@@ -81,6 +81,7 @@ public:
 		Automation,
 		HiddenAutomation,
 		SVS,
+		SVC,
 		Count
 	} ;
 
