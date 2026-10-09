@@ -154,12 +154,17 @@ def audit(extraction, output):
             groups[plugin].append(row)
     batch = 1
     size = 0
+    manifest = output / "plugin-batches.json"
+    frozen_batches = {}
+    if manifest.exists():
+        frozen_batches = {item["plugin"]: item["batch"]
+                          for item in json.loads(manifest.read_text(encoding="utf-8"))["plugins"]}
     for plugin, members in sorted(groups.items()):
         if size and size + len(members) > 200:
             batch += 1
             size = 0
         for row in members:
-            row["batch"] = f"M5-{batch:02d}"
+            row["batch"] = frozen_batches.get(plugin, f"M5-{batch:02d}")
             row["plugin"] = plugin
         size += len(members)
     report = {

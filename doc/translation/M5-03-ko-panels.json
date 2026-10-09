@@ -1,0 +1,37 @@
+[
+    {
+        "plugin": "eq",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "frequencyshifter",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "dynamicsprocessor",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "freeboy",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "flanger",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "gigplayer",
+        "reason": "Plugin unavailable in the configured development deployment",
+        "status": "MANUAL/PENDING"
+    }
+]

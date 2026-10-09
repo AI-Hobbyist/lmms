@@ -1,0 +1,44 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QWARN  : UiBaselineCapture::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll: ????????????�
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin frequencyshifter
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe.
+While testing pluginPanels
+Function time: 2129ms Total time: 9789ms
+
+Exception address: 0x00007FFD42061AB6
+Exception code   : 0xc0000005
+Nearby symbol    : QWidget::show
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FFDD0CA9C00
+#  2: ImeExtension() - 0x00007FFD611CEE40
+#  3: PcDownloadPicIconAndNotify() - 0x00007FFD5B0682A0
+#  4: UnhandledExceptionFilter() - 0x00007FFE085BED90
+#  5: strncpy() - 0x00007FFE0B327150
+#  6: _C_specific_handler() - 0x00007FFE0B2E4670
+#  7: _chkstk() - 0x00007FFE0B325460
+#  8: RtlWow64GetCurrentMachine() - 0x00007FFE0B28B6D0
+#  9: KiUserExceptionDispatcher() - 0x00007FFE0B324E10
+# 10: QWidget::show() - 0x00007FFD42061AB0
+# 11: lmms::graphModel::samples() - 0x00007FF7C5096FB0
+# 12: QMetaMethodInvoker::invokeImpl() - 0x00007FFD3F8E3FD0
+# 13: QMetaMethod::invokeImpl() - 0x00007FFD3F8E3DB0
+# 14: QTest::ignoreMessage() - 0x00007FFDD0C85E80
+# 15: QTest::ignoreMessage() - 0x00007FFDD0C85E80
+# 16: QTest::ignoreMessage() - 0x00007FFDD0C85E80
+# 17: QTest::ignoreMessage() - 0x00007FFDD0C85E80
+# 18: QTest::qRun() - 0x00007FFDD0C8B310
+# 19: QTest::qExec() - 0x00007FFDD0C88840
+# 20: lmms::Clip::name() - 0x00007FF7C50A1450
+# 21: lmms::gui::TabBar::widgetShown() - 0x00007FF7C5322690
+# 22: BaseThreadInitThunk() - 0x00007FFE09DACD70
+# 23: RtlUserThreadStart() - 0x00007FFE0B26CAC0

@@ -836,7 +836,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>plugin for processing dynamics in a flexible way</source>
-        <translation type="unfinished"></translation>
+        <translation>柔軟なダイナミクス処理用プラグイン</translation>
     </message>
     <message>
         <source>A native eq plugin</source>
@@ -986,7 +986,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A frequency shifter (not a pitch shifter) and barberpole phaser plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数シフター（ピッチシフターではありません）と無限循環フェイザープラグイン</translation>
     </message>
     <message>
         <source>Granular pitch shifter</source>
@@ -2201,11 +2201,11 @@ Continue?</source>
     </message>
     <message>
         <source>Attack time</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック時間</translation>
     </message>
     <message>
         <source>Release time</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース時間</translation>
     </message>
     <message>
         <source>Stereo mode</source>
@@ -2356,7 +2356,7 @@ Continue?</source>
     </message>
     <message>
         <source>HP res</source>
-        <translation>HP res</translation>
+        <translation>ハイパスのレゾナンス</translation>
     </message>
     <message>
         <source>Low-shelf res</source>
@@ -2452,27 +2452,27 @@ Continue?</source>
     </message>
     <message>
         <source>LP 12</source>
-        <translation>LP 12</translation>
+        <translation>ローパス 12</translation>
     </message>
     <message>
         <source>LP 24</source>
-        <translation>LP 24</translation>
+        <translation>ローパス 24</translation>
     </message>
     <message>
         <source>LP 48</source>
-        <translation>LP 48</translation>
+        <translation>ローパス 48</translation>
     </message>
     <message>
         <source>HP 12</source>
-        <translation>HP 12</translation>
+        <translation>ハイパス 12</translation>
     </message>
     <message>
         <source>HP 24</source>
-        <translation>HP 24</translation>
+        <translation>ハイパス 24</translation>
     </message>
     <message>
         <source>HP 48</source>
-        <translation>HP 48</translation>
+        <translation>ハイパス 48</translation>
     </message>
     <message>
         <source>Low-pass type</source>
@@ -2503,11 +2503,11 @@ Continue?</source>
     </message>
     <message>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>Stereo phase</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ位相</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -2519,7 +2519,7 @@ Continue?</source>
     </message>
     <message>
         <source>Invert</source>
-        <translation>Invert</translation>
+        <translation>反転</translation>
     </message>
 </context>
 <context>
@@ -2534,11 +2534,11 @@ Continue?</source>
     </message>
     <message>
         <source>Sweep rate shift amount</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ速度のシフト量</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターンのデューティー比</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
@@ -2550,7 +2550,7 @@ Continue?</source>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープの各ステップの長さ</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
@@ -2566,7 +2566,7 @@ Continue?</source>
     </message>
     <message>
         <source>Shift Register width</source>
-        <translation type="unfinished"></translation>
+        <translation>シフトレジスターの幅</translation>
     </message>
     <message>
         <source>Right output level</source>
@@ -6929,35 +6929,35 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::DynProcControlDialog</name>
     <message>
         <source>INPUT</source>
-        <translation>INPUT</translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Input gain:</translation>
+        <translation>入力ゲイン：</translation>
     </message>
     <message>
         <source>OUTPUT</source>
-        <translation>OUTPUT</translation>
+        <translation>出力</translation>
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Output gain:</translation>
+        <translation>出力ゲイン：</translation>
     </message>
     <message>
         <source>ATTACK</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック</translation>
     </message>
     <message>
         <source>Peak attack time:</source>
-        <translation type="unfinished"></translation>
+        <translation>ピークのアタック時間：</translation>
     </message>
     <message>
         <source>RELEASE</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース</translation>
     </message>
     <message>
         <source>Peak release time:</source>
-        <translation type="unfinished"></translation>
+        <translation>ピークのリリース時間：</translation>
     </message>
     <message>
         <source>Reset wavegraph</source>
@@ -6965,39 +6965,39 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Smooth wavegraph</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフを滑らかにする</translation>
     </message>
     <message>
         <source>Increase wavegraph amplitude by 1 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフの振幅を 1 dB 上げる</translation>
     </message>
     <message>
         <source>Decrease wavegraph amplitude by 1 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフの振幅を 1 dB 下げる</translation>
     </message>
     <message>
         <source>Stereo mode: maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオモード：最大</translation>
     </message>
     <message>
         <source>Process based on the maximum of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ両チャンネルの最大値に基づき処理</translation>
     </message>
     <message>
         <source>Stereo mode: average</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオモード：平均</translation>
     </message>
     <message>
         <source>Process based on the average of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ両チャンネルの平均値に基づき処理</translation>
     </message>
     <message>
         <source>Stereo mode: unlinked</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオモード：非リンク</translation>
     </message>
     <message>
         <source>Process each stereo channel independently</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオの各チャンネルを独立して処理</translation>
     </message>
 </context>
 <context>
@@ -7242,7 +7242,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::EqControlsDialog</name>
     <message>
         <source>HP</source>
-        <translation>HP</translation>
+        <translation>ハイパス</translation>
     </message>
     <message>
         <source>Low-shelf</source>
@@ -7270,7 +7270,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>LP</source>
-        <translation>LP</translation>
+        <translation>ローパス</translation>
     </message>
     <message>
         <source>Input gain</source>
@@ -7285,10 +7285,6 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>出力ゲイン</translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Bandwidth: </source>
         <translation>帯域幅</translation>
     </message>
@@ -7298,7 +7294,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Resonance: </source>
-        <translation type="unfinished"></translation>
+        <translation>レゾナンス：</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -7629,7 +7625,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>Amount:</source>
@@ -7637,11 +7633,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>PHASE</source>
-        <translation type="unfinished"></translation>
+        <translation>位相</translation>
     </message>
     <message>
         <source>Phase:</source>
-        <translation type="unfinished"></translation>
+        <translation>位相：</translation>
     </message>
     <message>
         <source>FDBK</source>
@@ -7661,7 +7657,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Invert</source>
-        <translation>Invert</translation>
+        <translation>反転</translation>
     </message>
 </context>
 <context>
@@ -7687,7 +7683,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FreeBoyInstrumentView</name>
     <message>
         <source>Sweep time:</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ時間：</translation>
     </message>
     <message>
         <source>Sweep time</source>
@@ -7695,75 +7691,75 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Sweep rate shift amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ速度のシフト量：</translation>
     </message>
     <message>
         <source>Sweep rate shift amount</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ速度のシフト量</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle:</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターンのデューティー比：</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターンのデューティー比</translation>
     </message>
     <message>
         <source>Square channel 1 volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形波チャンネル 1 の音量：</translation>
     </message>
     <message>
         <source>Square channel 1 volume</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形波チャンネル 1 の音量</translation>
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープの各ステップの長さ：</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープの各ステップの長さ</translation>
     </message>
     <message>
         <source>Square channel 2 volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形波チャンネル 2 の音量：</translation>
     </message>
     <message>
         <source>Square channel 2 volume</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形波チャンネル 2 の音量</translation>
     </message>
     <message>
         <source>Wave pattern channel volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターンチャンネルの音量：</translation>
     </message>
     <message>
         <source>Wave pattern channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターンチャンネルの音量</translation>
     </message>
     <message>
         <source>Noise channel volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>ノイズチャンネルの音量：</translation>
     </message>
     <message>
         <source>Noise channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>ノイズチャンネルの音量</translation>
     </message>
     <message>
         <source>SO1 volume (Right):</source>
-        <translation type="unfinished"></translation>
+        <translation>SO1 の音量（右）：</translation>
     </message>
     <message>
         <source>SO1 volume (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>SO1 の音量（右）</translation>
     </message>
     <message>
         <source>SO2 volume (Left):</source>
-        <translation type="unfinished"></translation>
+        <translation>SO2 の音量（左）：</translation>
     </message>
     <message>
         <source>SO2 volume (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>SO2 の音量（左）</translation>
     </message>
     <message>
         <source>Treble:</source>
@@ -7791,7 +7787,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Shift register width</source>
-        <translation type="unfinished"></translation>
+        <translation>シフトレジスターの幅</translation>
     </message>
     <message>
         <source>Channel 1 to SO1 (Right)</source>
@@ -7827,30 +7823,98 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Wave pattern graph</source>
-        <translation type="unfinished"></translation>
+        <translation>波形パターングラフ</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::FrequencyShifterControlDialog</name>
     <message>
         <source>Frequency Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数シフト</translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation>ミックス</translation>
+    </message>
+    <message>
+        <source>Spread</source>
+        <translation>スプレッド</translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation>位相</translation>
+    </message>
+    <message>
+        <source>Ring</source>
+        <translation>リング変調</translation>
+    </message>
+    <message>
+        <source>Harmonics</source>
+        <translation>倍音</translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation>トーン</translation>
+    </message>
+    <message>
+        <source>Glide</source>
+        <translation>グライド</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
+    </message>
+    <message>
+        <source>LFO Rate</source>
+        <translation>LFO 速度</translation>
+    </message>
+    <message>
+        <source>LFO Stereo Phase</source>
+        <translation>LFO ステレオ位相</translation>
+    </message>
+    <message>
+        <source>Delay Length</source>
+        <translation>ディレイの長さ</translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation>帰還</translation>
+    </message>
+    <message>
+        <source>Delay Length (fine)</source>
+        <translation>ディレイの長さ（微調整）</translation>
+    </message>
+    <message>
+        <source>Delay Damping</source>
+        <translation>ディレイのダンピング</translation>
+    </message>
+    <message>
+        <source>Delay Glide</source>
+        <translation>ディレイのグライド</translation>
+    </message>
+    <message>
+        <source>Antireflect</source>
+        <translation>反射防止</translation>
+    </message>
+    <message>
+        <source>Anti-reflect</source>
+        <translation>反射防止</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>センド</translation>
     </message>
     <message>
         <source>Route: Send</source>
-        <translation type="unfinished"></translation>
+        <translation>ルーティング：センド</translation>
     </message>
     <message>
         <source>Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>パス</translation>
     </message>
     <message>
         <source>Route: Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>ルーティング：パス</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -7858,38 +7922,38 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Route: Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>ルーティング：ミュート</translation>
     </message>
     <message>
         <source>Reset Shifter</source>
-        <translation type="unfinished"></translation>
+        <translation>シフターをリセット</translation>
     </message>
     <message>
         <source>Reset the shifter&apos;s oscillator phases to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>シフターのオシレーター位相を 0 にリセット（自動化可能）</translation>
     </message>
     <message>
         <source>Reset LFO</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO をリセット</translation>
     </message>
     <message>
         <source>Reset the LFO phase to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO の位相を 0 にリセット（自動化可能）</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation>Open help window</translation>
+        <translation>ヘルプウィンドウを開く</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::FrequencyShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Frequency Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Frequency Shifter is &lt;b&gt;not&lt;/b&gt; a pitch shifter.&lt;br&gt;&lt;br&gt;While &amp;quot;frequency&amp;quot; refers to Hz, &amp;quot;pitch&amp;quot; refers to octaves, semitones, cents, etc. &lt;br&gt;So, pitch shifting impacts all partials in the audio multiplicatively, while frequency shifting impacts it additively.&lt;br&gt;For example: If you have frequencies 100, 200, and 300 Hz, a pitch shift upward by 1.2x would result in 120, 240, and 360 Hz. Meanwhile, a frequency shift upward by 20 Hz would result in 120, 220, and 320 Hz.&lt;br&gt;Notice that a pitch shifter preserves the harmonic relationships between these frequencies, while frequency shifting destroys them entirely, resulting in an inharmonic timbre.&lt;br&gt;&lt;br&gt;A frequency shifter can also be used as a &amp;quot;barberpole phaser&amp;quot;. This is similar to other phasers, but unlike those, it can audibly move upward or downward infinitely, similar to a Shepard tone.&lt;br&gt;To achieve this, simply set the frequency shift amount to your desired phaser rate, and set the Mix to 50%. The resulting phase cancellation will filter the audio.&lt;br&gt;You may also achieve this by simply increasing the delay feedback, and keeping the delay length very low.&lt;br&gt;&lt;br&gt;This frequency shifter sports a unique &amp;quot;anti-reflect&amp;quot; algorithm which eliminates all frequencies aliasing through Nyquist and 0 Hz.&lt;br&gt;&lt;br&gt;This plugin may also be used as a ring modulator via the RING parameter. Ring modulation is the result of frequency shifting the audio upward and downward by the same amount in parallel.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shifter:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals.&lt;br&gt;&lt;b&gt;Frequency Shift&lt;/b&gt; - The amount of frequency shifting, in Hz.&lt;br&gt;&lt;b&gt;Spread&lt;/b&gt; - Offsets the frequency shift amount in opposite directions for the left and right channels.&lt;br&gt;Even very small amounts will add a lot of stereo width to the signal.&lt;br&gt;&lt;b&gt;Phase&lt;/b&gt; - Gives you manual control over the phase of the frequency shifter&apos;s internal oscillators.&lt;br&gt;When using the frequency shifter as a barberpole phaser, it is recommended to set the frequency shift amount to 0 and automate this Phase parameter.&lt;br&gt;&lt;b&gt;Ring&lt;/b&gt; - Blends in ring modulation, instead of just frequency shifting.&lt;br&gt;&lt;b&gt;Harm&lt;/b&gt; - Distorts the frequency shifter&apos;s internal sine oscillators. This brings them much closer to a smoothed square shape.&lt;br&gt;&lt;b&gt;Tone&lt;/b&gt; - A basic 1-pole lowpass on the frequency shifter&apos;s output, helpful for taming harsh high frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any frequency shift and phase parameter movements, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the frequency shifter&apos;s internal oscillators. This is automatable.&lt;br&gt;&lt;b&gt;Anti-reflect&lt;/b&gt; - Magic.&lt;br&gt;It removes all aliased frequencies through Nyquist and through 0 Hz. This is done via clean and CPU-efficient math tricks, not oversampling.&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO:&lt;/h3&gt;This modulates the frequency shift amount. Audio-rate modulation is fully supported.&lt;br&gt;&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - The amplitude of the LFO.&lt;br&gt;&lt;b&gt;Rate&lt;/b&gt; - LFO rate, in Hz.&lt;br&gt;&lt;b&gt;Stereo Phase&lt;/b&gt; - Offsets the phase of the LFO&apos;s right channel, making things stereo.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the LFO&apos;s oscillators. This is automatable.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Routing:&lt;/h3&gt;&lt;b&gt;Send&lt;/b&gt; - Sends the frequency shifter output into the delay.&lt;br&gt;&lt;b&gt;Pass&lt;/b&gt; - The audio input bypasses the frequency shifter, and is sent to both the delay and the output. The frequency shifter is now located inside of the delay line. Use this if you want the frequency shifter to only impact the echoes.&lt;br&gt;&lt;b&gt;Mute&lt;/b&gt; - Like &amp;quot;Pass&amp;quot; routing, except the input signal isn&apos;t sent to the output, so all you hear is the output from the delay line.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Length&lt;/b&gt; - Delay time in milliseconds.&lt;br&gt;&lt;b&gt;Fine&lt;/b&gt; - Identical to delay Length, but with a smaller knob range. This is helpful when using the feedback to cause comb filtering, giving you access to a unique phaser/flanger hybrid.&lt;br&gt;&lt;b&gt;Feedback&lt;/b&gt; - Feeds the output of the delay back into the input of the frequency shifter.&lt;br&gt;The delay&apos;s feedback path has very gentle saturation at high amplitudes, so the plugin can&apos;t break from high feedback values.&lt;br&gt;&lt;b&gt;Damping&lt;/b&gt; - A 1-pole lowpass filter in the feedback loop, so high frequencies fade out sooner than low frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any delay length changes, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Help&lt;/b&gt; - Instantly spawns a kiwano in a randomized location on the planet. 30 second cooldown.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;周波数シフター&lt;/b&gt;&lt;br&gt;&lt;br&gt;プラグイン作者：Lost Robot&lt;br&gt;GUI 作者：Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;概要：&lt;/h3&gt;周波数シフターは&lt;b&gt;ピッチシフターでは&lt;/b&gt;ありません。&lt;br&gt;&lt;br&gt;「周波数」は Hz、「音高」はオクターブ、半音、セントなどで表します。&lt;br&gt;そのため、ピッチシフトは音声の各部分音を乗算で、周波数シフトは加算で変化させます。&lt;br&gt;例：100、200、300 Hz を 1.2 倍にピッチシフトすると 120、240、360 Hz になります。一方、20 Hz 上に周波数シフトすると 120、220、320 Hz になります。&lt;br&gt;ピッチシフトはこれらの周波数間の倍音関係を保ちますが、周波数シフトはその関係を完全に崩し、非調和な音色を生みます。&lt;br&gt;&lt;br&gt;周波数シフターは「無限循環フェイザー」にも使えます。他のフェイザーに似ていますが、シェパードトーンのように聴覚上無限に上昇・下降できます。&lt;br&gt;周波数シフト量を希望するフェイザー速度にし、ミックスを 50% に設定します。生じる位相相殺が音声をフィルタリングします。&lt;br&gt;遅延フィードバックを増やし、遅延時間を非常に短く保つ方法でも実現できます。&lt;br&gt;&lt;br&gt;この周波数シフターは独自の「反射防止」アルゴリズムで、ナイキスト周波数と 0 Hz を越えるすべての折り返し周波数を除去します。&lt;br&gt;&lt;br&gt;RING パラメーターでリングモジュレーターとしても使えます。リング変調は音声を同じ量だけ上と下に並行して周波数シフトした結果です。&lt;br&gt;&lt;br&gt;&lt;h3&gt;シフター：&lt;/h3&gt;&lt;b&gt;ミックス&lt;/b&gt; - ウェット信号とドライ信号を混合します。&lt;br&gt;&lt;b&gt;周波数シフト&lt;/b&gt; - 周波数シフト量（Hz）。&lt;br&gt;&lt;b&gt;スプレッド&lt;/b&gt; - 左右のチャンネルの周波数シフト量を逆方向にずらします。&lt;br&gt;ごく小さい量でも信号のステレオ幅を大きく広げます。&lt;br&gt;&lt;b&gt;位相&lt;/b&gt; - 周波数シフター内部のオシレーター位相を手動で制御します。&lt;br&gt;無限循環フェイザーとして使う場合は、周波数シフト量を 0 にし、この位相パラメーターを自動化することを推奨します。&lt;br&gt;&lt;b&gt;リング変調&lt;/b&gt; - 周波数シフトだけでなくリング変調を混ぜます。&lt;br&gt;&lt;b&gt;倍音&lt;/b&gt; - 内部の正弦波オシレーターを歪ませ、滑らかな矩形波に近づけます。&lt;br&gt;&lt;b&gt;トーン&lt;/b&gt; - 出力の基本的な 1 極ローパスで、鋭い高域を抑えます。&lt;br&gt;&lt;b&gt;グライド&lt;/b&gt; - 周波数シフトと位相パラメーターの変化をローパス処理し、目標値に瞬時に跳ぶ代わりに時間をかけてゆっくり変化させます。&lt;br&gt;&lt;b&gt;リセット&lt;/b&gt; - 内部オシレーターの位相を瞬時にリセットします。自動化可能です。&lt;br&gt;&lt;b&gt;反射防止&lt;/b&gt; - 魔法です。&lt;br&gt;ナイキスト周波数と 0 Hz を越えるすべての折り返し周波数を除去します。オーバーサンプリングではなく、簡潔で CPU 効率のよい数学的手法を使います。&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO：&lt;/h3&gt;周波数シフト量を変調します。オーディオレートの変調を完全にサポートします。&lt;br&gt;&lt;br&gt;&lt;b&gt;量&lt;/b&gt; - LFO の振幅。&lt;br&gt;&lt;b&gt;速度&lt;/b&gt; - LFO の速度（Hz）。&lt;br&gt;&lt;b&gt;ステレオ位相&lt;/b&gt; - LFO の右チャンネル位相をずらし、ステレオ効果を作ります。&lt;br&gt;&lt;b&gt;リセット&lt;/b&gt; - LFO オシレーターの位相を瞬時にリセットします。自動化可能です。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ルーティング：&lt;/h3&gt;&lt;b&gt;センド&lt;/b&gt; - 周波数シフターの出力をディレイに送ります。&lt;br&gt;&lt;b&gt;パス&lt;/b&gt; - 音声入力が周波数シフターをバイパスし、ディレイと出力の両方に送られます。シフターは遅延線の内部に配置されます。エコーだけに影響させたい場合に使います。&lt;br&gt;&lt;b&gt;ミュート&lt;/b&gt; - 「パス」と似ていますが、入力信号を出力に送らず、遅延線の出力だけが聞こえます。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ディレイ：&lt;/h3&gt;&lt;b&gt;長さ&lt;/b&gt; - 遅延時間（ミリ秒）。&lt;br&gt;&lt;b&gt;微調整&lt;/b&gt; - ディレイの長さと同じですが、ノブの範囲が小さくなっています。帰還でコムフィルターを作るときに、独自のフェイザー／フランジャーの混合効果を得られます。&lt;br&gt;&lt;b&gt;帰還&lt;/b&gt; - ディレイの出力を周波数シフターの入力に戻します。&lt;br&gt;ディレイの帰還経路は高振幅でごく穏やかに飽和するため、高い帰還値でプラグインが破綻することはありません。&lt;br&gt;&lt;b&gt;ダンピング&lt;/b&gt; - 帰還ループ内の 1 極ローパスで、高域を低域より早く減衰させます。&lt;br&gt;&lt;b&gt;グライド&lt;/b&gt; - 遅延時間の変化をローパス処理し、目標値に瞬時に跳ぶ代わりに時間をかけてゆっくり変化させます。&lt;br&gt;&lt;b&gt;ヘルプ&lt;/b&gt; - 地球上のランダムな場所にキワノを瞬時に出現させます。クールダウンは 30 秒。&lt;br&gt;</translation>
     </message>
     <message>
         <source>Frequency Shifter Help</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数シフターのヘルプ</translation>
     </message>
 </context>
 <context>

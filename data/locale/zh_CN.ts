@@ -836,7 +836,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>plugin for processing dynamics in a flexible way</source>
-        <translation type="unfinished"></translation>
+        <translation>灵活处理动态的插件</translation>
     </message>
     <message>
         <source>A native eq plugin</source>
@@ -2360,7 +2360,7 @@ Continue?</source>
     </message>
     <message>
         <source>Low-shelf res</source>
-        <translation type="unfinished"></translation>
+        <translation>低架共振</translation>
     </message>
     <message>
         <source>Peak 1 BW</source>
@@ -2380,7 +2380,7 @@ Continue?</source>
     </message>
     <message>
         <source>High-shelf res</source>
-        <translation type="unfinished"></translation>
+        <translation>高架共振</translation>
     </message>
     <message>
         <source>LP res</source>
@@ -2507,7 +2507,7 @@ Continue?</source>
     </message>
     <message>
         <source>Stereo phase</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声相位</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -2526,19 +2526,19 @@ Continue?</source>
     <name>lmms::FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描时间</translation>
     </message>
     <message>
         <source>Sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描方向</translation>
     </message>
     <message>
         <source>Sweep rate shift amount</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描速率偏移量</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>波形占空比</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
@@ -2546,11 +2546,11 @@ Continue?</source>
     </message>
     <message>
         <source>Volume sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>音量扫描方向</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描中每一步的长度</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
@@ -2566,7 +2566,7 @@ Continue?</source>
     </message>
     <message>
         <source>Shift Register width</source>
-        <translation type="unfinished"></translation>
+        <translation>移位寄存器宽度</translation>
     </message>
     <message>
         <source>Right output level</source>
@@ -2578,35 +2578,35 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 1 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 2 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 3 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 3 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 4 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 1 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 2 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 3 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 3 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 4 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 → SO1（右）</translation>
     </message>
     <message>
         <source>Treble</source>
@@ -6947,7 +6947,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Peak attack time:</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值起音时间：</translation>
     </message>
     <message>
         <source>RELEASE</source>
@@ -6955,7 +6955,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Peak release time:</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值释音时间：</translation>
     </message>
     <message>
         <source>Reset wavegraph</source>
@@ -6979,23 +6979,23 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Process based on the maximum of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>按两个立体声通道的最大值处理</translation>
     </message>
     <message>
         <source>Stereo mode: average</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声模式：平均</translation>
     </message>
     <message>
         <source>Process based on the average of both stereo channels</source>
-        <translation type="unfinished"></translation>
+        <translation>按两个立体声通道的平均值处理</translation>
     </message>
     <message>
         <source>Stereo mode: unlinked</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声模式：独立</translation>
     </message>
     <message>
         <source>Process each stereo channel independently</source>
-        <translation type="unfinished"></translation>
+        <translation>分别处理各立体声通道</translation>
     </message>
 </context>
 <context>
@@ -7244,7 +7244,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Low-shelf</source>
-        <translation type="unfinished"></translation>
+        <translation>低架滤波</translation>
     </message>
     <message>
         <source>Peak 1</source>
@@ -7264,7 +7264,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>High-shelf</source>
-        <translation type="unfinished"></translation>
+        <translation>高架滤波</translation>
     </message>
     <message>
         <source>LP</source>
@@ -7283,20 +7283,16 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>输出增益</translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Bandwidth: </source>
         <translation>带宽: </translation>
     </message>
     <message>
         <source> Octave</source>
-        <translation type="unfinished"></translation>
+        <translation> 个八度</translation>
     </message>
     <message>
         <source>Resonance: </source>
-        <translation type="unfinished"></translation>
+        <translation>共振：</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -7304,11 +7300,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>LP group</source>
-        <translation type="unfinished"></translation>
+        <translation>低通组</translation>
     </message>
     <message>
         <source>HP group</source>
-        <translation type="unfinished"></translation>
+        <translation>高通组</translation>
     </message>
 </context>
 <context>
@@ -7319,7 +7315,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>BW: </source>
-        <translation type="unfinished"></translation>
+        <translation>带宽：</translation>
     </message>
     <message>
         <source>Freq: </source>
@@ -7615,15 +7611,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Delay time:</source>
-        <translation type="unfinished"></translation>
+        <translation>延迟时间：</translation>
     </message>
     <message>
         <source>RATE</source>
-        <translation type="unfinished"></translation>
+        <translation>速率</translation>
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"></translation>
+        <translation>周期：</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -7635,11 +7631,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>PHASE</source>
-        <translation type="unfinished"></translation>
+        <translation>相位</translation>
     </message>
     <message>
         <source>Phase:</source>
-        <translation type="unfinished"></translation>
+        <translation>相位：</translation>
     </message>
     <message>
         <source>FDBK</source>
@@ -7647,7 +7643,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Feedback amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>反馈量：</translation>
     </message>
     <message>
         <source>NOISE</source>
@@ -7655,7 +7651,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>White noise amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>白噪声量：</translation>
     </message>
     <message>
         <source>Invert</source>
@@ -7685,83 +7681,83 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FreeBoyInstrumentView</name>
     <message>
         <source>Sweep time:</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描时间：</translation>
     </message>
     <message>
         <source>Sweep time</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描时间</translation>
     </message>
     <message>
         <source>Sweep rate shift amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描速率偏移量：</translation>
     </message>
     <message>
         <source>Sweep rate shift amount</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描速率偏移量</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle:</source>
-        <translation type="unfinished"></translation>
+        <translation>波形占空比：</translation>
     </message>
     <message>
         <source>Wave pattern duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>波形占空比</translation>
     </message>
     <message>
         <source>Square channel 1 volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>方波通道 1 音量：</translation>
     </message>
     <message>
         <source>Square channel 1 volume</source>
-        <translation type="unfinished"></translation>
+        <translation>方波通道 1 音量</translation>
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描中每一步的长度：</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描中每一步的长度</translation>
     </message>
     <message>
         <source>Square channel 2 volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>方波通道 2 音量：</translation>
     </message>
     <message>
         <source>Square channel 2 volume</source>
-        <translation type="unfinished"></translation>
+        <translation>方波通道 2 音量</translation>
     </message>
     <message>
         <source>Wave pattern channel volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>波形通道音量：</translation>
     </message>
     <message>
         <source>Wave pattern channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>波形通道音量</translation>
     </message>
     <message>
         <source>Noise channel volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>噪声通道音量：</translation>
     </message>
     <message>
         <source>Noise channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>噪声通道音量</translation>
     </message>
     <message>
         <source>SO1 volume (Right):</source>
-        <translation type="unfinished"></translation>
+        <translation>SO1 音量（右）：</translation>
     </message>
     <message>
         <source>SO1 volume (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>SO1 音量（右）</translation>
     </message>
     <message>
         <source>SO2 volume (Left):</source>
-        <translation type="unfinished"></translation>
+        <translation>SO2 音量（左）：</translation>
     </message>
     <message>
         <source>SO2 volume (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>SO2 音量（左）</translation>
     </message>
     <message>
         <source>Treble:</source>
@@ -7781,74 +7777,142 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描方向</translation>
     </message>
     <message>
         <source>Volume sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>音量扫描方向</translation>
     </message>
     <message>
         <source>Shift register width</source>
-        <translation type="unfinished"></translation>
+        <translation>移位寄存器宽度</translation>
     </message>
     <message>
         <source>Channel 1 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 2 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 3 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 3 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 4 to SO1 (Right)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 → SO1（右）</translation>
     </message>
     <message>
         <source>Channel 1 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 2 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 3 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 3 → SO2（左）</translation>
     </message>
     <message>
         <source>Channel 4 to SO2 (Left)</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 → SO2（左）</translation>
     </message>
     <message>
         <source>Wave pattern graph</source>
-        <translation type="unfinished"></translation>
+        <translation>波形图</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::FrequencyShifterControlDialog</name>
     <message>
         <source>Frequency Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>频移</translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation>混合</translation>
+    </message>
+    <message>
+        <source>Spread</source>
+        <translation>扩展</translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation>相位</translation>
+    </message>
+    <message>
+        <source>Ring</source>
+        <translation>环形调制</translation>
+    </message>
+    <message>
+        <source>Harmonics</source>
+        <translation>谐波</translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation>音色</translation>
+    </message>
+    <message>
+        <source>Glide</source>
+        <translation>滑动</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
+    </message>
+    <message>
+        <source>LFO Rate</source>
+        <translation>LFO 速率</translation>
+    </message>
+    <message>
+        <source>LFO Stereo Phase</source>
+        <translation>LFO 立体声相位</translation>
+    </message>
+    <message>
+        <source>Delay Length</source>
+        <translation>延迟长度</translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation>反馈</translation>
+    </message>
+    <message>
+        <source>Delay Length (fine)</source>
+        <translation>延迟长度（微调）</translation>
+    </message>
+    <message>
+        <source>Delay Damping</source>
+        <translation>延迟阻尼</translation>
+    </message>
+    <message>
+        <source>Delay Glide</source>
+        <translation>延迟滑动</translation>
+    </message>
+    <message>
+        <source>Antireflect</source>
+        <translation>抗反射</translation>
+    </message>
+    <message>
+        <source>Anti-reflect</source>
+        <translation>抗反射</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>发送</translation>
     </message>
     <message>
         <source>Route: Send</source>
-        <translation type="unfinished"></translation>
+        <translation>路由：发送</translation>
     </message>
     <message>
         <source>Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>直通</translation>
     </message>
     <message>
         <source>Route: Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>路由：直通</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -7856,23 +7920,23 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Route: Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>路由：静音</translation>
     </message>
     <message>
         <source>Reset Shifter</source>
-        <translation type="unfinished"></translation>
+        <translation>重置频移器</translation>
     </message>
     <message>
         <source>Reset the shifter&apos;s oscillator phases to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>将频移器振荡器相位重置为 0（可自动化）</translation>
     </message>
     <message>
         <source>Reset LFO</source>
-        <translation type="unfinished"></translation>
+        <translation>重置 LFO</translation>
     </message>
     <message>
         <source>Reset the LFO phase to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>将 LFO 相位重置为 0（可自动化）</translation>
     </message>
     <message>
         <source>Open help window</source>
@@ -7883,11 +7947,11 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FrequencyShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Frequency Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Frequency Shifter is &lt;b&gt;not&lt;/b&gt; a pitch shifter.&lt;br&gt;&lt;br&gt;While &amp;quot;frequency&amp;quot; refers to Hz, &amp;quot;pitch&amp;quot; refers to octaves, semitones, cents, etc. &lt;br&gt;So, pitch shifting impacts all partials in the audio multiplicatively, while frequency shifting impacts it additively.&lt;br&gt;For example: If you have frequencies 100, 200, and 300 Hz, a pitch shift upward by 1.2x would result in 120, 240, and 360 Hz. Meanwhile, a frequency shift upward by 20 Hz would result in 120, 220, and 320 Hz.&lt;br&gt;Notice that a pitch shifter preserves the harmonic relationships between these frequencies, while frequency shifting destroys them entirely, resulting in an inharmonic timbre.&lt;br&gt;&lt;br&gt;A frequency shifter can also be used as a &amp;quot;barberpole phaser&amp;quot;. This is similar to other phasers, but unlike those, it can audibly move upward or downward infinitely, similar to a Shepard tone.&lt;br&gt;To achieve this, simply set the frequency shift amount to your desired phaser rate, and set the Mix to 50%. The resulting phase cancellation will filter the audio.&lt;br&gt;You may also achieve this by simply increasing the delay feedback, and keeping the delay length very low.&lt;br&gt;&lt;br&gt;This frequency shifter sports a unique &amp;quot;anti-reflect&amp;quot; algorithm which eliminates all frequencies aliasing through Nyquist and 0 Hz.&lt;br&gt;&lt;br&gt;This plugin may also be used as a ring modulator via the RING parameter. Ring modulation is the result of frequency shifting the audio upward and downward by the same amount in parallel.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shifter:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals.&lt;br&gt;&lt;b&gt;Frequency Shift&lt;/b&gt; - The amount of frequency shifting, in Hz.&lt;br&gt;&lt;b&gt;Spread&lt;/b&gt; - Offsets the frequency shift amount in opposite directions for the left and right channels.&lt;br&gt;Even very small amounts will add a lot of stereo width to the signal.&lt;br&gt;&lt;b&gt;Phase&lt;/b&gt; - Gives you manual control over the phase of the frequency shifter&apos;s internal oscillators.&lt;br&gt;When using the frequency shifter as a barberpole phaser, it is recommended to set the frequency shift amount to 0 and automate this Phase parameter.&lt;br&gt;&lt;b&gt;Ring&lt;/b&gt; - Blends in ring modulation, instead of just frequency shifting.&lt;br&gt;&lt;b&gt;Harm&lt;/b&gt; - Distorts the frequency shifter&apos;s internal sine oscillators. This brings them much closer to a smoothed square shape.&lt;br&gt;&lt;b&gt;Tone&lt;/b&gt; - A basic 1-pole lowpass on the frequency shifter&apos;s output, helpful for taming harsh high frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any frequency shift and phase parameter movements, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the frequency shifter&apos;s internal oscillators. This is automatable.&lt;br&gt;&lt;b&gt;Anti-reflect&lt;/b&gt; - Magic.&lt;br&gt;It removes all aliased frequencies through Nyquist and through 0 Hz. This is done via clean and CPU-efficient math tricks, not oversampling.&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO:&lt;/h3&gt;This modulates the frequency shift amount. Audio-rate modulation is fully supported.&lt;br&gt;&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - The amplitude of the LFO.&lt;br&gt;&lt;b&gt;Rate&lt;/b&gt; - LFO rate, in Hz.&lt;br&gt;&lt;b&gt;Stereo Phase&lt;/b&gt; - Offsets the phase of the LFO&apos;s right channel, making things stereo.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the LFO&apos;s oscillators. This is automatable.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Routing:&lt;/h3&gt;&lt;b&gt;Send&lt;/b&gt; - Sends the frequency shifter output into the delay.&lt;br&gt;&lt;b&gt;Pass&lt;/b&gt; - The audio input bypasses the frequency shifter, and is sent to both the delay and the output. The frequency shifter is now located inside of the delay line. Use this if you want the frequency shifter to only impact the echoes.&lt;br&gt;&lt;b&gt;Mute&lt;/b&gt; - Like &amp;quot;Pass&amp;quot; routing, except the input signal isn&apos;t sent to the output, so all you hear is the output from the delay line.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Length&lt;/b&gt; - Delay time in milliseconds.&lt;br&gt;&lt;b&gt;Fine&lt;/b&gt; - Identical to delay Length, but with a smaller knob range. This is helpful when using the feedback to cause comb filtering, giving you access to a unique phaser/flanger hybrid.&lt;br&gt;&lt;b&gt;Feedback&lt;/b&gt; - Feeds the output of the delay back into the input of the frequency shifter.&lt;br&gt;The delay&apos;s feedback path has very gentle saturation at high amplitudes, so the plugin can&apos;t break from high feedback values.&lt;br&gt;&lt;b&gt;Damping&lt;/b&gt; - A 1-pole lowpass filter in the feedback loop, so high frequencies fade out sooner than low frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any delay length changes, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Help&lt;/b&gt; - Instantly spawns a kiwano in a randomized location on the planet. 30 second cooldown.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;频移器&lt;/b&gt;&lt;br&gt;&lt;br&gt;插件作者：Lost Robot&lt;br&gt;界面作者：Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;概述：&lt;/h3&gt;频移器&lt;b&gt;不是&lt;/b&gt;移调器。&lt;br&gt;&lt;br&gt;“频率”以 Hz 表示，而“音高”以八度、半音、音分等表示。&lt;br&gt;因此，移调以乘法改变音频中的所有分音，而频移以加法改变它们。&lt;br&gt;例如：100、200、300 Hz 的频率向上移调 1.2 倍后变为 120、240、360 Hz；向上频移 20 Hz 后则变为 120、220、320 Hz。&lt;br&gt;移调保留这些频率之间的谐波关系，频移则会完全破坏这种关系，产生非谐和音色。&lt;br&gt;&lt;br&gt;频移器也可用作“无限循环相位器”。它类似其他相位器，但可以像谢泼德音一样产生听觉上无限上升或下降的效果。&lt;br&gt;只需将频移量设为所需的相位变化速率，并将混合设为 50%。产生的相位抵消将对音频进行滤波。&lt;br&gt;也可通过增大延迟反馈并保持很短的延迟时间来实现。&lt;br&gt;&lt;br&gt;此频移器采用独特的“抗反射”算法，消除跨过奈奎斯特频率及 0 Hz 的所有混叠频率。&lt;br&gt;&lt;br&gt;此插件还可通过 RING 参数用作环形调制器。环形调制是并行将音频向上和向下频移相同量的结果。&lt;br&gt;&lt;br&gt;&lt;h3&gt;频移器：&lt;/h3&gt;&lt;b&gt;混合&lt;/b&gt; - 混合湿信号和干信号。&lt;br&gt;&lt;b&gt;频移&lt;/b&gt; - 频移量，单位 Hz。&lt;br&gt;&lt;b&gt;扩展&lt;/b&gt; - 向相反方向偏移左右通道的频移量。&lt;br&gt;很小的量也会明显增加信号的立体声宽度。&lt;br&gt;&lt;b&gt;相位&lt;/b&gt; - 手动控制频移器内部振荡器的相位。&lt;br&gt;用作无限循环相位器时，建议将频移量设为 0 并自动化此相位参数。&lt;br&gt;&lt;b&gt;环形调制&lt;/b&gt; - 混入环形调制，而非仅进行频移。&lt;br&gt;&lt;b&gt;谐波&lt;/b&gt; - 使频移器内部正弦振荡器失真，使其更接近平滑方波。&lt;br&gt;&lt;b&gt;音色&lt;/b&gt; - 输出端的基础单极低通滤波器，用于抑制刺耳高频。&lt;br&gt;&lt;b&gt;滑动&lt;/b&gt; - 对频移及相位参数变化进行低通滤波，使其随时间缓慢变化，而非立即跳到目标值。&lt;br&gt;&lt;b&gt;重置&lt;/b&gt; - 立即重置内部振荡器的相位，可自动化。&lt;br&gt;&lt;b&gt;抗反射&lt;/b&gt; - 魔法。&lt;br&gt;消除跨过奈奎斯特频率及 0 Hz 的所有混叠频率。使用清晰且 CPU 高效的数学方法，而非过采样。&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO：&lt;/h3&gt;调制频移量，完全支持音频速率调制。&lt;br&gt;&lt;br&gt;&lt;b&gt;量&lt;/b&gt; - LFO 振幅。&lt;br&gt;&lt;b&gt;速率&lt;/b&gt; - LFO 速率，单位 Hz。&lt;br&gt;&lt;b&gt;立体声相位&lt;/b&gt; - 偏移 LFO 右通道相位，产生立体声效果。&lt;br&gt;&lt;b&gt;重置&lt;/b&gt; - 立即重置 LFO 振荡器相位，可自动化。&lt;br&gt;&lt;br&gt;&lt;h3&gt;路由：&lt;/h3&gt;&lt;b&gt;发送&lt;/b&gt; - 将频移器输出送入延迟器。&lt;br&gt;&lt;b&gt;直通&lt;/b&gt; - 音频输入绕过频移器，同时送入延迟器和输出端。此时频移器位于延迟线上；希望只影响回声时使用此模式。&lt;br&gt;&lt;b&gt;静音&lt;/b&gt; - 类似“直通”路由，但输入信号不送到输出端，因此只听到延迟线的输出。&lt;br&gt;&lt;br&gt;&lt;h3&gt;延迟：&lt;/h3&gt;&lt;b&gt;长度&lt;/b&gt; - 延迟时间，单位毫秒。&lt;br&gt;&lt;b&gt;微调&lt;/b&gt; - 与延迟长度相同，但旋钮范围更小。使用反馈产生梳状滤波时，可获得独特的相位器/镶边混合效果。&lt;br&gt;&lt;b&gt;反馈&lt;/b&gt; - 将延迟器输出反馈到频移器输入。&lt;br&gt;延迟反馈路径在高振幅时仅产生很温和的饱和，因此高反馈值不会使插件崩溃。&lt;br&gt;&lt;b&gt;阻尼&lt;/b&gt; - 反馈环路中的单极低通滤波器，使高频比低频更快衰减。&lt;br&gt;&lt;b&gt;滑动&lt;/b&gt; - 对延迟长度变化进行低通滤波，使其随时间缓慢变化，而非立即跳到目标值。&lt;br&gt;&lt;b&gt;帮助&lt;/b&gt; - 立即在地球上的随机地点生成一个刺角瓜。冷却时间 30 秒。&lt;br&gt;</translation>
     </message>
     <message>
         <source>Frequency Shifter Help</source>
-        <translation type="unfinished"></translation>
+        <translation>频移器帮助</translation>
     </message>
 </context>
 <context>
@@ -7898,7 +7962,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Choose patch</source>
-        <translation type="unfinished"></translation>
+        <translation>选择音色</translation>
     </message>
     <message>
         <source>Gain:</source>

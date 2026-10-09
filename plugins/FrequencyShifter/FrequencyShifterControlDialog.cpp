@@ -92,28 +92,28 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	shiftSpin->setModel(&c->m_freqShift);
 	shiftSpin->setSeamless(true, true);
 
-	mk(18, 30, "Mix", &c->m_mix, "", "fs_mix", K60);
-	mk(235, 24, "Spread", &c->m_spreadShift,"Hz", "fs_spread", K24);
-	mk(235, 72, "Phase",&c->m_phase, "", "fs_phase", K24);
-	mk(24, 115, "Ring", &c->m_ring, "", "fs_ring", K36);
-	mk(72, 115, "Harmonics", &c->m_harmonics, "", "fs_harm", K36);
-	mk(120, 115, "Tone",&c->m_tone, "Hz", "fs_tone", K36);
-	mk(200, 147, "Glide", &c->m_glide, "", "fs_glide", K19);
+	mk(18, 30, tr("Mix"), &c->m_mix, "", "fs_mix", K60);
+	mk(235, 24, tr("Spread"), &c->m_spreadShift, "Hz", "fs_spread", K24);
+	mk(235, 72, tr("Phase"), &c->m_phase, "", "fs_phase", K24);
+	mk(24, 115, tr("Ring"), &c->m_ring, "", "fs_ring", K36);
+	mk(72, 115, tr("Harmonics"), &c->m_harmonics, "", "fs_harm", K36);
+	mk(120, 115, tr("Tone"), &c->m_tone, "Hz", "fs_tone", K36);
+	mk(200, 147, tr("Glide"), &c->m_glide, "", "fs_glide", K19);
 
-	mk(18, 200, "LFO", &c->m_lfoAmount, "Hz", "fs_lfo", K36);
-	mk(66, 200, "LFO Rate", &c->m_lfoRate, "Hz", "fs_lforate", K36);
-	mk(114, 200, "LFO Stereo Phase", &c->m_lfoStereoPhase, "", "fs_lfost", K36);
+	mk(18, 200, tr("LFO"), &c->m_lfoAmount, "Hz", "fs_lfo", K36);
+	mk(66, 200, tr("LFO Rate"), &c->m_lfoRate, "Hz", "fs_lforate", K36);
+	mk(114, 200, tr("LFO Stereo Phase"), &c->m_lfoStereoPhase, "", "fs_lfost", K36);
 
-	mk(18, 282, "Delay Length", &c->m_delayLengthLong, "ms", "fs_delay", K36);
-	mk(114, 282, "Feedback", &c->m_feedback, "", "fs_feedback", K36);
-	mk(24, 324, "Delay Length (fine)", &c->m_delayLengthShort, "ms", "fs_finedelay", K24);
-	mk(120, 324, "Delay Damping", &c->m_delayDamp, "Hz", "fs_damp", K24);
-	mk(245, 315, "Delay Glide", &c->m_delayGlide, "", "fs_dglide", K19);
+	mk(18, 282, tr("Delay Length"), &c->m_delayLengthLong, "ms", "fs_delay", K36);
+	mk(114, 282, tr("Feedback"), &c->m_feedback, "", "fs_feedback", K36);
+	mk(24, 324, tr("Delay Length (fine)"), &c->m_delayLengthShort, "ms", "fs_finedelay", K24);
+	mk(120, 324, tr("Delay Damping"), &c->m_delayDamp, "Hz", "fs_damp", K24);
+	mk(245, 315, tr("Delay Glide"), &c->m_delayGlide, "", "fs_dglide", K19);
 
-	PixmapButton* antireflectButton = new PixmapButton(this, "Antireflect");
+	PixmapButton* antireflectButton = new PixmapButton(this, tr("Antireflect"));
 	antireflectButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_on"));
 	antireflectButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_off"));
-	antireflectButton->setToolTip("Anti-reflect");
+	antireflectButton->setToolTip(tr("Anti-reflect"));
 	antireflectButton->move(188, 122);
 	antireflectButton->setCheckable(true);
 	antireflectButton->setModel(&c->m_antireflect);

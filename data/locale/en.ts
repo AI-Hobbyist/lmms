@@ -7267,10 +7267,6 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Bandwidth: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -7815,6 +7811,74 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FrequencyShifterControlDialog</name>
     <message>
         <source>Frequency Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Harmonics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Glide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Stereo Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Length (fine)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay Glide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antireflect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anti-reflect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

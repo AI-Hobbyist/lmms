@@ -22,6 +22,7 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QTemporaryDir>
+#include <QTextEdit>
 #include <QToolButton>
 #include <QTranslator>
 #include <QtTest>
@@ -641,6 +642,48 @@ private slots:
 				QVERIFY(panel);
 				const auto preset = settings(effect);
 				showEditor(panel, evidencePrefix + '-' + name);
+				if (name == "frequencyshifter" && !selectedPlugins.isEmpty())
+				{
+					QWidget* helpButton = nullptr;
+					for (auto* widget : panel->findChildren<QWidget*>())
+					{
+						if (widget->toolTip()
+							== QCoreApplication::translate(
+								"lmms::gui::FrequencyShifterControlDialog", "Open help window"))
+						{
+							helpButton = widget;
+						}
+					}
+					QVERIFY(helpButton);
+					panel->show();
+					if (panel->parentWidget())
+					{
+						panel->parentWidget()->show();
+					}
+					QVERIFY(QTest::qWaitForWindowExposed(panel->window()));
+					QVERIFY(helpButton->isVisible());
+					QTest::qWait(200);
+					QTest::mouseClick(helpButton, Qt::LeftButton);
+					QCoreApplication::processEvents();
+					QTextEdit* help = nullptr;
+					for (auto* widget : QApplication::allWidgets())
+					{
+						auto* text = qobject_cast<QTextEdit*>(widget);
+						if (text && text->windowTitle()
+							== QCoreApplication::translate(
+								"lmms::gui::FrequencyShifterHelpView", "Frequency Shifter Help"))
+						{
+							help = text;
+						}
+					}
+					QVERIFY(help);
+					if (qEnvironmentVariable("LMMS_UI_TRANSLATION") != "en")
+					{
+						QVERIFY(!help->toPlainText().startsWith("Frequency Shifter"));
+					}
+					showEditor(help, evidencePrefix + "-help");
+					panel->hide();
+				}
 				checkPreset(effect, preset);
 			}
 			else

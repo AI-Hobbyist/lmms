@@ -143,3 +143,7 @@ M5-01 实窗补充：推送 `16f6990a30263fcce62533a271798d04e1af0522` 后复核
 M5-02：前批补充修正 `1150afb55ba9d60b7ab7c37667fa8abfaa2534c6` 推送确认后开始。Compressor/CrossoverEQ/Delay/Dispersion/DualFilter 共 192 键四语质量 PASS；中/日/韩分别修改 109/114/12 个待译或同原文项，保留 Moog 专名、DC 缩写与 Hz 单位，逐语言理由已记录。全库剩余空译 736/861/52，全部为后续插件批次。
 
 本批仅译文，无 C++ 变更，按计划生成四语 QM 并复用已编译的原生窗口测试程序。四语 pluginPanels 各 3 PASS、0 FAIL，100% 缩放，五个真实效果器窗及预设保存/恢复检查通过。代表截图确认中日韩字形正常。CodeGraph 核对 CompressorControlDialog：面板英文标识来自 controlsBox 与按钮位图，运行时参数提示使用 tr；保留既有位图，不改主题/控件设计，实际悬浮提示的可读性留 M7。开发加载目录仍为 build/Release/plugins。
+
+M5-03：上一检查点 64ae1368301dc80a01e13ce1d254503f03572272 已推送确认。Eq、FreeBoy、DynamicsProcessor、Flanger、GigPlayer、FrequencyShifter 共 216 键四语质量 PASS。移除 Eq 无效空 source，补上 FrequencyShifter 17 个实际控件提示入口，完整补译其 HTML 帮助并保持标签结构、数值和技术内容。plugin-batches.json 固定已定义批次，避免新增入口使后续插件重新分组；本批保持插件完整，不扩大功能范围。全库 3594 键，中/日/韩剩余空译 650/801/38，占位符异常 0。
+
+四语 QM 生成、eq/frequencyshifter/UiBaselineCapture 前台编译通过，DLL 写入 build/Release/plugins，开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，真实 Windows 窗口、100% 缩放；五个可用插件面板及 FrequencyShifter 帮助页取得截图，中文/日文帮助及韩文面板字形正常。GigPlayer 当前部署不可用，各语言覆盖记录 MANUAL/PENDING。帮助测试首次假定独立面板有父窗口而失败，修正测试空指针检查后重新编译、四语重测通过，保留失败日志；不修改生产窗口结构。位图标签及其悬浮全文验收继续按 M7 范围处理。

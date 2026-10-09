@@ -986,7 +986,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A frequency shifter (not a pitch shifter) and barberpole phaser plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>주파수 시프터 (피치 시프터 아님) 및 무한 순환 페이저 플러그인</translation>
     </message>
     <message>
         <source>Granular pitch shifter</source>
@@ -2452,27 +2452,27 @@ Continue?</source>
     </message>
     <message>
         <source>LP 12</source>
-        <translation>LP 12</translation>
+        <translation>로우패스 12</translation>
     </message>
     <message>
         <source>LP 24</source>
-        <translation>LP 24</translation>
+        <translation>로우패스 24</translation>
     </message>
     <message>
         <source>LP 48</source>
-        <translation>LP 48</translation>
+        <translation>로우패스 48</translation>
     </message>
     <message>
         <source>HP 12</source>
-        <translation>HP 12</translation>
+        <translation>하이패스 12</translation>
     </message>
     <message>
         <source>HP 24</source>
-        <translation>HP 24</translation>
+        <translation>하이패스 24</translation>
     </message>
     <message>
         <source>HP 48</source>
-        <translation>HP 48</translation>
+        <translation>하이패스 48</translation>
     </message>
     <message>
         <source>Low-pass type</source>
@@ -7240,7 +7240,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::EqControlsDialog</name>
     <message>
         <source>HP</source>
-        <translation>HP</translation>
+        <translation>하이패스</translation>
     </message>
     <message>
         <source>Low-shelf</source>
@@ -7268,7 +7268,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>LP</source>
-        <translation>LP</translation>
+        <translation>로우패스</translation>
     </message>
     <message>
         <source>Input gain</source>
@@ -7281,10 +7281,6 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <source>Output gain</source>
         <translation>출력 게인</translation>
-    </message>
-    <message>
-        <source></source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Bandwidth: </source>
@@ -7627,7 +7623,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>양</translation>
     </message>
     <message>
         <source>Amount:</source>
@@ -7643,7 +7639,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>FDBK</source>
-        <translation>FDBK</translation>
+        <translation>피드백</translation>
     </message>
     <message>
         <source>Feedback amount:</source>
@@ -7832,23 +7828,91 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FrequencyShifterControlDialog</name>
     <message>
         <source>Frequency Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>주파수 이동</translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation>믹스</translation>
+    </message>
+    <message>
+        <source>Spread</source>
+        <translation>확산</translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation>위상</translation>
+    </message>
+    <message>
+        <source>Ring</source>
+        <translation>링 변조</translation>
+    </message>
+    <message>
+        <source>Harmonics</source>
+        <translation>배음</translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation>톤</translation>
+    </message>
+    <message>
+        <source>Glide</source>
+        <translation>글라이드</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
+    </message>
+    <message>
+        <source>LFO Rate</source>
+        <translation>LFO 속도</translation>
+    </message>
+    <message>
+        <source>LFO Stereo Phase</source>
+        <translation>LFO 스테레오 위상</translation>
+    </message>
+    <message>
+        <source>Delay Length</source>
+        <translation>지연 길이</translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation>피드백</translation>
+    </message>
+    <message>
+        <source>Delay Length (fine)</source>
+        <translation>지연 길이 (미세 조정)</translation>
+    </message>
+    <message>
+        <source>Delay Damping</source>
+        <translation>지연 댐핑</translation>
+    </message>
+    <message>
+        <source>Delay Glide</source>
+        <translation>지연 글라이드</translation>
+    </message>
+    <message>
+        <source>Antireflect</source>
+        <translation>반사 방지</translation>
+    </message>
+    <message>
+        <source>Anti-reflect</source>
+        <translation>반사 방지</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>전송</translation>
     </message>
     <message>
         <source>Route: Send</source>
-        <translation type="unfinished"></translation>
+        <translation>라우팅: 전송</translation>
     </message>
     <message>
         <source>Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>통과</translation>
     </message>
     <message>
         <source>Route: Pass</source>
-        <translation type="unfinished"></translation>
+        <translation>라우팅: 통과</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -7856,23 +7920,23 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Route: Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>라우팅: 음소거</translation>
     </message>
     <message>
         <source>Reset Shifter</source>
-        <translation type="unfinished"></translation>
+        <translation>시프터 초기화</translation>
     </message>
     <message>
         <source>Reset the shifter&apos;s oscillator phases to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>시프터 오실레이터 위상을 0으로 초기화 (자동화 가능)</translation>
     </message>
     <message>
         <source>Reset LFO</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 초기화</translation>
     </message>
     <message>
         <source>Reset the LFO phase to 0 (automatable)</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 위상을 0으로 초기화 (자동화 가능)</translation>
     </message>
     <message>
         <source>Open help window</source>
@@ -7883,11 +7947,11 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::FrequencyShifterHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Frequency Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Frequency Shifter is &lt;b&gt;not&lt;/b&gt; a pitch shifter.&lt;br&gt;&lt;br&gt;While &amp;quot;frequency&amp;quot; refers to Hz, &amp;quot;pitch&amp;quot; refers to octaves, semitones, cents, etc. &lt;br&gt;So, pitch shifting impacts all partials in the audio multiplicatively, while frequency shifting impacts it additively.&lt;br&gt;For example: If you have frequencies 100, 200, and 300 Hz, a pitch shift upward by 1.2x would result in 120, 240, and 360 Hz. Meanwhile, a frequency shift upward by 20 Hz would result in 120, 220, and 320 Hz.&lt;br&gt;Notice that a pitch shifter preserves the harmonic relationships between these frequencies, while frequency shifting destroys them entirely, resulting in an inharmonic timbre.&lt;br&gt;&lt;br&gt;A frequency shifter can also be used as a &amp;quot;barberpole phaser&amp;quot;. This is similar to other phasers, but unlike those, it can audibly move upward or downward infinitely, similar to a Shepard tone.&lt;br&gt;To achieve this, simply set the frequency shift amount to your desired phaser rate, and set the Mix to 50%. The resulting phase cancellation will filter the audio.&lt;br&gt;You may also achieve this by simply increasing the delay feedback, and keeping the delay length very low.&lt;br&gt;&lt;br&gt;This frequency shifter sports a unique &amp;quot;anti-reflect&amp;quot; algorithm which eliminates all frequencies aliasing through Nyquist and 0 Hz.&lt;br&gt;&lt;br&gt;This plugin may also be used as a ring modulator via the RING parameter. Ring modulation is the result of frequency shifting the audio upward and downward by the same amount in parallel.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shifter:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals.&lt;br&gt;&lt;b&gt;Frequency Shift&lt;/b&gt; - The amount of frequency shifting, in Hz.&lt;br&gt;&lt;b&gt;Spread&lt;/b&gt; - Offsets the frequency shift amount in opposite directions for the left and right channels.&lt;br&gt;Even very small amounts will add a lot of stereo width to the signal.&lt;br&gt;&lt;b&gt;Phase&lt;/b&gt; - Gives you manual control over the phase of the frequency shifter&apos;s internal oscillators.&lt;br&gt;When using the frequency shifter as a barberpole phaser, it is recommended to set the frequency shift amount to 0 and automate this Phase parameter.&lt;br&gt;&lt;b&gt;Ring&lt;/b&gt; - Blends in ring modulation, instead of just frequency shifting.&lt;br&gt;&lt;b&gt;Harm&lt;/b&gt; - Distorts the frequency shifter&apos;s internal sine oscillators. This brings them much closer to a smoothed square shape.&lt;br&gt;&lt;b&gt;Tone&lt;/b&gt; - A basic 1-pole lowpass on the frequency shifter&apos;s output, helpful for taming harsh high frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any frequency shift and phase parameter movements, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the frequency shifter&apos;s internal oscillators. This is automatable.&lt;br&gt;&lt;b&gt;Anti-reflect&lt;/b&gt; - Magic.&lt;br&gt;It removes all aliased frequencies through Nyquist and through 0 Hz. This is done via clean and CPU-efficient math tricks, not oversampling.&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO:&lt;/h3&gt;This modulates the frequency shift amount. Audio-rate modulation is fully supported.&lt;br&gt;&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - The amplitude of the LFO.&lt;br&gt;&lt;b&gt;Rate&lt;/b&gt; - LFO rate, in Hz.&lt;br&gt;&lt;b&gt;Stereo Phase&lt;/b&gt; - Offsets the phase of the LFO&apos;s right channel, making things stereo.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the LFO&apos;s oscillators. This is automatable.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Routing:&lt;/h3&gt;&lt;b&gt;Send&lt;/b&gt; - Sends the frequency shifter output into the delay.&lt;br&gt;&lt;b&gt;Pass&lt;/b&gt; - The audio input bypasses the frequency shifter, and is sent to both the delay and the output. The frequency shifter is now located inside of the delay line. Use this if you want the frequency shifter to only impact the echoes.&lt;br&gt;&lt;b&gt;Mute&lt;/b&gt; - Like &amp;quot;Pass&amp;quot; routing, except the input signal isn&apos;t sent to the output, so all you hear is the output from the delay line.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Length&lt;/b&gt; - Delay time in milliseconds.&lt;br&gt;&lt;b&gt;Fine&lt;/b&gt; - Identical to delay Length, but with a smaller knob range. This is helpful when using the feedback to cause comb filtering, giving you access to a unique phaser/flanger hybrid.&lt;br&gt;&lt;b&gt;Feedback&lt;/b&gt; - Feeds the output of the delay back into the input of the frequency shifter.&lt;br&gt;The delay&apos;s feedback path has very gentle saturation at high amplitudes, so the plugin can&apos;t break from high feedback values.&lt;br&gt;&lt;b&gt;Damping&lt;/b&gt; - A 1-pole lowpass filter in the feedback loop, so high frequencies fade out sooner than low frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any delay length changes, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Help&lt;/b&gt; - Instantly spawns a kiwano in a randomized location on the planet. 30 second cooldown.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;주파수 시프터&lt;/b&gt;&lt;br&gt;&lt;br&gt;플러그인 제작: Lost Robot&lt;br&gt;GUI 제작: Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;개요:&lt;/h3&gt;주파수 시프터는&lt;b&gt;피치 시프터가&lt;/b&gt; 아닙니다.&lt;br&gt;&lt;br&gt;주파수는 Hz로, 음높이는 옥타브, 반음, 센트 등으로 나타냅니다.&lt;br&gt;따라서 피치 이동은 오디오의 모든 부분음을 곱셈으로, 주파수 이동은 덧셈으로 변경합니다.&lt;br&gt;예를 들어 100, 200, 300 Hz를 1.2배 위로 피치 이동하면 120, 240, 360 Hz가 됩니다. 반면 20 Hz 위로 주파수 이동하면 120, 220, 320 Hz가 됩니다.&lt;br&gt;피치 이동은 이 주파수들의 배음 관계를 유지하지만, 주파수 이동은 이를 완전히 무너뜨려 비조화적 음색을 만듭니다.&lt;br&gt;&lt;br&gt;주파수 시프터는 무한 순환 페이저로도 사용할 수 있습니다. 다른 페이저와 비슷하지만 셰퍼드 톤처럼 끝없이 상승하거나 하강하는 청각적 효과를 냅니다.&lt;br&gt;주파수 이동량을 원하는 페이저 속도로 설정하고 믹스를 50%로 설정하세요. 발생하는 위상 상쇄가 오디오를 필터링합니다.&lt;br&gt;지연 피드백을 늘리고 지연 시간을 매우 짧게 유지해도 구현할 수 있습니다.&lt;br&gt;&lt;br&gt;이 주파수 시프터는 고유한 반사 방지 알고리즘으로 나이퀴스트 주파수와 0 Hz를 넘어 생기는 모든 앨리어싱 주파수를 제거합니다.&lt;br&gt;&lt;br&gt;RING 매개변수로 링 모듈레이터로도 사용할 수 있습니다. 링 변조는 오디오 주파수를 같은 양만큼 위아래로 병렬 이동한 결과입니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;시프터:&lt;/h3&gt;&lt;b&gt;믹스&lt;/b&gt; - 웻 신호와 드라이 신호를 혼합합니다.&lt;br&gt;&lt;b&gt;주파수 이동&lt;/b&gt; - 주파수 이동량 (Hz).&lt;br&gt;&lt;b&gt;확산&lt;/b&gt; - 좌우 채널의 주파수 이동량을 반대 방향으로 오프셋합니다.&lt;br&gt;아주 작은 양도 신호의 스테레오 폭을 크게 넓힙니다.&lt;br&gt;&lt;b&gt;위상&lt;/b&gt; - 주파수 시프터 내부 오실레이터 위상을 수동으로 제어합니다.&lt;br&gt;무한 순환 페이저로 사용할 때는 주파수 이동량을 0으로 설정하고 이 위상 매개변수를 자동화하는 것을 권장합니다.&lt;br&gt;&lt;b&gt;링 변조&lt;/b&gt; - 주파수 이동뿐 아니라 링 변조를 섞습니다.&lt;br&gt;&lt;b&gt;배음&lt;/b&gt; - 내부 사인파 오실레이터를 왜곡하여 부드러운 사각파에 가깝게 만듭니다.&lt;br&gt;&lt;b&gt;톤&lt;/b&gt; - 출력의 기본 1극 로우패스 필터로 거친 고주파를 줄입니다.&lt;br&gt;&lt;b&gt;글라이드&lt;/b&gt; - 주파수 이동과 위상 매개변수 변화를 로우패스로 처리하여 목표값으로 즉시 이동하지 않고 시간에 따라 천천히 변하게 합니다.&lt;br&gt;&lt;b&gt;초기화&lt;/b&gt; - 내부 오실레이터 위상을 즉시 초기화합니다. 자동화할 수 있습니다.&lt;br&gt;&lt;b&gt;반사 방지&lt;/b&gt; - 마법.&lt;br&gt;나이퀴스트 주파수와 0 Hz를 넘어 생기는 모든 앨리어싱 주파수를 제거합니다. 오버샘플링 대신 간결하고 CPU 효율적인 수학 기법을 사용합니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO:&lt;/h3&gt;주파수 이동량을 변조합니다. 오디오 속도의 변조를 완전히 지원합니다.&lt;br&gt;&lt;br&gt;&lt;b&gt;양&lt;/b&gt; - LFO 진폭.&lt;br&gt;&lt;b&gt;속도&lt;/b&gt; - LFO 속도 (Hz).&lt;br&gt;&lt;b&gt;스테레오 위상&lt;/b&gt; - LFO 오른쪽 채널 위상을 오프셋하여 스테레오 효과를 만듭니다.&lt;br&gt;&lt;b&gt;초기화&lt;/b&gt; - LFO 오실레이터 위상을 즉시 초기화합니다. 자동화할 수 있습니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;라우팅:&lt;/h3&gt;&lt;b&gt;전송&lt;/b&gt; - 주파수 시프터 출력을 딜레이로 보냅니다.&lt;br&gt;&lt;b&gt;통과&lt;/b&gt; - 오디오 입력이 주파수 시프터를 우회하여 딜레이와 출력 양쪽으로 전송됩니다. 시프터는 지연선 내부에 위치합니다. 에코에만 영향을 주려면 이 모드를 사용하세요.&lt;br&gt;&lt;b&gt;음소거&lt;/b&gt; - 통과 라우팅과 비슷하지만 입력 신호가 출력으로 전송되지 않아 지연선 출력만 들립니다.&lt;br&gt;&lt;br&gt;&lt;h3&gt;딜레이:&lt;/h3&gt;&lt;b&gt;길이&lt;/b&gt; - 지연 시간 (밀리초).&lt;br&gt;&lt;b&gt;미세 조정&lt;/b&gt; - 지연 길이와 같지만 노브 범위가 더 작습니다. 피드백으로 콤 필터링을 만들 때 독특한 페이저/플랜저 혼합 효과를 얻을 수 있습니다.&lt;br&gt;&lt;b&gt;피드백&lt;/b&gt; - 딜레이 출력을 주파수 시프터 입력으로 되돌립니다.&lt;br&gt;딜레이 피드백 경로는 높은 진폭에서 매우 완만하게 포화되므로 높은 피드백 값으로 플러그인이 망가지지 않습니다.&lt;br&gt;&lt;b&gt;댐핑&lt;/b&gt; - 피드백 루프의 1극 로우패스 필터로 고주파가 저주파보다 빨리 감쇠하게 합니다.&lt;br&gt;&lt;b&gt;글라이드&lt;/b&gt; - 지연 길이 변화를 로우패스로 처리하여 목표값으로 즉시 이동하지 않고 시간에 따라 천천히 변하게 합니다.&lt;br&gt;&lt;b&gt;도움말&lt;/b&gt; - 지구의 무작위 위치에 키와노를 즉시 생성합니다. 재사용 대기시간 30초.&lt;br&gt;</translation>
     </message>
     <message>
         <source>Frequency Shifter Help</source>
-        <translation type="unfinished"></translation>
+        <translation>주파수 시프터 도움말</translation>
     </message>
 </context>
 <context>

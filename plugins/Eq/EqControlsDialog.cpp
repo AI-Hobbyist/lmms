@@ -90,7 +90,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	int distance = 126;
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )
 	{
-		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this,
+		auto gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, QString{}, this,
 			m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
 		gainFader->setFixedSize(faderSize);
 		gainFader->move( distance, 295 );
