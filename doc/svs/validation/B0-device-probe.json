@@ -1,0 +1,33 @@
+{
+  "runtime": "1.23.0",
+  "devices": [
+    {
+      "luid": "dxgi:00000000:000148ca",
+      "name": "AMD Radeon 780M Graphics",
+      "vendor": 4098,
+      "device": 6400,
+      "dedicatedBytes": 536870912,
+      "available": true,
+      "d3d12": "PASS",
+      "directml": "PASS",
+      "ortAdd": "PASS",
+      "dmlNodes": 1,
+      "cpuNodes": 0,
+      "profile": "doc/svs/validation\\B0-device-profile_2026-10-09_11-23-12.json"
+    },
+    {
+      "luid": "dxgi:00000000:00016a3c",
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "vendor": 4318,
+      "device": 11609,
+      "dedicatedBytes": 8282701824,
+      "available": true,
+      "d3d12": "PASS",
+      "directml": "PASS",
+      "ortAdd": "PASS",
+      "dmlNodes": 1,
+      "cpuNodes": 0,
+      "profile": "doc/svs/validation\\B0-device-profile_2026-10-09_11-23-13.json"
+    }
+  ]
+}

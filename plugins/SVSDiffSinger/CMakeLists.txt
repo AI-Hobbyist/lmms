@@ -64,6 +64,10 @@ FetchContent_Declare(
 	URL https://github.com/jbeder/yaml-cpp/archive/f7320141120f720aecc4c32be25586e7da9eb978.tar.gz
 	URL_HASH SHA256=2fd3bf695ccc056835a70dd6d3046312cc1004e8338b8b5c91646918a27b7ef6)
 FetchContent_MakeAvailable(diffsinger_json diffsinger_yaml)
+if(CMAKE_PROJECT_NAME STREQUAL "lmms")
+	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../src/core/svs/compute"
+		"${CMAKE_BINARY_DIR}/src/core/svs/compute")
+endif()
 add_library(DiffSingerNative INTERFACE)
 target_compile_features(DiffSingerNative INTERFACE cxx_std_17)
 target_compile_definitions(DiffSingerNative INTERFACE NOMINMAX)

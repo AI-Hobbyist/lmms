@@ -1,0 +1,2 @@
+B0 independent C ABI check
+PASS: independent compute C header with unchanged legacy SVS header

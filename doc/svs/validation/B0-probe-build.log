@@ -1,0 +1,7 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  1>Checking Build System
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  ComputeProbe.cpp
+  SVSComputeProbe.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\compute\SVSComputeProbe.exe

@@ -1,0 +1,7 @@
+[
+{"cat" : "Session","pid" :34776,"tid" :25948,"dur" :138,"ts" :10,"ph" : "X","name" :"model_loading_array","args" : {}},
+{"cat" : "Session","pid" :34776,"tid" :25948,"dur" :61195,"ts" :2545,"ph" : "X","name" :"session_initialization","args" : {}},
+{"cat" : "Node","pid" :34776,"tid" :25948,"dur" :883,"ts" :67421,"ph" : "X","name" :"DmlFusedNode_0_0_kernel_time","args" : {"parameter_size" : "0","provider" : "DmlExecutionProvider","op_name" : "DmlFusedNode_0_0","input_type_shape" : [{"float":[1,4]},{"float":[1,4]}],"node_index" : "1","output_type_shape" : [{"float":[1,4]}],"activation_size" : "32","output_size" : "16","thread_scheduling_stats" : {"main_thread": {"thread_pool_name": "session-2-intra-op", "thread_id": "25948", "block_size": [], "core": -1, "Distribution": 0, "DistributionEnqueue": 0, "Run": 0, "Wait": 0, "WaitRevoke": 0}, "sub_threads": {"51340": {"num_run": 0, "core": -1}}}}},
+{"cat" : "Session","pid" :34776,"tid" :25948,"dur" :898,"ts" :67417,"ph" : "X","name" :"SequentialExecutor::Execute","args" : {}},
+{"cat" : "Session","pid" :34776,"tid" :25948,"dur" :5959,"ts" :64915,"ph" : "X","name" :"model_run","args" : {}}
+]

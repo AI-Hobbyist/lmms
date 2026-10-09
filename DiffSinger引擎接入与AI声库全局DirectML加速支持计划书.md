@@ -233,7 +233,7 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | A2 | PASS | 六包原生歌词/真实12个 duration ONNX；词典/延续/休止/覆盖重置/最小时长/取消；说话人嵌入fixture和工程持久化；独立SDK/原位DLL/开发主题实窗 | 无本阶段人工项 |
 | A3 | DONE | 六包 CPU 全链、稳定 seed、SHA 音频/tensor 缓存、受限分块、tempo、导出/重开、只读参考曲线实窗通过；本阶段提交推送后进入 A4 | 已保留六份试听；主观听感 MANUAL/PENDING |
 | A4 | DONE | 既有 Release/58 个插件原位部署、独立 SDK/旧示例、完整 SVS 68/0、原生 GUI 5/0、实际 Release 与空声库启动 3/0；通用音域/背景波形、前缀/拼音/颜色/加粗波形通过，见 A4 验收 | 主观听感 MANUAL/PENDING |
-| B0 | NOT STARTED | — | — |
+| B0 | PASS | 共享 C ABI/策略/依赖/容差冻结；两块真实 LUID 的 DML Add 节点；六包 48/48 DML session；纯 C 头与缺设备负向通过，见 B0 验收 | 实际模型 DML 推理在 B3 验收 |
 | B1 | NOT STARTED | — | — |
 | B2 | NOT STARTED | — | — |
 | B3 | NOT STARTED | — | 多GPU视本机条件 |
@@ -259,3 +259,7 @@ A4 完成证据见 [A4 验收](doc/svs/DiffSinger-A4-validation.md)。本轮 A0�
 本增量自动验收完成：完整 SVS 70 passed / 0 failed / 2 GUI-only skipped；真实窗口专项 5 passed / 0 failed / 0 skipped；独立 SDK 旧 full/minimal 与 DiffSinger ABI 1.0–1.3 / 六包分段和颜色声明通过。见 doc/svs/SVS-segment-rendering-validation.md。完成本检查点提交推送后，再交付用户追加的英文 README 对比表与安装版全量替换包。
 
 用户追加交付已完成：英文主 README 对比表及 AI 辅助开发/独立分支同步上游说明已在 236c5f3fe 推送，原 README 保留。全量替换包 `build/packages/lmms-enhanced-full-236c5f3fe-win64.zip` 包含完整 DiffSinger 与官方默认四轨模板；ZIP 哈希、360 PE 位数、原开发目录实际覆盖/配置保留、包内运行库实窗启动及实际部署六包 ABI 通过，见 `doc/svs/SVS-replacement-package.md`。个人空白模板已先备份再恢复官方模板，生产初始化代码未修改。B 阶段仍未开始。
+
+## B 阶段实施（2026-10-09 新授权）
+
+用户已明确授权依次实施 B0～B4，每阶段分别提交推送。以上 A 阶段限定语属于历史检查点，不限制本次 B 实施。B0 自动验收通过，详见 [B0 验收](doc/svs/DiffSinger-B0-validation.md)；确认本阶段推送后才开始 B1。B1～B4 尚未完成，不宣称全局 GPU 加速完成。

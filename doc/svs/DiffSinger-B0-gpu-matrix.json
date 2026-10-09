@@ -1,0 +1,1382 @@
+{
+  "schemaVersion": 1,
+  "runtime": "onnxruntime-directml-1.23.0/directml-1.15.4",
+  "device": "dxgi:00000000:00016a3c",
+  "purpose": "B0 session compatibility; model node execution and numerical comparison pending B3",
+  "voices": [
+    {
+      "root": "fu2_ning2_na4-DiffSinger/fu2_ning2_na4",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "fu2_ning2_na4_aco.fu2_ning2_na4.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.fu2_ning2_na4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.fu2_ning2_na4.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.fu2_ning2_na4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.fu2_ning2_na4.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.fu2_ning2_na4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.fu2_ning2_na4.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    },
+    {
+      "root": "na4_wei2_lai2_te4-DiffSinger/na4_wei2_lai2_te4",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "na4_wei2_lai2_te4_aco.na4_wei2_lai2_te4.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.na4_wei2_lai2_te4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.na4_wei2_lai2_te4.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.na4_wei2_lai2_te4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.na4_wei2_lai2_te4.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.na4_wei2_lai2_te4.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.na4_wei2_lai2_te4.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    },
+    {
+      "root": "na4_xi1_da2-DiffSinger/na4_xi1_da2",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "na4_xi1_da2_aco.na4_xi1_da2.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/xm_dur.na4_xi1_da2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/xm_dur.na4_xi1_da2.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/xm_pit.na4_xi1_da2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/xm_pit.na4_xi1_da2.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/xm_var.na4_xi1_da2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/xm_var.na4_xi1_da2.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    },
+    {
+      "root": "wen1_di2-DiffSinger/wen1_di2",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "wen1_di2_aco.wen1_di2.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/md_dur.wen1_di2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/md_dur.wen1_di2.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/md_pit.wen1_di2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/md_pit.wen1_di2.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/md_var.wen1_di2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/md_var.wen1_di2.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    },
+    {
+      "root": "xi1_ge2_wen2-DiffSinger/xi1_ge2_wen2",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "xi1_ge2_wen2_aco.xi1_ge2_wen2.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/fd_dur.xi1_ge2_wen2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/fd_dur.xi1_ge2_wen2.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/fd_pit.xi1_ge2_wen2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/fd_pit.xi1_ge2_wen2.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/fd_var.xi1_ge2_wen2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/fd_var.xi1_ge2_wen2.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    },
+    {
+      "root": "xia2_die2-DiffSinger/xia2_die2",
+      "models": [
+        {
+          "stage": "acoustic",
+          "role": "acoustic",
+          "file": "xia2_die2_aco.xia2_die2.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 10,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "linguistic",
+          "file": "dsdur/sr4_dur.xia2_die2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "duration",
+          "role": "dur",
+          "file": "dsdur/sr4_dur.xia2_die2.dur.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 3,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "linguistic",
+          "file": "dspitch/sr4_pit.xia2_die2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "pitch",
+          "role": "pitch",
+          "file": "dspitch/sr4_pit.xia2_die2.pitch.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 9,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "linguistic",
+          "file": "dsvariance/sr4_var.xia2_die2.linguistic.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 2,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "variance",
+          "role": "variance",
+          "file": "dsvariance/sr4_var.xia2_die2.variance.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 8,
+                "outputs": 3,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        },
+        {
+          "stage": "vocoder",
+          "role": "model",
+          "file": "dsvocoder/kouon_pc_mini_nsf-hifigan_1028_44100hz_512hop_128bin.onnx",
+          "cpuOnly": false,
+          "constraintReason": "",
+          "dmlSession": "PASS",
+          "exitCode": 0,
+          "evidence": {
+            "runtime": "1.23.0",
+            "devices": [
+              {
+                "luid": "dxgi:00000000:00016a3c",
+                "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+                "vendor": 4318,
+                "device": 11609,
+                "dedicatedBytes": 8282701824,
+                "available": false,
+                "session": "PASS",
+                "inputs": 2,
+                "outputs": 1,
+                "execution": "PENDING_B3",
+                "note": "Session construction only; does not prove model DML node execution"
+              }
+            ]
+          },
+          "execution": "PENDING_B3"
+        }
+      ]
+    }
+  ]
+}
