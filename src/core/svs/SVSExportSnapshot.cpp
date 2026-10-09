@@ -1,18 +1,21 @@
 #include "SVSExportSnapshot.h"
-#include "SVSClip.h"
-#include "SVSTrack.h"
-#include "SVSSynthesisScheduler.h"
-#include "SVSTempoSource.h"
-#include "Song.h"
-#include "EffectChain.h"
-#include <QTimer>
+
 #include <QCoreApplication>
-#include <QRunnable>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
+#include <QRunnable>
 #include <QThread>
+#include <QTimer>
+
+#include "EffectChain.h"
 #include "Engine.h"
+#include "SVSClip.h"
+#include "SVSComputePolicy.h"
+#include "SVSSynthesisScheduler.h"
+#include "SVSTempoSource.h"
+#include "SVSTrack.h"
+#include "Song.h"
 namespace lmms::svs {
 namespace {
 QString mixContext(SVSTrack& track)
@@ -78,6 +81,31 @@ ExportSnapshot::ExportSnapshot(QVector<Region> regions, QObject* parent)
 	: QObject(parent)
 	, m_regions(std::move(regions))
 {
+	connect(&ComputePolicyUpdates::instance(), &ComputePolicyUpdates::changed, this, [this] {
+		if (m_state != State::Captured && m_state != State::Preparing && m_state != State::Ready)
+		{
+			return;
+		}
+		const bool affected = std::any_of(m_regions.cbegin(), m_regions.cend(), [](const Region& region) {
+			return region.input.document.contains("computePolicy")
+				|| (region.track && region.track->voice().metadata["engineType"].toString() == "ai");
+		});
+		if (!affected)
+		{
+			return;
+		}
+		const auto reason = tr("AI compute settings changed; restart SVS export");
+		m_diagnostics << reason;
+		for (const auto& control : m_controls)
+		{
+			control->cancel();
+		}
+		finish(State::Failed);
+		if (invalidated)
+		{
+			invalidated(reason);
+		}
+	});
 	connect(&TempoSource::forSong(*Engine::getSong()), &TempoSource::changed, this,
 		[this] { invalidateActive(tr("Project tempo changed while rendering SVS export; restart export")); });
 	for (int index = 0; index < m_regions.size(); ++index)

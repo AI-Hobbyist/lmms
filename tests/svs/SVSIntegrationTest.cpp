@@ -28,84 +28,87 @@
 #include <qt_windows.h>
 #include <tlhelp32.h>
 #endif
+#include <QClipboard>
+#include <QContextMenuEvent>
+#include <QDateTime>
+#include <QDialog>
+#include <QDomDocument>
+#include <QElapsedTimer>
+#include <QFileInfo>
+#include <QHelpEvent>
+#include <QInputMethodEvent>
+#include <QJsonDocument>
+#include <QLabel>
+#include <QLibrary>
+#include <QMimeData>
+#include <QMouseEvent>
+#include <QPlainTextEdit>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QPushButton>
+#include <QRunnable>
+#include <QScopeGuard>
+#include <QSemaphore>
+#include <QSignalSpy>
+#include <QSlider>
+#include <QStandardItemModel>
+#include <QStandardPaths>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTemporaryDir>
+#include <QTreeWidget>
+#include <QtEndian>
+#include <bit>
+#include <cmath>
+#include <cstdlib>
+
+#include "../../src/gui/editors/svs/SVSPitchRanges.h"
+#include "../../src/gui/editors/svs/operations/SVSCurveGesture.h"
+#include "../../src/gui/editors/svs/operations/SVSFeedbackPitch.h"
+#include "AudioDummy.h"
+#include "AudioEngine.h"
+#include "AutomationClip.h"
+#include "ConfigManager.h"
+#include "DataFile.h"
+#include "Engine.h"
+#include "GuiApplication.h"
+#include "Ladspa2LMMS.h"
+#include "MainWindow.h"
+#include "Mixer.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "PluginBrowser.h"
+#include "PluginFactory.h"
+#include "ProjectJournal.h"
+#include "ProjectRenderer.h"
+#include "RenderManager.h"
+#include "SVSCache.h"
+#include "SVSCanvas.h"
+#include "SVSClip.h"
+#include "SVSComputePolicy.h"
+#include "SVSCurve.h"
+#include "SVSExportSnapshot.h"
+#include "SVSImageLoader.h"
+#include "SVSLyricEditor.h"
+#include "SVSNoteOperations.h"
 #include "SVSParameterPanel.h"
 #include "SVSProjectController.h"
 #include "SVSProjectExport.h"
-#include "SVSProjectOutput.h"
 #include "SVSProjectImportDialog.h"
-#include "SVSSettingsPage.h"
-#include "PluginBrowser.h"
-#include "SetupDialog.h"
-#include <QTabWidget>
-#include <QTreeWidget>
-#include <QLabel>
-#include <QDomDocument>
-#include <QFileInfo>
-#include "Mixer.h"
-#include <cmath>
-#include "Engine.h"
-#include "AudioEngine.h"
-#include "AudioDummy.h"
-#include "ConfigManager.h"
-#include <QTemporaryDir>
-#include <QJsonDocument>
-#include "Song.h"
-#include "SVSTrack.h"
-#include "SVSClip.h"
-#include "SVSViews.h"
-#include "MainWindow.h"
-#include "SubWindow.h"
-#include "GuiApplication.h"
-#include <QDialog>
-#include "SVSCanvas.h"
-#include "SVSCurve.h"
+#include "SVSProjectOutput.h"
 #include "SVSResultStrip.h"
-#include "SVSLyricEditor.h"
-#include "SVSImageLoader.h"
-#include "SVSNoteOperations.h"
+#include "SVSSettingsPage.h"
 #include "SVSSynthesisScheduler.h"
-#include "SVSCache.h"
-#include "SVSTimeMapping.h"
 #include "SVSTempoSnapshot.h"
 #include "SVSTempoSource.h"
-#include "AutomationClip.h"
-#include "PatternTrack.h"
-#include <QSlider>
-#include <QPushButton>
-#include <QPlainTextEdit>
-#include <QTableWidget>
-#include <QInputMethodEvent>
-#include <QHelpEvent>
-#include <QMimeData>
-#include <QClipboard>
-#include "ProjectJournal.h"
-#include "PluginFactory.h"
-#include "Ladspa2LMMS.h"
-#include <QScopeGuard>
-#include "../../src/gui/editors/svs/operations/SVSCurveGesture.h"
-#include "../../src/gui/editors/svs/operations/SVSFeedbackPitch.h"
-#include "../../src/gui/editors/svs/SVSPitchRanges.h"
-#include "PatternStore.h"
+#include "SVSTimeMapping.h"
+#include "SVSTrack.h"
+#include "SVSViews.h"
 #include "SampleFrame.h"
-#include <QSemaphore>
-#include <QRunnable>
-#include "SVSExportSnapshot.h"
-#include "ProjectRenderer.h"
-#include "RenderManager.h"
-#include <QSignalSpy>
-#include <QtEndian>
-#include <bit>
-#include <QProcess>
-#include <QProcessEnvironment>
-#include <QLibrary>
-#include <cstdlib>
+#include "SetupDialog.h"
+#include "Song.h"
+#include "SubWindow.h"
 #include "svs.hpp"
-#include "DataFile.h"
-#include <QElapsedTimer>
-#include <QMouseEvent>
-#include <QContextMenuEvent>
-#include <QStandardPaths>
-#include <QDateTime>
 using namespace lmms;
 // Export restores and starts the previous device. These tests advance audio
 // periods themselves, so a restored dummy must not add concurrent periods.
@@ -149,7 +152,8 @@ private slots:
 	void initTestCase()
 	{
 		QVERIFY(m_configuration.isValid());
-		ConfigManager::inst()->loadConfigFile(m_configuration.filePath("svs-test-config.xml"));
+		ConfigManager::inst()->loadConfigFile(
+			qEnvironmentVariable("SVS_COMPUTE_CONFIG_TEST", m_configuration.filePath("svs-test-config.xml")));
 		if (qEnvironmentVariableIsSet("SVS_EMBEDDED_GUI_TEST"))
 		{
 			if (qEnvironmentVariableIsSet("SVS_TEST_AVATAR_PATH"))
@@ -3031,6 +3035,240 @@ private slots:
 			QVERIFY(!song->isExporting());
 			QVERIFY(!QFileInfo::exists(cancelledPath));
 		}
+	}
+	void globalComputePolicy()
+	{
+		const QJsonObject declaration{
+			{"protocolVersion", 1}, {"runtime", "svs-compute-1"}, {"supportedBackends", QJsonArray{"cpu", "directml"}}};
+		const QJsonObject requested{
+			{"requestedBackend", "directml"}, {"requestedDevice", "dxgi:test"}, {"policyRevision", 3}};
+		int probes = 0;
+		auto success = [&](const QString& id) {
+			++probes;
+			return QJsonObject{{"available", true},
+							   {"effectiveBackend", "directml"},
+							   {"effectiveDevice", id},
+							   {"providerEvidence", QJsonObject{{"dmlNodes", 1}}}};
+		};
+		QVERIFY(svs::resolveComputePolicy(requested, "concatenative", declaration, success).isEmpty());
+		auto unsupported = svs::resolveComputePolicy(requested, "ai", {}, success);
+		QCOMPARE(unsupported["effectiveBackend"].toString(), QString("cpu"));
+		QVERIFY(!unsupported["fallbackReason"].toString().isEmpty());
+		QCOMPARE(probes, 0);
+		auto gpu = svs::resolveComputePolicy(requested, "ai", declaration, success);
+		QCOMPARE(gpu["effectiveDevice"].toString(), QString("dxgi:test"));
+		QCOMPARE(probes, 1);
+		auto failed = svs::resolveComputePolicy(requested, "ai", declaration, [](const QString&) {
+			return QJsonObject{{"available", false}, {"reason", "device removed"}};
+		});
+		QCOMPARE(failed["effectiveBackend"].toString(), QString("cpu"));
+		QCOMPARE(failed["fallbackReason"].toString(), QString("device removed"));
+		svs::Input input;
+		input.document["computePolicy"] = gpu;
+		const auto gpuKey = svs::Cache::key(input, "policy-test");
+		gpu["policyRevision"] = 99;
+		gpu["requestedDevice"] = "other-request";
+		input.document["computePolicy"] = gpu;
+		QCOMPARE(svs::Cache::key(input, "policy-test"), gpuKey);
+		input.document["computePolicy"] = failed;
+		QVERIFY(svs::Cache::key(input, "policy-test") != gpuKey);
+		auto* config = ConfigManager::inst();
+		const auto original = svs::requestedComputePolicy();
+		auto restore = qScopeGuard([&] {
+			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
+			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
+			config->setValue("svs", "computePolicyRevision",
+							 QString::number(original["policyRevision"].toDouble(), 'f', 0));
+		});
+		svs::ExportSnapshot::Region ai;
+		ai.input.document["computePolicy"] = failed;
+		svs::ExportSnapshot aiExport({ai});
+		svs::ExportSnapshot traditionalExport({svs::ExportSnapshot::Region{}});
+		QSignalSpy updates(&svs::ComputePolicyUpdates::instance(), &svs::ComputePolicyUpdates::changed);
+		QVERIFY(svs::applyComputeSettings("directml", "dxgi:test-changed"));
+		QCOMPARE(updates.count(), 1);
+		QCOMPARE(aiExport.state(), svs::ExportSnapshot::State::Failed);
+		QCOMPARE(traditionalExport.state(), svs::ExportSnapshot::State::Captured);
+		QVERIFY(!svs::applyComputeSettings("directml", "dxgi:test-changed"));
+		QCOMPARE(updates.count(), 1);
+		// Exercise late-return and queued cancellation with the existing fault fixture.
+		const auto plugin = svs::Registry::instance().plugin("org.lmms.svs.example");
+		QVERIFY(plugin);
+		QString error;
+		svs::Input delayed;
+		delayed.voiceId = "full";
+		delayed.duration = .2;
+		delayed.secondsPerTick = .01;
+		svs::Note note;
+		note.id = "policy-cancel";
+		note.duration = 19.2;
+		delayed.notes = {note};
+		delayed.document = {
+			{"secondsPerTick", .01},
+			{"language", "en"},
+			{"capabilities", plugin->capabilities("full", {}, error)},
+			{"developmentFaults", QJsonObject{{"delayMs", 150}, {"lateReturn", true}}},
+			{"computePolicy", svs::resolveComputePolicy(QJsonObject{{"requestedBackend", "cpu"}}, "ai", declaration)}};
+		svs::SynthesisScheduler scheduler(1);
+		int oldResults = 0, traditionalResults = 0;
+		auto active
+			= scheduler.submit(plugin, delayed, 0, [](const auto&) {}, [&](auto, const auto&) { ++oldResults; });
+		auto queued
+			= scheduler.submit(plugin, delayed, 0, [](const auto&) {}, [&](auto, const auto&) { ++oldResults; });
+		delayed.document.remove("computePolicy");
+		auto traditional = scheduler.submit(
+			plugin, delayed, 0, [](const auto&) {},
+			[&](auto audio, const auto&) {
+				if (audio)
+				{
+					++traditionalResults;
+				}
+			});
+		QTest::qWait(30);
+		QVERIFY(svs::applyComputeSettings("cpu", "cpu"));
+		QVERIFY(active->cancelled);
+		QVERIFY(queued->cancelled);
+		QVERIFY(!traditional->cancelled);
+		QTRY_COMPARE_WITH_TIMEOUT(traditionalResults, 1, 10000);
+		QCOMPARE(oldResults, 0);
+		QCOMPARE(scheduler.activeCount(), 0);
+	}
+	void nativeComputeSettings()
+	{
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		auto* config = ConfigManager::inst();
+		const auto original = svs::requestedComputePolicy();
+		auto restore = qScopeGuard([&] {
+			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
+			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
+			config->setValue("svs", "computePolicyRevision",
+							 QString::number(original["policyRevision"].toDouble(), 'f', 0));
+		});
+		svs::applyComputeSettings("cpu", "cpu");
+		gui::SVSSettingsPage page;
+		page.resize(900, 650);
+		page.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&page));
+		QTest::qWait(700);
+		auto* backend = page.findChild<QComboBox*>("svsComputeBackend");
+		auto* device = page.findChild<QComboBox*>("svsComputeDevice");
+		QVERIFY(backend && device);
+		QCOMPARE(device->currentData().toString(), QString("cpu"));
+		QVERIFY(!device->isEnabled());
+		backend->setCurrentIndex(backend->findData("directml"));
+		QVERIFY(device->isEnabled());
+		QVERIFY(!static_cast<QStandardItemModel*>(device->model())->item(0)->isEnabled());
+		QVERIFY(device->count() > 1);
+		QVERIFY(device->currentData().toString().startsWith("dxgi:"));
+		// Editing the page alone is Cancel: no policy or revision is published.
+		QCOMPARE(svs::requestedComputePolicy()["requestedBackend"].toString(), QString("cpu"));
+		page.save();
+		const auto applied = svs::requestedComputePolicy();
+		QCOMPARE(applied["requestedDevice"].toString(), device->currentData().toString());
+		QTest::qWait(700);
+		QVERIFY(page.screen()->grabWindow(page.winId()).save("doc/svs/validation/B2-native-compute-settings.png"));
+		page.close();
+		gui::SVSSettingsPage reopened;
+		QCOMPARE(reopened.findChild<QComboBox*>("svsComputeDevice")->currentData().toString(),
+				 applied["requestedDevice"].toString());
+		config->setValue("svs", "computeDevice", "dxgi:ffffffff:ffffffff");
+		gui::SVSSettingsPage missing;
+		missing.resize(900, 650);
+		missing.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&missing));
+		QTest::qWait(700);
+		auto* unavailable = missing.findChild<QComboBox*>("svsComputeDevice");
+		QCOMPARE(unavailable->currentData().toString(), QString("dxgi:ffffffff:ffffffff"));
+		QVERIFY(
+			!static_cast<QStandardItemModel*>(unavailable->model())->item(unavailable->currentIndex())->isEnabled());
+		QVERIFY(missing.screen()->grabWindow(missing.winId()).save("doc/svs/validation/B2-native-missing-device.png"));
+		missing.close();
+	}
+	void computePolicyRestartChild()
+	{
+		if (!qEnvironmentVariableIsSet("SVS_COMPUTE_CONFIG_TEST"))
+		{
+			QSKIP("Child-only policy persistence check");
+		}
+		const auto policy = svs::requestedComputePolicy();
+		QCOMPARE(policy["requestedBackend"].toString(), QString("directml"));
+		QCOMPARE(policy["requestedDevice"].toString(), qEnvironmentVariable("SVS_COMPUTE_EXPECT_DEVICE"));
+		QCOMPARE(policy["policyRevision"].toDouble(), qEnvironmentVariable("SVS_COMPUTE_EXPECT_REVISION").toDouble());
+	}
+	void sharedAiHostPolicy()
+	{
+		auto* config = ConfigManager::inst();
+		const auto original = svs::requestedComputePolicy();
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		auto restore = qScopeGuard([&] {
+			delete track;
+			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
+			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
+			config->setValue("svs", "computePolicyRevision",
+							 QString::number(original["policyRevision"].toDouble(), 'f', 0));
+		});
+		QVERIFY(svs::Registry::instance().plugin("org.lmms.svs.compute-test"));
+		svs::applyComputeSettings("cpu", "cpu");
+		track->bindVoice("org.lmms.svs.compute-test", "compute-fixture");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "shared-compute-note";
+		note.duration = 48;
+		clip->setNotes({note});
+		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
+		QCOMPARE(clip->audio()->feedback["computeExecution"].toObject()["effectiveBackend"].toString(), QString("cpu"));
+		gui::SVSSettingsPage page;
+		auto* backend = page.findChild<QComboBox*>("svsComputeBackend");
+		auto* device = page.findChild<QComboBox*>("svsComputeDevice");
+		backend->setCurrentIndex(backend->findData("directml"));
+		const auto selected = device->currentData().toString();
+		QVERIFY(selected.startsWith("dxgi:"));
+		const auto cpuAudio = clip->audio();
+		page.save();
+		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() && clip->audio() != cpuAudio, 15000);
+		const auto execution = clip->audio()->feedback["computeExecution"].toObject();
+		QCOMPARE(execution["effectiveBackend"].toString(), QString("directml"));
+		QCOMPARE(execution["effectiveDevice"].toString(), selected);
+		QVERIFY(execution["providerEvidence"].toObject()["dmlNodes"].toInt() > 0);
+		qInfo().noquote() << QJsonDocument(execution).toJson(QJsonDocument::Compact);
+		const auto captured = svs::ExportSnapshot::capture(*Engine::getSong(), 48000);
+		QCOMPARE(captured.size(), 1);
+		QCOMPARE(captured[0].input.document["computePolicy"].toObject()["effectiveDevice"].toString(), selected);
+		svs::ExportSnapshot exported(captured);
+		exported.prepare();
+		QTRY_COMPARE_WITH_TIMEOUT(exported.state(), svs::ExportSnapshot::State::Ready, 15000);
+		QCOMPARE(exported.regions()[0].audio->feedback["computeExecution"].toObject()["effectiveDevice"].toString(),
+				 selected);
+		QDomDocument document;
+		auto node = document.createElement("svsclip");
+		clip->saveSettings(document, node);
+		QVERIFY(!node.attribute("cacheComputePolicy").isEmpty());
+		svs::Input recovery;
+		QVERIFY(clip->captureCachedInput(recovery));
+		QCOMPARE(recovery.document["computeDevice"].toString(), selected);
+		// Persist and restart a separate host process, not merely reopen a widget.
+		config->saveConfigFile();
+		QProcess child;
+		auto environment = QProcessEnvironment::systemEnvironment();
+		environment.remove("SVS_EMBEDDED_GUI_TEST");
+		environment.insert("SVS_COMPUTE_CONFIG_TEST", m_configuration.filePath("svs-test-config.xml"));
+		environment.insert("SVS_COMPUTE_EXPECT_DEVICE", selected);
+		environment.insert("SVS_COMPUTE_EXPECT_REVISION",
+						   QString::number(svs::requestedComputePolicy()["policyRevision"].toDouble(), 'f', 0));
+		child.setProcessEnvironment(environment);
+		child.start(QCoreApplication::applicationFilePath(), {"computePolicyRestartChild", "-o", "-,txt"});
+		QVERIFY(child.waitForStarted());
+		QVERIFY(child.waitForFinished(20000));
+		qInfo().noquote() << child.readAllStandardOutput() << child.readAllStandardError();
+		QCOMPARE(child.exitCode(), 0);
+		QJsonObject missing{
+			{"computePolicy",
+			 QJsonObject{{"requestedBackend", "directml"}, {"requestedDevice", "dxgi:ffffffff:ffffffff"}}},
+			{"capabilities", track->capabilities().original}};
+		svs::refreshComputePolicy(missing);
+		QCOMPARE(missing["computeBackend"].toString(), QString("cpu"));
+		QVERIFY(!missing["computePolicy"].toObject()["fallbackReason"].toString().isEmpty());
 	}
 	void exportSnapshotPreparation()
 	{

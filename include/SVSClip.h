@@ -60,6 +60,7 @@ private:
 	QJsonObject m_notesXmlExtras, m_unparsedCurves;
 	QString m_id, m_status = "Dirty";
 	QString m_cacheKey, m_cacheInputHash;
+	QJsonObject m_cacheComputePolicy;
 	uint32_t m_cacheRate = 0;
 	QVector<svs::Note> m_notes;
 	svs::Curves m_curves;

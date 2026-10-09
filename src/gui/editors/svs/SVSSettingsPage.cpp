@@ -1,29 +1,29 @@
 #include "SVSSettingsPage.h"
-#include <QPushButton>
-#include <QDebug>
-#include "ConfigManager.h"
-#include "SVSSynthesisScheduler.h"
-#include "Engine.h"
-#include "Song.h"
-#include "SVSTrack.h"
-#include "SVSClip.h"
-#include <QComboBox>
-#include <QLabel>
-#include <QFormLayout>
-#include <QVBoxLayout>
-#include <QScrollArea>
-#include <QJsonDocument>
-#include <QPointer>
-#include <QRunnable>
-#include <QSet>
-#include <QTabWidget>
-#include <QSlider>
+
 #include <QCheckBox>
+#include <QComboBox>
+#include <QDebug>
+#include <QFormLayout>
+#include <QJsonDocument>
+#include <QLabel>
+#include <QPointer>
+#include <QPushButton>
+#include <QRunnable>
+#include <QScrollArea>
+#include <QSet>
+#include <QSlider>
+#include <QStandardItemModel>
+#include <QTabWidget>
+#include <QVBoxLayout>
 #include <algorithm>
-#ifdef Q_OS_WIN
-#include <qt_windows.h>
-#include <dxgi.h>
-#endif
+
+#include "ConfigManager.h"
+#include "Engine.h"
+#include "SVSClip.h"
+#include "SVSComputePolicy.h"
+#include "SVSSynthesisScheduler.h"
+#include "SVSTrack.h"
+#include "Song.h"
 namespace lmms::gui {
 QString SVSSettingsPage::engineLabel(const svs::Voice& voice)
 {
@@ -56,52 +56,40 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	m_backend = new QComboBox(body);
 	m_backend->setObjectName("svsComputeBackend");
 	m_backend->addItem("CPU", "cpu");
-	for (const auto& name : QStringList{"DirectML", "LibTorch", "Vulkan"})
+	m_backend->addItem("DirectML", "directml");
+	for (const auto& name : QStringList{"LibTorch", "Vulkan"})
 		m_backend->addItem(tr("%1 — Coming soon").arg(name), name.toLower());
 	form->addRow(tr("AI voicebank computation engine"), m_backend);
 	m_device = new QComboBox(body);
 	m_device->setObjectName("svsComputeDevice");
 	m_device->addItem("CPU", "cpu");
-#ifdef Q_OS_WIN
-	// Discover hardware without adding a GPU SDK or runtime dependency.
-	const auto library = LoadLibraryW(L"dxgi.dll");
-	if (library)
+	QString probeError;
+	for (const auto& entry : svs::computeDevices(probeError))
 	{
-		using FactoryFunction = HRESULT(WINAPI*)(REFIID, void**);
-		const auto create = reinterpret_cast<FactoryFunction>(GetProcAddress(library, "CreateDXGIFactory1"));
-		IDXGIFactory1* factory = nullptr;
-		if (create && SUCCEEDED(create(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&factory))))
+		const auto device = entry.toObject();
+		if (device["backend"].toString() == "directml" && device["available"].toBool())
 		{
-			for (UINT index = 0;; ++index)
-			{
-				IDXGIAdapter1* adapter = nullptr;
-				if (factory->EnumAdapters1(index, &adapter) != S_OK)
-					break;
-				DXGI_ADAPTER_DESC1 description{};
-				if (SUCCEEDED(adapter->GetDesc1(&description)) && !(description.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
-				{
-					const auto id = QString("dxgi:%1:%2")
-										.arg(quint32(description.AdapterLuid.HighPart), 8, 16, QChar('0'))
-										.arg(description.AdapterLuid.LowPart, 8, 16, QChar('0'));
-					m_device->addItem(QString::fromWCharArray(description.Description), id);
-				}
-				adapter->Release();
-			}
-			factory->Release();
+			m_device->addItem(device["name"].toString(), device["device"].toString());
 		}
-		FreeLibrary(library);
 	}
-#endif
 	form->addRow(tr("Device"), m_device);
 	auto* hint = new QLabel(
-		tr("Backend and device options apply only to AI voicebanks. CPU is the available backend. Other backends are placeholders for testing device selection; synthesis continues to use CPU."),
+		tr("AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. "
+		   "Unavailable devices use CPU and report the reason; unsupported AI engines use CPU."),
 		body);
 	hint->setObjectName("svsComputeHint");
 	hint->setWordWrap(true);
+	if (!probeError.isEmpty()) { hint->setText(hint->text() + "\n" + probeError); }
 	controls->addWidget(hint);
 	auto* config = ConfigManager::inst();
 	m_backend->setCurrentIndex(std::max(0, m_backend->findData(config->value("svs", "computeBackend", "cpu"))));
-	m_device->setCurrentIndex(std::max(0, m_device->findData(config->value("svs", "computeDevice", "cpu"))));
+	const auto savedDevice = config->value("svs", "computeDevice", "cpu");
+	if (m_device->findData(savedDevice) < 0)
+	{
+		m_device->addItem(tr("Unavailable device: %1").arg(savedDevice), savedDevice);
+		static_cast<QStandardItemModel*>(m_device->model())->item(m_device->count() - 1)->setEnabled(false);
+	}
+	m_device->setCurrentIndex(std::max(0, m_device->findData(savedDevice)));
 	m_pitchRanges = new QCheckBox(tr("Show voicebank pitch ranges"), body);
 	m_pitchRanges->setObjectName("svsShowVoicePitchRanges");
 	m_pitchRanges->setChecked(config->value("svs", "showVoicePitchRanges", "1").toInt() != 0);
@@ -117,7 +105,19 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 		const bool cpu = m_backend->currentData().toString() == "cpu";
 		if (cpu)
 			m_device->setCurrentIndex(0);
-		m_device->setEnabled(!cpu);
+		else if (m_device->currentIndex() == 0)
+		{
+			for (int index = 1; index < m_device->count(); ++index)
+			{
+				if (static_cast<QStandardItemModel*>(m_device->model())->item(index)->isEnabled())
+				{
+					m_device->setCurrentIndex(index);
+					break;
+				}
+			}
+		}
+		static_cast<QStandardItemModel*>(m_device->model())->item(0)->setEnabled(cpu);
+		m_device->setEnabled(m_backend->currentData().toString() == "directml");
 	};
 	connect(m_backend, qOverload<int>(&QComboBox::currentIndexChanged), this, [updateDevice](int) { updateDevice(); });
 	updateDevice();
@@ -322,9 +322,8 @@ void SVSSettingsPage::refreshEngine()
 void SVSSettingsPage::save()
 {
 	auto* config = ConfigManager::inst();
-	config->setValue("svs", "computeBackend", m_backend->currentData().toString());
-	config->setValue("svs", "computeDevice",
-		m_backend->currentData().toString() == "cpu" ? "cpu" : m_device->currentData().toString());
+	const bool computeChanged
+		= svs::applyComputeSettings(m_backend->currentData().toString(), m_device->currentData().toString());
 	config->setValue("svs", "aiExampleRenderSteps", QString::number(m_aiSteps->value()));
 	config->setValue("svs", "showVoicePitchRanges", m_pitchRanges->isChecked() ? "1" : "0");
 	config->setValue("svs", "showBackgroundWaveform", m_backgroundWaveform->isChecked() ? "1" : "0");
@@ -358,8 +357,8 @@ void SVSSettingsPage::save()
 		if (base->type() == Track::Type::SVS)
 		{
 			auto* track = static_cast<SVSTrack*>(base);
-			if (!changed.contains(track->pluginId()))
-				continue;
+			const bool ai = track->voice().metadata["engineType"].toString() == "ai";
+			if (!changed.contains(track->pluginId()) && !(computeChanged && ai)) continue;
 			for (auto* item : track->getClips())
 			{
 				auto* clip = static_cast<SVSClip*>(item);

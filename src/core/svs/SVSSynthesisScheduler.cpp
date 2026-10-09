@@ -1,12 +1,15 @@
 #include "SVSSynthesisScheduler.h"
-#include "ConfigManager.h"
-#include "SVSCache.h"
-#include "SVSTempoSnapshot.h"
-#include "Song.h"
+
 #include <QCoreApplication>
 #include <QEvent>
 #include <QRunnable>
 #include <algorithm>
+
+#include "ConfigManager.h"
+#include "SVSCache.h"
+#include "SVSComputePolicy.h"
+#include "SVSTempoSnapshot.h"
+#include "Song.h"
 namespace lmms::svs {
 SynthesisScheduler& SynthesisScheduler::instance()
 {
@@ -19,6 +22,19 @@ SynthesisScheduler::SynthesisScheduler(int budget, QObject* parent)
 	, m_budget(std::clamp(budget, 1, 16))
 {
 	m_pool.setMaxThreadCount(m_budget);
+	connect(&ComputePolicyUpdates::instance(), &ComputePolicyUpdates::changed, this, [this] {
+		for (const auto& jobs : {m_queue, m_running})
+		{
+			for (const auto& job : jobs)
+			{
+				if (job->usesComputePolicy)
+				{
+					job->control->cancel();
+				}
+			}
+		}
+		dispatch();
+	});
 }
 SynthesisScheduler::~SynthesisScheduler()
 {
@@ -42,6 +58,7 @@ std::shared_ptr<RenderControl> SynthesisScheduler::submit(std::shared_ptr<Plugin
 	auto job
 		= std::make_shared<Job>(Job{std::move(plugin), std::move(input), priority, std::make_shared<RenderControl>(),
 			std::move(state), std::move(result), std::move(partial), std::move(retained)});
+	job->usesComputePolicy = job->input.document.contains("computePolicy");
 	if (m_stopping)
 	{
 		job->control->cancel();
@@ -129,6 +146,7 @@ void SynthesisScheduler::dispatch()
 					}
 					else
 					{
+						refreshComputePolicy(job->input.document);
 						const bool cacheable
 							= !job->plugin->identity().isEmpty() && !job->input.document.contains("developmentFaults");
 						const auto key = Cache::key(job->input, job->plugin->identity());
@@ -223,6 +241,12 @@ void SynthesisScheduler::dispatch()
 						}
 					}
 				}
+			}
+			if (result && job->usesComputePolicy)
+			{
+				auto tagged = std::make_shared<Audio>(*result);
+				tagged->feedback["computePolicy"] = job->input.document["computePolicy"];
+				result = std::move(tagged);
 			}
 			QMetaObject::invokeMethod(
 				this,

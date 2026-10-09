@@ -6,6 +6,8 @@ add_library(
 	SVSCurve.cpp
 	SVSWaveform.cpp
 	SVSCache.cpp
+	SVSComputePolicy.cpp
+	"${CMAKE_SOURCE_DIR}/include/SVSComputePolicy.h"
 	SVSExportSnapshot.cpp
 	SVSTempoSnapshot.cpp
 	SVSTempoSource.cpp
@@ -38,6 +40,7 @@ target_compile_definitions(lmmssvs PRIVATE LMMS_STATIC_DEFINE NOMINMAX)
 target_include_directories(lmmssvs PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svs/include"
 										  "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/src")
 target_link_libraries(lmmssvs PUBLIC ${QT_LIBRARIES})
+target_link_libraries(lmmssvs PRIVATE ${CMAKE_DL_LIBS})
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/sdk/svs/include/" DESTINATION include/svs)
 if(WIN32)
 	# Runtime assembly is explicit and uses the foreground SDK/logging pipeline.

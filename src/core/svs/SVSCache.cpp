@@ -201,6 +201,16 @@ QString Cache::key(const Input& input, const QString& identity)
 	document.remove("clipId");
 	document.remove("queryCapabilities");
 	document.remove("cacheDirectory");
+	if (document.contains("computePolicy"))
+	{
+		auto compute = document["computePolicy"].toObject();
+		for (const auto& field :
+			QStringList{"requestedBackend", "requestedDevice", "policyRevision", "fallbackReason", "supported"})
+		{
+			compute.remove(field);
+		}
+		document["computePolicy"] = compute;
+	}
 	if (document["pluginId"].toString() == "org.lmms.svs.diffsinger")
 	{
 		auto settings = document["engineSettings"].toObject();

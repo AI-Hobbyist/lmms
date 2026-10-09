@@ -17,8 +17,22 @@ set_target_properties(SVSComputeExample PROPERTIES PREFIX ""
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/svs/SVSComputeExample"
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/svs/SVSComputeExample")
 add_dependencies(SVSComputeExample SVSComputeFixtureWriter)
+if(WIN32)
+	set(svsc_platform windows)
+elseif(APPLE)
+	set(svsc_platform macos)
+else()
+	set(svsc_platform linux)
+endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|ARM64|arm64)$")
+	set(svsc_architecture arm64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(svsc_architecture x64)
+else()
+	set(svsc_architecture x86)
+endif()
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/compute-example-manifest.json"
-	"{\"id\":\"org.lmms.svs.compute-test\",\"name\":\"Shared AI Compute Test\",\"version\":\"1.0\",\"engineType\":\"ai\",\"entry\":\"SVSComputeExample${CMAKE_SHARED_MODULE_SUFFIX}\",\"apiMajor\":1,\"apiMinor\":0}\n")
+	"{\"id\":\"org.lmms.svs.compute-test\",\"name\":\"Shared AI Compute Test\",\"version\":\"1.0\",\"category\":\"Singing Voice Synthesis\",\"platform\":\"${svsc_platform}\",\"architecture\":\"${svsc_architecture}\",\"engineType\":\"ai\",\"entry\":\"SVSComputeExample${CMAKE_SHARED_MODULE_SUFFIX}\",\"apiMajor\":1,\"apiMinor\":0}\n")
 add_custom_command(TARGET SVSComputeExample POST_BUILD
 	COMMAND $<TARGET_FILE:SVSComputeFixtureWriter> "$<TARGET_FILE_DIR:SVSComputeExample>/fixture.onnx"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_BINARY_DIR}/compute-example-manifest.json"

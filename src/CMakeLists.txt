@@ -127,7 +127,7 @@ IF(LMMS_BUILD_LINUX)
 ENDIF()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-list(FILTER LMMS_INCLUDES EXCLUDE REGEX "/SVS(Clip|Track|Views|Canvas|ResultStrip|TempoSource|Model|ProjectBridge)\\.h$")
+list(FILTER LMMS_INCLUDES EXCLUDE REGEX "/SVS(Clip|Track|Views|Canvas|ResultStrip|TempoSource|Model|ProjectBridge|ComputePolicy)\\.h$")
 ADD_LIBRARY(lmmsobjs OBJECT
 	${LMMS_SRCS}
 	${LMMS_INCLUDES}

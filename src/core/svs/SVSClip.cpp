@@ -1,25 +1,28 @@
 #include "SVSClip.h"
-#include "SVSTrack.h"
-#include "SVSViews.h"
-#include "SVSSynthesisScheduler.h"
-#include "SVSCache.h"
-#include "SVSTempoSource.h"
-#include "SVSNoteOperations.h"
-#include "SVSXml.h"
-#include "ConfigManager.h"
-#include <QScopeGuard>
-#include "Engine.h"
-#include "Song.h"
-#include "AudioEngine.h"
+
 #include <QCoreApplication>
-#include <QThreadPool>
+#include <QCryptographicHash>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QRandomGenerator>
 #include <QRunnable>
+#include <QScopeGuard>
+#include <QThreadPool>
 #include <QTimer>
 #include <QUuid>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QCryptographicHash>
-#include <QRandomGenerator>
+
+#include "AudioEngine.h"
+#include "ConfigManager.h"
+#include "Engine.h"
+#include "SVSCache.h"
+#include "SVSComputePolicy.h"
+#include "SVSNoteOperations.h"
+#include "SVSSynthesisScheduler.h"
+#include "SVSTempoSource.h"
+#include "SVSTrack.h"
+#include "SVSViews.h"
+#include "SVSXml.h"
+#include "Song.h"
 namespace lmms {
 bool SVSClip::readOnly() const
 {
@@ -424,6 +427,7 @@ void SVSClip::synthesize()
 				target->m_cacheKey = result->cacheKey;
 				target->m_cacheInputHash = result->cacheInputHash;
 				target->m_cacheRate = rate;
+				target->m_cacheComputePolicy = result->feedback["computePolicy"].toObject();
 			}
 			if (result || target->m_segments.isEmpty())
 				std::atomic_store(&target->m_audio, result);
@@ -446,6 +450,13 @@ bool SVSClip::captureCachedInput(svs::Input& input) const
 		|| m_cacheRate > 192000)
 		return false;
 	auto cached = captureInput(m_cacheRate);
+	if (!m_cacheComputePolicy.isEmpty())
+	{
+		// Cached PCM remains recoverable without its engine or former GPU.
+		cached.document["computePolicy"] = m_cacheComputePolicy;
+		cached.document["computeBackend"] = m_cacheComputePolicy["effectiveBackend"];
+		cached.document["computeDevice"] = m_cacheComputePolicy["effectiveDevice"];
+	}
 	if (svs::Cache::editableKey(cached) != m_cacheInputHash)
 		return false;
 	cached.document["cacheOnlyKey"] = m_cacheKey;
@@ -487,8 +498,15 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 			->value("svsEngineSettings", "engine_" + QString::fromLatin1(track->pluginId().toUtf8().toHex()))
 			.toUtf8())
 										   .object();
-	input.document["computeBackend"] = "cpu";
-	input.document["computeDevice"] = "cpu";
+	const auto compute
+		= svs::resolveComputePolicy(svs::requestedComputePolicy(), track->voice().metadata["engineType"].toString(),
+									track->capabilities().original["compute"].toObject());
+	if (!compute.isEmpty())
+	{
+		input.document["computePolicy"] = compute;
+	}
+	input.document["computeBackend"] = compute["effectiveBackend"].toString("cpu");
+	input.document["computeDevice"] = compute["effectiveDevice"].toString("cpu");
 	input.document["cacheDirectory"] = svs::Cache::instance().engineDirectory(track->pluginId());
 	input.document["curves"] = svs::curvesToJson(m_curves);
 	input.document["secondsPerTick"] = input.secondsPerTick;
@@ -614,6 +632,8 @@ void SVSClip::saveSettings(QDomDocument& doc, QDomElement& node)
 	node.setAttribute("cacheKey", m_cacheKey);
 	node.setAttribute("cacheInputHash", m_cacheInputHash);
 	node.setAttribute("cacheSampleRate", m_cacheRate);
+	node.setAttribute("cacheComputePolicy",
+					  QString::fromUtf8(QJsonDocument(m_cacheComputePolicy).toJson(QJsonDocument::Compact)));
 	node.setAttribute(
 		"globalParameters", QString::fromUtf8(QJsonDocument(m_globalParameters).toJson(QJsonDocument::Compact)));
 	node.setAttribute("parameters", QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact)));
@@ -666,6 +686,7 @@ void SVSClip::loadSettings(const QDomElement& node)
 	m_cacheKey = node.attribute("cacheKey");
 	m_cacheInputHash = node.attribute("cacheInputHash");
 	m_cacheRate = node.attribute("cacheSampleRate").toUInt();
+	svs::jsonObjectAttribute(node, "cacheComputePolicy", m_cacheComputePolicy, m_migrationDiagnostic);
 	for (const auto& field : QStringList{"pos", "len", "off"})
 		if (node.hasAttribute(field))
 		{

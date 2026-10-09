@@ -30,6 +30,11 @@ struct Error : std::runtime_error
 	}
 };
 namespace detail {
+inline std::string utf8(const std::filesystem::path& path)
+{
+	const auto bytes = path.u8string();
+	return std::string(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+}
 struct LibraryState
 {
 	const svsc_api* api = nullptr;
@@ -225,7 +230,7 @@ public:
 #endif
 		if (!entry)
 		{
-			throw Error(SVSC_UNAVAILABLE, "Cannot load SVSCompute runtime: " + path.u8string());
+			throw Error(SVSC_UNAVAILABLE, "Cannot load SVSCompute runtime: " + detail::utf8(path));
 		}
 		m_state->check(entry(SVSC_ABI_VERSION, sizeof(svsc_api), &m_state->api));
 		if (!m_state->api || m_state->api->size < sizeof(svsc_api) || m_state->api->abi_version != SVSC_ABI_VERSION)
@@ -236,7 +241,7 @@ public:
 	Context context(const std::filesystem::path& directory) const
 	{
 		svsc_handle handle = 0;
-		m_state->check(m_state->api->create_context(directory.u8string().c_str(), &handle));
+		m_state->check(m_state->api->create_context(detail::utf8(directory).c_str(), &handle));
 		return Context(std::make_shared<detail::State>(m_state, handle, m_state->api->destroy_context));
 	}
 	const svsc_api& api() const { return *m_state->api; }

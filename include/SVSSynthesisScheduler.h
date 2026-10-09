@@ -39,6 +39,7 @@ private:
 		ResultCallback result;
 		PartialCallback partial;
 		QVector<SynthesisSegment> retained;
+		bool usesComputePolicy = false;
 	};
 	void dispatch();
 	int m_budget, m_active = 0, m_peak = 0;
