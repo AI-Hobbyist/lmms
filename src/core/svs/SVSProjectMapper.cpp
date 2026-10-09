@@ -69,7 +69,7 @@ ProjectImport ProjectMapper::prepareImport(
 		result.document.clear();
 		return result;
 	};
-	if (voice.pluginId.isEmpty() || voice.voiceId.isEmpty())
+	if (voice.pluginId.isEmpty() != voice.voiceId.isEmpty())
 		return reject(QStringLiteral("未选择有效的默认声库"));
 	const auto meters = project["time_signature_list"].toArray();
 	if (meters.isEmpty())
@@ -141,7 +141,9 @@ ProjectImport ProjectMapper::prepareImport(
 		const auto type = source["type_"].toString();
 		if (type != "Singing" && type != "Instrumental")
 			return reject(QStringLiteral("未知轨道类型：%1").arg(type));
-		const auto title = source["title"].toString().isEmpty() ? voice.name : source["title"].toString();
+		const auto title = source["title"].toString().isEmpty()
+			? (voice.name.isEmpty() ? QStringLiteral("SVS") : voice.name)
+			: source["title"].toString();
 		auto track = child(result.document, container, "track");
 		track.setAttribute("type", type == "Singing" ? 7 : 2);
 		track.setAttribute("name", title);

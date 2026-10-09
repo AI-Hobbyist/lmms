@@ -201,7 +201,7 @@ void SVSProjectController::chooseSource(const QJsonArray& formats)
 		reset();
 		return;
 	}
-	m_voice = dialog.selectedVoice();
+	m_voice = {};
 	m_formatId = format["id"].toString();
 	m_task = Task::Import;
 	progress(QStringLiteral("正在解析工程：%1").arg(QFileInfo(file.selectedFiles().first()).fileName()));
@@ -333,7 +333,7 @@ void SVSProjectController::finishImport(const svs::ProjectImport& prepared, cons
 		return;
 	}
 	// A registry refresh may have removed the voice while conversion was running.
-	bool present = false;
+	bool present = m_voice.pluginId.isEmpty() && m_voice.voiceId.isEmpty();
 	for (const auto& voice : svs::Registry::instance().voices())
 		if (voice.pluginId == m_voice.pluginId && voice.id == m_voice.voiceId)
 			present = true;

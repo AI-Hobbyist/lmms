@@ -414,7 +414,7 @@ void SVSClip::synthesize()
 		}
 	++m_request;
 	auto input = captureInput(Engine::audioEngine()->outputSampleRate());
-	if (!plugin && !captureCachedInput(input))
+	if (!plugin && !input.document["unselectedVoicePreview"].toBool() && !captureCachedInput(input))
 	{
 		m_status = svs::Registry::instance().scanning(track->pluginId())
 			? "Queued: voicebank scan"
@@ -436,10 +436,12 @@ void SVSClip::synthesize()
 				emit target->dataChanged();
 			}
 		},
-		[target, current, rate = input.rate, cachedOnly = !plugin](std::shared_ptr<const svs::Audio> result,
-																   const QString& error) {
+		[target, current, rate = input.rate, preview = input.document["unselectedVoicePreview"].toBool(),
+			cachedOnly = !plugin](std::shared_ptr<const svs::Audio> result, const QString& error) {
 			if (!current())
+			{
 				return;
+			}
 			if (result && !result->cacheKey.isEmpty())
 			{
 				target->m_cacheKey = result->cacheKey;
@@ -448,14 +450,28 @@ void SVSClip::synthesize()
 				target->m_cacheComputePolicy = result->feedback["computePolicy"].toObject();
 			}
 			if (result || target->m_segments.isEmpty())
+			{
 				std::atomic_store(&target->m_audio, result);
-			target->m_status
-				= result ? (cachedOnly ? "Missing voice/plugin: cached audio" : "Ready") : "Failed: " + error;
+			}
+			if (!result)
+			{
+				target->m_status = "Failed: " + error;
+			}
+			else if (preview)
+			{
+				target->m_status = tr("请选择一个歌手");
+			}
+			else
+			{
+				target->m_status = cachedOnly ? "Missing voice/plugin: cached audio" : "Ready";
+			}
 			emit target->dataChanged();
 		},
 		[target, current](std::shared_ptr<const svs::Audio> audio, QVector<svs::SynthesisSegment> segments) {
 			if (!current())
+			{
 				return;
+			}
 			target->m_segments = std::move(segments);
 			std::atomic_store(&target->m_audio, std::move(audio));
 			emit target->dataChanged();
@@ -509,6 +525,10 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 					  {"tempo", tempo->baseTempo},
 					  {"tempoSource", tempo->toJson()},
 					  {"contentEndTick", contentEnd}};
+	if (track->pluginId().isEmpty() && track->voiceId().isEmpty())
+	{
+		input.document["unselectedVoicePreview"] = true;
+	}
 	// Entity IDs may change during cloning; the synthesis seed remains part of the content.
 	input.document["seed"] = double(m_seed);
 	if (!m_globalParameters.isEmpty())

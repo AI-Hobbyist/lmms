@@ -332,17 +332,21 @@ QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent)
 	auto refreshSpeakers = [track, speakers] {
 		QSignalBlocker block(speakers);
 		speakers->clear();
-		speakers->addItem(QObject::tr("Select speaker"));
+		speakers->addItem(QObject::tr("未选定"), QString{});
 		for (const auto& voice : svs::Registry::instance().voices())
 			speakers->addItem(voice.name, voice.pluginId + "\n" + voice.id);
 		speakers->setCurrentIndex(std::max(0, speakers->findData(track->pluginId() + "\n" + track->voiceId())));
 	};
 	refreshSpeakers();
 	QObject::connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, dialog, refreshSpeakers);
+	QObject::connect(track, &Track::dataChanged, dialog, refreshSpeakers);
 	form->addRow(QObject::tr("Speaker"), speakers);
 	QObject::connect(speakers, qOverload<int>(&QComboBox::activated), dialog, [track, speakers](int index) {
-		if (index <= 0)
+		if (index == 0)
+		{
+			track->bindVoice({}, {});
 			return;
+		}
 		const auto key = speakers->itemData(index).toString().split('\n');
 		if (key.size() != 2)
 			return;
@@ -949,7 +953,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto refreshSingers = [this, track, singer] {
 		QSignalBlocker block(singer);
 		singer->clear();
-		singer->addItem(tr("Select singer"), QString{});
+		singer->addItem(tr("未选定"), QString{});
 		for (const auto& voice : svs::Registry::instance().voices())
 			singer->addItem(voice.name, voice.pluginId + "\n" + voice.id);
 		singer->setCurrentIndex(std::max(0, singer->findData(track->pluginId() + "\n" + track->voiceId())));
@@ -957,12 +961,24 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	refreshSingers();
 	connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, this, refreshSingers);
 	connect(singer, qOverload<int>(&QComboBox::activated), this, [track, singer](int index) {
-		if (index <= 0)
+		if (index == 0)
+		{
+			track->bindVoice({}, {});
 			return;
+		}
 		const auto key = singer->itemData(index).toString().split('\n');
 		if (key.size() == 2)
 			track->bindVoice(key[0], key[1]);
 	});
+	connect(track, &Track::dataChanged, this, refreshSingers);
+	auto* singerHint = new QLabel(tr("请选择一个歌手"), sidebar);
+	singerHint->setObjectName("svsSelectSingerHint");
+	sidebarLayout->addWidget(singerHint);
+	auto refreshSingerHint = [track, singerHint] {
+		singerHint->setVisible(track->pluginId().isEmpty() && track->voiceId().isEmpty());
+	};
+	connect(track, &Track::dataChanged, this, refreshSingerHint);
+	refreshSingerHint();
 	auto* rangesLabel = new QLabel(sidebar);
 	rangesLabel->setObjectName("svsPitchRanges");
 	rangesLabel->setWordWrap(true);

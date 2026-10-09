@@ -95,6 +95,15 @@ QVector<SVSResultStrip::Cell> SVSResultStrip::cells() const
 	if (!m_clip)
 		return result;
 	const auto& notes = m_dragging ? m_preview : m_clip->notes();
+	const auto* track = static_cast<SVSTrack*>(m_clip->getTrack());
+	if (track->pluginId().isEmpty() && track->voiceId().isEmpty())
+	{
+		for (const auto& note : notes)
+		{
+			result.push_back({note.id, note.lyric, 0, note.tick, note.duration, {}, {}});
+		}
+		return result;
+	}
 	QSet<QString> manual;
 	const bool timing = static_cast<SVSTrack*>(m_clip->getTrack())->capabilities().phonemeTiming;
 	for (const auto& note : notes)

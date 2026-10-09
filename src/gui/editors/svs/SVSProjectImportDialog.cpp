@@ -89,18 +89,9 @@ SVSProjectImportDialog::SVSProjectImportDialog(const QJsonObject& format, QWidge
 	setWindowTitle(QStringLiteral("导入SVS工程"));
 	resize(540, 430);
 	auto* layout = new QVBoxLayout(this);
-	auto* explanation = new QLabel(QStringLiteral("作为新工程导入。所有歌声轨将使用此次选择的声库。"), this);
+	auto* explanation = new QLabel(QStringLiteral("作为新工程导入。所有歌声轨均为未选定，使用正弦波试听；导入后请选择一个歌手。"), this);
 	explanation->setWordWrap(true);
 	layout->addWidget(explanation);
-	auto* form = new QFormLayout;
-	m_voices = new QComboBox(this);
-	m_voices->setObjectName("svsProjectDefaultVoice");
-	form->addRow(QStringLiteral("默认声库"), m_voices);
-	layout->addLayout(form);
-	m_status = new QLabel(this);
-	m_status->setWordWrap(true);
-	m_status->setObjectName("svsProjectVoiceStatus");
-	layout->addWidget(m_status);
 	auto* group = new QGroupBox(QStringLiteral("%1 输入选项").arg(format["name"].toString()), this);
 	auto* groupLayout = new QVBoxLayout(group);
 	auto* scroll = new QScrollArea(group);
@@ -125,47 +116,6 @@ SVSProjectImportDialog::SVSProjectImportDialog(const QJsonObject& format, QWidge
 	layout->addWidget(m_buttons);
 	connect(m_buttons, &QDialogButtonBox::accepted, this, &SVSProjectImportDialog::accept);
 	connect(m_buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	auto& registry = svs::Registry::instance();
-	connect(&registry, &svs::Registry::catalogChanged, this, [this] { refreshVoices(); });
-	connect(&registry, &svs::Registry::catalogScanStarted, this, [this] { refreshVoices(); });
-	connect(&registry, &svs::Registry::catalogScanFinished, this, [this] { refreshVoices(); });
-	refreshVoices();
-}
-void SVSProjectImportDialog::refreshVoices()
-{
-	const auto identity = m_voices->currentData();
-	m_voices->clear();
-	auto& registry = svs::Registry::instance();
-	QMap<QString, QString> engineNames;
-	for (const auto& engine : registry.engines())
-		engineNames[engine.id] = engine.name;
-	for (const auto& voice : registry.voices())
-	{
-		m_voices->addItem(QStringLiteral("%1 — %2").arg(voice.name, engineNames.value(voice.pluginId, voice.pluginId)),
-			QVariantList{voice.pluginId, voice.id});
-	}
-	const int selected = m_voices->findData(identity);
-	if (selected >= 0)
-		m_voices->setCurrentIndex(selected);
-	m_buttons->button(QDialogButtonBox::Ok)->setEnabled(m_voices->count() > 0);
-	m_status->setText(registry.scanning() ? QStringLiteral("正在扫描声库，列表将自动更新…")
-			: m_voices->count()			  ? QStringLiteral("默认声库仅用于此次导入。")
-										  : QStringLiteral("没有可用声库。请先在 SVS 设置中配置声库。"));
-}
-void SVSProjectImportDialog::accept()
-{
-	const auto identity = m_voices->currentData().toList();
-	if (identity.size() != 2)
-		return;
-	for (const auto& voice : svs::Registry::instance().voices())
-		if (voice.pluginId == identity[0].toString() && voice.id == identity[1].toString())
-		{
-			m_selected = {voice.pluginId, voice.id, voice.name, voice.language};
-			QDialog::accept();
-			return;
-		}
-	refreshVoices();
-	m_status->setText(QStringLiteral("所选声库已不可用，请重新选择。"));
 }
 QJsonObject SVSProjectImportDialog::options() const
 {

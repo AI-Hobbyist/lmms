@@ -195,6 +195,89 @@ private slots:
 		else
 			Engine::destroy();
 	}
+	void unselectedSingerPreview()
+	{
+		QVERIFY(m_guiApplication);
+		auto* song = Engine::getSong();
+		song->clearProject();
+		const auto cleanup = qScopeGuard([song] { song->clearProject(); });
+		const auto voices = svs::Registry::instance().voices();
+		for (const auto& voice : voices)
+		{
+			QVERIFY(!voice.pluginId.isEmpty());
+			QVERIFY(!voice.id.isEmpty());
+		}
+		const auto project
+			= QJsonDocument::fromJson(
+				  R"({"song_tempo_list":[{"position":0,"bpm":120}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"未选定试听","note_list":[{"start_pos":480,"length":480,"key_number":69,"lyric":"你好"}]}]})")
+				  .object();
+		const auto imported = svs::ProjectMapper::prepareImport(project, {}, {});
+		QString error;
+		QVERIFY2(gui::SVSProjectController::commitImport(imported, *song, error), qPrintable(error));
+		auto* track = static_cast<SVSTrack*>(song->tracks().front());
+		auto* clip = static_cast<SVSClip*>(track->getClip(0));
+		QVERIFY(track->voiceId().isEmpty());
+		QVERIFY(track->pluginId().isEmpty());
+		clip->synthesize();
+		QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
+		QCOMPARE(clip->status(), QStringLiteral("请选择一个歌手"));
+		const auto audio = clip->audio();
+		const auto auditionDirectory = qEnvironmentVariable("SVS_UNSELECTED_AUDIO_DIR");
+		if (!auditionDirectory.isEmpty())
+		{
+			svs::Cache cache(auditionDirectory);
+			const auto input = clip->captureInput(audio->rate);
+			cache.put(svs::Cache::key(input, "host-unselected-preview-v1"), input, audio);
+			qInfo() << "Unselected singer audition cache:" << cache.engineDirectory({});
+		}
+		const auto first = std::size_t(audio->mapping.localSeconds(clip->notes()[0].tick) * audio->rate);
+		QVERIFY(first > 0);
+		for (std::size_t frame = 0; frame < first; ++frame)
+		{
+			QCOMPARE(audio->samples[2 * frame], 0.f);
+		}
+		const auto sample = first + std::size_t(.03 * audio->rate);
+		QVERIFY(sample + audio->rate / 10 < audio->samples.size() / 2);
+		int crossings = 0;
+		for (auto frame = sample; frame < sample + audio->rate / 10; ++frame)
+		{
+			QVERIFY(std::isfinite(audio->samples[2 * frame]));
+			QCOMPARE(audio->samples[2 * frame], audio->samples[2 * frame + 1]);
+			if (audio->samples[2 * frame] < 0 && audio->samples[2 * (frame + 1)] >= 0)
+			{
+				++crossings;
+			}
+		}
+		QVERIFY(crossings >= 43 && crossings <= 45);
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1100, 660);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* singer = editor.findChild<QComboBox*>("svsSinger");
+		auto* hint = editor.findChild<QLabel*>("svsSelectSingerHint");
+		QVERIFY(singer && hint);
+		QCOMPARE(singer->currentText(), QStringLiteral("未选定"));
+		QVERIFY(hint->isVisible());
+		QCOMPARE(hint->text(), QStringLiteral("请选择一个歌手"));
+		QVERIFY(!clip->supportsPitchRecording());
+		QTest::qWait(700);
+		QVERIFY(
+			editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-unselected-singer-native.png"));
+		if (!voices.isEmpty())
+		{
+			track->bindVoice(voices.front().pluginId, voices.front().id);
+			QVERIFY(!hint->isVisible());
+			QMetaObject::invokeMethod(singer, "activated", Qt::DirectConnection, Q_ARG(int, 0));
+			QVERIFY(track->pluginId().isEmpty());
+			QVERIFY(track->voiceId().isEmpty());
+			QVERIFY(hint->isVisible());
+			QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QStringLiteral("请选择一个歌手"), 10000);
+		}
+		track->bindVoice("missing-engine", "missing-voice");
+		QVERIFY(!clip->captureInput(48000).document["unselectedVoicePreview"].toBool());
+		QVERIFY(clip->status().contains("Missing voice/plugin"));
+		editor.close();
+	}
 	void relativeConfigurationPaths()
 	{
 		auto* config = ConfigManager::inst();
@@ -698,12 +781,7 @@ private slots:
 		gui::SVSProjectImportDialog dialog(format, window);
 		dialog.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&dialog));
-		auto* choices = dialog.findChild<QComboBox*>("svsProjectDefaultVoice");
-		QVERIFY(choices);
-		QVERIFY(choices->count() > 0);
-		const auto selected = choices->currentData().toList();
-		QCOMPARE(selected.size(), 2);
-		QVERIFY(!choices->currentText().isEmpty());
+		QVERIFY(!dialog.findChild<QComboBox*>("svsProjectDefaultVoice"));
 		QVERIFY(dialog.options()["import_pitch"].toBool());
 		QCOMPARE(dialog.options()["pitch"].toString(), QString("full"));
 		QTest::qWait(600);
@@ -715,18 +793,19 @@ private slots:
 		// Confirming the dialog only selects a stable identity; it never imports tracks.
 		dialog.accept();
 		QCOMPARE(dialog.result(), int(QDialog::Accepted));
-		QCOMPARE(dialog.selectedVoice().pluginId, selected[0].toString());
-		QCOMPARE(dialog.selectedVoice().voiceId, selected[1].toString());
 		QCOMPARE(song->tracks().size(), count);
 		const auto project
 			= QJsonDocument::fromJson(
 				  R"({"song_tempo_list":[{"position":0,"bpm":120}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"原工程音高线","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2520,6050],[2640,5980],[2760,6030],[2880,6000],[2880,-100],[3360,6200],[3600,6250],[3600,-100],[1073741823,-100]]}}}]})")
 				  .object();
 		QString error;
-		const auto prepared = svs::ProjectMapper::prepareImport(project, dialog.selectedVoice(), {});
+		const auto prepared = svs::ProjectMapper::prepareImport(project, {}, {});
 		QVERIFY2(gui::SVSProjectController::commitImport(prepared, *song, error), qPrintable(error));
 		auto* track = static_cast<SVSTrack*>(song->tracks().front());
 		auto* clip = static_cast<SVSClip*>(track->getClip(0));
+		QVERIFY(track->pluginId().isEmpty());
+		QVERIFY(track->voiceId().isEmpty());
+		track->bindVoice("org.lmms.svs.example", "full");
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
 		// Exercise the imported curve at a nonzero clip position through production UI.
 		clip->movePosition(192);
@@ -783,10 +862,10 @@ private slots:
 		QVERIFY(QTest::qWaitForWindowExposed(&dialog));
 		auto* buttons = dialog.findChild<QDialogButtonBox*>();
 		QVERIFY(buttons);
-		QVERIFY(!buttons->button(QDialogButtonBox::Ok)->isEnabled());
-		QVERIFY(dialog.findChild<QLabel*>("svsProjectVoiceStatus")->text().contains(QStringLiteral("没有可用声库")));
+		QVERIFY(buttons->button(QDialogButtonBox::Ok)->isEnabled());
+		QVERIFY(!dialog.findChild<QComboBox*>("svsProjectDefaultVoice"));
 		dialog.accept();
-		QCOMPARE(dialog.result(), int(QDialog::Rejected));
+		QCOMPARE(dialog.result(), int(QDialog::Accepted));
 		dialog.reject();
 		QCOMPARE(song->tracks().size(), count);
 		QCOMPARE(song->isModified(), modified);

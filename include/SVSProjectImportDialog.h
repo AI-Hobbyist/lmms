@@ -21,17 +21,11 @@ class SVSProjectImportDialog : public QDialog
 {
 public:
 	explicit SVSProjectImportDialog(const QJsonObject& format, QWidget* parent = nullptr);
-	svs::ProjectVoice selectedVoice() const { return m_selected; }
 	QJsonObject options() const;
-	void accept() override;
 
 private:
-	void refreshVoices();
-	QComboBox* m_voices;
-	QLabel* m_status;
 	QDialogButtonBox* m_buttons;
 	SVSProjectOptionsWidget* m_options;
-	svs::ProjectVoice m_selected;
 };
 class SVSProjectExportDialog : public QDialog
 {

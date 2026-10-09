@@ -9,6 +9,7 @@
 #include "SVSCache.h"
 #include "SVSComputePolicy.h"
 #include "SVSTempoSnapshot.h"
+#include "SVSUnselectedPreview.h"
 #include "Song.h"
 namespace lmms::svs {
 namespace {
@@ -165,7 +166,12 @@ void SynthesisScheduler::dispatch()
 				}
 				if (error.isEmpty())
 				{
-					if (!job->plugin)
+					if (!job->plugin && job->input.document["unselectedVoicePreview"].toBool()
+						&& job->input.voiceId.isEmpty() && job->input.document["pluginId"].toString().isEmpty())
+					{
+						result = renderUnselectedPreview(job->input, error, job->control);
+					}
+					else if (!job->plugin)
 					{
 						result = Cache::instance().get(job->input.document["cacheOnlyKey"].toString(), job->input);
 						if (!result)
