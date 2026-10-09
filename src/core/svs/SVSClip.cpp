@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QCryptographicHash>
+#include <QRandomGenerator>
 namespace lmms {
 bool SVSClip::readOnly() const
 {
@@ -177,8 +178,19 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 }
 void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
 {
-	if (readOnly() || ranges.isEmpty()) { return; }
+	if (readOnly() || !supportsPitchRecording() || ranges.isEmpty()) { return; }
 	auto requests = m_editorState["pitchPredictionRequests"].toObject();
+	auto recordings = m_editorState["pitchRecordings"].toArray();
+	if (recordings.isEmpty())
+	{
+		recordings.append(
+			QJsonObject{{"number", 0}, {"seed", captureInput(44100).document["seed"]}, {"requests", requests}});
+	}
+	const auto options = m_editorState["pitchRecordingOptions"].toObject();
+	const double seed
+		= options["fixed"].toBool() ? options["seed"].toDouble() : double(QRandomGenerator::global()->generate());
+	if (!std::isfinite(seed) || seed < 0 || seed > UINT32_MAX || std::floor(seed) != seed) { return; }
+	const int recording = recordings.size();
 	auto curves = m_curves;
 	bool changed = false;
 	for (const auto& range : ranges)
@@ -188,7 +200,8 @@ void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
 		{
 			if (note.tick < range.second && note.tick + note.duration > range.first)
 			{
-				requests[note.id] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+				requests[note.id] = QJsonObject{{"request", QUuid::createUuid().toString(QUuid::WithoutBraces)},
+					{"seed", seed}, {"take", recording}};
 				changed = true;
 			}
 		}
@@ -198,10 +211,34 @@ void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
 
 	addJournalCheckPoint();
 	m_editorState["pitchPredictionRequests"] = requests;
+	recordings.append(QJsonObject{{"number", recording}, {"seed", seed}, {"requests", requests}});
+	m_editorState["pitchRecordings"] = recordings;
+	m_editorState["pitchRecordingCurrent"] = recording;
 	m_curves = std::move(curves);
 	invalidate();
 	synthesize();
 	Engine::getSong()->setModified();
+}
+
+void SVSClip::selectPitchRecording(int recording)
+{
+	const auto recordings = m_editorState["pitchRecordings"].toArray();
+	if (readOnly() || !supportsPitchRecording() || recording < 0 || recording >= recordings.size()
+		|| recording == m_editorState["pitchRecordingCurrent"].toInt())
+	{
+		return;
+	}
+	addJournalCheckPoint();
+	m_editorState["pitchPredictionRequests"] = recordings[recording].toObject()["requests"];
+	m_editorState["pitchRecordingCurrent"] = recording;
+	invalidate();
+	synthesize();
+	Engine::getSong()->setModified();
+}
+
+bool SVSClip::supportsPitchRecording() const
+{
+	return static_cast<SVSTrack*>(getTrack())->capabilities().original["pitch"].toObject()["prediction"].toBool();
 }
 void SVSClip::setEditorState(const QJsonObject& state)
 {

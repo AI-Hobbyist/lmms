@@ -959,6 +959,85 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 				refreshRanges();
 		});
 	refreshRanges();
+	auto* recordingPanel = new QWidget(sidebar);
+	recordingPanel->setObjectName("svsPitchRecordingPanel");
+	auto* recordingLayout = new QVBoxLayout(recordingPanel);
+	recordingLayout->setContentsMargins(0, 0, 0, 0);
+	auto* recordingStatus = new QLabel(recordingPanel);
+	recordingStatus->setObjectName("svsPitchRecordingStatus");
+	recordingStatus->setWordWrap(true);
+	recordingLayout->addWidget(recordingStatus);
+	auto* recordings = new QComboBox(recordingPanel);
+	recordings->setObjectName("svsPitchRecordings");
+	recordings->setToolTip(tr("切换到此前的音高重录结果"));
+	recordingLayout->addWidget(recordings);
+	auto* fixedSeed = new QCheckBox(tr("固定当前种子"), recordingPanel);
+	fixedSeed->setObjectName("svsPitchFixedSeed");
+	auto* seed = new QDoubleSpinBox(recordingPanel);
+	seed->setObjectName("svsPitchRecordingSeed");
+	seed->setDecimals(0);
+	seed->setRange(0, UINT32_MAX);
+	seed->setPrefix(tr("种子: "));
+	const auto recordingOptions = clip->editorState()["pitchRecordingOptions"].toObject();
+	fixedSeed->setChecked(recordingOptions["fixed"].toBool());
+	seed->setValue(recordingOptions["seed"].toDouble());
+	recordingLayout->addWidget(fixedSeed);
+	recordingLayout->addWidget(seed);
+	auto* record = new QPushButton(tr("音高重录"), recordingPanel);
+	record->setObjectName("svsRecordPitch");
+	recordingLayout->addWidget(record);
+	sidebarLayout->addWidget(recordingPanel);
+	auto storeRecordingOptions = [clip, fixedSeed, seed] {
+		auto state = clip->editorState();
+		state["pitchRecordingOptions"] = QJsonObject{{"fixed", fixedSeed->isChecked()}, {"seed", seed->value()}};
+		clip->setEditorState(state);
+	};
+	connect(fixedSeed, &QCheckBox::toggled, this, storeRecordingOptions);
+	connect(seed, qOverload<double>(&QDoubleSpinBox::valueChanged), this, storeRecordingOptions);
+	auto displayedRecording = std::make_shared<int>(recordingOptions.contains("seed")
+		? clip->editorState()["pitchRecordingCurrent"].toInt() : -1);
+	auto refreshRecordings = [clip, recordingPanel, recordingStatus, recordings, seed, displayedRecording] {
+		const QSignalBlocker block(recordings);
+		recordings->clear();
+		const auto history = clip->editorState()["pitchRecordings"].toArray();
+		for (const auto& value : history)
+		{
+			const auto entry = value.toObject();
+			recordings->addItem(
+				tr("重录 %1 · 种子 %2").arg(entry["number"].toInt()).arg(entry["seed"].toDouble(), 0, 'f', 0));
+		}
+		const int current
+			= std::clamp(clip->editorState()["pitchRecordingCurrent"].toInt(), 0, std::max(0, int(history.size()) - 1));
+		recordings->setCurrentIndex(current < history.size() ? current : -1);
+		if (current != *displayedRecording)
+		{
+			seed->setValue(history.isEmpty() ? clip->captureInput(44100).document["seed"].toDouble()
+											 : history[current].toObject()["seed"].toDouble());
+			*displayedRecording = current;
+		}
+		recordingPanel->setEnabled(!clip->readOnly() && clip->supportsPitchRecording());
+		recordingStatus->setText(!clip->supportsPitchRecording() ? tr("声库不支持自动音高")
+				: history.isEmpty() ? tr("当前: 原始音高 · 尚未重录")
+									: tr("当前: 重录 %1 / %2\n种子: %3")
+										  .arg(current)
+										  .arg(history.size() - 1)
+										  .arg(history[current].toObject()["seed"].toDouble(), 0, 'f', 0));
+	};
+	connect(clip, &Clip::dataChanged, this, refreshRecordings);
+	connect(track, &Track::dataChanged, this, refreshRecordings);
+	connect(recordings, qOverload<int>(&QComboBox::activated), clip, &SVSClip::selectPitchRecording);
+	connect(record, &QPushButton::clicked, this, [clip, canvas] {
+		QVector<QPair<double, double>> ranges;
+		for (const auto& note : clip->notes())
+		{
+			if (canvas->selectedNotes().isEmpty() || canvas->selectedNotes().contains(note.id))
+			{
+				ranges.append({note.tick, note.tick + note.duration});
+			}
+		}
+		clip->regeneratePitch(ranges);
+	});
+	refreshRecordings();
 	auto* globalControls = new SVSGlobalControls(sidebar);
 	sidebarLayout->addWidget(globalControls);
 	sidebarLayout->addStretch();

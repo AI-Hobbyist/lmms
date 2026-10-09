@@ -163,7 +163,8 @@ CpuModel& Synthesis::model(const std::string& stage, const std::string& role)
 }
 void Synthesis::declareParameters(const VoicePackage& voice, Json& schema)
 {
-	schema["pitch"] = {{"input", "absolute"}, {"feedback", true}, {"unit", "semitone"}};
+	schema["pitch"] = {{"input", "absolute"}, {"feedback", true}, {"unit", "semitone"},
+		{"prediction", voice.stages.count("pitch") != 0}};
 	auto parameter = [&](const std::string& id, const std::string& name, const std::string& unit, double minimum,
 						 double maximum, double value, bool feedback) {
 		Json p{{"id", id}, {"name", name}, {"group", "DiffSinger"}, {"scope", "clip"}, {"type", "float"},
@@ -399,10 +400,26 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		m_seed = uint32_t(seed);
 	}
 	const auto pitchRequests = input.value("pitchPredictionRequests", Json::object());
-	const auto pitchSeed = pitchRequests.empty() ? m_seed
-		: uint32_t(std::stoul(TensorCache::key("pitch-seed/" + pitchRequests.dump(), {{"seed", longs({m_seed})}})
-								 .substr(0, 8),
-			  nullptr, 16));
+	auto pitchSeed = pitchRequests.empty()
+		? m_seed
+		: uint32_t(std::stoul(
+			  TensorCache::key("pitch-seed/" + pitchRequests.dump(), {{"seed", longs({m_seed})}}).substr(0, 8), nullptr,
+			  16));
+	int newestTake = -1;
+	for (const auto& request : pitchRequests)
+	{
+		if (!request.is_object() || !request.contains("seed")) { continue; }
+		const auto take = request.value("take", 0);
+		if (take <= newestTake) { continue; }
+		const auto requestedSeed = request.at("seed").get<double>();
+		if (!std::isfinite(requestedSeed) || requestedSeed < 0 || requestedSeed > UINT32_MAX
+			|| std::floor(requestedSeed) != requestedSeed)
+		{
+			throw std::runtime_error("Invalid pitch recording seed");
+		}
+		pitchSeed = uint32_t(requestedSeed);
+		newestTake = take;
+	}
 	if (m_pitchSeed != pitchSeed)
 	{
 		for (auto it = m_models.begin(); it != m_models.end();)

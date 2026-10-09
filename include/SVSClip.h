@@ -34,6 +34,8 @@ public:
 	void setEditorState(const QJsonObject&);
 	void synthesize();
 	void regeneratePitch(const QVector<QPair<double, double>>& ranges);
+	void selectPitchRecording(int recording);
+	bool supportsPitchRecording() const;
 	svs::Input captureInput(uint32_t sampleRate) const;
 	bool captureCachedInput(svs::Input&) const;
 	void invalidate();

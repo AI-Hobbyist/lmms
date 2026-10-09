@@ -4900,9 +4900,116 @@ private slots:
 		delete restored;
 		delete track;
 	}
+	void nativePitchRecordingHistory()
+	{
+		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		const auto root = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
+		if (root.isEmpty()) { QSKIP("Automatic-pitch voice required"); }
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		const auto cleanup = qScopeGuard([&] { delete track; });
+		track->bindVoice("org.lmms.svs.example", "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note first;
+		first.id = "recording-first";
+		first.lyric = "la";
+		first.pronunciation = "la";
+		first.duration = 48;
+		first.pitch = 60;
+		auto second = first;
+		second.id = "recording-second";
+		second.tick = 192;
+		clip->setNotes({first, second});
+		QVERIFY(!clip->supportsPitchRecording());
+		clip->regeneratePitch({{0, 48}});
+		QVERIFY(clip->editorState()["pitchRecordings"].toArray().isEmpty());
+		QString error;
+		QVERIFY2(
+			svs::Registry::instance().refreshCatalog("org.lmms.svs.diffsinger",
+				{{"diffsinger.voicebankDirectories", QJsonArray{root}},
+					{"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
+				error),
+			qPrintable(error));
+		for (const auto& voice : svs::Registry::instance().voices())
+		{
+			if (voice.pluginId == "org.lmms.svs.diffsinger")
+			{
+				track->bindVoice(voice.pluginId, voice.id);
+				break;
+			}
+		}
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVERIFY(clip->supportsPitchRecording());
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1500, 900);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* canvas = editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");
+		auto* record = editor.findChild<QPushButton*>("svsRecordPitch");
+		auto* fixed = editor.findChild<QCheckBox*>("svsPitchFixedSeed");
+		auto* seed = editor.findChild<QDoubleSpinBox*>("svsPitchRecordingSeed");
+		auto* takes = editor.findChild<QComboBox*>("svsPitchRecordings");
+		QVERIFY(canvas && record && fixed && seed && takes);
+		canvas->setScroll(0, 66);
+		canvas->setZoom(4, 1);
+		canvas->setTool(gui::SVSCanvas::Tool::Notes);
+		QTest::qWait(300);
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, canvas->noteRect(first).center().toPoint());
+		QVERIFY(canvas->selectedNotes().contains(first.id));
+		QTest::mouseClick(record, Qt::LeftButton);
+		auto requests = clip->editorState()["pitchPredictionRequests"].toObject();
+		QCOMPARE(requests[first.id].toObject()["take"].toInt(), 1);
+		QVERIFY(!requests.contains(second.id));
+		const auto firstRequest = requests[first.id];
+		QCOMPARE(seed->value(), firstRequest.toObject()["seed"].toDouble());
+		QTest::mouseClick(fixed, Qt::LeftButton, Qt::NoModifier, QPoint(8, fixed->height() / 2));
+		QVERIFY(fixed->isChecked());
+		auto* seedInput = seed->findChild<QLineEdit*>();
+		QVERIFY(seedInput);
+		QTest::keyClick(seedInput, Qt::Key_A, Qt::ControlModifier);
+		QTest::keyClicks(seedInput, "4294967295");
+		QTest::keyClick(seedInput, Qt::Key_Enter);
+		QTest::mouseClick(record, Qt::LeftButton);
+		QCOMPARE(clip->editorState()["pitchRecordings"].toArray().size(), 3);
+		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id].toObject()["seed"].toDouble(),
+			double(UINT32_MAX));
+		QCOMPARE(takes->currentIndex(), 2);
+		QVERIFY(fixed->isChecked());
+		QTest::mouseClick(record, Qt::LeftButton);
+		QCOMPARE(clip->editorState()["pitchRecordingCurrent"].toInt(), 3);
+		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id].toObject()["seed"].toDouble(), double(UINT32_MAX));
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 180000);
+		QVERIFY2(clip->audio(), qPrintable(clip->status()));
+		QTest::qWait(700);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-pitch-recording-native.png"));
+		QTest::keyClick(takes, Qt::Key_Home);
+		QTest::keyClick(takes, Qt::Key_Down);
+		QCOMPARE(clip->editorState()["pitchRecordingCurrent"].toInt(), 1);
+		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id], firstRequest);
+		QCOMPARE(seed->value(), firstRequest.toObject()["seed"].toDouble());
+		QDomDocument document;
+		auto saved = document.createElement("svsclip");
+		document.appendChild(saved);
+		clip->saveSettings(document, saved);
+		auto* restored = static_cast<SVSClip*>(track->createClip(384));
+		restored->loadSettings(saved);
+		QCOMPARE(restored->editorState()["pitchRecordings"], clip->editorState()["pitchRecordings"]);
+		QCOMPARE(restored->editorState()["pitchRecordingCurrent"].toInt(), 1);
+		editor.close();
+	}
 	void nativePitchResetContextActions()
 	{
 		if (!m_guiApplication) { QSKIP("Native GUI required"); }
+		const auto voiceRoot = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
+		if (voiceRoot.isEmpty()) { QSKIP("Automatic-pitch voice required"); }
+		QString catalogError;
+		QVERIFY2(
+			svs::Registry::instance().refreshCatalog("org.lmms.svs.diffsinger",
+				{{"diffsinger.voicebankDirectories", QJsonArray{voiceRoot}},
+					{"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
+				catalogError),
+			qPrintable(catalogError));
 		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
 		auto* journal = Engine::projectJournal();
 		const bool previousJournalling = journal->isJournalling();
@@ -4910,9 +5017,16 @@ private slots:
 		journal->setJournalling(true);
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
 		auto cleanup = qScopeGuard([&] { delete track; });
-		const auto voice = svs::Registry::instance().voices().first();
-		track->bindVoice(voice.pluginId, "full");
+		for (const auto& voice : svs::Registry::instance().voices())
+		{
+			if (voice.pluginId == "org.lmms.svs.diffsinger")
+			{
+				track->bindVoice(voice.pluginId, voice.id);
+				break;
+			}
+		}
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVERIFY(track->capabilities().original["pitch"].toObject()["prediction"].toBool());
 		auto* clip = static_cast<SVSClip*>(track->createClip(0));
 		clip->setJournalling(true);
 		svs::Note first;

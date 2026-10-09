@@ -724,12 +724,23 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 				fontMetrics().elidedText(label, Qt::ElideRight, int(rectangle.width() - 6)));
 			const auto reading
 				= note.pronunciation.isEmpty() ? readings[note.id].toObject()["text"].toString() : note.pronunciation;
+			const auto recording = m_clip->editorState()["pitchPredictionRequests"].toObject()[note.id].toObject();
+			const auto takeLabel
+				= recording.contains("take") ? tr("重录 %1").arg(recording["take"].toInt()) : QString{};
+			const auto labelRectangle = rectangle.translated(0, -m_rowHeight).adjusted(3, 0, -3, 0);
+			const int takeWidth = takeLabel.isEmpty() ? 0 : fontMetrics().horizontalAdvance(takeLabel) + 6;
+			painter.setPen(color("pronunciationColor", QPalette::Text));
+			if (!takeLabel.isEmpty())
+			{
+				painter.drawText(labelRectangle, Qt::AlignBottom | Qt::AlignRight,
+					fontMetrics().elidedText(takeLabel, Qt::ElideLeft, std::max(0, int(labelRectangle.width()))));
+			}
 			if (!reading.isEmpty())
 			{
 				painter.setPen(color("pronunciationColor", QPalette::Text));
-				painter.drawText(rectangle.translated(0, -m_rowHeight).adjusted(3, 0, -3, 0),
-					Qt::AlignBottom | Qt::AlignLeft,
-					fontMetrics().elidedText(reading, Qt::ElideRight, std::max(0, int(rectangle.width() - 6))));
+				painter.drawText(labelRectangle.adjusted(0, 0, -takeWidth, 0), Qt::AlignBottom | Qt::AlignLeft,
+					fontMetrics().elidedText(
+						reading, Qt::ElideRight, std::max(0, int(labelRectangle.width()) - takeWidth)));
 			}
 		}
 	}
@@ -1820,12 +1831,12 @@ void SVSCanvas::addPitchActions(QMenu& menu)
 			ranges.append({note.tick, note.tick + note.duration});
 		}
 	}
-	auto* predict = menu.addAction(tr("Re-predict automatic pitch"), this, [this, ranges] {
+	auto* predict = menu.addAction(tr("音高重录"), this, [this, ranges] {
 		cancelOperation();
 		m_clip->regeneratePitch(ranges);
 	});
 	predict->setObjectName("svsRepredictSelectedPitch");
-	predict->setEnabled(!m_clip->readOnly() && !ranges.isEmpty());
+	predict->setEnabled(!m_clip->readOnly() && m_clip->supportsPitchRecording() && !ranges.isEmpty());
 	const auto scope = wholeClip ? tr("Applies to the whole SVS clip when nothing is selected.")
 								 : tr("Applies only to the selection; other pitch and render segments are retained.");
 	clear->setToolTip(scope);

@@ -14,6 +14,14 @@ Pitch input is `none`, `absolute` or `offset`. Continuous semitones use fraction
 
 ## Dictionaries and pronunciation
 
+### Optional automatic pitch recordings
+
+Any AI singing engine can opt into the host's pitch recording controls by declaring `pitch.prediction:true` for the selected voice. Missing or false means unavailable; returning pitch feedback alone does not enable recording. DiffSinger declares true only for voicebanks with a pitch prediction module. This is an optional JSON capability and requires no new C ABI function.
+
+The host's `pitchPredictionRequests` maps note IDs to recording requests, for example `{"note-a":{"request":"random-uuid","seed":4294967295,"take":2}}`. `seed` is an unsigned 32-bit integer chosen randomly by default or entered by the user; `take` is the recording number, and `request` changes on each recording even for the same fixed seed. Legacy string tokens remain readable by DiffSinger. Rest segmentation retains only requests belonging to that segment. For a model predicting a whole continuous phrase in one run, use the explicit seed of the highest-numbered active recording in that phrase; older unaffected rest-separated segments keep their own requests and caches. A manual fixed seed must be honored exactly. Include effective seed and request identity in prediction tensor caches; downstream inputs determine downstream cache invalidation.
+
+Recording snapshots and the current selection persist in clip editor state and participate in undo/redo. The sidebar lists recording numbers and seeds, and switching restores the snapshot's requests without creating a new recording. With no note selection a new recording applies to the whole current clip; otherwise only selected notes receive new requests. Re-rendering one saved recording must honor its stored seed, including after cache eviction or project reload. Feedback pronunciation remains separate: LMMS draws the reading at the upper left of the note and `重录 n` at the upper right. The original lyric stays inside the note.
+
 Pronunciation feedback `text` contains the resolved reading (for example `ni`), separately from the unchanged lyric (`你`). LMMS displays the reading above the note and the original lyric inside it. Do not return the lyric again as a substitute for an available reading.
 
 ```json
