@@ -598,19 +598,19 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     <name>NativeSVS</name>
     <message>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>モード</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基本</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -618,135 +618,135 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Breath</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレス</translation>
     </message>
     <message>
         <source>Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>表現</translation>
     </message>
     <message>
         <source>Tension</source>
-        <translation type="unfinished"></translation>
+        <translation>テンション</translation>
     </message>
     <message>
         <source>Gender</source>
-        <translation type="unfinished"></translation>
+        <translation>ジェンダー</translation>
     </message>
     <message>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>強さ</translation>
     </message>
     <message>
         <source>Note</source>
-        <translation type="unfinished"></translation>
+        <translation>ノート</translation>
     </message>
     <message>
         <source>Soft</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフト</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Phoneme gain</source>
-        <translation type="unfinished"></translation>
+        <translation>音素ゲイン</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Rendered energy</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリング済みエネルギー</translation>
     </message>
     <message>
         <source>Rendered level</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリング済みレベル</translation>
     </message>
     <message>
         <source>Rendered peak</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリング済みピーク</translation>
     </message>
     <message>
         <source>Singing Voice Synthesis</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声合成</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>話者</translation>
     </message>
     <message>
         <source>Rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリングステップ数</translation>
     </message>
     <message>
         <source>Voicebank directories</source>
-        <translation type="unfinished"></translation>
+        <translation>音源ディレクトリ</translation>
     </message>
     <message>
         <source>Global shared vocoder directories</source>
-        <translation type="unfinished"></translation>
+        <translation>グローバル共有ボコーダーディレクトリ</translation>
     </message>
     <message>
         <source>Show phoneme language prefixes</source>
-        <translation type="unfinished"></translation>
+        <translation>音素の言語接頭辞を表示</translation>
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>エネルギー（絶対値）</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation type="unfinished"></translation>
+        <translation>エネルギーのオフセット</translation>
     </message>
     <message>
         <source>energy</source>
-        <translation type="unfinished"></translation>
+        <translation>エネルギー</translation>
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレス（絶対値）</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレスのオフセット</translation>
     </message>
     <message>
         <source>breathiness</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレス</translation>
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>発声（絶対値）</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation type="unfinished"></translation>
+        <translation>発声のオフセット</translation>
     </message>
     <message>
         <source>voicing</source>
-        <translation type="unfinished"></translation>
+        <translation>発声</translation>
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>テンション（絶対値）</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation type="unfinished"></translation>
+        <translation>テンションのオフセット</translation>
     </message>
     <message>
         <source>tension</source>
-        <translation type="unfinished"></translation>
+        <translation>テンション</translation>
     </message>
     <message>
         <source>Velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>ベロシティ</translation>
     </message>
     <message>
         <source>Expressiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>表現力</translation>
     </message>
 </context>
 <context>
@@ -1147,23 +1147,23 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
-        <translation type="unfinished"></translation>
+        <translation>音名ラベル：SVS / 楽器のピアノロールと同期します。使用するには全音名ラベルを有効にしてください</translation>
     </message>
     <message>
         <source>Standard pitch names CDEFGAB</source>
-        <translation type="unfinished"></translation>
+        <translation>標準音名 CDEFGAB</translation>
     </message>
     <message>
         <source>Numbered notation 1234567</source>
-        <translation type="unfinished"></translation>
+        <translation>数字譜 1234567</translation>
     </message>
     <message>
         <source>Numbered notation key</source>
-        <translation type="unfinished"></translation>
+        <translation>数字譜の調</translation>
     </message>
     <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
-        <translation type="unfinished"></translation>
+        <translation>数字譜の基準：%1%2。基準の C は全体設定で変更できます</translation>
     </message>
     <message>
         <source>Select a weight</source>
@@ -1179,55 +1179,55 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>SVS plugin settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プラグイン設定</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>未選択</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>話者</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>参照</translation>
     </message>
     <message>
         <source>Choose image</source>
-        <translation type="unfinished"></translation>
+        <translation>画像を選択</translation>
     </message>
     <message>
         <source>Images (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</source>
-        <translation type="unfinished"></translation>
+        <translation>画像 (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</translation>
     </message>
     <message>
         <source>Avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>アバター</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートレート</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートレートを表示</translation>
     </message>
     <message>
         <source>Portrait transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートレートの透明度</translation>
     </message>
     <message>
         <source>Use voice images</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手の画像を使用</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"></translation>
+        <translation>エフェクト</translation>
     </message>
 </context>
 <context>
@@ -1294,26 +1294,76 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
+    <name>SVSImageLoader</name>
+    <message>
+        <source>Voice image is not available</source>
+        <translation>歌手の画像を利用できません</translation>
+    </message>
+    <message>
+        <source>Voice resource engine is unavailable</source>
+        <translation>歌手のリソースエンジンを利用できません</translation>
+    </message>
+    <message>
+        <source>Voice resource is not an image</source>
+        <translation>歌手のリソースは画像ではありません</translation>
+    </message>
+    <message>
+        <source>Voice image is missing or outside its package</source>
+        <translation>歌手の画像が見つからないか、パッケージの外にあります</translation>
+    </message>
+    <message>
+        <source>Voice image is unreadable or exceeds 16 MiB</source>
+        <translation>歌手の画像を読み込めないか、16 MiB を超えています</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds 16 MiB</source>
+        <translation>歌手の画像が 16 MiB を超えています</translation>
+    </message>
+    <message>
+        <source>Voice image has invalid dimensions or exceeds the decoding limit</source>
+        <translation>歌手の画像の寸法が無効、またはデコードの上限を超えています</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds the 64 MiB decoded image limit</source>
+        <translation>歌手の画像がデコード後の上限 64 MiB を超えています</translation>
+    </message>
+    <message>
+        <source>Voice image decoding failed: </source>
+        <translation>歌手の画像のデコードに失敗しました： </translation>
+    </message>
+</context>
+<context>
+    <name>SVSPitchRanges</name>
+    <message>
+        <source>Non-string pitch range</source>
+        <translation>音域が文字列ではありません</translation>
+    </message>
+    <message>
+        <source>Invalid pitch range</source>
+        <translation>無効な音域</translation>
+    </message>
+</context>
+<context>
     <name>SVSProjectUI</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>SVS project</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクト</translation>
     </message>
     <message>
         <source>Cancelling and cleaning up…</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセルして後処理を実行中…</translation>
     </message>
     <message>
         <source>Reading supported formats…</source>
-        <translation type="unfinished"></translation>
+        <translation>対応形式を読み込み中…</translation>
     </message>
     <message>
         <source>SVS project conversion failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクトの変換に失敗しました</translation>
     </message>
     <message>
         <source>Import SVS project</source>
@@ -1321,205 +1371,219 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>All supported formats (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>対応するすべての形式 (%1)</translation>
     </message>
     <message>
         <source>Parsing project: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトを解析中：%1</translation>
     </message>
     <message>
         <source>SVS project preflight failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクトの事前検証に失敗しました</translation>
     </message>
     <message>
         <source>Validating audio and project data…</source>
-        <translation type="unfinished"></translation>
+        <translation>音声とプロジェクトのデータを検証中…</translation>
     </message>
     <message>
         <source>Format %1, track %2, %3: %4</source>
-        <translation type="unfinished"></translation>
+        <translation>形式 %1、トラック %2、%3：%4</translation>
     </message>
     <message>
         <source>Could not create the imported audio resource directory: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>インポートした音声のリソースディレクトリを作成できませんでした：%1</translation>
     </message>
     <message>
         <source>Could not save the imported audio resource: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>インポートした音声リソースを保存できませんでした：%1</translation>
     </message>
     <message>
         <source>An unknown error occurred during project preflight</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトの事前検証中に不明なエラーが発生しました</translation>
     </message>
     <message>
         <source>Confirm lossy import</source>
-        <translation type="unfinished"></translation>
+        <translation>情報が失われるインポートを確認</translation>
     </message>
     <message>
         <source>Confirm the following content for format %1:
 %2
 
 Continue importing as a new project?</source>
-        <translation type="unfinished"></translation>
+        <translation>形式 %1 の以下の内容を確認してください：
+%2
+
+新しいプロジェクトとしてインポートしますか？</translation>
     </message>
     <message>
         <source>Voicebank unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>音源を利用できません</translation>
     </message>
     <message>
         <source>The selected voicebank was removed. The original project has been preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した音源が削除されました。元のプロジェクトは保持されています。</translation>
     </message>
     <message>
         <source>Could not commit the import</source>
-        <translation type="unfinished"></translation>
+        <translation>インポートを確定できませんでした</translation>
     </message>
     <message>
         <source>SVS project export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクトのエクスポートに失敗しました</translation>
     </message>
     <message>
         <source>Could not create the temporary export audio directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート用の一時音声ディレクトリを作成できませんでした。</translation>
     </message>
     <message>
         <source>Preparing the project snapshot and accompaniment…</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトのスナップショットと伴奏を準備中…</translation>
     </message>
     <message>
         <source>An unknown error occurred while preparing the export snapshot</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート用スナップショットの準備中に不明なエラーが発生しました</translation>
     </message>
     <message>
         <source>Reading output formats…</source>
-        <translation type="unfinished"></translation>
+        <translation>出力形式を読み込み中…</translation>
     </message>
     <message>
         <source>Export SVS project</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクトをエクスポート</translation>
     </message>
     <message>
         <source>Output extension mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ファイルの拡張子が一致しません</translation>
     </message>
     <message>
         <source>Format %1 supports: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>形式 %1 の対応内容：%2</translation>
     </message>
     <message>
         <source>Checking format restrictions and omitted content…</source>
-        <translation type="unfinished"></translation>
+        <translation>形式の制限と省略される内容を確認中…</translation>
     </message>
     <message>
         <source>Confirm lossy export</source>
-        <translation type="unfinished"></translation>
+        <translation>情報が失われるエクスポートを確認</translation>
     </message>
     <message>
         <source>
 
 Continue exporting?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+エクスポートを続行しますか？</translation>
     </message>
     <message>
         <source>Converting project…</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトを変換中…</translation>
     </message>
     <message>
         <source>Confirm format conversion warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>形式変換の警告を確認</translation>
     </message>
     <message>
         <source>
 
 Continue saving the file group?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+ファイル一式の保存を続行しますか？</translation>
     </message>
     <message>
         <source>Output file group preflight failed</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ファイル一式の事前検証に失敗しました</translation>
     </message>
     <message>
         <source>Confirm overwriting the export file group</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポートファイル一式の上書きを確認</translation>
     </message>
     <message>
         <source>All of the following files will be overwritten:
 %1
 
 Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>以下のファイルがすべて上書きされます：
+%1
+
+続行しますか？</translation>
     </message>
     <message>
         <source>Saving the complete file group…</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル一式を保存中…</translation>
     </message>
     <message>
         <source>An unknown error occurred while saving the export file group</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポートファイル一式の保存中に不明なエラーが発生しました</translation>
     </message>
     <message>
         <source>SVS project export complete</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS プロジェクトのエクスポートが完了しました</translation>
     </message>
     <message>
         <source>Could not save the output file group</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ファイル一式を保存できませんでした</translation>
+    </message>
+    <message>
+        <source>Incomplete project restore</source>
+        <translation>プロジェクトの復元が不完全です</translation>
     </message>
     <message>
         <source>An unknown error occurred while committing the project</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトの確定中に不明なエラーが発生しました</translation>
     </message>
     <message>
         <source>Preserve the original project pitch curve</source>
-        <translation type="unfinished"></translation>
+        <translation>元のプロジェクトのピッチカーブを保持</translation>
     </message>
     <message>
         <source>Import as a new project. All singing tracks start without a selected singer and use sine-wave preview; select a singer after importing.</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいプロジェクトとしてインポートします。すべての歌声トラックは歌手未選択の状態で始まり、正弦波でプレビューします。インポート後に歌手を選択してください。</translation>
     </message>
     <message>
         <source>%1 input options</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 の入力オプション</translation>
     </message>
     <message>
         <source>Preserve the original project portamento and supported vibrato in full.</source>
-        <translation type="unfinished"></translation>
+        <translation>元のプロジェクトのポルタメントと対応するビブラートを完全に保持します。</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>インポート</translation>
     </message>
     <message>
         <source>Export a snapshot taken when you click Export. No voicebank or synthesized audio is required. Select tracks for restricted formats; omitted content is listed in the next step.</source>
-        <translation type="unfinished"></translation>
+        <translation>「エクスポート」を押した時点のスナップショットを出力します。音源や合成音声は不要です。制限のある形式ではトラックを選択してください。省略される内容は次の手順で表示されます。</translation>
     </message>
     <message>
         <source>Select a singing track…</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声トラックを選択…</translation>
     </message>
     <message>
         <source>Select an accompaniment track…</source>
-        <translation type="unfinished"></translation>
+        <translation>伴奏トラックを選択…</translation>
     </message>
     <message>
         <source>Singing track for restricted formats</source>
-        <translation type="unfinished"></translation>
+        <translation>制限のある形式の歌声トラック</translation>
     </message>
     <message>
         <source>Accompaniment track for restricted formats</source>
-        <translation type="unfinished"></translation>
+        <translation>制限のある形式の伴奏トラック</translation>
     </message>
     <message>
         <source>%1 [%2] output options</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 [%2] の出力オプション</translation>
     </message>
     <message>
         <source>Set automatically from the track selection above.</source>
-        <translation type="unfinished"></translation>
+        <translation>上のトラック選択に基づいて自動設定されます。</translation>
     </message>
     <message>
         <source>Check and export</source>
-        <translation type="unfinished"></translation>
+        <translation>確認してエクスポート</translation>
     </message>
 </context>
 <context>
@@ -4486,7 +4550,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::RenderManager</name>
     <message>
         <source>Track deleted during SVS batch export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS の一括エクスポート中にトラックが削除されました</translation>
     </message>
 </context>
 <context>
@@ -4594,7 +4658,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SVSClip</name>
     <message>
         <source>Please select a singer</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手を選択してください</translation>
     </message>
 </context>
 <context>
@@ -7365,7 +7429,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Export failed SVS regions as silence</source>
-        <translation type="unfinished"></translation>
+        <translation>失敗した SVS 領域を無音でエクスポート</translation>
     </message>
     <message>
         <source> time(s)</source>
@@ -7373,7 +7437,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>SVS export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS のエクスポートに失敗しました</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
@@ -11164,11 +11228,15 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::PluginDescWidget</name>
     <message>
         <source>Send to new SVS track</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい SVS トラックへ送る</translation>
     </message>
     <message>
         <source>Send to new instrument track</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Native singing voice synthesis</source>
+        <translation>ネイティブ歌声合成</translation>
     </message>
 </context>
 <context>
@@ -11616,18 +11684,18 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVSBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSCanvas</name>
     <message>
         <source>Left drag: edit curve. Right drag: reset to baseline. Shift+right click: curve menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>左ドラッグ：カーブを編集。右ドラッグ：基準値にリセット。Shift+右クリック：カーブメニュー。</translation>
     </message>
     <message>
         <source>Take %1</source>
-        <translation type="unfinished"></translation>
+        <translation>テイク %1</translation>
     </message>
     <message>
         <source>Lyric: %1
@@ -11635,189 +11703,193 @@ Reading: %2
 Source: %3
 Phonemes: %4
 %5</source>
-        <translation type="unfinished"></translation>
+        <translation>歌詞：%1
+読み：%2
+ソース：%3
+音素：%4
+%5</translation>
     </message>
     <message>
         <source>Copied curve belongs to a different parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>コピーしたカーブは別のパラメーターに属しています</translation>
     </message>
     <message>
         <source>Clear hand-drawn pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>手描きピッチをクリア</translation>
     </message>
     <message>
         <source>Re-record pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチ再録音</translation>
     </message>
     <message>
         <source>Applies to the whole SVS clip when nothing is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>何も選択されていない場合は SVS クリップ全体に適用します。</translation>
     </message>
     <message>
         <source>Applies only to the selection; other pitch and render segments are retained.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択範囲のみに適用します。他のピッチとレンダリング区間は保持されます。</translation>
     </message>
     <message>
         <source>Copy curve selection</source>
-        <translation type="unfinished"></translation>
+        <translation>カーブの選択範囲をコピー</translation>
     </message>
     <message>
         <source>Paste curve here</source>
-        <translation type="unfinished"></translation>
+        <translation>ここにカーブを貼り付け</translation>
     </message>
     <message>
         <source>Delete selected anchors</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したアンカーを削除</translation>
     </message>
     <message>
         <source>Connect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択範囲を接続</translation>
     </message>
     <message>
         <source>Disconnect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択範囲を切断</translation>
     </message>
     <message>
         <source>Anchor value</source>
-        <translation type="unfinished"></translation>
+        <translation>アンカー値</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>オフ</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>オン</translation>
     </message>
     <message>
         <source>Semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>半音</translation>
     </message>
     <message>
         <source>Reset curve to default</source>
-        <translation type="unfinished"></translation>
+        <translation>カーブを初期値にリセット</translation>
     </message>
     <message>
         <source>Restore automatic pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>自動ピッチを復元</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>切り取り</translation>
     </message>
     <message>
         <source>Paste here</source>
-        <translation type="unfinished"></translation>
+        <translation>ここに貼り付け</translation>
     </message>
     <message>
         <source>Split at cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>カーソル位置で分割</translation>
     </message>
     <message>
         <source>Creates two editable notes and re-parses phonemes. Undo restores the complete original note.</source>
-        <translation type="unfinished"></translation>
+        <translation>編集可能な 2 つのノートを作成し、音素を再解析します。元に戻すと元のノート全体が復元されます。</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Transpose up octave</source>
-        <translation type="unfinished"></translation>
+        <translation>1 オクターブ上げる</translation>
     </message>
     <message>
         <source>Transpose down octave</source>
-        <translation type="unfinished"></translation>
+        <translation>1 オクターブ下げる</translation>
     </message>
     <message>
         <source>Pronunciation</source>
-        <translation type="unfinished"></translation>
+        <translation>発音</translation>
     </message>
     <message>
         <source>Manual reading…</source>
-        <translation type="unfinished"></translation>
+        <translation>手動の読み…</translation>
     </message>
     <message>
         <source>Manual reading</source>
-        <translation type="unfinished"></translation>
+        <translation>手動の読み</translation>
     </message>
     <message>
         <source>Reading (manual phonemes keep precedence)</source>
-        <translation type="unfinished"></translation>
+        <translation>読み（手動音素を優先）</translation>
     </message>
     <message>
         <source>Restore automatic reading</source>
-        <translation type="unfinished"></translation>
+        <translation>自動の読みを復元</translation>
     </message>
     <message>
         <source>Note language</source>
-        <translation type="unfinished"></translation>
+        <translation>ノートの言語</translation>
     </message>
     <message>
         <source>Track default</source>
-        <translation type="unfinished"></translation>
+        <translation>トラックの初期値</translation>
     </message>
     <message>
         <source>Input lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>歌詞を入力</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSClipView</name>
     <message>
         <source>Set as ghost in piano-roll</source>
-        <translation type="unfinished"></translation>
+        <translation>ピアノロールのゴーストノートに設定</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSLyricEditor</name>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>歌詞の一括入力</translation>
     </message>
     <message>
         <source>Skip voice continuation notes and tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声の継続ノートとトークンをスキップ</translation>
     </message>
     <message>
         <source>Tick</source>
-        <translation type="unfinished"></translation>
+        <translation>ティック</translation>
     </message>
     <message>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>元の内容</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>プレビュー</translation>
     </message>
     <message>
         <source>Reading / status</source>
-        <translation type="unfinished"></translation>
+        <translation>読み / 状態</translation>
     </message>
     <message>
         <source>Skipped continuation</source>
-        <translation type="unfinished"></translation>
+        <translation>継続ノートをスキップ済み</translation>
     </message>
     <message>
         <source> — manual override retained</source>
-        <translation type="unfinished"></translation>
+        <translation> — 手動設定を保持</translation>
     </message>
     <message>
         <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 個のトークンを割り当て、%2 個は未使用です。手動の読みと音素は保持されます。変更は確認時にまとめて適用されます。</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>
-        <translation type="unfinished"></translation>
+        <translation>このプレビューを開いている間にノートが変更されました。歌詞の一括入力を開き直して現在のノートを確認してください。</translation>
     </message>
 </context>
 <context>
@@ -11832,489 +11904,493 @@ Phonemes: %4
     </message>
     <message>
         <source>Browse…</source>
-        <translation type="unfinished"></translation>
+        <translation>参照…</translation>
     </message>
     <message>
         <source>Voicebank directory</source>
-        <translation type="unfinished"></translation>
+        <translation>音源ディレクトリ</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Add directory</source>
-        <translation type="unfinished"></translation>
+        <translation>ディレクトリを追加</translation>
     </message>
     <message>
         <source>; logarithmic scale</source>
-        <translation type="unfinished"></translation>
+        <translation>；対数スケール</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
         <source>SVS Piano Roll — LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS ピアノロール — LMMS</translation>
     </message>
     <message>
         <source>Play / Pause clip</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップを再生 / 一時停止</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>Clear ghost notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ゴーストノートをクリア</translation>
     </message>
     <message>
         <source>Synthesize</source>
-        <translation type="unfinished"></translation>
+        <translation>合成</translation>
     </message>
     <message>
         <source>Follow Song Editor scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>ソングエディターのスクロールに追従</translation>
     </message>
     <message>
         <source>Scroll automatically with the Song Editor timeline using its scrolling mode; stop at the clip boundary</source>
-        <translation type="unfinished"></translation>
+        <translation>ソングエディターのスクロールモードでタイムラインに自動追従します。クリップの境界で停止します</translation>
     </message>
     <message>
         <source>Lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>歌詞</translation>
     </message>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>歌詞の一括入力</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>選択</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished"></translation>
+        <translation>鉛筆</translation>
     </message>
     <message>
         <source>Pitch pen</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチペン</translation>
     </message>
     <message>
         <source>Anchor</source>
-        <translation type="unfinished"></translation>
+        <translation>アンカー</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>滑らかにする</translation>
     </message>
     <message>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>直線</translation>
     </message>
     <message>
         <source>Erase</source>
-        <translation type="unfinished"></translation>
+        <translation>消去</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーター</translation>
     </message>
     <message>
         <source>Show/hide parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーターを表示/非表示</translation>
     </message>
     <message>
         <source>Quantization</source>
-        <translation type="unfinished"></translation>
+        <translation>クオンタイズ</translation>
     </message>
     <message>
         <source>Note length</source>
-        <translation type="unfinished"></translation>
+        <translation>ノートの長さ</translation>
     </message>
     <message>
         <source>Last note</source>
-        <translation type="unfinished"></translation>
+        <translation>最後のノート</translation>
     </message>
     <message>
         <source>−</source>
-        <translation type="unfinished"></translation>
+        <translation>−</translation>
     </message>
     <message>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <source>Horizontal zoom: bars visible in the note area</source>
-        <translation type="unfinished"></translation>
+        <translation>横方向のズーム：ノート領域に表示する小節数</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタム</translation>
     </message>
     <message numerus="yes">
         <source>%n bar(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 小節</numerusform>
         </translation>
     </message>
     <message>
         <source>Singer</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語</translation>
     </message>
     <message>
         <source>Not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>未選択</translation>
     </message>
     <message>
         <source>Please select a singer</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手を選択してください</translation>
     </message>
     <message>
         <source>Available: %1
 Comfortable: %2
 Weak spots: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>使用可能：%1
+適正：%2
+弱い音域：%3</translation>
     </message>
     <message>
         <source>
 Unrecognized pitch: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>
+認識できないピッチ：%1</translation>
     </message>
     <message>
         <source>Switch to a previous pitch recording</source>
-        <translation type="unfinished"></translation>
+        <translation>以前のピッチ録音に切り替え</translation>
     </message>
     <message>
         <source>Lock the current seed</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のシードを固定</translation>
     </message>
     <message>
         <source>Seed: </source>
-        <translation type="unfinished"></translation>
+        <translation>シード： </translation>
     </message>
     <message>
         <source>Re-record pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチ再録音</translation>
     </message>
     <message>
         <source>Take %1 · seed %2</source>
-        <translation type="unfinished"></translation>
+        <translation>テイク %1 — シード %2</translation>
     </message>
     <message>
         <source>This voicebank does not support automatic pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>この音源は自動ピッチに対応していません</translation>
     </message>
     <message>
         <source>Current: original pitch · no recording yet</source>
-        <translation type="unfinished"></translation>
+        <translation>現在：元のピッチ — 録音なし</translation>
     </message>
     <message>
         <source>Current: take %1 / %2
 Seed: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>現在：テイク %1 / %2
+シード：%3</translation>
     </message>
     <message>
         <source>SVS editor settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エディター設定</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>プロパティ</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートレートを表示</translation>
     </message>
     <message>
         <source>Transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>透明度</translation>
     </message>
     <message>
         <source>Reset portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートレートをリセット</translation>
     </message>
     <message>
         <source>Use for new tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいトラックに使用</translation>
     </message>
     <message>
         <source>Move curves with notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ノートと一緒にカーブを移動</translation>
     </message>
     <message>
         <source>Import project dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト辞書をインポート</translation>
     </message>
     <message>
         <source>Import dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>辞書をインポート</translation>
     </message>
     <message>
         <source>JSON dictionary (*.json)</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON 辞書 (*.json)</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>トラック</translation>
     </message>
     <message>
         <source>Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップ</translation>
     </message>
     <message>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ノート</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>結果</translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation type="unfinished"></translation>
+        <translation>結果： </translation>
     </message>
     <message>
         <source>Read-only result. </source>
-        <translation type="unfinished"></translation>
+        <translation>読み取り専用の結果。 </translation>
     </message>
     <message>
         <source>Base value: adjust the sidebar control. </source>
-        <translation type="unfinished"></translation>
+        <translation>基準値：サイドバーのコントロールで調整します。 </translation>
     </message>
     <message>
         <source>Left click: select; right click: show/hide overlay.</source>
-        <translation type="unfinished"></translation>
+        <translation>左クリック：選択。右クリック：オーバーレイを表示/非表示。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSResultStrip</name>
     <message>
         <source>Phoneme duration is below the voice&apos;s editable minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>音素の長さが歌手の編集可能な最小値を下回っています</translation>
     </message>
     <message>
         <source>Phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Replace phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素を置換</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>記号</translation>
     </message>
     <message>
         <source>Restore automatic phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>自動音素を復元</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSSettingsPage</name>
     <message>
         <source>AI</source>
-        <translation type="unfinished"></translation>
+        <translation>AI</translation>
     </message>
     <message>
         <source>Traditional concatenation</source>
-        <translation type="unfinished"></translation>
+        <translation>従来型の連結合成</translation>
     </message>
     <message>
         <source>Non-AI example</source>
-        <translation type="unfinished"></translation>
+        <translation>非 AI の例</translation>
     </message>
     <message>
         <source>Type not declared</source>
-        <translation type="unfinished"></translation>
+        <translation>種類が未指定</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>%1 — Coming soon</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — 近日対応予定</translation>
     </message>
     <message>
         <source>AI voicebank computation engine</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 音源の計算エンジン</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>Release immediately after rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリング後すぐに解放</translation>
     </message>
     <message>
         <source>Release automatically when idle (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>待機時に自動解放（初期設定）</translation>
     </message>
     <message>
         <source>Keep models resident</source>
-        <translation type="unfinished"></translation>
+        <translation>モデルを常駐させる</translation>
     </message>
     <message>
         <source>AI model memory management</source>
-        <translation type="unfinished"></translation>
+        <translation>AI モデルのメモリ管理</translation>
     </message>
     <message>
         <source>Applies to all AI computation backends: CPU model memory and GPU model video memory. Released models reload when needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての AI 計算バックエンドの CPU モデルメモリと GPU モデルメモリに適用します。解放したモデルは必要に応じて再読み込みされます。</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Idle time before release</source>
-        <translation type="unfinished"></translation>
+        <translation>解放までの待機時間</translation>
     </message>
     <message>
         <source>Maximum simultaneous SVS renders across all tracks and engines. Default: 1. Other renders wait in the queue. Running renders finish when this limit is reduced.</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのトラックとエンジンにわたる SVS 同時レンダリング数の上限です。初期値は 1 で、他の処理は待機します。上限を下げても実行中のレンダリングは完了します。</translation>
     </message>
     <message>
         <source>Simultaneous SVS render threads</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS の同時レンダリングスレッド数</translation>
     </message>
     <message>
         <source>AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. Unavailable devices use CPU and report the reason; unsupported AI engines use CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>共有計算を使用する AI エンジンはこのバックエンドに従います。DirectML デバイスは実際の推論テストに合格する必要があります。利用できないデバイスは CPU に切り替わり、理由を報告します。未対応の AI エンジンは CPU を使用します。</translation>
     </message>
     <message>
         <source>Unavailable device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>利用できないデバイス：%1</translation>
     </message>
     <message>
         <source>Show voicebank pitch ranges</source>
-        <translation type="unfinished"></translation>
+        <translation>音源の音域を表示</translation>
     </message>
     <message>
         <source>Mark available, comfortable and weak pitches on the keyboard and show their ranges in the sidebar when the voicebank declares them.</source>
-        <translation type="unfinished"></translation>
+        <translation>音源が音域を宣言している場合、鍵盤に使用可能・適正・弱い音域を示し、サイドバーに範囲を表示します。</translation>
     </message>
     <message>
         <source>Show translucent background waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>半透明の背景波形を表示</translation>
     </message>
     <message>
         <source>Display the synthesized audio waveform behind SVS clips in the Song Editor.</source>
-        <translation type="unfinished"></translation>
+        <translation>ソングエディターの SVS クリップの背景に合成音声の波形を表示します。</translation>
     </message>
     <message>
         <source>Rescan voicebanks</source>
-        <translation type="unfinished"></translation>
+        <translation>音源を再スキャン</translation>
     </message>
     <message>
         <source>Rescan the applied voicebank directories. Apply directory changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>適用済みの音源ディレクトリを再スキャンします。ディレクトリの変更は先に適用してください。</translation>
     </message>
     <message>
         <source>Scanning voicebanks…</source>
-        <translation type="unfinished"></translation>
+        <translation>音源をスキャン中…</translation>
     </message>
     <message>
         <source>Voicebanks found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>見つかった音源：%1</translation>
     </message>
     <message>
         <source>AI engine settings example — layout preview only; no synthesis engine is installed for this example.</source>
-        <translation type="unfinished"></translation>
+        <translation>AI エンジン設定の例 — レイアウトのプレビューのみです。この例には合成エンジンがインストールされていません。</translation>
     </message>
     <message>
         <source>Example rendering steps: 1–100 (default 20)</source>
-        <translation type="unfinished"></translation>
+        <translation>例のレンダリングステップ数：1–100（初期値 20）</translation>
     </message>
     <message>
         <source>Example rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>例のレンダリングステップ数</translation>
     </message>
     <message>
         <source>Rendering steps (1–100)</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリングステップ数（1–100）</translation>
     </message>
     <message>
         <source>AI example (AI)</source>
-        <translation type="unfinished"></translation>
+        <translation>AI の例 (AI)</translation>
     </message>
     <message>
         <source>No SVS engine is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エンジンがインストールされていません。</translation>
     </message>
     <message>
         <source>Loading engine options…</source>
-        <translation type="unfinished"></translation>
+        <translation>エンジンのオプションを読み込み中…</translation>
     </message>
     <message>
         <source>Engine unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>エンジンを利用できません</translation>
     </message>
     <message>
         <source>Engine settings must be an array</source>
-        <translation type="unfinished"></translation>
+        <translation>エンジン設定は配列である必要があります</translation>
     </message>
     <message>
         <source>No voicebanks found. Configure directories and apply, then rescan.</source>
-        <translation type="unfinished"></translation>
+        <translation>音源が見つかりません。ディレクトリを設定して適用し、再スキャンしてください。</translation>
     </message>
     <message>
         <source>This engine does not declare additional options.</source>
-        <translation type="unfinished"></translation>
+        <translation>このエンジンには追加オプションがありません。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>トラック音量</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>パン</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>ミキサーチャンネル</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：%2</translation>
     </message>
 </context>
 <context>
@@ -12715,11 +12791,11 @@ Seed: %3</source>
     </message>
     <message>
         <source>Numbered notation reference (1=C)</source>
-        <translation type="unfinished"></translation>
+        <translation>数字譜の基準（1=C）</translation>
     </message>
     <message>
         <source>Default C4; other pitches automatically add upper or lower octave dots, only in numbered notation mode</source>
-        <translation type="unfinished"></translation>
+        <translation>初期値は C4 です。他のピッチには上下のオクターブ点が自動的に付きます。数字譜モードのみ適用されます</translation>
     </message>
     <message>
         <source>Show fader ticks</source>
@@ -13087,7 +13163,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>SVC</source>
@@ -15083,39 +15159,39 @@ Latency: %2 ms</source>
     <name>lmms::svs::ExportSnapshot</name>
     <message>
         <source>AI compute settings changed; restart SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 計算設定が変更されました。SVS エクスポートをやり直してください</translation>
     </message>
     <message>
         <source>Project tempo changed while rendering SVS export; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エクスポートのレンダリング中にプロジェクトのテンポが変更されました。やり直してください</translation>
     </message>
     <message>
         <source>SVS mix controls or routing changed while rendering; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>レンダリング中に SVS のミックス設定またはルーティングが変更されました。エクスポートをやり直してください</translation>
     </message>
     <message>
         <source>Track deleted while rendering SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エクスポートのレンダリング中にトラックが削除されました</translation>
     </message>
     <message>
         <source>Track deleted while preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エクスポートの準備中にトラックが削除されました</translation>
     </message>
     <message>
         <source>SVS mix controls, routing or effects changed during export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポートの準備中に SVS のミックス設定、ルーティング、またはエフェクトが変更されました。やり直してください</translation>
     </message>
     <message>
         <source>Project tempo changed during SVS export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エクスポートの準備中にプロジェクトのテンポが変更されました。やり直してください</translation>
     </message>
     <message>
         <source>SVS track &apos;%1&apos;, clip &apos;%2&apos; (%3), tick %4: %5</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS トラック「%1」、クリップ「%2」（%3）、ティック %4：%5</translation>
     </message>
     <message>
         <source>Track deleted before preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS エクスポートの準備前にトラックが削除されました</translation>
     </message>
 </context>
 </TS>

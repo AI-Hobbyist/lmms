@@ -1,7 +1,7 @@
 #include <QCheckBox>
-#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QDomDocument>
+#include <QDoubleSpinBox>
 #include <QFile>
 #include <QGridLayout>
 #include <QJsonArray>
@@ -59,6 +59,7 @@
 #include "SVSClip.h"
 #include "SVSParameterPanel.h"
 #include "SVSProjectImportDialog.h"
+#include "SVSSettingsPage.h"
 #include "SVSTrack.h"
 #include "SVSViews.h"
 #include "SampleClip.h"
@@ -209,6 +210,46 @@ private slots:
 			QVERIFY(foundWaveFormat);
 			capture(&exportDialog, "M1-export-" + language);
 			exportDialog.close();
+			QCoreApplication::removeTranslator(&translator);
+		}
+	}
+	void svsTranslations()
+	{
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		for (const auto& language : QStringList{"zh_CN", "ja", "en", "ko"})
+		{
+			QTranslator translator;
+			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
+			QCoreApplication::installTranslator(&translator);
+			SVSProjectImportDialog importDialog(QJsonObject{{"id", "test"}, {"name", "Test format"}});
+			QCOMPARE(importDialog.windowTitle(), QCoreApplication::translate("SVSProjectUI", "Import SVS project"));
+			if (language != "en") { QVERIFY(importDialog.windowTitle() != "Import SVS project"); }
+			capture(&importDialog, "M2-import-" + language);
+			importDialog.close();
+			SVSSettingsPage settings;
+			settings.resize(1000, 720);
+			const auto memoryPolicy = settings.findChild<QComboBox*>("svsComputeMemoryPolicy");
+			QVERIFY(memoryPolicy);
+			QCOMPARE(memoryPolicy->itemText(0),
+				QCoreApplication::translate("lmms::gui::SVSSettingsPage", "Release immediately after rendering"));
+			QVERIFY(!memoryPolicy->toolTip().isEmpty());
+			capture(&settings, "M2-settings-" + language);
+			settings.close();
+			auto* track = new SVSTrack(Engine::getSong());
+			auto* clip = static_cast<SVSClip*>(track->createClip(0));
+			svs::Note note;
+			note.id = "translation-note";
+			note.duration = 96;
+			note.pitch = 60;
+			note.lyric = "你好";
+			clip->setNotes({note});
+			{
+				SVSPianoRoll editor(clip);
+				editor.resize(1100, 660);
+				capture(&editor, "M2-editor-" + language);
+				editor.close();
+			}
+			delete track;
 			QCoreApplication::removeTranslator(&translator);
 		}
 	}

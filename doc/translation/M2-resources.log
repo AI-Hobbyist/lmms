@@ -1,0 +1,44 @@
+warning: in the working copy of 'src/gui/SVSBrowser.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSImageLoader.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSPitchRanges.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSProjectController.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "6d8bb56799c792539885f4a1ce4da6ff065908f0",
+  "working_diff_sha256": "9d9959856be5ece18c0aea0cfd34a9b828a2112b8aba5ca9fa20091a1f98b074",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1131,
+  "key_count": 3576,
+  "summary": {
+    "zh_CN": {
+      "same-source": 137,
+      "translated": 2096,
+      "empty": 1343
+    },
+    "ja": {
+      "same-source": 372,
+      "translated": 1570,
+      "empty": 1631,
+      "placeholder-error": 3
+    },
+    "en": {
+      "source": 3576
+    },
+    "ko": {
+      "same-source": 193,
+      "translated": 3067,
+      "empty": 316
+    }
+  }
+}
+Updating 'data/locale/zh_CN.qm'...
+    Generated 2246 translation(s) (2246 finished and 0 unfinished)
+    Ignored 1330 untranslated source text(s)
+Updating 'data/locale/ja.qm'...
+    Generated 1958 translation(s) (1958 finished and 0 unfinished)
+    Ignored 1618 untranslated source text(s)
+Updating 'data/locale/en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+    Ignored 3576 untranslated source text(s)
+Updating 'data/locale/ko.qm'...
+    Generated 3273 translation(s) (3273 finished and 0 unfinished)
+    Ignored 303 untranslated source text(s)

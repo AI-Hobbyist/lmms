@@ -35,33 +35,32 @@ struct Decoded
 };
 Decoded decode(const QString& package, const QString& path, QSize pixels, const std::shared_ptr<svs::Plugin>& plugin)
 {
-	if (path.isEmpty())
-		return {{}, QStringLiteral("Voice image is not available")};
+	if (path.isEmpty()) return {{}, QCoreApplication::translate("SVSImageLoader", "Voice image is not available")};
 	QByteArray bytes;
 	if (path.startsWith("svs-resource:"))
 	{
 		const auto separator = path.indexOf(':', 13);
 		if (separator < 0 || !plugin)
-			return {{}, QStringLiteral("Voice resource engine is unavailable")};
+			return {{}, QCoreApplication::translate("SVSImageLoader", "Voice resource engine is unavailable")};
 		QString mime, error;
 		bytes = plugin->resource(QUrl::fromPercentEncoding(path.mid(separator + 1).toLatin1()), mime, error);
 		if (!error.isEmpty())
 			return {{}, error};
 		if (!mime.startsWith("image/"))
-			return {{}, QStringLiteral("Voice resource is not an image")};
+			return {{}, QCoreApplication::translate("SVSImageLoader", "Voice resource is not an image")};
 	}
 	else
 	{
 		const auto root = QFileInfo(package).canonicalFilePath(), resolved = QFileInfo(path).canonicalFilePath();
 		if (root.isEmpty() || resolved.isEmpty() || !resolved.startsWith(root + '/', Qt::CaseInsensitive))
-			return {{}, QStringLiteral("Voice image is missing or outside its package")};
+			return {{}, QCoreApplication::translate("SVSImageLoader", "Voice image is missing or outside its package")};
 		QFile file(resolved);
 		if (!file.open(QIODevice::ReadOnly) || file.size() > 16 * 1024 * 1024)
-			return {{}, QStringLiteral("Voice image is unreadable or exceeds 16 MiB")};
+			return {{}, QCoreApplication::translate("SVSImageLoader", "Voice image is unreadable or exceeds 16 MiB")};
 		bytes = file.read(16 * 1024 * 1024 + 1);
 	}
 	if (bytes.size() > 16 * 1024 * 1024)
-		return {{}, QStringLiteral("Voice image exceeds 16 MiB")};
+		return {{}, QCoreApplication::translate("SVSImageLoader", "Voice image exceeds 16 MiB")};
 	const auto hash = QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex();
 	const auto key = QString::fromLatin1(hash) + QString("/%1/%2").arg(pixels.width()).arg(pixels.height());
 	{
@@ -76,16 +75,20 @@ Decoded decode(const QString& package, const QString& path, QSize pixels, const 
 	const auto native = reader.size();
 	if (!native.isValid() || native.width() > 32768 || native.height() > 32768
 		|| qint64(native.width()) * native.height() > 16 * 1024 * 1024)
-		return {{}, QStringLiteral("Voice image has invalid dimensions or exceeds the decoding limit")};
+		return {{},
+			QCoreApplication::translate(
+				"SVSImageLoader", "Voice image has invalid dimensions or exceeds the decoding limit")};
 	const int bits = QImage::toPixelFormat(reader.imageFormat()).bitsPerPixel();
 	const auto rowBytes = ((qint64(native.width()) * qMax(32, bits ? bits : 128) + 31) / 32) * 4;
 	if (rowBytes * native.height() > 64 * 1024 * 1024)
-		return {{}, QStringLiteral("Voice image exceeds the 64 MiB decoded image limit")};
+		return {
+			{}, QCoreApplication::translate("SVSImageLoader", "Voice image exceeds the 64 MiB decoded image limit")};
 	const auto scaled = native.scaled(pixels, Qt::KeepAspectRatio);
 	reader.setScaledSize(scaled);
 	auto image = reader.read();
 	if (image.isNull())
-		return {{}, QStringLiteral("Voice image decoding failed: ") + reader.errorString()};
+		return {
+			{}, QCoreApplication::translate("SVSImageLoader", "Voice image decoding failed: ") + reader.errorString()};
 	if (image.width() > pixels.width() || image.height() > pixels.height())
 		image = image.scaled(pixels, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);

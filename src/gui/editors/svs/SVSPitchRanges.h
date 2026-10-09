@@ -1,6 +1,7 @@
 #ifndef LMMS_SVS_PITCH_RANGES_H
 #define LMMS_SVS_PITCH_RANGES_H
 #include <QColor>
+#include <QCoreApplication>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QRegularExpression>
@@ -54,13 +55,13 @@ struct SVSPitchRanges
 					if (value.isString())
 						texts << value.toString();
 					else
-						result.invalid << "Non-string pitch range";
+						result.invalid << QCoreApplication::translate("SVSPitchRanges", "Non-string pitch range");
 				}
 			}
 			else if (source.isString())
 				texts << source.toString();
 			else if (!source.isUndefined())
-				result.invalid << "Invalid pitch range";
+				result.invalid << QCoreApplication::translate("SVSPitchRanges", "Invalid pitch range");
 			for (const auto& text : texts)
 				for (const auto& token : text.split(QRegularExpression("[,，;；]"), Qt::SkipEmptyParts))
 				{

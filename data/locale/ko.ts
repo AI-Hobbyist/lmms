@@ -598,19 +598,19 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     <name>NativeSVS</name>
     <message>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>모드</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>가수</translation>
     </message>
     <message>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>기본</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>고급</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -618,135 +618,135 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>Breath</source>
-        <translation type="unfinished"></translation>
+        <translation>호흡</translation>
     </message>
     <message>
         <source>Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>표현</translation>
     </message>
     <message>
         <source>Tension</source>
-        <translation type="unfinished"></translation>
+        <translation>긴장도</translation>
     </message>
     <message>
         <source>Gender</source>
-        <translation type="unfinished"></translation>
+        <translation>성별</translation>
     </message>
     <message>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>강도</translation>
     </message>
     <message>
         <source>Note</source>
-        <translation type="unfinished"></translation>
+        <translation>노트</translation>
     </message>
     <message>
         <source>Soft</source>
-        <translation type="unfinished"></translation>
+        <translation>부드럽게</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>레이블</translation>
     </message>
     <message>
         <source>Phoneme gain</source>
-        <translation type="unfinished"></translation>
+        <translation>음소 게인</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>음소</translation>
     </message>
     <message>
         <source>Rendered energy</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링된 에너지</translation>
     </message>
     <message>
         <source>Rendered level</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링된 레벨</translation>
     </message>
     <message>
         <source>Rendered peak</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링된 피크</translation>
     </message>
     <message>
         <source>Singing Voice Synthesis</source>
-        <translation type="unfinished"></translation>
+        <translation>가창 합성</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>화자</translation>
     </message>
     <message>
         <source>Rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링 단계 수</translation>
     </message>
     <message>
         <source>Voicebank directories</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 디렉터리</translation>
     </message>
     <message>
         <source>Global shared vocoder directories</source>
-        <translation type="unfinished"></translation>
+        <translation>전역 공유 보코더 디렉터리</translation>
     </message>
     <message>
         <source>Show phoneme language prefixes</source>
-        <translation type="unfinished"></translation>
+        <translation>음소 언어 접두사 표시</translation>
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지 (절댓값)</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지 오프셋</translation>
     </message>
     <message>
         <source>energy</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지</translation>
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>기식 (절댓값)</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation type="unfinished"></translation>
+        <translation>기식 오프셋</translation>
     </message>
     <message>
         <source>breathiness</source>
-        <translation type="unfinished"></translation>
+        <translation>기식</translation>
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>발성 (절댓값)</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation type="unfinished"></translation>
+        <translation>발성 오프셋</translation>
     </message>
     <message>
         <source>voicing</source>
-        <translation type="unfinished"></translation>
+        <translation>발성</translation>
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>긴장도 (절댓값)</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation type="unfinished"></translation>
+        <translation>긴장도 오프셋</translation>
     </message>
     <message>
         <source>tension</source>
-        <translation type="unfinished"></translation>
+        <translation>긴장도</translation>
     </message>
     <message>
         <source>Velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>벨로시티</translation>
     </message>
     <message>
         <source>Expressiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>표현력</translation>
     </message>
 </context>
 <context>
@@ -1147,23 +1147,23 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
-        <translation type="unfinished"></translation>
+        <translation>음 이름 레이블: SVS / 악기 피아노 롤과 동기화합니다. 사용하려면 모든 음 이름 레이블을 활성화하세요</translation>
     </message>
     <message>
         <source>Standard pitch names CDEFGAB</source>
-        <translation type="unfinished"></translation>
+        <translation>표준 음 이름 CDEFGAB</translation>
     </message>
     <message>
         <source>Numbered notation 1234567</source>
-        <translation type="unfinished"></translation>
+        <translation>숫자 악보 1234567</translation>
     </message>
     <message>
         <source>Numbered notation key</source>
-        <translation type="unfinished"></translation>
+        <translation>숫자 악보 조성</translation>
     </message>
     <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
-        <translation type="unfinished"></translation>
+        <translation>숫자 악보 기준: %1%2. 기준 C는 전역 설정에서 변경하세요</translation>
     </message>
     <message>
         <source>Select a weight</source>
@@ -1179,55 +1179,55 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>SVS plugin settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 플러그인 설정</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>가수</translation>
     </message>
     <message>
         <source>Not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 안 됨</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>화자</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>찾아보기</translation>
     </message>
     <message>
         <source>Choose image</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지 선택</translation>
     </message>
     <message>
         <source>Images (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지 (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</translation>
     </message>
     <message>
         <source>Avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>아바타</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>초상화</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>초상화 표시</translation>
     </message>
     <message>
         <source>Portrait transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>초상화 투명도</translation>
     </message>
     <message>
         <source>Use voice images</source>
-        <translation type="unfinished"></translation>
+        <translation>가수 이미지 사용</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"></translation>
+        <translation>이펙트</translation>
     </message>
 </context>
 <context>
@@ -1294,26 +1294,76 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
+    <name>SVSImageLoader</name>
+    <message>
+        <source>Voice image is not available</source>
+        <translation>가수 이미지 사용 불가</translation>
+    </message>
+    <message>
+        <source>Voice resource engine is unavailable</source>
+        <translation>가수 리소스 엔진 사용 불가</translation>
+    </message>
+    <message>
+        <source>Voice resource is not an image</source>
+        <translation>가수 리소스가 이미지가 아닙니다</translation>
+    </message>
+    <message>
+        <source>Voice image is missing or outside its package</source>
+        <translation>가수 이미지가 없거나 패키지 밖에 있습니다</translation>
+    </message>
+    <message>
+        <source>Voice image is unreadable or exceeds 16 MiB</source>
+        <translation>가수 이미지를 읽을 수 없거나 16 MiB를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds 16 MiB</source>
+        <translation>가수 이미지가 16 MiB를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Voice image has invalid dimensions or exceeds the decoding limit</source>
+        <translation>가수 이미지 크기가 잘못되었거나 디코딩 제한을 초과합니다</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds the 64 MiB decoded image limit</source>
+        <translation>디코딩된 가수 이미지가 64 MiB 제한을 초과합니다</translation>
+    </message>
+    <message>
+        <source>Voice image decoding failed: </source>
+        <translation>가수 이미지 디코딩 실패: </translation>
+    </message>
+</context>
+<context>
+    <name>SVSPitchRanges</name>
+    <message>
+        <source>Non-string pitch range</source>
+        <translation>음역이 문자열이 아닙니다</translation>
+    </message>
+    <message>
+        <source>Invalid pitch range</source>
+        <translation>잘못된 음역</translation>
+    </message>
+</context>
+<context>
     <name>SVSProjectUI</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>SVS project</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트</translation>
     </message>
     <message>
         <source>Cancelling and cleaning up…</source>
-        <translation type="unfinished"></translation>
+        <translation>취소 및 정리 중…</translation>
     </message>
     <message>
         <source>Reading supported formats…</source>
-        <translation type="unfinished"></translation>
+        <translation>지원 형식 읽는 중…</translation>
     </message>
     <message>
         <source>SVS project conversion failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트 변환 실패</translation>
     </message>
     <message>
         <source>Import SVS project</source>
@@ -1321,205 +1371,219 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>All supported formats (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>지원하는 모든 형식 (%1)</translation>
     </message>
     <message>
         <source>Parsing project: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 분석 중: %1</translation>
     </message>
     <message>
         <source>SVS project preflight failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트 사전 검사 실패</translation>
     </message>
     <message>
         <source>Validating audio and project data…</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오와 프로젝트 데이터 검증 중…</translation>
     </message>
     <message>
         <source>Format %1, track %2, %3: %4</source>
-        <translation type="unfinished"></translation>
+        <translation>형식 %1, 트랙 %2, %3: %4</translation>
     </message>
     <message>
         <source>Could not create the imported audio resource directory: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>가져온 오디오 리소스 디렉터리를 만들 수 없습니다: %1</translation>
     </message>
     <message>
         <source>Could not save the imported audio resource: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>가져온 오디오 리소스를 저장할 수 없습니다: %1</translation>
     </message>
     <message>
         <source>An unknown error occurred during project preflight</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 사전 검사 중 알 수 없는 오류가 발생했습니다</translation>
     </message>
     <message>
         <source>Confirm lossy import</source>
-        <translation type="unfinished"></translation>
+        <translation>손실이 있는 가져오기 확인</translation>
     </message>
     <message>
         <source>Confirm the following content for format %1:
 %2
 
 Continue importing as a new project?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 형식의 다음 내용을 확인하세요:
+%2
+
+새 프로젝트로 가져오시겠습니까?</translation>
     </message>
     <message>
         <source>Voicebank unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 사용 불가</translation>
     </message>
     <message>
         <source>The selected voicebank was removed. The original project has been preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 음원 라이브러리가 제거되었습니다. 원본 프로젝트는 유지되었습니다.</translation>
     </message>
     <message>
         <source>Could not commit the import</source>
-        <translation type="unfinished"></translation>
+        <translation>가져오기를 적용할 수 없습니다</translation>
     </message>
     <message>
         <source>SVS project export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트 내보내기 실패</translation>
     </message>
     <message>
         <source>Could not create the temporary export audio directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기용 임시 오디오 디렉터리를 만들 수 없습니다.</translation>
     </message>
     <message>
         <source>Preparing the project snapshot and accompaniment…</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 스냅샷과 반주 준비 중…</translation>
     </message>
     <message>
         <source>An unknown error occurred while preparing the export snapshot</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기 스냅샷 준비 중 알 수 없는 오류가 발생했습니다</translation>
     </message>
     <message>
         <source>Reading output formats…</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 형식 읽는 중…</translation>
     </message>
     <message>
         <source>Export SVS project</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트 내보내기</translation>
     </message>
     <message>
         <source>Output extension mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 확장자가 일치하지 않습니다</translation>
     </message>
     <message>
         <source>Format %1 supports: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 형식 지원 항목: %2</translation>
     </message>
     <message>
         <source>Checking format restrictions and omitted content…</source>
-        <translation type="unfinished"></translation>
+        <translation>형식 제한과 생략되는 내용 확인 중…</translation>
     </message>
     <message>
         <source>Confirm lossy export</source>
-        <translation type="unfinished"></translation>
+        <translation>손실이 있는 내보내기 확인</translation>
     </message>
     <message>
         <source>
 
 Continue exporting?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+내보내기를 계속하시겠습니까?</translation>
     </message>
     <message>
         <source>Converting project…</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 변환 중…</translation>
     </message>
     <message>
         <source>Confirm format conversion warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>형식 변환 경고 확인</translation>
     </message>
     <message>
         <source>
 
 Continue saving the file group?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+파일 묶음 저장을 계속하시겠습니까?</translation>
     </message>
     <message>
         <source>Output file group preflight failed</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 파일 묶음 사전 검사 실패</translation>
     </message>
     <message>
         <source>Confirm overwriting the export file group</source>
-        <translation type="unfinished"></translation>
+        <translation>내보낼 파일 묶음 덮어쓰기 확인</translation>
     </message>
     <message>
         <source>All of the following files will be overwritten:
 %1
 
 Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>다음 파일을 모두 덮어씁니다:
+%1
+
+계속하시겠습니까?</translation>
     </message>
     <message>
         <source>Saving the complete file group…</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 파일 묶음 저장 중…</translation>
     </message>
     <message>
         <source>An unknown error occurred while saving the export file group</source>
-        <translation type="unfinished"></translation>
+        <translation>내보낼 파일 묶음 저장 중 알 수 없는 오류가 발생했습니다</translation>
     </message>
     <message>
         <source>SVS project export complete</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 프로젝트 내보내기 완료</translation>
     </message>
     <message>
         <source>Could not save the output file group</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 파일 묶음을 저장할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Incomplete project restore</source>
+        <translation>프로젝트 복원이 불완전합니다</translation>
     </message>
     <message>
         <source>An unknown error occurred while committing the project</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 적용 중 알 수 없는 오류가 발생했습니다</translation>
     </message>
     <message>
         <source>Preserve the original project pitch curve</source>
-        <translation type="unfinished"></translation>
+        <translation>원본 프로젝트 피치 곡선 유지</translation>
     </message>
     <message>
         <source>Import as a new project. All singing tracks start without a selected singer and use sine-wave preview; select a singer after importing.</source>
-        <translation type="unfinished"></translation>
+        <translation>새 프로젝트로 가져옵니다. 모든 가창 트랙은 가수가 선택되지 않은 상태에서 사인파 미리 듣기를 사용합니다. 가져온 후 가수를 선택하세요.</translation>
     </message>
     <message>
         <source>%1 input options</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 입력 옵션</translation>
     </message>
     <message>
         <source>Preserve the original project portamento and supported vibrato in full.</source>
-        <translation type="unfinished"></translation>
+        <translation>원본 프로젝트의 포르타멘토와 지원되는 비브라토를 온전히 유지합니다.</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>가져오기</translation>
     </message>
     <message>
         <source>Export a snapshot taken when you click Export. No voicebank or synthesized audio is required. Select tracks for restricted formats; omitted content is listed in the next step.</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기를 누른 시점의 스냅샷을 내보냅니다. 음원 라이브러리나 합성된 오디오는 필요하지 않습니다. 제한된 형식은 트랙을 선택하세요. 생략되는 내용은 다음 단계에 표시됩니다.</translation>
     </message>
     <message>
         <source>Select a singing track…</source>
-        <translation type="unfinished"></translation>
+        <translation>가창 트랙 선택…</translation>
     </message>
     <message>
         <source>Select an accompaniment track…</source>
-        <translation type="unfinished"></translation>
+        <translation>반주 트랙 선택…</translation>
     </message>
     <message>
         <source>Singing track for restricted formats</source>
-        <translation type="unfinished"></translation>
+        <translation>제한된 형식에 사용할 가창 트랙</translation>
     </message>
     <message>
         <source>Accompaniment track for restricted formats</source>
-        <translation type="unfinished"></translation>
+        <translation>제한된 형식에 사용할 반주 트랙</translation>
     </message>
     <message>
         <source>%1 [%2] output options</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 [%2] 출력 옵션</translation>
     </message>
     <message>
         <source>Set automatically from the track selection above.</source>
-        <translation type="unfinished"></translation>
+        <translation>위에서 선택한 트랙에 따라 자동으로 설정됩니다.</translation>
     </message>
     <message>
         <source>Check and export</source>
-        <translation type="unfinished"></translation>
+        <translation>검사 후 내보내기</translation>
     </message>
 </context>
 <context>
@@ -4484,7 +4548,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::RenderManager</name>
     <message>
         <source>Track deleted during SVS batch export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 일괄 내보내기 중 트랙이 삭제되었습니다</translation>
     </message>
 </context>
 <context>
@@ -4592,7 +4656,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SVSClip</name>
     <message>
         <source>Please select a singer</source>
-        <translation type="unfinished"></translation>
+        <translation>가수를 선택하세요</translation>
     </message>
 </context>
 <context>
@@ -7364,7 +7428,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Export failed SVS regions as silence</source>
-        <translation type="unfinished"></translation>
+        <translation>실패한 SVS 구간을 무음으로 내보내기</translation>
     </message>
     <message>
         <source> time(s)</source>
@@ -7372,7 +7436,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>SVS export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 실패</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
@@ -11173,11 +11237,15 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::PluginDescWidget</name>
     <message>
         <source>Send to new SVS track</source>
-        <translation type="unfinished"></translation>
+        <translation>새 SVS 트랙으로 보내기</translation>
     </message>
     <message>
         <source>Send to new instrument track</source>
         <translation>새 악기 트랙으로 전송하기</translation>
+    </message>
+    <message>
+        <source>Native singing voice synthesis</source>
+        <translation>기본 가창 합성</translation>
     </message>
 </context>
 <context>
@@ -11625,18 +11693,18 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVSBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>검색</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSCanvas</name>
     <message>
         <source>Left drag: edit curve. Right drag: reset to baseline. Shift+right click: curve menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>왼쪽 드래그: 곡선 편집. 오른쪽 드래그: 기준선으로 재설정. Shift+오른쪽 클릭: 곡선 메뉴.</translation>
     </message>
     <message>
         <source>Take %1</source>
-        <translation type="unfinished"></translation>
+        <translation>테이크 %1</translation>
     </message>
     <message>
         <source>Lyric: %1
@@ -11644,189 +11712,193 @@ Reading: %2
 Source: %3
 Phonemes: %4
 %5</source>
-        <translation type="unfinished"></translation>
+        <translation>가사: %1
+독음: %2
+출처: %3
+음소: %4
+%5</translation>
     </message>
     <message>
         <source>Copied curve belongs to a different parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>복사한 곡선은 다른 매개변수에 속합니다</translation>
     </message>
     <message>
         <source>Clear hand-drawn pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>직접 그린 피치 지우기</translation>
     </message>
     <message>
         <source>Re-record pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>피치 재녹음</translation>
     </message>
     <message>
         <source>Applies to the whole SVS clip when nothing is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 영역이 없으면 SVS 클립 전체에 적용합니다.</translation>
     </message>
     <message>
         <source>Applies only to the selection; other pitch and render segments are retained.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 영역에만 적용합니다. 다른 피치 및 렌더링 구간은 유지됩니다.</translation>
     </message>
     <message>
         <source>Copy curve selection</source>
-        <translation type="unfinished"></translation>
+        <translation>곡선 선택 영역 복사</translation>
     </message>
     <message>
         <source>Paste curve here</source>
-        <translation type="unfinished"></translation>
+        <translation>여기에 곡선 붙여넣기</translation>
     </message>
     <message>
         <source>Delete selected anchors</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 앵커 삭제</translation>
     </message>
     <message>
         <source>Connect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 영역 연결</translation>
     </message>
     <message>
         <source>Disconnect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 영역 연결 해제</translation>
     </message>
     <message>
         <source>Anchor value</source>
-        <translation type="unfinished"></translation>
+        <translation>앵커 값</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>끄기</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>켜기</translation>
     </message>
     <message>
         <source>Semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>반음</translation>
     </message>
     <message>
         <source>Reset curve to default</source>
-        <translation type="unfinished"></translation>
+        <translation>곡선을 기본값으로 재설정</translation>
     </message>
     <message>
         <source>Restore automatic pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 피치 복원</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>복사</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>잘라내기</translation>
     </message>
     <message>
         <source>Paste here</source>
-        <translation type="unfinished"></translation>
+        <translation>여기에 붙여넣기</translation>
     </message>
     <message>
         <source>Split at cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>커서 위치에서 분할</translation>
     </message>
     <message>
         <source>Creates two editable notes and re-parses phonemes. Undo restores the complete original note.</source>
-        <translation type="unfinished"></translation>
+        <translation>편집 가능한 노트 두 개를 만들고 음소를 다시 분석합니다. 실행 취소하면 원래 노트가 온전히 복원됩니다.</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>Transpose up octave</source>
-        <translation type="unfinished"></translation>
+        <translation>한 옥타브 올리기</translation>
     </message>
     <message>
         <source>Transpose down octave</source>
-        <translation type="unfinished"></translation>
+        <translation>한 옥타브 내리기</translation>
     </message>
     <message>
         <source>Pronunciation</source>
-        <translation type="unfinished"></translation>
+        <translation>발음</translation>
     </message>
     <message>
         <source>Manual reading…</source>
-        <translation type="unfinished"></translation>
+        <translation>수동 독음…</translation>
     </message>
     <message>
         <source>Manual reading</source>
-        <translation type="unfinished"></translation>
+        <translation>수동 독음</translation>
     </message>
     <message>
         <source>Reading (manual phonemes keep precedence)</source>
-        <translation type="unfinished"></translation>
+        <translation>독음 (수동 음소가 우선)</translation>
     </message>
     <message>
         <source>Restore automatic reading</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 독음 복원</translation>
     </message>
     <message>
         <source>Note language</source>
-        <translation type="unfinished"></translation>
+        <translation>노트 언어</translation>
     </message>
     <message>
         <source>Track default</source>
-        <translation type="unfinished"></translation>
+        <translation>트랙 기본값</translation>
     </message>
     <message>
         <source>Input lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>가사 입력</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSClipView</name>
     <message>
         <source>Set as ghost in piano-roll</source>
-        <translation type="unfinished"></translation>
+        <translation>피아노 롤의 고스트 노트로 설정</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>이름 변경</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSLyricEditor</name>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>가사 일괄 입력</translation>
     </message>
     <message>
         <source>Skip voice continuation notes and tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>음성 연장 노트 및 토큰 건너뛰기</translation>
     </message>
     <message>
         <source>Tick</source>
-        <translation type="unfinished"></translation>
+        <translation>틱</translation>
     </message>
     <message>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>원본</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>미리 보기</translation>
     </message>
     <message>
         <source>Reading / status</source>
-        <translation type="unfinished"></translation>
+        <translation>독음 / 상태</translation>
     </message>
     <message>
         <source>Skipped continuation</source>
-        <translation type="unfinished"></translation>
+        <translation>연장 노트 건너뜀</translation>
     </message>
     <message>
         <source> — manual override retained</source>
-        <translation type="unfinished"></translation>
+        <translation> — 수동 설정 유지</translation>
     </message>
     <message>
         <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation type="unfinished"></translation>
+        <translation>토큰 %1개를 할당했고 %2개는 사용하지 않았습니다. 수동 독음과 음소는 유지됩니다. 확인 시 변경 사항이 함께 적용됩니다.</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 미리 보기가 열린 동안 노트가 변경되었습니다. 가사 일괄 입력을 다시 열어 현재 노트를 확인하세요.</translation>
     </message>
 </context>
 <context>
@@ -11841,489 +11913,493 @@ Phonemes: %4
     </message>
     <message>
         <source>Browse…</source>
-        <translation type="unfinished"></translation>
+        <translation>찾아보기…</translation>
     </message>
     <message>
         <source>Voicebank directory</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 디렉터리</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>제거</translation>
     </message>
     <message>
         <source>Add directory</source>
-        <translation type="unfinished"></translation>
+        <translation>디렉터리 추가</translation>
     </message>
     <message>
         <source>; logarithmic scale</source>
-        <translation type="unfinished"></translation>
+        <translation>; 로그 척도</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
         <source>SVS Piano Roll — LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 피아노 롤 — LMMS</translation>
     </message>
     <message>
         <source>Play / Pause clip</source>
-        <translation type="unfinished"></translation>
+        <translation>클립 재생 / 일시 정지</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>정지</translation>
     </message>
     <message>
         <source>Clear ghost notes</source>
-        <translation type="unfinished"></translation>
+        <translation>고스트 노트 지우기</translation>
     </message>
     <message>
         <source>Synthesize</source>
-        <translation type="unfinished"></translation>
+        <translation>합성</translation>
     </message>
     <message>
         <source>Follow Song Editor scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>송 편집기 스크롤 따라가기</translation>
     </message>
     <message>
         <source>Scroll automatically with the Song Editor timeline using its scrolling mode; stop at the clip boundary</source>
-        <translation type="unfinished"></translation>
+        <translation>송 편집기의 스크롤 모드에 따라 타임라인을 자동으로 따라가며 클립 경계에서 멈춥니다</translation>
     </message>
     <message>
         <source>Lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>가사</translation>
     </message>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>가사 일괄 입력</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>선택</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished"></translation>
+        <translation>연필</translation>
     </message>
     <message>
         <source>Pitch pen</source>
-        <translation type="unfinished"></translation>
+        <translation>피치 펜</translation>
     </message>
     <message>
         <source>Anchor</source>
-        <translation type="unfinished"></translation>
+        <translation>앵커</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>부드럽게</translation>
     </message>
     <message>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>직선</translation>
     </message>
     <message>
         <source>Erase</source>
-        <translation type="unfinished"></translation>
+        <translation>지우개</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>매개변수</translation>
     </message>
     <message>
         <source>Show/hide parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>매개변수 표시/숨기기</translation>
     </message>
     <message>
         <source>Quantization</source>
-        <translation type="unfinished"></translation>
+        <translation>퀀타이즈</translation>
     </message>
     <message>
         <source>Note length</source>
-        <translation type="unfinished"></translation>
+        <translation>노트 길이</translation>
     </message>
     <message>
         <source>Last note</source>
-        <translation type="unfinished"></translation>
+        <translation>마지막 노트</translation>
     </message>
     <message>
         <source>−</source>
-        <translation type="unfinished"></translation>
+        <translation>−</translation>
     </message>
     <message>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <source>Horizontal zoom: bars visible in the note area</source>
-        <translation type="unfinished"></translation>
+        <translation>가로 확대/축소: 노트 영역에 표시할 마디 수</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정</translation>
     </message>
     <message numerus="yes">
         <source>%n bar(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n마디</numerusform>
         </translation>
     </message>
     <message>
         <source>Singer</source>
-        <translation type="unfinished"></translation>
+        <translation>가수</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>언어</translation>
     </message>
     <message>
         <source>Not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 안 됨</translation>
     </message>
     <message>
         <source>Please select a singer</source>
-        <translation type="unfinished"></translation>
+        <translation>가수를 선택하세요</translation>
     </message>
     <message>
         <source>Available: %1
 Comfortable: %2
 Weak spots: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 가능: %1
+적정: %2
+약한 음역: %3</translation>
     </message>
     <message>
         <source>
 Unrecognized pitch: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>
+인식할 수 없는 피치: %1</translation>
     </message>
     <message>
         <source>Switch to a previous pitch recording</source>
-        <translation type="unfinished"></translation>
+        <translation>이전 피치 녹음으로 전환</translation>
     </message>
     <message>
         <source>Lock the current seed</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 시드 고정</translation>
     </message>
     <message>
         <source>Seed: </source>
-        <translation type="unfinished"></translation>
+        <translation>시드: </translation>
     </message>
     <message>
         <source>Re-record pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>피치 재녹음</translation>
     </message>
     <message>
         <source>Take %1 · seed %2</source>
-        <translation type="unfinished"></translation>
+        <translation>테이크 %1 — 시드 %2</translation>
     </message>
     <message>
         <source>This voicebank does not support automatic pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>이 음원 라이브러리는 자동 피치를 지원하지 않습니다</translation>
     </message>
     <message>
         <source>Current: original pitch · no recording yet</source>
-        <translation type="unfinished"></translation>
+        <translation>현재: 원본 피치 — 아직 녹음 없음</translation>
     </message>
     <message>
         <source>Current: take %1 / %2
 Seed: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>현재: 테이크 %1 / %2
+시드: %3</translation>
     </message>
     <message>
         <source>SVS editor settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 편집기 설정</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>설정</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>속성</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>초상화 표시</translation>
     </message>
     <message>
         <source>Transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>투명도</translation>
     </message>
     <message>
         <source>Reset portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>초상화 재설정</translation>
     </message>
     <message>
         <source>Use for new tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>새 트랙에 사용</translation>
     </message>
     <message>
         <source>Move curves with notes</source>
-        <translation type="unfinished"></translation>
+        <translation>노트와 함께 곡선 이동</translation>
     </message>
     <message>
         <source>Import project dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 사전 가져오기</translation>
     </message>
     <message>
         <source>Import dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>사전 가져오기</translation>
     </message>
     <message>
         <source>JSON dictionary (*.json)</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON 사전 (*.json)</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>트랙</translation>
     </message>
     <message>
         <source>Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>클립</translation>
     </message>
     <message>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>노트</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>음소</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>결과</translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation type="unfinished"></translation>
+        <translation>결과: </translation>
     </message>
     <message>
         <source>Read-only result. </source>
-        <translation type="unfinished"></translation>
+        <translation>읽기 전용 결과입니다. </translation>
     </message>
     <message>
         <source>Base value: adjust the sidebar control. </source>
-        <translation type="unfinished"></translation>
+        <translation>기본값: 사이드바의 컨트롤로 조정합니다. </translation>
     </message>
     <message>
         <source>Left click: select; right click: show/hide overlay.</source>
-        <translation type="unfinished"></translation>
+        <translation>왼쪽 클릭: 선택. 오른쪽 클릭: 오버레이 표시/숨기기.</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSResultStrip</name>
     <message>
         <source>Phoneme duration is below the voice&apos;s editable minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>음소 길이가 가수의 편집 가능 최솟값보다 짧습니다</translation>
     </message>
     <message>
         <source>Phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>음소</translation>
     </message>
     <message>
         <source>Replace phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>음소 바꾸기</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>음소</translation>
     </message>
     <message>
         <source>Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>기호</translation>
     </message>
     <message>
         <source>Restore automatic phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 음소 복원</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSSettingsPage</name>
     <message>
         <source>AI</source>
-        <translation type="unfinished"></translation>
+        <translation>AI</translation>
     </message>
     <message>
         <source>Traditional concatenation</source>
-        <translation type="unfinished"></translation>
+        <translation>전통적인 연결 합성</translation>
     </message>
     <message>
         <source>Non-AI example</source>
-        <translation type="unfinished"></translation>
+        <translation>비 AI 예시</translation>
     </message>
     <message>
         <source>Type not declared</source>
-        <translation type="unfinished"></translation>
+        <translation>유형이 지정되지 않음</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>%1 — Coming soon</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — 지원 예정</translation>
     </message>
     <message>
         <source>AI voicebank computation engine</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 음원 라이브러리 연산 엔진</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>장치</translation>
     </message>
     <message>
         <source>Release immediately after rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링 후 즉시 해제</translation>
     </message>
     <message>
         <source>Release automatically when idle (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>유휴 시 자동 해제 (기본값)</translation>
     </message>
     <message>
         <source>Keep models resident</source>
-        <translation type="unfinished"></translation>
+        <translation>모델 상주 유지</translation>
     </message>
     <message>
         <source>AI model memory management</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 모델 메모리 관리</translation>
     </message>
     <message>
         <source>Applies to all AI computation backends: CPU model memory and GPU model video memory. Released models reload when needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 AI 연산 백엔드의 CPU 모델 메모리와 GPU 모델 메모리에 적용합니다. 해제한 모델은 필요할 때 다시 불러옵니다.</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 초</translation>
     </message>
     <message>
         <source>Idle time before release</source>
-        <translation type="unfinished"></translation>
+        <translation>해제 전 유휴 시간</translation>
     </message>
     <message>
         <source>Maximum simultaneous SVS renders across all tracks and engines. Default: 1. Other renders wait in the queue. Running renders finish when this limit is reduced.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 트랙과 엔진에 걸친 SVS 동시 렌더링 수의 최댓값입니다. 기본값은 1이며 나머지는 대기열에서 기다립니다. 한도를 줄여도 실행 중인 렌더링은 완료됩니다.</translation>
     </message>
     <message>
         <source>Simultaneous SVS render threads</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 동시 렌더링 스레드 수</translation>
     </message>
     <message>
         <source>AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. Unavailable devices use CPU and report the reason; unsupported AI engines use CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>공유 연산을 사용하는 AI 엔진은 이 백엔드를 따릅니다. DirectML 장치는 실제 추론 검사에 통과해야 합니다. 사용할 수 없는 장치는 CPU로 전환하고 이유를 알립니다. 지원되지 않는 AI 엔진은 CPU를 사용합니다.</translation>
     </message>
     <message>
         <source>Unavailable device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>사용할 수 없는 장치: %1</translation>
     </message>
     <message>
         <source>Show voicebank pitch ranges</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 음역 표시</translation>
     </message>
     <message>
         <source>Mark available, comfortable and weak pitches on the keyboard and show their ranges in the sidebar when the voicebank declares them.</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리에 음역 정보가 있으면 건반에 사용 가능·적정·약한 피치를 표시하고 사이드바에 음역을 표시합니다.</translation>
     </message>
     <message>
         <source>Show translucent background waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>반투명 배경 파형 표시</translation>
     </message>
     <message>
         <source>Display the synthesized audio waveform behind SVS clips in the Song Editor.</source>
-        <translation type="unfinished"></translation>
+        <translation>송 편집기의 SVS 클립 뒤에 합성된 오디오 파형을 표시합니다.</translation>
     </message>
     <message>
         <source>Rescan voicebanks</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 다시 검색</translation>
     </message>
     <message>
         <source>Rescan the applied voicebank directories. Apply directory changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>적용된 음원 라이브러리 디렉터리를 다시 검색합니다. 디렉터리 변경 사항을 먼저 적용하세요.</translation>
     </message>
     <message>
         <source>Scanning voicebanks…</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리 검색 중…</translation>
     </message>
     <message>
         <source>Voicebanks found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>발견한 음원 라이브러리: %1</translation>
     </message>
     <message>
         <source>AI engine settings example — layout preview only; no synthesis engine is installed for this example.</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 엔진 설정 예시 — 레이아웃 미리 보기 전용입니다. 이 예시에는 합성 엔진이 설치되어 있지 않습니다.</translation>
     </message>
     <message>
         <source>Example rendering steps: 1–100 (default 20)</source>
-        <translation type="unfinished"></translation>
+        <translation>예시 렌더링 단계 수: 1–100 (기본값 20)</translation>
     </message>
     <message>
         <source>Example rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>예시 렌더링 단계 수</translation>
     </message>
     <message>
         <source>Rendering steps (1–100)</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링 단계 수 (1–100)</translation>
     </message>
     <message>
         <source>AI example (AI)</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 예시 (AI)</translation>
     </message>
     <message>
         <source>No SVS engine is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 엔진이 설치되어 있지 않습니다.</translation>
     </message>
     <message>
         <source>Loading engine options…</source>
-        <translation type="unfinished"></translation>
+        <translation>엔진 옵션 불러오는 중…</translation>
     </message>
     <message>
         <source>Engine unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>엔진 사용 불가</translation>
     </message>
     <message>
         <source>Engine settings must be an array</source>
-        <translation type="unfinished"></translation>
+        <translation>엔진 설정은 배열이어야 합니다</translation>
     </message>
     <message>
         <source>No voicebanks found. Configure directories and apply, then rescan.</source>
-        <translation type="unfinished"></translation>
+        <translation>음원 라이브러리를 찾지 못했습니다. 디렉터리를 설정하고 적용한 후 다시 검색하세요.</translation>
     </message>
     <message>
         <source>This engine does not declare additional options.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 엔진에는 추가 옵션이 없습니다.</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>트랙 음량</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>팬</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>믹서 채널</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1: %2</translation>
     </message>
 </context>
 <context>
@@ -12724,11 +12800,11 @@ Seed: %3</source>
     </message>
     <message>
         <source>Numbered notation reference (1=C)</source>
-        <translation type="unfinished"></translation>
+        <translation>숫자 악보 기준 (1=C)</translation>
     </message>
     <message>
         <source>Default C4; other pitches automatically add upper or lower octave dots, only in numbered notation mode</source>
-        <translation type="unfinished"></translation>
+        <translation>기본값은 C4입니다. 다른 피치에는 위·아래 옥타브 점이 자동으로 추가됩니다. 숫자 악보 모드에만 적용됩니다</translation>
     </message>
     <message>
         <source>Show fader ticks</source>
@@ -13096,7 +13172,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>SVC</source>
@@ -15092,39 +15168,39 @@ Latency: %2 ms</source>
     <name>lmms::svs::ExportSnapshot</name>
     <message>
         <source>AI compute settings changed; restart SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 연산 설정이 변경되었습니다. SVS 내보내기를 다시 시작하세요</translation>
     </message>
     <message>
         <source>Project tempo changed while rendering SVS export; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 렌더링 중 프로젝트 템포가 변경되었습니다. 내보내기를 다시 시작하세요</translation>
     </message>
     <message>
         <source>SVS mix controls or routing changed while rendering; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>렌더링 중 SVS 믹스 설정 또는 라우팅이 변경되었습니다. 내보내기를 다시 시작하세요</translation>
     </message>
     <message>
         <source>Track deleted while rendering SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 렌더링 중 트랙이 삭제되었습니다</translation>
     </message>
     <message>
         <source>Track deleted while preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 준비 중 트랙이 삭제되었습니다</translation>
     </message>
     <message>
         <source>SVS mix controls, routing or effects changed during export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기 준비 중 SVS 믹스 설정, 라우팅 또는 이펙트가 변경되었습니다. 내보내기를 다시 시작하세요</translation>
     </message>
     <message>
         <source>Project tempo changed during SVS export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 준비 중 프로젝트 템포가 변경되었습니다. 내보내기를 다시 시작하세요</translation>
     </message>
     <message>
         <source>SVS track &apos;%1&apos;, clip &apos;%2&apos; (%3), tick %4: %5</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 트랙 &apos;%1&apos;, 클립 &apos;%2&apos; (%3), 틱 %4: %5</translation>
     </message>
     <message>
         <source>Track deleted before preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 내보내기 준비 전에 트랙이 삭제되었습니다</translation>
     </message>
 </context>
 </TS>

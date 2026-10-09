@@ -44,7 +44,8 @@ void SVSBrowser::refresh()
 	m_tree->clear();
 	// Reuse the existing voice widget, avatar/resource loader and svsvoice drag/drop contract.
 	static const PixmapLoader logo("sample_track");
-	static Plugin::Descriptor descriptor{"svs", "Singing Voice Synthesis", "Native singing voice synthesis", "LMMS", 1,
+	static Plugin::Descriptor descriptor{"svs", "Singing Voice Synthesis",
+		QT_TRANSLATE_NOOP("lmms::gui::PluginDescWidget", "Native singing voice synthesis"), "LMMS", 1,
 		Plugin::Type::SVS, &logo, "", nullptr};
 	auto& registry = svs::Registry::instance();
 	QMap<QString, QTreeWidgetItem*> groups;

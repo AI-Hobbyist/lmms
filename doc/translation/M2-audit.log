@@ -1,0 +1,32 @@
+warning: in the working copy of 'src/gui/SVSBrowser.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSImageLoader.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSPitchRanges.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSProjectController.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "6d8bb56799c792539885f4a1ce4da6ff065908f0",
+  "working_diff_sha256": "9d9959856be5ece18c0aea0cfd34a9b828a2112b8aba5ca9fa20091a1f98b074",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1131,
+  "key_count": 3576,
+  "summary": {
+    "zh_CN": {
+      "same-source": 137,
+      "translated": 2109,
+      "empty": 1330
+    },
+    "ja": {
+      "same-source": 372,
+      "translated": 1583,
+      "empty": 1618,
+      "placeholder-error": 3
+    },
+    "en": {
+      "source": 3576
+    },
+    "ko": {
+      "same-source": 193,
+      "translated": 3080,
+      "empty": 303
+    }
+  }
+}

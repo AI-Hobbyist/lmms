@@ -673,8 +673,9 @@ bool SVSProjectController::commitImport(const svs::ProjectImport& prepared, Song
 		const auto expected
 			= root.firstChildElement("song").firstChildElement("trackcontainer").elementsByTagName("track").size();
 		if (song.hasErrors() || int(song.tracks().size()) != expected)
-			throw std::runtime_error(
-				song.errorSummary().isEmpty() ? "Incomplete project restore" : song.errorSummary().toStdString());
+			throw std::runtime_error(song.errorSummary().isEmpty()
+					? QCoreApplication::translate("SVSProjectUI", "Incomplete project restore").toStdString()
+					: song.errorSummary().toStdString());
 		song.setModified(true);
 		return true;
 	}

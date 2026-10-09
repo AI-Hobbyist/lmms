@@ -83,7 +83,8 @@ if ($buildExitCode -ne 0) { Get-Content build.log; exit $buildExitCode }
 | --- | --- | --- | --- | --- |
 | M0 | 当前审计、术语、逐键阶段及插件批次、逐项调查账本已建立 | 提取和审计退出码 0；审计边界检查 PASS | 按计划不适用 | 本阶段提交后推送，下一阶段开始前确认远端一致 |
 | M1 | 入口统一、英文 source 迁移、四语目录同步完成 | lmms / UiBaselineCapture / SVSIntegrationTest 构建及两组测试 PASS | Windows Qt、100%，四语入口及导出对话框截图 PASS | 本阶段提交推送后确认远端一致 |
-| M2～M7 | TODO | 未执行 | 未执行 | 未提交 |
+| M2 | SVS 307 键补齐，品牌/模板保留已记录 | 四语资源、受影响目标构建、307 键质量检查 PASS | 四语导入、设置、空声库编辑器，Windows 100% PASS | 本阶段提交推送后确认远端一致 |
+| M3～M7 | TODO | 未执行 | 未执行 | 未提交 |
 
 M0 提取曾因输入列表带双引号被 lupdate 当成文件名失败，移除列表内引号后通过；没有变更任何 TS 或业务代码。
 
@@ -98,3 +99,13 @@ M0 已提交并推送 `422f305ced7f97e4f8448ccad99558107b23bfd8`，开始 M1 前
 验证：四语 lrelease 退出码 0；最终前台构建 `lmms UiBaselineCapture SVSIntegrationTest` 通过。开发可执行文件 `build/Release/lmms.exe`；启用的 amplifier/kicker/tripleoscillator DLL 位于 `build/Release/plugins`，SVS 引擎沿既有 `build/Release/svs` 部署。首次编译发现 QJsonArray 代理不能绑定非常量引用，改为索引更新后通过，失败日志保留。
 
 `translationEntryPoints` 和 `unselectedSingerPreview` 各 3 PASS、0 FAIL。前者逐语言验证真实参数窗口的译文命中、Mixed 悬浮提示、固定声明及未知数据回退，并验证导出窗口/格式上下文；后者验证迁移后的声库空状态与菜单。截图均来自真实 Windows QScreen 窗口，100% 缩放；环境为 Qt 6.10.3、Microsoft YaHei UI、默认开发主题。四语截图中 CJK/韩文字形正常。后续尚未补译的导出标签按 M4 处理。测试日志中的 JACK 未运行和测试可执行路径缺少 SVSCompute 属既有运行环境警告，未扩大本阶段修改范围；不把此测试当作计算功能验证。
+
+## M2 结果
+
+M1 检查点 `6d8bb56799c792539885f4a1ce4da6ff065908f0` 已推送并核对远端。M2 完成 294 个原分配键，并为声库图片本地错误、音域解析、工程恢复及声库浏览描述增加 13 个必要入口，总计 307 个 M2 键。全库当前 3576 键，中/日/韩剩余空译 1330/1618/303，均属于后续阶段；日文原有 3 个异常仍留 M4。
+
+中日韩空缺补译分别 227/303/303 项；已有有效译文保留，英文使用源文回退。同原文只保留 AI/SVS/PAN/VOL、加减符号和占位符排版模板，逐语言已记录。M2 既有声明字段均有结论；用户数据和声明分组排序不改变。已接入本地 GUI 提示关闭，尚未确认的核心/插件诊断候选继续在 M6 逐项核对，不计为已翻译。
+
+质量命令：`python buildtools/translation-audit.py check --stage M2`，307 键 × 四语 PASS；检查覆盖、占位符、复数、同原文处置、HTML、换行及助记符。四语 QM 生成退出码 0，`lmms UiBaselineCapture` 前台编译通过，开发程序仍为 `build/Release/lmms.exe`。没有修改其他语言目录或算法。
+
+`svsTranslations` 原生实窗测试 3 PASS、0 FAIL，逐语言打开实际导入对话框、SVS 设置页和未选歌手的 SVS 钢琴窗，关闭后进入下一语言。设置页验证内存策略译文及完整长提示，截图核对 DiffSinger 固定参数、声库空状态和长段落；编辑器核对音高不支持状态、种子/重录及正常 CJK/韩文字形。全部 100% 缩放。测试程序路径下 SVSCompute 未部署的原始诊断如实显示，计算设备实际探测由 M7 开发程序场景验证，不将测试环境回退当作真实推理通过。

@@ -1292,6 +1292,56 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
+    <name>SVSImageLoader</name>
+    <message>
+        <source>Voice image is not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice resource engine is unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice resource is not an image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image is missing or outside its package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image is unreadable or exceeds 16 MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image exceeds 16 MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image has invalid dimensions or exceeds the decoding limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image exceeds the 64 MiB decoded image limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice image decoding failed: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SVSPitchRanges</name>
+    <message>
+        <source>Non-string pitch range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid pitch range</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SVSProjectUI</name>
     <message>
         <source>Cancel</source>
@@ -1461,6 +1511,10 @@ Continue?</source>
     </message>
     <message>
         <source>Could not save the output file group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incomplete project restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11158,6 +11212,10 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Send to new instrument track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Native singing voice synthesis</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

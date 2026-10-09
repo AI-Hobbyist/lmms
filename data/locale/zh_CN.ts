@@ -644,19 +644,19 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     <name>NativeSVS</name>
     <message>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>模式</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基础</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>高级</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -664,135 +664,135 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>Breath</source>
-        <translation type="unfinished"></translation>
+        <translation>呼吸</translation>
     </message>
     <message>
         <source>Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>表现</translation>
     </message>
     <message>
         <source>Tension</source>
-        <translation type="unfinished"></translation>
+        <translation>张力</translation>
     </message>
     <message>
         <source>Gender</source>
-        <translation type="unfinished"></translation>
+        <translation>性别</translation>
     </message>
     <message>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>力度</translation>
     </message>
     <message>
         <source>Note</source>
-        <translation type="unfinished"></translation>
+        <translation>音符</translation>
     </message>
     <message>
         <source>Soft</source>
-        <translation type="unfinished"></translation>
+        <translation>柔和</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>标签</translation>
     </message>
     <message>
         <source>Phoneme gain</source>
-        <translation type="unfinished"></translation>
+        <translation>音素增益</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Rendered energy</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染能量</translation>
     </message>
     <message>
         <source>Rendered level</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染电平</translation>
     </message>
     <message>
         <source>Rendered peak</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染峰值</translation>
     </message>
     <message>
         <source>Singing Voice Synthesis</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声合成</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>说话人</translation>
     </message>
     <message>
         <source>Rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染步数</translation>
     </message>
     <message>
         <source>Voicebank directories</source>
-        <translation type="unfinished"></translation>
+        <translation>声库目录</translation>
     </message>
     <message>
         <source>Global shared vocoder directories</source>
-        <translation type="unfinished"></translation>
+        <translation>全局共享声码器目录</translation>
     </message>
     <message>
         <source>Show phoneme language prefixes</source>
-        <translation type="unfinished"></translation>
+        <translation>显示音素语言前缀</translation>
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>能量（绝对值）</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation type="unfinished"></translation>
+        <translation>能量偏移</translation>
     </message>
     <message>
         <source>energy</source>
-        <translation type="unfinished"></translation>
+        <translation>能量</translation>
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>气声（绝对值）</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation type="unfinished"></translation>
+        <translation>气声偏移</translation>
     </message>
     <message>
         <source>breathiness</source>
-        <translation type="unfinished"></translation>
+        <translation>气声</translation>
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>发声（绝对值）</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation type="unfinished"></translation>
+        <translation>发声偏移</translation>
     </message>
     <message>
         <source>voicing</source>
-        <translation type="unfinished"></translation>
+        <translation>发声</translation>
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>张力（绝对值）</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation type="unfinished"></translation>
+        <translation>张力偏移</translation>
     </message>
     <message>
         <source>tension</source>
-        <translation type="unfinished"></translation>
+        <translation>张力</translation>
     </message>
     <message>
         <source>Velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>力度</translation>
     </message>
     <message>
         <source>Expressiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>表现力</translation>
     </message>
 </context>
 <context>
@@ -1225,11 +1225,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>SVS plugin settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 插件设置</translation>
     </message>
     <message>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Not selected</source>
@@ -1237,43 +1237,43 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>说话人</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>浏览</translation>
     </message>
     <message>
         <source>Choose image</source>
-        <translation type="unfinished"></translation>
+        <translation>选择图片</translation>
     </message>
     <message>
         <source>Images (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</source>
-        <translation type="unfinished"></translation>
+        <translation>图片 (*.png *.jpg *.jpeg *.webp *.svg *.bmp)</translation>
     </message>
     <message>
         <source>Avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>头像</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>立绘</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>显示立绘</translation>
     </message>
     <message>
         <source>Portrait transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>立绘透明度</translation>
     </message>
     <message>
         <source>Use voice images</source>
-        <translation type="unfinished"></translation>
+        <translation>使用歌手图片</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"></translation>
+        <translation>效果器</translation>
     </message>
 </context>
 <context>
@@ -1337,6 +1337,56 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <source>This plugin is not suitable for use in a &amp;lsquo;hard real-time&amp;rsquo; environment.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SVSImageLoader</name>
+    <message>
+        <source>Voice image is not available</source>
+        <translation>歌手图片不可用</translation>
+    </message>
+    <message>
+        <source>Voice resource engine is unavailable</source>
+        <translation>歌手资源引擎不可用</translation>
+    </message>
+    <message>
+        <source>Voice resource is not an image</source>
+        <translation>歌手资源不是图片</translation>
+    </message>
+    <message>
+        <source>Voice image is missing or outside its package</source>
+        <translation>歌手图片缺失或位于资源包之外</translation>
+    </message>
+    <message>
+        <source>Voice image is unreadable or exceeds 16 MiB</source>
+        <translation>歌手图片无法读取或超过 16 MiB</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds 16 MiB</source>
+        <translation>歌手图片超过 16 MiB</translation>
+    </message>
+    <message>
+        <source>Voice image has invalid dimensions or exceeds the decoding limit</source>
+        <translation>歌手图片尺寸无效或超过解码限制</translation>
+    </message>
+    <message>
+        <source>Voice image exceeds the 64 MiB decoded image limit</source>
+        <translation>歌手图片解码后超过 64 MiB 限制</translation>
+    </message>
+    <message>
+        <source>Voice image decoding failed: </source>
+        <translation>歌手图片解码失败： </translation>
+    </message>
+</context>
+<context>
+    <name>SVSPitchRanges</name>
+    <message>
+        <source>Non-string pitch range</source>
+        <translation>音域不是字符串</translation>
+    </message>
+    <message>
+        <source>Invalid pitch range</source>
+        <translation>无效音域</translation>
     </message>
 </context>
 <context>
@@ -1520,6 +1570,10 @@ Continue?</source>
     <message>
         <source>Could not save the output file group</source>
         <translation>输出文件组保存失败</translation>
+    </message>
+    <message>
+        <source>Incomplete project restore</source>
+        <translation>工程恢复不完整</translation>
     </message>
     <message>
         <source>An unknown error occurred while committing the project</source>
@@ -4540,7 +4594,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::RenderManager</name>
     <message>
         <source>Track deleted during SVS batch export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 批量导出期间轨道被删除</translation>
     </message>
 </context>
 <context>
@@ -7419,7 +7473,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Export failed SVS regions as silence</source>
-        <translation type="unfinished"></translation>
+        <translation>将失败的 SVS 区域导出为静音</translation>
     </message>
     <message>
         <source> time(s)</source>
@@ -7427,7 +7481,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>SVS export failed</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 导出失败</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
@@ -11223,11 +11277,15 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::PluginDescWidget</name>
     <message>
         <source>Send to new SVS track</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到新 SVS 轨道</translation>
     </message>
     <message>
         <source>Send to new instrument track</source>
         <translation>发送到新的乐器轨道</translation>
+    </message>
+    <message>
+        <source>Native singing voice synthesis</source>
+        <translation>原生歌声合成</translation>
     </message>
 </context>
 <context>
@@ -11675,14 +11733,14 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVSBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSCanvas</name>
     <message>
         <source>Left drag: edit curve. Right drag: reset to baseline. Shift+right click: curve menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>左键拖动：编辑曲线。右键拖动：重置为基线。Shift+右键单击：曲线菜单。</translation>
     </message>
     <message>
         <source>Take %1</source>
@@ -11694,15 +11752,19 @@ Reading: %2
 Source: %3
 Phonemes: %4
 %5</source>
-        <translation type="unfinished"></translation>
+        <translation>歌词：%1
+读音：%2
+来源：%3
+音素：%4
+%5</translation>
     </message>
     <message>
         <source>Copied curve belongs to a different parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>复制的曲线属于其他参数</translation>
     </message>
     <message>
         <source>Clear hand-drawn pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>清除手绘音高</translation>
     </message>
     <message>
         <source>Re-record pitch</source>
@@ -11710,173 +11772,173 @@ Phonemes: %4
     </message>
     <message>
         <source>Applies to the whole SVS clip when nothing is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>未选择内容时应用于整个 SVS 片段。</translation>
     </message>
     <message>
         <source>Applies only to the selection; other pitch and render segments are retained.</source>
-        <translation type="unfinished"></translation>
+        <translation>仅应用于选区；保留其他音高和渲染片段。</translation>
     </message>
     <message>
         <source>Copy curve selection</source>
-        <translation type="unfinished"></translation>
+        <translation>复制曲线选区</translation>
     </message>
     <message>
         <source>Paste curve here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此粘贴曲线</translation>
     </message>
     <message>
         <source>Delete selected anchors</source>
-        <translation type="unfinished"></translation>
+        <translation>删除所选锚点</translation>
     </message>
     <message>
         <source>Connect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>连接选区</translation>
     </message>
     <message>
         <source>Disconnect selection</source>
-        <translation type="unfinished"></translation>
+        <translation>断开选区</translation>
     </message>
     <message>
         <source>Anchor value</source>
-        <translation type="unfinished"></translation>
+        <translation>锚点值</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>开启</translation>
     </message>
     <message>
         <source>Semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>半音</translation>
     </message>
     <message>
         <source>Reset curve to default</source>
-        <translation type="unfinished"></translation>
+        <translation>将曲线重置为默认值</translation>
     </message>
     <message>
         <source>Restore automatic pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复自动音高</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>复制</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Paste here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此粘贴</translation>
     </message>
     <message>
         <source>Split at cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>在光标处分割</translation>
     </message>
     <message>
         <source>Creates two editable notes and re-parses phonemes. Undo restores the complete original note.</source>
-        <translation type="unfinished"></translation>
+        <translation>创建两个可编辑音符并重新解析音素。撤销可恢复完整的原音符。</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Transpose up octave</source>
-        <translation type="unfinished"></translation>
+        <translation>升高八度</translation>
     </message>
     <message>
         <source>Transpose down octave</source>
-        <translation type="unfinished"></translation>
+        <translation>降低八度</translation>
     </message>
     <message>
         <source>Pronunciation</source>
-        <translation type="unfinished"></translation>
+        <translation>发音</translation>
     </message>
     <message>
         <source>Manual reading…</source>
-        <translation type="unfinished"></translation>
+        <translation>手动读音…</translation>
     </message>
     <message>
         <source>Manual reading</source>
-        <translation type="unfinished"></translation>
+        <translation>手动读音</translation>
     </message>
     <message>
         <source>Reading (manual phonemes keep precedence)</source>
-        <translation type="unfinished"></translation>
+        <translation>读音（手动音素仍优先）</translation>
     </message>
     <message>
         <source>Restore automatic reading</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复自动读音</translation>
     </message>
     <message>
         <source>Note language</source>
-        <translation type="unfinished"></translation>
+        <translation>音符语言</translation>
     </message>
     <message>
         <source>Track default</source>
-        <translation type="unfinished"></translation>
+        <translation>轨道默认值</translation>
     </message>
     <message>
         <source>Input lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>输入歌词</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSClipView</name>
     <message>
         <source>Set as ghost in piano-roll</source>
-        <translation type="unfinished"></translation>
+        <translation>设为钢琴窗参考音符</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>更改名称</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSLyricEditor</name>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>批量歌词</translation>
     </message>
     <message>
         <source>Skip voice continuation notes and tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>跳过延续音符和词元</translation>
     </message>
     <message>
         <source>Tick</source>
-        <translation type="unfinished"></translation>
+        <translation>刻度</translation>
     </message>
     <message>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>原文</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>预览</translation>
     </message>
     <message>
         <source>Reading / status</source>
-        <translation type="unfinished"></translation>
+        <translation>读音 / 状态</translation>
     </message>
     <message>
         <source>Skipped continuation</source>
-        <translation type="unfinished"></translation>
+        <translation>已跳过延续音</translation>
     </message>
     <message>
         <source> — manual override retained</source>
-        <translation type="unfinished"></translation>
+        <translation> — 保留手动覆盖</translation>
     </message>
     <message>
         <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation type="unfinished"></translation>
+        <translation>已分配 %1 个词元；%2 个未使用。保留手动读音和音素。确认时统一应用更改。</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>
-        <translation type="unfinished"></translation>
+        <translation>预览打开期间音符已更改。请重新打开批量歌词以检查当前音符。</translation>
     </message>
 </context>
 <context>
@@ -11891,46 +11953,46 @@ Phonemes: %4
     </message>
     <message>
         <source>Browse…</source>
-        <translation type="unfinished"></translation>
+        <translation>浏览…</translation>
     </message>
     <message>
         <source>Voicebank directory</source>
-        <translation type="unfinished"></translation>
+        <translation>声库目录</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>移除</translation>
     </message>
     <message>
         <source>Add directory</source>
-        <translation type="unfinished"></translation>
+        <translation>添加目录</translation>
     </message>
     <message>
         <source>; logarithmic scale</source>
-        <translation type="unfinished"></translation>
+        <translation>；对数刻度</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
         <source>SVS Piano Roll — LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 钢琴窗 — LMMS</translation>
     </message>
     <message>
         <source>Play / Pause clip</source>
-        <translation type="unfinished"></translation>
+        <translation>播放 / 暂停片段</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>Clear ghost notes</source>
-        <translation type="unfinished"></translation>
+        <translation>清除参考音符</translation>
     </message>
     <message>
         <source>Synthesize</source>
-        <translation type="unfinished"></translation>
+        <translation>合成</translation>
     </message>
     <message>
         <source>Follow Song Editor scrolling</source>
@@ -11942,93 +12004,93 @@ Phonemes: %4
     </message>
     <message>
         <source>Lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>歌词</translation>
     </message>
     <message>
         <source>Batch lyrics</source>
-        <translation type="unfinished"></translation>
+        <translation>批量歌词</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>选择</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished"></translation>
+        <translation>铅笔</translation>
     </message>
     <message>
         <source>Pitch pen</source>
-        <translation type="unfinished"></translation>
+        <translation>音高画笔</translation>
     </message>
     <message>
         <source>Anchor</source>
-        <translation type="unfinished"></translation>
+        <translation>锚点</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑</translation>
     </message>
     <message>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>直线</translation>
     </message>
     <message>
         <source>Erase</source>
-        <translation type="unfinished"></translation>
+        <translation>擦除</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>参数</translation>
     </message>
     <message>
         <source>Show/hide parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>显示/隐藏参数</translation>
     </message>
     <message>
         <source>Quantization</source>
-        <translation type="unfinished"></translation>
+        <translation>量化</translation>
     </message>
     <message>
         <source>Note length</source>
-        <translation type="unfinished"></translation>
+        <translation>音符长度</translation>
     </message>
     <message>
         <source>Last note</source>
-        <translation type="unfinished"></translation>
+        <translation>最后一个音符</translation>
     </message>
     <message>
         <source>−</source>
-        <translation type="unfinished"></translation>
+        <translation>−</translation>
     </message>
     <message>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <source>Horizontal zoom: bars visible in the note area</source>
-        <translation type="unfinished"></translation>
+        <translation>水平缩放：音符区域可见的小节数</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>自定义</translation>
     </message>
     <message numerus="yes">
         <source>%n bar(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 小节</numerusform>
         </translation>
     </message>
     <message>
         <source>Singer</source>
-        <translation type="unfinished"></translation>
+        <translation>歌手</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>语言</translation>
     </message>
     <message>
         <source>Not selected</source>
@@ -12042,12 +12104,15 @@ Phonemes: %4
         <source>Available: %1
 Comfortable: %2
 Weak spots: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>可用：%1
+舒适：%2
+薄弱：%3</translation>
     </message>
     <message>
         <source>
 Unrecognized pitch: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>
+无法识别的音高：%1</translation>
     </message>
     <message>
         <source>Switch to a previous pitch recording</source>
@@ -12085,296 +12150,296 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVS editor settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 编辑器设置</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>设置</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>属性</translation>
     </message>
     <message>
         <source>Show portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>显示立绘</translation>
     </message>
     <message>
         <source>Transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>透明度</translation>
     </message>
     <message>
         <source>Reset portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>重置立绘</translation>
     </message>
     <message>
         <source>Use for new tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>用于新轨道</translation>
     </message>
     <message>
         <source>Move curves with notes</source>
-        <translation type="unfinished"></translation>
+        <translation>随音符移动曲线</translation>
     </message>
     <message>
         <source>Import project dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>导入工程词典</translation>
     </message>
     <message>
         <source>Import dictionary</source>
-        <translation type="unfinished"></translation>
+        <translation>导入词典</translation>
     </message>
     <message>
         <source>JSON dictionary (*.json)</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON 词典 (*.json)</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>轨道</translation>
     </message>
     <message>
         <source>Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>片段</translation>
     </message>
     <message>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>音符</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>结果</translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation type="unfinished"></translation>
+        <translation>结果： </translation>
     </message>
     <message>
         <source>Read-only result. </source>
-        <translation type="unfinished"></translation>
+        <translation>只读结果。 </translation>
     </message>
     <message>
         <source>Base value: adjust the sidebar control. </source>
-        <translation type="unfinished"></translation>
+        <translation>基础值：调整侧栏控件。 </translation>
     </message>
     <message>
         <source>Left click: select; right click: show/hide overlay.</source>
-        <translation type="unfinished"></translation>
+        <translation>左键单击：选择；右键单击：显示/隐藏叠加层。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSResultStrip</name>
     <message>
         <source>Phoneme duration is below the voice&apos;s editable minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>音素时长低于歌手允许编辑的最小值</translation>
     </message>
     <message>
         <source>Phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Replace phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>替换音素</translation>
     </message>
     <message>
         <source>Phoneme</source>
-        <translation type="unfinished"></translation>
+        <translation>音素</translation>
     </message>
     <message>
         <source>Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>符号</translation>
     </message>
     <message>
         <source>Restore automatic phonemes</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复自动音素</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSSettingsPage</name>
     <message>
         <source>AI</source>
-        <translation type="unfinished"></translation>
+        <translation>AI</translation>
     </message>
     <message>
         <source>Traditional concatenation</source>
-        <translation type="unfinished"></translation>
+        <translation>传统拼接</translation>
     </message>
     <message>
         <source>Non-AI example</source>
-        <translation type="unfinished"></translation>
+        <translation>非 AI 示例</translation>
     </message>
     <message>
         <source>Type not declared</source>
-        <translation type="unfinished"></translation>
+        <translation>未声明类型</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>%1 — Coming soon</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — 即将推出</translation>
     </message>
     <message>
         <source>AI voicebank computation engine</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 声库计算引擎</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>设备</translation>
     </message>
     <message>
         <source>Release immediately after rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染后立即释放</translation>
     </message>
     <message>
         <source>Release automatically when idle (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>空闲时自动释放（默认）</translation>
     </message>
     <message>
         <source>Keep models resident</source>
-        <translation type="unfinished"></translation>
+        <translation>保持模型常驻</translation>
     </message>
     <message>
         <source>AI model memory management</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 模型内存管理</translation>
     </message>
     <message>
         <source>Applies to all AI computation backends: CPU model memory and GPU model video memory. Released models reload when needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>适用于所有 AI 计算后端：CPU 模型内存和 GPU 模型显存。已释放的模型将在需要时重新加载。</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Idle time before release</source>
-        <translation type="unfinished"></translation>
+        <translation>释放前的空闲时间</translation>
     </message>
     <message>
         <source>Maximum simultaneous SVS renders across all tracks and engines. Default: 1. Other renders wait in the queue. Running renders finish when this limit is reduced.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有轨道和引擎的最大同时 SVS 渲染数。默认：1。其他渲染排队等待。降低此上限时，正在运行的渲染仍会完成。</translation>
     </message>
     <message>
         <source>Simultaneous SVS render threads</source>
-        <translation type="unfinished"></translation>
+        <translation>同时 SVS 渲染线程数</translation>
     </message>
     <message>
         <source>AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. Unavailable devices use CPU and report the reason; unsupported AI engines use CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用共享计算的 AI 引擎遵循此后端设置。DirectML 设备须通过实际推理探测。不可用设备回退到 CPU 并报告原因；不支持的 AI 引擎使用 CPU。</translation>
     </message>
     <message>
         <source>Unavailable device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>不可用设备：%1</translation>
     </message>
     <message>
         <source>Show voicebank pitch ranges</source>
-        <translation type="unfinished"></translation>
+        <translation>显示声库音域</translation>
     </message>
     <message>
         <source>Mark available, comfortable and weak pitches on the keyboard and show their ranges in the sidebar when the voicebank declares them.</source>
-        <translation type="unfinished"></translation>
+        <translation>声库声明音域时，在键盘上标记可用、舒适和薄弱音高，并在侧栏显示音域。</translation>
     </message>
     <message>
         <source>Show translucent background waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>显示半透明背景波形</translation>
     </message>
     <message>
         <source>Display the synthesized audio waveform behind SVS clips in the Song Editor.</source>
-        <translation type="unfinished"></translation>
+        <translation>在歌曲编辑器的 SVS 片段后方显示合成音频波形。</translation>
     </message>
     <message>
         <source>Rescan voicebanks</source>
-        <translation type="unfinished"></translation>
+        <translation>重新扫描声库</translation>
     </message>
     <message>
         <source>Rescan the applied voicebank directories. Apply directory changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>重新扫描已应用的声库目录。请先应用目录更改。</translation>
     </message>
     <message>
         <source>Scanning voicebanks…</source>
-        <translation type="unfinished"></translation>
+        <translation>正在扫描声库…</translation>
     </message>
     <message>
         <source>Voicebanks found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>找到声库：%1</translation>
     </message>
     <message>
         <source>AI engine settings example — layout preview only; no synthesis engine is installed for this example.</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 引擎设置示例 — 仅预览布局；此示例未安装合成引擎。</translation>
     </message>
     <message>
         <source>Example rendering steps: 1–100 (default 20)</source>
-        <translation type="unfinished"></translation>
+        <translation>示例渲染步数：1–100（默认 20）</translation>
     </message>
     <message>
         <source>Example rendering steps</source>
-        <translation type="unfinished"></translation>
+        <translation>示例渲染步数</translation>
     </message>
     <message>
         <source>Rendering steps (1–100)</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染步数（1–100）</translation>
     </message>
     <message>
         <source>AI example (AI)</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 示例 (AI)</translation>
     </message>
     <message>
         <source>No SVS engine is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>未安装 SVS 引擎。</translation>
     </message>
     <message>
         <source>Loading engine options…</source>
-        <translation type="unfinished"></translation>
+        <translation>正在加载引擎选项…</translation>
     </message>
     <message>
         <source>Engine unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>引擎不可用</translation>
     </message>
     <message>
         <source>Engine settings must be an array</source>
-        <translation type="unfinished"></translation>
+        <translation>引擎设置必须为数组</translation>
     </message>
     <message>
         <source>No voicebanks found. Configure directories and apply, then rescan.</source>
-        <translation type="unfinished"></translation>
+        <translation>未找到声库。请配置目录并应用，然后重新扫描。</translation>
     </message>
     <message>
         <source>This engine does not declare additional options.</source>
-        <translation type="unfinished"></translation>
+        <translation>此引擎未声明其他选项。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>轨道音量</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>声像</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>混音器通道</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：%2</translation>
     </message>
 </context>
 <context>
@@ -13147,7 +13212,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVS</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS</translation>
     </message>
     <message>
         <source>SVC</source>
@@ -15143,39 +15208,39 @@ Latency: %2 ms</source>
     <name>lmms::svs::ExportSnapshot</name>
     <message>
         <source>AI compute settings changed; restart SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>AI 计算设置已更改；请重新开始 SVS 导出</translation>
     </message>
     <message>
         <source>Project tempo changed while rendering SVS export; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 导出渲染期间工程速度已更改；请重新导出</translation>
     </message>
     <message>
         <source>SVS mix controls or routing changed while rendering; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染期间 SVS 混音控制或路由已更改；请重新导出</translation>
     </message>
     <message>
         <source>Track deleted while rendering SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 导出渲染期间轨道被删除</translation>
     </message>
     <message>
         <source>Track deleted while preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>准备 SVS 导出期间轨道被删除</translation>
     </message>
     <message>
         <source>SVS mix controls, routing or effects changed during export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>导出准备期间 SVS 混音控制、路由或效果器已更改；请重新导出</translation>
     </message>
     <message>
         <source>Project tempo changed during SVS export preparation; restart export</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 导出准备期间工程速度已更改；请重新导出</translation>
     </message>
     <message>
         <source>SVS track &apos;%1&apos;, clip &apos;%2&apos; (%3), tick %4: %5</source>
-        <translation type="unfinished"></translation>
+        <translation>SVS 轨道“%1”，片段“%2”（%3），刻度 %4：%5</translation>
     </message>
     <message>
         <source>Track deleted before preparing SVS export</source>
-        <translation type="unfinished"></translation>
+        <translation>准备 SVS 导出前轨道被删除</translation>
     </message>
 </context>
 </TS>

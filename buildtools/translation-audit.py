@@ -247,6 +247,48 @@ def worklist(output):
     print(json.dumps(Counter(row.get("batch", row["stage"]) for row in report["keys"]), indent=2))
 
 
+def check_stage(output, stage):
+    report = json.loads((output / "current-audit.json").read_text(encoding="utf-8"))
+    ledger = json.loads((output / "review-ledger.json").read_text(encoding="utf-8"))
+    retained = {(item["id"], item["language"]) for item in ledger["same_source_reviews"]
+                if item["state"] == "CLOSED" and item["decision"] == "retain"}
+    rows = [row for row in report["keys"]
+            if stage == "all" or row.get("batch", row["stage"]) == stage]
+    if not rows:
+        raise SystemExit(f"No keys assigned to {stage}")
+    failures = []
+    for language in LANGUAGES:
+        messages = catalog(ROOT / "data/locale" / f"{language}.ts")
+        for row in rows:
+            state = row["status"][language]
+            if state not in ("translated", "source", "same-source"):
+                failures.append((language, row["key"], state))
+                continue
+            if state == "same-source" and (row["id"], language) not in retained:
+                failures.append((language, row["key"], "same-source review missing"))
+            if state == "source":
+                continue
+            source = row["key"][1]
+            translation = messages[tuple(row["key"])].find("translation")
+            forms = translation.findall("numerusform")
+            for node in forms or [translation]:
+                text = "".join(node.itertext())
+                if source.count("\n") != text.count("\n"):
+                    failures.append((language, row["key"], "newline count"))
+                tags = lambda value: Counter(re.findall(r"</?[A-Za-z][^>]*>", value))
+                if tags(source) != tags(text):
+                    failures.append((language, row["key"], "HTML tags"))
+                mnemonic = lambda value: len(re.findall(r"&(?!&)", value.replace("&&", "")))
+                if mnemonic(source) != mnemonic(text):
+                    failures.append((language, row["key"], "mnemonic count"))
+    for failure in failures:
+        print(json.dumps(failure, ensure_ascii=False))
+    if failures:
+        raise SystemExit(f"FAIL: {len(failures)} issues in {stage}")
+    print(f"PASS: {stage}, {len(rows)} keys × four languages; coverage, placeholders, "
+          "plural forms, same-source decisions, HTML, newlines and mnemonics")
+
+
 def selfcheck():
     ordinary = ("Test", "Value %1", "", "no")
     assert status("en", ordinary, None) == "source-unlisted"
@@ -273,7 +315,8 @@ def selfcheck():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("inputs", "audit", "worklist", "selfcheck"))
+    parser.add_argument("command", choices=("inputs", "audit", "worklist", "selfcheck", "check"))
+    parser.add_argument("--stage", default="all")
     parser.add_argument("--output", type=Path, default=ROOT / "doc/translation")
     parser.add_argument("--extraction", type=Path)
     args = parser.parse_args()
@@ -292,6 +335,8 @@ def main():
         audit((args.extraction or output / "current.ts").resolve(), output)
     elif args.command == "worklist":
         worklist(output)
+    elif args.command == "check":
+        check_stage(output, args.stage)
     else:
         selfcheck()
 
