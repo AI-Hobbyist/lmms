@@ -474,7 +474,7 @@ QString SlewDistortionHelpView::s_helpText = tr(
 
 SlewDistortionHelpView::SlewDistortionHelpView() : QTextEdit(s_helpText)
 {
-	setWindowTitle("Slew Distortion Help");
+	setWindowTitle(tr("Slew Distortion Help"));
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);

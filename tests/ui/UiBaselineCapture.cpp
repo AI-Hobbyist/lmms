@@ -642,14 +642,20 @@ private slots:
 				QVERIFY(panel);
 				const auto preset = settings(effect);
 				showEditor(panel, evidencePrefix + '-' + name);
-				if ((name == "frequencyshifter" || name == "granularpitchshifter") && !selectedPlugins.isEmpty())
+				if ((name == "frequencyshifter" || name == "granularpitchshifter" || name == "slewdistortion")
+					&& !selectedPlugins.isEmpty())
 				{
 					const bool granular = name == "granularpitchshifter";
-					const char* panelContext = granular ? "lmms::gui::GranularPitchShifterControlDialog"
-														: "lmms::gui::FrequencyShifterControlDialog";
-					const char* helpContext
-						= granular ? "lmms::gui::GranularPitchShifterHelpView" : "lmms::gui::FrequencyShifterHelpView";
-					const char* helpTitle = granular ? "Granular Pitch Shifter Help" : "Frequency Shifter Help";
+					const bool slew = name == "slewdistortion";
+					const char* panelContext = slew ? "lmms::gui::SlewDistortionControlDialog"
+						: granular					? "lmms::gui::GranularPitchShifterControlDialog"
+													: "lmms::gui::FrequencyShifterControlDialog";
+					const char* helpContext = slew ? "lmms::gui::SlewDistortionHelpView"
+						: granular				   ? "lmms::gui::GranularPitchShifterHelpView"
+												   : "lmms::gui::FrequencyShifterHelpView";
+					const char* helpTitle = slew ? "Slew Distortion Help"
+						: granular				 ? "Granular Pitch Shifter Help"
+												 : "Frequency Shifter Help";
 					QWidget* helpButton = nullptr;
 					for (auto* widget : panel->findChildren<QWidget*>())
 					{
@@ -681,8 +687,9 @@ private slots:
 					QVERIFY(help);
 					if (qEnvironmentVariable("LMMS_UI_TRANSLATION") != "en")
 					{
-						QVERIFY(
-							!help->toPlainText().startsWith(granular ? "Granular Pitch Shifter" : "Frequency Shifter"));
+						QVERIFY(!help->toPlainText().contains(slew ? "Slew Distortion is a multiband slew rate limiter"
+								: granular							 ? "Granular Pitch Shifter"
+																	 : "Frequency Shifter"));
 					}
 					showEditor(help, evidencePrefix + "-help");
 					if (granular)

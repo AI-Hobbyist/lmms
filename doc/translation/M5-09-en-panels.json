@@ -1,0 +1,34 @@
+[
+  {
+    "plugin": "slicert",
+    "preset": "UI snapshot and restore/save checked",
+    "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+    "status": "BASELINE CAPTURED"
+  },
+  {
+    "plugin": "sf2player",
+    "status": "BASELINE CAPTURED",
+    "preset": "UI snapshot and restore/save checked",
+    "evidence": "M5-09-window-en.log",
+    "scope": "LMMS controls and real help window; artwork exceptions retained"
+  },
+  {
+    "plugin": "sfxr",
+    "status": "BASELINE CAPTURED",
+    "preset": "UI snapshot and restore/save checked",
+    "evidence": "M5-09-window-en.log",
+    "scope": "LMMS controls and real help window; artwork exceptions retained"
+  },
+  {
+    "plugin": "slewdistortion",
+    "status": "BASELINE CAPTURED",
+    "preset": "UI snapshot and restore/save checked",
+    "evidence": "M5-09-window-en.log",
+    "scope": "LMMS controls and real help window; artwork exceptions retained"
+  },
+  {
+    "plugin": "sid",
+    "status": "MANUAL/PENDING",
+    "reason": "Plugin unavailable in configured development deployment"
+  }
+]

@@ -920,7 +920,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>LMMS port of sfxr</source>
-        <translation type="unfinished"></translation>
+        <translation>sfxr の LMMS 移植版</translation>
     </message>
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
@@ -1002,7 +1002,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A 2-band distortion and slew rate limiter plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>2バンドの歪み・スルーレート制限プラグイン。</translation>
     </message>
     <message>
         <source>Basic Slicer</source>
@@ -4859,7 +4859,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Reverb width</source>
-        <translation type="unfinished"></translation>
+        <translation>リバーブの幅</translation>
     </message>
     <message>
         <source>Reverb level</source>
@@ -4871,19 +4871,19 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Chorus voices</source>
-        <translation type="unfinished"></translation>
+        <translation>コーラスのボイス数</translation>
     </message>
     <message>
         <source>Chorus level</source>
-        <translation type="unfinished"></translation>
+        <translation>コーラスレベル</translation>
     </message>
     <message>
         <source>Chorus speed</source>
-        <translation type="unfinished"></translation>
+        <translation>コーラス速度</translation>
     </message>
     <message>
         <source>Chorus depth</source>
-        <translation type="unfinished"></translation>
+        <translation>コーラスの深さ</translation>
     </message>
     <message>
         <source>A soundfont %1 could not be loaded.</source>
@@ -4894,7 +4894,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SfxrInstrument</name>
     <message>
         <source>Wave</source>
-        <translation type="unfinished"></translation>
+        <translation>波形</translation>
     </message>
 </context>
 <context>
@@ -4913,7 +4913,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Voice 3 off</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス 3 をオフ</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -4928,194 +4928,198 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SlewDistortionControls</name>
     <message>
         <source>Type 1</source>
-        <translation type="unfinished"></translation>
+        <translation>タイプ 1</translation>
     </message>
     <message>
         <source>Type 2</source>
-        <translation type="unfinished"></translation>
+        <translation>タイプ 2</translation>
     </message>
     <message>
         <source>Drive 1</source>
-        <translation type="unfinished"></translation>
+        <translation>ドライブ 1</translation>
     </message>
     <message>
         <source>Drive 2</source>
-        <translation type="unfinished"></translation>
+        <translation>ドライブ 2</translation>
     </message>
     <message>
         <source>Slew Up 1</source>
-        <translation type="unfinished"></translation>
+        <translation>上昇スルーレート 1</translation>
     </message>
     <message>
         <source>Slew Up 2</source>
-        <translation type="unfinished"></translation>
+        <translation>上昇スルーレート 2</translation>
     </message>
     <message>
         <source>Slew Down 1</source>
-        <translation type="unfinished"></translation>
+        <translation>下降スルーレート 1</translation>
     </message>
     <message>
         <source>Slew Down 2</source>
-        <translation type="unfinished"></translation>
+        <translation>下降スルーレート 2</translation>
     </message>
     <message>
         <source>Bias 1</source>
-        <translation type="unfinished"></translation>
+        <translation>バイアス 1</translation>
     </message>
     <message>
         <source>Bias 2</source>
-        <translation type="unfinished"></translation>
+        <translation>バイアス 2</translation>
     </message>
     <message>
         <source>Warp 1</source>
-        <translation type="unfinished"></translation>
+        <translation>ワープしきい値 1</translation>
     </message>
     <message>
         <source>Warp 2</source>
-        <translation type="unfinished"></translation>
+        <translation>ワープしきい値 2</translation>
     </message>
     <message>
         <source>Crush 1</source>
-        <translation type="unfinished"></translation>
+        <translation>クラッシュ 1</translation>
     </message>
     <message>
         <source>Crush 2</source>
-        <translation type="unfinished"></translation>
+        <translation>クラッシュ 2</translation>
     </message>
     <message>
         <source>Out Vol 1</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量 1</translation>
     </message>
     <message>
         <source>Out Vol 2</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量 2</translation>
     </message>
     <message>
         <source>Attack 1</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック 1</translation>
     </message>
     <message>
         <source>Attack 2</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック 2</translation>
     </message>
     <message>
         <source>Release 1</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース 1</translation>
     </message>
     <message>
         <source>Release 2</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース 2</translation>
     </message>
     <message>
         <source>Dynamics 1</source>
-        <translation type="unfinished"></translation>
+        <translation>ダイナミクス復元 1</translation>
     </message>
     <message>
         <source>Dynamics 2</source>
-        <translation type="unfinished"></translation>
+        <translation>ダイナミクス復元 2</translation>
     </message>
     <message>
         <source>Dynamic Slew 1</source>
-        <translation type="unfinished"></translation>
+        <translation>動的スルーレート 1</translation>
     </message>
     <message>
         <source>Dynamic Slew 2</source>
-        <translation type="unfinished"></translation>
+        <translation>動的スルーレート 2</translation>
     </message>
     <message>
         <source>DC Offset Remover</source>
-        <translation type="unfinished"></translation>
+        <translation>DC オフセット除去</translation>
     </message>
     <message>
         <source>Multiband</source>
-        <translation type="unfinished"></translation>
+        <translation>マルチバンド</translation>
     </message>
     <message>
         <source>Oversample</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーサンプリング</translation>
     </message>
     <message>
         <source>Split</source>
-        <translation type="unfinished"></translation>
+        <translation>クロスオーバー周波数</translation>
     </message>
     <message>
         <source>Mix 1</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス 1</translation>
     </message>
     <message>
         <source>Mix 2</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス 2</translation>
     </message>
     <message>
         <source>Slew Link 1</source>
-        <translation type="unfinished"></translation>
+        <translation>スルーレート連動 1</translation>
     </message>
     <message>
         <source>Slew Link 2</source>
-        <translation type="unfinished"></translation>
+        <translation>スルーレート連動 2</translation>
     </message>
     <message>
         <source>Hard Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>ハードクリップ</translation>
     </message>
     <message>
         <source>Tanh</source>
-        <translation type="unfinished"></translation>
+        <translation>双曲線正接</translation>
     </message>
     <message>
         <source>Fast Soft Clip 1</source>
-        <translation type="unfinished"></translation>
+        <translation>高速ソフトクリップ 1</translation>
     </message>
     <message>
         <source>Fast Soft Clip 2</source>
-        <translation type="unfinished"></translation>
+        <translation>高速ソフトクリップ 2</translation>
     </message>
     <message>
         <source>Sinusoidal</source>
-        <translation type="unfinished"></translation>
+        <translation>正弦波フォールディング</translation>
     </message>
     <message>
         <source>Foldback</source>
-        <translation type="unfinished"></translation>
+        <translation>フォールドバック</translation>
     </message>
     <message>
         <source>Full Rectify</source>
-        <translation type="unfinished"></translation>
+        <translation>全波整流</translation>
     </message>
     <message>
         <source>Half Rectify</source>
-        <translation type="unfinished"></translation>
+        <translation>半波整流</translation>
     </message>
     <message>
         <source>Smooth Rectify</source>
-        <translation type="unfinished"></translation>
+        <translation>滑らかな整流</translation>
     </message>
     <message>
         <source>Bitcrush</source>
-        <translation type="unfinished"></translation>
+        <translation>ビットクラッシュ</translation>
     </message>
 </context>
 <context>
     <name>lmms::SlicerT</name>
     <message>
         <source>Note threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>ノート検出しきい値</translation>
     </message>
     <message>
         <source>FadeOut</source>
-        <translation type="unfinished"></translation>
+        <translation>フェードアウト</translation>
     </message>
     <message>
         <source>Original bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>元の BPM</translation>
     </message>
     <message>
         <source>Slice snap</source>
-        <translation type="unfinished"></translation>
+        <translation>スライスのスナップ</translation>
     </message>
     <message>
         <source>BPM sync</source>
-        <translation type="unfinished"></translation>
+        <translation>BPM 同期</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>オフ</translation>
     </message>
     <message>
         <source>Sample not found: %1</source>
@@ -5369,27 +5373,27 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Voice %1 attack</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 アタック</translation>
     </message>
     <message>
         <source>Voice %1 decay</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 ディケイ</translation>
     </message>
     <message>
         <source>Voice %1 sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 サステイン</translation>
     </message>
     <message>
         <source>Voice %1 release</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 リリース</translation>
     </message>
     <message>
         <source>Voice %1 coarse detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 粗調整デチューン</translation>
     </message>
     <message>
         <source>Voice %1 wave shape</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 波形</translation>
     </message>
     <message>
         <source>Voice %1 sync</source>
@@ -5397,15 +5401,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Voice %1 ring modulate</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 リング変調</translation>
     </message>
     <message>
         <source>Voice %1 filtered</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 フィルター</translation>
     </message>
     <message>
         <source>Voice %1 test</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス %1 テスト</translation>
     </message>
 </context>
 <context>
@@ -13466,11 +13470,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Room size:</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋サイズ：</translation>
     </message>
     <message>
         <source>Damping:</source>
-        <translation type="unfinished"></translation>
+        <translation>ダンピング：</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -13478,7 +13482,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル：</translation>
     </message>
     <message>
         <source>Apply chorus (if supported)</source>
@@ -13486,7 +13490,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Voices:</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス数：</translation>
     </message>
     <message>
         <source>Speed:</source>
@@ -13517,11 +13521,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>High-pass filter </source>
-        <translation type="unfinished"></translation>
+        <translation>ハイパスフィルター </translation>
     </message>
     <message>
         <source>Band-pass filter </source>
-        <translation type="unfinished"></translation>
+        <translation>バンドパスフィルター </translation>
     </message>
     <message>
         <source>Low-pass filter </source>
@@ -13529,7 +13533,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Voice 3 off </source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス 3 をオフ </translation>
     </message>
     <message>
         <source>MOS6581 SID </source>
@@ -13557,23 +13561,23 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Pulse Width:</source>
-        <translation type="unfinished"></translation>
+        <translation>パルス幅：</translation>
     </message>
     <message>
         <source>Coarse:</source>
-        <translation type="unfinished"></translation>
+        <translation>粗調整：</translation>
     </message>
     <message>
         <source>Pulse wave</source>
-        <translation type="unfinished"></translation>
+        <translation>パルス波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -13585,11 +13589,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Ring modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>リング変調</translation>
     </message>
     <message>
         <source>Filtered</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター有効</translation>
     </message>
     <message>
         <source>Test</source>
@@ -13597,7 +13601,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Pulse width:</source>
-        <translation type="unfinished"></translation>
+        <translation>パルス幅：</translation>
     </message>
 </context>
 <context>
@@ -13611,177 +13615,181 @@ Latency: %2 ms</source>
     <name>lmms::gui::SlewDistortionControlDialog</name>
     <message>
         <source>Slew Up 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>上昇スルーレート 1：</translation>
     </message>
     <message>
         <source>Slew Up 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>上昇スルーレート 2：</translation>
     </message>
     <message>
         <source>Slew Down 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>下降スルーレート 1：</translation>
     </message>
     <message>
         <source>Slew Down 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>下降スルーレート 2：</translation>
     </message>
     <message>
         <source>Warp 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>ワープしきい値 1：</translation>
     </message>
     <message>
         <source>Warp 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>ワープしきい値 2：</translation>
     </message>
     <message>
         <source>Crush 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>クラッシュ 1：</translation>
     </message>
     <message>
         <source>Crush 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>クラッシュ 2：</translation>
     </message>
     <message>
         <source>Attack 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック 1：</translation>
     </message>
     <message>
         <source>Attack 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>アタック 2：</translation>
     </message>
     <message>
         <source>Release 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース 1：</translation>
     </message>
     <message>
         <source>Release 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース 2：</translation>
     </message>
     <message>
         <source>Dynamics 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>ダイナミクス復元 1：</translation>
     </message>
     <message>
         <source>Dynamics 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>ダイナミクス復元 2：</translation>
     </message>
     <message>
         <source>Dynamic Slew 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>動的スルーレート 1：</translation>
     </message>
     <message>
         <source>Dynamic Slew 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>動的スルーレート 2：</translation>
     </message>
     <message>
         <source>Slew Link 1</source>
-        <translation type="unfinished"></translation>
+        <translation>スルーレート連動 1</translation>
     </message>
     <message>
         <source>Slew Link 2</source>
-        <translation type="unfinished"></translation>
+        <translation>スルーレート連動 2</translation>
     </message>
     <message>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"></translation>
+        <translation>DC オフセット除去</translation>
     </message>
     <message>
         <source>Multiband</source>
-        <translation type="unfinished"></translation>
+        <translation>マルチバンド</translation>
     </message>
     <message>
         <source>Split:</source>
-        <translation type="unfinished"></translation>
+        <translation>クロスオーバー周波数：</translation>
     </message>
     <message>
         <source>Mix 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス 1：</translation>
     </message>
     <message>
         <source>Mix 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス 2：</translation>
     </message>
     <message>
         <source>Disable Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーサンプリングを無効にする</translation>
     </message>
     <message>
         <source>2x Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>2 倍オーバーサンプリング</translation>
     </message>
     <message>
         <source>4x Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>4 倍オーバーサンプリング</translation>
     </message>
     <message>
         <source>8x Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>8 倍オーバーサンプリング</translation>
     </message>
     <message>
         <source>16x Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>16 倍オーバーサンプリング</translation>
     </message>
     <message>
         <source>32x Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation>32 倍オーバーサンプリング</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation>Open help window</translation>
+        <translation>ヘルプを開く</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SlewDistortionHelpView</name>
     <message>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Slew Distortion&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Slew Distortion is a multiband slew rate limiter and distortion effect.&lt;br&gt;&lt;br&gt;Slew rate limiting is something I accidentally invented while trying to make a lowpass filter for the first time.&lt;br&gt;In short, a slew rate limiter limits how quickly the waveform can move from one point to the next.&lt;br&gt;You&apos;ll hear that it has a similar quality to a lowpass filter, in that it does quieten the high frequencies by quite a bit.&lt;br&gt;However, the intensity of this effect depends heavily on the input signal, and with it comes a rather unique distortion of that signal.&lt;br&gt;&lt;br&gt;In this plugin, the slew rate limiting is followed by waveshaping distortion.&lt;br&gt;Every distortion type is a pure waveshaping function with no filters or delays of any kind involved.&lt;br&gt;These distortions will generate new harmonics at exact frequency multiples of the incoming audio.&lt;br&gt;&lt;br&gt;Because the plugin is multiband, you can apply these effects to different frequency ranges independently.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Distortion Types:&lt;/h3&gt;&lt;b&gt;Hard Clip&lt;/b&gt; - Aggressively clamps the audio signal to 0 dBFS.&lt;br&gt;This leaves the signal entirely untouched until it passes the clamping threshold, beyond which all content is clipped out entirely.&lt;br&gt;&lt;b&gt;Tanh&lt;/b&gt; - A very gentle sigmoid distortion.&lt;br&gt;This waveshape is mathematically smooth and continuous at all derivatives.&lt;br&gt;It can be pushed significantly harder than most other distortion shapes before it starts generating harsh high frequencies.&lt;br&gt;&lt;b&gt;Fast Soft Clip 1&lt;/b&gt; - A CPU-efficient soft clipping function.&lt;br&gt;&lt;b&gt;Fast Soft Clip 2&lt;/b&gt; - A CPU-efficient cubic soft clipping function.&lt;br&gt;&lt;b&gt;Sinusoidal&lt;/b&gt; - Incredibly smooth wavewrapping distortion.&lt;br&gt;Unlike all the previous distortion types, loud audio information is not entirely lost or clipped away, and is instead wrapped back down to lower values.&lt;br&gt;&lt;b&gt;Foldover&lt;/b&gt; - A non-smooth wavewrapping alternative.&lt;br&gt;This leaves the audio values untouched relative to neighboring values,&lt;br&gt;except at the borders where the waveshape sharply changes directions, generating harsh distortion.&lt;br&gt;&lt;b&gt;Full-wave Rectify&lt;/b&gt; - Flips the bottom half of the waveform to the top half.&lt;br&gt;The timbre of this commonly sounds similar to shifting the audio upward by one octave.&lt;br&gt;Unlike all the previous distortion types, this one is asymmetrical by default, meaning it will generate even-multiple harmonics.&lt;br&gt;&lt;b&gt;Smooth Rectify&lt;/b&gt; - An alternative to Full-wave Rectify which has a smooth corner.&lt;br&gt;&lt;b&gt;Half-wave Rectify&lt;/b&gt; - An alternative to Full-wave Rectify which clips all negative audio samples instead of reflecting them upward.&lt;br&gt;&lt;b&gt;Bitcrush&lt;/b&gt; - Bit depth reduction. This distortion type is special-cased to have the Drive change its shape instead of its input amplitude.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Slew:&lt;/h3&gt;This section controls the slew rate limit, the speed at which the incoming waveform&apos;s values can change.&lt;br&gt;&lt;b&gt;Up&lt;/b&gt; and &lt;b&gt;Down&lt;/b&gt; control the slew rate limit for upward and downward movement, respectively.&lt;br&gt;The &lt;b&gt;Slew Link&lt;/b&gt; button locks the Slew Up and Slew Down parameters to the same value, for convenience.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Dynamics:&lt;/h3&gt;This section uses an envelope follower to track the volume of the incoming audio signal.&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - Restores the dynamic range lost from the distortion and slew rate limiting by matching the output volume to the input volume.&lt;br&gt;&lt;b&gt;Slew&lt;/b&gt; - Dynamically changes the slew rate, depending on the input volume.&lt;br&gt;&lt;b&gt;Attack&lt;/b&gt; - How quickly the envelope follower responds to increases in volume (e.g. transients).&lt;br&gt;&lt;b&gt;Release&lt;/b&gt; - How quickly the envelope follower responds to decreases in volume.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;This section allows further sculpting of the distortion shape beyond what the distortion types can achieve on their own.&lt;br&gt;&lt;b&gt;Warp&lt;/b&gt; - Causes input values smaller than this value to be unimpacted by the waveshaping.&lt;br&gt;The distortion shape is properly scaled and shifted to ensure it remains perfectly clean and continuous.&lt;br&gt;&lt;b&gt;Crush&lt;/b&gt; - Increases the volume of audio below the Warp value.&lt;br&gt;This adds a sharp corner to the waveshaping function, resulting in much more aggressive distortion.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals for the current band.&lt;br&gt;Since both the wet and dry signal are after the crossover filter and have oversampling applied,&lt;br&gt;this parameter is entirely immune to phase issues caused by blending signals.&lt;br&gt;&lt;b&gt;Bias&lt;/b&gt; - Adds DC offset to the input signal before the distortion, causing the waveshaping to be asymmetrical.&lt;br&gt;This allows every distortion type to generate even-multiple harmonics, including the symmetrical types which usually only generate odd-multiple harmonics.&lt;br&gt;&lt;b&gt;DC Remover&lt;/b&gt; - Removes DC offset (0 Hz audio) from the output signal. You&apos;ll almost always want to leave this enabled.&lt;br&gt;&lt;b&gt;Multiband&lt;/b&gt; - Splits the signal into two frequency bands. If disabled, the top band&apos;s parameters are applied to the entire audio signal.&lt;br&gt;&lt;b&gt;Split&lt;/b&gt; - The crossover frequency at which the Multiband mode splits the signal into two bands.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Oversampling:&lt;/h3&gt;An audio signal is only capable of storing frequencies below Nyquist, which is half of the sample rate.&lt;br&gt;If any form of distortion generates new frequencies that are above this Nyquist frequency, they will be reflected (aliased) back downward.&lt;br&gt;For example, if the distortion generates a harmonic that is 5000 Hz above Nyquist, that frequency will be aliased down to 5000 Hz below Nyquist.&lt;br&gt;This aliasing is inharmonic, oftentimes sounds unpleasant, and can even contribute to auditory masking within the song.&lt;br&gt;&lt;br&gt;Oversampling helps to resolve this issue by temporarily increasing the sample rate of the signal,&lt;br&gt;so significantly higher frequencies can be supported before they start aliasing back into the audible range.&lt;br&gt;Those higher frequencies are then filtered out before decreasing the sample rate back to its original value so they don&apos;t alias.&lt;br&gt;&lt;br&gt;This plugin supports up to five stages of oversampling.&lt;br&gt;Each stage provides an extra 2 octaves of headroom before frequencies alias far enough to become audible.&lt;br&gt;The number on the button is how much the sample rate is increased by. THE PLUGIN&apos;S CPU USAGE WILL BE INCREASED BY APPROXIMATELY THE SAME AMOUNT.&lt;br&gt;Even just 2x oversampling can make a massive difference and is oftentimes all you need, but up to 32x oversampling is supported.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;スルーレート歪み&lt;/b&gt;&lt;br&gt;&lt;br&gt;プラグイン制作：Lost Robot&lt;br&gt;GUI 制作：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;概要：&lt;/h3&gt;Slew Distortion は、マルチバンドのスルーレートリミッターと歪みエフェクトです。&lt;br&gt;&lt;br&gt;スルーレート制限は、初めてローパスフィルターを作ろうとした際に偶然考案したものです。&lt;br&gt;スルーレートリミッターは、波形がある点から次の点へ移動する速さを制限します。&lt;br&gt;高域をかなり抑えるため、ローパスフィルターに似た音になります。&lt;br&gt;ただし、効果の強さは入力信号に大きく依存し、信号に独特な歪みを加えます。&lt;br&gt;&lt;br&gt;このプラグインでは、スルーレート制限の後にウェーブシェーピングによる歪みを適用します。&lt;br&gt;どの歪みタイプも純粋なウェーブシェーピング関数で、フィルターや遅延を含みません。&lt;br&gt;これらの歪みは、入力音の周波数の整数倍に新しい倍音を生成します。&lt;br&gt;&lt;br&gt;マルチバンドなので、異なる周波数帯域に個別に効果を適用できます。&lt;br&gt;&lt;br&gt;&lt;h3&gt;歪みタイプ：&lt;/h3&gt;&lt;b&gt;ハードクリップ&lt;/b&gt; - 音声信号を強く制限して 0 dBFS に収めます。&lt;br&gt;制限しきい値までは信号を変えず、それを超える部分を完全に切り落とします。&lt;br&gt;&lt;b&gt;Tanh&lt;/b&gt; - 非常に穏やかなシグモイド歪みです。&lt;br&gt;この波形は数学的に滑らかで、すべての階数の導関数が連続です。&lt;br&gt;ほとんどの他の歪み形状よりも強く駆動しても、耳障りな高域が生じにくくなっています。&lt;br&gt;&lt;b&gt;高速ソフトクリップ 1&lt;/b&gt; - CPU 負荷の低いソフトクリッピング関数です。&lt;br&gt;&lt;b&gt;高速ソフトクリップ 2&lt;/b&gt; - CPU 負荷の低い三次関数によるソフトクリッピングです。&lt;br&gt;&lt;b&gt;正弦波フォールディング&lt;/b&gt; - 非常に滑らかな波形の折り返し歪みです。&lt;br&gt;上記のタイプと異なり、大きな音の情報を完全に失ったり切り落としたりせず、小さな値へ折り返します。&lt;br&gt;&lt;b&gt;フォールドオーバー&lt;/b&gt; - 滑らかではない波形の折り返しです。&lt;br&gt;隣接する値に対する音声値の関係はそのまま保ちますが、&lt;br&gt;境界では波形が急に方向を変えるため、強い歪みが生じます。&lt;br&gt;&lt;b&gt;全波整流&lt;/b&gt; - 波形の下半分を上半分へ反転します。&lt;br&gt;音色は通常、音を 1 オクターブ上げた場合に似ています。&lt;br&gt;上記のタイプと異なり、標準で非対称なので偶数次倍音を生成します。&lt;br&gt;&lt;b&gt;滑らかな整流&lt;/b&gt; - 角を滑らかにした全波整流の代替です。&lt;br&gt;&lt;b&gt;半波整流&lt;/b&gt; - 負のサンプルを上へ反転する代わりに切り落とす、全波整流の代替です。&lt;br&gt;&lt;b&gt;ビットクラッシュ&lt;/b&gt; - ビット深度を下げます。このタイプだけは、ドライブが入力振幅ではなく形状を変えます。&lt;br&gt;&lt;br&gt;&lt;h3&gt;スルーレート：&lt;/h3&gt;入力波形の値が変化できる速さ、つまりスルーレート制限を設定します。&lt;br&gt;&lt;b&gt;上昇&lt;/b&gt;と&lt;b&gt;下降&lt;/b&gt;は、それぞれ上向きと下向きの変化速度を制限します。&lt;br&gt;便利な&lt;b&gt;スルーレート連動&lt;/b&gt;ボタンで、上昇と下降のパラメーターを同じ値に固定できます。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ダイナミクス：&lt;/h3&gt;エンベロープフォロワーで入力音声信号の音量を追跡します。&lt;br&gt;&lt;b&gt;量&lt;/b&gt; - 出力音量を入力音量に合わせ、歪みとスルーレート制限で失われたダイナミックレンジを復元します。&lt;br&gt;&lt;b&gt;スルーレート&lt;/b&gt; - 入力音量に応じてスルーレートを動的に変えます。&lt;br&gt;&lt;b&gt;アタック&lt;/b&gt; - 音量の増加（トランジェントなど）にエンベロープフォロワーが反応する速さです。&lt;br&gt;&lt;b&gt;リリース&lt;/b&gt; - 音量の減少にエンベロープフォロワーが反応する速さです。&lt;br&gt;&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;歪みタイプだけでは得られない形状を、さらに調整できます。&lt;br&gt;&lt;b&gt;ワープ&lt;/b&gt; - この値未満の入力値をウェーブシェーピングの影響から除外します。&lt;br&gt;歪み形状を適切に拡大縮小・移動し、きれいで連続した状態を保ちます。&lt;br&gt;&lt;b&gt;クラッシュ&lt;/b&gt; - ワープ値未満の音量を増やします。&lt;br&gt;ウェーブシェーピング関数に鋭い角が加わり、かなり強い歪みが生じます。&lt;br&gt;&lt;br&gt;&lt;h3&gt;その他：&lt;/h3&gt;&lt;b&gt;ミックス&lt;/b&gt; - 現在の帯域のウェット信号とドライ信号を混ぜます。&lt;br&gt;両方ともクロスオーバーフィルターを通り、オーバーサンプリングが適用されているため、&lt;br&gt;信号の混合による位相問題は発生しません。&lt;br&gt;&lt;b&gt;バイアス&lt;/b&gt; - 歪みの前に入力へ DC オフセットを加え、ウェーブシェーピングを非対称にします。&lt;br&gt;通常は奇数次倍音だけを生成する対称タイプを含め、すべてのタイプで偶数次倍音を生成できます。&lt;br&gt;&lt;b&gt;DC 除去&lt;/b&gt; - 出力の DC オフセット（0 Hz の音声）を除去します。ほとんどの場合、有効のままにしてください。&lt;br&gt;&lt;b&gt;マルチバンド&lt;/b&gt; - 信号を 2 つの周波数帯域に分けます。無効の場合は上側の帯域の設定を信号全体に適用します。&lt;br&gt;&lt;b&gt;分割&lt;/b&gt; - マルチバンドモードで信号を 2 帯域に分けるクロスオーバー周波数です。&lt;br&gt;&lt;br&gt;&lt;h3&gt;オーバーサンプリング：&lt;/h3&gt;音声信号が保持できるのは、サンプルレートの半分であるナイキスト周波数未満の周波数だけです。&lt;br&gt;歪みによってナイキスト周波数を超える成分が生じると、低い周波数へ折り返されます（エイリアシング）。&lt;br&gt;例えばナイキスト周波数より 5000 Hz 高い倍音は、ナイキスト周波数より 5000 Hz 低い周波数に折り返されます。&lt;br&gt;この折り返しは非調和的で、不快に聞こえることが多く、曲の聴覚的マスキングにもつながります。&lt;br&gt;&lt;br&gt;オーバーサンプリングは信号のサンプルレートを一時的に上げて、この問題を軽減します。&lt;br&gt;これにより、可聴域へ折り返されるまでに、はるかに高い周波数を扱えます。&lt;br&gt;サンプルレートを元に戻す前に高い周波数を除去し、折り返しを防ぎます。&lt;br&gt;&lt;br&gt;このプラグインは最大 5 段階のオーバーサンプリングに対応します。&lt;br&gt;各段階で、折り返しが可聴域へ届くまでの余裕がさらに 2 オクターブ増えます。&lt;br&gt;ボタンの数字はサンプルレートの倍率です。プラグインの CPU 使用量もおおむね同じ倍率で増加します。&lt;br&gt;2 倍だけでも大きく改善し、多くの場合それで十分ですが、最大 32 倍まで対応します。&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Slew Distortion Help</source>
+        <translation>スルーレート歪みのヘルプ</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SlicerTView</name>
     <message>
         <source>Slice snap</source>
-        <translation type="unfinished"></translation>
+        <translation>スライスのスナップ</translation>
     </message>
     <message>
         <source>Set slice snapping for detection</source>
-        <translation type="unfinished"></translation>
+        <translation>検出時のスライススナップを設定</translation>
     </message>
     <message>
         <source>Sync sample</source>
-        <translation type="unfinished"></translation>
+        <translation>サンプルを同期</translation>
     </message>
     <message>
         <source>Enable BPM sync</source>
-        <translation type="unfinished"></translation>
+        <translation>BPM 同期を有効にする</translation>
     </message>
     <message>
         <source>Clear all slices</source>
-        <translation type="unfinished"></translation>
+        <translation>全スライスを消去</translation>
     </message>
     <message>
         <source>Original sample BPM</source>
-        <translation type="unfinished"></translation>
+        <translation>元のサンプルの BPM</translation>
     </message>
     <message>
         <source>Threshold used for slicing</source>
-        <translation type="unfinished"></translation>
+        <translation>スライス検出のしきい値</translation>
     </message>
     <message>
         <source>Fade Out per note in milliseconds</source>
-        <translation type="unfinished"></translation>
+        <translation>各ノートのフェードアウト時間（ミリ秒）</translation>
     </message>
     <message>
         <source>Copy midi pattern to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI パターンをクリップボードにコピー</translation>
     </message>
     <message>
         <source>Open sample selector</source>
-        <translation type="unfinished"></translation>
+        <translation>サンプル選択を開く</translation>
     </message>
     <message>
         <source>Reset slices</source>
-        <translation type="unfinished"></translation>
+        <translation>スライスをリセット</translation>
     </message>
     <message>
         <source>Threshold</source>
@@ -13807,12 +13815,16 @@ Latency: %2 ms</source>
         <source>Snap</source>
         <translation>スナップ</translation>
     </message>
+    <message>
+        <source>No sample loaded</source>
+        <translation>サンプル未読込</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::SlicerTWaveform</name>
     <message>
         <source>Click to load sample</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックしてサンプルを読み込む</translation>
     </message>
 </context>
 <context>

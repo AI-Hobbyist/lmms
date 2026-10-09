@@ -167,3 +167,7 @@ M5-07：M5-06 检查点 95d98cba92a94e50b3ed56f5911896f84ea6fcc3 已推送确认
 M5-08：M5-07 检查点 8bedb1022fa19986e6352c8f9868082d622c59a3 已推送确认。Nes/OpulenZ/Organic/Oscilloscope/Patman/PeakControllerEffect/ReverbSC 共 195 键四语质量 PASS。Organic 的 18 个谐波名称及 6 个波形名称增加固定上下文提取和显示翻译，不改数组顺序、参数、预设或算法；FM 保留标准缩写并逐语言登记。实窗复核修正既有日语 DCAY 误译为 ATCK 的问题，改为ディケイ并重新验证。全库 3624 键，中/日/韩剩余空译 353/377/14。
 
 四语 QM 生成、organic 前台编译通过，DLL 写入 build/Release/plugins/organic.dll；开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，七个真实插件面板及预设恢复通过，100% 缩放，中日韩字形正常。日语峰值控制器修正后的独立复测 3 PASS；M5-08-ja-decay 截图为该标签最终证据。既有位图标识保留，完整悬浮参数提示留 M7。
+
+M5-09：M5-08 检查点 371dcab0bafb871325f0f1dac25f5f6312272617 已推送确认。Sf2Player/Sfxr/Sid/SlewDistortion/SlicerT 共 177 键四语质量 PASS。补齐 SoundFont 合唱/混响、SID 声部、失真类型及切片操作；完整补译 Slew Distortion 日语 HTML 帮助，保持标签和技术内容。新增帮助标题、SlicerT 的 Off 与无采样状态三个入口，不改变音频参数和预设。Tanh 按数学函数处理，芯片型号/BPM/MIDI 保留并登记。全库 3627 键，中/日/韩剩余空译 240/257/14。
+
+四语 QM、slewdistortion/slicert/UiBaselineCapture 编译通过，DLL 部署于 build/Release/plugins，开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，四个已部署插件面板、真实帮助窗与预设恢复通过；SID 未部署，MANUAL/PENDING。SlicerT 固定文字修正后另行四语复测，100% 原生 Windows 实窗。中日韩字形正常；SlicerT 的 SYNC/CLEAR 标识来自按钮位图，保留既有 artwork，完整操作提示已翻译，M7 验证悬浮全文和窄标签省略，不重绘位图或改变布局。
