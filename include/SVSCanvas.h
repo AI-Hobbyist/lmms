@@ -11,6 +11,7 @@
 
 class QLineEdit;
 class QTimer;
+class QMenu;
 namespace lmms::gui {
 class SVSEditTransaction;
 class SVSCurveGesture;
@@ -164,6 +165,7 @@ private:
 	void updateOperation(const QPointF&, Qt::KeyboardModifiers);
 	void finishLyric(bool commit, int navigate = 0);
 	void rememberViewport();
+	void addPitchActions(QMenu&);
 	svs::Curve pitchCurve() const;
 	svs::Curve parameterCurve(const svs::Parameter&, bool feedback) const;
 	void paintParameterOverlays(QPainter&);

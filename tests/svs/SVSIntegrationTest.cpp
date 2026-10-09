@@ -4858,6 +4858,109 @@ private slots:
 		delete restored;
 		delete track;
 	}
+	void nativePitchResetContextActions()
+	{
+		if (!m_guiApplication) { QSKIP("Native GUI required"); }
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		auto* journal = Engine::projectJournal();
+		const bool previousJournalling = journal->isJournalling();
+		auto restoreJournal = qScopeGuard([&] { journal->setJournalling(previousJournalling); });
+		journal->setJournalling(true);
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		auto cleanup = qScopeGuard([&] { delete track; });
+		const auto voice = svs::Registry::instance().voices().first();
+		track->bindVoice(voice.pluginId, "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		clip->setJournalling(true);
+		svs::Note first;
+		first.id = "reset-first";
+		first.duration = 48;
+		first.pitch = 60;
+		auto second = first;
+		second.id = "reset-second";
+		second.tick = 192;
+		second.pitch = 64;
+		svs::Curve pitch;
+		pitch.id = "svs.pitch";
+		pitch.unit = "semitone";
+		pitch.mode = "absolute";
+		pitch.insert(0, 60.5);
+		pitch.insert(48, 61.5);
+		pitch.insert(192, 64.5);
+		pitch.insert(240, 65.5);
+		clip->setEditorData({first, second}, {{"svs.pitch", pitch}});
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		gui::SVSCanvas canvas(clip);
+		canvas.resize(900, 500);
+		canvas.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&canvas));
+		QTest::qWait(300);
+		auto invoke = [&](const QString& name, bool capture = false) {
+			bool invoked = false;
+			QTimer timeout;
+			timeout.setSingleShot(true);
+			connect(&timeout, &QTimer::timeout, &canvas, [] {
+				if (auto* popup = QApplication::activePopupWidget()) { popup->close(); }
+			});
+			timeout.start(2000);
+			QTimer::singleShot(200, &canvas, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu) { return; }
+				if (capture)
+				{
+					menu->screen()->grabWindow(menu->winId()).save("doc/svs/validation/SVS-pitch-context-native.png");
+				}
+				for (auto* action : menu->actions())
+				{
+					if (action->objectName() == name && action->isEnabled())
+					{
+						invoked = true;
+						QTest::mouseClick(menu, Qt::LeftButton, Qt::NoModifier, menu->actionGeometry(action).center());
+						return;
+					}
+				}
+				menu->close();
+			});
+			const auto empty = canvas.pointAt(100, 66).toPoint();
+			QContextMenuEvent event(QContextMenuEvent::Mouse, empty, canvas.mapToGlobal(empty));
+			QApplication::sendEvent(&canvas, &event);
+			return invoked;
+		};
+		QTest::mouseClick(&canvas, Qt::LeftButton, Qt::NoModifier, canvas.noteRect(first).center().toPoint());
+		QVERIFY(canvas.selectedNotes().contains(first.id));
+		QVERIFY(invoke("svsClearHandDrawnPitch", true));
+		QVERIFY(!clip->curves()["svs.pitch"].valueAt(24));
+		QCOMPARE(clip->curves()["svs.pitch"].valueAt(216), pitch.valueAt(216));
+		QVERIFY(invoke("svsRepredictSelectedPitch"));
+		auto requests = clip->captureInput(44100).document["pitchPredictionRequests"].toObject();
+		QVERIFY(requests.contains(first.id));
+		QVERIFY(!requests.contains(second.id));
+		const auto previousRequest = requests[first.id];
+		QVERIFY(invoke("svsRepredictSelectedPitch"));
+		QVERIFY(clip->captureInput(44100).document["pitchPredictionRequests"].toObject()[first.id] != previousRequest);
+		QTest::keyClick(&canvas, Qt::Key_Z, Qt::ControlModifier);
+		QCOMPARE(clip->captureInput(44100).document["pitchPredictionRequests"].toObject()[first.id], previousRequest);
+		QTest::keyClick(&canvas, Qt::Key_Z, Qt::ControlModifier | Qt::ShiftModifier);
+		QVERIFY(clip->captureInput(44100).document["pitchPredictionRequests"].toObject()[first.id] != previousRequest);
+		QTest::keyClick(&canvas, Qt::Key_A, Qt::ControlModifier);
+		QTest::mouseClick(&canvas, Qt::LeftButton, Qt::NoModifier, canvas.pointAt(100, 66).toPoint());
+		QVERIFY(canvas.selectedNotes().isEmpty());
+		QVERIFY(invoke("svsClearHandDrawnPitch"));
+		QVERIFY(!clip->curves().contains("svs.pitch"));
+		QVERIFY(invoke("svsRepredictSelectedPitch"));
+		requests = clip->captureInput(44100).document["pitchPredictionRequests"].toObject();
+		QVERIFY(requests.contains(first.id) && requests.contains(second.id));
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		QDomDocument document;
+		auto node = document.createElement("svsclip");
+		clip->saveSettings(document, node);
+		QCOMPARE(QJsonDocument::fromJson(node.attribute("editorState").toUtf8())
+					 .object()["pitchPredictionRequests"]
+					 .toObject(),
+			requests);
+		canvas.close();
+	}
 	void curveUndoAndSelectionMove()
 	{
 		auto* journal = Engine::projectJournal();
@@ -6978,6 +7081,12 @@ private slots:
 		const auto original = svs::planSynthesisSegments(input, mapping, error);
 		QVERIFY2(error.isEmpty(), qPrintable(error));
 		QCOMPARE(original.size(), 3);
+		input.document["pitchPredictionRequests"] = QJsonObject{{"first", "request-one"}};
+		const auto repredicted = svs::planSynthesisSegments(input, mapping, error);
+		QVERIFY(repredicted[0].signature != original[0].signature);
+		QCOMPARE(repredicted[1].signature, original[1].signature);
+		QCOMPARE(repredicted[2].signature, original[2].signature);
+		input.document.remove("pitchPredictionRequests");
 		input.notes[0].pitch += 1;
 		auto changed = svs::planSynthesisSegments(input, mapping, error);
 		QVERIFY(changed[0].signature != original[0].signature);

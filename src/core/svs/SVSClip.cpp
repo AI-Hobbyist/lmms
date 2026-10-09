@@ -174,6 +174,34 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 	synthesize();
 	Engine::getSong()->setModified();
 }
+void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
+{
+	if (readOnly() || ranges.isEmpty()) { return; }
+	auto requests = m_editorState["pitchPredictionRequests"].toObject();
+	auto curves = m_curves;
+	bool changed = false;
+	for (const auto& range : ranges)
+	{
+		if (!std::isfinite(range.first) || !std::isfinite(range.second) || range.first >= range.second) { continue; }
+		for (const auto& note : m_notes)
+		{
+			if (note.tick < range.second && note.tick + note.duration > range.first)
+			{
+				requests[note.id] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+				changed = true;
+			}
+		}
+		if (curves.contains("svs.pitch")) { curves["svs.pitch"].replaceRange(range.first, range.second, svs::Curve{}); }
+	}
+	if (!changed) { return; }
+
+	addJournalCheckPoint();
+	m_editorState["pitchPredictionRequests"] = requests;
+	m_curves = std::move(curves);
+	invalidate();
+	synthesize();
+	Engine::getSong()->setModified();
+}
 void SVSClip::setEditorState(const QJsonObject& state)
 {
 	if (!readOnly() && state != m_editorState)
@@ -432,6 +460,13 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 			{"hash", dictionary.hash}, {"language", dictionary.language}, {"phonemeSet", dictionary.phonemeSet},
 			{"entries", dictionary.entries}});
 	input.document["voiceDictionaries"] = dictionaries;
+	auto pitchRequests = m_editorState["pitchPredictionRequests"].toObject();
+	QJsonObject activeRequests;
+	for (const auto& note : m_notes)
+	{
+		if (pitchRequests.contains(note.id)) { activeRequests[note.id] = pitchRequests[note.id]; }
+	}
+	if (!activeRequests.isEmpty()) { input.document["pitchPredictionRequests"] = activeRequests; }
 	input.document["queryCapabilities"] = true;
 	input.document["voiceVersion"] = track->voice().version;
 	input.document["pluginVersion"] = track->voice().metadata["pluginVersion"];

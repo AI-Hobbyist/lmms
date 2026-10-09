@@ -33,6 +33,7 @@ public:
 	const QJsonObject& editorState() const { return m_editorState; }
 	void setEditorState(const QJsonObject&);
 	void synthesize();
+	void regeneratePitch(const QVector<QPair<double, double>>& ranges);
 	svs::Input captureInput(uint32_t sampleRate) const;
 	bool captureCachedInput(svs::Input&) const;
 	void invalidate();

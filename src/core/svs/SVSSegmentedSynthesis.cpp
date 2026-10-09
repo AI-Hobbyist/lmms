@@ -95,6 +95,17 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 			curves[it.key()] = local.toJson();
 		}
 		segment.input.document["curves"] = curves;
+		if (input.document.contains("pitchPredictionRequests"))
+		{
+			const auto requests = input.document["pitchPredictionRequests"].toObject();
+			QJsonObject localRequests;
+			for (const auto& note : group)
+			{
+				if (requests.contains(note.id)) { localRequests[note.id] = requests[note.id]; }
+			}
+			segment.input.document.remove("pitchPredictionRequests");
+			if (!localRequests.isEmpty()) { segment.input.document["pitchPredictionRequests"] = localRequests; }
+		}
 		segment.signature = Cache::editableKey(segment.input);
 		result.append(std::move(segment));
 	}

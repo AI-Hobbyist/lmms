@@ -404,8 +404,11 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	TensorCache cache(fs::u8path(input.value("cacheDirectory", std::string())));
 	auto run = [&](const std::string& stage, const std::string& role, const Tensors& inputs) {
 		auto& target = model(stage, role);
+		const auto pitchRequest = stage == "pitch" && input.contains("pitchPredictionRequests")
+			? "/repredict=" + input.at("pitchPredictionRequests").dump()
+			: std::string{};
 		const auto key = TensorCache::key("CPU/ORT1.23.0/native.v2/seed=" + std::to_string(m_seed) + "/pinyin621f8ca9/"
-				+ m_voice->fingerprint + "/" + stage + "/" + role,
+				+ m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
 			inputs);
 		Tensors out;
 		if (cancelled.load())

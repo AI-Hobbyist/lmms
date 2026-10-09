@@ -1766,11 +1766,77 @@ void SVSCanvas::setPronunciation(const QString& id, const QString& reading)
 			note.pronunciation = reading;
 	m_clip->setNotes(notes);
 }
+void SVSCanvas::addPitchActions(QMenu& menu)
+{
+	if (!m_clip || m_parameter) { return; }
+	QVector<QPair<double, double>> ranges;
+	const bool anchorSelection = !noteTool() && !m_selectedAnchors.isEmpty();
+	if (!noteTool() && m_selectedAnchors.size() >= 2)
+	{
+		ranges.append({*std::min_element(m_selectedAnchors.begin(), m_selectedAnchors.end()),
+			*std::max_element(m_selectedAnchors.begin(), m_selectedAnchors.end())});
+	}
+	else if (anchorSelection)
+	{
+		const auto tick = *m_selectedAnchors.begin();
+		for (const auto& note : m_clip->notes())
+		{
+			if (note.tick <= tick && note.tick + note.duration >= tick)
+			{
+				ranges.append({note.tick, note.tick + note.duration});
+			}
+		}
+	}
+	else
+	{
+		for (const auto& note : m_clip->notes())
+		{
+			if (m_selected.contains(note.id)) { ranges.append({note.tick, note.tick + note.duration}); }
+		}
+	}
+	const bool wholeClip = !anchorSelection && m_selected.isEmpty();
+	menu.addSeparator();
+	auto* clear = menu.addAction(tr("Clear hand-drawn pitch"), this, [this, ranges, wholeClip] {
+		cancelOperation();
+		auto curves = m_clip->curves();
+		if (wholeClip) { curves.remove("svs.pitch"); }
+		else
+		{
+			for (const auto& range : ranges)
+			{
+				curves["svs.pitch"].replaceRange(range.first, range.second, svs::Curve{});
+			}
+		}
+		m_clip->setEditorData(m_clip->notes(), curves);
+	});
+	clear->setObjectName("svsClearHandDrawnPitch");
+	clear->setEnabled(
+		!m_clip->readOnly() && m_clip->curves().contains("svs.pitch") && (wholeClip || !ranges.isEmpty()));
+
+	if (wholeClip)
+	{
+		for (const auto& note : m_clip->notes())
+		{
+			ranges.append({note.tick, note.tick + note.duration});
+		}
+	}
+	auto* predict = menu.addAction(tr("Re-predict automatic pitch"), this, [this, ranges] {
+		cancelOperation();
+		m_clip->regeneratePitch(ranges);
+	});
+	predict->setObjectName("svsRepredictSelectedPitch");
+	predict->setEnabled(!m_clip->readOnly() && !ranges.isEmpty());
+	const auto scope = wholeClip ? tr("Applies to the whole SVS clip when nothing is selected.")
+								 : tr("Applies only to the selection; other pitch and render segments are retained.");
+	clear->setToolTip(scope);
+	predict->setToolTip(scope);
+}
 void SVSCanvas::contextMenuEvent(QContextMenuEvent* event)
 {
 	// Right dragging parameters resets them; it must never open a blocking menu.
 	if ((m_parameter && event->reason() == QContextMenuEvent::Mouse && !event->modifiers().testFlag(Qt::ShiftModifier))
-		|| (!m_parameter && m_tool == Tool::Freehand))
+		|| (!m_parameter && m_tool == Tool::Freehand && event->reason() == QContextMenuEvent::Mouse
+			&& !event->modifiers().testFlag(Qt::ShiftModifier)))
 	{
 		event->accept();
 		return;
@@ -1838,6 +1904,7 @@ void SVSCanvas::contextMenuEvent(QContextMenuEvent* event)
 			curves.remove(m_curveId);
 			m_clip->setEditorData(m_clip->notes(), curves);
 		});
+		addPitchActions(menu);
 		menu.exec(event->globalPos());
 		return;
 	}
@@ -1865,6 +1932,7 @@ void SVSCanvas::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(tr("Delete"), this, &SVSCanvas::deleteSelection);
 	menu.addAction(tr("Transpose up octave"), this, [this] { transpose(12); });
 	menu.addAction(tr("Transpose down octave"), this, [this] { transpose(-12); });
+	addPitchActions(menu);
 	if (!hit.isEmpty())
 	{
 		auto found = std::find_if(
