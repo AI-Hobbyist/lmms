@@ -55,6 +55,7 @@ SVCBrowser::SVCBrowser(QWidget* parent)
 	connect(m_search, &QLineEdit::textChanged, this, &SVCBrowser::filter);
 	m_tree->setObjectName("svcBrowserTree");
 	m_tree->setHeaderHidden(true);
+	m_tree->setIndentation(10);
 	m_tree->setDragEnabled(true);
 	addContentWidget(view);
 	connect(&svc::Catalog::instance(), &svc::Catalog::changed, this, &SVCBrowser::refresh);
