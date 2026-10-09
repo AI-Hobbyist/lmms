@@ -133,7 +133,7 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>tri</source>
-        <translation>tri</translation>
+        <translation>3화음</translation>
     </message>
     <message>
         <source>6</source>
@@ -1075,23 +1075,23 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Failed to load sample</source>
-        <translation type="unfinished"></translation>
+        <translation>샘플을 불러올 수 없습니다</translation>
     </message>
     <message>
         <source>The sample may be corrupted or unsupported.</source>
-        <translation type="unfinished"></translation>
+        <translation>샘플이 손상되었거나 지원되지 않을 수 있습니다.</translation>
     </message>
     <message>
         <source>Failed to load sample at path %1, the file may not exist, be corrupted, or is unsupported.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 경로의 샘플을 불러올 수 없습니다. 파일이 없거나 손상되었거나 지원되지 않을 수 있습니다.</translation>
     </message>
     <message>
         <source>The sample size is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>샘플 크기가 잘못되었습니다.</translation>
     </message>
     <message>
         <source>Failed to load Base64 sample, invalid size</source>
-        <translation type="unfinished"></translation>
+        <translation>Base64 샘플을 불러올 수 없습니다. 크기가 잘못되었습니다</translation>
     </message>
     <message>
         <source>URI: </source>
@@ -1242,15 +1242,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Architecture: %1-bit</source>
-        <translation type="unfinished"></translation>
+        <translation>아키텍처: %1비트</translation>
     </message>
     <message>
         <source>Vendor: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>제작사: %1</translation>
     </message>
     <message>
         <source>Version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>버전: %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
@@ -1602,15 +1602,15 @@ Continue?</source>
     </message>
     <message>
         <source>Invalid VST2 shell identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 셸 식별 정보가 잘못되었습니다.</translation>
     </message>
     <message>
         <source>Invalid VST3 class identity or architecture.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 클래스 식별 정보 또는 아키텍처가 잘못되었습니다.</translation>
     </message>
     <message>
         <source>Invalid VST3 module fingerprint.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 모듈 지문이 잘못되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -2238,7 +2238,7 @@ Continue?</source>
     <name>lmms::Engine</name>
     <message>
         <source>VST catalog is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 카탈로그를 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Generating wavetables</source>
@@ -5428,47 +5428,47 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Unsupported or invalid VST2 PE module: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>지원되지 않거나 잘못된 VST2 PE 모듈: %1</translation>
     </message>
     <message>
         <source>VST2 scan failed for %1 (error %2, stage %3, native code %4).</source>
-        <translation type="unfinished"></translation>
+        <translation>%1의 VST2 검색 실패 (오류 %2, 단계 %3, 네이티브 코드 %4).</translation>
     </message>
     <message>
         <source>VST2 discovery is currently implemented for Windows.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 검색은 현재 Windows에서만 구현되어 있습니다.</translation>
     </message>
     <message>
         <source>VST3 selection cannot be loaded: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 VST3를 불러올 수 없습니다: %1</translation>
     </message>
     <message>
         <source>VST3 state identity does not match the selected class.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 상태 식별 정보가 선택한 클래스와 일치하지 않습니다.</translation>
     </message>
     <message>
         <source>VST3 project state exceeds the size limit. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 프로젝트 상태가 크기 제한을 초과합니다. 원본 데이터는 유지되었습니다.</translation>
     </message>
     <message>
         <source>Invalid VST3 project state. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 프로젝트 상태가 잘못되었습니다. 원본 데이터는 유지되었습니다.</translation>
     </message>
     <message>
         <source>VST3 processing reconfiguration failed (error %1).</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 처리 재설정 실패 (오류 %1).</translation>
     </message>
     <message>
         <source>VST3 Plugin Preset (*.vstpreset)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 플러그인 프리셋 (*.vstpreset)</translation>
     </message>
     <message>
         <source>Invalid VST3 preset or class identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 프리셋 또는 클래스 식별 정보가 잘못되었습니다.</translation>
     </message>
     <message>
         <source>Could not save VST3 preset.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 프리셋을 저장할 수 없습니다.</translation>
     </message>
     <message>
         <source>.fxp</source>
@@ -5488,15 +5488,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Invalid VST3 state envelope. Current state is unchanged.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 상태 봉투가 잘못되었습니다. 현재 상태는 변경되지 않았습니다.</translation>
     </message>
     <message>
         <source>VST3 state restoration failed. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 상태 복원 실패. 원본 데이터는 유지되었습니다.</translation>
     </message>
     <message>
         <source>VST3 state could not be saved. Previous state is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 상태를 저장할 수 없습니다. 이전 상태는 유지되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -5818,7 +5818,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Output device</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 장치</translation>
     </message>
     <message>
         <source>Backend</source>
@@ -5902,7 +5902,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Double-click on an automation clip in Song Editor to open it here</source>
-        <translation type="unfinished"></translation>
+        <translation>송 편집기에서 자동화 클립을 두 번 클릭하면 여기에 열립니다</translation>
     </message>
 </context>
 <context>
@@ -6161,11 +6161,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::gui::CPULoadWidget</name>
     <message>
         <source>CPU 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU 100%</translation>
     </message>
     <message>
         <source>CPU %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU %1%</translation>
     </message>
     <message>
         <source>DSP total: %1%</source>
@@ -7056,15 +7056,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;이름: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Author: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;제작자: &lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Description: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;설명: &lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -7107,14 +7107,14 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>손상된 오디오 감지: 영향받은 채널 음소거 중</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::EnvelopeAndLfoView</name>
     <message>
         <source>AMT</source>
-        <translation>AMT</translation>
+        <translation>양</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -7122,7 +7122,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>DEL</source>
-        <translation>DEL</translation>
+        <translation>지연</translation>
     </message>
     <message>
         <source>Pre-delay:</source>
@@ -7130,7 +7130,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>ATT</source>
-        <translation>ATT</translation>
+        <translation>어택</translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -7138,7 +7138,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>HOLD</source>
-        <translation>HOLD</translation>
+        <translation>유지</translation>
     </message>
     <message>
         <source>Hold:</source>
@@ -7146,7 +7146,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>DEC</source>
-        <translation>DEC</translation>
+        <translation>디케이</translation>
     </message>
     <message>
         <source>Decay:</source>
@@ -7154,7 +7154,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>SUST</source>
-        <translation>SUST</translation>
+        <translation>서스테인</translation>
     </message>
     <message>
         <source>Sustain:</source>
@@ -7162,7 +7162,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>REL</source>
-        <translation>REL</translation>
+        <translation>릴리스</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -7170,7 +7170,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>SPD</source>
-        <translation>SPD</translation>
+        <translation>속도</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -7178,7 +7178,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>FREQ x 100</source>
-        <translation>FREQ x 100</translation>
+        <translation>주파수 × 100</translation>
     </message>
     <message>
         <source>Multiply LFO frequency by 100</source>
@@ -7344,7 +7344,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Bit rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>비트레이트:</translation>
     </message>
     <message>
         <source>Bit depth:</source>
@@ -7352,7 +7352,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>스테레오 모드:</translation>
     </message>
     <message>
         <source>Compression level:</source>
@@ -7372,7 +7372,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Render looped section:</source>
-        <translation type="unfinished"></translation>
+        <translation>반복 구간 렌더링:</translation>
     </message>
     <message>
         <source>Start</source>
@@ -7388,7 +7388,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <source>16 Bit integer</source>
@@ -7416,15 +7416,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>%1 (Fastest, biggest)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (가장 빠름, 가장 큼)</translation>
     </message>
     <message>
         <source>%1 (Slowest, smallest)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (가장 느림, 가장 작음)</translation>
     </message>
     <message>
         <source>Export settings</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기 설정</translation>
     </message>
     <message>
         <source>Export failed SVS regions as silence</source>
@@ -8200,7 +8200,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation>공진</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -8208,7 +8208,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Cutoff frequency:</source>
@@ -8279,7 +8279,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>손상된 오디오 감지: 영향받은 채널 음소거 중</translation>
     </message>
 </context>
 <context>
@@ -9204,7 +9204,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>BASE</source>
-        <translation>BASE</translation>
+        <translation>기준</translation>
     </message>
     <message>
         <source>Base:</source>
@@ -9212,7 +9212,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>LFO frequency:</source>
@@ -9220,7 +9220,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>양</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -9228,7 +9228,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>PHS</source>
-        <translation>PHS</translation>
+        <translation>위상</translation>
     </message>
     <message>
         <source>Phase offset:</source>
@@ -9541,7 +9541,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>재생용 오디오 장치를 설정하지 못했습니다. 오디오 장치 설정(예: 샘플레이트)을 조정한 후 LMMS를 다시 시작하세요.</translation>
     </message>
     <message>
         <source>Untitled</source>
@@ -9627,11 +9627,11 @@ LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translatio
     </message>
     <message>
         <source>Detach all subwindows</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 하위 창 분리</translation>
     </message>
     <message>
         <source>Attach all subwindows</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 하위 창 붙이기</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -9986,7 +9986,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>FIRST</source>
-        <translation>FIRST</translation>
+        <translation>시작</translation>
     </message>
     <message>
         <source>First MIDI key that will be mapped</source>
@@ -9994,7 +9994,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>LAST</source>
-        <translation>LAST</translation>
+        <translation>끝</translation>
     </message>
     <message>
         <source>Last MIDI key that will be mapped</source>
@@ -10002,7 +10002,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>MIDDLE</source>
-        <translation>MIDDLE</translation>
+        <translation>중간</translation>
     </message>
     <message>
         <source>First line in the keymap refers to this MIDI key</source>
@@ -10010,7 +10010,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>BASE N.</source>
-        <translation>BASE N.</translation>
+        <translation>기준음</translation>
     </message>
     <message>
         <source>Base note frequency will be assigned to this MIDI key</source>
@@ -10967,25 +10967,27 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Knife Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>칼 도구</translation>
     </message>
     <message>
         <source>Click and drag over notes to cut along a line
 Hold Shift to automatically remove short ends</source>
-        <translation type="unfinished"></translation>
+        <translation>음표 위를 클릭하고 드래그하여 선을 따라 자르기
+Shift 키를 누르면 짧은 끝부분을 자동으로 제거합니다</translation>
     </message>
     <message>
         <source>Double-click on an instrument clip in Song Editor to open it here</source>
-        <translation type="unfinished"></translation>
+        <translation>곡 편집기의 악기 클립을 두 번 클릭하면 여기에서 열립니다</translation>
     </message>
     <message>
         <source>Pitch Bending</source>
-        <translation type="unfinished"></translation>
+        <translation>피치 벤드</translation>
     </message>
     <message>
         <source>Click and drag on a note or selection to edit its detuning curve
 Shift-click to open the note in Automation Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>음표 또는 선택 항목을 클릭하고 드래그하여 디튠 곡선 편집
+Shift 키를 누른 채 클릭하면 자동화 편집기에서 음표를 엽니다</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -11230,7 +11232,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>VST Instruments</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 악기</translation>
     </message>
 </context>
 <context>
@@ -12621,7 +12623,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Could not save the copied audio sample.</source>
-        <translation type="unfinished"></translation>
+        <translation>복사한 오디오 샘플을 저장할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -12660,7 +12662,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>손상된 오디오 감지: 해당 채널 음소거</translation>
     </message>
 </context>
 <context>
@@ -12729,51 +12731,51 @@ Seed: %3</source>
     <name>lmms::gui::ScanRootsWidget</name>
     <message>
         <source>Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>디렉터리</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>활성화</translation>
     </message>
     <message>
         <source>Recursive</source>
-        <translation type="unfinished"></translation>
+        <translation>재귀</translation>
     </message>
     <message>
         <source>VST2</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2</translation>
     </message>
     <message>
         <source>VST3</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>추가</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>찾아보기</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>제거</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>위로</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>아래로</translation>
     </message>
     <message>
         <source>Edit paths directly to include unavailable directories. Duplicate paths keep the first row&apos;s options. This list does not change the directory used by older projects.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용할 수 없는 디렉터리도 경로를 직접 편집하여 추가할 수 있습니다. 중복 경로는 첫 행의 옵션을 유지합니다. 이 목록은 이전 프로젝트의 디렉터리를 변경하지 않습니다.</translation>
     </message>
     <message>
         <source>VST scan directory</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 스캔 디렉터리</translation>
     </message>
 </context>
 <context>
@@ -12844,19 +12846,19 @@ Seed: %3</source>
     </message>
     <message>
         <source>Attach and show when closed</source>
-        <translation type="unfinished"></translation>
+        <translation>닫을 때 연결하고 표시</translation>
     </message>
     <message>
         <source>Attach and hide when closed</source>
-        <translation type="unfinished"></translation>
+        <translation>닫을 때 연결하고 숨기기</translation>
     </message>
     <message>
         <source>Always detached</source>
-        <translation type="unfinished"></translation>
+        <translation>항상 분리</translation>
     </message>
     <message>
         <source>Detached window behavior</source>
-        <translation type="unfinished"></translation>
+        <translation>분리된 창 동작</translation>
     </message>
     <message>
         <source>Dual-button</source>
@@ -12880,15 +12882,15 @@ Seed: %3</source>
     </message>
     <message>
         <source>Stepped (Scroll once the playhead goes out of view)</source>
-        <translation type="unfinished"></translation>
+        <translation>단계별 (재생 헤드가 화면 밖으로 나가면 스크롤)</translation>
     </message>
     <message>
         <source>Continuous (Scroll constantly to keep the playhead in the center)</source>
-        <translation type="unfinished"></translation>
+        <translation>연속 (재생 헤드를 중앙에 유지하도록 계속 스크롤)</translation>
     </message>
     <message>
         <source>Default Autoscroll Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 자동 스크롤 모드</translation>
     </message>
     <message>
         <source>Projects</source>
@@ -12912,39 +12914,39 @@ Seed: %3</source>
     </message>
     <message>
         <source>Local HTTP MCP server</source>
-        <translation type="unfinished"></translation>
+        <translation>로컬 HTTP MCP 서버</translation>
     </message>
     <message>
         <source>Enable HTTP MCP server</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP MCP 서버 활성화</translation>
     </message>
     <message>
         <source>Port (0 assigns an available port)</source>
-        <translation type="unfinished"></translation>
+        <translation>포트 (0이면 사용 가능한 포트 할당)</translation>
     </message>
     <message>
         <source>Bearer token environment variable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearer 토큰 환경 변수: %1</translation>
     </message>
     <message>
         <source>Copy connection address</source>
-        <translation type="unfinished"></translation>
+        <translation>연결 주소 복사</translation>
     </message>
     <message>
         <source>Apply server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 설정 적용</translation>
     </message>
     <message>
         <source>Running: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>실행 중: %1</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>중지됨</translation>
     </message>
     <message>
         <source>Stopped: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>중지됨: %1</translation>
     </message>
     <message>
         <source>Performance</source>
@@ -12976,79 +12978,79 @@ Seed: %3</source>
     </message>
     <message>
         <source>VST</source>
-        <translation type="unfinished"></translation>
+        <translation>VST</translation>
     </message>
     <message>
         <source>Plugin windows</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인 창</translation>
     </message>
     <message>
         <source>VST directory for older projects</source>
-        <translation type="unfinished"></translation>
+        <translation>이전 프로젝트의 VST 디렉터리</translation>
     </message>
     <message>
         <source>VST scan directories</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 스캔 디렉터리</translation>
     </message>
     <message>
         <source>Refresh saved directories</source>
-        <translation type="unfinished"></translation>
+        <translation>저장된 디렉터리 새로 고침</translation>
     </message>
     <message>
         <source>Rescan including failed plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>실패한 플러그인 포함하여 다시 스캔</translation>
     </message>
     <message>
         <source>Cancel scan</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔 취소</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인</translation>
     </message>
     <message>
         <source>Format / architecture</source>
-        <translation type="unfinished"></translation>
+        <translation>형식 / 아키텍처</translation>
     </message>
     <message>
         <source>VST catalog is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 카탈로그를 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Scanning: %1 (%2/%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔 중: %1 (%2/%3)</translation>
     </message>
     <message>
         <source>Instrument: %1; Effect: %2; scan failures: %3.%4</source>
-        <translation type="unfinished"></translation>
+        <translation>악기: %1; 이펙트: %2; 스캔 실패: %3.%4</translation>
     </message>
     <message>
         <source> Scan cancelled; previous results retained.</source>
-        <translation type="unfinished"></translation>
+        <translation> 스캔이 취소되었습니다. 이전 결과를 유지합니다.</translation>
     </message>
     <message>
         <source>Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>악기</translation>
     </message>
     <message>
         <source>Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>이펙트</translation>
     </message>
     <message>
         <source>%1: %2 (error %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1: %2 (오류 %3)</translation>
     </message>
     <message>
         <source>%1 additional failures.</source>
-        <translation type="unfinished"></translation>
+        <translation>추가 실패 %1개.</translation>
     </message>
     <message>
         <source>Scan cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔이 취소되었습니다.</translation>
     </message>
     <message>
         <source>No scan completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>완료된 스캔이 없습니다.</translation>
     </message>
     <message>
         <source>VST plugins embedding:</source>
@@ -13076,7 +13078,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"></translation>
+        <translation>이펙트</translation>
     </message>
     <message>
         <source>Keep effects running even without input</source>
@@ -13108,15 +13110,15 @@ Seed: %3</source>
     </message>
     <message>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>기타</translation>
     </message>
     <message>
         <source>Enable mix sanitization</source>
-        <translation type="unfinished"></translation>
+        <translation>믹스 정화 활성화</translation>
     </message>
     <message>
         <source>Provides protection from any plugins or tracks that generate corrupted audio, but may negatively impact performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>손상된 오디오를 생성하는 플러그인이나 트랙으로부터 보호하지만 성능에 영향을 줄 수 있습니다.</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -13838,7 +13840,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Move recording cursor using &lt;Left/Right&gt; arrows</source>
-        <translation>&lt;왼쪽/오른쪽&gt; 화살표로 녹음 커서를 이동</translation>
+        <translation>&lt;Left/Right&gt; 화살표 키로 녹음 커서 이동</translation>
     </message>
 </context>
 <context>
@@ -13887,7 +13889,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Detach</source>
-        <translation type="unfinished"></translation>
+        <translation>분리</translation>
     </message>
 </context>
 <context>
@@ -14263,7 +14265,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>다시 렌더링</translation>
     </message>
     <message>
         <source>Clone this track</source>
@@ -14656,7 +14658,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Please enter a new value between %1 dBFS and %2 dBFS:</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 dBFS에서 %2 dBFS 사이의 새 값을 입력하세요:</translation>
     </message>
 </context>
 <context>

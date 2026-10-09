@@ -50,54 +50,8 @@
     <message>
         <source>Current language not translated (or native English).
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>当前语言是简体中文。
-
-以下是简体中文翻译团队（至2026.1.17）：
-协调员：
-Arthur200000 &lt;Mingye Wang&gt;
-Mingcong Bai &lt;JeffBai&gt;
-复核员：
-liushuyu011 &lt;shuyu liu&gt;
-tonghuix &lt;Tong Hui&gt;
-tonychee7000 &lt;Sense T&gt;
-翻译员：
-4444TENSEI
-Aldmine
-Feihei
-Hcat
-HzhangX
-JIAZIYI007
-KitraMGP
-LYF610400210
-NKID00
-Romonov
-Toyiff
-alephnacl
-auxisli34
-combai
-forlmms
-jamexyz
-kisaayano
-liuyandong20110609
-loinkii
-pigfromChina
-prcups
-qzhsjz
-ral_hole
-shaun_he
-sout233
-tannineo
-ty1234567
-vcat
-wdnmd
-x147
-xiaofuyesnew
-zm1990s
-白敬新
-
-LMMS作为一款开源免费编辑软件，其翻译是各位热爱作曲的人的无私奉献而就。我们需要更多、更地道、更权威、更准确的翻译！若您有兴趣提高翻译质量，您可以访问：
-https://github.com/LMMS/lmms/wiki/Creating-a-localization
-或者联系维护团队 (https://github.com/AOSC-Dev/translations)、之前的译者或本项目维护者!</translation>
+        <translation>当前语言尚未翻译（或使用原生英语）。
+如果您有兴趣将 LMMS 翻译为其他语言或改善现有翻译，欢迎协助！请联系维护者！</translation>
     </message>
     <message>
         <source>License</source>
@@ -132,7 +86,7 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>sndio</source>
-        <translation type="unfinished"></translation>
+        <translation>sndio</translation>
     </message>
     <message>
         <source>[System Default]</source>
@@ -143,11 +97,11 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
-        <translation>octave</translation>
+        <translation>八度</translation>
     </message>
     <message>
         <source>Major</source>
-        <translation>Major</translation>
+        <translation>大调</translation>
     </message>
     <message>
         <source>Majb5</source>
@@ -155,7 +109,7 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>minor</source>
-        <translation>minor</translation>
+        <translation>小调</translation>
     </message>
     <message>
         <source>minb5</source>
@@ -179,7 +133,7 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>tri</source>
-        <translation>tri</translation>
+        <translation>三和弦</translation>
     </message>
     <message>
         <source>6</source>
@@ -538,11 +492,11 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>Jack-MIDI</source>
-        <translation type="unfinished"></translation>
+        <translation>JACK MIDI</translation>
     </message>
     <message>
         <source>sndio MIDI</source>
-        <translation type="unfinished"></translation>
+        <translation>sndio MIDI</translation>
     </message>
     <message>
         <source>WinMM MIDI</source>
@@ -1288,15 +1242,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Architecture: %1-bit</source>
-        <translation type="unfinished"></translation>
+        <translation>架构：%1 位</translation>
     </message>
     <message>
         <source>Vendor: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>厂商：%1</translation>
     </message>
     <message>
         <source>Version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>版本：%1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
@@ -1648,15 +1602,15 @@ Continue?</source>
     </message>
     <message>
         <source>Invalid VST2 shell identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效 VST2 shell 标识。</translation>
     </message>
     <message>
         <source>Invalid VST3 class identity or architecture.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效 VST3 类标识或架构。</translation>
     </message>
     <message>
         <source>Invalid VST3 module fingerprint.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效 VST3 模块指纹。</translation>
     </message>
 </context>
 <context>
@@ -2067,7 +2021,7 @@ Continue?</source>
     <name>lmms::DetuningHelper</name>
     <message>
         <source>Note detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>音符失谐</translation>
     </message>
 </context>
 <context>
@@ -2284,7 +2238,7 @@ Continue?</source>
     <name>lmms::Engine</name>
     <message>
         <source>VST catalog is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 目录不可用。</translation>
     </message>
     <message>
         <source>Generating wavetables</source>
@@ -2777,11 +2731,11 @@ Continue?</source>
     </message>
     <message>
         <source>Note repeats</source>
-        <translation type="unfinished"></translation>
+        <translation>音符重复次数</translation>
     </message>
     <message>
         <source>Cycle steps</source>
-        <translation type="unfinished"></translation>
+        <translation>循环步数</translation>
     </message>
     <message>
         <source>Skip rate</source>
@@ -2844,15 +2798,15 @@ Continue?</source>
     <name>lmms::InstrumentFunctionNoteStacking</name>
     <message>
         <source>Chords</source>
-        <translation>Chords</translation>
+        <translation>和弦</translation>
     </message>
     <message>
         <source>Chord type</source>
-        <translation>Chord type</translation>
+        <translation>和弦类型</translation>
     </message>
     <message>
         <source>Chord range</source>
-        <translation>Chord range</translation>
+        <translation>和弦范围</translation>
     </message>
 </context>
 <context>
@@ -2959,7 +2913,7 @@ Continue?</source>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation>SV Notch</translation>
+        <translation>状态变量陷波</translation>
     </message>
     <message>
         <source>Fast Formant</source>
@@ -2967,7 +2921,7 @@ Continue?</source>
     </message>
     <message>
         <source>Tripole</source>
-        <translation>Tripole</translation>
+        <translation>三极滤波</translation>
     </message>
 </context>
 <context>
@@ -3022,7 +2976,7 @@ Continue?</source>
     </message>
     <message>
         <source>CC Controller %1</source>
-        <translation type="unfinished"></translation>
+        <translation>CC 控制器 %1</translation>
     </message>
 </context>
 <context>
@@ -3524,19 +3478,19 @@ Continue?</source>
     <name>lmms::Microtuner</name>
     <message>
         <source>Microtuner</source>
-        <translation type="unfinished"></translation>
+        <translation>微调音器</translation>
     </message>
     <message>
         <source>Microtuner on / off</source>
-        <translation type="unfinished"></translation>
+        <translation>开启 / 关闭微调音器</translation>
     </message>
     <message>
         <source>Selected scale</source>
-        <translation type="unfinished"></translation>
+        <translation>所选音阶</translation>
     </message>
     <message>
         <source>Selected keyboard mapping</source>
-        <translation type="unfinished"></translation>
+        <translation>所选键盘映射</translation>
     </message>
 </context>
 <context>
@@ -4505,7 +4459,7 @@ Continue?</source>
     <name>lmms::PatternTrack</name>
     <message>
         <source>Pattern %1</source>
-        <translation type="unfinished"></translation>
+        <translation>节奏型 %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
@@ -5184,7 +5138,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Aborting project load</source>
-        <translation type="unfinished"></translation>
+        <translation>中止工程加载</translation>
     </message>
     <message>
         <source>Project file contains local paths to plugins, which could be used to run malicious code.</source>
@@ -5200,7 +5154,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source> (repeated %1 times)</source>
-        <translation type="unfinished"></translation>
+        <translation>（重复 %1 次）</translation>
     </message>
     <message>
         <source>The following errors occurred while loading: </source>
@@ -5462,7 +5416,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>VST Plugin Preset (*.fxp *.fxb)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 插件预设 (*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>
@@ -5474,47 +5428,47 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Unsupported or invalid VST2 PE module: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>不支持或无效的 VST2 PE 模块：%1</translation>
     </message>
     <message>
         <source>VST2 scan failed for %1 (error %2, stage %3, native code %4).</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 扫描 %1 失败（错误 %2，阶段 %3，原生代码 %4）。</translation>
     </message>
     <message>
         <source>VST2 discovery is currently implemented for Windows.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 插件发现目前仅在 Windows 上实现。</translation>
     </message>
     <message>
         <source>VST3 selection cannot be loaded: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无法加载所选 VST3：%1</translation>
     </message>
     <message>
         <source>VST3 state identity does not match the selected class.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 状态标识与所选类不匹配。</translation>
     </message>
     <message>
         <source>VST3 project state exceeds the size limit. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 工程状态超过大小限制，已保留原数据。</translation>
     </message>
     <message>
         <source>Invalid VST3 project state. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 工程状态无效，已保留原数据。</translation>
     </message>
     <message>
         <source>VST3 processing reconfiguration failed (error %1).</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 处理配置更新失败（错误 %1）。</translation>
     </message>
     <message>
         <source>VST3 Plugin Preset (*.vstpreset)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 插件预设 (*.vstpreset)</translation>
     </message>
     <message>
         <source>Invalid VST3 preset or class identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效 VST3 预设或类标识。</translation>
     </message>
     <message>
         <source>Could not save VST3 preset.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法保存 VST3 预设。</translation>
     </message>
     <message>
         <source>.fxp</source>
@@ -5534,15 +5488,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Invalid VST3 state envelope. Current state is unchanged.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 状态封装无效，当前状态未改变。</translation>
     </message>
     <message>
         <source>VST3 state restoration failed. Original data is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 状态恢复失败，已保留原数据。</translation>
     </message>
     <message>
         <source>VST3 state could not be saved. Previous state is preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法保存 VST3 状态，已保留之前的状态。</translation>
     </message>
 </context>
 <context>
@@ -5864,7 +5818,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Output device</source>
-        <translation type="unfinished"></translation>
+        <translation>输出设备</translation>
     </message>
     <message>
         <source>Backend</source>
@@ -5929,26 +5883,26 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"></translation>
+        <translation>模型已连接到此片段。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::AutomationEditor</name>
     <message>
         <source>Edit Value</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑数值</translation>
     </message>
     <message>
         <source>New outValue</source>
-        <translation type="unfinished"></translation>
+        <translation>新的输出值</translation>
     </message>
     <message>
         <source>New inValue</source>
-        <translation type="unfinished"></translation>
+        <translation>新的输入值</translation>
     </message>
     <message>
         <source>Double-click on an automation clip in Song Editor to open it here</source>
-        <translation type="unfinished"></translation>
+        <translation>双击歌曲编辑器中的自动化片段，在此打开</translation>
     </message>
 </context>
 <context>
@@ -5959,7 +5913,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Stop playing of current clip (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>停止播放当前片段（空格）</translation>
     </message>
     <message>
         <source>Edit actions</source>
@@ -5975,11 +5929,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Draw outValues mode (Shift+C)</source>
-        <translation type="unfinished"></translation>
+        <translation>绘制输出值模式 (Shift+C)</translation>
     </message>
     <message>
         <source>Edit tangents mode (Shift+T)</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑切线模式 (Shift+T)</translation>
     </message>
     <message>
         <source>Flip vertically</source>
@@ -6039,7 +5993,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Automation Editor - no clip</source>
-        <translation type="unfinished"></translation>
+        <translation>自动化编辑器 - 无片段</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
@@ -6047,7 +6001,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"></translation>
+        <translation>模型已连接到此片段。</translation>
     </message>
 </context>
 <context>
@@ -6207,31 +6161,31 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::gui::CPULoadWidget</name>
     <message>
         <source>CPU 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU 100%</translation>
     </message>
     <message>
         <source>CPU %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU %1%</translation>
     </message>
     <message>
         <source>DSP total: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>DSP 总计：%1%</translation>
     </message>
     <message>
         <source> - Notes and setup: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation> - 音符与设置：%1%</translation>
     </message>
     <message>
         <source> - Instruments: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation> - 乐器：%1%</translation>
     </message>
     <message>
         <source> - Effects: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation> - 效果器：%1%</translation>
     </message>
     <message>
         <source> - Mixing: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation> - 混音：%1%</translation>
     </message>
 </context>
 <context>
@@ -6297,15 +6251,16 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.
 Press &lt;Shift&gt; for destructive splitting.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;%1&gt; 或 &lt;Alt&gt; 可不按量化分割。
+按住 &lt;Shift&gt; 可破坏性分割。</translation>
     </message>
     <message>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;%1&gt; 或 &lt;Alt&gt; 可不按量化分割。</translation>
     </message>
     <message>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized resizing.</source>
-        <translation type="unfinished"></translation>
+        <translation>按住 &lt;%1&gt; 或 &lt;Alt&gt; 可不按量化调整大小。</translation>
     </message>
     <message>
         <source>Hint</source>
@@ -6317,7 +6272,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Delete selection (middle mousebutton)</source>
-        <translation type="unfinished"></translation>
+        <translation>删除选区（鼠标中键）</translation>
     </message>
     <message>
         <source>Cut</source>
@@ -6325,7 +6280,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Cut selection</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切选区</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -6333,7 +6288,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Copy selection</source>
-        <translation type="unfinished"></translation>
+        <translation>复制选区</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -6345,11 +6300,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
-        <translation type="unfinished"></translation>
+        <translation>静音/取消静音选区（&lt;%1&gt; + 中键单击）</translation>
     </message>
     <message>
         <source>Clip color</source>
-        <translation type="unfinished"></translation>
+        <translation>片段颜色</translation>
     </message>
     <message>
         <source>Change</source>
@@ -6361,15 +6316,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Pick random</source>
-        <translation type="unfinished"></translation>
+        <translation>随机选择</translation>
     </message>
     <message>
         <source>Disable auto-resize</source>
-        <translation type="unfinished"></translation>
+        <translation>禁用自动调整大小</translation>
     </message>
     <message>
         <source>Enable auto-resize</source>
-        <translation type="unfinished"></translation>
+        <translation>启用自动调整大小</translation>
     </message>
 </context>
 <context>
@@ -7063,7 +7018,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Toggle Step Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>切换步进录音</translation>
     </message>
 </context>
 <context>
@@ -7093,7 +7048,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>全部</translation>
     </message>
     <message>
         <source>Search</source>
@@ -7101,15 +7056,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>&lt;b&gt;Name: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;名称：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Author: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;作者：&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Description: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;说明：&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -7152,7 +7107,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到损坏音频：正在静音受影响通道</translation>
     </message>
 </context>
 <context>
@@ -7167,11 +7122,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>DEL</source>
-        <translation>DEL</translation>
+        <translation>延迟</translation>
     </message>
     <message>
         <source>Pre-delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>预延迟：</translation>
     </message>
     <message>
         <source>ATT</source>
@@ -7227,15 +7182,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Multiply LFO frequency by 100</source>
-        <translation type="unfinished"></translation>
+        <translation>将 LFO 频率乘以 100</translation>
     </message>
     <message>
         <source>MOD ENV AMOUNT</source>
-        <translation type="unfinished"></translation>
+        <translation>调制包络强度</translation>
     </message>
     <message>
         <source>Control envelope amount by this LFO</source>
-        <translation type="unfinished"></translation>
+        <translation>用此 LFO 控制包络强度</translation>
     </message>
     <message>
         <source>Hint</source>
@@ -7243,38 +7198,38 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Drag and drop a sample into this window.</source>
-        <translation type="unfinished"></translation>
+        <translation>将采样拖放到此窗口。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::EnvelopeGraph</name>
     <message>
         <source>Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <source>Dynamic</source>
-        <translation type="unfinished"></translation>
+        <translation>动态</translation>
     </message>
     <message>
         <source>Uses absolute spacings but switches to relative spacing if it&apos;s running out of space</source>
-        <translation type="unfinished"></translation>
+        <translation>使用绝对间距，空间不足时改用相对间距</translation>
     </message>
     <message>
         <source>Absolute</source>
-        <translation type="unfinished"></translation>
+        <translation>绝对</translation>
     </message>
     <message>
         <source>Provides enough potential space for each segment but does not scale</source>
-        <translation type="unfinished"></translation>
+        <translation>为每个分段提供足够空间，但不进行缩放</translation>
     </message>
     <message>
         <source>Relative</source>
-        <translation type="unfinished"></translation>
+        <translation>相对</translation>
     </message>
     <message>
         <source>Always uses all of the available space to display the envelope graph</source>
-        <translation type="unfinished"></translation>
+        <translation>始终使用全部可用空间显示包络曲线</translation>
     </message>
 </context>
 <context>
@@ -7389,7 +7344,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Bit rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>比特率：</translation>
     </message>
     <message>
         <source>Bit depth:</source>
@@ -7397,7 +7352,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声模式：</translation>
     </message>
     <message>
         <source>Compression level:</source>
@@ -7417,7 +7372,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Render looped section:</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染循环段：</translation>
     </message>
     <message>
         <source>Start</source>
@@ -7461,11 +7416,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>%1 (Fastest, biggest)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1（最快、最大）</translation>
     </message>
     <message>
         <source>%1 (Slowest, smallest)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1（最慢、最小）</translation>
     </message>
     <message>
         <source>Export settings</source>
@@ -7477,7 +7432,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source> time(s)</source>
-        <translation type="unfinished"></translation>
+        <translation> 次</translation>
     </message>
     <message>
         <source>SVS export failed</source>
@@ -7508,7 +7463,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>-inf</source>
-        <translation type="unfinished"></translation>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -7527,22 +7482,22 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>User content</source>
-        <translation type="unfinished"></translation>
+        <translation>用户内容</translation>
     </message>
     <message>
         <source>Factory content</source>
-        <translation type="unfinished"></translation>
+        <translation>出厂内容</translation>
     </message>
     <message>
         <source>Hidden content</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏内容</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
         <source>Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Finder</translation>
     </message>
     <message>
         <source>Explorer</source>
@@ -7558,11 +7513,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Remove favorite file</source>
-        <translation type="unfinished"></translation>
+        <translation>移除收藏文件</translation>
     </message>
     <message>
         <source>Add favorite file</source>
-        <translation type="unfinished"></translation>
+        <translation>添加收藏文件</translation>
     </message>
     <message>
         <source>Send to active instrument-track</source>
@@ -7574,7 +7529,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Pattern Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>节奏型编辑器</translation>
     </message>
     <message>
         <source>Open in %1</source>
@@ -7582,7 +7537,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Remove favorite folder</source>
-        <translation type="unfinished"></translation>
+        <translation>移除收藏文件夹</translation>
     </message>
     <message>
         <source>Add favorite folder</source>
@@ -7590,7 +7545,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Send to new AudioFileProcessor instance</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到新 AudioFileProcessor 实例</translation>
     </message>
     <message>
         <source>Send to new instrument track</source>
@@ -7598,15 +7553,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source> (%2Enter)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%2Enter)</translation>
     </message>
     <message>
         <source>Send to new sample track (Shift + Enter)</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到新采样轨道 (Shift + Enter)</translation>
     </message>
     <message>
         <source>Send to new SlicerT instance</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到新 SlicerT 实例</translation>
     </message>
     <message>
         <source>Loading sample</source>
@@ -7622,7 +7577,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>%1 does not appear to be a valid %2 file</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 似乎不是有效的 %2 文件</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
@@ -8045,11 +8000,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Preparing microtuner</source>
-        <translation type="unfinished"></translation>
+        <translation>正在准备微调音器</translation>
     </message>
     <message>
         <source>Preparing pattern editor</source>
-        <translation type="unfinished"></translation>
+        <translation>正在准备节奏型编辑器</translation>
     </message>
     <message>
         <source>Preparing piano roll</source>
@@ -8072,7 +8027,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>REP</source>
-        <translation type="unfinished"></translation>
+        <translation>重复</translation>
     </message>
     <message>
         <source>CYCLE</source>
@@ -8104,11 +8059,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Note repeats:</source>
-        <translation type="unfinished"></translation>
+        <translation>音符重复次数：</translation>
     </message>
     <message>
         <source>time(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>次</translation>
     </message>
     <message>
         <source>Cycle notes:</source>
@@ -8187,12 +8142,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>CHAN</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of two digits</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>通道</translation>
     </message>
     <message>
         <source>VELOC</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>力度</translation>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>
@@ -8201,7 +8156,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>PROG</source>
         <extracomment>This string must be be short, its width must be less than the * width of LCD spin-box of three digits</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>音色</translation>
     </message>
     <message>
         <source>NOTE</source>
@@ -8218,15 +8173,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>VELOCITY MAPPING</source>
-        <translation type="unfinished"></translation>
+        <translation>力度映射</translation>
     </message>
     <message>
         <source>MIDI VELOCITY</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI 力度</translation>
     </message>
     <message>
         <source>MIDI notes at this velocity correspond to 100% note velocity.</source>
-        <translation type="unfinished"></translation>
+        <translation>此 MIDI 力度对应 100% 音符力度。</translation>
     </message>
 </context>
 <context>
@@ -8265,11 +8220,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Q/RESO</source>
-        <translation type="unfinished"></translation>
+        <translation>Q/共振</translation>
     </message>
     <message>
         <source>Q/Resonance:</source>
-        <translation type="unfinished"></translation>
+        <translation>Q/共振：</translation>
     </message>
     <message>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
@@ -8316,7 +8271,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Open/Close MIDI CC Rack</source>
-        <translation type="unfinished"></translation>
+        <translation>打开/关闭 MIDI CC 面板</translation>
     </message>
     <message>
         <source>%1: %2</source>
@@ -8324,7 +8279,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到损坏音频：正在静音受影响通道</translation>
     </message>
 </context>
 <context>
@@ -8399,7 +8354,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>CHAN</source>
-        <translation type="unfinished"></translation>
+        <translation>通道</translation>
     </message>
     <message>
         <source>Save current instrument track settings in a preset file</source>
@@ -8411,11 +8366,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Envelope, filter &amp; LFO</source>
-        <translation type="unfinished"></translation>
+        <translation>包络、滤波器与 LFO</translation>
     </message>
     <message>
         <source>Chord stacking &amp; arpeggio</source>
-        <translation type="unfinished"></translation>
+        <translation>和弦叠加与琶音</translation>
     </message>
     <message>
         <source>Effects</source>
@@ -8427,7 +8382,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Tuning and transposition</source>
-        <translation type="unfinished"></translation>
+        <translation>调音与移调</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -8446,7 +8401,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::InstrumentTuningView</name>
     <message>
         <source>GLOBAL TRANSPOSITION</source>
-        <translation type="unfinished"></translation>
+        <translation>全局移调</translation>
     </message>
     <message>
         <source>Enables the use of global transposition</source>
@@ -8458,27 +8413,27 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>MICROTUNER</source>
-        <translation type="unfinished"></translation>
+        <translation>微调音器</translation>
     </message>
     <message>
         <source>Active scale:</source>
-        <translation type="unfinished"></translation>
+        <translation>当前音阶：</translation>
     </message>
     <message>
         <source>Edit scales and keymaps</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑音阶和键盘映射</translation>
     </message>
     <message>
         <source>Active keymap:</source>
-        <translation type="unfinished"></translation>
+        <translation>当前键盘映射：</translation>
     </message>
     <message>
         <source>Import note ranges from keymap</source>
-        <translation type="unfinished"></translation>
+        <translation>从键盘映射导入音符范围</translation>
     </message>
     <message>
         <source>When enabled, the first, last and base notes of this instrument will be overwritten with values specified by the selected keymap.</source>
-        <translation type="unfinished"></translation>
+        <translation>启用后，此乐器的首音、末音和基准音将被所选键盘映射指定的值覆盖。</translation>
     </message>
 </context>
 <context>
@@ -9319,11 +9274,11 @@ Double click to pick a file.</source>
     </message>
     <message>
         <source>Multiply modulation frequency by 1</source>
-        <translation type="unfinished"></translation>
+        <translation>将调制频率乘以 1</translation>
     </message>
     <message>
         <source>Multiply modulation frequency by 100</source>
-        <translation type="unfinished"></translation>
+        <translation>将调制频率乘以 100</translation>
     </message>
     <message>
         <source>Divide modulation frequency by 100</source>
@@ -9341,11 +9296,11 @@ Double click to pick a file.</source>
     <name>lmms::gui::LmmsStyle</name>
     <message>
         <source>Theme updated</source>
-        <translation type="unfinished"></translation>
+        <translation>主题已更新</translation>
     </message>
     <message>
         <source>LMMS theme file %1 has been reloaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS 主题文件 %1 已重新加载。</translation>
     </message>
 </context>
 <context>
@@ -9474,7 +9429,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Export &amp;Tracks...</source>
-        <translation type="unfinished"></translation>
+        <translation>导出轨道(&amp;T)...</translation>
     </message>
     <message>
         <source>Export &amp;MIDI...</source>
@@ -9498,7 +9453,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Scales and keymaps</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶和键盘映射</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -9562,7 +9517,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Pattern Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>节奏型编辑器</translation>
     </message>
     <message>
         <source>Piano Roll</source>
@@ -9574,7 +9529,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Mixer</source>
-        <translation type="unfinished"></translation>
+        <translation>混音器</translation>
     </message>
     <message>
         <source>Show/hide controller rack</source>
@@ -9586,7 +9541,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法设置播放音频设备。请尝试调整音频设备设置（例如采样率），然后重新启动 LMMS。</translation>
     </message>
     <message>
         <source>Untitled</source>
@@ -9676,7 +9631,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Attach all subwindows</source>
-        <translation type="unfinished"></translation>
+        <translation>附加所有子窗口</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -9874,7 +9829,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>VST sync</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 同步</translation>
     </message>
     <message>
         <source>Automated</source>
@@ -9912,7 +9867,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Meter numerator</source>
-        <translation type="unfinished"></translation>
+        <translation>拍号分子</translation>
     </message>
     <message>
         <source>Meter Denominator</source>
@@ -9920,7 +9875,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Meter denominator</source>
-        <translation type="unfinished"></translation>
+        <translation>拍号分母</translation>
     </message>
     <message>
         <source>TIME SIG</source>
@@ -9931,23 +9886,23 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>lmms::gui::MicrotunerConfig</name>
     <message>
         <source>Selected scale slot</source>
-        <translation type="unfinished"></translation>
+        <translation>所选音阶槽位</translation>
     </message>
     <message>
         <source>Selected keymap slot</source>
-        <translation type="unfinished"></translation>
+        <translation>所选键盘映射槽位</translation>
     </message>
     <message>
         <source>First key</source>
-        <translation type="unfinished"></translation>
+        <translation>起始键</translation>
     </message>
     <message>
         <source>Last key</source>
-        <translation type="unfinished"></translation>
+        <translation>末尾键</translation>
     </message>
     <message>
         <source>Middle key</source>
-        <translation type="unfinished"></translation>
+        <translation>中央键</translation>
     </message>
     <message>
         <source>Base key</source>
@@ -9955,23 +9910,23 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Base note frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>基准音频率</translation>
     </message>
     <message>
         <source>Microtuner Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>微调音器配置</translation>
     </message>
     <message>
         <source>Scale slot to edit:</source>
-        <translation type="unfinished"></translation>
+        <translation>要编辑的音阶槽位：</translation>
     </message>
     <message>
         <source>Scale description. Cannot start with &quot;!&quot; and cannot contain a newline character.</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶说明，不能以“!”开头或包含换行字符。</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>加载</translation>
     </message>
     <message>
         <source>Save</source>
@@ -9979,41 +9934,43 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Load scale definition from a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>从文件加载音阶定义。</translation>
     </message>
     <message>
         <source>Save scale definition to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>将音阶定义保存到文件。</translation>
     </message>
     <message>
         <source>Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.
 Other inputs are treated as integer ratios and must be in the form of &apos;a/b&apos; or &apos;a&apos;.
 Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>请逐行输入音程。包含小数点的数字视为音分。
+其他输入视为整数比值，必须采用 'a/b' 或 'a' 格式。
+同度（0.0 音分或比值 1/1）始终作为隐藏的首值存在，请勿手动输入。</translation>
     </message>
     <message>
         <source>Apply scale changes</source>
-        <translation type="unfinished"></translation>
+        <translation>应用音阶更改</translation>
     </message>
     <message>
         <source>Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument.</source>
-        <translation type="unfinished"></translation>
+        <translation>验证并应用所选音阶的更改。要使用该音阶，请在支持此功能的乐器设置中选取。</translation>
     </message>
     <message>
         <source>Keymap slot to edit:</source>
-        <translation type="unfinished"></translation>
+        <translation>要编辑的键盘映射槽位：</translation>
     </message>
     <message>
         <source>Keymap description. Cannot start with &quot;!&quot; and cannot contain a newline character.</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射说明，不能以“!”开头或包含换行字符。</translation>
     </message>
     <message>
         <source>Load key mapping definition from a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>从文件加载键盘映射定义。</translation>
     </message>
     <message>
         <source>Save key mapping definition to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>将键盘映射定义保存到文件。</translation>
     </message>
     <message>
         <source>Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key,
@@ -10029,7 +9986,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>FIRST</source>
-        <translation type="unfinished"></translation>
+        <translation>起始</translation>
     </message>
     <message>
         <source>First MIDI key that will be mapped</source>
@@ -10037,7 +9994,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>LAST</source>
-        <translation type="unfinished"></translation>
+        <translation>结束</translation>
     </message>
     <message>
         <source>Last MIDI key that will be mapped</source>
@@ -10045,83 +10002,83 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>MIDDLE</source>
-        <translation type="unfinished"></translation>
+        <translation>中间</translation>
     </message>
     <message>
         <source>First line in the keymap refers to this MIDI key</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射的首行对应此 MIDI 键</translation>
     </message>
     <message>
         <source>BASE N.</source>
-        <translation type="unfinished"></translation>
+        <translation>基准音</translation>
     </message>
     <message>
         <source>Base note frequency will be assigned to this MIDI key</source>
-        <translation type="unfinished"></translation>
+        <translation>基准音频率将分配给此 MIDI 键</translation>
     </message>
     <message>
         <source>BASE NOTE FREQ</source>
-        <translation type="unfinished"></translation>
+        <translation>基准音频率</translation>
     </message>
     <message>
         <source>Apply keymap changes</source>
-        <translation type="unfinished"></translation>
+        <translation>应用键盘映射更改</translation>
     </message>
     <message>
         <source>Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument.</source>
-        <translation type="unfinished"></translation>
+        <translation>验证并应用所选键盘映射的更改。要使用该映射，请在支持此功能的乐器设置中选取。</translation>
     </message>
     <message>
         <source>Scale parsing error</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶解析错误</translation>
     </message>
     <message>
         <source>Scale name cannot start with an exclamation mark</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶名称不能以感叹号开头</translation>
     </message>
     <message>
         <source>Scale name cannot contain a new-line character</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶名称不能包含换行字符</translation>
     </message>
     <message>
         <source>Interval defined in cents cannot be converted to a number</source>
-        <translation type="unfinished"></translation>
+        <translation>以音分定义的音程无法转换为数字</translation>
     </message>
     <message>
         <source>Numerator of an interval defined as a ratio cannot be converted to a number</source>
-        <translation type="unfinished"></translation>
+        <translation>以比值定义的音程分子无法转换为数字</translation>
     </message>
     <message>
         <source>Denominator of an interval defined as a ratio cannot be converted to a number</source>
-        <translation type="unfinished"></translation>
+        <translation>以比值定义的音程分母无法转换为数字</translation>
     </message>
     <message>
         <source>Interval defined as a ratio cannot be negative</source>
-        <translation type="unfinished"></translation>
+        <translation>以比值定义的音程不能为负数</translation>
     </message>
     <message>
         <source>Keymap parsing error</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射解析错误</translation>
     </message>
     <message>
         <source>Keymap name cannot start with an exclamation mark</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射名称不能以感叹号开头</translation>
     </message>
     <message>
         <source>Keymap name cannot contain a new-line character</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射名称不能包含换行字符</translation>
     </message>
     <message>
         <source>Scale degree cannot be converted to a whole number</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶级数无法转换为整数</translation>
     </message>
     <message>
         <source>Scale degree cannot be negative</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶级数不能为负数</translation>
     </message>
     <message>
         <source>Invalid keymap</source>
-        <translation type="unfinished"></translation>
+        <translation>无效键盘映射</translation>
     </message>
     <message>
         <source>Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.</source>
@@ -10129,77 +10086,77 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>Open scale</source>
-        <translation type="unfinished"></translation>
+        <translation>打开音阶</translation>
     </message>
     <message>
         <source>Scala scale definition (*.scl)</source>
-        <translation type="unfinished"></translation>
+        <translation>Scala 音阶定义 (*.scl)</translation>
     </message>
     <message>
         <source>Scale load failure</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶加载失败</translation>
     </message>
     <message>
         <source>Unable to open selected file.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开所选文件。</translation>
     </message>
     <message>
         <source>Open keymap</source>
-        <translation type="unfinished"></translation>
+        <translation>打开键盘映射</translation>
     </message>
     <message>
         <source>Scala keymap definition (*.kbm)</source>
-        <translation type="unfinished"></translation>
+        <translation>Scala 键盘映射定义 (*.kbm)</translation>
     </message>
     <message>
         <source>Keymap load failure</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射加载失败</translation>
     </message>
     <message>
         <source>Save scale</source>
-        <translation type="unfinished"></translation>
+        <translation>保存音阶</translation>
     </message>
     <message>
         <source>Scale save failure</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶保存失败</translation>
     </message>
     <message>
         <source>Unable to open selected file for writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开所选文件进行写入。</translation>
     </message>
     <message>
         <source>Save keymap</source>
-        <translation type="unfinished"></translation>
+        <translation>保存键盘映射</translation>
     </message>
     <message>
         <source>Keymap save failure</source>
-        <translation type="unfinished"></translation>
+        <translation>键盘映射保存失败</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::MidiCCRackView</name>
     <message>
         <source>MIDI CC Rack - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI CC 面板 - %1</translation>
     </message>
     <message>
         <source>MIDI CC Knobs:</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI CC 旋钮：</translation>
     </message>
     <message>
         <source>CC %1</source>
-        <translation type="unfinished"></translation>
+        <translation>CC %1</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::MidiClipView</name>
     <message>
         <source>Transpose</source>
-        <translation type="unfinished"></translation>
+        <translation>移调</translation>
     </message>
     <message>
         <source>Semitones to transpose by:</source>
-        <translation type="unfinished"></translation>
+        <translation>移调半音数：</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -10219,11 +10176,11 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>Merge Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>合并所选项</translation>
     </message>
     <message>
         <source>Clear notes out of bounds</source>
-        <translation type="unfinished"></translation>
+        <translation>清除越界音符</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -10261,7 +10218,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>New Mixer Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>新建混音通道</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -10284,7 +10241,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>Mute this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>静音此通道</translation>
     </message>
     <message>
         <source>Solo</source>
@@ -10292,11 +10249,11 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>Solo this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>独奏此通道</translation>
     </message>
     <message>
         <source>Fader %1</source>
-        <translation type="unfinished"></translation>
+        <translation>推子 %1</translation>
     </message>
     <message>
         <source>Move &amp;left</source>
@@ -10332,14 +10289,17 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     </message>
     <message>
         <source>Pick random</source>
-        <translation type="unfinished"></translation>
+        <translation>随机选取</translation>
     </message>
     <message>
         <source>This Mixer Channel is being used.
 Are you sure you want to remove this channel?
 
 Warning: This operation can not be undone.</source>
-        <translation type="unfinished"></translation>
+        <translation>此混音通道正在使用。
+确定要移除此通道吗？
+
+警告：此操作无法撤销。</translation>
     </message>
     <message>
         <source>Confirm removal</source>
@@ -10354,7 +10314,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::MixerView</name>
     <message>
         <source>Mixer</source>
-        <translation type="unfinished"></translation>
+        <translation>混音器</translation>
     </message>
 </context>
 <context>
@@ -10704,7 +10664,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::Oscilloscope</name>
     <message>
         <source>Oscilloscope</source>
-        <translation type="unfinished"></translation>
+        <translation>示波器</translation>
     </message>
     <message>
         <source>Click to enable</source>
@@ -10788,7 +10748,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PatternClipView</name>
     <message>
         <source>Open in Pattern Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>在节拍编辑器中打开</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -10803,7 +10763,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PatternEditorWindow</name>
     <message>
         <source>Pattern Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍编辑器</translation>
     </message>
     <message>
         <source>Play/pause current pattern (Space)</source>
@@ -10811,11 +10771,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Stop playback of current pattern (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>停止播放当前节拍（Space）</translation>
     </message>
     <message>
         <source>Pattern selector</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍选择器</translation>
     </message>
     <message>
         <source>Track and step actions</source>
@@ -10823,11 +10783,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>New pattern</source>
-        <translation type="unfinished"></translation>
+        <translation>新建节拍</translation>
     </message>
     <message>
         <source>Clone pattern</source>
-        <translation type="unfinished"></translation>
+        <translation>克隆节拍</translation>
     </message>
     <message>
         <source>Add sample-track</source>
@@ -10924,7 +10884,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PeakIndicator</name>
     <message>
         <source>-inf</source>
-        <translation type="unfinished"></translation>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -10971,7 +10931,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>No key</source>
-        <translation type="unfinished"></translation>
+        <translation>无调性</translation>
     </message>
     <message>
         <source>No scale</source>
@@ -10983,11 +10943,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Nudge</source>
-        <translation type="unfinished"></translation>
+        <translation>微移</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation type="unfinished"></translation>
+        <translation>吸附</translation>
     </message>
     <message>
         <source>Velocity: %1%</source>
@@ -11007,25 +10967,27 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Knife Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>切割工具</translation>
     </message>
     <message>
         <source>Click and drag over notes to cut along a line
 Hold Shift to automatically remove short ends</source>
-        <translation type="unfinished"></translation>
+        <translation>在音符上单击并拖动以沿直线切割
+按住 Shift 自动移除较短端</translation>
     </message>
     <message>
         <source>Double-click on an instrument clip in Song Editor to open it here</source>
-        <translation type="unfinished"></translation>
+        <translation>双击乐曲编辑器中的乐器片段以在此处打开</translation>
     </message>
     <message>
         <source>Pitch Bending</source>
-        <translation type="unfinished"></translation>
+        <translation>弯音</translation>
     </message>
     <message>
         <source>Click and drag on a note or selection to edit its detuning curve
 Shift-click to open the note in Automation Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>单击并拖动音符或所选音符以编辑失谐曲线
+按住 Shift 单击可在自动化编辑器中打开音符</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -11044,15 +11006,15 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or pattern track</source>
-        <translation type="unfinished"></translation>
+        <translation>播放乐曲或节拍轨时，从 MIDI 设备/通道钢琴录制音符</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano, one step at the time</source>
-        <translation type="unfinished"></translation>
+        <translation>从 MIDI 设备/通道钢琴逐步录制音符</translation>
     </message>
     <message>
         <source>Stop playing of current clip (Space)</source>
-        <translation type="unfinished"></translation>
+        <translation>停止播放当前片段（Space）</translation>
     </message>
     <message>
         <source>Edit actions</source>
@@ -11072,7 +11034,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Pitch Bend mode (Shift+T)</source>
-        <translation type="unfinished"></translation>
+        <translation>弯音模式（Shift+T）</translation>
     </message>
     <message>
         <source>Quantize</source>
@@ -11080,15 +11042,15 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Quantize positions</source>
-        <translation type="unfinished"></translation>
+        <translation>量化位置</translation>
     </message>
     <message>
         <source>Quantize lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>量化长度</translation>
     </message>
     <message>
         <source>File actions</source>
-        <translation type="unfinished"></translation>
+        <translation>文件操作</translation>
     </message>
     <message>
         <source>Import clip</source>
@@ -11120,35 +11082,35 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Glue</source>
-        <translation type="unfinished"></translation>
+        <translation>粘合</translation>
     </message>
     <message>
         <source>Knife</source>
-        <translation type="unfinished"></translation>
+        <translation>切割</translation>
     </message>
     <message>
         <source>Strum</source>
-        <translation type="unfinished"></translation>
+        <translation>扫弦</translation>
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>填充</translation>
     </message>
     <message>
         <source>Cut overlaps</source>
-        <translation type="unfinished"></translation>
+        <translation>裁剪重叠部分</translation>
     </message>
     <message>
         <source>Min length as last</source>
-        <translation type="unfinished"></translation>
+        <translation>沿用上次最小长度</translation>
     </message>
     <message>
         <source>Max length as last</source>
-        <translation type="unfinished"></translation>
+        <translation>沿用上次最大长度</translation>
     </message>
     <message>
         <source>Reverse Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>反转音符</translation>
     </message>
     <message>
         <source>Zoom and note controls</source>
@@ -11168,23 +11130,23 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Note length</source>
-        <translation type="unfinished"></translation>
+        <translation>音符长度</translation>
     </message>
     <message>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation>调性</translation>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>音阶</translation>
     </message>
     <message>
         <source>Chord</source>
-        <translation type="unfinished"></translation>
+        <translation>和弦</translation>
     </message>
     <message>
         <source>Snap mode</source>
-        <translation type="unfinished"></translation>
+        <translation>吸附模式</translation>
     </message>
     <message>
         <source>Clear ghost notes</source>
@@ -11220,7 +11182,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>You are about to import a clip, this will overwrite your current clip. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>即将导入片段，这会覆盖当前片段。是否继续？</translation>
     </message>
     <message>
         <source>Open clip</source>
@@ -11232,7 +11194,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>Imported clip %1!</source>
-        <translation type="unfinished"></translation>
+        <translation>已导入片段 %1！</translation>
     </message>
 </context>
 <context>
@@ -11270,7 +11232,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>VST Instruments</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 乐器</translation>
     </message>
 </context>
 <context>
@@ -12661,7 +12623,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Could not save the copied audio sample.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法保存复制的音频采样。</translation>
     </message>
 </context>
 <context>
@@ -12700,7 +12662,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Corrupted audio detected: muting affected channels</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到损坏的音频：受影响的通道已静音</translation>
     </message>
 </context>
 <context>
@@ -12719,7 +12681,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Solo this sample track</source>
-        <translation type="unfinished"></translation>
+        <translation>独奏此采样轨</translation>
     </message>
     <message>
         <source>Sample volume</source>
@@ -12751,69 +12713,69 @@ Seed: %3</source>
     </message>
     <message>
         <source>CHAN</source>
-        <translation type="unfinished"></translation>
+        <translation>通道</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SaveOptionsWidget</name>
     <message>
         <source>Discard MIDI connections</source>
-        <translation type="unfinished"></translation>
+        <translation>丢弃 MIDI 连接</translation>
     </message>
     <message>
         <source>Save As Project Bundle (with resources)</source>
-        <translation type="unfinished"></translation>
+        <translation>另存为项目包（含资源）</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::ScanRootsWidget</name>
     <message>
         <source>Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>目录</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>启用</translation>
     </message>
     <message>
         <source>Recursive</source>
-        <translation type="unfinished"></translation>
+        <translation>递归</translation>
     </message>
     <message>
         <source>VST2</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2</translation>
     </message>
     <message>
         <source>VST3</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>添加</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>浏览</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>移除</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>上移</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>下移</translation>
     </message>
     <message>
         <source>Edit paths directly to include unavailable directories. Duplicate paths keep the first row&apos;s options. This list does not change the directory used by older projects.</source>
-        <translation type="unfinished"></translation>
+        <translation>直接编辑路径可包含暂不可用的目录。重复路径保留首行选项。此列表不会更改旧项目使用的目录。</translation>
     </message>
     <message>
         <source>VST scan directory</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 扫描目录</translation>
     </message>
 </context>
 <context>
@@ -12900,15 +12862,15 @@ Seed: %3</source>
     </message>
     <message>
         <source>Dual-button</source>
-        <translation type="unfinished"></translation>
+        <translation>双按钮</translation>
     </message>
     <message>
         <source>Grab closest</source>
-        <translation type="unfinished"></translation>
+        <translation>拖动最近端点</translation>
     </message>
     <message>
         <source>Handles</source>
-        <translation type="unfinished"></translation>
+        <translation>手柄</translation>
     </message>
     <message>
         <source>Loop edit mode</source>
@@ -12920,15 +12882,15 @@ Seed: %3</source>
     </message>
     <message>
         <source>Stepped (Scroll once the playhead goes out of view)</source>
-        <translation type="unfinished"></translation>
+        <translation>分步（播放头离开视野后滚动）</translation>
     </message>
     <message>
         <source>Continuous (Scroll constantly to keep the playhead in the center)</source>
-        <translation type="unfinished"></translation>
+        <translation>连续（持续滚动以使播放头保持居中）</translation>
     </message>
     <message>
         <source>Default Autoscroll Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>默认自动滚动模式</translation>
     </message>
     <message>
         <source>Projects</source>
@@ -12936,7 +12898,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Compress project files by default</source>
-        <translation type="unfinished"></translation>
+        <translation>默认压缩项目文件</translation>
     </message>
     <message>
         <source>Create a backup file when saving a project</source>
@@ -12952,39 +12914,39 @@ Seed: %3</source>
     </message>
     <message>
         <source>Local HTTP MCP server</source>
-        <translation type="unfinished"></translation>
+        <translation>本地 HTTP MCP 服务器</translation>
     </message>
     <message>
         <source>Enable HTTP MCP server</source>
-        <translation type="unfinished"></translation>
+        <translation>启用 HTTP MCP 服务器</translation>
     </message>
     <message>
         <source>Port (0 assigns an available port)</source>
-        <translation type="unfinished"></translation>
+        <translation>端口（0 表示自动分配可用端口）</translation>
     </message>
     <message>
         <source>Bearer token environment variable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearer 令牌环境变量：%1</translation>
     </message>
     <message>
         <source>Copy connection address</source>
-        <translation type="unfinished"></translation>
+        <translation>复制连接地址</translation>
     </message>
     <message>
         <source>Apply server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>应用服务器设置</translation>
     </message>
     <message>
         <source>Running: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>运行中：%1</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止</translation>
     </message>
     <message>
         <source>Stopped: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止：%1</translation>
     </message>
     <message>
         <source>Performance</source>
@@ -13004,7 +12966,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>User interface (UI) effects vs. performance</source>
-        <translation type="unfinished"></translation>
+        <translation>界面特效与性能</translation>
     </message>
     <message>
         <source>Smooth scroll in song editor</source>
@@ -13012,83 +12974,83 @@ Seed: %3</source>
     </message>
     <message>
         <source>Display playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished"></translation>
+        <translation>在 AudioFileProcessor 中显示播放光标</translation>
     </message>
     <message>
         <source>VST</source>
-        <translation type="unfinished"></translation>
+        <translation>VST</translation>
     </message>
     <message>
         <source>Plugin windows</source>
-        <translation type="unfinished"></translation>
+        <translation>插件窗口</translation>
     </message>
     <message>
         <source>VST directory for older projects</source>
-        <translation type="unfinished"></translation>
+        <translation>旧项目的 VST 目录</translation>
     </message>
     <message>
         <source>VST scan directories</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 扫描目录</translation>
     </message>
     <message>
         <source>Refresh saved directories</source>
-        <translation type="unfinished"></translation>
+        <translation>刷新已保存目录</translation>
     </message>
     <message>
         <source>Rescan including failed plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>重新扫描（含失败插件）</translation>
     </message>
     <message>
         <source>Cancel scan</source>
-        <translation type="unfinished"></translation>
+        <translation>取消扫描</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>插件</translation>
     </message>
     <message>
         <source>Format / architecture</source>
-        <translation type="unfinished"></translation>
+        <translation>格式 / 架构</translation>
     </message>
     <message>
         <source>VST catalog is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 目录不可用。</translation>
     </message>
     <message>
         <source>Scanning: %1 (%2/%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>正在扫描：%1（%2/%3）</translation>
     </message>
     <message>
         <source>Instrument: %1; Effect: %2; scan failures: %3.%4</source>
-        <translation type="unfinished"></translation>
+        <translation>乐器：%1；效果器：%2；扫描失败：%3。%4</translation>
     </message>
     <message>
         <source> Scan cancelled; previous results retained.</source>
-        <translation type="unfinished"></translation>
+        <translation> 扫描已取消；保留之前的结果。</translation>
     </message>
     <message>
         <source>Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>乐器</translation>
     </message>
     <message>
         <source>Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>效果器</translation>
     </message>
     <message>
         <source>%1: %2 (error %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：%2（错误 %3）</translation>
     </message>
     <message>
         <source>%1 additional failures.</source>
-        <translation type="unfinished"></translation>
+        <translation>另有 %1 项失败。</translation>
     </message>
     <message>
         <source>Scan cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>扫描已取消。</translation>
     </message>
     <message>
         <source>No scan completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>尚未完成扫描。</translation>
     </message>
     <message>
         <source>VST plugins embedding:</source>
@@ -13116,7 +13078,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"></translation>
+        <translation>效果器</translation>
     </message>
     <message>
         <source>Keep effects running even without input</source>
@@ -13152,11 +13114,11 @@ Seed: %3</source>
     </message>
     <message>
         <source>Enable mix sanitization</source>
-        <translation type="unfinished"></translation>
+        <translation>启用混音清理</translation>
     </message>
     <message>
         <source>Provides protection from any plugins or tracks that generate corrupted audio, but may negatively impact performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>防止插件或轨道产生的损坏音频造成影响，但可能降低性能。</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -13180,7 +13142,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>启用后，从 MIDI 控制器录制的音符将自动量化。禁用时，始终以最高可用分辨率录制。</translation>
     </message>
     <message>
         <source>Paths</source>
@@ -13248,11 +13210,11 @@ Seed: %3</source>
     </message>
     <message>
         <source>The currently selected value is not a power of 2 (32, 64, 128, 256). Some plugins may not be available.</source>
-        <translation type="unfinished"></translation>
+        <translation>当前值不是 2 的幂（32、64、128、256）。部分插件可能不可用。</translation>
     </message>
     <message>
         <source>The currently selected value is less than or equal to 32. Some plugins may not be available.</source>
-        <translation type="unfinished"></translation>
+        <translation>当前值小于或等于 32。部分插件可能不可用。</translation>
     </message>
     <message>
         <source>Frames: %1
@@ -13680,7 +13642,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>A bundle folder with that name already exists on the selected path. Can&apos;t overwrite a project bundle. Please select a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选路径已存在同名项目包文件夹。无法覆盖项目包，请选择其他名称。</translation>
     </message>
     <message>
         <source>Error</source>
@@ -13688,11 +13650,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Couldn&apos;t create bundle folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建项目包文件夹。</translation>
     </message>
     <message>
         <source>Couldn&apos;t create resources folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建资源文件夹。</translation>
     </message>
     <message>
         <source>Failed to copy resources.</source>
@@ -13732,7 +13694,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>This %1 was created with LMMS %2</source>
-        <translation type="unfinished"></translation>
+        <translation>此%1由 LMMS %2 创建</translation>
     </message>
     <message>
         <source>Zoom</source>
@@ -13748,7 +13710,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Tempo in BPM</source>
-        <translation type="unfinished"></translation>
+        <translation>速度（BPM）</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -13756,7 +13718,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Global transposition</source>
-        <translation type="unfinished"></translation>
+        <translation>全局移调</translation>
     </message>
     <message>
         <source>1/%1 Bar</source>
@@ -13772,7 +13734,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Value: %1 keys</source>
-        <translation type="unfinished"></translation>
+        <translation>数值：%1 个半音</translation>
     </message>
 </context>
 <context>
@@ -13791,7 +13753,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Record samples from Audio-device while playing song or pattern track</source>
-        <translation type="unfinished"></translation>
+        <translation>播放乐曲或节拍轨时从音频设备录制采样</translation>
     </message>
     <message>
         <source>Stop song (Space)</source>
@@ -13803,7 +13765,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Add pattern-track</source>
-        <translation type="unfinished"></translation>
+        <translation>添加节拍轨</translation>
     </message>
     <message>
         <source>Add sample-track</source>
@@ -13835,7 +13797,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Bar insert controls</source>
-        <translation type="unfinished"></translation>
+        <translation>小节插入控制</translation>
     </message>
     <message>
         <source>Insert bar</source>
@@ -13855,19 +13817,19 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Snap controls</source>
-        <translation type="unfinished"></translation>
+        <translation>吸附控制</translation>
     </message>
     <message>
         <source>Clip snapping size</source>
-        <translation type="unfinished"></translation>
+        <translation>片段吸附大小</translation>
     </message>
     <message>
         <source>Toggle proportional snap on/off</source>
-        <translation type="unfinished"></translation>
+        <translation>切换比例吸附</translation>
     </message>
     <message>
         <source>Base snapping size</source>
-        <translation type="unfinished"></translation>
+        <translation>基础吸附大小</translation>
     </message>
 </context>
 <context>
@@ -13878,7 +13840,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Move recording cursor using &lt;Left/Right&gt; arrows</source>
-        <translation type="unfinished"></translation>
+        <translation>使用 &lt;Left/Right&gt; 方向键移动录音光标</translation>
     </message>
 </context>
 <context>
@@ -13927,7 +13889,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Detach</source>
-        <translation type="unfinished"></translation>
+        <translation>独立显示</translation>
     </message>
 </context>
 <context>
@@ -14201,19 +14163,19 @@ Latency: %2 ms</source>
     <name>lmms::gui::TimeLineWidget</name>
     <message>
         <source>Auto scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>自动滚动</translation>
     </message>
     <message>
         <source>Stepped auto scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>分步自动滚动</translation>
     </message>
     <message>
         <source>Continuous auto scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>连续自动滚动</translation>
     </message>
     <message>
         <source>Auto scrolling disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>禁用自动滚动</translation>
     </message>
     <message>
         <source>Loop points</source>
@@ -14221,7 +14183,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>After stopping go back to beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>停止后回到开头</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
@@ -14241,27 +14203,27 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Set loop begin here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此设置循环起点</translation>
     </message>
     <message>
         <source>Set loop end here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此设置循环终点</translation>
     </message>
     <message>
         <source>Loop edit mode (hold shift)</source>
-        <translation type="unfinished"></translation>
+        <translation>循环编辑模式（按住 Shift）</translation>
     </message>
     <message>
         <source>Dual-button</source>
-        <translation type="unfinished"></translation>
+        <translation>双按钮</translation>
     </message>
     <message>
         <source>Grab closest</source>
-        <translation type="unfinished"></translation>
+        <translation>拖动最近端点</translation>
     </message>
     <message>
         <source>Handles</source>
-        <translation type="unfinished"></translation>
+        <translation>手柄</translation>
     </message>
 </context>
 <context>
@@ -14275,11 +14237,11 @@ Latency: %2 ms</source>
     <name>lmms::gui::TrackOperationsWidget</name>
     <message>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop action.</source>
-        <translation type="unfinished"></translation>
+        <translation>单击移动手柄时按住 &lt;%1&gt;，开始新的拖放操作。</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>操作</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -14303,7 +14265,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>重新渲染</translation>
     </message>
     <message>
         <source>Clone this track</source>
@@ -14319,7 +14281,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Channel %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 %1：%2</translation>
     </message>
     <message>
         <source>Assign to new Mixer Channel</source>
@@ -14347,11 +14309,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Pick random</source>
-        <translation type="unfinished"></translation>
+        <translation>随机选取</translation>
     </message>
     <message>
         <source>Reset clip colors</source>
-        <translation type="unfinished"></translation>
+        <translation>重置片段颜色</translation>
     </message>
 </context>
 <context>
@@ -14696,7 +14658,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Please enter a new value between %1 dBFS and %2 dBFS:</source>
-        <translation type="unfinished"></translation>
+        <translation>请输入 %1 dBFS 到 %2 dBFS 之间的新值：</translation>
     </message>
 </context>
 <context>

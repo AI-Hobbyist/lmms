@@ -278,7 +278,9 @@ def check_stage(output, stage):
                 tags = lambda value: Counter(re.findall(r"</?[A-Za-z][^>]*>", value))
                 if tags(source) != tags(text):
                     failures.append((language, row["key"], "HTML tags"))
-                mnemonic = lambda value: len(re.findall(r"&(?!&)", value.replace("&&", "")))
+                mnemonic = lambda value: len(re.findall(
+                    r"&(?=[^\s&])", re.sub(r"&(?:[A-Za-z]+|#[0-9]+);", "", value).replace("&&", "")
+                ))
                 if mnemonic(source) != mnemonic(text):
                     failures.append((language, row["key"], "mnemonic count"))
     for failure in failures:

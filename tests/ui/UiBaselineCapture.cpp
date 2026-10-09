@@ -297,6 +297,25 @@ private slots:
 			QCoreApplication::removeTranslator(&translator);
 		}
 	}
+	void hostTranslations()
+	{
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		QVERIFY(!language.isEmpty());
+		capture(m_gui->mainWindow(), "M4-main-" + language);
+		const QList<QPair<SetupDialog::ConfigTab, QString>> pages{
+			{SetupDialog::ConfigTab::GeneralSettings, "general"}, {SetupDialog::ConfigTab::VstSettings, "vst"}};
+		for (const auto& page : pages)
+		{
+			SetupDialog settings(page.first);
+			QCOMPARE(settings.windowTitle(), QCoreApplication::translate("lmms::gui::SetupDialog", "Settings"));
+			capture(&settings, "M4-" + page.second + '-' + language);
+			settings.close();
+		}
+		ExportProjectDialog dialog(m_config.filePath("export.wav"), ExportProjectDialog::Mode::ExportProject);
+		capture(&dialog, "M4-export-" + language);
+		dialog.close();
+	}
 	void scenes()
 	{
 		auto* song = Engine::getSong();
