@@ -15098,6 +15098,17 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
+    <name>lmms::gui::XpressiveHelpView</name>
+    <message>
+        <source>&lt;b&gt;O1, O2&lt;/b&gt; - Two output waves. Panning is controlled by PN1 and PN2.&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).&lt;br&gt;These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.&lt;br&gt;&lt;h4&gt;Available variables:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - Time in seconds.&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - Note&apos;s pitched frequency. Available only in the output expressions.&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - Note&apos;s keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - Base note. By default it is 69 which means A4, unless you change it.&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - Sample rate. In wave expression it returns the wave&apos;s number of samples.&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - Song&apos;s Tempo. Available only in the output expressions.&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - Note&apos;s volume. Note that the output is already multiplied by the volume. Available only in the output expressions.&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.&lt;br&gt;The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - A random value that remains consistent in the lifetime of a single wave. Meant to be used with &lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].&lt;br&gt;&lt;h4&gt;Available functions:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - As mentioned before. You can reference them only in O1 and O2.&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;100 cents equals one semitone&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - Gives you the last n&apos;th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - Integrates x by delta t (It sums values and divides them by sample rate).&lt;br&gt;If you use notes with automated frequency, you should use:&lt;br&gt;sinew(integrate(f)) instead of sinew(t*f)&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - A random vector. Each cell is reference by an integer index in the range [0,2^31]&lt;br&gt;Each evaluation of an expression results in different random vector.&lt;br&gt;Although, it remains consistent in the lifetime of a single wave.&lt;br&gt;If you want a single random values you can use randv(0),randv(1)... &lt;br&gt;and every reference to randv(a) will give you the same value.If you want a random wave you can use randv(t*srate).&lt;br&gt;Each random value is in the range [-1,1).&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - works exactly like randv(x),&lt;br&gt;except that it lets you to select the seed manualy,&lt;br&gt;if you want to try different random values and make it consistent in each evaluation.&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - A triangle wave with period of 1.&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - A square wave with period of 1.&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - A saw wave with period of 1.&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - If x is in range of (min_val,max_val) it returns x. Otherwise if it&apos;s greater than max_val it returns max_val, else returns min_val.&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, etc. are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Operands + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; | are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Amplitude Modulation&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;Ring Modulation&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;Mix Modulation&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;Frequency Modulation&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;Phase Modulation&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</source>
+        <translation>&lt;b&gt;O1, O2&lt;/b&gt; - 출력 파형 2개입니다. 패닝은 PN1과 PN2로 제어합니다.&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 수식으로 계산하는 파형 샘플입니다. 이 샘플에서 변수 t의 범위는 [0,1)입니다.&lt;br&gt;출력 파형(O1, O2)에서 이 파형을 함수로 사용할 수 있습니다. 파형 주기는 1입니다.&lt;br&gt;&lt;h4&gt;사용 가능한 변수:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - 시간(초)입니다.&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - 노트의 피치 주파수입니다. 출력 수식에서만 사용할 수 있습니다.&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - 노트의 건반 번호입니다. 0은 C-1, 60은 C4, 127은 G9입니다. 출력 수식에서만 사용할 수 있습니다.&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - 기준 노트입니다. 변경하지 않으면 기본값은 A4를 나타내는 69입니다.&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - 샘플레이트입니다. 파형 수식에서는 파형의 샘플 수를 반환합니다.&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - 곡의 템포입니다. 출력 수식에서만 사용할 수 있습니다.&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - 노트 음량입니다. 출력에는 이미 음량이 곱해져 있습니다. 출력 수식에서만 사용할 수 있습니다.&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - 건반을 누르는 동안 0.0, 놓은 후 1.0입니다. 출력 수식에서만 사용할 수 있습니다.&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - 건반을 놓은 후의 시간입니다. 누르는 동안 0.0이며 놓은 후 초를 셉니다.&lt;br&gt;건반을 놓은 후 0.0에서 1.0으로 전환하는 시간은 REL 노브로 정합니다.&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - 단일 파형이 유지되는 동안 일정한 무작위 값입니다. 함께 사용할 함수:&lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - 일반 노브입니다. O1과 O2에서만 참조할 수 있으며 범위는 [-1,1]입니다.&lt;br&gt;&lt;h4&gt;사용 가능한 함수:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 앞서 설명한 파형입니다. O1과 O2에서만 참조할 수 있습니다.&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - pow(2,x/1200)을 반환합니다. 변수 f에 곱하여 주파수를 조정할 수 있습니다.&lt;br&gt;100센트는 반음 하나입니다.&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - pow(2,x/12)를 반환합니다. 변수 f에 곱하여 주파수를 조정할 수 있습니다.&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - 이전에 계산한 n번째 샘플을 반환합니다. O1과 O2에서는 1초 분량을 유지하므로 n은 [1,srate] 범위여야 하며, 아니면 0을 반환합니다.&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - 시간 차 delta t에 대해 x를 적분합니다(값을 합산하고 샘플레이트로 나눕니다).&lt;br&gt;주파수를 자동화한 노트에서는 다음을 사용하세요:&lt;br&gt;sinew(t*f) 대신 sinew(integrate(f)).&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - 무작위 벡터입니다. 각 요소는 [0,2^31] 범위의 정수 인덱스로 참조합니다.&lt;br&gt;수식을 계산할 때마다 다른 무작위 벡터가 생성됩니다.&lt;br&gt;다만 단일 파형이 유지되는 동안 일정합니다.&lt;br&gt;단일 무작위 값이 필요하면 randv(0), randv(1)…을 사용할 수 있습니다.&lt;br&gt;randv(a)를 참조할 때마다 같은 값을 얻습니다. 무작위 파형에는 randv(t*srate)를 사용할 수 있습니다.&lt;br&gt;각 무작위 값의 범위는 [-1,1)입니다.&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - randv(x)와 동일하게 동작하지만,&lt;br&gt;시드를 직접 선택할 수 있습니다.&lt;br&gt;다른 무작위 값을 시도하고 매번 계산할 때 일관되게 유지하려는 경우 사용합니다.&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - 주기가 1인 사인파입니다(일반 사인 함수의 주기는 2*pi).&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - 주기가 1인 삼각파입니다.&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - 주기가 1인 사각파입니다.&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - 주기가 1인 톱니파입니다.&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - x가 (min_val,max_val) 범위이면 x, max_val보다 크면 max_val, 아니면 min_val을 반환합니다.&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, 등 함수도 사용할 수 있습니다.&lt;/b&gt;&lt;br&gt;&lt;b&gt;연산자 + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; |도 사용할 수 있습니다.&lt;/b&gt;&lt;br&gt;&lt;b&gt;진폭 변조&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;링 변조&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;믹스 변조&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;주파수 변조&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;위상 변조&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Xpressive Help</source>
+        <translation>Xpressive 도움말</translation>
+    </message>
+</context>
+<context>
     <name>lmms::gui::XpressiveView</name>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15164,6 +15175,10 @@ Latency: %2 ms</source>
         <translation>웨이브인터폴레이트</translation>
     </message>
     <message>
+        <source>Interpolate</source>
+        <translation>보간</translation>
+    </message>
+    <message>
         <source>ExpressionValid</source>
         <translation>유효한표현식</translation>
     </message>
@@ -15180,12 +15195,24 @@ Latency: %2 ms</source>
         <translation>범용 3:</translation>
     </message>
     <message>
+        <source>O1 panning</source>
+        <translation>O1 패닝</translation>
+    </message>
+    <message>
         <source>O1 panning:</source>
         <translation>O1 패닝:</translation>
     </message>
     <message>
+        <source>O2 panning</source>
+        <translation>O2 패닝</translation>
+    </message>
+    <message>
         <source>O2 panning:</source>
         <translation>O2 패닝:</translation>
+    </message>
+    <message>
+        <source>Release transition</source>
+        <translation>릴리스 전환</translation>
     </message>
     <message>
         <source>Release transition:</source>
@@ -15200,7 +15227,7 @@ Latency: %2 ms</source>
     <name>lmms::gui::ZynAddSubFxView</name>
     <message>
         <source>PORT</source>
-        <translation>PORT</translation>
+        <translation>포르타멘토</translation>
     </message>
     <message>
         <source>Portamento:</source>
@@ -15208,7 +15235,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Filter frequency:</source>
@@ -15216,7 +15243,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>RES</source>
-        <translation>RES</translation>
+        <translation>공명</translation>
     </message>
     <message>
         <source>Filter resonance:</source>
@@ -15240,7 +15267,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>RES CF</source>
-        <translation>RES CF</translation>
+        <translation>공명 중심</translation>
     </message>
     <message>
         <source>Resonance center frequency:</source>
@@ -15248,7 +15275,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>RES BW</source>
-        <translation>RES BW</translation>
+        <translation>공명 대역폭</translation>
     </message>
     <message>
         <source>Resonance bandwidth:</source>

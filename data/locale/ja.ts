@@ -974,7 +974,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"></translation>
+        <translation>数式パーサー</translation>
     </message>
     <message>
         <source>Embedded ZynAddSubFX</source>
@@ -5641,27 +5641,27 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"></translation>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"></translation>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W1 の平滑化</translation>
     </message>
     <message>
         <source>W2 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W2 の平滑化</translation>
     </message>
     <message>
         <source>W3 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W3 の平滑化</translation>
     </message>
     <message>
         <source>Panning 1</source>
@@ -5673,42 +5673,42 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Rel trans</source>
-        <translation type="unfinished"></translation>
+        <translation>リリース移行</translation>
     </message>
 </context>
 <context>
     <name>lmms::ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
-        <translation type="unfinished"></translation>
+        <translation>ポルタメント</translation>
     </message>
     <message>
         <source>Filter frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター周波数</translation>
     </message>
     <message>
         <source>Filter resonance</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター共鳴</translation>
     </message>
     <message>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域幅</translation>
     </message>
     <message>
         <source>FM gain</source>
-        <translation type="unfinished"></translation>
+        <translation>FM ゲイン</translation>
     </message>
     <message>
         <source>Resonance center frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴中心周波数</translation>
     </message>
     <message>
         <source>Resonance bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴帯域幅</translation>
     </message>
     <message>
         <source>Forward MIDI control change events</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI コントロールチェンジイベントを転送</translation>
     </message>
 </context>
 <context>
@@ -15098,6 +15098,17 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
+    <name>lmms::gui::XpressiveHelpView</name>
+    <message>
+        <source>&lt;b&gt;O1, O2&lt;/b&gt; - Two output waves. Panning is controlled by PN1 and PN2.&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).&lt;br&gt;These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.&lt;br&gt;&lt;h4&gt;Available variables:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - Time in seconds.&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - Note&apos;s pitched frequency. Available only in the output expressions.&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - Note&apos;s keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - Base note. By default it is 69 which means A4, unless you change it.&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - Sample rate. In wave expression it returns the wave&apos;s number of samples.&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - Song&apos;s Tempo. Available only in the output expressions.&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - Note&apos;s volume. Note that the output is already multiplied by the volume. Available only in the output expressions.&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.&lt;br&gt;The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - A random value that remains consistent in the lifetime of a single wave. Meant to be used with &lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].&lt;br&gt;&lt;h4&gt;Available functions:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - As mentioned before. You can reference them only in O1 and O2.&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;100 cents equals one semitone&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - Gives you the last n&apos;th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - Integrates x by delta t (It sums values and divides them by sample rate).&lt;br&gt;If you use notes with automated frequency, you should use:&lt;br&gt;sinew(integrate(f)) instead of sinew(t*f)&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - A random vector. Each cell is reference by an integer index in the range [0,2^31]&lt;br&gt;Each evaluation of an expression results in different random vector.&lt;br&gt;Although, it remains consistent in the lifetime of a single wave.&lt;br&gt;If you want a single random values you can use randv(0),randv(1)... &lt;br&gt;and every reference to randv(a) will give you the same value.If you want a random wave you can use randv(t*srate).&lt;br&gt;Each random value is in the range [-1,1).&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - works exactly like randv(x),&lt;br&gt;except that it lets you to select the seed manualy,&lt;br&gt;if you want to try different random values and make it consistent in each evaluation.&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - A triangle wave with period of 1.&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - A square wave with period of 1.&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - A saw wave with period of 1.&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - If x is in range of (min_val,max_val) it returns x. Otherwise if it&apos;s greater than max_val it returns max_val, else returns min_val.&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, etc. are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Operands + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; | are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Amplitude Modulation&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;Ring Modulation&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;Mix Modulation&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;Frequency Modulation&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;Phase Modulation&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</source>
+        <translation>&lt;b&gt;O1, O2&lt;/b&gt; - 2 つの出力波形。パンは PN1 と PN2 で調整します。&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 数式で計算する波形サンプル。このサンプル内での変数 t の範囲は [0,1) です。&lt;br&gt;出力波形（O1、O2）内でこれらを関数として使えます。波形の周期は 1 です。&lt;br&gt;&lt;h4&gt;使用可能な変数：&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - 時間（秒）。&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - ノートのピッチ周波数。出力数式でのみ使用できます。&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - ノートの鍵盤番号。0 は C-1、60 は C4、127 は G9 です。出力数式でのみ使用できます。&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - 基準ノート。変更しない限り、標準値は A4 を表す 69 です。&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - サンプルレート。波形数式では波形のサンプル数を返します。&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - 曲のテンポ。出力数式でのみ使用できます。&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - ノートの音量。出力には既に音量が掛けられています。出力数式でのみ使用できます。&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - 鍵盤を押している間は 0.0、離した後は 1.0 です。出力数式でのみ使用できます。&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - リリース後の時間。ノートを押している間は 0.0 で、その後は秒数を数えます。&lt;br&gt;鍵盤を離した後、0.0 から 1.0 へ移る時間は REL ノブで決まります。&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - 単一波形の存続中は一定のランダム値。次の関数と組み合わせて使います：&lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - 汎用ノブ。O1 と O2 でのみ参照でき、範囲は [-1,1] です。&lt;br&gt;&lt;h4&gt;使用可能な関数：&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 上記の波形。O1 と O2 でのみ参照できます。&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - pow(2,x/1200) を返します。変数 f に掛けて周波数を変えられます。&lt;br&gt;100 セントは 1 半音です。&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - pow(2,x/12) を返します。変数 f に掛けて周波数を変えられます。&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - n 個前に計算したサンプルを返します。O1 と O2 では 1 秒分を保持します。引数 n は [1,srate] の範囲で、それ以外は 0 を返します。&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - 時間差 delta t で x を積分します（値を加算してサンプルレートで割ります）。&lt;br&gt;周波数をオートメーションするノートでは、次を使ってください：&lt;br&gt;sinew(t*f) の代わりに sinew(integrate(f))。&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - ランダムなベクトル。各要素は [0,2^31] の整数インデックスで参照します。&lt;br&gt;数式を計算するたびに異なるランダムベクトルを生成します。&lt;br&gt;ただし、単一波形の存続中は一定です。&lt;br&gt;単一のランダム値には randv(0)、randv(1)… を使えます。&lt;br&gt;randv(a) の各参照は同じ値を返します。ランダムな波形には randv(t*srate) を使えます。&lt;br&gt;各ランダム値の範囲は [-1,1) です。&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - randv(x) と同じ動作ですが、&lt;br&gt;シードを手動で選べます。&lt;br&gt;異なるランダム値を試し、各計算で同じ結果を得る場合に使います。&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - 周期 1 の正弦波（通常の正弦関数の周期は 2*pi です）。&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - 周期 1 の三角波。&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - 周期 1 の矩形波。&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - 周期 1 のノコギリ波。&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - x が (min_val,max_val) 内なら x、max_val より大きければ max_val、それ以外は min_val を返します。&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, などの関数も使用できます。&lt;/b&gt;&lt;br&gt;&lt;b&gt;演算子 + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; | も使用できます。&lt;/b&gt;&lt;br&gt;&lt;b&gt;振幅変調&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;リング変調&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;ミックス変調&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;周波数変調&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;位相変調&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Xpressive Help</source>
+        <translation>Xpressive のヘルプ</translation>
+    </message>
+</context>
+<context>
     <name>lmms::gui::XpressiveView</name>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15105,158 +15116,174 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Select oscillator W1</source>
-        <translation>Select oscillator W1</translation>
+        <translation>オシレーター W1 を選択</translation>
     </message>
     <message>
         <source>Select oscillator W2</source>
-        <translation>Select oscillator W2</translation>
+        <translation>オシレーター W2 を選択</translation>
     </message>
     <message>
         <source>Select oscillator W3</source>
-        <translation>Select oscillator W3</translation>
+        <translation>オシレーター W3 を選択</translation>
     </message>
     <message>
         <source>Select output O1</source>
-        <translation>Select output O1</translation>
+        <translation>出力 O1 を選択</translation>
     </message>
     <message>
         <source>Select output O2</source>
-        <translation>Select output O2</translation>
+        <translation>出力 O2 を選択</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation>Open help window</translation>
+        <translation>ヘルプを開く</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Moog-saw wave</source>
-        <translation>Moog-saw wave</translation>
+        <translation>Moog ノコギリ波</translation>
     </message>
     <message>
         <source>Exponential wave</source>
-        <translation>Exponential wave</translation>
+        <translation>指数波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>User-defined wave</source>
-        <translation>User-defined wave</translation>
+        <translation>ユーザー定義波形</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>White noise</source>
-        <translation>White noise</translation>
+        <translation>ホワイトノイズ</translation>
     </message>
     <message>
         <source>WaveInterpolate</source>
-        <translation>WaveInterpolate</translation>
+        <translation>波形の補間</translation>
+    </message>
+    <message>
+        <source>Interpolate</source>
+        <translation>補間</translation>
     </message>
     <message>
         <source>ExpressionValid</source>
-        <translation>ExpressionValid</translation>
+        <translation>数式の状態</translation>
     </message>
     <message>
         <source>General purpose 1:</source>
-        <translation>General purpose 1:</translation>
+        <translation>汎用パラメーター 1：</translation>
     </message>
     <message>
         <source>General purpose 2:</source>
-        <translation>General purpose 2:</translation>
+        <translation>汎用パラメーター 2：</translation>
     </message>
     <message>
         <source>General purpose 3:</source>
-        <translation>General purpose 3:</translation>
+        <translation>汎用パラメーター 3：</translation>
+    </message>
+    <message>
+        <source>O1 panning</source>
+        <translation>O1 パン</translation>
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation>O1 panning:</translation>
+        <translation>O1 パン：</translation>
+    </message>
+    <message>
+        <source>O2 panning</source>
+        <translation>O2 パン</translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation>O2 panning:</translation>
+        <translation>O2 パン：</translation>
+    </message>
+    <message>
+        <source>Release transition</source>
+        <translation>リリース移行</translation>
     </message>
     <message>
         <source>Release transition:</source>
-        <translation>Release transition:</translation>
+        <translation>リリース移行：</translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation>Smoothness</translation>
+        <translation>滑らかさ</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::ZynAddSubFxView</name>
     <message>
         <source>PORT</source>
-        <translation>PORT</translation>
+        <translation>滑音</translation>
     </message>
     <message>
         <source>Portamento:</source>
-        <translation>Portamento:</translation>
+        <translation>ポルタメント：</translation>
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Filter frequency:</source>
-        <translation>Filter frequency:</translation>
+        <translation>フィルター周波数：</translation>
     </message>
     <message>
         <source>RES</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴</translation>
     </message>
     <message>
         <source>Filter resonance:</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター共鳴：</translation>
     </message>
     <message>
         <source>BW</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域幅</translation>
     </message>
     <message>
         <source>Bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域幅：</translation>
     </message>
     <message>
         <source>FM GAIN</source>
-        <translation type="unfinished"></translation>
+        <translation>FM ゲイン</translation>
     </message>
     <message>
         <source>FM gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>FM ゲイン：</translation>
     </message>
     <message>
         <source>RES CF</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴中心</translation>
     </message>
     <message>
         <source>Resonance center frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴中心周波数：</translation>
     </message>
     <message>
         <source>RES BW</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴幅</translation>
     </message>
     <message>
         <source>Resonance bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴帯域幅：</translation>
     </message>
     <message>
         <source>Forward MIDI control changes</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI コントロールチェンジを転送</translation>
     </message>
     <message>
         <source>Show GUI</source>

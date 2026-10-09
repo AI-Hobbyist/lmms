@@ -15057,6 +15057,17 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
+    <name>lmms::gui::XpressiveHelpView</name>
+    <message>
+        <source>&lt;b&gt;O1, O2&lt;/b&gt; - Two output waves. Panning is controlled by PN1 and PN2.&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).&lt;br&gt;These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.&lt;br&gt;&lt;h4&gt;Available variables:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - Time in seconds.&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - Note&apos;s pitched frequency. Available only in the output expressions.&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - Note&apos;s keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - Base note. By default it is 69 which means A4, unless you change it.&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - Sample rate. In wave expression it returns the wave&apos;s number of samples.&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - Song&apos;s Tempo. Available only in the output expressions.&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - Note&apos;s volume. Note that the output is already multiplied by the volume. Available only in the output expressions.&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.&lt;br&gt;The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - A random value that remains consistent in the lifetime of a single wave. Meant to be used with &lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].&lt;br&gt;&lt;h4&gt;Available functions:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - As mentioned before. You can reference them only in O1 and O2.&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;100 cents equals one semitone&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - Gives you the last n&apos;th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - Integrates x by delta t (It sums values and divides them by sample rate).&lt;br&gt;If you use notes with automated frequency, you should use:&lt;br&gt;sinew(integrate(f)) instead of sinew(t*f)&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - A random vector. Each cell is reference by an integer index in the range [0,2^31]&lt;br&gt;Each evaluation of an expression results in different random vector.&lt;br&gt;Although, it remains consistent in the lifetime of a single wave.&lt;br&gt;If you want a single random values you can use randv(0),randv(1)... &lt;br&gt;and every reference to randv(a) will give you the same value.If you want a random wave you can use randv(t*srate).&lt;br&gt;Each random value is in the range [-1,1).&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - works exactly like randv(x),&lt;br&gt;except that it lets you to select the seed manualy,&lt;br&gt;if you want to try different random values and make it consistent in each evaluation.&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - A triangle wave with period of 1.&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - A square wave with period of 1.&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - A saw wave with period of 1.&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - If x is in range of (min_val,max_val) it returns x. Otherwise if it&apos;s greater than max_val it returns max_val, else returns min_val.&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, etc. are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Operands + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; | are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Amplitude Modulation&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;Ring Modulation&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;Mix Modulation&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;Frequency Modulation&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;Phase Modulation&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xpressive Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>lmms::gui::XpressiveView</name>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15123,6 +15134,10 @@ Latency: %2 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Interpolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>ExpressionValid</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15139,11 +15154,23 @@ Latency: %2 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>O1 panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>O1 panning:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>O2 panning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>O2 panning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release transition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

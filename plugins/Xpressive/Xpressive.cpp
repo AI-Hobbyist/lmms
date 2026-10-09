@@ -434,9 +434,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 			embed::getIconPixmap("white_noise_wave_inactive"));
 	m_whiteNoiseWaveBtn->setToolTip(tr("White noise"));
 
-
-	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
-										 LedCheckBox::LedColor::Green);
+	m_waveInterpolate = new LedCheckBox(tr("Interpolate"), this, tr("WaveInterpolate"), LedCheckBox::LedColor::Green);
 	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
@@ -460,21 +458,19 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_generalPurposeKnob[2]->setHintText(tr("General purpose 3:"), "");
 	m_generalPurposeKnob[2]->move(COL_KNOBS, ROW_KNOBSA3);
 
-	m_panningKnob[0] = new XpressiveKnob(this,"O1 panning");
+	m_panningKnob[0] = new XpressiveKnob(this, tr("O1 panning"));
 	m_panningKnob[0]->setHintText(tr("O1 panning:"), "");
 	m_panningKnob[0]->move(COL_KNOBS, ROW_KNOBSP1);
 
-	m_panningKnob[1] = new XpressiveKnob(this,"O2 panning");
+	m_panningKnob[1] = new XpressiveKnob(this, tr("O2 panning"));
 	m_panningKnob[1]->setHintText(tr("O2 panning:"), "");
 	m_panningKnob[1]->move(COL_KNOBS, ROW_KNOBSP2);
 
-	m_relKnob = new XpressiveKnob(this,"Release transition");
+	m_relKnob = new XpressiveKnob(this, tr("Release transition"));
 	m_relKnob->setHintText(tr("Release transition:"), "ms");
 	m_relKnob->move(COL_KNOBS, ROW_KNOBREL);
 
-
-
-	m_smoothKnob=new Knob(KnobType::Styled, this, "Smoothness");
+	m_smoothKnob = new Knob(KnobType::Styled, this, tr("Smoothness"));
 	m_smoothKnob->setFixedSize(25, 25);
 	m_smoothKnob->setCenterPointX(12.5);
 	m_smoothKnob->setCenterPointY(12.5);
@@ -807,61 +803,67 @@ void XpressiveView::usrWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-QString XpressiveHelpView::s_helpText=
-"<b>O1, O2</b> - Two output waves. Panning is controlled by PN1 and PN2.<br>"
-"<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
-"These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
-"<h4>Available variables:</h4><br>"
-"<b>t</b> - Time in seconds.<br>"
-"<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
-"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
-"<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
-"<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
-"<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
-"<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
-"<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.<br>"
-"<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.<br>"
-"The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
-"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. Meant to be used with <b>randsv</b><br>"
-"<b>A1, A2, A3</b> - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].<br>"
-"<h4>Available functions:</h4><br>"
-"<b>W1, W2, W3</b> - As mentioned before. You can reference them only in O1 and O2.<br>"
-"<b>cent(x)</b> - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
-"100 cents equals one semitone<br>"
-"<b>semitone(x)</b> - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
-"<b>last(n)</b> - Gives you the last n'th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.<br>"
-"<b>integrate(x)</b> - Integrates x by delta t (It sums values and divides them by sample rate).<br>"
-"If you use notes with automated frequency, you should use:<br>"
-"sinew(integrate(f)) instead of sinew(t*f)<br>"
-"<b>randv(x)</b> - A random vector. Each cell is reference by an integer index in the range [0,2^31]<br>"
-"Each evaluation of an expression results in different random vector.<br>"
-"Although, it remains consistent in the lifetime of a single wave.<br>"
-"If you want a single random values you can use randv(0),randv(1)... <br>"
-"and every reference to randv(a) will give you the same value."
-"If you want a random wave you can use randv(t*srate).<br>"
-"Each random value is in the range [-1,1).<br>"
-"<b>randsv(x,seed)</b> - works exactly like randv(x),<br>"
-"except that it lets you to select the seed manualy,<br>"
-"if you want to try different random values and make it consistent in each evaluation.<br>"
-"<b>sinew(x)</b> - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).<br>"
-"<b>trianglew(x)</b> - A triangle wave with period of 1.<br>"
-"<b>squarew(x)</b> - A square wave with period of 1.<br>"
-"<b>saww(x)</b> - A saw wave with period of 1.<br>"
-"<b>clamp(min_val,x,max_val)</b> - If x is in range of (min_val,max_val) it returns x. Otherwise if it's greater than max_val it returns max_val, else returns min_val.<br>"
-"<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
-"hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
-"avg, sgn, mod, etc. are also available.</b><br>"
-"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
-"<b>Amplitude Modulation</b> - W1(t*f)*(1+W2(t*f))<br>"
-"<b>Ring Modulation</b> - W1(t * f)*W2(t * f)<br>"
-"<b>Mix Modulation</b> - 0.5*( W1(t * f) + W2(t * f) )<br>"
-"<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
-"<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
-		;
+QString XpressiveHelpView::s_helpText = tr(
+	"<b>O1, O2</b> - Two output waves. Panning is controlled by PN1 and PN2.<br>"
+	"<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
+	"These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
+	"<h4>Available variables:</h4><br>"
+	"<b>t</b> - Time in seconds.<br>"
+	"<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
+	"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output "
+	"expressions.<br>"
+	"<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
+	"<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
+	"<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
+	"<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output "
+	"expressions.<br>"
+	"<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output "
+	"expressions.<br>"
+	"<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting "
+	"seconds.<br>"
+	"The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
+	"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. Meant to be used with "
+	"<b>randsv</b><br>"
+	"<b>A1, A2, A3</b> - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].<br>"
+	"<h4>Available functions:</h4><br>"
+	"<b>W1, W2, W3</b> - As mentioned before. You can reference them only in O1 and O2.<br>"
+	"<b>cent(x)</b> - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
+	"100 cents equals one semitone<br>"
+	"<b>semitone(x)</b> - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
+	"<b>last(n)</b> - Gives you the last n'th evaluated sample. In O1 and O2 it keeps a whole second. Thus the "
+	"argument n must be in the range [1,srate], or else, it will return 0.<br>"
+	"<b>integrate(x)</b> - Integrates x by delta t (It sums values and divides them by sample rate).<br>"
+	"If you use notes with automated frequency, you should use:<br>"
+	"sinew(integrate(f)) instead of sinew(t*f)<br>"
+	"<b>randv(x)</b> - A random vector. Each cell is reference by an integer index in the range [0,2^31]<br>"
+	"Each evaluation of an expression results in different random vector.<br>"
+	"Although, it remains consistent in the lifetime of a single wave.<br>"
+	"If you want a single random values you can use randv(0),randv(1)... <br>"
+	"and every reference to randv(a) will give you the same value."
+	"If you want a random wave you can use randv(t*srate).<br>"
+	"Each random value is in the range [-1,1).<br>"
+	"<b>randsv(x,seed)</b> - works exactly like randv(x),<br>"
+	"except that it lets you to select the seed manualy,<br>"
+	"if you want to try different random values and make it consistent in each evaluation.<br>"
+	"<b>sinew(x)</b> - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).<br>"
+	"<b>trianglew(x)</b> - A triangle wave with period of 1.<br>"
+	"<b>squarew(x)</b> - A square wave with period of 1.<br>"
+	"<b>saww(x)</b> - A saw wave with period of 1.<br>"
+	"<b>clamp(min_val,x,max_val)</b> - If x is in range of (min_val,max_val) it returns x. Otherwise if it's greater "
+	"than max_val it returns max_val, else returns min_val.<br>"
+	"<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
+	"hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
+	"avg, sgn, mod, etc. are also available.</b><br>"
+	"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
+	"<b>Amplitude Modulation</b> - W1(t*f)*(1+W2(t*f))<br>"
+	"<b>Ring Modulation</b> - W1(t * f)*W2(t * f)<br>"
+	"<b>Mix Modulation</b> - 0.5*( W1(t * f) + W2(t * f) )<br>"
+	"<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
+	"<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>");
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
-	setWindowTitle ( "Xpressive Help" );
+	setWindowTitle(tr("Xpressive Help"));
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );

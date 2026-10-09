@@ -181,3 +181,7 @@ M5-11：M5-10 检查点 bcfaf3a837c258b3170dd0101f8f45efbd8c9d6c 已推送确认
 四语 QM、waveshaper 编译通过，DLL 写入 build/Release/plugins/waveshaper.dll；开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，五个已部署插件面板及预设恢复通过。Vibed 未部署，MANUAL/PENDING；VeSTige 为 LMMS 未加载外部插件时的宿主面板，外部编辑器和声音不计为已验证。Clip input 标签修正后另行四语复测，M5-11-clip 截图为最终证据；既有位图按钮保留，完整悬浮说明与窄标签处理留 M7。
 
 M5-11 视觉后续：WaveShaper 日语 Clip input 标签已命中译文，但固定窄面板右边界截断全文，留 M7 授权的省略号与完整悬浮提示处理；本批不宣称全文可读性通过。
+
+M5-12：M5-11 检查点 7a0fcedc0a66fddbe4aef4cd8363cd6503ecb970 已推送确认。Xpressive/ZynAddSubFx 共 66 键四语质量 PASS。Xpressive 新增帮助正文/标题、插值复选框及固定旋钮名称 6 个必要入口，完整补译变量/函数/调制说明并保留公式、数值范围和 HTML 结构；表达式变量 A1/A2/A3 保留并逐语言登记。补齐 ZynAddSubFX 宿主参数与 MIDI 转发，第三方内部编辑器不改写。全库 3633 键，中日韩缺键、空译、unfinished 和占位符异常均为 0；英文为源文回退。
+
+四语 QM 生成、xpressive/UiBaselineCapture 前台编译通过，DLL 写入 build/Release/plugins/xpressive.dll，开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，两插件面板、Xpressive 真实帮助页及预设恢复通过。代表截图确认中文帮助、日语插值与韩文宿主字形正常；帮助长文可滚动，最终底部和长提示验收留 M7。Zyn 原始空 XML 调试日志不作为功能失败或新修改范围。M5 十二批已逐批提交推送；M6 继续全库质量和硬编码候选调用方收敛，M7 完成最终场景矩阵。

@@ -620,6 +620,39 @@ private slots:
 				QVERIFY(window->isVisible());
 				QVERIFY(!window->visibleRegion().isEmpty());
 				capture(m_gui->mainWindow(), evidencePrefix + '-' + name);
+				if (name == "xpressive" && !selectedPlugins.isEmpty())
+				{
+					QWidget* helpButton = nullptr;
+					for (auto* widget : window->findChildren<QWidget*>())
+					{
+						if (widget->toolTip()
+							== QCoreApplication::translate("lmms::gui::XpressiveView", "Open help window"))
+						{
+							helpButton = widget;
+						}
+					}
+					QVERIFY(helpButton);
+					QTest::mouseClick(helpButton, Qt::LeftButton);
+					QTextEdit* help = nullptr;
+					for (auto* widget : QApplication::allWidgets())
+					{
+						auto* text = qobject_cast<QTextEdit*>(widget);
+						if (text
+							&& text->windowTitle()
+								== QCoreApplication::translate("lmms::gui::XpressiveHelpView", "Xpressive Help"))
+						{
+							help = text;
+						}
+					}
+					QVERIFY(help);
+					if (qEnvironmentVariable("LMMS_UI_TRANSLATION") != "en")
+					{
+						QVERIFY(!help->toPlainText().contains("Two output waves"));
+					}
+					QVERIFY(help->isVisible());
+					capture(m_gui->mainWindow(), evidencePrefix + "-help");
+					help->parentWidget()->hide();
+				}
 				window->toggleVisibility(false);
 				checkPreset(track->instrument(), preset);
 			}

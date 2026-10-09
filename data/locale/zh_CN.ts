@@ -5641,39 +5641,39 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"></translation>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"></translation>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W1 平滑</translation>
     </message>
     <message>
         <source>W2 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W2 平滑</translation>
     </message>
     <message>
         <source>W3 smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>W3 平滑</translation>
     </message>
     <message>
         <source>Panning 1</source>
-        <translation type="unfinished"></translation>
+        <translation>声像 1</translation>
     </message>
     <message>
         <source>Panning 2</source>
-        <translation type="unfinished"></translation>
+        <translation>声像 2</translation>
     </message>
     <message>
         <source>Rel trans</source>
-        <translation type="unfinished"></translation>
+        <translation>释音过渡</translation>
     </message>
 </context>
 <context>
@@ -5684,11 +5684,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Filter frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波频率</translation>
     </message>
     <message>
         <source>Filter resonance</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波共振</translation>
     </message>
     <message>
         <source>Bandwidth</source>
@@ -5696,19 +5696,19 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>FM gain</source>
-        <translation type="unfinished"></translation>
+        <translation>FM 增益</translation>
     </message>
     <message>
         <source>Resonance center frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>共振中心频率</translation>
     </message>
     <message>
         <source>Resonance bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>共振带宽</translation>
     </message>
     <message>
         <source>Forward MIDI control change events</source>
-        <translation type="unfinished"></translation>
+        <translation>转发 MIDI 控制变化事件</translation>
     </message>
 </context>
 <context>
@@ -15098,6 +15098,17 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
+    <name>lmms::gui::XpressiveHelpView</name>
+    <message>
+        <source>&lt;b&gt;O1, O2&lt;/b&gt; - Two output waves. Panning is controlled by PN1 and PN2.&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).&lt;br&gt;These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.&lt;br&gt;&lt;h4&gt;Available variables:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - Time in seconds.&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - Note&apos;s pitched frequency. Available only in the output expressions.&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - Note&apos;s keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - Base note. By default it is 69 which means A4, unless you change it.&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - Sample rate. In wave expression it returns the wave&apos;s number of samples.&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - Song&apos;s Tempo. Available only in the output expressions.&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - Note&apos;s volume. Note that the output is already multiplied by the volume. Available only in the output expressions.&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.&lt;br&gt;The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - A random value that remains consistent in the lifetime of a single wave. Meant to be used with &lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].&lt;br&gt;&lt;h4&gt;Available functions:&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - As mentioned before. You can reference them only in O1 and O2.&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;100 cents equals one semitone&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - Gives you the last n&apos;th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - Integrates x by delta t (It sums values and divides them by sample rate).&lt;br&gt;If you use notes with automated frequency, you should use:&lt;br&gt;sinew(integrate(f)) instead of sinew(t*f)&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - A random vector. Each cell is reference by an integer index in the range [0,2^31]&lt;br&gt;Each evaluation of an expression results in different random vector.&lt;br&gt;Although, it remains consistent in the lifetime of a single wave.&lt;br&gt;If you want a single random values you can use randv(0),randv(1)... &lt;br&gt;and every reference to randv(a) will give you the same value.If you want a random wave you can use randv(t*srate).&lt;br&gt;Each random value is in the range [-1,1).&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - works exactly like randv(x),&lt;br&gt;except that it lets you to select the seed manualy,&lt;br&gt;if you want to try different random values and make it consistent in each evaluation.&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - A triangle wave with period of 1.&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - A square wave with period of 1.&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - A saw wave with period of 1.&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - If x is in range of (min_val,max_val) it returns x. Otherwise if it&apos;s greater than max_val it returns max_val, else returns min_val.&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, etc. are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Operands + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; | are also available.&lt;/b&gt;&lt;br&gt;&lt;b&gt;Amplitude Modulation&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;Ring Modulation&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;Mix Modulation&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;Frequency Modulation&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;Phase Modulation&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</source>
+        <translation>&lt;b&gt;O1, O2&lt;/b&gt; - 两个输出波形，声像由 PN1 和 PN2 控制。&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 由表达式计算的波形采样，其中变量 t 的范围为 [0,1)。&lt;br&gt;可在输出波形（O1、O2）中将这些波形作为函数使用，波形周期为 1。&lt;br&gt;&lt;h4&gt;可用变量：&lt;/h4&gt;&lt;br&gt;&lt;b&gt;t&lt;/b&gt; - 时间，单位为秒。&lt;br&gt;&lt;b&gt;f&lt;/b&gt; - 音符移调后的频率，仅可用于输出表达式。&lt;br&gt;&lt;b&gt;key&lt;/b&gt; - 音符对应的键盘键号：0 表示 C-1，60 表示 C4，127 表示 G9。仅可用于输出表达式。&lt;br&gt;&lt;b&gt;bnote&lt;/b&gt; - 基准音符。未更改时默认值为 69，即 A4。&lt;br&gt;&lt;b&gt;srate&lt;/b&gt; - 采样率。在波形表达式中返回波形的采样点数。&lt;br&gt;&lt;b&gt;tempo&lt;/b&gt; - 歌曲速度，仅可用于输出表达式。&lt;br&gt;&lt;b&gt;v&lt;/b&gt; - 音符音量。注意输出已经乘以音量。仅可用于输出表达式。&lt;br&gt;&lt;b&gt;rel&lt;/b&gt; - 按键按住时为 0.0，松开后为 1.0。仅可用于输出表达式。&lt;br&gt;&lt;b&gt;trel&lt;/b&gt; - 松键后的时间。按住音符时为 0.0，松开后开始以秒计时。&lt;br&gt;松键后从 0.0 过渡到 1.0 的时间由 REL 旋钮决定。&lt;br&gt;&lt;b&gt;seed&lt;/b&gt; - 在单个波形生命周期内保持一致的随机值，供以下函数使用：&lt;b&gt;randsv&lt;/b&gt;&lt;br&gt;&lt;b&gt;A1, A2, A3&lt;/b&gt; - 通用旋钮，仅可在 O1 和 O2 中引用，范围为 [-1,1]。&lt;br&gt;&lt;h4&gt;可用函数：&lt;/h4&gt;&lt;br&gt;&lt;b&gt;W1, W2, W3&lt;/b&gt; - 如上所述，仅可在 O1 和 O2 中引用。&lt;br&gt;&lt;b&gt;cent(x)&lt;/b&gt; - 返回 pow(2,x/1200)，可与变量 f 相乘以调整频率。&lt;br&gt;100 音分等于一个半音。&lt;br&gt;&lt;b&gt;semitone(x)&lt;/b&gt; - 返回 pow(2,x/12)，可与变量 f 相乘以调整频率。&lt;br&gt;&lt;b&gt;last(n)&lt;/b&gt; - 返回之前第 n 个已计算的采样。在 O1、O2 中保留一整秒，因此参数 n 必须在 [1,srate] 范围内，否则返回 0。&lt;br&gt;&lt;b&gt;integrate(x)&lt;/b&gt; - 按时间增量 delta t 对 x 积分（将数值相加再除以采样率）。&lt;br&gt;若音符频率使用自动化，请使用：&lt;br&gt;sinew(integrate(f))，而不是 sinew(t*f)。&lt;br&gt;&lt;b&gt;randv(x)&lt;/b&gt; - 随机向量，每个元素通过 [0,2^31] 范围内的整数索引引用。&lt;br&gt;每次计算表达式都会生成不同的随机向量。&lt;br&gt;但在单个波形的生命周期内保持一致。&lt;br&gt;若需要单个随机值，可使用 randv(0)、randv(1)… &lt;br&gt;每次引用 randv(a) 都得到相同值。若需要随机波形，可使用 randv(t*srate)。&lt;br&gt;每个随机值的范围为 [-1,1)。&lt;br&gt;&lt;b&gt;randsv(x,seed)&lt;/b&gt; - 与 randv(x) 的功能完全相同，&lt;br&gt;但允许手动选择种子，&lt;br&gt;用于尝试不同的随机值，并在每次计算时保持一致。&lt;br&gt;&lt;b&gt;sinew(x)&lt;/b&gt; - 周期为 1 的正弦波（普通正弦函数的周期为 2*pi）。&lt;br&gt;&lt;b&gt;trianglew(x)&lt;/b&gt; - 周期为 1 的三角波。&lt;br&gt;&lt;b&gt;squarew(x)&lt;/b&gt; - 周期为 1 的方波。&lt;br&gt;&lt;b&gt;saww(x)&lt;/b&gt; - 周期为 1 的锯齿波。&lt;br&gt;&lt;b&gt;clamp(min_val,x,max_val)&lt;/b&gt; - x 位于 (min_val,max_val) 范围内时返回 x；大于 max_val 时返回 max_val，否则返回 min_val。&lt;br&gt;&lt;b&gt;abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, avg, sgn, mod, 等函数也可使用。&lt;/b&gt;&lt;br&gt;&lt;b&gt;还支持运算符 + - * / % ^ &amp;gt; &amp;lt; &amp;gt;= &amp;lt;= == != &amp;amp; |。&lt;/b&gt;&lt;br&gt;&lt;b&gt;振幅调制&lt;/b&gt; - W1(t*f)*(1+W2(t*f))&lt;br&gt;&lt;b&gt;环形调制&lt;/b&gt; - W1(t * f)*W2(t * f)&lt;br&gt;&lt;b&gt;混合调制&lt;/b&gt; - 0.5*( W1(t * f) + W2(t * f) )&lt;br&gt;&lt;b&gt;频率调制&lt;/b&gt; - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )&lt;br&gt;&lt;b&gt;相位调制&lt;/b&gt; - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Xpressive Help</source>
+        <translation>Xpressive 帮助</translation>
+    </message>
+</context>
+<context>
     <name>lmms::gui::XpressiveView</name>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15117,11 +15128,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Select output O1</source>
-        <translation type="unfinished"></translation>
+        <translation>选择输出 O1</translation>
     </message>
     <message>
         <source>Select output O2</source>
-        <translation type="unfinished"></translation>
+        <translation>选择输出 O2</translation>
     </message>
     <message>
         <source>Open help window</source>
@@ -15161,39 +15172,55 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>WaveInterpolate</source>
-        <translation type="unfinished"></translation>
+        <translation>波形插值</translation>
+    </message>
+    <message>
+        <source>Interpolate</source>
+        <translation>插值</translation>
     </message>
     <message>
         <source>ExpressionValid</source>
-        <translation type="unfinished"></translation>
+        <translation>表达式状态</translation>
     </message>
     <message>
         <source>General purpose 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>通用参数 1：</translation>
     </message>
     <message>
         <source>General purpose 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>通用参数 2：</translation>
     </message>
     <message>
         <source>General purpose 3:</source>
-        <translation type="unfinished"></translation>
+        <translation>通用参数 3：</translation>
+    </message>
+    <message>
+        <source>O1 panning</source>
+        <translation>O1 声像</translation>
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>O1 声像：</translation>
+    </message>
+    <message>
+        <source>O2 panning</source>
+        <translation>O2 声像</translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>O2 声像：</translation>
+    </message>
+    <message>
+        <source>Release transition</source>
+        <translation>释音过渡</translation>
     </message>
     <message>
         <source>Release transition:</source>
-        <translation type="unfinished"></translation>
+        <translation>释音过渡：</translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑度</translation>
     </message>
 </context>
 <context>
@@ -15212,19 +15239,19 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Filter frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波频率：</translation>
     </message>
     <message>
         <source>RES</source>
-        <translation type="unfinished"></translation>
+        <translation>共振</translation>
     </message>
     <message>
         <source>Filter resonance:</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波共振：</translation>
     </message>
     <message>
         <source>BW</source>
-        <translation type="unfinished"></translation>
+        <translation>带宽</translation>
     </message>
     <message>
         <source>Bandwidth:</source>
@@ -15240,23 +15267,23 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>RES CF</source>
-        <translation type="unfinished"></translation>
+        <translation>共振中心</translation>
     </message>
     <message>
         <source>Resonance center frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>共振中心频率：</translation>
     </message>
     <message>
         <source>RES BW</source>
-        <translation type="unfinished"></translation>
+        <translation>共振带宽</translation>
     </message>
     <message>
         <source>Resonance bandwidth:</source>
-        <translation type="unfinished"></translation>
+        <translation>共振带宽：</translation>
     </message>
     <message>
         <source>Forward MIDI control changes</source>
-        <translation type="unfinished"></translation>
+        <translation>转发 MIDI 控制变化</translation>
     </message>
     <message>
         <source>Show GUI</source>
