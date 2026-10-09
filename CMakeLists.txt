@@ -856,6 +856,7 @@ ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(sdk/svs)
+add_subdirectory(sdk/svc)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
