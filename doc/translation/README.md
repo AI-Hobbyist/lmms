@@ -171,3 +171,7 @@ M5-08：M5-07 检查点 8bedb1022fa19986e6352c8f9868082d622c59a3 已推送确认
 M5-09：M5-08 检查点 371dcab0bafb871325f0f1dac25f5f6312272617 已推送确认。Sf2Player/Sfxr/Sid/SlewDistortion/SlicerT 共 177 键四语质量 PASS。补齐 SoundFont 合唱/混响、SID 声部、失真类型及切片操作；完整补译 Slew Distortion 日语 HTML 帮助，保持标签和技术内容。新增帮助标题、SlicerT 的 Off 与无采样状态三个入口，不改变音频参数和预设。Tanh 按数学函数处理，芯片型号/BPM/MIDI 保留并登记。全库 3627 键，中/日/韩剩余空译 240/257/14。
 
 四语 QM、slewdistortion/slicert/UiBaselineCapture 编译通过，DLL 部署于 build/Release/plugins，开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，四个已部署插件面板、真实帮助窗与预设恢复通过；SID 未部署，MANUAL/PENDING。SlicerT 固定文字修正后另行四语复测，100% 原生 Windows 实窗。中日韩字形正常；SlicerT 的 SYNC/CLEAR 标识来自按钮位图，保留既有 artwork，完整操作提示已翻译，M7 验证悬浮全文和窄标签省略，不重绘位图或改变布局。
+
+M5-10：M5-09 检查点 d24c0d7422be0b503b3e29651f767c9d6fe2cb1f 已推送确认。SpectrumAnalyzer/StereoEnhancer/StereoMatrix/Stk/TapTempo 共 174 键四语质量 PASS。补齐频谱分析的 FFT、幅度/频率范围、平均/峰值、瀑布图及高级说明，STK 乐器预设/演奏参数和节拍测速操作。ADSR 与 Hz/ms 数值模板作为标准技术表示保留并逐语言登记；英文源文回退。全库 3627 键，中/日/韩剩余空译 114/129/12。
+
+本批仅译文，四语 QM 生成通过，按计划复用已编译的原生测试程序。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，五个插件均取得面板截图，预设恢复通过（工具面板不适用）。STK 使用既有 build/vcpkg_installed/x64-windows/share/libstk/rawwaves，不创建新部署目录。代表截图确认中文测速提示和日文频谱控制正常显示，字形正常；高级参数展开、完整悬浮提示及乐器其他预设切换留 M7 最终矩阵。开发程序与插件目录仍为 build/Release/lmms.exe、build/Release/plugins。

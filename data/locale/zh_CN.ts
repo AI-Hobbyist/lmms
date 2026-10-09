@@ -942,7 +942,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished"></translation>
+        <translation>旋律打击乐器</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
@@ -3340,7 +3340,7 @@ Continue?</source>
     <name>lmms::MalletsInstrument</name>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation>硬度</translation>
     </message>
     <message>
         <source>Position</source>
@@ -3348,15 +3348,15 @@ Continue?</source>
     </message>
     <message>
         <source>Vibrato gain</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音增益</translation>
     </message>
     <message>
         <source>Vibrato frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音频率</translation>
     </message>
     <message>
         <source>Stick mix</source>
-        <translation type="unfinished"></translation>
+        <translation>槌击混合</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -3364,7 +3364,7 @@ Continue?</source>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>交叉淡化</translation>
     </message>
     <message>
         <source>LFO speed</source>
@@ -3372,11 +3372,11 @@ Continue?</source>
     </message>
     <message>
         <source>LFO depth</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 深度</translation>
     </message>
     <message>
         <source>ADSR</source>
-        <translation type="unfinished"></translation>
+        <translation>ADSR</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -3384,7 +3384,7 @@ Continue?</source>
     </message>
     <message>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>运动</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -3392,7 +3392,7 @@ Continue?</source>
     </message>
     <message>
         <source>Bowed</source>
-        <translation type="unfinished"></translation>
+        <translation>弓奏</translation>
     </message>
     <message>
         <source>Instrument</source>
@@ -3400,35 +3400,35 @@ Continue?</source>
     </message>
     <message>
         <source>Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>扩散</translation>
     </message>
     <message>
         <source>Randomness</source>
-        <translation type="unfinished"></translation>
+        <translation>随机程度</translation>
     </message>
     <message>
         <source>Marimba</source>
-        <translation type="unfinished"></translation>
+        <translation>马林巴琴</translation>
     </message>
     <message>
         <source>Vibraphone</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音琴</translation>
     </message>
     <message>
         <source>Agogo</source>
-        <translation type="unfinished"></translation>
+        <translation>阿戈戈铃</translation>
     </message>
     <message>
         <source>Wood 1</source>
-        <translation type="unfinished"></translation>
+        <translation>木质 1</translation>
     </message>
     <message>
         <source>Reso</source>
-        <translation type="unfinished"></translation>
+        <translation>共鸣</translation>
     </message>
     <message>
         <source>Wood 2</source>
-        <translation type="unfinished"></translation>
+        <translation>木质 2</translation>
     </message>
     <message>
         <source>Beats</source>
@@ -3436,23 +3436,23 @@ Continue?</source>
     </message>
     <message>
         <source>Two fixed</source>
-        <translation type="unfinished"></translation>
+        <translation>两端固定</translation>
     </message>
     <message>
         <source>Clump</source>
-        <translation type="unfinished"></translation>
+        <translation>簇状音色</translation>
     </message>
     <message>
         <source>Tubular bells</source>
-        <translation type="unfinished"></translation>
+        <translation>管钟</translation>
     </message>
     <message>
         <source>Uniform bar</source>
-        <translation type="unfinished"></translation>
+        <translation>均匀棒</translation>
     </message>
     <message>
         <source>Tuned bar</source>
-        <translation type="unfinished"></translation>
+        <translation>调音棒</translation>
     </message>
     <message>
         <source>Glass</source>
@@ -3460,7 +3460,7 @@ Continue?</source>
     </message>
     <message>
         <source>Tibetan bowl</source>
-        <translation type="unfinished"></translation>
+        <translation>藏式钵</translation>
     </message>
 </context>
 <context>
@@ -4667,15 +4667,15 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Reference freeze</source>
-        <translation type="unfinished"></translation>
+        <translation>参考冻结</translation>
     </message>
     <message>
         <source>Waterfall</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图</translation>
     </message>
     <message>
         <source>Averaging</source>
-        <translation type="unfinished"></translation>
+        <translation>平均</translation>
     </message>
     <message>
         <source>Stereo</source>
@@ -4683,71 +4683,71 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Peak hold</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值保持</translation>
     </message>
     <message>
         <source>Logarithmic frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>对数频率</translation>
     </message>
     <message>
         <source>Logarithmic amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>对数幅度</translation>
     </message>
     <message>
         <source>Frequency range</source>
-        <translation type="unfinished"></translation>
+        <translation>频率范围</translation>
     </message>
     <message>
         <source>Amplitude range</source>
-        <translation type="unfinished"></translation>
+        <translation>幅度范围</translation>
     </message>
     <message>
         <source>FFT block size</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 块大小</translation>
     </message>
     <message>
         <source>FFT window type</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窗类型</translation>
     </message>
     <message>
         <source>Peak envelope resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值包络分辨率</translation>
     </message>
     <message>
         <source>Spectrum display resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>频谱显示分辨率</translation>
     </message>
     <message>
         <source>Peak decay multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值衰减倍率</translation>
     </message>
     <message>
         <source>Averaging weight</source>
-        <translation type="unfinished"></translation>
+        <translation>平均权重</translation>
     </message>
     <message>
         <source>Waterfall history size</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图历史长度</translation>
     </message>
     <message>
         <source>Waterfall gamma correction</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图伽马校正</translation>
     </message>
     <message>
         <source>FFT window overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窗重叠</translation>
     </message>
     <message>
         <source>FFT zero padding</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 补零</translation>
     </message>
     <message>
         <source>Full (auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>完整范围（自动）</translation>
     </message>
     <message>
         <source>Audible</source>
-        <translation type="unfinished"></translation>
+        <translation>可听范围</translation>
     </message>
     <message>
         <source>Bass</source>
@@ -4755,47 +4755,47 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Mids</source>
-        <translation type="unfinished"></translation>
+        <translation>中频</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>高频</translation>
     </message>
     <message>
         <source>Extended</source>
-        <translation type="unfinished"></translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <source>Loud</source>
-        <translation type="unfinished"></translation>
+        <translation>强信号</translation>
     </message>
     <message>
         <source>Silent</source>
-        <translation type="unfinished"></translation>
+        <translation>弱信号</translation>
     </message>
     <message>
         <source>(High time res.)</source>
-        <translation type="unfinished"></translation>
+        <translation>（高时间分辨率）</translation>
     </message>
     <message>
         <source>(High freq. res.)</source>
-        <translation type="unfinished"></translation>
+        <translation>（高频率分辨率）</translation>
     </message>
     <message>
         <source>Rectangular (Off)</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形窗（关闭）</translation>
     </message>
     <message>
         <source>Blackman-Harris (Default)</source>
-        <translation type="unfinished"></translation>
+        <translation>布莱克曼-哈里斯窗（默认）</translation>
     </message>
     <message>
         <source>Hamming</source>
-        <translation type="unfinished"></translation>
+        <translation>汉明窗</translation>
     </message>
     <message>
         <source>Hanning</source>
-        <translation type="unfinished"></translation>
+        <translation>汉宁窗</translation>
     </message>
 </context>
 <context>
@@ -9801,11 +9801,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>扩散</translation>
     </message>
     <message>
         <source>Spread:</source>
-        <translation type="unfinished"></translation>
+        <translation>扩散：</translation>
     </message>
     <message>
         <source>Random</source>
@@ -9813,7 +9813,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Random:</source>
-        <translation type="unfinished"></translation>
+        <translation>随机：</translation>
     </message>
     <message>
         <source>Missing files</source>
@@ -9825,11 +9825,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation>硬度</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished"></translation>
+        <translation>硬度：</translation>
     </message>
     <message>
         <source>Position</source>
@@ -9841,27 +9841,27 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Vibrato gain</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音增益</translation>
     </message>
     <message>
         <source>Vibrato gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音增益：</translation>
     </message>
     <message>
         <source>Vibrato frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音频率</translation>
     </message>
     <message>
         <source>Vibrato frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音频率：</translation>
     </message>
     <message>
         <source>Stick mix</source>
-        <translation type="unfinished"></translation>
+        <translation>槌击混合</translation>
     </message>
     <message>
         <source>Stick mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>槌击混合：</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -9873,11 +9873,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>交叉淡化</translation>
     </message>
     <message>
         <source>Crossfade:</source>
-        <translation type="unfinished"></translation>
+        <translation>交叉淡化：</translation>
     </message>
     <message>
         <source>LFO speed</source>
@@ -9889,19 +9889,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>LFO depth</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 深度</translation>
     </message>
     <message>
         <source>LFO depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 深度：</translation>
     </message>
     <message>
         <source>ADSR</source>
-        <translation type="unfinished"></translation>
+        <translation>ADSR</translation>
     </message>
     <message>
         <source>ADSR:</source>
-        <translation type="unfinished"></translation>
+        <translation>ADSR:</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -12611,31 +12611,31 @@ Seed: %3</source>
     </message>
     <message>
         <source>Pause data acquisition</source>
-        <translation type="unfinished"></translation>
+        <translation>暂停数据采集</translation>
     </message>
     <message>
         <source>Reference freeze</source>
-        <translation type="unfinished"></translation>
+        <translation>参考冻结</translation>
     </message>
     <message>
         <source>Freeze current input as a reference / disable falloff in peak-hold mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>冻结当前输入作为参考；在峰值保持模式下禁用衰减。</translation>
     </message>
     <message>
         <source>Waterfall</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图</translation>
     </message>
     <message>
         <source>Display real-time spectrogram</source>
-        <translation type="unfinished"></translation>
+        <translation>显示实时声谱图</translation>
     </message>
     <message>
         <source>Averaging</source>
-        <translation type="unfinished"></translation>
+        <translation>平均</translation>
     </message>
     <message>
         <source>Enable exponential moving average</source>
-        <translation type="unfinished"></translation>
+        <translation>启用指数移动平均</translation>
     </message>
     <message>
         <source>Stereo</source>
@@ -12643,115 +12643,115 @@ Seed: %3</source>
     </message>
     <message>
         <source>Display stereo channels separately</source>
-        <translation type="unfinished"></translation>
+        <translation>分别显示立体声通道</translation>
     </message>
     <message>
         <source>Peak hold</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值保持</translation>
     </message>
     <message>
         <source>Display envelope of peak values</source>
-        <translation type="unfinished"></translation>
+        <translation>显示峰值包络</translation>
     </message>
     <message>
         <source>Logarithmic frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>对数频率</translation>
     </message>
     <message>
         <source>Switch between logarithmic and linear frequency scale</source>
-        <translation type="unfinished"></translation>
+        <translation>切换对数与线性频率刻度</translation>
     </message>
     <message>
         <source>Frequency range</source>
-        <translation type="unfinished"></translation>
+        <translation>频率范围</translation>
     </message>
     <message>
         <source>Logarithmic amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>对数幅度</translation>
     </message>
     <message>
         <source>Switch between logarithmic and linear amplitude scale</source>
-        <translation type="unfinished"></translation>
+        <translation>切换对数与线性幅度刻度</translation>
     </message>
     <message>
         <source>Amplitude range</source>
-        <translation type="unfinished"></translation>
+        <translation>幅度范围</translation>
     </message>
     <message>
         <source>FFT block size</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 块大小</translation>
     </message>
     <message>
         <source>FFT window type</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窗类型</translation>
     </message>
     <message>
         <source>Envelope res.</source>
-        <translation type="unfinished"></translation>
+        <translation>包络分辨率</translation>
     </message>
     <message>
         <source>Increase envelope resolution for better details, decrease for better GUI performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>提高包络分辨率可显示更多细节，降低可改善界面性能。</translation>
     </message>
     <message>
         <source>Maximum number of envelope points drawn per pixel:</source>
-        <translation type="unfinished"></translation>
+        <translation>每像素绘制的最大包络点数：</translation>
     </message>
     <message>
         <source>Spectrum res.</source>
-        <translation type="unfinished"></translation>
+        <translation>频谱分辨率</translation>
     </message>
     <message>
         <source>Increase spectrum resolution for better details, decrease for better GUI performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>提高频谱分辨率可显示更多细节，降低可改善界面性能。</translation>
     </message>
     <message>
         <source>Maximum number of spectrum points drawn per pixel:</source>
-        <translation type="unfinished"></translation>
+        <translation>每像素绘制的最大频谱点数：</translation>
     </message>
     <message>
         <source>Falloff factor</source>
-        <translation type="unfinished"></translation>
+        <translation>衰减系数</translation>
     </message>
     <message>
         <source>Decrease to make peaks fall faster.</source>
-        <translation type="unfinished"></translation>
+        <translation>减小可使峰值回落更快。</translation>
     </message>
     <message>
         <source>Multiply buffered value by</source>
-        <translation type="unfinished"></translation>
+        <translation>缓冲值乘以</translation>
     </message>
     <message>
         <source>Averaging weight</source>
-        <translation type="unfinished"></translation>
+        <translation>平均权重</translation>
     </message>
     <message>
         <source>Decrease to make averaging slower and smoother.</source>
-        <translation type="unfinished"></translation>
+        <translation>减小可使平均过程更慢、更平滑。</translation>
     </message>
     <message>
         <source>New sample contributes</source>
-        <translation type="unfinished"></translation>
+        <translation>新采样贡献比例</translation>
     </message>
     <message>
         <source>Waterfall height</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图高度</translation>
     </message>
     <message>
         <source>Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>增大可减慢滚动，减小可更清楚地查看快速变化。注意：CPU 用量中等。</translation>
     </message>
     <message>
         <source>Number of lines to keep:</source>
-        <translation type="unfinished"></translation>
+        <translation>保留行数：</translation>
     </message>
     <message>
         <source>Waterfall gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>瀑布图伽马</translation>
     </message>
     <message>
         <source>Decrease to see very weak signals, increase to get better contrast.</source>
-        <translation type="unfinished"></translation>
+        <translation>减小可查看更弱的信号，增大可提高对比度。</translation>
     </message>
     <message>
         <source>Gamma value:</source>
@@ -12759,39 +12759,39 @@ Seed: %3</source>
     </message>
     <message>
         <source>Window overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>窗重叠</translation>
     </message>
     <message>
         <source>Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>增大可避免漏掉 FFT 窗边缘附近的快速变化。注意：CPU 用量较高。</translation>
     </message>
     <message>
         <source>Number of times each sample is processed:</source>
-        <translation type="unfinished"></translation>
+        <translation>每个采样的处理次数：</translation>
     </message>
     <message>
         <source>Zero padding</source>
-        <translation type="unfinished"></translation>
+        <translation>补零</translation>
     </message>
     <message>
         <source>Increase to get smoother-looking spectrum. Warning: high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>增大可使频谱更平滑。注意：CPU 用量较高。</translation>
     </message>
     <message>
         <source>Processing buffer is</source>
-        <translation type="unfinished"></translation>
+        <translation>处理缓冲区为</translation>
     </message>
     <message>
         <source> steps larger than input block</source>
-        <translation type="unfinished"></translation>
+        <translation> 步，大于输入块</translation>
     </message>
     <message>
         <source>Advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>高级设置</translation>
     </message>
     <message>
         <source>Access advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>打开高级设置</translation>
     </message>
 </context>
 <context>
@@ -14050,7 +14050,7 @@ Latency: %2 ms</source>
     <name>lmms::gui::StereoEnhancerControlDialog</name>
     <message>
         <source>WIDTH</source>
-        <translation type="unfinished"></translation>
+        <translation>宽度</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -14099,19 +14099,19 @@ Latency: %2 ms</source>
     <name>lmms::gui::TapTempoView</name>
     <message>
         <source>Tap to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>点击开始</translation>
     </message>
     <message>
         <source>Display in high precision</source>
-        <translation type="unfinished"></translation>
+        <translation>高精度显示</translation>
     </message>
     <message>
         <source>Precision</source>
-        <translation type="unfinished"></translation>
+        <translation>精度</translation>
     </message>
     <message>
         <source>Mute metronome</source>
-        <translation type="unfinished"></translation>
+        <translation>静音节拍器</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -14119,19 +14119,19 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>BPM in milliseconds</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍周期（毫秒）</translation>
     </message>
     <message>
         <source>0 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>0 ms</translation>
     </message>
     <message>
         <source>Frequency of BPM</source>
-        <translation type="unfinished"></translation>
+        <translation>节拍频率</translation>
     </message>
     <message>
         <source>0.0000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0000 Hz</translation>
     </message>
     <message>
         <source>Reset counter and sidebar information</source>
@@ -14151,7 +14151,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>%1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ms</translation>
     </message>
     <message>
         <source>%1 Hz</source>

@@ -14099,7 +14099,7 @@ Latency: %2 ms</source>
     <name>lmms::gui::TapTempoView</name>
     <message>
         <source>Tap to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>탭하여 시작</translation>
     </message>
     <message>
         <source>Display in high precision</source>
@@ -14131,7 +14131,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>0.0000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0000 Hz</translation>
     </message>
     <message>
         <source>Reset counter and sidebar information</source>

@@ -930,7 +930,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A graphical spectrum analyzer.</source>
-        <translation type="unfinished"></translation>
+        <translation>グラフィカルなスペクトラムアナライザー。</translation>
     </message>
     <message>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
@@ -942,7 +942,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished"></translation>
+        <translation>音程のある打楽器</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
@@ -1010,7 +1010,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Tap to the beat</source>
-        <translation type="unfinished"></translation>
+        <translation>拍に合わせてタップ</translation>
     </message>
     <message>
         <source>Filter for exporting MIDI files from LMMS</source>
@@ -3340,7 +3340,7 @@ Continue?</source>
     <name>lmms::MalletsInstrument</name>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation>硬さ</translation>
     </message>
     <message>
         <source>Position</source>
@@ -3348,15 +3348,15 @@ Continue?</source>
     </message>
     <message>
         <source>Vibrato gain</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラートゲイン</translation>
     </message>
     <message>
         <source>Vibrato frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラート周波数</translation>
     </message>
     <message>
         <source>Stick mix</source>
-        <translation type="unfinished"></translation>
+        <translation>打撃ミックス</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -3364,15 +3364,15 @@ Continue?</source>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>クロスフェード</translation>
     </message>
     <message>
         <source>LFO speed</source>
-        <translation>LFO speed</translation>
+        <translation>LFO 速度</translation>
     </message>
     <message>
         <source>LFO depth</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO の深さ</translation>
     </message>
     <message>
         <source>ADSR</source>
@@ -3380,11 +3380,11 @@ Continue?</source>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>圧力</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>動き</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -3392,7 +3392,7 @@ Continue?</source>
     </message>
     <message>
         <source>Bowed</source>
-        <translation type="unfinished"></translation>
+        <translation>弓奏</translation>
     </message>
     <message>
         <source>Instrument</source>
@@ -3400,11 +3400,11 @@ Continue?</source>
     </message>
     <message>
         <source>Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>広がり</translation>
     </message>
     <message>
         <source>Randomness</source>
-        <translation type="unfinished"></translation>
+        <translation>ランダム性</translation>
     </message>
     <message>
         <source>Marimba</source>
@@ -3420,47 +3420,47 @@ Continue?</source>
     </message>
     <message>
         <source>Wood 1</source>
-        <translation type="unfinished"></translation>
+        <translation>木材 1</translation>
     </message>
     <message>
         <source>Reso</source>
-        <translation type="unfinished"></translation>
+        <translation>共鳴</translation>
     </message>
     <message>
         <source>Wood 2</source>
-        <translation type="unfinished"></translation>
+        <translation>木材 2</translation>
     </message>
     <message>
         <source>Beats</source>
-        <translation type="unfinished"></translation>
+        <translation>うなり</translation>
     </message>
     <message>
         <source>Two fixed</source>
-        <translation type="unfinished"></translation>
+        <translation>両端固定</translation>
     </message>
     <message>
         <source>Clump</source>
-        <translation type="unfinished"></translation>
+        <translation>クランプ</translation>
     </message>
     <message>
         <source>Tubular bells</source>
-        <translation type="unfinished"></translation>
+        <translation>チューブラーベル</translation>
     </message>
     <message>
         <source>Uniform bar</source>
-        <translation type="unfinished"></translation>
+        <translation>均一バー</translation>
     </message>
     <message>
         <source>Tuned bar</source>
-        <translation type="unfinished"></translation>
+        <translation>調律バー</translation>
     </message>
     <message>
         <source>Glass</source>
-        <translation type="unfinished"></translation>
+        <translation>ガラス</translation>
     </message>
     <message>
         <source>Tibetan bowl</source>
-        <translation type="unfinished"></translation>
+        <translation>チベタンボウル</translation>
     </message>
 </context>
 <context>
@@ -4667,15 +4667,15 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Reference freeze</source>
-        <translation type="unfinished"></translation>
+        <translation>基準を固定</translation>
     </message>
     <message>
         <source>Waterfall</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォール</translation>
     </message>
     <message>
         <source>Averaging</source>
-        <translation type="unfinished"></translation>
+        <translation>平均化</translation>
     </message>
     <message>
         <source>Stereo</source>
@@ -4683,71 +4683,71 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Peak hold</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク保持</translation>
     </message>
     <message>
         <source>Logarithmic frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>対数周波数</translation>
     </message>
     <message>
         <source>Logarithmic amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>対数振幅</translation>
     </message>
     <message>
         <source>Frequency range</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数範囲</translation>
     </message>
     <message>
         <source>Amplitude range</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅範囲</translation>
     </message>
     <message>
         <source>FFT block size</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT ブロックサイズ</translation>
     </message>
     <message>
         <source>FFT window type</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窓タイプ</translation>
     </message>
     <message>
         <source>Peak envelope resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク包絡線の分解能</translation>
     </message>
     <message>
         <source>Spectrum display resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>スペクトル表示分解能</translation>
     </message>
     <message>
         <source>Peak decay multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク減衰倍率</translation>
     </message>
     <message>
         <source>Averaging weight</source>
-        <translation type="unfinished"></translation>
+        <translation>平均化の重み</translation>
     </message>
     <message>
         <source>Waterfall history size</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォールの履歴サイズ</translation>
     </message>
     <message>
         <source>Waterfall gamma correction</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォールのガンマ補正</translation>
     </message>
     <message>
         <source>FFT window overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窓の重なり</translation>
     </message>
     <message>
         <source>FFT zero padding</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT ゼロパディング</translation>
     </message>
     <message>
         <source>Full (auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>全範囲（自動）</translation>
     </message>
     <message>
         <source>Audible</source>
-        <translation type="unfinished"></translation>
+        <translation>可聴域</translation>
     </message>
     <message>
         <source>Bass</source>
@@ -4755,47 +4755,47 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Mids</source>
-        <translation type="unfinished"></translation>
+        <translation>中域</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>高域</translation>
     </message>
     <message>
         <source>Extended</source>
-        <translation type="unfinished"></translation>
+        <translation>拡張</translation>
     </message>
     <message>
         <source>Loud</source>
-        <translation type="unfinished"></translation>
+        <translation>強い信号</translation>
     </message>
     <message>
         <source>Silent</source>
-        <translation type="unfinished"></translation>
+        <translation>弱い信号</translation>
     </message>
     <message>
         <source>(High time res.)</source>
-        <translation type="unfinished"></translation>
+        <translation>（高時間分解能）</translation>
     </message>
     <message>
         <source>(High freq. res.)</source>
-        <translation type="unfinished"></translation>
+        <translation>（高周波数分解能）</translation>
     </message>
     <message>
         <source>Rectangular (Off)</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形窓（オフ）</translation>
     </message>
     <message>
         <source>Blackman-Harris (Default)</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラックマン・ハリス窓（標準）</translation>
     </message>
     <message>
         <source>Hamming</source>
-        <translation type="unfinished"></translation>
+        <translation>ハミング窓</translation>
     </message>
     <message>
         <source>Hanning</source>
-        <translation type="unfinished"></translation>
+        <translation>ハニング窓</translation>
     </message>
 </context>
 <context>
@@ -5169,7 +5169,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::StereoEnhancerControls</name>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>幅</translation>
     </message>
 </context>
 <context>
@@ -9801,11 +9801,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>広がり</translation>
     </message>
     <message>
         <source>Spread:</source>
-        <translation type="unfinished"></translation>
+        <translation>広がり：</translation>
     </message>
     <message>
         <source>Random</source>
@@ -9813,7 +9813,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Random:</source>
-        <translation type="unfinished"></translation>
+        <translation>ランダム：</translation>
     </message>
     <message>
         <source>Missing files</source>
@@ -9825,11 +9825,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation>硬さ</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished"></translation>
+        <translation>硬さ：</translation>
     </message>
     <message>
         <source>Position</source>
@@ -9841,27 +9841,27 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Vibrato gain</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラートゲイン</translation>
     </message>
     <message>
         <source>Vibrato gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラートゲイン：</translation>
     </message>
     <message>
         <source>Vibrato frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラート周波数</translation>
     </message>
     <message>
         <source>Vibrato frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラート周波数：</translation>
     </message>
     <message>
         <source>Stick mix</source>
-        <translation type="unfinished"></translation>
+        <translation>打撃ミックス</translation>
     </message>
     <message>
         <source>Stick mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>打撃ミックス：</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -9869,31 +9869,31 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Modulator:</source>
-        <translation type="unfinished"></translation>
+        <translation>モジュレーター：</translation>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>クロスフェード</translation>
     </message>
     <message>
         <source>Crossfade:</source>
-        <translation type="unfinished"></translation>
+        <translation>クロスフェード：</translation>
     </message>
     <message>
         <source>LFO speed</source>
-        <translation>LFO speed</translation>
+        <translation>LFO 速度</translation>
     </message>
     <message>
         <source>LFO speed:</source>
-        <translation>LFO speed:</translation>
+        <translation>LFO 速度：</translation>
     </message>
     <message>
         <source>LFO depth</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO の深さ</translation>
     </message>
     <message>
         <source>LFO depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO の深さ：</translation>
     </message>
     <message>
         <source>ADSR</source>
@@ -9905,11 +9905,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>圧力</translation>
     </message>
     <message>
         <source>Pressure:</source>
-        <translation type="unfinished"></translation>
+        <translation>圧力：</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -12611,31 +12611,31 @@ Seed: %3</source>
     </message>
     <message>
         <source>Pause data acquisition</source>
-        <translation type="unfinished"></translation>
+        <translation>データ取得を一時停止</translation>
     </message>
     <message>
         <source>Reference freeze</source>
-        <translation type="unfinished"></translation>
+        <translation>基準を固定</translation>
     </message>
     <message>
         <source>Freeze current input as a reference / disable falloff in peak-hold mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の入力を基準として固定し、ピーク保持モードでは減衰を無効にします。</translation>
     </message>
     <message>
         <source>Waterfall</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォール</translation>
     </message>
     <message>
         <source>Display real-time spectrogram</source>
-        <translation type="unfinished"></translation>
+        <translation>リアルタイムのスペクトログラムを表示</translation>
     </message>
     <message>
         <source>Averaging</source>
-        <translation type="unfinished"></translation>
+        <translation>平均化</translation>
     </message>
     <message>
         <source>Enable exponential moving average</source>
-        <translation type="unfinished"></translation>
+        <translation>指数移動平均を有効にする</translation>
     </message>
     <message>
         <source>Stereo</source>
@@ -12643,147 +12643,147 @@ Seed: %3</source>
     </message>
     <message>
         <source>Display stereo channels separately</source>
-        <translation type="unfinished"></translation>
+        <translation>左右チャンネルを個別に表示</translation>
     </message>
     <message>
         <source>Peak hold</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク保持</translation>
     </message>
     <message>
         <source>Display envelope of peak values</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク値の包絡線を表示</translation>
     </message>
     <message>
         <source>Logarithmic frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>対数周波数</translation>
     </message>
     <message>
         <source>Switch between logarithmic and linear frequency scale</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数の対数・線形目盛りを切り替える</translation>
     </message>
     <message>
         <source>Frequency range</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数範囲</translation>
     </message>
     <message>
         <source>Logarithmic amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>対数振幅</translation>
     </message>
     <message>
         <source>Switch between logarithmic and linear amplitude scale</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅の対数・線形目盛りを切り替える</translation>
     </message>
     <message>
         <source>Amplitude range</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅範囲</translation>
     </message>
     <message>
         <source>FFT block size</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT ブロックサイズ</translation>
     </message>
     <message>
         <source>FFT window type</source>
-        <translation type="unfinished"></translation>
+        <translation>FFT 窓タイプ</translation>
     </message>
     <message>
         <source>Envelope res.</source>
-        <translation type="unfinished"></translation>
+        <translation>包絡線の分解能</translation>
     </message>
     <message>
         <source>Increase envelope resolution for better details, decrease for better GUI performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>包絡線の分解能を上げると詳細が見え、下げると GUI の性能が上がります。</translation>
     </message>
     <message>
         <source>Maximum number of envelope points drawn per pixel:</source>
-        <translation type="unfinished"></translation>
+        <translation>1 ピクセルに描く包絡線の最大点数：</translation>
     </message>
     <message>
         <source>Spectrum res.</source>
-        <translation type="unfinished"></translation>
+        <translation>スペクトル分解能</translation>
     </message>
     <message>
         <source>Increase spectrum resolution for better details, decrease for better GUI performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>スペクトルの分解能を上げると詳細が見え、下げると GUI の性能が上がります。</translation>
     </message>
     <message>
         <source>Maximum number of spectrum points drawn per pixel:</source>
-        <translation type="unfinished"></translation>
+        <translation>1 ピクセルに描くスペクトルの最大点数：</translation>
     </message>
     <message>
         <source>Falloff factor</source>
-        <translation type="unfinished"></translation>
+        <translation>減衰係数</translation>
     </message>
     <message>
         <source>Decrease to make peaks fall faster.</source>
-        <translation type="unfinished"></translation>
+        <translation>小さくするとピークが速く減衰します。</translation>
     </message>
     <message>
         <source>Multiply buffered value by</source>
-        <translation type="unfinished"></translation>
+        <translation>バッファ値に掛ける係数</translation>
     </message>
     <message>
         <source>Averaging weight</source>
-        <translation type="unfinished"></translation>
+        <translation>平均化の重み</translation>
     </message>
     <message>
         <source>Decrease to make averaging slower and smoother.</source>
-        <translation type="unfinished"></translation>
+        <translation>小さくすると平均化が遅く、滑らかになります。</translation>
     </message>
     <message>
         <source>New sample contributes</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいサンプルの寄与率</translation>
     </message>
     <message>
         <source>Waterfall height</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォールの高さ</translation>
     </message>
     <message>
         <source>Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>大きくするとスクロールが遅くなり、小さくすると速い変化が見やすくなります。注意：CPU 負荷は中程度です。</translation>
     </message>
     <message>
         <source>Number of lines to keep:</source>
-        <translation type="unfinished"></translation>
+        <translation>保持する行数：</translation>
     </message>
     <message>
         <source>Waterfall gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォーターフォールのガンマ</translation>
     </message>
     <message>
         <source>Decrease to see very weak signals, increase to get better contrast.</source>
-        <translation type="unfinished"></translation>
+        <translation>小さくすると弱い信号が見え、大きくするとコントラストが上がります。</translation>
     </message>
     <message>
         <source>Gamma value:</source>
-        <translation type="unfinished"></translation>
+        <translation>ガンマ値：</translation>
     </message>
     <message>
         <source>Window overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>窓の重なり</translation>
     </message>
     <message>
         <source>Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>大きくすると FFT 窓の端付近の速い変化を見逃しにくくなります。注意：CPU 負荷が高くなります。</translation>
     </message>
     <message>
         <source>Number of times each sample is processed:</source>
-        <translation type="unfinished"></translation>
+        <translation>各サンプルの処理回数：</translation>
     </message>
     <message>
         <source>Zero padding</source>
-        <translation type="unfinished"></translation>
+        <translation>ゼロパディング</translation>
     </message>
     <message>
         <source>Increase to get smoother-looking spectrum. Warning: high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>大きくするとスペクトルが滑らかになります。注意：CPU 負荷が高くなります。</translation>
     </message>
     <message>
         <source>Processing buffer is</source>
-        <translation type="unfinished"></translation>
+        <translation>処理バッファーは</translation>
     </message>
     <message>
         <source> steps larger than input block</source>
-        <translation type="unfinished"></translation>
+        <translation> ステップ分、入力ブロックより大きい</translation>
     </message>
     <message>
         <source>Advanced settings</source>
@@ -12791,7 +12791,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Access advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細設定を開く</translation>
     </message>
 </context>
 <context>
@@ -14099,19 +14099,19 @@ Latency: %2 ms</source>
     <name>lmms::gui::TapTempoView</name>
     <message>
         <source>Tap to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>タップして開始</translation>
     </message>
     <message>
         <source>Display in high precision</source>
-        <translation type="unfinished"></translation>
+        <translation>高精度で表示</translation>
     </message>
     <message>
         <source>Precision</source>
-        <translation type="unfinished"></translation>
+        <translation>精度</translation>
     </message>
     <message>
         <source>Mute metronome</source>
-        <translation type="unfinished"></translation>
+        <translation>メトロノームをミュート</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -14119,7 +14119,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>BPM in milliseconds</source>
-        <translation type="unfinished"></translation>
+        <translation>拍の周期（ミリ秒）</translation>
     </message>
     <message>
         <source>0 ms</source>
@@ -14127,15 +14127,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Frequency of BPM</source>
-        <translation type="unfinished"></translation>
+        <translation>拍の周波数</translation>
     </message>
     <message>
         <source>0.0000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0000 Hz</translation>
     </message>
     <message>
         <source>Reset counter and sidebar information</source>
-        <translation type="unfinished"></translation>
+        <translation>カウンターとサイドバー情報をリセット</translation>
     </message>
     <message>
         <source>Reset</source>
@@ -14143,7 +14143,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Sync with project tempo</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトのテンポに同期</translation>
     </message>
     <message>
         <source>Sync</source>
