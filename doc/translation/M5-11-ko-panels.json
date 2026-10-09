@@ -1,0 +1,37 @@
+[
+    {
+        "plugin": "watsyn",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "tripleoscillator",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "waveshaper",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vestige",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS unloaded host wrapper; foreign editor and sound MANUAL/PENDING",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vectorscope",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vibed",
+        "reason": "Plugin unavailable in the configured development deployment",
+        "status": "MANUAL/PENDING"
+    }
+]

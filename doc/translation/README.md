@@ -175,3 +175,9 @@ M5-09：M5-08 检查点 371dcab0bafb871325f0f1dac25f5f6312272617 已推送确认
 M5-10：M5-09 检查点 d24c0d7422be0b503b3e29651f767c9d6fe2cb1f 已推送确认。SpectrumAnalyzer/StereoEnhancer/StereoMatrix/Stk/TapTempo 共 174 键四语质量 PASS。补齐频谱分析的 FFT、幅度/频率范围、平均/峰值、瀑布图及高级说明，STK 乐器预设/演奏参数和节拍测速操作。ADSR 与 Hz/ms 数值模板作为标准技术表示保留并逐语言登记；英文源文回退。全库 3627 键，中/日/韩剩余空译 114/129/12。
 
 本批仅译文，四语 QM 生成通过，按计划复用已编译的原生测试程序。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，五个插件均取得面板截图，预设恢复通过（工具面板不适用）。STK 使用既有 build/vcpkg_installed/x64-windows/share/libstk/rawwaves，不创建新部署目录。代表截图确认中文测速提示和日文频谱控制正常显示，字形正常；高级参数展开、完整悬浮提示及乐器其他预设切换留 M7 最终矩阵。开发程序与插件目录仍为 build/Release/lmms.exe、build/Release/plugins。
+
+M5-11：M5-10 检查点 bcfaf3a837c258b3170dd0101f8f45efbd8c9d6c 已推送确认。TripleOscillator/Vectorscope/Vestige/Vibed/Watsyn/WaveShaper 共 197 键四语质量 PASS。补齐弦模型、振荡器调制与波表混合、矢量显示以及 VeSTige 原生宿主的扫描/标识说明；品牌、文件后缀及插件名称/标识组合模板按原值保留。实窗发现 WaveShaper 的 Clip input 显示标签未接入翻译，使用既有 tr 键修正，不增加词条、不改控件位置或预设。全库 3627 键，中/日剩余空译 35/27，韩语空译 0。
+
+四语 QM、waveshaper 编译通过，DLL 写入 build/Release/plugins/waveshaper.dll；开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，五个已部署插件面板及预设恢复通过。Vibed 未部署，MANUAL/PENDING；VeSTige 为 LMMS 未加载外部插件时的宿主面板，外部编辑器和声音不计为已验证。Clip input 标签修正后另行四语复测，M5-11-clip 截图为最终证据；既有位图按钮保留，完整悬浮说明与窄标签处理留 M7。
+
+M5-11 视觉后续：WaveShaper 日语 Clip input 标签已命中译文，但固定窄面板右边界截断全文，留 M7 授权的省略号与完整悬浮提示处理；本批不宣称全文可读性通过。

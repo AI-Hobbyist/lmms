@@ -958,7 +958,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Vibrating string modeler</source>
-        <translation type="unfinished"></translation>
+        <translation>振动弦建模器</translation>
     </message>
     <message>
         <source>plugin for using arbitrary VST effects inside LMMS.</source>
@@ -970,7 +970,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>plugin for waveshaping</source>
-        <translation type="unfinished"></translation>
+        <translation>波形整形插件</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
@@ -5264,54 +5264,54 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::VecControls</name>
     <message>
         <source>Logarithmic scale</source>
-        <translation type="unfinished"></translation>
+        <translation>对数刻度</translation>
     </message>
     <message>
         <source>Lines rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>线条绘制</translation>
     </message>
 </context>
 <context>
     <name>lmms::VestigeInstrument</name>
     <message>
         <source>Invalid VST2 shell identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 外壳标识无效。</translation>
     </message>
     <message>
         <source>Invalid VST3 class identity or architecture.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 类标识或架构无效。</translation>
     </message>
     <message>
         <source>Invalid VST3 module fingerprint.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 模块指纹无效。</translation>
     </message>
     <message>
         <source>Scan the VST3 module before selecting its class: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>选择类之前请先扫描 VST3 模块：%1</translation>
     </message>
     <message>
         <source>VST3 module requires a saved ClassID and architecture selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 模块需要已保存的 ClassID 和架构选择。</translation>
     </message>
     <message>
         <source>Select VST3 class</source>
-        <translation type="unfinished"></translation>
+        <translation>选择 VST3 类</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>插件</translation>
     </message>
     <message>
         <source>VST2 shell %1 requires a saved shellid selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 外壳 %1 需要已保存的 shellid 选择。</translation>
     </message>
     <message>
         <source>%1 [%2]</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 [%2]</translation>
     </message>
     <message>
         <source>Select VST2 shell plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>选择 VST2 外壳插件</translation>
     </message>
     <message>
         <source>Loading plugin</source>
@@ -5326,43 +5326,43 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::Vibed</name>
     <message>
         <source>String %1 volume</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 音量</translation>
     </message>
     <message>
         <source>String %1 stiffness</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 刚度</translation>
     </message>
     <message>
         <source>Pick %1 position</source>
-        <translation type="unfinished"></translation>
+        <translation>拨弦 %1 位置</translation>
     </message>
     <message>
         <source>Pickup %1 position</source>
-        <translation type="unfinished"></translation>
+        <translation>拾音 %1 位置</translation>
     </message>
     <message>
         <source>String %1 panning</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 声像</translation>
     </message>
     <message>
         <source>String %1 detune</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 失谐</translation>
     </message>
     <message>
         <source>String %1 fuzziness</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 模糊程度</translation>
     </message>
     <message>
         <source>String %1 length</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 长度</translation>
     </message>
     <message>
         <source>Impulse %1</source>
-        <translation type="unfinished"></translation>
+        <translation>激励 %1</translation>
     </message>
     <message>
         <source>String %1</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1</translation>
     </message>
 </context>
 <context>
@@ -5607,15 +5607,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>A1-B2 Crosstalk</source>
-        <translation type="unfinished"></translation>
+        <translation>A1-B2 串扰</translation>
     </message>
     <message>
         <source>A2-A1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>A2-A1 调制</translation>
     </message>
     <message>
         <source>B2-B1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>B2-B1 调制</translation>
     </message>
     <message>
         <source>Selected graph</source>
@@ -14523,15 +14523,15 @@ Latency: %2 ms</source>
     <name>lmms::gui::TripleOscillatorView</name>
     <message>
         <source>Modulate phase of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 1 的相位</translation>
     </message>
     <message>
         <source>Modulate amplitude of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 1 的振幅</translation>
     </message>
     <message>
         <source>Mix output of oscillators 1 &amp; 2</source>
-        <translation type="unfinished"></translation>
+        <translation>混合振荡器 1 与 2 的输出</translation>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
@@ -14539,19 +14539,19 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Modulate frequency of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 1 的频率</translation>
     </message>
     <message>
         <source>Modulate phase of oscillator 2 by oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 3 调制振荡器 2 的相位</translation>
     </message>
     <message>
         <source>Modulate amplitude of oscillator 2 by oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 3 调制振荡器 2 的振幅</translation>
     </message>
     <message>
         <source>Mix output of oscillators 2 &amp; 3</source>
-        <translation type="unfinished"></translation>
+        <translation>混合振荡器 2 与 3 的输出</translation>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
@@ -14619,7 +14619,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Moog-like saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Moog 式锯齿波</translation>
     </message>
     <message>
         <source>Exponential wave</source>
@@ -14642,30 +14642,30 @@ Latency: %2 ms</source>
     <name>lmms::gui::VecControlsDialog</name>
     <message>
         <source>Log. scale</source>
-        <translation type="unfinished"></translation>
+        <translation>对数刻度</translation>
     </message>
     <message>
         <source>Display amplitude on logarithmic scale to better see small values.</source>
-        <translation type="unfinished"></translation>
+        <translation>以对数刻度显示幅度，更清楚地查看小值。</translation>
     </message>
     <message>
         <source>Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>线条</translation>
     </message>
     <message>
         <source>Render with lines.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用线条绘制。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::VectorView</name>
     <message>
         <source>Exec avg.: %1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>平均执行：%1 ms</translation>
     </message>
     <message>
         <source>Zoom: %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>缩放：%1 %</translation>
     </message>
 </context>
 <context>
@@ -14723,27 +14723,27 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>VST2 files (*.dll)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 文件 (*.dll)</translation>
     </message>
     <message>
         <source>VST files (*.dll *.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 文件 (*.dll *.vst3)</translation>
     </message>
     <message>
         <source>VST3 files (*.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 文件 (*.vst3)</translation>
     </message>
     <message>
         <source>All VST files (*.dll *.so)</source>
-        <translation type="unfinished"></translation>
+        <translation>所有 VST 文件 (*.dll *.so)</translation>
     </message>
     <message>
         <source>Windows VST2 files (*.dll)</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows VST2 文件 (*.dll)</translation>
     </message>
     <message>
         <source>LinuxVST files (*.so)</source>
-        <translation type="unfinished"></translation>
+        <translation>LinuxVST 文件 (*.so)</translation>
     </message>
     <message>
         <source>No VST plugin loaded</source>
@@ -14774,7 +14774,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Normalize waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>归一化波形</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -14802,55 +14802,55 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>String volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦音量：</translation>
     </message>
     <message>
         <source>String stiffness:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦刚度：</translation>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation type="unfinished"></translation>
+        <translation>拨弦位置：</translation>
     </message>
     <message>
         <source>Pickup position:</source>
-        <translation type="unfinished"></translation>
+        <translation>拾音位置：</translation>
     </message>
     <message>
         <source>String panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦声像：</translation>
     </message>
     <message>
         <source>String detune:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦失谐：</translation>
     </message>
     <message>
         <source>String fuzziness:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦模糊程度：</translation>
     </message>
     <message>
         <source>String length:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦长度：</translation>
     </message>
     <message>
         <source>Impulse Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>激励编辑器</translation>
     </message>
     <message>
         <source>Impulse</source>
-        <translation type="unfinished"></translation>
+        <translation>激励</translation>
     </message>
     <message>
         <source>Enable/disable string</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/禁用弦</translation>
     </message>
     <message>
         <source>Octave</source>
-        <translation type="unfinished"></translation>
+        <translation>八度</translation>
     </message>
     <message>
         <source>String</source>
-        <translation type="unfinished"></translation>
+        <translation>弦</translation>
     </message>
 </context>
 <context>
@@ -14931,23 +14931,23 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Mix envelope amount</source>
-        <translation type="unfinished"></translation>
+        <translation>混合包络量</translation>
     </message>
     <message>
         <source>Mix envelope attack</source>
-        <translation type="unfinished"></translation>
+        <translation>混合包络起音</translation>
     </message>
     <message>
         <source>Mix envelope hold</source>
-        <translation type="unfinished"></translation>
+        <translation>混合包络保持</translation>
     </message>
     <message>
         <source>Mix envelope decay</source>
-        <translation type="unfinished"></translation>
+        <translation>混合包络衰减</translation>
     </message>
     <message>
         <source>Crosstalk</source>
-        <translation type="unfinished"></translation>
+        <translation>串扰</translation>
     </message>
     <message>
         <source>Select oscillator A1</source>
@@ -14967,35 +14967,35 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Mix output of A2 to A1</source>
-        <translation type="unfinished"></translation>
+        <translation>将 A2 的输出混合至 A1</translation>
     </message>
     <message>
         <source>Modulate amplitude of A1 by output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>用 A2 的输出调制 A1 的振幅</translation>
     </message>
     <message>
         <source>Ring modulate A1 and A2</source>
-        <translation type="unfinished"></translation>
+        <translation>对 A1 与 A2 进行环形调制</translation>
     </message>
     <message>
         <source>Modulate phase of A1 by output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>用 A2 的输出调制 A1 的相位</translation>
     </message>
     <message>
         <source>Mix output of B2 to B1</source>
-        <translation type="unfinished"></translation>
+        <translation>将 B2 的输出混合至 B1</translation>
     </message>
     <message>
         <source>Modulate amplitude of B1 by output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>用 B2 的输出调制 B1 的振幅</translation>
     </message>
     <message>
         <source>Ring modulate B1 and B2</source>
-        <translation type="unfinished"></translation>
+        <translation>对 B1 与 B2 进行环形调制</translation>
     </message>
     <message>
         <source>Modulate phase of B1 by output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>用 B2 的输出调制 B1 的相位</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15007,23 +15007,23 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Load a waveform from a sample file</source>
-        <translation type="unfinished"></translation>
+        <translation>从采样文件加载波形</translation>
     </message>
     <message>
         <source>Phase left</source>
-        <translation type="unfinished"></translation>
+        <translation>左声道相位</translation>
     </message>
     <message>
         <source>Shift phase by -15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>相位偏移 -15 度</translation>
     </message>
     <message>
         <source>Phase right</source>
-        <translation type="unfinished"></translation>
+        <translation>右声道相位</translation>
     </message>
     <message>
         <source>Shift phase by +15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>相位偏移 +15 度</translation>
     </message>
     <message>
         <source>Normalize</source>

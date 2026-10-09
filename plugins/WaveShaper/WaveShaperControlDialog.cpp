@@ -100,7 +100,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
 	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
 
-	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
+	auto clipInputToggle = new LedCheckBox(tr("Clip input"), this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
 	clipInputToggle->setToolTip(tr("Clip input signal to 0 dB"));

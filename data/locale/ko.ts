@@ -5275,43 +5275,43 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::VestigeInstrument</name>
     <message>
         <source>Invalid VST2 shell identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 VST2 셸 식별 정보입니다.</translation>
     </message>
     <message>
         <source>Invalid VST3 class identity or architecture.</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 VST3 클래스 식별 정보 또는 아키텍처입니다.</translation>
     </message>
     <message>
         <source>Invalid VST3 module fingerprint.</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 VST3 모듈 지문입니다.</translation>
     </message>
     <message>
         <source>Scan the VST3 module before selecting its class: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>클래스를 선택하기 전에 VST3 모듈을 스캔하세요: %1</translation>
     </message>
     <message>
         <source>VST3 module requires a saved ClassID and architecture selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 모듈에 저장된 ClassID 및 아키텍처 선택이 필요합니다.</translation>
     </message>
     <message>
         <source>Select VST3 class</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 클래스 선택</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인</translation>
     </message>
     <message>
         <source>VST2 shell %1 requires a saved shellid selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 셸 %1에 저장된 shellid 선택이 필요합니다.</translation>
     </message>
     <message>
         <source>%1 [%2]</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 [%2]</translation>
     </message>
     <message>
         <source>Select VST2 shell plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 셸 플러그인 선택</translation>
     </message>
     <message>
         <source>Loading plugin</source>
@@ -14727,11 +14727,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>VST files (*.dll *.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 파일 (*.dll *.vst3)</translation>
     </message>
     <message>
         <source>VST3 files (*.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 파일 (*.vst3)</translation>
     </message>
     <message>
         <source>All VST files (*.dll *.so)</source>

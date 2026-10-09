@@ -946,19 +946,19 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"></translation>
+        <translation>多様な方法で変調できる 3 基の強力なオシレーター</translation>
     </message>
     <message>
         <source>A stereo field visualizer.</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ音場のビジュアライザー。</translation>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS 内で VST(i) プラグインを使うためのホスト</translation>
     </message>
     <message>
         <source>Vibrating string modeler</source>
-        <translation type="unfinished"></translation>
+        <translation>振動する弦のモデリング</translation>
     </message>
     <message>
         <source>plugin for using arbitrary VST effects inside LMMS.</source>
@@ -966,11 +966,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>4-oscillator modulatable wavetable synth</source>
-        <translation type="unfinished"></translation>
+        <translation>変調可能な 4 オシレーターのウェーブテーブルシンセ</translation>
     </message>
     <message>
         <source>plugin for waveshaping</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェーブシェーピングのプラグイン</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
@@ -4405,31 +4405,31 @@ Continue?</source>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 粗調整デチューン</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 左チャンネルの微調整デチューン</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning right</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 右チャンネルの微調整デチューン</translation>
     </message>
     <message>
         <source>Osc %1 phase-offset</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 位相オフセット</translation>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 ステレオ位相デチューン</translation>
     </message>
     <message>
         <source>Osc %1 wave shape</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター %1 波形</translation>
     </message>
     <message>
         <source>Modulation type %1</source>
-        <translation type="unfinished"></translation>
+        <translation>変調タイプ %1</translation>
     </message>
 </context>
 <context>
@@ -5264,54 +5264,54 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::VecControls</name>
     <message>
         <source>Logarithmic scale</source>
-        <translation type="unfinished"></translation>
+        <translation>対数目盛り</translation>
     </message>
     <message>
         <source>Lines rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>線で描画</translation>
     </message>
 </context>
 <context>
     <name>lmms::VestigeInstrument</name>
     <message>
         <source>Invalid VST2 shell identity.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 シェル識別情報が無効です。</translation>
     </message>
     <message>
         <source>Invalid VST3 class identity or architecture.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 クラス識別情報またはアーキテクチャーが無効です。</translation>
     </message>
     <message>
         <source>Invalid VST3 module fingerprint.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 モジュールのフィンガープリントが無効です。</translation>
     </message>
     <message>
         <source>Scan the VST3 module before selecting its class: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>クラスを選ぶ前に VST3 モジュールをスキャンしてください：%1</translation>
     </message>
     <message>
         <source>VST3 module requires a saved ClassID and architecture selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 モジュールには保存済みの ClassID とアーキテクチャーの選択が必要です。</translation>
     </message>
     <message>
         <source>Select VST3 class</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 クラスを選択</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>プラグイン</translation>
     </message>
     <message>
         <source>VST2 shell %1 requires a saved shellid selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 シェル %1 には保存済みの shellid 選択が必要です。</translation>
     </message>
     <message>
         <source>%1 [%2]</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 [%2]</translation>
     </message>
     <message>
         <source>Select VST2 shell plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 シェルプラグインを選択</translation>
     </message>
     <message>
         <source>Loading plugin</source>
@@ -5330,31 +5330,31 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>String %1 stiffness</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 剛性</translation>
     </message>
     <message>
         <source>Pick %1 position</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 を弾く位置</translation>
     </message>
     <message>
         <source>Pickup %1 position</source>
-        <translation type="unfinished"></translation>
+        <translation>ピックアップ %1 位置</translation>
     </message>
     <message>
         <source>String %1 panning</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 パン</translation>
     </message>
     <message>
         <source>String %1 detune</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 デチューン</translation>
     </message>
     <message>
         <source>String %1 fuzziness</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 曖昧さ</translation>
     </message>
     <message>
         <source>String %1 length</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1 長さ</translation>
     </message>
     <message>
         <source>Impulse %1</source>
@@ -5362,7 +5362,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>String %1</source>
-        <translation type="unfinished"></translation>
+        <translation>弦 %1</translation>
     </message>
 </context>
 <context>
@@ -5507,115 +5507,115 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::WatsynInstrument</name>
     <message>
         <source>Volume A1</source>
-        <translation>Volume A1</translation>
+        <translation>A1 音量</translation>
     </message>
     <message>
         <source>Volume A2</source>
-        <translation>Volume A2</translation>
+        <translation>A2 音量</translation>
     </message>
     <message>
         <source>Volume B1</source>
-        <translation>Volume B1</translation>
+        <translation>B1 音量</translation>
     </message>
     <message>
         <source>Volume B2</source>
-        <translation>Volume B2</translation>
+        <translation>B2 音量</translation>
     </message>
     <message>
         <source>Panning A1</source>
-        <translation>Panning A1</translation>
+        <translation>A1 パン</translation>
     </message>
     <message>
         <source>Panning A2</source>
-        <translation>Panning A2</translation>
+        <translation>A2 パン</translation>
     </message>
     <message>
         <source>Panning B1</source>
-        <translation>Panning B1</translation>
+        <translation>B1 パン</translation>
     </message>
     <message>
         <source>Panning B2</source>
-        <translation>Panning B2</translation>
+        <translation>B2 パン</translation>
     </message>
     <message>
         <source>Freq. multiplier A1</source>
-        <translation>Freq. multiplier A1</translation>
+        <translation>A1 周波数倍率</translation>
     </message>
     <message>
         <source>Freq. multiplier A2</source>
-        <translation>Freq. multiplier A2</translation>
+        <translation>A2 周波数倍率</translation>
     </message>
     <message>
         <source>Freq. multiplier B1</source>
-        <translation>Freq. multiplier B1</translation>
+        <translation>B1 周波数倍率</translation>
     </message>
     <message>
         <source>Freq. multiplier B2</source>
-        <translation>Freq. multiplier B2</translation>
+        <translation>B2 周波数倍率</translation>
     </message>
     <message>
         <source>Left detune A1</source>
-        <translation>Left detune A1</translation>
+        <translation>A1 左チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Left detune A2</source>
-        <translation>Left detune A2</translation>
+        <translation>A2 左チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Left detune B1</source>
-        <translation>Left detune B1</translation>
+        <translation>B1 左チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Left detune B2</source>
-        <translation>Left detune B2</translation>
+        <translation>B2 左チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Right detune A1</source>
-        <translation>Right detune A1</translation>
+        <translation>A1 右チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Right detune A2</source>
-        <translation>Right detune A2</translation>
+        <translation>A2 右チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Right detune B1</source>
-        <translation>Right detune B1</translation>
+        <translation>B1 右チャンネルのデチューン</translation>
     </message>
     <message>
         <source>Right detune B2</source>
-        <translation>Right detune B2</translation>
+        <translation>B2 右チャンネルのデチューン</translation>
     </message>
     <message>
         <source>A-B Mix</source>
-        <translation>A-B Mix</translation>
+        <translation>A-B ミックス</translation>
     </message>
     <message>
         <source>A-B Mix envelope amount</source>
-        <translation>A-B Mix envelope amount</translation>
+        <translation>A-B ミックスエンベロープの量</translation>
     </message>
     <message>
         <source>A-B Mix envelope attack</source>
-        <translation>A-B Mix envelope attack</translation>
+        <translation>A-B ミックスエンベロープのアタック</translation>
     </message>
     <message>
         <source>A-B Mix envelope hold</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B ミックスエンベロープのホールド</translation>
     </message>
     <message>
         <source>A-B Mix envelope decay</source>
-        <translation type="unfinished"></translation>
+        <translation>A-B ミックスエンベロープのディケイ</translation>
     </message>
     <message>
         <source>A1-B2 Crosstalk</source>
-        <translation type="unfinished"></translation>
+        <translation>A1-B2 クロストーク</translation>
     </message>
     <message>
         <source>A2-A1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>A2-A1 変調</translation>
     </message>
     <message>
         <source>B2-B1 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>B2-B1 変調</translation>
     </message>
     <message>
         <source>Selected graph</source>
@@ -14523,15 +14523,15 @@ Latency: %2 ms</source>
     <name>lmms::gui::TripleOscillatorView</name>
     <message>
         <source>Modulate phase of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 2 でオシレーター 1 の位相を変調</translation>
     </message>
     <message>
         <source>Modulate amplitude of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 2 でオシレーター 1 の振幅を変調</translation>
     </message>
     <message>
         <source>Mix output of oscillators 1 &amp; 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 1 と 2 の出力をミックス</translation>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
@@ -14539,19 +14539,19 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Modulate frequency of oscillator 1 by oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 2 でオシレーター 1 の周波数を変調</translation>
     </message>
     <message>
         <source>Modulate phase of oscillator 2 by oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 3 でオシレーター 2 の位相を変調</translation>
     </message>
     <message>
         <source>Modulate amplitude of oscillator 2 by oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 3 でオシレーター 2 の振幅を変調</translation>
     </message>
     <message>
         <source>Mix output of oscillators 2 &amp; 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 2 と 3 の出力をミックス</translation>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
@@ -14559,7 +14559,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Modulate frequency of oscillator 2 by oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター 3 でオシレーター 2 の周波数を変調</translation>
     </message>
     <message>
         <source>Osc %1 volume:</source>
@@ -14603,27 +14603,27 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>Moog-like saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Moog 風ノコギリ波</translation>
     </message>
     <message>
         <source>Exponential wave</source>
-        <translation>Exponential wave</translation>
+        <translation>指数波</translation>
     </message>
     <message>
         <source>White noise</source>
@@ -14631,41 +14631,41 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>User-defined wave</source>
-        <translation>User-defined wave</translation>
+        <translation>ユーザー定義波形</translation>
     </message>
     <message>
         <source>Use alias-free wavetable oscillators.</source>
-        <translation type="unfinished"></translation>
+        <translation>エイリアシングのないウェーブテーブルオシレーターを使います。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::VecControlsDialog</name>
     <message>
         <source>Log. scale</source>
-        <translation type="unfinished"></translation>
+        <translation>対数目盛り</translation>
     </message>
     <message>
         <source>Display amplitude on logarithmic scale to better see small values.</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅を対数目盛りで表示して、小さい値を見やすくします。</translation>
     </message>
     <message>
         <source>Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>線</translation>
     </message>
     <message>
         <source>Render with lines.</source>
-        <translation type="unfinished"></translation>
+        <translation>線で描画します。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::VectorView</name>
     <message>
         <source>Exec avg.: %1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>平均実行時間：%1 ms</translation>
     </message>
     <message>
         <source>Zoom: %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>ズーム：%1 %</translation>
     </message>
 </context>
 <context>
@@ -14695,7 +14695,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Control VST plugin from LMMS host</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS ホストから VST プラグインを操作</translation>
     </message>
     <message>
         <source>Open VST plugin preset</source>
@@ -14723,27 +14723,27 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>VST2 files (*.dll)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST2 ファイル (*.dll)</translation>
     </message>
     <message>
         <source>VST files (*.dll *.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST ファイル (*.dll *.vst3)</translation>
     </message>
     <message>
         <source>VST3 files (*.vst3)</source>
-        <translation type="unfinished"></translation>
+        <translation>VST3 ファイル (*.vst3)</translation>
     </message>
     <message>
         <source>All VST files (*.dll *.so)</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての VST ファイル (*.dll *.so)</translation>
     </message>
     <message>
         <source>Windows VST2 files (*.dll)</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows VST2 ファイル (*.dll)</translation>
     </message>
     <message>
         <source>LinuxVST files (*.so)</source>
-        <translation type="unfinished"></translation>
+        <translation>LinuxVST ファイル (*.so)</translation>
     </message>
     <message>
         <source>No VST plugin loaded</source>
@@ -14755,7 +14755,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>by </source>
-        <translation type="unfinished"></translation>
+        <translation>作者： </translation>
     </message>
     <message>
         <source> - VST plugin control</source>
@@ -14770,7 +14770,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Smooth waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>波形を滑らかにする</translation>
     </message>
     <message>
         <source>Normalize waveform</source>
@@ -14778,71 +14778,71 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>White noise</source>
-        <translation>White noise</translation>
+        <translation>ホワイトノイズ</translation>
     </message>
     <message>
         <source>User-defined wave</source>
-        <translation>User-defined wave</translation>
+        <translation>ユーザー定義波形</translation>
     </message>
     <message>
         <source>String volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦の音量：</translation>
     </message>
     <message>
         <source>String stiffness:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦の剛性：</translation>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦を弾く位置：</translation>
     </message>
     <message>
         <source>Pickup position:</source>
-        <translation type="unfinished"></translation>
+        <translation>ピックアップ位置：</translation>
     </message>
     <message>
         <source>String panning:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦のパン：</translation>
     </message>
     <message>
         <source>String detune:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦のデチューン：</translation>
     </message>
     <message>
         <source>String fuzziness:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦の曖昧さ：</translation>
     </message>
     <message>
         <source>String length:</source>
-        <translation type="unfinished"></translation>
+        <translation>弦の長さ：</translation>
     </message>
     <message>
         <source>Impulse Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>インパルスエディター</translation>
     </message>
     <message>
         <source>Impulse</source>
-        <translation type="unfinished"></translation>
+        <translation>インパルス</translation>
     </message>
     <message>
         <source>Enable/disable string</source>
-        <translation type="unfinished"></translation>
+        <translation>弦を有効・無効にする</translation>
     </message>
     <message>
         <source>Octave</source>
@@ -14850,7 +14850,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>String</source>
-        <translation type="unfinished"></translation>
+        <translation>弦</translation>
     </message>
 </context>
 <context>
@@ -14911,11 +14911,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Freq. multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数倍率</translation>
     </message>
     <message>
         <source>Left detune</source>
-        <translation type="unfinished"></translation>
+        <translation>左チャンネルのデチューン</translation>
     </message>
     <message>
         <source> cents</source>
@@ -14923,79 +14923,79 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Right detune</source>
-        <translation type="unfinished"></translation>
+        <translation>右チャンネルのデチューン</translation>
     </message>
     <message>
         <source>A-B Mix</source>
-        <translation>A-B Mix</translation>
+        <translation>A-B ミックス</translation>
     </message>
     <message>
         <source>Mix envelope amount</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックスエンベロープの量</translation>
     </message>
     <message>
         <source>Mix envelope attack</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックスエンベロープのアタック</translation>
     </message>
     <message>
         <source>Mix envelope hold</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックスエンベロープのホールド</translation>
     </message>
     <message>
         <source>Mix envelope decay</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックスエンベロープのディケイ</translation>
     </message>
     <message>
         <source>Crosstalk</source>
-        <translation type="unfinished"></translation>
+        <translation>クロストーク</translation>
     </message>
     <message>
         <source>Select oscillator A1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター A1 を選択</translation>
     </message>
     <message>
         <source>Select oscillator A2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター A2 を選択</translation>
     </message>
     <message>
         <source>Select oscillator B1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター B1 を選択</translation>
     </message>
     <message>
         <source>Select oscillator B2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター B2 を選択</translation>
     </message>
     <message>
         <source>Mix output of A2 to A1</source>
-        <translation type="unfinished"></translation>
+        <translation>A2 の出力を A1 にミックス</translation>
     </message>
     <message>
         <source>Modulate amplitude of A1 by output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A2 の出力で A1 の振幅を変調</translation>
     </message>
     <message>
         <source>Ring modulate A1 and A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A1 と A2 をリング変調</translation>
     </message>
     <message>
         <source>Modulate phase of A1 by output of A2</source>
-        <translation type="unfinished"></translation>
+        <translation>A2 の出力で A1 の位相を変調</translation>
     </message>
     <message>
         <source>Mix output of B2 to B1</source>
-        <translation type="unfinished"></translation>
+        <translation>B2 の出力を B1 にミックス</translation>
     </message>
     <message>
         <source>Modulate amplitude of B1 by output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>B2 の出力で B1 の振幅を変調</translation>
     </message>
     <message>
         <source>Ring modulate B1 and B2</source>
-        <translation type="unfinished"></translation>
+        <translation>B1 と B2 をリング変調</translation>
     </message>
     <message>
         <source>Modulate phase of B1 by output of B2</source>
-        <translation type="unfinished"></translation>
+        <translation>B2 の出力で B1 の位相を変調</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -15011,66 +15011,66 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Phase left</source>
-        <translation type="unfinished"></translation>
+        <translation>左チャンネルの位相</translation>
     </message>
     <message>
         <source>Shift phase by -15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>位相を -15 度ずらす</translation>
     </message>
     <message>
         <source>Phase right</source>
-        <translation type="unfinished"></translation>
+        <translation>右チャンネルの位相</translation>
     </message>
     <message>
         <source>Shift phase by +15 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>位相を +15 度ずらす</translation>
     </message>
     <message>
         <source>Normalize</source>
-        <translation>Normalize</translation>
+        <translation>正規化</translation>
     </message>
     <message>
         <source>Invert</source>
-        <translation>Invert</translation>
+        <translation>反転</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Smooth</translation>
+        <translation>滑らかにする</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::WaveShaperControlDialog</name>
     <message>
         <source>INPUT</source>
-        <translation>INPUT</translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Input gain:</translation>
+        <translation>入力ゲイン：</translation>
     </message>
     <message>
         <source>OUTPUT</source>
-        <translation>OUTPUT</translation>
+        <translation>出力</translation>
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Output gain:</translation>
+        <translation>出力ゲイン：</translation>
     </message>
     <message>
         <source>Reset wavegraph</source>
@@ -15078,15 +15078,15 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Smooth wavegraph</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフを滑らかにする</translation>
     </message>
     <message>
         <source>Increase wavegraph amplitude by 1 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフの振幅を 1 dB 上げる</translation>
     </message>
     <message>
         <source>Decrease wavegraph amplitude by 1 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>波形グラフの振幅を 1 dB 下げる</translation>
     </message>
     <message>
         <source>Clip input</source>
