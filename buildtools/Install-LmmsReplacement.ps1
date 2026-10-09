@@ -65,6 +65,10 @@ try {
         throw 'Unsupported or empty replacement manifest.'
     }
     $names = @{}
+    $incremental = $manifest.PackageKind -eq 'Incremental'
+    if ($incremental -and (-not $manifest.BaseFiles.Count -or -not $manifest.BasePackage)) {
+        throw 'Incremental package baseline missing.'
+    }
     foreach ($file in $manifest.Files) {
         $name = [string]$file.Path
         if ($names.ContainsKey($name)) {
@@ -97,7 +101,7 @@ try {
             $stream.Dispose()
         }
     }
-    if (-not $names.ContainsKey('lmms.exe') -or -not $names.ContainsKey('platforms/qwindows.dll')) {
+    if (-not $incremental -and (-not $names.ContainsKey('lmms.exe') -or -not $names.ContainsKey('platforms/qwindows.dll'))) {
         throw 'Incomplete Windows runtime.'
     }
     if (-not $TargetDirectory) {
@@ -114,6 +118,23 @@ try {
     foreach ($file in $manifest.Files) {
         $null = Get-ContainedPath $target $file.Path
     }
+    if ($incremental) {
+        $baselineNames = @{}
+        foreach ($file in $manifest.BaseFiles) {
+            if ($baselineNames.ContainsKey($file.Path)) { throw "Duplicate baseline file: $($file.Path)" }
+            $baselineNames[$file.Path] = $true
+            $path = Get-ContainedPath $target $file.Path
+            if ($names.ContainsKey($file.Path)) { continue }
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
+                (Get-Item -LiteralPath $path).Length -ne $file.Bytes -or
+                (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $file.SHA256) {
+                throw "Incremental baseline mismatch: $($file.Path). Install $($manifest.BasePackage) first."
+            }
+        }
+        if (-not $baselineNames.ContainsKey('lmms.exe') -or -not $baselineNames.ContainsKey('platforms/qwindows.dll')) {
+            throw 'Incomplete incremental baseline.'
+        }
+    }
     if ($VerifyOnly) {
         Write-Output "Verified $($manifest.Files.Count) payload files and installation paths. No changes made."; exit 0
     }
@@ -124,7 +145,7 @@ try {
     }
     # Native LMMS plugins from another build can have an incompatible widget ABI.
     $pluginRoot = Join-Path $target 'plugins'
-    if (Test-Path -LiteralPath $pluginRoot) {
+    if (-not $incremental -and (Test-Path -LiteralPath $pluginRoot)) {
         foreach ($old in Get-ChildItem -LiteralPath $pluginRoot -Filter '*.dll' -File -Recurse) {
             $relative = $old.FullName.Substring($target.Length + 1).Replace('\', '/')
             if (-not $names.ContainsKey($relative)) {

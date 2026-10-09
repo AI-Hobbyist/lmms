@@ -158,6 +158,8 @@ void SVSProjectController::chooseSource(const QJsonArray& formats)
 	file.setAcceptMode(QFileDialog::AcceptOpen);
 	QStringList filters;
 	QMap<QString, QJsonObject> identities;
+	QStringList supportedSuffixes;
+	QMap<QString, QJsonObject> suffixIdentities;
 	for (const auto& entry : formats)
 	{
 		const auto format = entry.toObject();
@@ -165,19 +167,29 @@ void SVSProjectController::chooseSource(const QJsonArray& formats)
 			continue;
 		QStringList suffixes;
 		for (const auto& suffix : format["suffixes"].toArray())
+		{
 			suffixes << "*." + suffix.toString();
+			suffixIdentities[suffix.toString().toLower()] = format;
+		}
+		supportedSuffixes << suffixes;
 		const auto filter = QStringLiteral("%1 [%2] (%3)")
 								.arg(format["name"].toString(), format["id"].toString(), suffixes.join(' '));
 		filters << filter;
 		identities[filter] = format;
 	}
+	supportedSuffixes.removeDuplicates();
+	const auto supportedFilter = QStringLiteral("所有支持格式 (%1)").arg(supportedSuffixes.join(' '));
+	filters.prepend(supportedFilter);
 	file.setNameFilters(filters);
+	file.selectNameFilter(supportedFilter);
 	if (file.exec() != QDialog::Accepted || file.selectedFiles().isEmpty())
 	{
 		reset();
 		return;
 	}
-	const auto format = identities.value(file.selectedNameFilter());
+	const auto format = file.selectedNameFilter() == supportedFilter
+		? suffixIdentities.value(QFileInfo(file.selectedFiles().first()).suffix().toLower())
+		: identities.value(file.selectedNameFilter());
 	if (format.isEmpty())
 	{
 		reset();
@@ -413,6 +425,8 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 	file.setOption(QFileDialog::DontConfirmOverwrite, true);
 	QStringList filters;
 	QMap<QString, QJsonObject> identities;
+	QStringList supportedSuffixes;
+	QMap<QString, QJsonObject> suffixIdentities;
 	QString defaultFilter;
 	for (const auto& entry : formats)
 	{
@@ -421,7 +435,11 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 			continue;
 		QStringList suffixes;
 		for (const auto& suffix : format["suffixes"].toArray())
+		{
 			suffixes << "*." + suffix.toString();
+			suffixIdentities[suffix.toString().toLower()] = format;
+		}
+		supportedSuffixes << suffixes;
 		const auto filter = QStringLiteral("%1 [%2] (%3)")
 								.arg(format["name"].toString(), format["id"].toString(), suffixes.join(' '));
 		filters << filter;
@@ -429,19 +447,26 @@ void SVSProjectController::chooseExport(const QJsonArray& formats)
 		if (format["id"].toString() == "json")
 			defaultFilter = filter;
 	}
+	supportedSuffixes.removeDuplicates();
+	const auto supportedFilter = QStringLiteral("所有支持格式 (%1)").arg(supportedSuffixes.join(' '));
+	filters.prepend(supportedFilter);
 	file.setNameFilters(filters);
-	file.selectNameFilter(defaultFilter);
-	file.setDefaultSuffix(identities[defaultFilter]["suffixes"].toArray().first().toString());
+	file.selectNameFilter(supportedFilter);
+	const auto defaultSuffix = identities[defaultFilter]["suffixes"].toArray().first().toString();
+	file.setDefaultSuffix(defaultSuffix);
 	file.selectFile(QStringLiteral("SVS工程"));
-	connect(&file, &QFileDialog::filterSelected, &file, [&file, &identities](const QString& filter) {
-		file.setDefaultSuffix(identities[filter]["suffixes"].toArray().first().toString());
+	connect(&file, &QFileDialog::filterSelected, &file, [&file, &identities, &supportedFilter, &defaultSuffix](const QString& filter) {
+		file.setDefaultSuffix(filter == supportedFilter
+			? defaultSuffix : identities[filter]["suffixes"].toArray().first().toString());
 	});
 	if (file.exec() != QDialog::Accepted || file.selectedFiles().isEmpty())
 	{
 		reset();
 		return;
 	}
-	const auto format = identities.value(file.selectedNameFilter());
+	const auto format = file.selectedNameFilter() == supportedFilter
+		? suffixIdentities.value(QFileInfo(file.selectedFiles().first()).suffix().toLower())
+		: identities.value(file.selectedNameFilter());
 	if (format.isEmpty())
 	{
 		reset();

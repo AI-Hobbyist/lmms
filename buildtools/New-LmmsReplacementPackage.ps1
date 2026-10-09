@@ -1,6 +1,7 @@
-param([string]$ProductCommit)
+﻿param([string]$ProductCommit, [string]$BaseManifest)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.IO.Compression
 $project = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 if (-not $ProductCommit) {
     $ProductCommit = & git -C $project rev-parse HEAD
@@ -14,6 +15,9 @@ if (-not (Test-Path -LiteralPath $runtime -PathType Container) -or -not (Test-Pa
     throw 'Reuse the existing runtime and package directories.'
 }
 $name = 'lmms-enhanced-full-' + $ProductCommit.Substring(0, 9) + '-win64.zip'
+if ($BaseManifest) {
+    $name = 'lmms-enhanced-incremental-' + $ProductCommit.Substring(0, 9) + '-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-win64.zip'
+}
 $zipPath = Join-Path $output $name
 if (Test-Path -LiteralPath $zipPath) {
     throw "Package already exists: $zipPath"
@@ -72,6 +76,31 @@ foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imagefo
         $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
     }
 }
+# Project conversion runs in this isolated deployed runtime, not system Python.
+$projectRuntime = Join-Path $runtime 'svs-project'
+if (-not (Test-Path -LiteralPath $projectRuntime -PathType Container)) {
+    throw 'Deployed SVS project runtime missing.'
+}
+foreach ($file in Get-ChildItem -LiteralPath $projectRuntime -File -Recurse) {
+    if ($file.FullName -match '[\\/]__pycache__[\\/]' -or $file.Extension -in @('.pyc', '.pdb', '.lib', '.exp')) {
+        continue
+    }
+    $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
+}
+foreach ($required in @('bridge.py', 'formats.json', 'export-policy.json', 'runtime-lock.json', 'python/python.exe', 'python/python313.dll', 'python/python313.zip', 'licenses/LibreSVIP-LICENSE', 'licenses/CPython-LICENSE.txt')) {
+    if (-not $payload.ContainsKey("svs-project/$required")) {
+        throw "Incomplete SVS project runtime: $required"
+    }
+}
+foreach ($name in @('formats.json', 'export-policy.json', 'runtime-lock.json')) {
+    if ((Get-FileHash -LiteralPath $payload["svs-project/$name"]).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project "doc/svs/project/$name")).Hash) {
+        throw "Stale deployed SVS project manifest: $name"
+    }
+}
+if ((Get-FileHash -LiteralPath $payload['svs-project/bridge.py']).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project 'tools/svs-project/bridge.py')).Hash) {
+    throw 'Stale deployed SVS project bridge.'
+}
+$payload['svs-project/usage.md'] = Join-Path $project 'doc/svs/project/usage.md'
 $payload['LICENSE.txt'] = Join-Path $project 'LICENSE.txt'
 $payload['README.md'] = Join-Path $project 'README.md'
 $targets = Get-Content -LiteralPath (Join-Path $project 'doc/ui-modernization/validation/plugin-targets.txt')
@@ -109,6 +138,26 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
         [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
     })
 $manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records }
+if ($BaseManifest) {
+    $base = Get-Content -LiteralPath $BaseManifest -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($base.Format -ne 1 -or $base.PackageKind -eq 'Incremental' -or -not $base.Files.Count) {
+        throw 'An incremental package requires a full replacement package manifest.'
+    }
+    $baseline = @{}
+    foreach ($entry in $base.Files) {
+        if ($baseline.ContainsKey($entry.Path)) { throw "Duplicate baseline path: $($entry.Path)" }
+        $baseline[$entry.Path] = $entry
+        if (-not $payload.ContainsKey($entry.Path)) { throw "File removal requires a full package: $($entry.Path)" }
+    }
+    $records = @($records | Where-Object { -not $baseline.ContainsKey($_.Path) -or $_.SHA256 -ne $baseline[$_.Path].SHA256 })
+    if (-not $records.Count) { throw 'No runtime changes relative to the full package.' }
+    $manifest.Files = $records
+    $manifest.PackageKind = 'Incremental'
+    $manifest.BasePackage = [IO.Path]::GetFileName($BaseManifest).Replace('.manifest.json', '')
+    $manifest.BaseProductCommit = $base.ProductCommit
+    $manifest.BaseManifestSHA256 = (Get-FileHash -LiteralPath $BaseManifest -Algorithm SHA256).Hash
+    $manifest.BaseFiles = @($base.Files)
+}
 $manifestText = $manifest | ConvertTo-Json -Depth 5
 $instructions = @'
 LMMS 增强分支全量替换包（Windows x64）
@@ -128,6 +177,7 @@ LMMS 增强分支全量替换包（Windows x64）
 支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与 SVS 示例。
 包含原生 DiffSinger CPU 完整依赖文件夹、空拍分段增量渲染、当前段/总段进度和参数配色；SDK 保持 ABI 1.0–1.3 兼容。
 包含官方默认工程模板：TripleOscillator、Sample track、Pattern 0、Automation track；Pattern Editor 包含 Kicker。
+包含 SVS 工程导入导出菜单、隔离 CPython/LibreSVIP 运行时和第三方许可文本；有损格式会在写入前具名提示。
 用户 templates/default.mpt 优先于官方模板。如果此前自行设置了空白模板，请先备份并停用该覆盖文件，再新建工程。
 全部分支增强由 AI 辅助开发；本分支独立维护并同步上游更新。英文功能对比及原版 README 见 README.md。
 Sid（缺 Perl）与 GigPlayer（缺 libgig）未构建。
@@ -137,11 +187,46 @@ SVS 实窗专项使用实际部署插件与主题通过；最终操作体验和�
 
 构建来源：https://github.com/AI-Hobbyist/lmms
 源代码版本：7b44c5487187d241c2dece22630a573479129c44（F6）
-工作区仍含用户其他任务的 Song.h/Song.cpp 未提交修改；包来自该工作区构建，不称纯提交重建。
-详细证据：仓库 doc/svs/SVS-segment-rendering-validation.md、doc/ui-modernization/acceptance.md 与 delivery-audit.md。
+工作区变更：__WORKTREE_STATUS__
+包来自当前工作区构建；存在上述修改时，不称纯提交重建。
+SVS 工程转换使用说明：svs-project/usage.md；完整验收记录：仓库 doc/svs/project/M4-validation.md。
+jyutping 与 wanakana-python 上游许可声明复核仍为非阻塞 MANUAL/PENDING，已保留原始声明和来源。
+其他证据：仓库 doc/svs/SVS-segment-rendering-validation.md、doc/ui-modernization/acceptance.md 与 delivery-audit.md。
 许可文本：LICENSE.txt；第三方资源随其原有许可。请保留自己的原安装文件作为回滚来源。
 '@
 $instructions = $instructions.Replace('7b44c5487187d241c2dece22630a573479129c44（F6）', $ProductCommit)
+if ($BaseManifest) {
+    $instructions = @"
+LMMS 增量覆盖包（Windows x64）
+
+所需基包：$($manifest.BasePackage)
+基包源码版本：$($manifest.BaseProductCommit)
+当前源码版本：$ProductCommit
+变更文件数：$($records.Count)
+
+1. 先安装上述全量基包，然后关闭 LMMS。
+2. 解压本包，双击 Install-Replace.cmd，选择包含 lmms.exe 的原安装目录。
+   Program Files 目录需要以管理员身份运行。
+3. 安装器校验基包未变更文件及增量文件 SHA256，仅覆盖本包列出的文件。
+   原有插件、运行库、个人配置、工程和声库保持原位。
+
+包含 SVS 导入/导出文件对话框的“所有支持格式”默认筛选及按扩展名识别。
+此前已安装此增量时也可再次运行；校验失败时应重新安装全量基包。
+工作区变更：__WORKTREE_STATUS__
+包来自当前工作区构建；存在上述修改时，不称纯提交重建。
+构建来源：https://github.com/AI-Hobbyist/lmms
+"@
+}
+$worktreeStatus = @(& git -C $project status --short --untracked-files=no)
+if ($LASTEXITCODE -ne 0) {
+    throw 'Cannot identify worktree changes.'
+}
+$instructions = $instructions.Replace('__WORKTREE_STATUS__', $(if ($worktreeStatus.Count) {
+            $worktreeStatus -join '; '
+        }
+        else {
+            '无已跟踪文件修改'
+        }))
 $cmd = "@echo off`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"%~dp0Install-Replace.ps1`"`r`npause`r`n"
 $expected = @{}
 $archive = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Create)
@@ -202,6 +287,6 @@ finally {
 }
 $manifestText | Set-Content -LiteralPath ($zipPath + '.manifest.json') -Encoding UTF8
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
-"$hash  $name" | Set-Content -LiteralPath ($zipPath + '.sha256') -Encoding ASCII
+"$hash  $([IO.Path]::GetFileName($zipPath))" | Set-Content -LiteralPath ($zipPath + '.sha256') -Encoding ASCII
 Write-Output "Created and verified $($records.Count) runtime files + 4 package entries: $zipPath"
 Write-Output "Bytes: $((Get-Item -LiteralPath $zipPath).Length); SHA256: $hash"

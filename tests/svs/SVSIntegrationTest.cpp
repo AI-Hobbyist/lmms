@@ -829,12 +829,17 @@ private slots:
 				{
 					picker->setProperty("projectHandled", true);
 					++filesShown;
-					for (const auto& filter : picker->nameFilters())
-						if (filter.contains("[json]"))
-						{
-							picker->selectNameFilter(filter);
-							break;
-						}
+					QCOMPARE(picker->selectedNameFilter(), picker->nameFilters().first());
+					QVERIFY(picker->selectedNameFilter().startsWith(QStringLiteral("所有支持格式 (")));
+					QVERIFY(picker->selectedNameFilter().contains("*.json"));
+					QVERIFY(picker->selectedNameFilter().contains("*.mxl"));
+					QVERIFY(picker->selectedNameFilter().contains("*.vshp"));
+					picker->setProperty("filterCapturePending", true);
+					QTimer::singleShot(600, picker, [picker] {
+						picker->setProperty("filterCapturePending", false);
+						QVERIFY(picker->screen()->grabWindow(picker->winId())
+							.save("doc/svs/project/supported-formats-native-import.png"));
+					});
 					picker->setDirectory(QFileInfo(selectedPath).absolutePath());
 				}
 				picker->selectFile(QFileInfo(selectedPath).fileName());
@@ -850,7 +855,8 @@ private slots:
 							+ picker->selectedFiles().join('|') + "\n")
 								.toUtf8());
 				}
-				QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
+				if (!picker->property("filterCapturePending").toBool())
+					QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
 			}
 			else if (modal->objectName() == "svsProjectImportDialog")
 			{
@@ -1098,20 +1104,32 @@ private slots:
 				if (!picker->property("exportHandled").toBool())
 				{
 					picker->setProperty("exportHandled", true);
-					const auto format = choice == "loss-cancel" ? "[lrc]" : "[json]";
-					for (const auto& filter : picker->nameFilters())
-						if (filter.contains(format))
-						{
-							picker->selectNameFilter(filter);
-							break;
-						}
+					QCOMPARE(picker->selectedNameFilter(), picker->nameFilters().first());
+					QVERIFY(picker->selectedNameFilter().startsWith(QStringLiteral("所有支持格式 (")));
+					QVERIFY(picker->selectedNameFilter().contains("*.json"));
+					QVERIFY(picker->selectedNameFilter().contains("*.mxl"));
+					QVERIFY(!picker->selectedNameFilter().contains("*.vshp"));
+					picker->setProperty("filterCapturePending", true);
+					QTimer::singleShot(600, picker, [picker] {
+						picker->setProperty("filterCapturePending", false);
+						QVERIFY(picker->screen()->grabWindow(picker->winId())
+							.save("doc/svs/project/supported-formats-native-export.png"));
+					});
+					if (choice == "loss-cancel")
+						for (const auto& filter : picker->nameFilters())
+							if (filter.contains("[lrc]"))
+							{
+								picker->selectNameFilter(filter);
+								break;
+							}
 					picker->setDirectory(QFileInfo(output).absolutePath());
 				}
 				const auto path = choice == "loss-cancel" ? lyrics : output;
 				picker->selectFile(QFileInfo(path).fileName());
 				if (auto* edit = picker->findChild<QLineEdit*>("fileNameEdit"))
 					edit->setText(QFileInfo(path).fileName());
-				QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
+				if (!picker->property("filterCapturePending").toBool())
+					QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
 			}
 			else if (modal->objectName() == "svsProjectExportDialog")
 			{

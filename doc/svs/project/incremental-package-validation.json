@@ -1,0 +1,351 @@
+{
+  "Package": "lmms-enhanced-incremental-1464680e8-20261009-094754-win64.zip",
+  "Bytes": 7999581,
+  "SHA256": "FBB8747525E613F1A83023257EBC1C2F07AE5AFFB3089D3882F3F667EE42AE50",
+  "SourceCommit": "1464680e87e052433030eeaf308d15a6394b9d6e",
+  "SourceIncludesWorktreeChanges": true,
+  "BasePackage": "lmms-enhanced-full-55ced558c-win64.zip",
+  "ChangedFiles": [
+    {
+      "Path": "lmms.exe",
+      "Bytes": 6164992,
+      "SHA256": "499255D6C1D05FAA8CD126658687B36C760D5D34393A2DC2DE38811E5CC58049"
+    },
+    {
+      "Path": "plugins/amplifier.dll",
+      "Bytes": 48128,
+      "SHA256": "6CBCB52123EF9B5D1AB2F5299CAE2DAAC3B38714A8664E0FE6A46C215AC0234B"
+    },
+    {
+      "Path": "plugins/analyzer.dll",
+      "Bytes": 173056,
+      "SHA256": "FDD8519E2A71E6AE519A58FDE983D7975EAC2451B9E1AE94D23BEA497908F7AD"
+    },
+    {
+      "Path": "plugins/audiofileprocessor.dll",
+      "Bytes": 366592,
+      "SHA256": "08F13CBF7809CD60A209A596DAB3AD4D12D9D5D1CDF35E9A50263FF2E143E2CA"
+    },
+    {
+      "Path": "plugins/bassbooster.dll",
+      "Bytes": 44544,
+      "SHA256": "59E118E01ADBC2BB446BC723AA39EC67A5D919F6D6E8085E1D62A8D47ECEE912"
+    },
+    {
+      "Path": "plugins/bitcrush.dll",
+      "Bytes": 56832,
+      "SHA256": "53AD7BE98E78C5C496BD39F2E9702AD3CD31E85DD9CFA27F502E61893D0680E7"
+    },
+    {
+      "Path": "plugins/bitinvader.dll",
+      "Bytes": 180736,
+      "SHA256": "C78B27C2306945986CA5506DA21404E770499302D652ECB04E3D6DEAE38F62F0"
+    },
+    {
+      "Path": "plugins/carlabase.dll",
+      "Bytes": 213504,
+      "SHA256": "6296FA9536A1E3E9B64D37FAE54EA8329318721E3E0C61859BFCAA51A196407F"
+    },
+    {
+      "Path": "plugins/carlapatchbay.dll",
+      "Bytes": 22016,
+      "SHA256": "EFC1CB71B57E16FF8486C69203422DD935D6C2D5424493D24F62D42A2A266678"
+    },
+    {
+      "Path": "plugins/carlarack.dll",
+      "Bytes": 22016,
+      "SHA256": "509780D4E2A2B5CCA76BFA274E88E4D9D62B6350C76237E8D7D71390AFAE4853"
+    },
+    {
+      "Path": "plugins/compressor.dll",
+      "Bytes": 353280,
+      "SHA256": "976D2DD61E8928A3D6A5C8FA902B060895E13A2CA3AF4A58F8A8D1521A71B9C9"
+    },
+    {
+      "Path": "plugins/crossovereq.dll",
+      "Bytes": 64000,
+      "SHA256": "04EAEA9F9A75B25F6E648CB485F3D3FF05CBFB8440EA8BCCFFD0911AEC90C968"
+    },
+    {
+      "Path": "plugins/delay.dll",
+      "Bytes": 57856,
+      "SHA256": "0FD8BF014B3AB0F0A90759EF89F4587A72E678C46EBB783E1DCF3AE164CBB69F"
+    },
+    {
+      "Path": "plugins/dispersion.dll",
+      "Bytes": 47616,
+      "SHA256": "D8BEC36A33151FA42334554B454FF7BC5AB37822D9545D2C3614AA62BCB515CA"
+    },
+    {
+      "Path": "plugins/dualfilter.dll",
+      "Bytes": 75264,
+      "SHA256": "FB7A3EAA9B545E2CE7722A4B37D27E7AC5D2470D75E332DD98E1847F78AA58E1"
+    },
+    {
+      "Path": "plugins/dynamicsprocessor.dll",
+      "Bytes": 78336,
+      "SHA256": "59089EED1701BEF99214C10A6B932EA83FC16055E2BEAC04328DD62C235C7B03"
+    },
+    {
+      "Path": "plugins/eq.dll",
+      "Bytes": 193536,
+      "SHA256": "812908D34C0F1F55C826D0DC8144B506E79EF63809CDEDCE3B7E516376308845"
+    },
+    {
+      "Path": "plugins/flanger.dll",
+      "Bytes": 57344,
+      "SHA256": "EC19541A704483817FBE4E71A15D40B9C6F899653CB36F6FB8BB4BEBA63B3D5C"
+    },
+    {
+      "Path": "plugins/freeboy.dll",
+      "Bytes": 171008,
+      "SHA256": "3B3A365C78130A8FEC177032E75FF28CB197BF4A90958F785EF518B3A36ECBD4"
+    },
+    {
+      "Path": "plugins/frequencyshifter.dll",
+      "Bytes": 187904,
+      "SHA256": "DAB10590248A347055275509AF3E255F2C03A10D5193D84D1A5C42452C9C5E72"
+    },
+    {
+      "Path": "plugins/granularpitchshifter.dll",
+      "Bytes": 148480,
+      "SHA256": "3BDB6B9834A024C783C931E4E8DDD3D93501FAD5558F0680DC987EB39EFD0F0A"
+    },
+    {
+      "Path": "plugins/hydrogenimport.dll",
+      "Bytes": 46592,
+      "SHA256": "33FD4E4D769E7E141F1F187CF4DA2BCDD59168AD8155B1BB97547B12BFDCBA56"
+    },
+    {
+      "Path": "plugins/kicker.dll",
+      "Bytes": 173056,
+      "SHA256": "5F2957978489E3C838E8560A48F0F1B6F93F23A6E85199CE1E92E814732E1E1D"
+    },
+    {
+      "Path": "plugins/ladspabrowser.dll",
+      "Bytes": 93696,
+      "SHA256": "9CF1F33706B36A7FE55D703ED551C1228E88A42B95A9B9FDAD20A25C27B9FD5C"
+    },
+    {
+      "Path": "plugins/ladspaeffect.dll",
+      "Bytes": 116736,
+      "SHA256": "4EB732BE3EE91E14EED383DDA1947F1A951BC3AE88987B86D3C9161C6CDC1538"
+    },
+    {
+      "Path": "plugins/lb302.dll",
+      "Bytes": 171008,
+      "SHA256": "3964D0213005DA07F51E97330ADD126882E41F8B619B219A62116B1EF56914E5"
+    },
+    {
+      "Path": "plugins/lomm.dll",
+      "Bytes": 303616,
+      "SHA256": "20CE8D35C94E30898E2F189E65DFFAA5A18649DCAAADA2A5C6BEB5F1898D179A"
+    },
+    {
+      "Path": "plugins/lv2effect.dll",
+      "Bytes": 37888,
+      "SHA256": "0FE08D75BF631CC89034ADED7EE97B7CAA33C9551747CDA84E9AF0D2DB610580"
+    },
+    {
+      "Path": "plugins/lv2instrument.dll",
+      "Bytes": 42496,
+      "SHA256": "CA9E1EC9B8A7DFA586305C0B6E96ACC78B711CAA67C1EC70641BA87E4AE497EF"
+    },
+    {
+      "Path": "plugins/malletsstk.dll",
+      "Bytes": 216576,
+      "SHA256": "20D53B0A18B9CE22570B0267AD0F2D33D97262A919EA9FDAEB1472D4FD9C7330"
+    },
+    {
+      "Path": "plugins/midiexport.dll",
+      "Bytes": 67584,
+      "SHA256": "3FB990926C8F24DFF9E277B40EDC6FCE247425D782567BDEB0B7FF0DAC8339CA"
+    },
+    {
+      "Path": "plugins/midiimport.dll",
+      "Bytes": 119808,
+      "SHA256": "4BD8B48F84C0FE278E50E9FCF6ACD3AE3FF0CAAC22F3CDA3C516F2EBBD606231"
+    },
+    {
+      "Path": "plugins/monstro.dll",
+      "Bytes": 310784,
+      "SHA256": "EEA53FBB8863D9344303936FC1D4A144CF8432729AA2D5EB1C67DFE8EC4C1AE0"
+    },
+    {
+      "Path": "plugins/multitapecho.dll",
+      "Bytes": 64512,
+      "SHA256": "FC266CB01170658B2C3E9EFE65CB7D326FE4AA967D51B28093D9BB11BA36DE2A"
+    },
+    {
+      "Path": "plugins/nes.dll",
+      "Bytes": 192512,
+      "SHA256": "83A131240ECAAFBEF6521385C857216435FCF0C0C52B137F33B0A76C4FAECA70"
+    },
+    {
+      "Path": "plugins/opulenz.dll",
+      "Bytes": 227840,
+      "SHA256": "E44509A9E5AEDF4DE81B73F2820A420F44BFE880DFEA784A3B222CECC75BD37B"
+    },
+    {
+      "Path": "plugins/organic.dll",
+      "Bytes": 127488,
+      "SHA256": "B1AD9CEEEAB6396A73A9E6FCFE9C0EDA1CCE26B891B2DFEE6D0B164CDB59CF05"
+    },
+    {
+      "Path": "plugins/oscilloscope.dll",
+      "Bytes": 61952,
+      "SHA256": "409F9E5D31DED1E0E937FF16B5F9C6A182311C365BB7DCF7D48C4B074E0DC414"
+    },
+    {
+      "Path": "plugins/patman.dll",
+      "Bytes": 105984,
+      "SHA256": "C8F30DB81B893EBF06344619D6F926C9E37598F30CA26DDF09B3B4681CBDF24B"
+    },
+    {
+      "Path": "plugins/peakcontrollereffect.dll",
+      "Bytes": 70656,
+      "SHA256": "34ADE7522FE67704FA6820160B168DB16F6E7BD2A0361C342B7C014FA47A09CA"
+    },
+    {
+      "Path": "plugins/reverbsc.dll",
+      "Bytes": 48640,
+      "SHA256": "8DBC169C79E79DC37F3A5A0EAEE50530E532D2773843B77CE2AC93D03FE833A8"
+    },
+    {
+      "Path": "plugins/sf2player.dll",
+      "Bytes": 235520,
+      "SHA256": "E9CBA05966238E2019FDAA29433063C2186D3E3E7C906A722FA931621AC01D03"
+    },
+    {
+      "Path": "plugins/sfxr.dll",
+      "Bytes": 186880,
+      "SHA256": "964B59CC5872FCE94BAC4C2215C0734D0D7FA787728E9EEFAD21127DD1FA825C"
+    },
+    {
+      "Path": "plugins/slewdistortion.dll",
+      "Bytes": 270336,
+      "SHA256": "0241D1B58DAD11EE220D1F66A49559104761DB004620C3377A87CDE1E96FB398"
+    },
+    {
+      "Path": "plugins/slicert.dll",
+      "Bytes": 131584,
+      "SHA256": "5D9730FD1BA53A24249FB9C30783ECC700D4D274B4FB10E194205B8409D3745A"
+    },
+    {
+      "Path": "plugins/stereoenhancer.dll",
+      "Bytes": 36864,
+      "SHA256": "A5F4ED6A23DEFD42D90335096F1B0A509D6797663D8ACF477E6E1919363473BC"
+    },
+    {
+      "Path": "plugins/stereomatrix.dll",
+      "Bytes": 44544,
+      "SHA256": "3822FC97280D702373003B524CB6AE4065E4C104D4E7E35B543221703850A880"
+    },
+    {
+      "Path": "plugins/taptempo.dll",
+      "Bytes": 54784,
+      "SHA256": "70CE61E5216C4C51E20A0EF9434474EFFCB71BB9C3C569CD8262F43F76A91686"
+    },
+    {
+      "Path": "plugins/tripleoscillator.dll",
+      "Bytes": 125440,
+      "SHA256": "EA2874028471465BD1C427C1D2766C5556EB0C63138846E0222B3515A4204F8C"
+    },
+    {
+      "Path": "plugins/vectorscope.dll",
+      "Bytes": 53760,
+      "SHA256": "D576F841C0B6ED2FA6ED5E819E557C4A9C7A0147FEA7529D38B5EF6018239DE2"
+    },
+    {
+      "Path": "plugins/vestige.dll",
+      "Bytes": 158208,
+      "SHA256": "8B816E786D779BF9D5B42611B694E7E1A308AEFBD6B19FA23773A56C6BFE7433"
+    },
+    {
+      "Path": "plugins/vibedstrings.dll",
+      "Bytes": 124416,
+      "SHA256": "C208C0C1A615809471EDEDADDD05AE73A59F88CD5EBE582C47BDDC979CFD85F4"
+    },
+    {
+      "Path": "plugins/vstbase.dll",
+      "Bytes": 371200,
+      "SHA256": "C594731004BAE4F1B88E4C1F44F76A3A9798E5774F4C183252A075D1B3CA605B"
+    },
+    {
+      "Path": "plugins/vsteffect.dll",
+      "Bytes": 167424,
+      "SHA256": "E8E047F34E68E8738746F6EB4107B66CAF3695D0B9420EA6D769BFF62FCA4D6E"
+    },
+    {
+      "Path": "plugins/watsyn.dll",
+      "Bytes": 238592,
+      "SHA256": "A6D8B1333CF4FBFFCA1AB921C68F41EF15DD8FD1AB09F6DECBB63B4ECDFC30A5"
+    },
+    {
+      "Path": "plugins/waveshaper.dll",
+      "Bytes": 64000,
+      "SHA256": "413159828E49CA4A2141EFE1954924D50F0C72F9660DB8E6A9E0D8305F8BBF0B"
+    },
+    {
+      "Path": "plugins/xpressive.dll",
+      "Bytes": 2723328,
+      "SHA256": "F49C8F887DE0969C8AB963D75DD5A7D1255E7300D97605E7911AE59E10B75E31"
+    },
+    {
+      "Path": "plugins/zynaddsubfx.dll",
+      "Bytes": 534528,
+      "SHA256": "E7DCC43D6FC727184F7120A5D1CD531DB096CBAC6CC1E8076408AEAEC9C1040F"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/manifest.json",
+      "Bytes": 333,
+      "SHA256": "3AA1C3FB440F5BBF5ECA6BF3A006BD10A5D0C74D0CCB99F6077E92D3E6E5FD1D"
+    },
+    {
+      "Path": "svs/SVSDiffSinger/SVSDiffSinger.dll",
+      "Bytes": 781312,
+      "SHA256": "EF901CC4040049C2C785D14FA6AA6F53A0F5EE33F25591C72525C8537554BBF6"
+    },
+    {
+      "Path": "svs/SVSExample/en.json",
+      "Bytes": 498,
+      "SHA256": "115F73C98A1725066AFADD748128A5284C9298F3C284BEE08C551532FB6231EE"
+    },
+    {
+      "Path": "svs/SVSExample/ja.json",
+      "Bytes": 810,
+      "SHA256": "29809FCB41733CD95C4203662997460912272EC01F78659D70CBEA54F5ED3AF5"
+    },
+    {
+      "Path": "svs/SVSExample/manifest.json",
+      "Bytes": 426,
+      "SHA256": "360C61956249798949F6A76E3B7C068B8396DF82269CD739407DB0FFFE166F23"
+    },
+    {
+      "Path": "svs/SVSExample/SVSExample.dll",
+      "Bytes": 140288,
+      "SHA256": "1C16706D306C0FABF77A378EA35CCF302315E3BA381AC762DEA4C287F1D228CC"
+    },
+    {
+      "Path": "svs/SVSExample/zh.json",
+      "Bytes": 998,
+      "SHA256": "1550AD7920D261EFE198F8B43D571BFA06583B057E82B2AC092C9DCA53E90B57"
+    },
+    {
+      "Path": "svs-project/bridge.py",
+      "Bytes": 59118,
+      "SHA256": "96945AB6E8FF21E56003DC06823D0144ABF252732072C2ED64AC16F680F6957A"
+    }
+  ],
+  "Validation": {
+    "ArchiveEntryHashes": "PASS",
+    "BaselineMismatchRejectedBeforeWrite": "PASS: development README differed from full package",
+    "IncrementalInstallation": "PASS: 66 files verified in existing build/Release",
+    "ExistingPluginDllsPreserved": "PASS: 252 paths and SHA256 values unchanged",
+    "NativeWindowsImportExportFlows": "PASS: 4 passed, 0 failed (includes setup and cleanup)",
+    "NativeDevelopmentWindow": "PASS: normal Windows window exposed and closed with exit code 0"
+  },
+  "FollowUp": [
+    "Existing Carla DLL load warnings occurred in both the filter flow test and the development startup; diagnosis is outside this incremental package task."
+  ]
+}
