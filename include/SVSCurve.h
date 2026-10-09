@@ -18,7 +18,7 @@ public:
 	void connect(double start, double end);
 	void pinTangents();
 	void replaceRange(double start, double end, const Curve& localSource);
-	Curve slice(double start, double end) const;
+	Curve slice(double start, double end, bool rebase = true) const;
 	QJsonObject toJson() const;
 	static bool fromJson(const QJsonObject&, Curve&, QString& error, const Parameter* descriptor = nullptr);
 	bool operator==(const Curve& other) const { return toJson() == other.toJson(); }

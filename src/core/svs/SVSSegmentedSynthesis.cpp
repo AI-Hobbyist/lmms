@@ -84,14 +84,9 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 			Curve curve;
 			if (!Curve::fromJson(it.value().toObject(), curve, error))
 				return {};
-			auto local = curve.slice(contextFirst, contextLast);
-			for (auto& point : local.evaluator.points)
-				point.tick += contextFirst;
-			for (auto& gap : local.evaluator.gaps)
-			{
-				gap.start += contextFirst;
-				gap.end += contextFirst;
-			}
+			// Segment inputs retain content-local ticks. Rebasing and adding the
+			// origin back can collapse adjacent discontinuity anchors through rounding.
+			auto local = curve.slice(contextFirst, contextLast, false);
 			curves[it.key()] = local.toJson();
 		}
 		segment.input.document["curves"] = curves;

@@ -196,20 +196,21 @@ void Curve::connect(double start, double end)
 	}
 	evaluator.gaps = std::move(retained);
 }
-Curve Curve::slice(double start, double end) const
+Curve Curve::slice(double start, double end, bool rebase) const
 {
 	Curve result = *this;
 	result.evaluator.points.clear();
 	result.evaluator.gaps.clear();
 	if (start > end)
 		std::swap(start, end);
+	const double origin = rebase ? start : 0;
 	for (size_t index = 0; index < evaluator.points.size(); ++index)
 	{
 		const auto& point = evaluator.points[index];
 		if (point.tick >= start && point.tick <= end)
 		{
 			auto copied = point;
-			copied.tick -= start;
+			copied.tick -= origin;
 			if (copied.automatic)
 			{
 				copied.automatic = false;
@@ -221,10 +222,10 @@ Curve Curve::slice(double start, double end) const
 	auto boundary = [&](double time) {
 		if (auto value = valueAt(time))
 		{
-			result.insert(time - start, *value);
+			result.insert(time - origin, *value);
 			auto& points = result.evaluator.points;
 			auto i = std::lower_bound(
-				points.begin(), points.end(), time - start, [](const auto& p, double t) { return p.tick < t; });
+				points.begin(), points.end(), time - origin, [](const auto& p, double t) { return p.tick < t; });
 			i->automatic = false;
 			i->tangentIn = i->tangentOut = derivativeAt(time);
 			auto upper = std::upper_bound(evaluator.points.begin(), evaluator.points.end(), time,
@@ -237,7 +238,7 @@ Curve Curve::slice(double start, double end) const
 	boundary(end);
 	for (const auto& gap : evaluator.gaps)
 		if (gap.end > start && gap.start < end)
-			result.evaluator.gaps.push_back({std::max(gap.start, start) - start, std::min(gap.end, end) - start});
+			result.evaluator.gaps.push_back({std::max(gap.start, start) - origin, std::min(gap.end, end) - origin});
 	return result;
 }
 QJsonObject Curve::toJson() const

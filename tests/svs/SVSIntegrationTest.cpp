@@ -4900,6 +4900,66 @@ private slots:
 		delete restored;
 		delete track;
 	}
+	void nativePencilCurveRenders()
+	{
+		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		const auto root = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
+		if (root.isEmpty()) { QSKIP("DiffSinger voice required"); }
+		QString error;
+		QVERIFY2(svs::Registry::instance().refreshCatalog(
+					 "org.lmms.svs.diffsinger", {{"diffsinger.voicebankDirectories", QJsonArray{root}}}, error),
+			qPrintable(error));
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		const auto cleanup = qScopeGuard([&] { delete track; });
+		for (const auto& voice : svs::Registry::instance().voices())
+		{
+			if (voice.pluginId == "org.lmms.svs.diffsinger")
+			{
+				track->bindVoice(voice.pluginId, voice.id);
+				break;
+			}
+		}
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "pencil-curve";
+		note.lyric = note.pronunciation = "la";
+		note.duration = 192;
+		note.pitch = 60;
+		clip->setNotes({note});
+		const auto* declaration = track->capabilities().parameter("diffsinger.voicing.offset", "clip");
+		QVERIFY(declaration);
+		svs::Curve curve;
+		curve.id = declaration->id;
+		curve.unit = declaration->unit;
+		curve.insert(0, 0.);
+		curve.insert(192, 0.);
+		clip->setEditorData({note}, {{curve.id, curve}});
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1500, 900);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* tab = editor.findChild<QToolButton*>("svsParameterTab.input:" + curve.id);
+		QVERIFY(tab);
+		QTest::mouseClick(tab, Qt::LeftButton);
+		auto* lane = editor.findChild<gui::SVSCanvas*>("svsParameterLane." + curve.id + ".input");
+		auto* canvas = editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");
+		QVERIFY(lane && canvas);
+		canvas->setTool(gui::SVSCanvas::Tool::Pencil);
+		QCOMPARE(lane->tool(), gui::SVSCanvas::Tool::Pencil);
+		QTest::mousePress(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(48, -4).toPoint());
+		QTest::mouseMove(lane, lane->curvePointAt(72, -6).toPoint());
+		QTest::mouseRelease(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(96, -2).toPoint());
+		QVERIFY(clip->curves()[curve.id] != curve);
+		QCOMPARE(clip->notes(), QVector<svs::Note>{note});
+		QTRY_VERIFY_WITH_TIMEOUT(clip->status() == "Ready" || clip->status().startsWith("Failed"), 180000);
+		QCOMPARE(clip->status(), QString("Ready"));
+		QVERIFY(clip->audio());
+		QTest::qWait(700);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-pencil-curve-native.png"));
+		editor.close();
+	}
 	void nativeSidebarLanguages()
 	{
 		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
@@ -7258,6 +7318,48 @@ private slots:
 		QCOMPARE(restoredClip->notes()[1].pitch, b.pitch);
 		QTRY_VERIFY_WITH_TIMEOUT(restoredClip->audio() != nullptr, 180000);
 		QCOMPARE(restoredClip->audio()->samples, audio->samples);
+	}
+	void segmentedEditedCurveAnchors()
+	{
+		svs::Curve curve;
+		curve.id = "diffsinger.voicing.offset";
+		curve.insert(0, 0.);
+		curve.insert(192, 0.);
+		gui::SVSCurveGesture gesture;
+		gesture.begin(curve, 48, -4., gui::SVSCurveGesture::Kind::Line);
+		gesture.update(96, -2.);
+		curve = gesture.preview;
+		QString error;
+		svs::Curve parsed;
+		QVERIFY2(svs::Curve::fromJson(curve.toJson(), parsed, error), qPrintable(error));
+		svs::Input input;
+		input.secondsPerTick = .01;
+		input.document = {{"secondsPerTick", .01},
+			{"capabilities",
+				QJsonObject{{"synthesis",
+					QJsonObject{
+						{"segmented", QJsonObject{{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}}}}}}},
+			{"curves", svs::curvesToJson({{curve.id, curve}})}};
+		svs::Note note;
+		note.id = "edited-curve";
+		note.duration = 192;
+		input.notes = {note};
+		svs::TimeMapping mapping;
+		QVERIFY(svs::readTimeMapping(input.document, input.secondsPerTick, mapping, error));
+		const auto segments = svs::planSynthesisSegments(input, mapping, error);
+		QVERIFY2(error.isEmpty(), qPrintable(error));
+		QCOMPARE(segments.size(), 1);
+		const auto json = QJsonDocument::fromJson(
+			QJsonDocument(segments[0].input.document["curves"].toObject()).toJson(QJsonDocument::Compact))
+							  .object()[curve.id]
+							  .toObject();
+		QVERIFY2(svs::Curve::fromJson(json, parsed, error), qPrintable(error));
+		QCOMPARE(parsed.evaluator.points.size(), curve.evaluator.points.size());
+		for (size_t index = 0; index < curve.evaluator.points.size(); ++index)
+		{
+			QCOMPARE(parsed.evaluator.points[index].tick, curve.evaluator.points[index].tick);
+			QCOMPARE(parsed.evaluator.points[index].value, curve.evaluator.points[index].value);
+		}
 	}
 	void segmentedPlanDependenciesAndAssembly()
 	{
