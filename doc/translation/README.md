@@ -159,3 +159,7 @@ M5-05：前批检查点及账本格式修正 0d8ba6ec66d043f944f9747e2a8e62fae0f
 M5-06：M5-05 检查点 e478286f74b2e31dffb2be2c2dd1c2d0b5b00031 已推送确认。Lb302/Lv2Effect/Lv2Instrument/MidiImport/MidiExport 共 59 键四语质量 PASS。指数波按钮原来错误复用白噪声名称，增加 Exponential wave 正确入口，音频与波形顺序不变；补齐 MIDI 导入导出说明和 LB302 波形/滤波提示。两项既有日语 MIDI 告警的额外换行修复。全库 3600 键，中/日/韩剩余空译 440/565/18。
 
 四语 QM、lb302 编译通过，build/Release/plugins/lb302.dll 部署原位，开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，LB302 面板与预设保存/恢复通过，主机中日韩字形正常；面板既有英文位图保留。当前没有 LV2 外部样本，Lv2Effect/Lv2Instrument 均明确记录 MANUAL/PENDING。MIDI 导入错误弹窗的最终真实场景留 M7，不将静态质量检查视为该场景验收。
+
+M5-07：M5-06 检查点 95d98cba92a94e50b3ed56f5911896f84ea6fcc3 已推送确认。Monstro/MultitapEcho 共 161 键四语质量 PASS，补齐日语振荡器/包络/LFO 调制矩阵参数、波形和三语剩余回声提示；已有有效译文保留。MultitapEcho 交换输入复选框标签接入既有 tr 键，不增加键、不改预设或控件位置。全库 3600 键，中/日/韩剩余空译 429/481/18。
+
+四语 QM 生成与 multitapecho 编译通过，DLL 写入 build/Release/plugins/multitapecho.dll；开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，两插件面板及预设保存/恢复通过，中文复选框已显示译文。日语交换输入的标签与相邻旋钮标签拥挤，M7 核对授权范围内的省略与悬浮全文；不宣称此项完整可读性通过。Monstro 位图标识保留，矩阵实际切换及悬浮提示留最终场景矩阵。

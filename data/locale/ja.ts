@@ -884,11 +884,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Monstrous 3-oscillator synth with modulation matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>変調マトリックス搭載の強力な3オシレーターシンセ</translation>
     </message>
     <message>
         <source>A multitap echo delay plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>マルチタップエコーディレイ</translation>
     </message>
     <message>
         <source>A NES-like synthesizer</source>
@@ -3637,203 +3637,203 @@ Continue?</source>
     <name>lmms::MonstroInstrument</name>
     <message>
         <source>Osc 1 volume</source>
-        <translation>Osc 1 volume</translation>
+        <translation>オシレーター1の音量</translation>
     </message>
     <message>
         <source>Osc 1 panning</source>
-        <translation>Osc 1 panning</translation>
+        <translation>オシレーター1のパン</translation>
     </message>
     <message>
         <source>Osc 1 coarse detune</source>
-        <translation>Osc 1 coarse detune</translation>
+        <translation>オシレーター1の粗調整</translation>
     </message>
     <message>
         <source>Osc 1 fine detune left</source>
-        <translation>Osc 1 fine detune left</translation>
+        <translation>オシレーター1の左の微調整</translation>
     </message>
     <message>
         <source>Osc 1 fine detune right</source>
-        <translation>Osc 1 fine detune right</translation>
+        <translation>オシレーター1の右の微調整</translation>
     </message>
     <message>
         <source>Osc 1 stereo phase offset</source>
-        <translation>Osc 1 stereo phase offset</translation>
+        <translation>オシレーター1のステレオ位相オフセット</translation>
     </message>
     <message>
         <source>Osc 1 pulse width</source>
-        <translation>Osc 1 pulse width</translation>
+        <translation>オシレーター1のパルス幅</translation>
     </message>
     <message>
         <source>Osc 1 sync send on rise</source>
-        <translation>Osc 1 sync send on rise</translation>
+        <translation>オシレーター1の立ち上がりで同期送信</translation>
     </message>
     <message>
         <source>Osc 1 sync send on fall</source>
-        <translation>Osc 1 sync send on fall</translation>
+        <translation>オシレーター1の立ち下がりで同期送信</translation>
     </message>
     <message>
         <source>Osc 2 volume</source>
-        <translation>Osc 2 volume</translation>
+        <translation>オシレーター2の音量</translation>
     </message>
     <message>
         <source>Osc 2 panning</source>
-        <translation>Osc 2 panning</translation>
+        <translation>オシレーター2のパン</translation>
     </message>
     <message>
         <source>Osc 2 coarse detune</source>
-        <translation>Osc 2 coarse detune</translation>
+        <translation>オシレーター2の粗調整</translation>
     </message>
     <message>
         <source>Osc 2 fine detune left</source>
-        <translation>Osc 2 fine detune left</translation>
+        <translation>オシレーター2の左の微調整</translation>
     </message>
     <message>
         <source>Osc 2 fine detune right</source>
-        <translation>Osc 2 fine detune right</translation>
+        <translation>オシレーター2の右の微調整</translation>
     </message>
     <message>
         <source>Osc 2 stereo phase offset</source>
-        <translation>Osc 2 stereo phase offset</translation>
+        <translation>オシレーター2のステレオ位相オフセット</translation>
     </message>
     <message>
         <source>Osc 2 waveform</source>
-        <translation>Osc 2 waveform</translation>
+        <translation>オシレーター2の波形</translation>
     </message>
     <message>
         <source>Osc 2 sync hard</source>
-        <translation>Osc 2 sync hard</translation>
+        <translation>オシレーター2のハード同期</translation>
     </message>
     <message>
         <source>Osc 2 sync reverse</source>
-        <translation>Osc 2 sync reverse</translation>
+        <translation>オシレーター2の逆同期</translation>
     </message>
     <message>
         <source>Osc 3 volume</source>
-        <translation>Osc 3 volume</translation>
+        <translation>オシレーター3の音量</translation>
     </message>
     <message>
         <source>Osc 3 panning</source>
-        <translation>Osc 3 panning</translation>
+        <translation>オシレーター3のパン</translation>
     </message>
     <message>
         <source>Osc 3 coarse detune</source>
-        <translation>Osc 3 coarse detune</translation>
+        <translation>オシレーター3の粗調整</translation>
     </message>
     <message>
         <source>Osc 3 Stereo phase offset</source>
-        <translation>Osc 3 Stereo phase offset</translation>
+        <translation>オシレーター3のステレオ位相オフセット</translation>
     </message>
     <message>
         <source>Osc 3 sub-oscillator mix</source>
-        <translation>Osc 3 sub-oscillator mix</translation>
+        <translation>オシレーター3のサブオシレーターのミックス</translation>
     </message>
     <message>
         <source>Osc 3 waveform 1</source>
-        <translation>Osc 3 waveform 1</translation>
+        <translation>オシレーター3の波形1</translation>
     </message>
     <message>
         <source>Osc 3 waveform 2</source>
-        <translation>Osc 3 waveform 2</translation>
+        <translation>オシレーター3の波形2</translation>
     </message>
     <message>
         <source>Osc 3 sync hard</source>
-        <translation>Osc 3 sync hard</translation>
+        <translation>オシレーター3のハード同期</translation>
     </message>
     <message>
         <source>Osc 3 Sync reverse</source>
-        <translation>Osc 3 Sync reverse</translation>
+        <translation>オシレーター3の逆同期</translation>
     </message>
     <message>
         <source>LFO 1 waveform</source>
-        <translation>LFO 1 waveform</translation>
+        <translation>LFO 1 波形</translation>
     </message>
     <message>
         <source>LFO 1 attack</source>
-        <translation>LFO 1 attack</translation>
+        <translation>LFO 1 アタック</translation>
     </message>
     <message>
         <source>LFO 1 rate</source>
-        <translation>LFO 1 rate</translation>
+        <translation>LFO 1 レート</translation>
     </message>
     <message>
         <source>LFO 1 phase</source>
-        <translation>LFO 1 phase</translation>
+        <translation>LFO 1 位相</translation>
     </message>
     <message>
         <source>LFO 2 waveform</source>
-        <translation>LFO 2 waveform</translation>
+        <translation>LFO 2 波形</translation>
     </message>
     <message>
         <source>LFO 2 attack</source>
-        <translation>LFO 2 attack</translation>
+        <translation>LFO 2 アタック</translation>
     </message>
     <message>
         <source>LFO 2 rate</source>
-        <translation>LFO 2 rate</translation>
+        <translation>LFO 2 レート</translation>
     </message>
     <message>
         <source>LFO 2 phase</source>
-        <translation>LFO 2 phase</translation>
+        <translation>LFO 2 位相</translation>
     </message>
     <message>
         <source>Env 1 pre-delay</source>
-        <translation>Env 1 pre-delay</translation>
+        <translation>エンベロープ1のプリディレイ</translation>
     </message>
     <message>
         <source>Env 1 attack</source>
-        <translation>Env 1 attack</translation>
+        <translation>エンベロープ1のアタック</translation>
     </message>
     <message>
         <source>Env 1 hold</source>
-        <translation>Env 1 hold</translation>
+        <translation>エンベロープ1のホールド</translation>
     </message>
     <message>
         <source>Env 1 decay</source>
-        <translation>Env 1 decay</translation>
+        <translation>エンベロープ1のディケイ</translation>
     </message>
     <message>
         <source>Env 1 sustain</source>
-        <translation>Env 1 sustain</translation>
+        <translation>エンベロープ1のサステイン</translation>
     </message>
     <message>
         <source>Env 1 release</source>
-        <translation>Env 1 release</translation>
+        <translation>エンベロープ1のリリース</translation>
     </message>
     <message>
         <source>Env 1 slope</source>
-        <translation>Env 1 slope</translation>
+        <translation>エンベロープ1の傾き</translation>
     </message>
     <message>
         <source>Env 2 pre-delay</source>
-        <translation>Env 2 pre-delay</translation>
+        <translation>エンベロープ2のプリディレイ</translation>
     </message>
     <message>
         <source>Env 2 attack</source>
-        <translation>Env 2 attack</translation>
+        <translation>エンベロープ2のアタック</translation>
     </message>
     <message>
         <source>Env 2 hold</source>
-        <translation>Env 2 hold</translation>
+        <translation>エンベロープ2のホールド</translation>
     </message>
     <message>
         <source>Env 2 decay</source>
-        <translation>Env 2 decay</translation>
+        <translation>エンベロープ2のディケイ</translation>
     </message>
     <message>
         <source>Env 2 sustain</source>
-        <translation>Env 2 sustain</translation>
+        <translation>エンベロープ2のサステイン</translation>
     </message>
     <message>
         <source>Env 2 release</source>
-        <translation>Env 2 release</translation>
+        <translation>エンベロープ2のリリース</translation>
     </message>
     <message>
         <source>Env 2 slope</source>
-        <translation>Env 2 slope</translation>
+        <translation>エンベロープ2の傾き</translation>
     </message>
     <message>
         <source>Osc 2+3 modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2+3の変調</translation>
     </message>
     <message>
         <source>Selected view</source>
@@ -3841,263 +3841,263 @@ Continue?</source>
     </message>
     <message>
         <source>Osc 1 - Vol env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 音量 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 1 - Vol env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 音量 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 1 - Vol LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 音量 LFO1</translation>
     </message>
     <message>
         <source>Osc 1 - Vol LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 音量 LFO2</translation>
     </message>
     <message>
         <source>Osc 2 - Vol env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 音量 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 2 - Vol env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 音量 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 2 - Vol LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 音量 LFO1</translation>
     </message>
     <message>
         <source>Osc 2 - Vol LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 音量 LFO2</translation>
     </message>
     <message>
         <source>Osc 3 - Vol env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 音量 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 3 - Vol env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 音量 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 3 - Vol LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 音量 LFO1</translation>
     </message>
     <message>
         <source>Osc 3 - Vol LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 音量 LFO2</translation>
     </message>
     <message>
         <source>Osc 1 - Phs env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 位相 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 1 - Phs env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 位相 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 1 - Phs LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 位相 LFO1</translation>
     </message>
     <message>
         <source>Osc 1 - Phs LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - 位相 LFO2</translation>
     </message>
     <message>
         <source>Osc 2 - Phs env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 位相 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 2 - Phs env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 位相 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 2 - Phs LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 位相 LFO1</translation>
     </message>
     <message>
         <source>Osc 2 - Phs LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - 位相 LFO2</translation>
     </message>
     <message>
         <source>Osc 3 - Phs env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 位相 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 3 - Phs env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 位相 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 3 - Phs LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 位相 LFO1</translation>
     </message>
     <message>
         <source>Osc 3 - Phs LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - 位相 LFO2</translation>
     </message>
     <message>
         <source>Osc 1 - Pit env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - ピッチ エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 1 - Pit env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - ピッチ エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 1 - Pit LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - ピッチ LFO1</translation>
     </message>
     <message>
         <source>Osc 1 - Pit LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - ピッチ LFO2</translation>
     </message>
     <message>
         <source>Osc 2 - Pit env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - ピッチ エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 2 - Pit env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - ピッチ エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 2 - Pit LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - ピッチ LFO1</translation>
     </message>
     <message>
         <source>Osc 2 - Pit LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2 - ピッチ LFO2</translation>
     </message>
     <message>
         <source>Osc 3 - Pit env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - ピッチ エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 3 - Pit env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - ピッチ エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 3 - Pit LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - ピッチ LFO1</translation>
     </message>
     <message>
         <source>Osc 3 - Pit LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - ピッチ LFO2</translation>
     </message>
     <message>
         <source>Osc 1 - PW env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - パルス幅 エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 1 - PW env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - パルス幅 エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 1 - PW LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - パルス幅 LFO1</translation>
     </message>
     <message>
         <source>Osc 1 - PW LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター1 - パルス幅 LFO2</translation>
     </message>
     <message>
         <source>Osc 3 - Sub env 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - サブオシレーターのミックス エンベロープ1</translation>
     </message>
     <message>
         <source>Osc 3 - Sub env 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - サブオシレーターのミックス エンベロープ2</translation>
     </message>
     <message>
         <source>Osc 3 - Sub LFO 1</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - サブオシレーターのミックス LFO1</translation>
     </message>
     <message>
         <source>Osc 3 - Sub LFO 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3 - サブオシレーターのミックス LFO2</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Bandlimited Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限三角波</translation>
     </message>
     <message>
         <source>Bandlimited Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限ノコギリ波</translation>
     </message>
     <message>
         <source>Bandlimited Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限ランプ波</translation>
     </message>
     <message>
         <source>Bandlimited Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限矩形波</translation>
     </message>
     <message>
         <source>Bandlimited Moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限Moog ノコギリ波</translation>
     </message>
     <message>
         <source>Soft square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフト矩形波</translation>
     </message>
     <message>
         <source>Absolute sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>絶対値正弦波</translation>
     </message>
     <message>
         <source>Exponential wave</source>
-        <translation>Exponential wave</translation>
+        <translation>指数波</translation>
     </message>
     <message>
         <source>White noise</source>
-        <translation>White noise</translation>
+        <translation>ホワイトノイズ</translation>
     </message>
     <message>
         <source>Digital Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタル三角波</translation>
     </message>
     <message>
         <source>Digital Saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタルノコギリ波</translation>
     </message>
     <message>
         <source>Digital Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタルランプ波</translation>
     </message>
     <message>
         <source>Digital Square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタル矩形波</translation>
     </message>
     <message>
         <source>Digital Moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタルMoog ノコギリ波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Ramp wave</source>
-        <translation type="unfinished"></translation>
+        <translation>ランプ波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>Moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Moog ノコギリ波</translation>
     </message>
     <message>
         <source>Abs. sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>絶対値正弦波</translation>
     </message>
     <message>
         <source>Random</source>
@@ -4105,7 +4105,7 @@ Continue?</source>
     </message>
     <message>
         <source>Random smooth</source>
-        <translation type="unfinished"></translation>
+        <translation>滑らかなランダム</translation>
     </message>
 </context>
 <context>
@@ -10416,11 +10416,11 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::MonstroView</name>
     <message>
         <source>Operators view</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター表示</translation>
     </message>
     <message>
         <source>Matrix view</source>
-        <translation type="unfinished"></translation>
+        <translation>マトリックス表示</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -10436,11 +10436,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source> semitones</source>
-        <translation type="unfinished"></translation>
+        <translation> 半音</translation>
     </message>
     <message>
         <source>Fine tune left</source>
-        <translation type="unfinished"></translation>
+        <translation>左の微調整</translation>
     </message>
     <message>
         <source> cents</source>
@@ -10448,7 +10448,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Fine tune right</source>
-        <translation type="unfinished"></translation>
+        <translation>右の微調整</translation>
     </message>
     <message>
         <source>Stereo phase offset</source>
@@ -10456,7 +10456,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source> deg</source>
-        <translation type="unfinished"></translation>
+        <translation> 度</translation>
     </message>
     <message>
         <source>Pulse width</source>
@@ -10464,31 +10464,31 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Send sync on pulse rise</source>
-        <translation type="unfinished"></translation>
+        <translation>パルスの立ち上がりで同期を送信</translation>
     </message>
     <message>
         <source>Send sync on pulse fall</source>
-        <translation type="unfinished"></translation>
+        <translation>パルスの立ち下がりで同期を送信</translation>
     </message>
     <message>
         <source>Hard sync oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2のハード同期</translation>
     </message>
     <message>
         <source>Reverse sync oscillator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2の逆同期</translation>
     </message>
     <message>
         <source>Sub-osc mix</source>
-        <translation type="unfinished"></translation>
+        <translation>サブオシレーターのミックス</translation>
     </message>
     <message>
         <source>Hard sync oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3のハード同期</translation>
     </message>
     <message>
         <source>Reverse sync oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター3の逆同期</translation>
     </message>
     <message>
         <source>Attack</source>
@@ -10496,19 +10496,19 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Rate</source>
-        <translation>Rate</translation>
+        <translation>レート</translation>
     </message>
     <message>
         <source>Phase</source>
-        <translation>Phase</translation>
+        <translation>位相</translation>
     </message>
     <message>
         <source>Pre-delay</source>
-        <translation>Pre-delay</translation>
+        <translation>プリディレイ</translation>
     </message>
     <message>
         <source>Hold</source>
-        <translation>Hold</translation>
+        <translation>ホールド</translation>
     </message>
     <message>
         <source>Decay</source>
@@ -10524,46 +10524,46 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Slope</source>
-        <translation>Slope</translation>
+        <translation>傾き</translation>
     </message>
     <message>
         <source>Mix osc 2 with osc 3</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2と3をミックス</translation>
     </message>
     <message>
         <source>Modulate amplitude of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2で3の振幅を変調</translation>
     </message>
     <message>
         <source>Modulate frequency of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2で3の周波数を変調</translation>
     </message>
     <message>
         <source>Modulate phase of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター2で3の位相を変調</translation>
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation>Modulation amount</translation>
+        <translation>変調量</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::MultitapEchoControlDialog</name>
     <message>
         <source>Length</source>
-        <translation>Length</translation>
+        <translation>長さ</translation>
     </message>
     <message>
         <source>Step length:</source>
-        <translation>Step length:</translation>
+        <translation>ステップ長：</translation>
     </message>
     <message>
         <source>Dry</source>
-        <translation>Dry</translation>
+        <translation>ドライ</translation>
     </message>
     <message>
         <source>Dry gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>ドライゲイン：</translation>
     </message>
     <message>
         <source>Stages</source>
@@ -10571,15 +10571,15 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Low-pass stages:</source>
-        <translation type="unfinished"></translation>
+        <translation>ローパス段数：</translation>
     </message>
     <message>
         <source>Swap inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>入力を入れ替え</translation>
     </message>
     <message>
         <source>Swap left and right input channels for reflections</source>
-        <translation type="unfinished"></translation>
+        <translation>反射音の左右入力チャンネルを入れ替え</translation>
     </message>
 </context>
 <context>

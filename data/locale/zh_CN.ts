@@ -10480,15 +10480,15 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Sub-osc mix</source>
-        <translation type="unfinished"></translation>
+        <translation>子振荡器混合</translation>
     </message>
     <message>
         <source>Hard sync oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>硬同步振荡器 3</translation>
     </message>
     <message>
         <source>Reverse sync oscillator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>反向同步振荡器 3</translation>
     </message>
     <message>
         <source>Attack</source>
@@ -10500,7 +10500,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>相位</translation>
     </message>
     <message>
         <source>Pre-delay</source>
@@ -10524,23 +10524,23 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>斜率</translation>
     </message>
     <message>
         <source>Mix osc 2 with osc 3</source>
-        <translation type="unfinished"></translation>
+        <translation>混合振荡器 2 与振荡器 3</translation>
     </message>
     <message>
         <source>Modulate amplitude of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 3 的振幅</translation>
     </message>
     <message>
         <source>Modulate frequency of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 3 的频率</translation>
     </message>
     <message>
         <source>Modulate phase of osc 3 by osc 2</source>
-        <translation type="unfinished"></translation>
+        <translation>用振荡器 2 调制振荡器 3 的相位</translation>
     </message>
     <message>
         <source>Modulation amount</source>
@@ -10571,7 +10571,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Low-pass stages:</source>
-        <translation type="unfinished"></translation>
+        <translation>低通级数：</translation>
     </message>
     <message>
         <source>Swap inputs</source>
@@ -10579,7 +10579,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Swap left and right input channels for reflections</source>
-        <translation type="unfinished"></translation>
+        <translation>交换反射的左右输入通道</translation>
     </message>
 </context>
 <context>

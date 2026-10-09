@@ -1,0 +1,19 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  MultitapEchoControlDialog.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/MultitapEcho/Release/multitapecho.exp
+  multitapecho.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\multitapecho.dll
