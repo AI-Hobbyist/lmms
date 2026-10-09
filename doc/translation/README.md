@@ -155,3 +155,7 @@ M5-04：M5-03 检查点 8e24a7a0431a9f2e4df373d49a87f89150628eb4 已推送确认
 M5-05：前批检查点及账本格式修正 0d8ba6ec66d043f944f9747e2a8e62fae0f741b6 已推送确认。LOMM/LadspaBrowser/LadspaEffect 共 197 键四语质量 PASS；新增 LOMM 固定预读延迟的 %1 模板，替代提取器无法处理的动态 tr 拼接，不改数值与算法。补译多段压缩参数及 LADSPA 固定状态/端口说明，第三方插件名称和作者元数据保留。全库 3599 键，中/日/韩剩余空译 473/596/28。
 
 四语 QM、lomm 前台编译成功，DLL 写入 build/Release/plugins/lomm.dll；开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，覆盖 LOMM、LADSPA 浏览器及现有 LADSPA 效果器宿主面板，预设保存/恢复通过，固定说明正常显示。LOMM 英文位图标识保留，长提示实际悬浮验收留 M7，不将位图重绘纳入本批。
+
+M5-06：M5-05 检查点 e478286f74b2e31dffb2be2c2dd1c2d0b5b00031 已推送确认。Lb302/Lv2Effect/Lv2Instrument/MidiImport/MidiExport 共 59 键四语质量 PASS。指数波按钮原来错误复用白噪声名称，增加 Exponential wave 正确入口，音频与波形顺序不变；补齐 MIDI 导入导出说明和 LB302 波形/滤波提示。两项既有日语 MIDI 告警的额外换行修复。全库 3600 键，中/日/韩剩余空译 440/565/18。
+
+四语 QM、lb302 编译通过，build/Release/plugins/lb302.dll 部署原位，开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，LB302 面板与预设保存/恢复通过，主机中日韩字形正常；面板既有英文位图保留。当前没有 LV2 外部样本，Lv2Effect/Lv2Instrument 均明确记录 MANUAL/PENDING。MIDI 导入错误弹窗的最终真实场景留 M7，不将静态质量检查视为该场景验收。

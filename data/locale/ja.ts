@@ -872,15 +872,15 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Incomplete monophonic imitation TB-303</source>
-        <translation type="unfinished"></translation>
+        <translation>未完成のモノフォニック TB-303 エミュレーション</translation>
     </message>
     <message>
         <source>plugin for using arbitrary LV2-effects inside LMMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS 内で任意の LV2 エフェクトを使うプラグイン。</translation>
     </message>
     <message>
         <source>plugin for using arbitrary LV2 instruments inside LMMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS 内で任意の LV2 楽器を使うプラグイン。</translation>
     </message>
     <message>
         <source>Monstrous 3-oscillator synth with modulation matrix</source>
@@ -1014,11 +1014,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Filter for exporting MIDI files from LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS から MIDI ファイルを書き出すフィルター</translation>
     </message>
     <message>
         <source>Filter for importing MIDI files into LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI ファイルを LMMS に読み込むフィルター</translation>
     </message>
 </context>
 <context>
@@ -3266,11 +3266,11 @@ Continue?</source>
     </message>
     <message>
         <source>VCF Envelope Mod</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF エンベロープ変調</translation>
     </message>
     <message>
         <source>VCF Envelope Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF エンベロープの減衰</translation>
     </message>
     <message>
         <source>Distortion</source>
@@ -3512,29 +3512,27 @@ Continue?</source>
     </message>
     <message>
         <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation>設定ダイアログ(編集-&gt;設定)においてデフォルトのサウンドフォントが設定されていないため、このMIDIファイルがインポートされても音声は再生されません。
-MIDIサウンドフォントをダウンロードし、サウンドフォントを指定した後、再試行して下さい。</translation>
+        <translation>設定ダイアログ(編集-&gt;設定)においてデフォルトのサウンドフォントが設定されていないため、このMIDIファイルがインポートされても音声は再生されません。MIDIサウンドフォントをダウンロードし、サウンドフォントを指定した後、再試行して下さい。</translation>
     </message>
     <message>
         <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
-        <translation>LMMSのコンパイル時に、MIDIファイルを再生するためのSF2プレーヤーを有効にしませんでした。
-そのため、このMIDIファイルをインポートしても音声が流れません。</translation>
+        <translation>LMMSのコンパイル時に、MIDIファイルを再生するためのSF2プレーヤーを有効にしませんでした。そのため、このMIDIファイルをインポートしても音声が流れません。</translation>
     </message>
     <message>
         <source>MIDI Time Signature Numerator</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI 拍子の分子</translation>
     </message>
     <message>
         <source>MIDI Time Signature Denominator</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI 拍子の分母</translation>
     </message>
     <message>
         <source>Numerator</source>
-        <translation type="unfinished"></translation>
+        <translation>分子</translation>
     </message>
     <message>
         <source>Denominator</source>
-        <translation type="unfinished"></translation>
+        <translation>分母</translation>
     </message>
     <message>
         <source>Tempo</source>
@@ -9137,7 +9135,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Env Mod:</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ変調：</translation>
     </message>
     <message>
         <source>Decay:</source>
@@ -9145,47 +9143,47 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation type="unfinished"></translation>
+        <translation>303風、24dB/オクターブ、3ポールフィルター</translation>
     </message>
     <message>
         <source>Slide Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation>スライドの減衰：</translation>
     </message>
     <message>
         <source>DIST:</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み：</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>ノコギリ波</translation>
     </message>
     <message>
         <source>Click here for a sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックしてノコギリ波を選択。</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Click here for a triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして三角波を選択。</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>Click here for a square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして矩形波を選択。</translation>
     </message>
     <message>
         <source>Rounded square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>丸みのある矩形波</translation>
     </message>
     <message>
         <source>Click here for a square wave with a rounded end.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして末端が丸い矩形波を選択。</translation>
     </message>
     <message>
         <source>Moog wave</source>
@@ -9197,11 +9195,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Click for a sine wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして正弦波を選択。</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>指数波</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -9209,43 +9211,43 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして指数波を選択。</translation>
     </message>
     <message>
         <source>Click here for white noise.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックしてホワイトノイズを選択。</translation>
     </message>
     <message>
         <source>Bandlimited saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限ノコギリ波</translation>
     </message>
     <message>
         <source>Click here for bandlimited sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして帯域制限ノコギリ波を選択。</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限矩形波</translation>
     </message>
     <message>
         <source>Click here for bandlimited square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして帯域制限矩形波を選択。</translation>
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限三角波</translation>
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして帯域制限三角波を選択。</translation>
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域制限 Moog ノコギリ波</translation>
     </message>
     <message>
         <source>Click here for bandlimited moog-like wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックして帯域制限 Moog 風の波形を選択。</translation>
     </message>
 </context>
 <context>

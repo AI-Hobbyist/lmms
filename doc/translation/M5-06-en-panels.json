@@ -1,0 +1,18 @@
+[
+    {
+        "plugin": "lv2effect",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "lv2instrument",
+        "reason": "No external subplugin fixture installed",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "lb302",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    }
+]

@@ -9185,6 +9185,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Exponential wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>White noise wave</source>
         <translation type="unfinished"></translation>
     </message>

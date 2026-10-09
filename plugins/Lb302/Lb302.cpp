@@ -710,7 +710,7 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	sinWaveBtn->setToolTip(tr("Click for a sine wave."));
 	m_waveBtnGrp->addButton(sinWaveBtn);
 
-	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
+	auto exponentialWaveBtn = new PixmapButton(this, tr("Exponential wave"));
 	exponentialWaveBtn->move(waveBtnX + (16 * 6), waveBtnY);
 	exponentialWaveBtn->setActiveGraphic(embed::getIconPixmap("exp_wave_active"));
 	exponentialWaveBtn->setInactiveGraphic(embed::getIconPixmap("exp_wave_inactive"));

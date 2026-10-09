@@ -1014,11 +1014,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Filter for exporting MIDI files from LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS에서 MIDI 파일을 내보내는 필터</translation>
     </message>
     <message>
         <source>Filter for importing MIDI files into LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI 파일을 LMMS로 가져오는 필터</translation>
     </message>
 </context>
 <context>
@@ -9159,7 +9159,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 톱니파 선택.</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -9167,7 +9167,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 삼각파 선택.</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -9175,7 +9175,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 사각파 선택.</translation>
     </message>
     <message>
         <source>Rounded square wave</source>
@@ -9183,7 +9183,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a square wave with a rounded end.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 끝이 둥근 사각파 선택.</translation>
     </message>
     <message>
         <source>Moog wave</source>
@@ -9199,7 +9199,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click for a sine wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 사인파 선택.</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>지수파</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -9211,7 +9215,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for white noise.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 백색 잡음 선택.</translation>
     </message>
     <message>
         <source>Bandlimited saw wave</source>
@@ -9219,7 +9223,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for bandlimited sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 대역 제한 톱니파 선택.</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
@@ -9243,7 +9247,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for bandlimited moog-like wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 대역 제한 Moog 스타일 파형 선택.</translation>
     </message>
 </context>
 <context>

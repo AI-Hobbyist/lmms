@@ -872,7 +872,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Incomplete monophonic imitation TB-303</source>
-        <translation type="unfinished"></translation>
+        <translation>尚未完善的 TB-303 单声部仿真</translation>
     </message>
     <message>
         <source>plugin for using arbitrary LV2-effects inside LMMS.</source>
@@ -1014,11 +1014,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Filter for exporting MIDI files from LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>从 LMMS 导出 MIDI 文件的过滤器</translation>
     </message>
     <message>
         <source>Filter for importing MIDI files into LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>将 MIDI 文件导入 LMMS 的过滤器</translation>
     </message>
 </context>
 <context>
@@ -3258,19 +3258,19 @@ Continue?</source>
     <name>lmms::Lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF 截止频率</translation>
     </message>
     <message>
         <source>VCF Resonance</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF 共振</translation>
     </message>
     <message>
         <source>VCF Envelope Mod</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF 包络调制</translation>
     </message>
     <message>
         <source>VCF Envelope Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>VCF 包络衰减</translation>
     </message>
     <message>
         <source>Distortion</source>
@@ -3282,23 +3282,23 @@ Continue?</source>
     </message>
     <message>
         <source>Slide Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>滑音衰减</translation>
     </message>
     <message>
         <source>Slide</source>
-        <translation type="unfinished"></translation>
+        <translation>滑音</translation>
     </message>
     <message>
         <source>Accent</source>
-        <translation type="unfinished"></translation>
+        <translation>重音</translation>
     </message>
     <message>
         <source>Dead</source>
-        <translation type="unfinished"></translation>
+        <translation>不重新触发包络</translation>
     </message>
     <message>
         <source>24dB/oct Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>24dB/八度滤波器</translation>
     </message>
 </context>
 <context>
@@ -9127,7 +9127,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::Lb302SynthView</name>
     <message>
         <source>Cutoff Freq:</source>
-        <translation type="unfinished"></translation>
+        <translation>截止频率：</translation>
     </message>
     <message>
         <source>Resonance:</source>
@@ -9135,7 +9135,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Env Mod:</source>
-        <translation type="unfinished"></translation>
+        <translation>包络调制：</translation>
     </message>
     <message>
         <source>Decay:</source>
@@ -9143,15 +9143,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation type="unfinished"></translation>
+        <translation>303 风格、24dB/八度、三极点滤波器</translation>
     </message>
     <message>
         <source>Slide Decay:</source>
-        <translation type="unfinished"></translation>
+        <translation>滑音衰减：</translation>
     </message>
     <message>
         <source>DIST:</source>
-        <translation type="unfinished"></translation>
+        <translation>失真：</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -9159,7 +9159,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择锯齿波。</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -9167,7 +9167,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择三角波。</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -9175,7 +9175,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择方波。</translation>
     </message>
     <message>
         <source>Rounded square wave</source>
@@ -9183,15 +9183,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for a square wave with a rounded end.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择末端圆滑的方波。</translation>
     </message>
     <message>
         <source>Moog wave</source>
-        <translation type="unfinished"></translation>
+        <translation>Moog 波形</translation>
     </message>
     <message>
         <source>Click here for a moog-like wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择 Moog 风格波形。</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -9199,7 +9199,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click for a sine wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击选择正弦波。</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>指数波</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -9211,39 +9215,39 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Click here for white noise.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择白噪声。</translation>
     </message>
     <message>
         <source>Bandlimited saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>带限锯齿波</translation>
     </message>
     <message>
         <source>Click here for bandlimited sawtooth wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择带限锯齿波。</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
-        <translation type="unfinished"></translation>
+        <translation>带限方波</translation>
     </message>
     <message>
         <source>Click here for bandlimited square wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择带限方波。</translation>
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>带限三角波</translation>
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择带限三角波。</translation>
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
-        <translation type="unfinished"></translation>
+        <translation>带限 Moog 锯齿波</translation>
     </message>
     <message>
         <source>Click here for bandlimited moog-like wave.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击此处选择带限 Moog 风格波形。</translation>
     </message>
 </context>
 <context>
