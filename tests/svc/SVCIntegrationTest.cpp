@@ -1,5 +1,6 @@
 #include <QComboBox>
 #include <QDomDocument>
+#include <QDoubleSpinBox>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -7,6 +8,7 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QScreen>
+#include <QSlider>
 #include <QSpinBox>
 #include <QTemporaryDir>
 #include <QTimer>
@@ -303,14 +305,15 @@ private slots:
 			auto* tree = browser.findChild<QTreeWidget*>("svcBrowserTree");
 			const auto* root = tree->topLevelItem(0);
 			QVERIFY(root);
-			QCOMPARE(root->child(0)->child(0)->childCount(), 0); // Single speaker has no redundant level.
+			QCOMPARE(root->child(0)->childCount(), 0); // Single speaker has no redundant level.
 			const QTreeWidgetItem* fixture = nullptr;
-			for (int index = 0; index < root->childCount(); ++index)
+			for (int index = 0; index < tree->topLevelItemCount(); ++index)
 			{
-				if (root->child(index)->text(0) == profile.name) { fixture = root->child(index); }
+				if (tree->topLevelItem(index)->text(0) == profile.name) { fixture = tree->topLevelItem(index); }
 			}
 			QVERIFY(fixture);
 			QCOMPARE(fixture->child(0)->childCount(), 2);
+			QVERIFY(!fixture->child(0)->child(0)->icon(0).isNull());
 			QTest::qWait(250);
 			const auto screenshot = window.screen()->grabWindow(window.winId());
 			QVERIFY(!screenshot.isNull());
@@ -423,11 +426,9 @@ private slots:
 		auto* tree = browser.findChild<QTreeWidget*>("svcBrowserTree");
 		QVERIFY(tree);
 		const auto hasRvcCategory = [&] {
-			const auto* root = tree->topLevelItem(0);
-			if (!root) { return false; }
-			for (int index = 0; index < root->childCount(); ++index)
+			for (int index = 0; index < tree->topLevelItemCount(); ++index)
 			{
-				if (root->child(index)->text(0) == catalog.engine("RVC").name) { return true; }
+				if (tree->topLevelItem(index)->text(0) == catalog.engine("RVC").name) { return true; }
 			}
 			return false;
 		};
@@ -477,7 +478,6 @@ private slots:
 		}
 		QVERIFY(!model.isEmpty());
 		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
-		track->setName(QString::fromUtf8("RVC 芙宁娜 · 实际 API"));
 		auto data = wave(16000, 64000, 0);
 		for (uint32_t i = 0; i < 64000; ++i)
 		{
@@ -494,6 +494,7 @@ private slots:
 		QVERIFY(track->setSelection({{"engine_id", "RVC"}, {"model_id", "芙宁娜"},
 			{"weight_id", model.value("weights").toArray().first().toObject().value("id")}, {"speaker_id", "0"},
 			{"parameters", QJsonObject{{"index_mode", "off"}, {"chunk_seconds", 1}, {"f0_method", "rmvpe"}}}}));
+		QCOMPARE(track->name(), model.value("name").toString());
 		bool progressive = false;
 		int conversionHeartbeats = 0;
 		QTimer conversionHeartbeat;
@@ -510,10 +511,32 @@ private slots:
 			gui::SVCWindow window(track, m_gui->mainWindow());
 			window.show();
 			QVERIFY(QTest::qWaitForWindowExposed(&window));
-			auto* pitch = window.findChild<QWidget*>("svcParameter_pitch_shift")->findChild<gui::Knob*>();
-			QVERIFY(pitch);
-			QCOMPARE(pitch->model()->minValue(), -24.f);
-			QCOMPARE(pitch->model()->maxValue(), 24.f);
+			auto* pitch = window.findChild<QSlider*>("svcSlider_pitch_shift");
+			auto* pitchValue = window.findChild<QDoubleSpinBox*>("svcValue_pitch_shift");
+			QVERIFY(pitch && pitchValue);
+			QCOMPARE(pitch->property("minimumValue").toDouble(), -24.);
+			QCOMPARE(pitch->property("maximumValue").toDouble(), 24.);
+			QVERIFY(!window.findChild<QComboBox*>("svcSpeaker")->isVisible());
+			pitch->setValue(5625);
+			QCOMPARE(pitchValue->value(), 3.);
+			QCOMPARE(track->selection().value("parameters").toObject().value("pitch_shift").toDouble(), 3.);
+			pitchValue->setValue(-30);
+			QCOMPARE(pitch->property("minimumValue").toDouble(), -30.);
+			pitchValue->setValue(0);
+			auto* rate = window.findChild<QDoubleSpinBox*>("svcValue_resample_sr");
+			QVERIFY(rate);
+			rate->setValue(12000);
+			QCOMPARE(rate->value(), 0.);
+			rate->setValue(32000);
+			QCOMPARE(track->selection().value("parameters").toObject().value("resample_sr").toDouble(), 32000.);
+			rate->setValue(0);
+			for (const auto& value : svc::parameterDefinitions(profile, model))
+			{
+				const auto p = value.toObject();
+				if (p.value("type") == "enum") { continue; }
+				QVERIFY(window.findChild<QSlider*>("svcSlider_" + p.value("id").toString()));
+				QVERIFY(window.findChild<QDoubleSpinBox*>("svcValue_" + p.value("id").toString()));
+			}
 			QTest::mouseClick(window.findChild<QPushButton*>("svcReRender"), Qt::LeftButton);
 			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete() || clip->conversionFailed(), 120000);
 			QVERIFY2(clip->conversionComplete(), qPrintable(clip->status()));

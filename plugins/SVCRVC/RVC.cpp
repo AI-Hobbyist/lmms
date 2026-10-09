@@ -16,15 +16,6 @@ struct Context
 	QString address;
 	QByteArray token, capabilities, error;
 };
-QJsonArray speakers(int count)
-{
-	QJsonArray result;
-	for (int i = 0; i < count; ++i)
-	{
-		result.append(QJsonObject{{"id", QString::number(i)}, {"name", QString("Speaker %1").arg(i)}});
-	}
-	return result;
-}
 QJsonObject normalize(const QJsonObject& init)
 {
 	if (!init.value("models").isArray() || !init.value("parameters").isObject() || !init.value("limits").isObject())
@@ -93,6 +84,7 @@ QJsonObject normalize(const QJsonObject& init)
 		}
 		if (p.value("type") == "number") { p.insert("step", .01); }
 		else if (p.value("type") == "integer") { p.insert("step", 1); }
+		if (p.value("type") != "enum") { p.insert("control", "slider"); }
 		parameters.append(p);
 	}
 	QJsonArray models;
@@ -103,13 +95,11 @@ QJsonObject normalize(const QJsonObject& init)
 		for (const auto& value : source.value("weights").toArray())
 		{
 			auto weight = value.toObject();
-			const auto count = weight.value("speaker_count").toInt();
-			if (count < 1 || count > 4096) { weight.insert("usable", false); }
 			weight.insert("id", weight.value("weight_id"));
 			weight.insert("name", weight.value("weight_id"));
 			weight.insert("available", weight.value("usable").toBool());
-			weight.insert("reason", "Weight is unusable or speaker metadata is unsupported");
-			weight.insert("speakers", speakers(std::clamp(count, 0, 4096)));
+			weight.insert("reason", "Weight is unusable");
+			weight.insert("speakers", QJsonArray{QJsonObject{{"id", "0"}, {"name", "Speaker 0"}}});
 			weight.insert("automatic_index", weight.value("compatible_indexes").toArray().size() <= 1);
 			weights.append(weight);
 		}
@@ -142,6 +132,7 @@ QJsonObject normalize(const QJsonObject& init)
 			{"speakers", weights.size() == 1 ? weights.first().toObject().value("speakers") : QJsonValue(QJsonArray{})},
 			{"parameters", modelParameters}, {"available", !weights.isEmpty()}};
 		model.insert("require_weight_selection", weights.size() > 1);
+		model.insert("fixed_speaker_id", "0");
 		models.append(model);
 	}
 	const auto limits = init.value("limits").toObject();
@@ -267,11 +258,12 @@ void* start(void* opaque, const svc_request* request)
 		const auto selection = QJsonDocument::fromJson(request->selection_json).object();
 		QUrl url = endpoint(context.address, "/api/v1/infer");
 		QUrlQuery query;
-		for (const auto& key : {"model_id", "weight_id", "speaker_id"})
+		for (const auto& key : {"model_id", "weight_id"})
 		{
 			if (!selection.value(key).isString() || selection.value(key).toString().isEmpty()) { return nullptr; }
 			query.addQueryItem(key, selection.value(key).toString());
 		}
+		query.addQueryItem("speaker_id", "0");
 		auto parameters = selection.value("parameters").toObject();
 		const auto caps = QJsonDocument::fromJson(context.capabilities).object();
 		QJsonObject weight;

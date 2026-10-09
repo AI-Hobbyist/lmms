@@ -430,6 +430,7 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 		return {};
 	}
 	auto selection = saved;
+	if (model.contains("fixed_speaker_id")) { selection.insert("speaker_id", model.value("fixed_speaker_id")); }
 	for (const auto& pair : {std::pair{"weight_id", "weights"}, std::pair{"speaker_id", "speakers"}})
 	{
 		const auto entries = selectionContext(selection, model).value(pair.second).toArray();

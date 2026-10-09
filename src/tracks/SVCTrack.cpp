@@ -1,6 +1,7 @@
 #include "SVCTrack.h"
 
 #include <QDomElement>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <algorithm>
 #include <cmath>
@@ -154,8 +155,25 @@ bool SVCTrack::setSelection(const QJsonObject& selection)
 		return false;
 	}
 	if (selection == m_selection) { return true; }
+	const auto modelName = [](const QJsonObject& selection) {
+		const auto profile = svc::Catalog::instance().engine(selection.value("engine_id").toString());
+		for (const auto& value : profile.capabilities.value("models").toArray())
+		{
+			const auto model = value.toObject();
+			if (model.value("id") == selection.value("model_id"))
+			{
+				return model.value("name").toString(model.value("id").toString());
+			}
+		}
+		return QString{};
+	};
+	const auto previousModel = modelName(m_selection);
+	const auto nextModel = modelName(selection);
+	const auto defaultName
+		= name() == tr("Singing Voice Conversion") || (!previousModel.isEmpty() && name() == previousModel);
 	addJournalCheckPoint();
 	m_selection = selection;
+	if (defaultName && !nextModel.isEmpty()) { setName(nextModel); }
 	invalidateClips();
 	Engine::getSong()->setModified();
 	return true;

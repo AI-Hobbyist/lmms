@@ -305,8 +305,16 @@ int main(int argc, char** argv)
 	const auto caps = QJsonDocument::fromJson(capabilities).object();
 	const auto model = caps.value("models").toArray().first().toObject();
 	check(model.value("weights").toArray().size() == 2
+			&& model.value("weights").toArray()[0].toObject().value("speakers").toArray().size() == 1
 			&& model.value("weights").toArray()[1].toObject().value("speakers").toArray().size() == 1,
-		"multiweight single/multi speakers");
+		"RVC defaults to speaker 0 regardless of reported speaker count");
+	check(model.value("fixed_speaker_id") == "0", "fixed default speaker");
+	for (const auto& value : model.value("parameters").toArray())
+	{
+		const auto parameter = value.toObject();
+		check(
+			parameter.value("type") == "enum" || parameter.value("control") == "slider", "RVC numeric slider metadata");
+	}
 	plugin->destroy_context(context);
 	for (const auto status : {200, 401, 413, 422, 429, 503, 408, 302})
 	{
@@ -328,6 +336,7 @@ int main(int argc, char** argv)
 		check(response.request.contains("index_rate=0") && !response.request.contains("index_id="),
 			"no index forces zero");
 		check(response.request.contains("%E4%B8%AD%E6%96%87"), "Chinese ID URL encoding");
+		check(response.request.contains("speaker_id=0"), "single model speaker request");
 		if (status == 200)
 		{
 			check(terminal == SVC_COMPLETE && observer.audio == 2 && observer.early && observer.done == 1,

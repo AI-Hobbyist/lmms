@@ -2,6 +2,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -541,8 +542,13 @@ void SVCWindow::refreshChoices()
 		model.value("require_weight_selection").toBool());
 	auto selection = m_track->selection();
 	selection.insert("weight_id", m_weights->currentData().toString());
+	if (model.contains("fixed_speaker_id")) { selection.insert("speaker_id", model.value("fixed_speaker_id")); }
 	choices(m_speakers, svc::selectionContext(selection, model).value("speakers").toArray(),
 		selection.value("speaker_id").toString());
+	for (int index = 0; index < m_speakers->count(); ++index)
+	{
+		m_speakers->setItemIcon(index, embed::getIconPixmap("svc_track.svg"));
+	}
 	auto* form = qobject_cast<QFormLayout*>(m_weights->parentWidget()->layout()->itemAt(0)->layout());
 	if (form)
 	{
@@ -596,6 +602,71 @@ void SVCWindow::refreshParameters()
 				saveSelection();
 				refreshParameterAvailability();
 			});
+		}
+		else if (parameter.value("control") == "slider")
+		{
+			const auto initial = m_parameters.value(id).toDouble();
+			const auto extent = std::max(24., std::abs(initial));
+			const auto minimum = parameter.value("minimum").toDouble(-extent);
+			const auto maximum = parameter.value("maximum").toDouble(extent);
+			const auto step = parameter.value("step").toDouble(1);
+			auto* slider = new QSlider(Qt::Horizontal, row);
+			slider->setObjectName("svcSlider_" + id);
+			slider->setRange(0, 10000);
+			slider->setProperty("minimumValue", minimum);
+			slider->setProperty("maximumValue", maximum);
+			auto* edit = new QDoubleSpinBox(row);
+			edit->setObjectName("svcValue_" + id);
+			edit->setDecimals(parameter.value("type") == "integer" ? 0 : 6);
+			edit->setRange(parameter.value("minimum").toDouble(-1e12), parameter.value("maximum").toDouble(1e12));
+			edit->setSingleStep(step);
+			edit->setKeyboardTracking(false);
+			edit->setValue(initial);
+			edit->setMinimumWidth(110);
+			body->addWidget(slider, 1);
+			body->addWidget(edit);
+			body->addWidget(new QLabel(parameter.value("unit").toString(), row));
+			const auto sync = [slider, edit] {
+				const auto value = edit->value();
+				const auto minimum = std::min(slider->property("minimumValue").toDouble(), value);
+				const auto maximum = std::max(slider->property("maximumValue").toDouble(), value);
+				slider->setProperty("minimumValue", minimum);
+				slider->setProperty("maximumValue", maximum);
+				QSignalBlocker blocked(slider);
+				slider->setValue(
+					maximum > minimum ? int(std::lround((value - minimum) * 10000 / (maximum - minimum))) : 0);
+			};
+			sync();
+			connect(edit, &QDoubleSpinBox::valueChanged, this, [this, edit, sync, parameter, id](double value) {
+				const auto excluded = parameter.value("excluded_range").toArray();
+				if (excluded.size() == 2 && value >= excluded[0].toDouble() && value <= excluded[1].toDouble())
+				{
+					QSignalBlocker blocked(edit);
+					edit->setValue(m_parameters.value(id).toDouble());
+					sync();
+					return;
+				}
+				sync();
+				m_parameters.insert(id, value);
+				saveSelection();
+				refreshParameterAvailability();
+			});
+			connect(slider, &QSlider::valueChanged, this, [slider, edit, parameter, step](int position) {
+				const auto minimum = slider->property("minimumValue").toDouble();
+				const auto maximum = slider->property("maximumValue").toDouble();
+				auto value = minimum + (maximum - minimum) * position / 10000.;
+				if (step > 0) { value = std::round(value / step) * step; }
+				const auto excluded = parameter.value("excluded_range").toArray();
+				if (excluded.size() == 2 && value >= excluded[0].toDouble() && value <= excluded[1].toDouble())
+				{
+					value = value > edit->value() ? excluded[1].toDouble() + step : excluded[0].toDouble() - step;
+				}
+				edit->setValue(std::clamp(value, minimum, maximum));
+			});
+			if (!parameter.contains("minimum") || !parameter.contains("maximum"))
+			{
+				row->setToolTip(tr("Backend range unavailable; entering a value extends the slider range"));
+			}
 		}
 		else
 		{

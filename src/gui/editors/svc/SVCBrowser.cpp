@@ -35,7 +35,7 @@ void attach(QTreeWidgetItem* item, const QJsonObject& selection, const QJsonObje
 }
 } // namespace
 SVCBrowser::SVCBrowser(QWidget* parent)
-	: SideBarWidget(tr("Singing Voice Conversion"), embed::getIconPixmap("svc_track.svg"), parent)
+	: SideBarWidget("SVC", embed::getIconPixmap("svc_track.svg"), parent)
 	, m_tree(new SVCTree(contentParent()))
 {
 	m_tree->setObjectName("svcBrowserTree");
@@ -53,16 +53,16 @@ SVCBrowser::SVCBrowser(QWidget* parent)
 void SVCBrowser::refresh()
 {
 	m_tree->clear();
-	auto* root = new QTreeWidgetItem(m_tree, {tr("Singing Voice Conversion")});
 	for (const auto& engine : svc::Catalog::instance().engines())
 	{
 		if (!engine.api) { continue; }
-		auto* branch = new QTreeWidgetItem(root, {engine.name});
+		auto* branch = new QTreeWidgetItem(m_tree, {engine.name});
 		branch->setToolTip(0, svc::Catalog::instance().status(engine.id));
 		for (const auto& value : engine.capabilities.value("models").toArray())
 		{
 			const auto model = value.toObject();
 			auto* leaf = new QTreeWidgetItem(branch, {model.value("name").toString(model.value("id").toString())});
+			leaf->setIcon(0, embed::getIconPixmap("svc_track.svg"));
 			QJsonObject selection{{"engine_id", engine.id}, {"model_id", model.value("id")}};
 			const auto weights = model.value("weights").toArray();
 			if (!weights.isEmpty() && (weights.size() == 1 || !model.contains("parameters")))
@@ -85,6 +85,7 @@ void SVCBrowser::refresh()
 					selection.insert("speaker_id", speaker.value("id"));
 					auto* child
 						= new QTreeWidgetItem(leaf, {speaker.value("name").toString(speaker.value("id").toString())});
+					child->setIcon(0, embed::getIconPixmap("svc_track.svg"));
 					attach(child, selection, speaker);
 					if (!engine.api) { child->setDisabled(true); }
 				}
