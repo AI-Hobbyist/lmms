@@ -1,0 +1,59 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ComputeClient.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/core/svs/compute/Release/SVSCompute.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/core/svs/compute/Release/SVSCompute.exp
+  SVSCompute.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\SVSCompute.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  ComputeWorker.cpp
+  SVSComputeWorker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\compute\SVSComputeWorker.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  ComputeConformance.cpp
+  SVSComputeConformance.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\compute\Release\SVSComputeConformance.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  CpuModel.cpp
+  Synthesis.cpp
+  正在生成代码...
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+  DiffSingerSynthesisTest.cpp
+  DiffSingerSynthesisTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerSynthesisTest.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  Automatic MOC and UIC for target SVSExample
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  SVSClip.cpp
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+  SVSExportSnapshot.cpp
+  SVSSynthesisScheduler.cpp
+  SVSSettingsPage.cpp
+  SVSTrack.cpp
+  正在生成代码...
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  Engine.cpp
+  SetupDialog.cpp
+  正在生成代码...
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(3312,24): error C2086: “lmms::gui::SVSSettingsPage reopened”: 重定义 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(3304,24):
+      参见“reopened”的声明

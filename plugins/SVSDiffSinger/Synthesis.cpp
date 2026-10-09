@@ -735,16 +735,18 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	}
 	acceleration(ac, in, acoustic, steps);
 	speaker(ac, in, *m_voice, acoustic, parameters, frames);
-	const auto mel = run("acoustic", "acoustic", in).at("mel");
-	if (mel.dimensions != std::vector<int64_t>({1, frames, acoustic.values.at("num_mel_bins").get<int64_t>()}))
+	std::vector<float> waveform;
 	{
-		throw std::runtime_error("Acoustic mel shape mismatch");
+		auto mel = run("acoustic", "acoustic", in).at("mel");
+		in.clear();
+		if (mel.dimensions != std::vector<int64_t>({1, frames, acoustic.values.at("num_mel_bins").get<int64_t>()}))
+		{
+			throw std::runtime_error("Acoustic mel shape mismatch");
+		}
+		Tensors vocoderInputs{{"mel", std::move(mel)}, {"f0", floats(f0)}};
+		waveform = run("vocoder", "model", vocoderInputs).at("waveform").values<float>();
 	}
-	const auto waveform = run("vocoder", "model", {{"mel", mel}, {"f0", floats(f0)}}).at("waveform").values<float>();
-	if (waveform.size() != size_t(frames * hop))
-	{
-		throw std::runtime_error("Vocoder sample count mismatch");
-	}
+	if (waveform.size() != size_t(frames * hop)) { throw std::runtime_error("Vocoder sample count mismatch"); }
 	const size_t outputFrames = size_t(std::ceil(double(waveform.size()) * rate / sourceRate));
 	if (outputFrames > 128 * 1024 * 1024 / 8)
 	{

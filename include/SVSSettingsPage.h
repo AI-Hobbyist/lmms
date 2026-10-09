@@ -21,6 +21,7 @@ private:
 	QComboBox* m_device;
 	QComboBox* m_memoryPolicy;
 	QSpinBox* m_idleSeconds;
+	QSpinBox* m_concurrency;
 	QSlider* m_aiSteps;
 	QCheckBox* m_pitchRanges;
 	QCheckBox* m_backgroundWaveform;

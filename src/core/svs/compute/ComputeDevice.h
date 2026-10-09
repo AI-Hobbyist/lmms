@@ -34,12 +34,15 @@ struct Device
 		options.SetIntraOpNumThreads(4);
 		options.SetInterOpNumThreads(1);
 		options.SetGraphOptimizationLevel(ORT_ENABLE_ALL);
+		// Per-run CPU tensors must not remain in an allocator arena or a cached
+		// memory-pattern buffer after inference, even when models stay resident.
+		options.DisableCpuMemArena();
+		options.DisableMemPattern();
 		if (backend == "cpu")
 		{
 			return;
 		}
 #ifdef SVSC_HAS_DML
-		options.DisableMemPattern();
 		if (!dml)
 		{
 			Microsoft::WRL::ComPtr<IDXGIFactory1> factory;

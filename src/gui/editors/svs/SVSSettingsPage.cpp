@@ -87,8 +87,17 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	m_idleSeconds->setRange(1, 86400);
 	m_idleSeconds->setSuffix(tr(" s"));
 	form->addRow(tr("Idle time before release"), m_idleSeconds);
-	connect(m_memoryPolicy, qOverload<int>(&QComboBox::currentIndexChanged), this,
-			[this] { m_idleSeconds->setEnabled(m_memoryPolicy->currentData().toString() == "idle"); });
+	m_concurrency = new QSpinBox(body);
+	m_concurrency->setObjectName("svsRenderConcurrency");
+	m_concurrency->setRange(1, 16);
+	m_concurrency->setValue(std::clamp(ConfigManager::inst()->value("svs", "concurrency", "1").toInt(), 1, 16));
+	m_concurrency->setToolTip(
+		tr("Maximum simultaneous SVS renders across all tracks and engines. Default: 1. "
+		   "Other renders wait in the queue. Running renders finish when this limit is reduced."));
+	form->addRow(tr("Simultaneous SVS render threads"), m_concurrency);
+	connect(m_memoryPolicy, qOverload<int>(&QComboBox::currentIndexChanged), this, [this] {
+		m_idleSeconds->setEnabled(m_memoryPolicy->currentData().toString() == "idle");
+	});
 	auto* hint = new QLabel(
 		tr("AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. "
 		   "Unavailable devices use CPU and report the reason; unsupported AI engines use CPU."),
@@ -352,6 +361,8 @@ void SVSSettingsPage::save()
 {
 	auto* config = ConfigManager::inst();
 	svs::applyComputeMemorySettings(m_memoryPolicy->currentData().toString(), m_idleSeconds->value());
+	config->setValue("svs", "concurrency", QString::number(m_concurrency->value()));
+	svs::SynthesisScheduler::instance().setBudget(m_concurrency->value());
 	const bool computeChanged
 		= svs::applyComputeSettings(m_backend->currentData().toString(), m_device->currentData().toString());
 	config->setValue("svs", "aiExampleRenderSteps", QString::number(m_aiSteps->value()));

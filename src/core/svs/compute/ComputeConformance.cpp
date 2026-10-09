@@ -70,6 +70,28 @@ int main(int argc, char** argv)
 										{sizeof(svsc_tensor), SVSC_FLOAT32, "y", 2, 0, shape, sizeof(y), y}};
 		svsc_session_desc options{sizeof(options), 0, "cpu", "cpu", "conformance", ""};
 		Json report{{"cpu", Json::object()}};
+		{
+			auto session = model.session(options);
+			auto completedRun = session.createRun();
+			{
+				auto result = completedRun.run(inputs);
+				require(Json::parse(context.memoryStatus())["tensorAllocatedBytes"] == sizeof(x),
+						"Completed run retained its shared transport buffer");
+				require(static_cast<const float*>(result.value().tensors[0].data)[0] == 5,
+						"Released transport invalidated owned output");
+			}
+			require(Json::parse(context.memoryStatus())["tensorAllocatedBytes"] == 0,
+					"Released result retained inference tensors");
+			for (int i = 0; i < 32; ++i)
+			{
+				session.createRun().run(inputs);
+				require(Json::parse(context.memoryStatus())["tensorAllocatedBytes"] == 0,
+						"Sequential inference accumulated tensor buffers");
+			}
+			std::cout
+				<< "PASS: completed transport freed immediately; owned output freed on release; 32 runs return to zero."
+				<< std::endl;
+		}
 		for (const auto type : {SVSC_INT64, SVSC_BOOL, SVSC_FLOAT32})
 		{
 			const bool scalar = type == SVSC_FLOAT32;

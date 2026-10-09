@@ -32,7 +32,7 @@ void recordCompletedCompute(Input& input, std::shared_ptr<const Audio>& audio)
 SynthesisScheduler& SynthesisScheduler::instance()
 {
 	static SynthesisScheduler scheduler(
-		std::clamp(ConfigManager::inst()->value("svs", "concurrency", "2").toInt(), 1, 16));
+		std::clamp(ConfigManager::inst()->value("svs", "concurrency", "1").toInt(), 1, 16));
 	return scheduler;
 }
 SynthesisScheduler::SynthesisScheduler(int budget, QObject* parent)
@@ -57,6 +57,13 @@ SynthesisScheduler::SynthesisScheduler(int budget, QObject* parent)
 SynthesisScheduler::~SynthesisScheduler()
 {
 	shutdown();
+}
+void SynthesisScheduler::setBudget(int budget)
+{
+	m_budget = std::clamp(budget, 1, 16);
+	m_pool.setMaxThreadCount(m_budget);
+	// Running jobs keep their slots when the limit is reduced.
+	dispatch();
 }
 void SynthesisScheduler::shutdown()
 {

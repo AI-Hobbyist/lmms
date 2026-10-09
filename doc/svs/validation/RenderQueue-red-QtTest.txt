@@ -1,0 +1,12 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+FAIL!  : SVSIntegrationTest::schedulerDefaultsToOneRender() Compared values are not the same
+   Actual   (scheduler.budget()): 2
+   Expected (1)                 : 1
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(4131) : failure location
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 4561ms
+********* Finished testing of SVSIntegrationTest *********

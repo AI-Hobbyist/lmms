@@ -195,6 +195,7 @@ LMMS 增强分支全量替换包（Windows x64）
 本包为完整运行文件，并非差分包：主程序、52 个启用 UI 插件、3 个导入导出插件、
 支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与可用 DiffSinger 引擎。
 包含原生 DiffSinger CPU/DirectML 完整依赖文件夹、共享计算 worker 与许可；SVS 全局选择实际设备，按阶段显示执行后端。模型内存管理默认空闲 60 秒释放，也可立即释放或常驻；CPU/GPU 通用。SDK 保持旧 ABI 兼容。
+推理临时张量在消费完成后立即回收；全局同时渲染线程默认 1，可设为 1～16，其余轨道片段排队依次渲染。
 安装器从可加载路径移除 SVSExample、SVSComputeExample、SVSMinimal 的示例 DLL 及扫描 manifest（保留 .disabled 备份）；仓库与独立 SDK 示例代码保留作参考。
 包含官方默认工程模板：TripleOscillator、Sample track、Pattern 0、Automation track；Pattern Editor 包含 Kicker。
 包含 SVS 工程导入导出菜单、隔离 CPython/LibreSVIP 运行时和第三方许可文本；有损格式会在写入前具名提示。
@@ -232,6 +233,7 @@ LMMS 增量覆盖包（Windows x64）
    可用引擎、运行库、个人配置、工程和声库保持原位。
 
 包含原生 DiffSinger CPU/DirectML、共享计算依赖和许可、全局模型内存管理（默认空闲 60 秒，可立即释放或常驻）。
+推理临时张量在消费完成后立即回收；全局同时渲染线程默认 1，可设为 1～16，其余轨道片段排队依次渲染。
 示例引擎代码保留于仓库和独立 SDK；DAW 只部署可用引擎与必要运行库。
 此前已安装此增量时也可再次运行；校验失败时应重新安装全量基包。
 工作区变更：__WORKTREE_STATUS__

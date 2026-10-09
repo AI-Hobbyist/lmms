@@ -701,6 +701,7 @@ svsc_status SVSC_CALL memoryStatus(svsc_handle handle, char** output)
 	return call([&] {
 		const auto context = get<Context>(handle, Kind::Context);
 		auto report = Residency::instance().status();
+			report["tensorAllocatedBytes"] = context->allocatedBytes.load();
 		std::shared_ptr<Worker> worker, cpu;
 		{
 			std::lock_guard<std::mutex> lock(context->mutex);

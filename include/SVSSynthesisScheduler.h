@@ -15,13 +15,14 @@ public:
 	using ResultCallback = std::function<void(std::shared_ptr<const Audio>, const QString&)>;
 	using PartialCallback = std::function<void(std::shared_ptr<const Audio>, QVector<SynthesisSegment>)>;
 	static SynthesisScheduler& instance();
-	SynthesisScheduler(int budget = 2, QObject* parent = nullptr);
+		SynthesisScheduler(int budget = 1, QObject* parent = nullptr);
 	~SynthesisScheduler() override;
 	std::shared_ptr<RenderControl> submit(std::shared_ptr<Plugin>, Input, int priority, StateCallback, ResultCallback,
 		PartialCallback = {}, QVector<SynthesisSegment> retained = {});
 	void cancel(const std::shared_ptr<RenderControl>&);
 	void cancelAll();
 	void shutdown();
+		void setBudget(int budget);
 	QThreadPool& declarationPool() { return m_declarationPool; }
 	int activeCount() const { return m_active; }
 	int queuedCount() const { return int(m_queue.size()); }

@@ -232,9 +232,9 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 		for (const auto& input : inputs)
 		{
 			const auto& tensor = input.second;
-			tensors.push_back({sizeof(svsc_tensor), uint32_t(tensor.type), input.first.c_str(),
-							   uint32_t(tensor.dimensions.size()), 0, tensor.dimensions.data(), tensor.bytes.size(),
-							   tensor.bytes.data()});
+			tensors.push_back(
+				{sizeof(svsc_tensor), uint32_t(tensor.type), input.first.c_str(), uint32_t(tensor.dimensions.size()), 0,
+					tensor.dimensions.data(), tensor.bytes.size(), tensor.bytes.data()});
 		}
 		auto run = m_computeSession->createRun();
 		std::atomic<bool> complete{false};
@@ -257,7 +257,7 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 		});
 		try
 		{
-			auto result = run.run(tensors);
+			std::optional<svs_compute::Result> result(run.run(tensors));
 			complete.store(true);
 			cancellation.join();
 			if (cancelled.load())
@@ -265,7 +265,7 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 				throw std::runtime_error("Cancelled");
 			}
 			Tensors output;
-			const auto& view = result.value();
+			const auto& view = result->value();
 			m_execution = Json::parse(view.execution_json);
 			m_execution["requestedBackend"] = m_requestedBackend;
 			m_execution["requestedDevice"] = m_requestedDevice;
@@ -288,6 +288,9 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 				}
 				output.emplace(value.name, std::move(tensor));
 			}
+			// The copied output owns its data; release the compute result before
+			// observers or the next synthesis stage can retain temporary storage.
+			result.reset();
 			if (inferenceObserver)
 			{
 				inferenceObserver(m_path, m_stage, m_seed, inputs, output, m_execution);

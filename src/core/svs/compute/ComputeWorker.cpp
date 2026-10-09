@@ -480,6 +480,11 @@ class Server
 				std::memcpy(buffer.payload() + tensors[i]["offset"].get<size_t>(), copies[i].data(), copies[i].size());
 			}
 		}
+		// Drop per-inference tensors before profiling or replying. Model sessions
+		// remain resident according to the independent model memory policy.
+		outputs.clear();
+		values.clear();
+		copies.clear();
 		model.captureProfile();
 		return {{"outputs", tensors},
 				{"execution",

@@ -3247,7 +3247,10 @@ private slots:
 		const auto original = svs::requestedComputePolicy();
 		const auto originalMemory = config->value("svs", "computeMemoryPolicy", "idle");
 		const auto originalSeconds = config->value("svs", "computeIdleSeconds", "60").toInt();
+		const auto originalConcurrency = config->value("svs", "concurrency", "1");
 		auto restore = qScopeGuard([&] {
+			config->setValue("svs", "concurrency", originalConcurrency);
+			svs::SynthesisScheduler::instance().setBudget(originalConcurrency.toInt());
 			svs::applyComputeMemorySettings(originalMemory, originalSeconds);
 			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
 			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
@@ -3256,6 +3259,7 @@ private slots:
 		});
 		svs::applyComputeSettings("cpu", "cpu");
 		svs::applyComputeMemorySettings("idle", 60);
+		config->setValue("svs", "concurrency", "1");
 		gui::SVSSettingsPage page;
 		page.resize(900, 650);
 		page.show();
@@ -3265,6 +3269,11 @@ private slots:
 		auto* device = page.findChild<QComboBox*>("svsComputeDevice");
 		auto* memory = page.findChild<QComboBox*>("svsComputeMemoryPolicy");
 		auto* seconds = page.findChild<QSpinBox*>("svsComputeIdleSeconds");
+		auto* concurrency = page.findChild<QSpinBox*>("svsRenderConcurrency");
+		QVERIFY(concurrency);
+		QCOMPARE(concurrency->value(), 1);
+		concurrency->setValue(3);
+		QCOMPARE(config->value("svs", "concurrency"), QString("1"));
 		QVERIFY(memory && seconds);
 		QCOMPARE(memory->count(), 3);
 		QCOMPARE(memory->currentData().toString(), QString("idle"));
@@ -3290,13 +3299,16 @@ private slots:
 		QCOMPARE(svs::requestedComputePolicy()["requestedBackend"].toString(), QString("cpu"));
 		page.save();
 		const auto applied = svs::requestedComputePolicy();
+		QCOMPARE(config->value("svs", "concurrency"), QString("3"));
+		QCOMPARE(svs::SynthesisScheduler::instance().budget(), 3);
 		QCOMPARE(config->value("svs", "computeMemoryPolicy"), QString("idle"));
 		QCOMPARE(config->value("svs", "computeIdleSeconds"), QString("17"));
 		QCOMPARE(applied["requestedDevice"].toString(), device->currentData().toString());
 		QTest::qWait(700);
-		QVERIFY(page.screen()->grabWindow(page.winId()).save("doc/svs/validation/B4-native-compute-settings.png"));
+		QVERIFY(page.screen()->grabWindow(page.winId()).save("doc/svs/validation/RenderQueue-native-compute-settings.png"));
 		page.close();
 		gui::SVSSettingsPage reopened;
+		QCOMPARE(reopened.findChild<QSpinBox*>("svsRenderConcurrency")->value(), 3);
 		QCOMPARE(reopened.findChild<QSpinBox*>("svsComputeIdleSeconds")->value(), 17);
 		QCOMPARE(reopened.findChild<QComboBox*>("svsComputeDevice")->currentData().toString(),
 				 applied["requestedDevice"].toString());
@@ -3310,7 +3322,7 @@ private slots:
 		QCOMPARE(unavailable->currentData().toString(), QString("dxgi:ffffffff:ffffffff"));
 		QVERIFY(
 			!static_cast<QStandardItemModel*>(unavailable->model())->item(unavailable->currentIndex())->isEnabled());
-		QVERIFY(missing.screen()->grabWindow(missing.winId()).save("doc/svs/validation/B4-native-missing-device.png"));
+		QVERIFY(missing.screen()->grabWindow(missing.winId()).save("doc/svs/validation/RenderQueue-native-missing-device.png"));
 		missing.close();
 	}
 	void computePolicyRestartChild()
@@ -4124,6 +4136,88 @@ private slots:
 			QVERIFY(cache.diskBytes() <= 25000);
 		}
 		QVERIFY(!cache.get("../outside", input));
+	}
+	void schedulerDefaultsToOneRender()
+	{
+		svs::SynthesisScheduler scheduler;
+		QCOMPARE(scheduler.budget(), 1);
+		scheduler.setBudget(0);
+		QCOMPARE(scheduler.budget(), 1);
+		scheduler.setBudget(30);
+		QCOMPARE(scheduler.budget(), 16);
+		scheduler.setBudget(2);
+		QCOMPARE(scheduler.budget(), 2);
+	}
+	void schedulerQueuesTracksSequentially()
+	{
+		const auto voice = svs::Registry::instance().voices().first();
+		const auto library = QDir(voice.package).filePath("SVSExample");
+		QVector<std::shared_ptr<svs::Plugin>> plugins;
+		for (int i = 0; i < 4; ++i)
+		{
+			auto plugin = std::make_shared<svs::Plugin>(library);
+			QVERIFY2(plugin->valid(), qPrintable(plugin->error()));
+			plugins.push_back(std::move(plugin));
+		}
+		svs::Input input;
+		input.voiceId = "full";
+		input.secondsPerTick = 60. / (120 * 48);
+		input.duration = .2;
+		svs::Note note;
+		note.id = "queue-note";
+		note.duration = 19.2;
+		input.notes = {note};
+		input.document = {{"secondsPerTick", input.secondsPerTick},
+						  {"language", "en"},
+						  {"developmentFaults", QJsonObject{{"delayMs", 100}, {"lateReturn", true}}}};
+		svs::SynthesisScheduler scheduler;
+		QString capabilityError;
+		input.document["capabilities"] = plugins.first()->capabilities("full", {}, capabilityError);
+		QVERIFY2(capabilityError.isEmpty(), qPrintable(capabilityError));
+		QVector<int> started, completed;
+		QVector<std::shared_ptr<svs::RenderControl>> controls;
+		for (int i = 0; i < plugins.size(); ++i)
+		{
+			input.clipId = QString("track-%1").arg(i);
+			controls.push_back(scheduler.submit(
+				plugins[i], input, 0,
+				[&, i](const QString& state) {
+					if (state == "Rendering")
+					{
+						started.push_back(i);
+					}
+				},
+				[&, i](auto audio, const auto& error) {
+					QVERIFY2(audio, qPrintable(error));
+					completed.push_back(i);
+				}));
+		}
+		QCOMPARE(scheduler.activeCount(), 1);
+		QCOMPARE(scheduler.queuedCount(), 3);
+		scheduler.cancel(controls[1]);
+		QCOMPARE(scheduler.queuedCount(), 2);
+		QTRY_COMPARE_WITH_TIMEOUT(completed.size(), 3, 10000);
+		QCOMPARE(started, QVector<int>({0, 2, 3}));
+		QCOMPARE(completed, started);
+		QCOMPARE(scheduler.peakActiveCount(), 1);
+		QCOMPARE(scheduler.activeCount(), 0);
+		for (int i = 0; i < 4; ++i)
+		{
+			scheduler.submit(
+				plugins[i], input, 0,
+				[](const auto&) {
+				},
+				[](auto, const auto&) {
+				});
+		}
+		QCOMPARE(scheduler.activeCount(), 1);
+		scheduler.setBudget(2);
+		QCOMPARE(scheduler.activeCount(), 2);
+		scheduler.setBudget(1);
+		QCOMPARE(scheduler.activeCount(), 2);
+		QCOMPARE(scheduler.queuedCount(), 2);
+		QTRY_COMPARE_WITH_TIMEOUT(scheduler.activeCount(), 0, 10000);
+		QCOMPARE(scheduler.queuedCount(), 0);
 	}
 	void schedulerShutdownWaitsForWorkers()
 	{
