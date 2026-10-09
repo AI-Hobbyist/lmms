@@ -34,6 +34,25 @@ SVSClip::SVSClip(Track* track)
 {
 	changeLength(TimePos::ticksPerBar());
 	setName("SVS");
+	connect(track->getMutedModel(), &BoolModel::dataChanged, this, [this, track] {
+		if (track->isMuted())
+		{
+			if (m_renderControl)
+			{
+				svs::SynthesisScheduler::instance().cancel(m_renderControl);
+				++m_request;
+			}
+			if (m_status != "Ready" && m_status != "Cancelled" && !readOnly())
+			{
+				m_status = "Dirty";
+				emit dataChanged();
+			}
+		}
+		else if (m_status == "Dirty")
+		{
+			scheduleSynthesis();
+		}
+	});
 	connect(&svs::TempoSource::forSong(*Engine::getSong()), &svs::TempoSource::changed, this, [this] {
 		invalidate();
 		scheduleSynthesis();
@@ -276,6 +295,10 @@ bool SVSClip::setNoteParameter(const QStringList& ids, const QString& id, const 
 }
 void SVSClip::synthesize()
 {
+	if (getTrack()->isMuted())
+	{
+		return;
+	}
 	if (readOnly())
 	{
 		m_status = migrationDiagnostic();

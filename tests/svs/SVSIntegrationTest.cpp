@@ -2276,6 +2276,141 @@ private slots:
 		QTRY_VERIFY_WITH_TIMEOUT(clip->status().contains("no valid cached audio"), 10000);
 		QVERIFY(!clip->audio());
 	}
+	void nativeSvsMuteAndSolo()
+	{
+		if (!m_guiApplication)
+			QSKIP("Native GUI required");
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		auto* song = Engine::getSong();
+		auto* left = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
+		auto* right = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
+		auto cleanup = qScopeGuard([&] {
+			song->stop();
+			delete right;
+			delete left;
+		});
+		auto* window = static_cast<QWidget*>(m_guiApplication->mainWindow());
+		window->show();
+		QVERIFY(QTest::qWaitForWindowExposed(window));
+		QCoreApplication::processEvents();
+		gui::SVSTrackView* leftView = nullptr;
+		gui::SVSTrackView* rightView = nullptr;
+		for (auto* view : window->findChildren<gui::SVSTrackView*>())
+		{
+			if (view->getTrack() == left)
+				leftView = view;
+			if (view->getTrack() == right)
+				rightView = view;
+		}
+		QVERIFY(leftView && rightView);
+		auto* mute = leftView->findChild<QAbstractButton*>("btn-mute");
+		auto* solo = rightView->findChild<QAbstractButton*>("btn-solo");
+		QVERIFY(mute && solo);
+		const auto voice = svs::Registry::instance().voices().first();
+		left->bindVoice(voice.pluginId, "full");
+		right->bindVoice(voice.pluginId, "minimal");
+		QTRY_VERIFY_WITH_TIMEOUT(left->capabilitiesReady() && right->capabilitiesReady(), 10000);
+		left->panningModel()->setValue(-100);
+		right->panningModel()->setValue(100);
+		auto* a = static_cast<SVSClip*>(left->createClip(0));
+		auto* b = static_cast<SVSClip*>(right->createClip(0));
+		svs::Note note;
+		note.id = "mute-playback";
+		note.duration = 192;
+		note.pitch = 60;
+		a->setNotes({note});
+		note.pitch = 67;
+		b->setNotes({note});
+		QTRY_VERIFY_WITH_TIMEOUT(a->audio() && b->audio(), 10000);
+		auto energy = [&] {
+			song->stop();
+			song->getTimeline(Song::PlayMode::Song).setTicks(0);
+			song->playSong();
+			QPair<double, double> result{0, 0};
+			for (int period = 0; period < 100; ++period)
+			{
+				for (const auto& frame : Engine::audioEngine()->renderNextPeriod())
+				{
+					if (period >= 16)
+					{
+						result.first += frame[0] * frame[0];
+						result.second += frame[1] * frame[1];
+					}
+				}
+			}
+			song->stop();
+			return result;
+		};
+		const auto audible = energy();
+		QVERIFY(audible.first > 0.01 && audible.second > 0.01);
+		QTest::mouseClick(mute, Qt::LeftButton);
+		QVERIFY2(left->isMuted(), "Song Editor mute button must change the SVS track model");
+		const auto muted = energy();
+		QVERIFY(muted.first < 1e-10 && muted.second > 0.01);
+		QTest::mouseClick(mute, Qt::LeftButton);
+		QVERIFY(!left->isMuted());
+		QTest::mouseClick(solo, Qt::LeftButton);
+		QVERIFY(left->isMuted());
+		QVERIFY(!right->isMuted());
+		const auto soloed = energy();
+		QVERIFY(soloed.first < 1e-10 && soloed.second > 0.01);
+		QTest::qWait(400);
+		QVERIFY(window->screen()->grabWindow(window->winId()).save("doc/svs/validation/SVS-mute-solo-native.png"));
+		QTest::mouseClick(solo, Qt::LeftButton);
+		QVERIFY(!left->isMuted() && !right->isMuted());
+	}
+	void mutedSvsDefersSynthesis()
+	{
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		auto cleanup = qScopeGuard([&] { delete track; });
+		const auto voice = svs::Registry::instance().voices().first();
+		track->bindVoice(voice.pluginId, "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		track->getMutedModel()->setValue(true);
+		const auto request = clip->captureInput(44100).request;
+		svs::Note note;
+		note.id = "muted-render";
+		note.duration = 192;
+		note.pitch = 60;
+		clip->setNotes({note});
+		clip->synthesize();
+		QTest::qWait(200);
+		QCOMPARE(clip->captureInput(44100).request, request);
+		QCOMPARE(clip->status(), QString("Dirty"));
+		QVERIFY(!clip->audio());
+		track->getMutedModel()->setValue(false);
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		const auto cached = clip->audio();
+		QVERIFY(cached);
+		track->getMutedModel()->setValue(true);
+		track->getMutedModel()->setValue(false);
+		QTest::qWait(100);
+		QCOMPARE(clip->audio(), cached);
+		track->getMutedModel()->setValue(true);
+		note.pitch = 67;
+		const auto editedRequest = clip->captureInput(44100).request;
+		clip->setNotes({note});
+		QTest::qWait(200);
+		QCOMPARE(clip->captureInput(44100).request, editedRequest);
+		track->getMutedModel()->setValue(false);
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		QVERIFY(clip->audio() && clip->audio() != cached);
+		clip->invalidate();
+		clip->synthesize();
+		track->getMutedModel()->setValue(true);
+		const auto suspendedRequest = clip->captureInput(44100).request;
+		QTRY_COMPARE_WITH_TIMEOUT(svs::SynthesisScheduler::instance().activeCount(), 0, 10000);
+		QCOMPARE(clip->status(), QString("Dirty"));
+		QCOMPARE(clip->captureInput(44100).request, suspendedRequest);
+		track->getMutedModel()->setValue(false);
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		clip->cancelSynthesis();
+		track->getMutedModel()->setValue(true);
+		track->getMutedModel()->setValue(false);
+		QTest::qWait(100);
+		QCOMPARE(clip->status(), QString("Cancelled"));
+	}
 	void cachedPlaybackAndTrackExports()
 	{
 		auto* song = Engine::getSong();

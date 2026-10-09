@@ -429,6 +429,7 @@ QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent)
 SVSTrackView::SVSTrackView(SVSTrack* track, TrackContainerView* container)
 	: TrackView(track, container)
 {
+	setModel(track);
 	auto* label = new TrackLabelButton(this, getTrackSettingsWidget());
 	label->setObjectName("svsTrackAvatar");
 	auto* avatar = new SVSImageLoader(label);
