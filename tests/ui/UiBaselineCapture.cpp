@@ -604,6 +604,16 @@ private slots:
 				const auto preset = settings(track->instrument());
 				// Keep the default host geometry; forcing an MDI size masks fixed-panel regressions.
 				auto* window = view->getInstrumentTrackWindow();
+				if (name == "bitinvader" && !selectedPlugins.isEmpty())
+				{
+					QStringList labels;
+					for (auto* label : window->findChildren<LedCheckBox*>())
+					{
+						labels.append(label->text());
+					}
+					QVERIFY(labels.contains(QCoreApplication::translate("lmms::gui::BitInvaderView", "Interpolation")));
+					QVERIFY(labels.contains(QCoreApplication::translate("lmms::gui::BitInvaderView", "Normalize")));
+				}
 				window->toggleVisibility(true);
 				window->parentWidget()->move(0, 0);
 				QVERIFY(window->isVisible());

@@ -1,0 +1,49 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  BitInvader.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/BitInvader/Release/bitinvader.exp
+  bitinvader.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\bitinvader.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+  amplifier.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\amplifier.dll
+  tripleoscillator.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\tripleoscillator.dll
+  kicker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\kicker.dll
+  Automatic MOC for target UiBaselineCapture
+  UiBaselineCapture.cpp
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(612,28): error C2662: “const QString &lmms::gui::LedCheckBox::text(void)”: 不能将“this”指针从“const lmms::gui::LedCheckBox”转换为“lmms::gui::LedCheckBox &” [D:\UserData\Desktop\Project\lmms\build\tests\UiBaselineCapture.vcxproj]
+      D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(612,21):
+      转换丢失限定符
+      D:\UserData\Desktop\Project\lmms\include\LedCheckBox.h(59,25):
+      参见“lmms::gui::LedCheckBox::text”的声明
+      D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(612,28):
+      尝试匹配参数列表“()”时

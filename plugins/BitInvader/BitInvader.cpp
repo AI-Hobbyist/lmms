@@ -397,14 +397,11 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 	m_smoothBtn->setToolTip(
 			tr( "Smooth waveform" ) );
 
-
-	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
-							tr( "Interpolation" ), LedCheckBox::LedColor::Yellow );
+	m_interpolationToggle
+		= new LedCheckBox(tr("Interpolation"), this, tr("Interpolation"), LedCheckBox::LedColor::Yellow);
 	m_interpolationToggle->move( 131, 221 );
 
-
-	m_normalizeToggle = new LedCheckBox( "Normalize", this,
-							tr( "Normalize" ), LedCheckBox::LedColor::Green );
+	m_normalizeToggle = new LedCheckBox(tr("Normalize"), this, tr("Normalize"), LedCheckBox::LedColor::Green);
 	m_normalizeToggle->move( 131, 236 );
 	
 	

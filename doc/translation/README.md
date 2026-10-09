@@ -136,3 +136,6 @@ M4 质量检查 PASS，四语 QM 生成通过，前台 `lmms UiBaselineCapture` 
 M4 检查点 `f036467a1584780e9f8b91b4d5ebc81300cfe9b2` 已推送并确认远端。M5-01 涵盖 Amplifier、AudioFileProcessor、BassBooster、BitInvader、Bitcrush 及 Carla 的关联 context，当前 103 键四语质量 PASS。新增 Carla 输入/输出参数两个标签入口，移除两个图标按钮共用的无效空 source（仍显示图标和原悬浮说明），全库 3578 键；剩余中/日/韩空译 840/961/53。Sinc 保留为标准插值算法名，通用操作与波形名补译。
 
 四语 QM 生成、UiBaselineCapture 和 Carla 目标编译成功，CarlaBase/Rack/Patchbay 及支持库使用 `build/Release/plugins`，开发程序为 `build/Release/lmms.exe`。测试支持指定本批插件，避免无关窗口与截图；预设保存/恢复检查沿用既有测试。四语 pluginPanels 各 3 PASS，真实 Windows 窗口截图覆盖五个可用原生插件，100% 缩放。Carla 依赖运行环境，窗口未验证，逐语言覆盖记录为 MANUAL/PENDING。日语 Bitcrush 的固定小面板标签拥挤，M7 核对已授权的省略与悬浮全文行为，本批不宣称该项视觉完整性通过。
+
+M5-01 实窗补充：推送 `16f6990a30263fcce62533a271798d04e1af0522` 后复核韩语截图，确认 BitInvader 的 Interpolation/Normalize 原来仅提示被翻译，显示标签仍使用字面量。以既有 tr 入口替换两个标签，不增加键、不改控件位置、预设或算法。新增真实 LedCheckBox 文本断言，四语重新启动实窗复测。首次测试编译遇到 LedCheckBox::text() 非 const 接口，调整测试遍历指针后通过，不修改生产接口；失败日志保留。
+补充验证结果：四语 BitInvader 复测各 3 PASS，实际标签和截图均命中译文，100% 缩放；M5-01 103 键质量再次 PASS。
