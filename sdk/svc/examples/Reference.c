@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,6 +11,7 @@ typedef struct reference_job
 	svc_status status;
 	unsigned stage;
 	uint64_t offset;
+	double gain;
 	uint8_t input[SVC_MAX_FEED];
 } reference_job;
 
@@ -20,7 +22,7 @@ static const char* capabilities(void* engine)
 		   "\"models\":[{\"id\":\"identity\",\"name\":\"Reference identity\","
 		   "\"speakers\":[{\"id\":\"0\",\"name\":\"Speaker 0\"}]}],"
 		   "\"parameters\":[{\"id\":\"gain\",\"name\":\"Gain\",\"type\":\"number\","
-		   "\"scope\":\"request\",\"unit\":\"dB\",\"default\":0,\"step\":1}],"
+		   "\"scope\":\"request\",\"unit\":\"dB\",\"default\":0,\"step\":1,\"minimum\":-24,\"maximum\":24}],"
 		   "\"limits\":{\"max_upload_bytes\":104857600,\"max_seconds\":600,\"min_seconds\":0.1}}";
 }
 
@@ -45,6 +47,30 @@ static void* start(void* engine, const svc_request* request)
 		return NULL;
 	}
 	memcpy(job->selection, request->selection_json, length + 1);
+	job->gain = 1.0;
+	{
+		const char* gain = strstr(job->selection, "\"gain\"");
+		if (gain)
+		{
+			char* end;
+			double db;
+			gain = strchr(gain, ':');
+			if (!gain)
+			{
+				free(job->selection);
+				free(job);
+				return NULL;
+			}
+			db = strtod(gain + 1, &end);
+			if (end == gain + 1 || !isfinite(db) || db < -24 || db > 24)
+			{
+				free(job->selection);
+				free(job);
+				return NULL;
+			}
+			job->gain = pow(10.0, db / 20.0);
+		}
+	}
 	job->request = *request;
 	job->request.selection_json = job->selection;
 	return job;
@@ -85,6 +111,18 @@ static svc_status pump(void* pointer)
 		}
 		else
 		{
+			int64_t index;
+			for (index = 0; index < count; index += 2)
+			{
+				const int16_t input = (int16_t)((uint16_t)job->input[index] | (uint16_t)job->input[index + 1] << 8);
+				double value = round(input * job->gain);
+				int16_t output;
+				if (value < -32768) { value = -32768; }
+				if (value > 32767) { value = 32767; }
+				output = (int16_t)value;
+				job->input[index] = (uint8_t)output;
+				job->input[index + 1] = (uint8_t)((uint16_t)output >> 8);
+			}
 			event.type = SVC_AUDIO;
 			event.chunk_index = job->stage++;
 			event.sample_offset = job->offset;

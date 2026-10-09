@@ -48,6 +48,7 @@
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "SVSSettingsPage.h"
+#include "SVCSettingsPage.h"
 #include "TabBar.h"
 #include "TabButton.h"
 #include "TimeLineWidget.h"
@@ -1092,6 +1093,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* svs_w = new SVSSettingsPage(settings_w);
 	m_svsSettings = svs_w;
 	settingsLayout->addWidget(svs_w);
+	auto* svc_w = new SVCSettingsPage(settings_w);
+	m_svcSettings = svc_w;
+	settingsLayout->addWidget(svc_w);
 	vstControlsLayout->addStretch();
 
 	// Major tabs ordering.
@@ -1116,6 +1120,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* svsTab = m_tabBar->addTab(svs_w, tr("SVS"), 6, true, true, false);
 	svsTab->setObjectName("svsSettingsTab");
 	svsTab->setIcon(embed::getIconPixmap("svs_track.svg", 48, 48));
+	auto* svcTab = m_tabBar->addTab(svc_w, tr("SVC"), 7, true, true, false);
+	svcTab->setObjectName("svcSettingsTab");
+	svcTab->setIcon(embed::getIconPixmap("svc_track.svg", 48, 48));
 
 	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
@@ -1283,6 +1290,11 @@ void SetupDialog::accept()
 		it.value()->saveSettings();
 	}
 	static_cast<SVSSettingsPage*>(m_svsSettings)->save();
+	if (!static_cast<SVCSettingsPage*>(m_svcSettings)->save())
+	{
+		m_tabBar->setActiveTab(static_cast<int>(ConfigTab::SvcSettings));
+		return;
+	}
 	ConfigManager::inst()->saveConfigFile();
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstScanRoots && m_vstScanRoots->changed())

@@ -89,6 +89,7 @@ bool SVCClip::setSourceFile(const QString& file)
 	m_sourceDigest = digest;
 	m_cacheReferences = {};
 	m_complete = false;
+	m_failed = false;
 	m_activeSegments.clear();
 	if (!m_loading)
 	{
@@ -115,6 +116,7 @@ void SVCClip::updateLength()
 void SVCClip::invalidate()
 {
 	m_complete = false;
+	m_failed = false;
 	if (m_playback) { m_playback->invalidate(); }
 	m_activeSegments.clear();
 	setStatus(m_playback ? tr("Needs re-render") : tr("Import audio"));
@@ -137,6 +139,7 @@ uint64_t SVCClip::beginConversion(const std::vector<svc::Segment>& segments)
 	if (!m_playback) { return 0; }
 	const auto generation = m_playback->begin(segments);
 	m_complete = false;
+	m_failed = false;
 	m_activeSegments = segments;
 	setStatus(tr("Queued"));
 	return generation;
@@ -145,19 +148,27 @@ uint64_t SVCClip::beginConversion(const std::vector<svc::Segment>& segments)
 bool SVCClip::publish(const svc_event& event)
 {
 	if (!m_playback || !m_playback->publish(event)) { return false; }
+	publishStatus(event);
+	return true;
+}
+
+void SVCClip::publishStatus(const svc_event& event)
+{
+	if (!m_playback || event.generation_id != m_playback->generation()) { return; }
 	setStatus(tr("Segment %1/%2, backend chunk %3/%4; replaced %5%")
 			.arg(event.segment_id + 1)
 			.arg(m_activeSegments.size())
 			.arg(event.chunk_index)
-			.arg(event.total_chunks)
+			.arg(event.total_chunks ? QString::number(event.total_chunks) : tr("?"))
 			.arg(m_playback->progress() * 100, 0, 'f', 1));
-	return true;
 }
 
-bool SVCClip::finishSegment(uint64_t generation, uint64_t segment, svc_status terminal, const QJsonObject& cache)
+bool SVCClip::finishSegment(
+	uint64_t generation, uint64_t segment, svc_status terminal, const QJsonObject& cache, bool alreadyPublished)
 {
 	if (!m_playback || generation != m_playback->generation() || segment >= m_activeSegments.size()) { return false; }
-	const auto completed = m_playback->complete(generation, segment, terminal);
+	const auto completed = alreadyPublished ? terminal == SVC_COMPLETE && m_playback->segmentComplete(segment)
+											: m_playback->complete(generation, segment, terminal);
 	if (completed && !cache.isEmpty())
 	{
 		auto entry = cache;
@@ -172,7 +183,8 @@ bool SVCClip::finishSegment(uint64_t generation, uint64_t segment, svc_status te
 		retained.append(entry);
 		m_cacheReferences = retained;
 	}
-	m_complete = m_playback->finished();
+	m_complete = completed && m_playback->finished();
+	m_failed = !completed && terminal != SVC_CANCELLED;
 	setStatus(m_complete				? tr("Complete")
 			: completed					? tr("Queued next segment")
 			: terminal == SVC_CANCELLED ? tr("Cancelled; partial result")

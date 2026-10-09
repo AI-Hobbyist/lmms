@@ -24,11 +24,14 @@ public:
 	std::shared_ptr<svc::PlaybackState> playback() const { return m_playback; }
 	QString status() const { return m_status; }
 	bool conversionComplete() const { return m_complete; }
+	bool conversionFailed() const { return m_failed; }
 	void setStatus(const QString& status);
 	void invalidate();
 	uint64_t beginConversion(const std::vector<svc::Segment>& segments);
 	bool publish(const svc_event& event);
-	bool finishSegment(uint64_t generation, uint64_t segment, svc_status terminal, const QJsonObject& cache = {});
+	void publishStatus(const svc_event& event);
+	bool finishSegment(uint64_t generation, uint64_t segment, svc_status terminal, const QJsonObject& cache = {},
+		bool alreadyPublished = false);
 	void setStartTimeOffset(const TimePos& offset) override;
 	void changeLength(const TimePos& length) override;
 	void updateLength() override;
@@ -44,5 +47,6 @@ private:
 	std::vector<svc::Segment> m_activeSegments;
 	bool m_loading = false;
 	bool m_complete = false;
+	bool m_failed = false;
 };
 } // namespace lmms

@@ -26,6 +26,7 @@
 
 
 #include <QLayout>
+#include <QJsonDocument>
 #include <QPointer>
 #include <QScrollBar>
 #include <QWheelEvent>
@@ -39,6 +40,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "SVSTrack.h"
+#include "SVCTrack.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "Song.h"
@@ -386,7 +388,7 @@ void TrackContainerView::clearAllTracks()
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-		QString("svsvoice,presetfile,pluginpresetfile,samplefile,instrument,"
+		QString("svcselection,svsvoice,presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( static_cast<int>(Track::Type::Instrument) ).
@@ -409,6 +411,29 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString value = StringPairDrag::decodeValue( _de );
+	if (type == "svcselection")
+	{
+		if (m_tc == Engine::patternStore())
+		{
+			_de->ignore();
+			return;
+		}
+		const auto selection = QJsonDocument::fromJson(value.toUtf8()).object();
+		if (selection.value("engine_id").toString().isEmpty() || selection.value("model_id").toString().isEmpty())
+		{
+			_de->ignore();
+			return;
+		}
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, m_tc));
+		if (!track->setSelection(selection))
+		{
+			delete track;
+			_de->ignore();
+			return;
+		}
+		_de->accept();
+		return;
+	}
 	if (type == "svsvoice")
 	{
 		if (m_tc == Engine::patternStore())

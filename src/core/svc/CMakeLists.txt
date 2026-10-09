@@ -1,4 +1,4 @@
-add_library(svc-host STATIC SVCChunking.cpp SVCCache.cpp SVCPlayback.cpp)
+add_library(svc-host STATIC SVCChunking.cpp SVCCache.cpp SVCPlayback.cpp SVCAudition.cpp)
 target_compile_features(svc-host PUBLIC cxx_std_17)
 target_include_directories(svc-host PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/sdk/svc/include")
 target_link_libraries(svc-host PUBLIC Qt6::Core)

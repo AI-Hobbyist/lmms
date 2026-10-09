@@ -9,7 +9,9 @@
 #include "EffectChain.h"
 #include "Mixer.h"
 #include "PlayHandle.h"
+#include "SVCCatalog.h"
 #include "SVCClip.h"
+#include "SVCConversion.h"
 #include "SVCViews.h"
 #include "Song.h"
 #include "panning.h"
@@ -68,8 +70,10 @@ SVCTrack::SVCTrack(TrackContainer* container)
 	, m_bus("SVC", true, &m_volume, &m_pan, &m_mutedModel)
 {
 	setName(tr("Singing Voice Conversion"));
+	m_chunks = svc::chunkDefaults();
 	m_pan.setCenterValue(DefaultPanning);
 	connect(&m_mix, &IntModel::dataChanged, this, [this]() { m_bus.setNextMixerChannel(m_mix.value()); });
+	connect(this, &SVCTrack::renderRequested, this, [this] { svc::ConversionService::instance().render(this); });
 }
 
 SVCTrack::~SVCTrack()

@@ -50,6 +50,9 @@ SET(LMMS_SRCS
 	gui/clips/PatternClipView.cpp
 	gui/clips/SampleClipView.cpp
 	gui/editors/svc/SVCViews.cpp
+	gui/editors/svc/SVCWindow.cpp
+	gui/editors/svc/SVCSettingsPage.cpp
+	gui/editors/svc/SVCBrowser.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/Editor.cpp

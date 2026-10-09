@@ -1,8 +1,13 @@
+#include <QComboBox>
 #include <QDomDocument>
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QPointer>
+#include <QPushButton>
 #include <QScreen>
 #include <QTemporaryDir>
+#include <QTreeWidget>
 #include <QtEndian>
 #include <QtTest>
 
@@ -10,15 +15,20 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "ProjectJournal.h"
 #include "ProjectRenderer.h"
+#include "SVCBrowser.h"
 #include "SVCCache.h"
+#include "SVCCatalog.h"
 #include "SVCClip.h"
+#include "SVCConversion.h"
 #include "SVCTrack.h"
 #include "SVCViews.h"
+#include "SVCWindow.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -244,6 +254,127 @@ private slots:
 		QVERIFY(dynamic_cast<SampleClip*>(sample->createClip(0)));
 		QTest::qWait(30);
 		delete sample;
+	}
+
+	void capabilityControlsAndBrowser()
+	{
+		auto profile = svc::Catalog::instance().engine("reference");
+		profile.id = "fixture";
+		profile.name = QString::fromUtf8("中文模型引擎");
+		profile.capabilities = QJsonDocument::fromJson(R"({"schema_version":1,"engine_id":"fixture",
+		"models":[{"id":"multi","name":"多权重多说话人","weights":[{"id":"w1","name":"权重甲"},{"id":"w2","name":"权重乙"}],
+		"speakers":[{"id":"0","name":"说话人甲"},{"id":"9","name":"说话人乙"}]}],
+		"parameters":[{"id":"gain","name":"增益","type":"number","scope":"request","unit":"dB","default":0,"step":1,"minimum":-24,"maximum":24},
+		{"id":"method","name":"方法","type":"enum","scope":"request","unit":"","default":"fast","options":[{"id":"fast","name":"快速","available":true},{"id":"missing","name":"不可用","available":false,"reason":"missing dependency"}]},
+		{"id":"conditional","name":"条件参数","type":"number","scope":"request","unit":"s","default":1,"step":1,"minimum":0,"maximum":5,"enabled_when":{"speaker_id":"9"}}],
+		"limits":{"max_upload_bytes":104857600,"max_seconds":600,"min_seconds":0.1}})")
+								   .object();
+		const auto installError = svc::Catalog::instance().install(profile);
+		QVERIFY2(installError.isEmpty(), qPrintable(installError));
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		QVERIFY(track->setSelection(
+			{{"engine_id", "fixture"}, {"model_id", "multi"}, {"weight_id", "w2"}, {"speaker_id", "9"}}));
+		{
+			gui::SVCWindow window(track, m_gui->mainWindow());
+			window.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&window));
+			QTest::qWait(250);
+			auto* weights = window.findChild<QComboBox*>("svcWeight");
+			auto* speakers = window.findChild<QComboBox*>("svcSpeaker");
+			QVERIFY(weights->isVisible() && speakers->isVisible());
+			QCOMPARE(weights->currentData().toString(), QString("w2"));
+			QCOMPARE(speakers->currentData().toString(), QString("9"));
+			auto* conditional = window.findChild<QWidget*>("svcParameter_conditional");
+			QVERIFY(conditional->isEnabled());
+			speakers->setCurrentIndex(0);
+			QVERIFY(!conditional->isEnabled());
+			QString error;
+			const auto request = svc::Catalog::instance().requestSelection(track->selection(), error);
+			QVERIFY(error.isEmpty());
+			QVERIFY(!request.value("parameters").toObject().contains("conditional"));
+			auto* methods = window.findChild<QWidget*>("svcParameter_method")->findChild<QComboBox*>();
+			QVERIFY(!(methods->model()->flags(methods->model()->index(1, 0)) & Qt::ItemIsEnabled));
+			gui::SVCBrowser browser(nullptr);
+			auto* tree = browser.findChild<QTreeWidget*>("svcBrowserTree");
+			const auto* root = tree->topLevelItem(0);
+			QVERIFY(root);
+			QCOMPARE(root->child(0)->child(0)->childCount(), 0); // Single speaker has no redundant level.
+			QCOMPARE(root->child(1)->child(0)->childCount(), 2);
+			QTest::qWait(250);
+			const auto screenshot = window.screen()->grabWindow(window.winId());
+			QVERIFY(!screenshot.isNull());
+			QVERIFY(screenshot.save(
+				"build/tests/svc/SVC-M3-controls-native" + qEnvironmentVariable("LMMS_SVC_DPI_SUFFIX") + ".png"));
+			window.close();
+		}
+		QVERIFY(svc::setChunkDefaults({-65, 24, 8}).isEmpty());
+		auto* defaultsTrack = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		QCOMPARE(defaultsTrack->chunkConfig().silenceThresholdDbfs, -65.);
+		QCOMPARE(track->chunkConfig().silenceThresholdDbfs, -70.);
+		QVERIFY(svc::setChunkDefaults({}).isEmpty());
+		delete defaultsTrack;
+		delete track;
+		QTest::qWait(30);
+	}
+
+	void referenceRerenderAndAudition()
+	{
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		track->setName(QString::fromUtf8("SVC 原音与转换试听"));
+		auto* clip = static_cast<SVCClip*>(track->createClip(0));
+		QVERIFY(clip->setSourceFile(m_source));
+		QVERIFY(track->setSelection({{"engine_id", "reference"}, {"model_id", "identity"}, {"speaker_id", "0"},
+			{"parameters", QJsonObject{{"gain", 0}}}}));
+		{
+			gui::SVCWindow window(track, m_gui->mainWindow());
+			window.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&window));
+			QVERIFY(!window.findChild<QComboBox*>("svcSpeaker")->isVisible());
+			const auto sourceOnly = clip->playback()->snapshot();
+			QCOMPARE(svc::auditionSample(*sourceOnly, 100, svc::AuditionMode::Source, 0, 0)[0], .125f);
+			QCOMPARE(svc::auditionSample(*sourceOnly, 100, svc::AuditionMode::Rendered, 0, 0)[0], 0.f);
+			auto* button = window.findChild<QPushButton*>("svcReRender");
+			QVERIFY(button);
+			QTest::mouseClick(button, Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete(), 15000);
+			const auto first = clip->playback()->snapshot();
+			QCOMPARE(svc::auditionSample(*first, 100, svc::AuditionMode::Overlay, 0, 0)[0], .25f);
+			QVERIFY(std::abs(svc::auditionSample(*first, 100, svc::AuditionMode::Overlay, 6.020599913, 0)[0] - .375f)
+				< .00001f);
+			const auto oldGeneration = clip->playback()->generation();
+			auto* gain = window.findChild<QWidget*>("svcParameter_gain")->findChild<gui::Knob*>();
+			gain->model()->setValue(6);
+			QVERIFY(clip->playback()->generation() > oldGeneration && !clip->conversionComplete());
+			QCOMPARE(clip->playback()->snapshot()->trackSample(100, 0), .125f); // Previous B survives until rerender.
+			QTest::mouseClick(button, Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete(), 15000);
+			QVERIFY(std::abs(clip->playback()->snapshot()->trackSample(100, 0) - .249420f) < .0001f);
+			const auto sum
+				= svc::auditionSample(*clip->playback()->snapshot(), 100, svc::AuditionMode::Overlay, 24, 24)[0];
+			QVERIFY(sum > 1); // No automatic normalization.
+			auto* waveView = window.findChild<gui::SVCWaveform*>();
+			QVERIFY(waveView);
+			waveView->setStyleSheet("lmms--gui--SVCWaveform { qproperty-svcSourceColor: #ff6600; }");
+			waveView->ensurePolished();
+			QCOMPARE(waveView->sourceColor(), QColor("#ff6600"));
+			waveView->setStyleSheet({});
+			QTest::mouseClick(window.findChild<QPushButton*>("svcAuditionPlay"), Qt::LeftButton);
+			QVERIFY(window.audition()->playing);
+			for (int index = 0; index < 4; ++index)
+			{
+				Engine::audioEngine()->renderNextPeriod();
+			}
+			QVERIFY(window.audition()->position > 0);
+			QTest::qWait(300);
+			QVERIFY(window.screen()
+					->grabWindow(window.winId())
+					.save("build/tests/svc/SVC-M3-audition-native" + qEnvironmentVariable("LMMS_SVC_DPI_SUFFIX")
+						+ ".png"));
+			window.close();
+			QVERIFY(!window.audition()->playing);
+		}
+		delete track;
+		QTest::qWait(30);
 	}
 
 	void cleanupTestCase()

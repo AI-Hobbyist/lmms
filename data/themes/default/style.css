@@ -1680,3 +1680,19 @@ lmms--gui--LmmsPalette {
 lmms--gui--SVSCanvas {
 	qproperty-noteCornerRadius: 2;
 }
+
+/* Singing Voice Conversion: source, progressive result and shared playhead. */
+lmms--gui--SVCClipView {
+    qproperty-svcTrackColor: #8064B5;
+    qproperty-svcSourceColor: #788A9B;
+    qproperty-svcRenderedColor: #42B8A5;
+    qproperty-svcPendingColor: #D5A64A;
+    qproperty-svcErrorColor: #D66A72;
+}
+lmms--gui--SVCWaveform {
+    qproperty-svcSourceColor: #788A9B;
+    qproperty-svcRenderedColor: #42B8A5;
+    qproperty-svcPendingColor: #D5A64A;
+    qproperty-svcErrorColor: #D66A72;
+    qproperty-svcComparePlayheadColor: #F2ECFF;
+}

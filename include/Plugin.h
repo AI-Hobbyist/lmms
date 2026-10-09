@@ -83,6 +83,7 @@ public:
 				// several other plugins (e.g. VST-support)
 		Other,
 		SVS,
+		SVC,
 		Undefined = 255
 	} ;
 

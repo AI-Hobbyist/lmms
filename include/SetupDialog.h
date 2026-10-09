@@ -61,7 +61,8 @@ public:
 		MidiSettings,
 			PathsSettings,
 		VstSettings,
-		SvsSettings
+		SvsSettings,
+		SvcSettings
 	};
 
 	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
@@ -137,6 +138,7 @@ private slots:
 private:
 	TabBar * m_tabBar;
 	QWidget* m_svsSettings = nullptr;
+	QWidget* m_svcSettings = nullptr;
 
 	// General settings widgets.
 	bool m_tooltips;

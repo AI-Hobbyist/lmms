@@ -859,6 +859,10 @@ ADD_SUBDIRECTORY(sdk/svs)
 add_subdirectory(sdk/svc)
 add_subdirectory(src/core/svc)
 target_static_libraries(lmmsobjs svc-host)
+target_static_libraries(lmmsobjs svc-reference)
+if(WIN32)
+    target_static_libraries(lmmsobjs Advapi32)
+endif()
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)

@@ -48,6 +48,7 @@ public:
 	uint64_t generation() const { return m_generation.load(); }
 	double progress() const;
 	bool finished() const;
+	bool segmentComplete(uint64_t segment) const;
 
 private:
 	struct RequestState

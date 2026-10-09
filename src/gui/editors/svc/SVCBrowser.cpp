@@ -1,0 +1,89 @@
+#include "SVCBrowser.h"
+
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QTreeWidget>
+
+#include "Engine.h"
+#include "SVCCatalog.h"
+#include "SVCTrack.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "embed.h"
+namespace lmms::gui {
+namespace {
+class SVCTree final : public QTreeWidget
+{
+public:
+	using QTreeWidget::QTreeWidget;
+
+protected:
+	void startDrag(Qt::DropActions) override
+	{
+		const auto* item = currentItem();
+		if (!item || item->isDisabled() || !item->data(0, Qt::UserRole).isValid()) { return; }
+		new StringPairDrag(
+			"svcselection", item->data(0, Qt::UserRole).toString(), embed::getIconPixmap("svc_track.svg"), this);
+	}
+};
+void attach(QTreeWidgetItem* item, const QJsonObject& selection, const QJsonObject& metadata)
+{
+	item->setData(0, Qt::UserRole, QString::fromUtf8(QJsonDocument(selection).toJson(QJsonDocument::Compact)));
+	item->setFlags(item->flags() | Qt::ItemIsDragEnabled);
+	item->setDisabled(!metadata.value("available").toBool(true));
+	item->setToolTip(0, metadata.value("reason").toString());
+}
+} // namespace
+SVCBrowser::SVCBrowser(QWidget* parent)
+	: SideBarWidget(tr("Singing Voice Conversion"), embed::getIconPixmap("svc_track.svg"), parent)
+	, m_tree(new SVCTree(contentParent()))
+{
+	m_tree->setObjectName("svcBrowserTree");
+	m_tree->setHeaderHidden(true);
+	m_tree->setDragEnabled(true);
+	addContentWidget(m_tree);
+	connect(&svc::Catalog::instance(), &svc::Catalog::changed, this, &SVCBrowser::refresh);
+	connect(m_tree, &QTreeWidget::itemDoubleClicked, this, [](QTreeWidgetItem* item) {
+		if (item->isDisabled() || !item->data(0, Qt::UserRole).isValid()) { return; }
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		track->setSelection(QJsonDocument::fromJson(item->data(0, Qt::UserRole).toString().toUtf8()).object());
+	});
+	refresh();
+}
+void SVCBrowser::refresh()
+{
+	m_tree->clear();
+	auto* root = new QTreeWidgetItem(m_tree, {tr("Singing Voice Conversion")});
+	for (const auto& engine : svc::Catalog::instance().engines())
+	{
+		auto* branch = new QTreeWidgetItem(root, {engine.name});
+		for (const auto& value : engine.capabilities.value("models").toArray())
+		{
+			const auto model = value.toObject();
+			auto* leaf = new QTreeWidgetItem(branch, {model.value("name").toString(model.value("id").toString())});
+			QJsonObject selection{{"engine_id", engine.id}, {"model_id", model.value("id")}};
+			const auto weights = model.value("weights").toArray();
+			if (!weights.isEmpty()) { selection.insert("weight_id", weights.first().toObject().value("id")); }
+			const auto speakers = model.value("speakers").toArray();
+			if (speakers.size() <= 1)
+			{
+				if (!speakers.isEmpty()) { selection.insert("speaker_id", speakers.first().toObject().value("id")); }
+				attach(leaf, selection, model);
+			}
+			else
+			{
+				leaf->setDisabled(!model.value("available").toBool(true));
+				for (const auto& entry : speakers)
+				{
+					const auto speaker = entry.toObject();
+					selection.insert("speaker_id", speaker.value("id"));
+					auto* child
+						= new QTreeWidgetItem(leaf, {speaker.value("name").toString(speaker.value("id").toString())});
+					attach(child, selection, speaker);
+				}
+			}
+		}
+	}
+	m_tree->expandAll();
+}
+} // namespace lmms::gui

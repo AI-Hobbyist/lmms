@@ -43,6 +43,7 @@
 #include "lmms_math.h"
 #include "KeyboardShortcuts.h"
 #include "Song.h"
+#include "SVCTrack.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackContainerView.h"
@@ -244,6 +245,10 @@ void TrackOperationsWidget::updateMenu()
 {
 	QMenu * toMenu = m_trackOps->menu();
 	toMenu->clear();
+	if (auto* svcTrack = dynamic_cast<SVCTrack*>(m_trackView->getTrack()))
+	{
+		toMenu->addAction(tr("Re-render"), svcTrack, &SVCTrack::renderRequested);
+	}
 	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
 						tr( "Clone this track" ),
 						this, SLOT(cloneTrack()));

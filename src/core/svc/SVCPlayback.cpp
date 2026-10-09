@@ -215,4 +215,10 @@ bool PlaybackState::finished() const
 		return request.terminal == SVC_COMPLETE;
 	});
 }
+
+bool PlaybackState::segmentComplete(uint64_t segment) const
+{
+	std::lock_guard lock(m_mutex);
+	return segment < m_requests.size() && m_requests[segment].terminal == SVC_COMPLETE;
+}
 } // namespace lmms::svc
