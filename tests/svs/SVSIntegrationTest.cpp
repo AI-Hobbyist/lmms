@@ -4900,6 +4900,41 @@ private slots:
 		delete restored;
 		delete track;
 	}
+	void nativeSidebarLanguages()
+	{
+		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		const auto cleanup = qScopeGuard([&] { delete track; });
+		track->bindVoice("org.lmms.svs.example", "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1500, 900);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* language = editor.findChild<QComboBox*>("svsSidebarLanguage");
+		auto* propertyLanguage = editor.findChild<QComboBox*>("svsLanguage");
+		QVERIFY(language && propertyLanguage);
+		QVERIFY(language->isVisible());
+		QCOMPARE(language->count(), track->capabilities().languages.size());
+		for (int index = 0; index < language->count(); ++index)
+		{
+			QCOMPARE(language->itemData(index).toString(), track->capabilities().languages[index]);
+		}
+		const auto selected = language->itemData(1).toString();
+		QTest::keyClick(language, Qt::Key_Home);
+		QTest::keyClick(language, Qt::Key_Down);
+		QTRY_COMPARE(track->language(), selected);
+		QCOMPARE(propertyLanguage->currentData().toString(), selected);
+		QTest::qWait(700);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-sidebar-language-native.png"));
+		track->bindVoice("org.lmms.svs.example", "minimal");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVERIFY(track->capabilities().languages.size() <= 1);
+		QVERIFY(!language->isVisible());
+		editor.close();
+	}
 	void nativePitchRecordingHistory()
 	{
 		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }

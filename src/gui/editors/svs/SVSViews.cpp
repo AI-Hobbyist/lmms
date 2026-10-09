@@ -922,6 +922,30 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto* singer = new QComboBox(sidebar);
 	singer->setObjectName("svsSinger");
 	sidebarLayout->addWidget(singer);
+	auto* sidebarLanguageLabel = new QLabel(tr("Language"), sidebar);
+	auto* sidebarLanguage = new QComboBox(sidebar);
+	sidebarLanguage->setObjectName("svsSidebarLanguage");
+	sidebarLanguageLabel->setBuddy(sidebarLanguage);
+	sidebarLayout->addWidget(sidebarLanguageLabel);
+	sidebarLayout->addWidget(sidebarLanguage);
+	auto refreshSidebarLanguage = [track, sidebarLanguage, sidebarLanguageLabel] {
+		const QSignalBlocker block(sidebarLanguage);
+		sidebarLanguage->clear();
+		for (const auto& language : track->capabilities().languages)
+		{
+			const auto name = QLocale(language).nativeLanguageName();
+			sidebarLanguage->addItem(name.isEmpty() ? language : name, language);
+		}
+		sidebarLanguage->setCurrentIndex(sidebarLanguage->findData(track->language()));
+		const bool available = track->capabilitiesReady() && sidebarLanguage->count() > 1;
+		sidebarLanguageLabel->setVisible(available);
+		sidebarLanguage->setVisible(available);
+		sidebarLanguage->setEnabled(!track->readOnly());
+	};
+	connect(sidebarLanguage, qOverload<int>(&QComboBox::activated), this,
+		[track, sidebarLanguage](int index) { track->setLanguage(sidebarLanguage->itemData(index).toString()); });
+	connect(track, &Track::dataChanged, this, refreshSidebarLanguage);
+	refreshSidebarLanguage();
 	auto refreshSingers = [this, track, singer] {
 		QSignalBlocker block(singer);
 		singer->clear();
