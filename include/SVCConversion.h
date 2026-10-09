@@ -19,6 +19,7 @@ class ConversionService : public QObject
 public:
 	static ConversionService& instance();
 	void render(SVCTrack* track);
+	void renderClip(SVCClip* clip);
 	void cancel(SVCTrack* track);
 	void shutdown();
 	~ConversionService() override;

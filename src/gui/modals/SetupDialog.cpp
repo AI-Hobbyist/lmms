@@ -1095,7 +1095,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	settingsLayout->addWidget(svs_w);
 	auto* svc_w = new SVCSettingsPage(settings_w);
 	m_svcSettings = svc_w;
-	settingsLayout->addWidget(svc_w);
+	auto* svcScroll = new QScrollArea(settings_w);
+	svcScroll->setObjectName("svcSettingsScroll");
+	svcScroll->setWidgetResizable(true);
+	svcScroll->setFrameShape(QFrame::NoFrame);
+	svcScroll->setWidget(svc_w);
+	settingsLayout->addWidget(svcScroll);
 	vstControlsLayout->addStretch();
 
 	// Major tabs ordering.
@@ -1120,7 +1125,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* svsTab = m_tabBar->addTab(svs_w, tr("SVS"), 6, true, true, false);
 	svsTab->setObjectName("svsSettingsTab");
 	svsTab->setIcon(embed::getIconPixmap("svs_track.svg", 48, 48));
-	auto* svcTab = m_tabBar->addTab(svc_w, tr("SVC"), 7, true, true, false);
+	auto* svcTab = m_tabBar->addTab(svcScroll, tr("SVC"), 7, true, true, false);
 	svcTab->setObjectName("svcSettingsTab");
 	svcTab->setIcon(embed::getIconPixmap("svc_track.svg", 48, 48));
 

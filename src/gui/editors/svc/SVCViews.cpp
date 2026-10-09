@@ -12,7 +12,9 @@
 
 #include "Knob.h"
 #include "MixerChannelLcdSpinBox.h"
+#include "RenameDialog.h"
 #include "SVCClip.h"
+#include "SVCConversion.h"
 #include "SVCTrack.h"
 #include "SVCWindow.h"
 #include "TrackLabelButton.h"
@@ -172,5 +174,15 @@ void SVCClipView::dropEvent(QDropEvent* event)
 }
 
 void SVCClipView::constructContextMenu(QMenu* menu)
-{ menu->addAction(tr("Import audio"), this, &SVCClipView::importAudio); }
+{
+	menu->addAction(tr("Import audio"), this, &SVCClipView::importAudio);
+	menu->addAction(embed::getIconPixmap("svc_render.svg"), tr("Re-render"), this,
+		[this] { svc::ConversionService::instance().renderClip(m_clip); });
+	menu->addSeparator();
+	menu->addAction(embed::getIconPixmap("edit_rename"), tr("Change name"), this, [this] {
+		auto name = m_clip->name();
+		RenameDialog dialog(name);
+		if (dialog.exec() == QDialog::Accepted) { m_clip->setName(name); }
+	});
+}
 } // namespace lmms::gui

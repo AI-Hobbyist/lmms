@@ -96,50 +96,55 @@ void ConversionService::render(SVCTrack* track)
 {
 	for (auto* base : track->getClips())
 	{
-		auto* clip = static_cast<SVCClip*>(base);
-		if (!clip->playback())
+		renderClip(static_cast<SVCClip*>(base));
+	}
+}
+
+void ConversionService::renderClip(SVCClip* clip)
+{
+	auto* track = static_cast<SVCTrack*>(clip->getTrack());
+	if (!clip->playback())
+	{
+		clip->setStatus(tr("Import audio before rendering"));
+		return;
+	}
+	QString error;
+	const auto selection = Catalog::instance().requestSelection(track->selection(), error);
+	if (!error.isEmpty())
+	{
+		clip->setStatus(error);
+		return;
+	}
+	auto task = std::make_shared<Task>();
+	task->clip = clip;
+	task->playback = clip->playback();
+	task->engine = Catalog::instance().engine(selection.value("engine_id").toString());
+	task->connectionIdentity = Catalog::instance().connection(task->engine.id).address;
+	task->selection = selection;
+	task->config = track->chunkConfig();
+	task->working = ConfigManager::inst()->workingDir();
+	try
+	{
+		std::lock_guard lock(m_mutex);
+		if (m_queue.size() >= 32)
 		{
-			clip->setStatus(tr("Import audio before rendering"));
-			continue;
+			clip->setStatus(tr("SVC queue is full; try again"));
+			return;
 		}
-		QString error;
-		const auto selection = Catalog::instance().requestSelection(track->selection(), error);
-		if (!error.isEmpty())
+		clip->invalidate();
+		task->generation = task->playback->generation();
+		clip->setStatus(tr("Queued for silence analysis and conversion"));
+		m_queue.push_back(task);
+		if (!m_worker.joinable())
 		{
-			clip->setStatus(error);
-			continue;
+			m_stopping = false;
+			m_worker = std::thread([this] { work(); });
 		}
-		auto task = std::make_shared<Task>();
-		task->clip = clip;
-		task->playback = clip->playback();
-		task->engine = Catalog::instance().engine(selection.value("engine_id").toString());
-		task->connectionIdentity = Catalog::instance().connection(task->engine.id).address;
-		task->selection = selection;
-		task->config = track->chunkConfig();
-		task->working = ConfigManager::inst()->workingDir();
-		try
-		{
-			std::lock_guard lock(m_mutex);
-			if (m_queue.size() >= 32)
-			{
-				clip->setStatus(tr("SVC queue is full; try again"));
-				continue;
-			}
-			clip->invalidate();
-			task->generation = task->playback->generation();
-			clip->setStatus(tr("Queued for silence analysis and conversion"));
-			m_queue.push_back(task);
-			if (!m_worker.joinable())
-			{
-				m_stopping = false;
-				m_worker = std::thread([this] { work(); });
-			}
-			m_wake.notify_all();
-		}
-		catch (const std::exception& exception)
-		{
-			clip->setStatus(QString::fromUtf8(exception.what()));
-		}
+		m_wake.notify_all();
+	}
+	catch (const std::exception& exception)
+	{
+		clip->setStatus(QString::fromUtf8(exception.what()));
 	}
 }
 

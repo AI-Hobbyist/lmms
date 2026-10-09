@@ -34,6 +34,7 @@ public:
 protected:
 	void paintEvent(QPaintEvent*) override;
 	void mouseDoubleClickEvent(QMouseEvent*) override;
+	void constructContextMenu(QMenu* menu) override;
 
 private:
 	SVSClip* m_clip;

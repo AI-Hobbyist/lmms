@@ -12,6 +12,7 @@
 #include "StringPairDrag.h"
 #include "Knob.h"
 #include "MixerChannelLcdSpinBox.h"
+#include "RenameDialog.h"
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
@@ -30,6 +31,7 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QMenu>
 #include <QDropEvent>
 #include <QScrollBar>
 #include <QToolButton>
@@ -507,6 +509,16 @@ SVSClipView::SVSClipView(SVSClip* clip, TrackView* view)
 				update();
 		});
 }
+void SVSClipView::constructContextMenu(QMenu* menu)
+{
+	menu->addSeparator();
+	menu->addAction(embed::getIconPixmap("edit_rename"), tr("Change name"), this, [this] {
+		auto name = m_clip->name();
+		RenameDialog dialog(name);
+		if (dialog.exec() == QDialog::Accepted) { m_clip->setName(name); }
+	});
+}
+
 void SVSClipView::paintEvent(QPaintEvent*)
 {
 	QPainter p(this);

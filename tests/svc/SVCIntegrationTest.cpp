@@ -1,14 +1,18 @@
 #include <QAction>
 #include <QComboBox>
+#include <QContextMenuEvent>
 #include <QDomDocument>
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLineEdit>
+#include <QMenu>
 #include <QPointer>
 #include <QPushButton>
 #include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSlider>
 #include <QSpinBox>
 #include <QTemporaryDir>
@@ -40,6 +44,10 @@
 #include "SVCViews.h"
 #include "SVCWindow.h"
 #include "SVSBrowser.h"
+#include "SVSClip.h"
+#include "SVSViews.h"
+#include "RenameDialog.h"
+#include "SetupDialog.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -453,6 +461,140 @@ private slots:
 		QTest::qWait(300);
 		QVERIFY(browser.screen()->grabWindow(browser.winId()).save("build/tests/svc/SVS-sidebar-search-native.png"));
 		browser.close();
+	}
+
+	void svcSettingsResize()
+	{
+		gui::SetupDialog dialog(gui::SetupDialog::ConfigTab::SvcSettings);
+		dialog.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+		dialog.resize(dialog.width(), 680);
+		QTest::qWait(100);
+		QCOMPARE(dialog.height(), 680);
+		dialog.resize(dialog.width(), 600);
+		QTest::qWait(200);
+		qInfo() << "SVC settings requested height 600; actual" << dialog.height() << "minimum"
+				<< dialog.minimumHeight();
+		QVERIFY(dialog.screen()->grabWindow(dialog.winId()).save("build/tests/svc/SVC-settings-resize-native.png"));
+		QCOMPARE(dialog.height(), 600);
+		auto* scroll = dialog.findChild<QScrollArea*>("svcSettingsScroll");
+		QVERIFY(scroll);
+		QVERIFY(scroll->verticalScrollBar()->maximum() > 0);
+		scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+		QTest::qWait(100);
+		QVERIFY(dialog.screen()->grabWindow(dialog.winId()).save("build/tests/svc/SVC-settings-bottom-native.png"));
+		dialog.close();
+	}
+
+	void voiceClipNames()
+	{
+		for (const auto type : {Track::Type::SVC, Track::Type::SVS})
+		{
+			auto* track = Track::create(type, Engine::getSong());
+			auto* clip = track->createClip(0);
+			clip->changeLength(TimePos::ticksPerBar() * 4);
+			gui::ClipView* view = nullptr;
+			const auto findView = [&] {
+				for (auto* candidate : m_gui->mainWindow()->findChildren<gui::ClipView*>())
+				{
+					if (candidate->getClip() == clip) { view = candidate; }
+				}
+				return view != nullptr;
+			};
+			QTRY_VERIFY(findView());
+			const auto name = QString::fromUtf8(type == Track::Type::SVC ? "转换主唱片段" : "合成主唱片段");
+			const auto rename = [&](bool cancel) {
+				bool invoked = false;
+				QTimer watchdog;
+				watchdog.setSingleShot(true);
+				connect(&watchdog, &QTimer::timeout, this, [] {
+					if (auto* dialog = QApplication::activeModalWidget()) { dialog->close(); }
+					if (auto* menu = QApplication::activePopupWidget()) { menu->close(); }
+				});
+				watchdog.start(5000);
+				QTimer::singleShot(100, this, [&] {
+					auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+					QVERIFY(menu);
+					QAction* action = nullptr;
+					for (auto* candidate : menu->actions())
+					{
+						if (candidate->text() == "Change name") { action = candidate; }
+					}
+					QVERIFY(action);
+					QTimer::singleShot(100, this, [&] {
+						auto* dialog = qobject_cast<gui::RenameDialog*>(QApplication::activeModalWidget());
+						QVERIFY(dialog);
+						auto* input = dialog->findChild<QLineEdit*>();
+						QVERIFY(input);
+						input->setText(cancel ? "cancelled name" : name);
+						QTest::qWait(100);
+						QVERIFY(dialog->screen()
+								->grabWindow(dialog->winId())
+								.save(QString("build/tests/svc/%1-rename-native.png").arg(int(type))));
+						QTest::keyClick(input, cancel ? Qt::Key_Escape : Qt::Key_Return);
+						invoked = true;
+					});
+					action->trigger();
+					menu->close();
+				});
+				QContextMenuEvent event(QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)));
+				QApplication::sendEvent(view, &event);
+				QVERIFY(invoked);
+			};
+			rename(false);
+			QCOMPARE(clip->name(), name);
+			rename(true);
+			QCOMPARE(clip->name(), name);
+			QDomDocument document;
+			auto element = document.createElement("clip");
+			document.appendChild(element);
+			const auto saved = clip->saveState(document, element);
+			auto* restored = track->createClip(TimePos::ticksPerBar() * 4);
+			restored->restoreState(saved);
+			QCOMPARE(restored->name(), name);
+			if (type == Track::Type::SVC)
+			{
+				auto* svcTrack = static_cast<SVCTrack*>(track);
+				auto* target = static_cast<SVCClip*>(clip);
+				auto* untouched = static_cast<SVCClip*>(restored);
+				QVERIFY(target->setSourceFile(m_source));
+				QVERIFY(untouched->setSourceFile(m_source));
+				QVERIFY(svcTrack->setSelection({{"engine_id", "reference"}, {"model_id", "identity"},
+					{"speaker_id", "0"}, {"parameters", QJsonObject{{"gain", 0}}}}));
+				const auto generation = untouched->playback()->generation();
+				const auto status = untouched->status();
+				QSignalSpy wholeTrack(svcTrack, &SVCTrack::renderRequested);
+				bool invoked = false;
+				QTimer::singleShot(100, this, [&] {
+					auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+					QVERIFY(menu);
+					for (auto* action : menu->actions())
+					{
+						if (action->text() == "Re-render")
+						{
+							action->trigger();
+							invoked = true;
+						}
+					}
+					menu->close();
+				});
+				QContextMenuEvent event(QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)));
+				QApplication::sendEvent(view, &event);
+				QVERIFY(invoked);
+				QTRY_VERIFY_WITH_TIMEOUT(target->conversionComplete(), 10000);
+				QCOMPARE(wholeTrack.count(), 0);
+				QCOMPARE(untouched->playback()->generation(), generation);
+				QCOMPARE(untouched->status(), status);
+				QVERIFY(untouched->cacheReferences().isEmpty());
+			}
+			QTest::qWait(100);
+			QVERIFY(m_gui->mainWindow()
+					->screen()
+					->grabWindow(m_gui->mainWindow()->winId())
+					.save(QString("build/tests/svc/%1-renamed-clip-native.png").arg(int(type))));
+			delete track;
+			QTest::qWait(30);
+		}
 	}
 
 	void referenceRerenderAndAudition()
