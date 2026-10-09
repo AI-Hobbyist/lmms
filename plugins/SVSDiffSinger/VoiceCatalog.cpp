@@ -738,7 +738,7 @@ Json VoicePackage::declaration() const
 			std::find(languages.begin(), languages.end(), Json("zh")) != languages.end()
 				? "zh"
 				: languages[0].get<std::string>()},
-		{"defaultLyric", "a"}, {"metadata", metadata}, {"metadataSources", sources}};
+		{"defaultLyric", "a"}, {"voicebankPath", root.u8string()}, {"metadata", metadata}, {"metadataSources", sources}};
 	for (const auto& item : resources)
 	{
 		value[item.first] = item.second->id;

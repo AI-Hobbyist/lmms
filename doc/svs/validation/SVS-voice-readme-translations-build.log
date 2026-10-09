@@ -1,0 +1,64 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Automatic MOC and UIC for target SVSExample
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/lmms.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Generating D:/UserData/Desktop/Project/lmms/data/locale/en.qm
+  Updating 'D:/UserData/Desktop/Project/lmms/data/locale/en.qm'...
+      Generated 5 translation(s) (5 finished and 0 unfinished)
+      Ignored 3877 untranslated source text(s)
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Generating D:/UserData/Desktop/Project/lmms/data/locale/zh_CN.qm
+  Updating 'D:/UserData/Desktop/Project/lmms/data/locale/zh_CN.qm'...
+      Generated 3882 translation(s) (3882 finished and 0 unfinished)
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Generating D:/UserData/Desktop/Project/lmms/data/locale/ja.qm
+  Updating 'D:/UserData/Desktop/Project/lmms/data/locale/ja.qm'...
+      Generated 3882 translation(s) (3882 finished and 0 unfinished)
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  Generating D:/UserData/Desktop/Project/lmms/data/locale/ko.qm
+  Updating 'D:/UserData/Desktop/Project/lmms/data/locale/ko.qm'...
+      Generated 3882 translation(s) (3882 finished and 0 unfinished)

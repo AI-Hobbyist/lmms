@@ -13043,6 +13043,26 @@ Phonemes: %4
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
+        <source>Voicebank README</source>
+        <translation>Voicebank README</translation>
+    </message>
+    <message>
+        <source>Voicebank README: %1</source>
+        <translation>Voicebank README: %1</translation>
+    </message>
+    <message>
+        <source>Cannot read README: %1</source>
+        <translation>Cannot read README: %1</translation>
+    </message>
+    <message>
+        <source>Read the selected voicebank&apos;s README</source>
+        <translation>Read the selected voicebank&apos;s README</translation>
+    </message>
+    <message>
+        <source>No voicebank README found</source>
+        <translation>No voicebank README found</translation>
+    </message>
+    <message>
         <source>SVS Piano Roll — LMMS</source>
         <translation type="unfinished"></translation>
     </message>

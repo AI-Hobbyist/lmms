@@ -106,6 +106,8 @@
 #include "SVSTimeMapping.h"
 #include "SVSTrack.h"
 #include "SVSViews.h"
+#include "SVSVoiceReadme.h"
+#include <QTranslator>
 #include "SampleFrame.h"
 #include "SetupDialog.h"
 #include "Song.h"
@@ -203,6 +205,66 @@ private slots:
 		}
 		else
 			Engine::destroy();
+	}
+	void voiceReadmeNative()
+	{
+		QVERIFY(m_guiApplication);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		const QStringList readmeLanguages{"en", "zh_CN", "ja", "ko"};
+		const QStringList readmeLabels{"Voicebank README", QStringLiteral("声库说明"),
+			QStringLiteral("音声ライブラリの説明"), QStringLiteral("음성 라이브러리 설명")};
+		for (int i = 0; i < readmeLanguages.size(); ++i)
+		{
+			QTranslator translator;
+			QVERIFY(translator.load("build/Release/data/locale/" + readmeLanguages[i] + ".qm"));
+			QCOMPARE(translator.translate("lmms::gui::SVSPianoRoll", "Voicebank README"), readmeLabels[i]);
+		}
+		QTranslator chinese;
+		QVERIFY(chinese.load("build/Release/data/locale/zh_CN.qm"));
+		QCoreApplication::installTranslator(&chinese);
+		const auto removeTranslator = qScopeGuard([&] { QCoreApplication::removeTranslator(&chinese); });
+		QTemporaryDir directory;
+		QVERIFY(directory.isValid());
+		svs::Voice voice;
+		voice.name = QStringLiteral("测试声库");
+		voice.metadata["voicebankPath"] = directory.path();
+		QVERIFY(gui::voiceReadmeFiles(voice).isEmpty());
+		QFile markdown(directory.filePath("ReadMe.MD"));
+		QVERIFY(markdown.open(QIODevice::WriteOnly));
+		markdown.write(QStringLiteral("# 声库说明\n\n作者、使用说明与许可。\n").toUtf8());
+		markdown.close();
+		QFile plain(directory.filePath("README.txt"));
+		QVERIFY(plain.open(QIODevice::WriteOnly));
+		plain.write(QStringLiteral("声库文本说明 <b>保持原文</b>").toUtf8());
+		plain.close();
+		QCOMPARE(gui::voiceReadmeFiles(voice).size(), 2);
+		QPointer<QDialog> dialog = gui::openVoiceReadme(voice, nullptr);
+		QVERIFY(dialog);
+		const auto cleanup = qScopeGuard([&] {
+			if (dialog)
+			{
+				dialog->close();
+			}
+		});
+		QVERIFY(QTest::qWaitForWindowExposed(dialog));
+		QTest::qWait(600);
+		auto* tabs = dialog->findChild<QTabWidget*>();
+		QVERIFY(tabs);
+		QCOMPARE(tabs->count(), 2);
+		for (int i = 0; i < tabs->count(); ++i)
+		{
+			auto* viewer = qobject_cast<QTextEdit*>(tabs->widget(i));
+			QVERIFY(viewer && viewer->isReadOnly());
+			QVERIFY(viewer->toPlainText().contains(QStringLiteral("声库")));
+			if (tabs->tabText(i).endsWith("txt"))
+			{
+				QVERIFY(viewer->toPlainText().contains("<b>"));
+			}
+		}
+		QVERIFY(dialog->screen()->grabWindow(dialog->winId()).save("doc/svs/validation/SVS-voice-readme-native.png"));
+		voice.metadata = {};
+		QVERIFY(gui::voiceReadmeFiles(voice).isEmpty());
+		QVERIFY(!gui::openVoiceReadme(voice, nullptr));
 	}
 	void midiPianoRollSongSweepNative()
 	{

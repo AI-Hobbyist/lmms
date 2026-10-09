@@ -1,0 +1,50 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  Automatic MOC and UIC for target lmmssvs
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  SVSViews.cpp
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC and UIC for target RemoteCatalogIo
+  RemoteCatalogIo.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\RemoteCatalogIo.exe
+  Automatic MOC and UIC for target lmms
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/Release/lmms.exp
+  lmms.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\lmms.exe
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  VoiceCatalog.cpp
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/plugins/SVSDiffSinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  Automatic MOC and UIC for target SVSExample
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  SVSViews.cpp
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/tests/Release/lmms.lib 和对象 D:/UserData/Desktop/Project/lmms/build/tests/Release/lmms.exp
+  SVSIntegrationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\tests\Release\lmms.exe

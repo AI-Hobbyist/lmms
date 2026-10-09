@@ -13081,6 +13081,26 @@ Phonemes: %4
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
+        <source>Voicebank README</source>
+        <translation>音声ライブラリの説明</translation>
+    </message>
+    <message>
+        <source>Voicebank README: %1</source>
+        <translation>音声ライブラリの説明：%1</translation>
+    </message>
+    <message>
+        <source>Cannot read README: %1</source>
+        <translation>README を読み込めません：%1</translation>
+    </message>
+    <message>
+        <source>Read the selected voicebank&apos;s README</source>
+        <translation>選択した音声ライブラリの README を読む</translation>
+    </message>
+    <message>
+        <source>No voicebank README found</source>
+        <translation>音声ライブラリの README が見つかりません</translation>
+    </message>
+    <message>
         <source>SVS Piano Roll — LMMS</source>
         <translation>SVS ピアノロール — LMMS</translation>
     </message>

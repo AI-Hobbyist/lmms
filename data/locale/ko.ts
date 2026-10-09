@@ -13081,6 +13081,26 @@ Phonemes: %4
 <context>
     <name>lmms::gui::SVSPianoRoll</name>
     <message>
+        <source>Voicebank README</source>
+        <translation>음성 라이브러리 설명</translation>
+    </message>
+    <message>
+        <source>Voicebank README: %1</source>
+        <translation>음성 라이브러리 설명: %1</translation>
+    </message>
+    <message>
+        <source>Cannot read README: %1</source>
+        <translation>README를 읽을 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Read the selected voicebank&apos;s README</source>
+        <translation>선택한 음성 라이브러리의 README 읽기</translation>
+    </message>
+    <message>
+        <source>No voicebank README found</source>
+        <translation>음성 라이브러리 README를 찾을 수 없습니다</translation>
+    </message>
+    <message>
         <source>SVS Piano Roll — LMMS</source>
         <translation>SVS 피아노 롤 — LMMS</translation>
     </message>

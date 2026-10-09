@@ -59,6 +59,7 @@
 #include "SVSPitchRanges.h"
 #include "SVSResultStrip.h"
 #include "SVSTrack.h"
+#include "SVSVoiceReadme.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -1211,6 +1212,19 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	};
 	connect(track, &Track::dataChanged, this, refreshSingerHint);
 	refreshSingerHint();
+	auto* readme = new QPushButton(tr("Voicebank README"), sidebar);
+	readme->setObjectName("svsVoiceReadmeButton");
+	sidebarLayout->addWidget(readme);
+	auto refreshReadme = [this, track, readme] {
+		const bool available = !voiceReadmeFiles(track->voice()).isEmpty();
+		readme->setEnabled(available);
+		readme->setToolTip(available ? tr("Read the selected voicebank's README")
+									 : tr("No voicebank README found"));
+	};
+	connect(track, &Track::dataChanged, this, refreshReadme);
+	connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, this, refreshReadme);
+	connect(readme, &QPushButton::clicked, this, [this, track] { openVoiceReadme(track->voice(), this); });
+	refreshReadme();
 	auto* rangesLabel = new QLabel(sidebar);
 	rangesLabel->setObjectName("svsPitchRanges");
 	rangesLabel->setWordWrap(true);
