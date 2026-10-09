@@ -2,7 +2,9 @@
 
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QLineEdit>
 #include <QTreeWidget>
+#include <QVBoxLayout>
 
 #include "Engine.h"
 #include "SVCCatalog.h"
@@ -35,13 +37,26 @@ void attach(QTreeWidgetItem* item, const QJsonObject& selection, const QJsonObje
 }
 } // namespace
 SVCBrowser::SVCBrowser(QWidget* parent)
-	: SideBarWidget("SVC", embed::getIconPixmap("svc_track.svg"), parent)
+	: SideBarWidget("SVC", embed::getIconPixmap("svc_track.svg").transformed(QTransform().rotate(90)), parent)
 	, m_tree(new SVCTree(contentParent()))
+	, m_search(new QLineEdit(contentParent()))
 {
+	auto* view = new QWidget(contentParent());
+	auto* layout = new QVBoxLayout(view);
+	layout->setContentsMargins(5, 5, 5, 5);
+	layout->setSpacing(5);
+	m_search->setObjectName("svcBrowserSearch");
+	m_search->setPlaceholderText(tr("Search"));
+	m_search->setMaxLength(64);
+	m_search->setClearButtonEnabled(true);
+	m_search->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	layout->addWidget(m_search);
+	layout->addWidget(m_tree);
+	connect(m_search, &QLineEdit::textChanged, this, &SVCBrowser::filter);
 	m_tree->setObjectName("svcBrowserTree");
 	m_tree->setHeaderHidden(true);
 	m_tree->setDragEnabled(true);
-	addContentWidget(m_tree);
+	addContentWidget(view);
 	connect(&svc::Catalog::instance(), &svc::Catalog::changed, this, &SVCBrowser::refresh);
 	connect(m_tree, &QTreeWidget::itemDoubleClicked, this, [](QTreeWidgetItem* item) {
 		if (item->isDisabled() || !item->data(0, Qt::UserRole).isValid()) { return; }
@@ -93,5 +108,24 @@ void SVCBrowser::refresh()
 		}
 	}
 	m_tree->expandAll();
+	filter(m_search->text());
+}
+
+void SVCBrowser::filter(const QString& text)
+{
+	const auto visit = [&text](auto&& self, QTreeWidgetItem* item, bool parentMatches) -> bool {
+		const auto matches = parentMatches || item->text(0).contains(text, Qt::CaseInsensitive);
+		bool visible = matches && !item->childCount();
+		for (int index = 0; index < item->childCount(); ++index)
+		{
+			visible = self(self, item->child(index), matches) || visible;
+		}
+		item->setHidden(!visible);
+		return visible;
+	};
+	for (int index = 0; index < m_tree->topLevelItemCount(); ++index)
+	{
+		visit(visit, m_tree->topLevelItem(index), false);
+	}
 }
 } // namespace lmms::gui

@@ -79,6 +79,7 @@
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "PluginBrowser.h"
+#include "SVSBrowser.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "ProjectRenderer.h"
@@ -1627,9 +1628,8 @@ private slots:
 		auto* mainWindow = m_guiApplication->mainWindow();
 		mainWindow->resize(1400, 1000);
 		mainWindow->show();
-		auto* addSVS = mainWindow->findChild<QAction*>("svsAddTrackAction");
-		QVERIFY(addSVS);
-		QCOMPARE(addSVS->icon().pixmap(24, 24).toImage(), QIcon("resources:svs_track.svg").pixmap(24, 24).toImage());
+		QVERIFY(!mainWindow->findChild<QAction*>("svsAddTrackAction"));
+		QVERIFY(mainWindow->findChild<gui::SVSBrowser*>());
 		const auto existingWindows = mainWindow->workspace()->subWindowList().size();
 		if (qEnvironmentVariableIsSet("SVS_SETTINGS_TEST"))
 		{
@@ -7647,19 +7647,16 @@ private slots:
 		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}},
 										 error),
 				 qPrintable(error));
-		gui::PluginBrowser browser(nullptr);
+		gui::SVSBrowser browser(nullptr);
 		auto* tree = browser.findChild<QTreeWidget*>();
 		QVERIFY(tree);
-		QTreeWidgetItem* root = nullptr;
-		for (int i = 0; i < tree->topLevelItemCount(); ++i)
-			if (tree->topLevelItem(i)->text(0) == "Singing Voice Synthesis")
-				root = tree->topLevelItem(i);
-		QVERIFY(root);
-		QVERIFY(!root->isHidden());
+		auto* search = browser.findChild<QLineEdit*>("svsBrowserSearch");
+		QVERIFY(search);
+		QCOMPARE(browser.title(), QString("SVS"));
 		auto group = [&] {
-			for (int i = 0; i < root->childCount(); ++i)
-				if (root->child(i)->data(0, Qt::UserRole).toString() == id)
-					return root->child(i);
+			for (int i = 0; i < tree->topLevelItemCount(); ++i)
+				if (tree->topLevelItem(i)->data(0, Qt::UserRole).toString() == id)
+					return tree->topLevelItem(i);
 			return static_cast<QTreeWidgetItem*>(nullptr);
 		};
 		QVERIFY(!group());
@@ -7670,25 +7667,25 @@ private slots:
 		QVERIFY(group());
 		QCOMPARE(group()->text(0), QString("DiffSinger"));
 		QCOMPARE(group()->childCount(), 6);
-		for (int i = 0; i < root->childCount(); ++i)
-			QVERIFY(!tree->itemWidget(root->child(i), 0));
-		QVERIFY(QMetaObject::invokeMethod(&browser, "onFilterChanged", Q_ARG(QString, QString("DiffSinger"))));
+		for (int i = 0; i < tree->topLevelItemCount(); ++i)
+			QVERIFY(!tree->itemWidget(tree->topLevelItem(i), 0));
+		search->setText("DiffSinger");
 		QVERIFY(!group()->isHidden());
 		for (int i = 0; i < group()->childCount(); ++i)
 			QVERIFY(!group()->child(i)->isHidden());
 		const auto name = static_cast<gui::PluginDescWidget*>(tree->itemWidget(group()->child(0), 0))->name();
-		QVERIFY(QMetaObject::invokeMethod(&browser, "onFilterChanged", Q_ARG(QString, name)));
+		search->setText(name);
 		QVERIFY(!group()->isHidden());
 		QVERIFY(!group()->child(0)->isHidden());
-		QVERIFY(QMetaObject::invokeMethod(&browser, "onFilterChanged", Q_ARG(QString, QString("no-such-svs-voice"))));
+		search->setText("no-such-svs-voice");
 		QVERIFY(group()->isHidden());
-		QVERIFY(QMetaObject::invokeMethod(&browser, "onFilterChanged", Q_ARG(QString, QString{})));
+		search->clear();
 		QVERIFY(!group()->isHidden());
 		tree->setParent(nullptr);
 		tree->resize(360, 700);
 		tree->show();
 		QVERIFY(QTest::qWaitForWindowExposed(tree));
-		tree->scrollToItem(root, QAbstractItemView::PositionAtTop);
+		tree->scrollToItem(group(), QAbstractItemView::PositionAtTop);
 		QTest::qWait(500);
 		QVERIFY(tree->screen()->grabWindow(tree->winId()).save("doc/svs/validation/SVS-browser-engine-groups.png"));
 		tree->close();

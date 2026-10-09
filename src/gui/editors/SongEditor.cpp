@@ -954,10 +954,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	trackActionsToolBar->addAction( m_addPatternTrackAction );
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
-	auto* addSVS = new QAction(embed::getIconPixmap("svs_track"), tr("Add SVS track"), this);
-	addSVS->setObjectName("svsAddTrackAction");
-	connect(addSVS, &QAction::triggered, this, [] { Track::create(Track::Type::SVS, Engine::getSong()); });
-	trackActionsToolBar->addAction(addSVS);
 
 
 	// Edit actions

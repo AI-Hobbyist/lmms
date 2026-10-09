@@ -97,12 +97,6 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	// Add plugins to the tree
 	addPlugins();
-	connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, this, [this] {
-		refreshSvsVoices();
-		updateRootVisibilities();
-		if (const auto* search = m_view->findChild<QLineEdit*>())
-			onFilterChanged(search->text());
-	});
 #ifdef LMMS_BUILD_WIN32
 	auto* timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, [this, published = std::uint64_t{0}]() mutable {
@@ -219,9 +213,6 @@ void PluginBrowser::addPlugins()
 	// Add a root node to the tree for native LMMS plugins
 	const auto lmmsRoot = addRoot("LMMS");
 	lmmsRoot->setExpanded(true);
-	const auto svsRoot = addRoot("Singing Voice Synthesis");
-	svsRoot->setExpanded(true);
-	refreshSvsVoices();
 
 	// Add all of the descriptors to the tree
 	for (const auto desc : descs)
@@ -260,51 +251,6 @@ void PluginBrowser::addPlugins()
 
 
 
-
-void PluginBrowser::refreshSvsVoices()
-{
-	QTreeWidgetItem* root = nullptr;
-	for (int i = 0; i < m_descTree->topLevelItemCount(); ++i)
-		if (m_descTree->topLevelItem(i)->text(0) == "Singing Voice Synthesis")
-		{
-			root = m_descTree->topLevelItem(i);
-			break;
-		}
-	if (!root)
-		return;
-	qDeleteAll(root->takeChildren());
-	static const PixmapLoader logo("sample_track");
-	static Plugin::Descriptor descriptor{"svs", "Singing Voice Synthesis", "Native singing voice synthesis", "LMMS", 1,
-		Plugin::Type::SVS, &logo, "", nullptr};
-	auto& registry = svs::Registry::instance();
-	QMap<QString, QTreeWidgetItem*> groups;
-	for (const auto& engine : registry.engines())
-	{
-		const auto& voices = registry.voices();
-		if (std::none_of(
-				voices.begin(), voices.end(), [&engine](const auto& voice) { return voice.pluginId == engine.id; }))
-		{
-			continue;
-		}
-		auto* group = new QTreeWidgetItem(root);
-		group->setText(0, engine.name);
-		group->setData(0, Qt::UserRole, engine.id);
-		group->setExpanded(true);
-		groups.insert(engine.id, group);
-	}
-	for (const auto& voice : registry.voices())
-	{
-		auto* group = groups.value(voice.pluginId);
-		if (!group)
-		{
-			continue;
-		}
-		auto* item = new QTreeWidgetItem(group);
-		PluginDescWidget::PluginKey key(
-			&descriptor, voice.name, {{"pluginId", voice.pluginId}, {"voiceId", voice.id}, {"avatar", voice.avatar}});
-		m_descTree->setItemWidget(item, 0, new PluginDescWidget(key, m_descTree));
-	}
-}
 
 PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 							QWidget * _parent ) :

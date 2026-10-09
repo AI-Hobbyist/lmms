@@ -1,3 +1,4 @@
+#include <QAction>
 #include <QComboBox>
 #include <QDomDocument>
 #include <QDoubleSpinBox>
@@ -12,6 +13,7 @@
 #include <QSpinBox>
 #include <QTemporaryDir>
 #include <QTimer>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QtEndian>
 #include <QtTest>
@@ -25,6 +27,7 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "MixerView.h"
+#include "PluginBrowser.h"
 #include "ProjectJournal.h"
 #include "ProjectRenderer.h"
 #include "SVCBrowser.h"
@@ -36,9 +39,11 @@
 #include "SVCTrack.h"
 #include "SVCViews.h"
 #include "SVCWindow.h"
+#include "SVSBrowser.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
 #include "Song.h"
+#include "embed.h"
 
 using namespace lmms;
 class SVCManualAudioDevice final : public AudioDummy
@@ -314,6 +319,25 @@ private slots:
 			QVERIFY(fixture);
 			QCOMPARE(fixture->child(0)->childCount(), 2);
 			QVERIFY(!fixture->child(0)->child(0)->icon(0).isNull());
+			auto* search = browser.findChild<QLineEdit*>("svcBrowserSearch");
+			QVERIFY(search);
+			QCOMPARE(browser.title(), QString("SVC"));
+			QCOMPARE(search->maxLength(), 64);
+			QVERIFY(search->isClearButtonEnabled());
+			search->setText(QString::fromUtf8("说话人乙"));
+			QVERIFY(!fixture->isHidden());
+			QVERIFY(fixture->child(0)->child(0)->isHidden());
+			QVERIFY(!fixture->child(0)->child(1)->isHidden());
+			search->setText(profile.name);
+			QVERIFY(!fixture->child(0)->child(0)->isHidden());
+			search->setText("NO-SVC-MATCH");
+			QVERIFY(fixture->isHidden());
+			QVERIFY(svc::Catalog::instance().install(profile).isEmpty());
+			for (int index = 0; index < tree->topLevelItemCount(); ++index)
+			{
+				QVERIFY(tree->topLevelItem(index)->isHidden());
+			}
+			search->clear();
 			QTest::qWait(250);
 			const auto screenshot = window.screen()->grabWindow(window.winId());
 			QVERIFY(!screenshot.isNull());
@@ -355,6 +379,74 @@ private slots:
 		delete defaultsTrack;
 		delete track;
 		QTest::qWait(30);
+	}
+
+	void svsSidebarSeparationAndSearch()
+	{
+		QCOMPARE(m_gui->mainWindow()->findChildren<gui::SVSBrowser*>().size(), 1);
+		QVERIFY(!m_gui->mainWindow()->findChild<QAction*>("svsAddTrackAction"));
+		const auto* instruments = m_gui->mainWindow()->findChild<gui::PluginBrowser*>();
+		QVERIFY(instruments);
+		const auto* instrumentTree = instruments->findChild<QTreeWidget*>();
+		QVERIFY(instrumentTree);
+		for (int index = 0; index < instrumentTree->topLevelItemCount(); ++index)
+		{
+			QVERIFY(instrumentTree->topLevelItem(index)->text(0) != "Singing Voice Synthesis");
+		}
+		for (const auto& title : {QString("SVC"), QString("SVS")})
+		{
+			QToolButton* tab = nullptr;
+			for (auto* button : m_gui->mainWindow()->findChildren<QToolButton*>())
+			{
+				if (button->toolTip() == title) { tab = button; }
+			}
+			QVERIFY(tab);
+			if (!tab->isChecked()) { QTest::mouseClick(tab, Qt::LeftButton); }
+			QTest::qWait(300);
+			QVERIFY(m_gui->mainWindow()
+					->screen()
+					->grabWindow(m_gui->mainWindow()->winId())
+					.save("build/tests/svc/" + title + "-sidebar-main-native.png"));
+			QTest::mouseClick(tab, Qt::LeftButton);
+		}
+		gui::SVSBrowser browser(nullptr);
+		browser.resize(320, 600);
+		browser.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&browser));
+		QCOMPARE(browser.title(), QString("SVS"));
+		auto* search = browser.findChild<QLineEdit*>("svsBrowserSearch");
+		auto* tree = browser.findChild<QTreeWidget*>("svsBrowserTree");
+		QVERIFY(search && tree);
+		QCOMPARE(search->maxLength(), 64);
+		QVERIFY(search->isClearButtonEnabled());
+		// Exercise filtering through the real page with deterministic catalog widgets, without changing installed
+		// engines.
+		static const PixmapLoader logo("sample_track");
+		static Plugin::Descriptor descriptor{"svs", "Singing Voice Synthesis", "Native singing voice synthesis", "LMMS",
+			1, Plugin::Type::SVS, &logo, "", nullptr};
+		auto* engine = new QTreeWidgetItem(tree, {"Test SVS Engine"});
+		auto* first = new QTreeWidgetItem(engine);
+		auto* second = new QTreeWidgetItem(engine);
+		tree->setItemWidget(first, 0,
+			new gui::PluginDescWidget(
+				{&descriptor, QString::fromUtf8("声库甲"), {{"pluginId", "fixture"}, {"voiceId", "a"}}}, tree));
+		tree->setItemWidget(second, 0,
+			new gui::PluginDescWidget(
+				{&descriptor, QString::fromUtf8("声库乙"), {{"pluginId", "fixture"}, {"voiceId", "b"}}}, tree));
+		engine->setExpanded(true);
+		search->setText(QString::fromUtf8("声库乙"));
+		QVERIFY(!engine->isHidden());
+		QVERIFY(first->isHidden());
+		QVERIFY(!second->isHidden());
+		search->setText("test svs engine");
+		QVERIFY(!first->isHidden() && !second->isHidden());
+		search->setText("NO-SVS-MATCH");
+		QVERIFY(engine->isHidden());
+		search->clear();
+		QVERIFY(!engine->isHidden() && !first->isHidden() && !second->isHidden());
+		QTest::qWait(300);
+		QVERIFY(browser.screen()->grabWindow(browser.winId()).save("build/tests/svc/SVS-sidebar-search-native.png"));
+		browser.close();
 	}
 
 	void referenceRerenderAndAudition()
