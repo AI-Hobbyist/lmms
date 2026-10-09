@@ -7967,7 +7967,15 @@ Please make sure you have write permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source> seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Jitter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> octaves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8016,6 +8024,17 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Prefilter</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::GranularPitchShifterHelpView</name>
+    <message>
+        <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Granular Pitch Shifter Help</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

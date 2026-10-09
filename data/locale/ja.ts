@@ -856,7 +856,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Filter for importing Hydrogen files into LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>Hydrogen ファイルを LMMS に読み込むフィルター</translation>
     </message>
     <message>
         <source>Versatile drum synthesizer</source>
@@ -990,7 +990,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Granular pitch shifter</source>
-        <translation type="unfinished"></translation>
+        <translation>グラニュラーピッチシフター</translation>
     </message>
     <message>
         <source>Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS.</source>
@@ -2640,35 +2640,35 @@ Continue?</source>
     </message>
     <message>
         <source>Grain Size</source>
-        <translation type="unfinished"></translation>
+        <translation>グレインサイズ</translation>
     </message>
     <message>
         <source>Spray</source>
-        <translation type="unfinished"></translation>
+        <translation>位置拡散</translation>
     </message>
     <message>
         <source>Jitter</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチ揺らぎ</translation>
     </message>
     <message>
         <source>Twitch</source>
-        <translation type="unfinished"></translation>
+        <translation>生成間隔の揺らぎ</translation>
     </message>
     <message>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチのステレオ幅</translation>
     </message>
     <message>
         <source>Spray Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>位置拡散のステレオ</translation>
     </message>
     <message>
         <source>Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>形状</translation>
     </message>
     <message>
         <source>Fade Length</source>
-        <translation type="unfinished"></translation>
+        <translation>フェード長</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -2676,23 +2676,23 @@ Continue?</source>
     </message>
     <message>
         <source>Minimum Allowed Latency</source>
-        <translation type="unfinished"></translation>
+        <translation>最小許容レイテンシー</translation>
     </message>
     <message>
         <source>Prefilter</source>
-        <translation type="unfinished"></translation>
+        <translation>プリフィルター</translation>
     </message>
     <message>
         <source>Density</source>
-        <translation type="unfinished"></translation>
+        <translation>密度</translation>
     </message>
     <message>
         <source>Glide</source>
-        <translation type="unfinished"></translation>
+        <translation>グライド</translation>
     </message>
     <message>
         <source>Ring Buffer Length</source>
-        <translation type="unfinished"></translation>
+        <translation>リングバッファー長</translation>
     </message>
     <message>
         <source>5 Seconds</source>
@@ -2700,19 +2700,19 @@ Continue?</source>
     </message>
     <message>
         <source>10 Seconds (Size)</source>
-        <translation type="unfinished"></translation>
+        <translation>10 秒（サイズ）</translation>
     </message>
     <message>
         <source>40 Seconds (Size and Pitch)</source>
-        <translation type="unfinished"></translation>
+        <translation>40 秒（サイズとピッチ）</translation>
     </message>
     <message>
         <source>40 Seconds (Size and Spray and Jitter)</source>
-        <translation type="unfinished"></translation>
+        <translation>40 秒（サイズ、位置拡散、ピッチ揺らぎ）</translation>
     </message>
     <message>
         <source>120 Seconds (All of the above)</source>
-        <translation type="unfinished"></translation>
+        <translation>120 秒（上記すべて）</translation>
     </message>
 </context>
 <context>
@@ -2990,23 +2990,23 @@ Continue?</source>
     <name>lmms::KickerInstrument</name>
     <message>
         <source>Start frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>開始周波数</translation>
     </message>
     <message>
         <source>End frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>終了周波数</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Length</translation>
+        <translation>長さ</translation>
     </message>
     <message>
         <source>Start distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>開始時の歪み</translation>
     </message>
     <message>
         <source>End distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>終了時の歪み</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -3014,7 +3014,7 @@ Continue?</source>
     </message>
     <message>
         <source>Envelope slope</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープの傾き</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -3022,19 +3022,19 @@ Continue?</source>
     </message>
     <message>
         <source>Click</source>
-        <translation type="unfinished"></translation>
+        <translation>クリック音</translation>
     </message>
     <message>
         <source>Frequency slope</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数の傾き</translation>
     </message>
     <message>
         <source>Start from note</source>
-        <translation type="unfinished"></translation>
+        <translation>ノートから開始</translation>
     </message>
     <message>
         <source>End to note</source>
-        <translation type="unfinished"></translation>
+        <translation>終了をノートに合わせる</translation>
     </message>
 </context>
 <context>
@@ -7979,47 +7979,55 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::GranularPitchShifterControlDialog</name>
     <message>
         <source>Grain Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>グレインサイズ：</translation>
     </message>
     <message>
         <source>Spray:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置拡散：</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Jitter:</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチ揺らぎ：</translation>
+    </message>
+    <message>
+        <source> octaves</source>
+        <translation> オクターブ</translation>
     </message>
     <message>
         <source>Twitch:</source>
-        <translation type="unfinished"></translation>
+        <translation>生成間隔の揺らぎ：</translation>
     </message>
     <message>
         <source>Spray Stereo Spread:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置拡散のステレオ幅：</translation>
     </message>
     <message>
         <source>Grain Shape:</source>
-        <translation type="unfinished"></translation>
+        <translation>グレイン形状：</translation>
     </message>
     <message>
         <source>Fade Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>フェード長：</translation>
     </message>
     <message>
         <source>Feedback:</source>
-        <translation type="unfinished"></translation>
+        <translation>フィードバック：</translation>
     </message>
     <message>
         <source>Minimum Allowed Latency:</source>
-        <translation type="unfinished"></translation>
+        <translation>最小許容レイテンシー：</translation>
     </message>
     <message>
         <source>Density:</source>
-        <translation type="unfinished"></translation>
+        <translation>密度：</translation>
     </message>
     <message>
         <source>Glide:</source>
-        <translation type="unfinished"></translation>
+        <translation>グライド：</translation>
     </message>
     <message>
         <source>Pitch</source>
@@ -8027,15 +8035,26 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチのステレオ幅</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation>Open help window</translation>
+        <translation>ヘルプウィンドウを開く</translation>
     </message>
     <message>
         <source>Prefilter</source>
-        <translation type="unfinished"></translation>
+        <translation>プリフィルター</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::GranularPitchShifterHelpView</name>
+    <message>
+        <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
+        <translation>&lt;div style='text-align: center;'&gt;&lt;b&gt;グラニュラーピッチシフター&lt;/b&gt;&lt;br&gt;&lt;br&gt;プラグイン作者：Lost Robot&lt;br&gt;GUI 作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;グレイン：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - ピッチの移動量。12平均律の半音単位です。&lt;br&gt;&lt;b&gt;サイズ&lt;/b&gt; - 各グレインの長さを Hz で表します。既定ではこの周波数の2倍で新しいグレインを生成します。&lt;br&gt;通常、ピッチを上げるときは高めの周波数に設定し、下げるときはその逆にします。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ランダム：&lt;/h3&gt;&lt;b&gt;位置拡散&lt;/b&gt; - 各グレインの再生位置のランダム変動量。秒単位です。&lt;br&gt;グレインを再生する時刻ではなく、読み取る音声の位置が変わります。&lt;br&gt;例えば0.5秒にすると、各グレインは最大で半秒前の音声を再生できます。&lt;br&gt;通常は少量でも位置拡散を加えることを推奨します。グレインの周期性が崩れ、グラニュラーピッチシフターで生じがちな主なアーティファクトを抑えられます。&lt;br&gt;グレイン同士の相関もなくなるため、形状を2にすると常に最適になります。&lt;br&gt;&lt;b&gt;ピッチ揺らぎ&lt;/b&gt; - 各グレインのピッチのランダム変動量。オクターブ単位です。&lt;br&gt;グレインの生成頻度には影響しません。&lt;br&gt;&lt;b&gt;生成間隔の揺らぎ&lt;/b&gt; - 新しいグレインの生成頻度のランダム変動量。オクターブ単位です。&lt;br&gt;ピッチ揺らぎと生成間隔の揺らぎは同じ乱数を使います。同じ値なら、グレインの生成タイミングはピッチの変化に正確に比例して変わります。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ステレオ：&lt;/h3&gt;&lt;b&gt;ピッチ&lt;/b&gt; - 左右チャンネル間のピッチの総距離。12平均律の半音単位です。&lt;br&gt;表示された移動量の半分を右チャンネルに、その逆を左チャンネルに適用します。&lt;br&gt;&lt;b&gt;位置拡散&lt;/b&gt; - ランダム項目の位置拡散で、左右チャンネルのランダムな位置に許容する距離です。&lt;br&gt;1にすると各チャンネルの位置拡散値が完全に独立します。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 各グレインのフェード形状。通常は2が最適で、等電力フェードになります。&lt;br&gt;ただしピッチ移動が小さく大半のパラメーターが既定値の場合、等ゲインフェードとなる1の方が適することがあります。&lt;br&gt;すべてのフェードはグレインの50%重複を前提に設計されています。&lt;br&gt;&lt;b&gt;フェード&lt;/b&gt; - グレインのフェード長。1では最も滑らかにフェードし、グレイン全体にわたります。&lt;br&gt;1未満ではフェードのアーティファクトが聞こえやすくなりますが、フェードはグレインの外縁だけに適用されます。&lt;br&gt;0ではフェードがなくなるため、クリック音が発生します。&lt;br&gt;&lt;br&gt;&lt;h3&gt;ディレイ：&lt;/h3&gt;&lt;b&gt;フィードバック&lt;/b&gt; - ピッチシフターのフィードバック量です。&lt;br&gt;出力の一部を入力バッファーに戻します。大きな値は危険な場合があります。&lt;br&gt;&lt;b&gt;レイテンシー&lt;/b&gt; - ピッチシフターの最小レイテンシーです。&lt;br&gt;設定に応じてレイテンシーを動的に変え、可能な最小値に保ちます。&lt;br&gt;レイテンシーを一定に近づけたい場合は、変化しなくなるまでこの値を増やします。&lt;br&gt;フィードバックの最小ディレイ量の設定にも使えます。&lt;br&gt;レイテンシーを大きくすると、ピッチ移動量を高速に自動化した際の微細な揺れを抑えられます。&lt;br&gt;&lt;h3&gt;その他：&lt;/h3&gt;&lt;b&gt;プリフィルター&lt;/b&gt; - ピッチ移動前に12 dBローパスフィルターを有効にします。カットオフを自動調整し、エイリアシングを大幅に減らします。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - グレインの生成頻度の倍率です。&lt;br&gt;グレインの重複が50%を超えるようになります。&lt;br&gt;ランダム項目のノブを使わないと、耳に痛い鋭い音が発生します。&lt;br&gt;それ以外では、ユニゾンや静的な Paulstretch に似た面白い効果を得られます。&lt;br&gt;値を増やした場合、このノブは他のどのパラメーターよりも多くの CPU を使います。&lt;br&gt;&lt;b&gt;グライド&lt;/b&gt; - ピッチ移動量の補間時間です。&lt;br&gt;少量のグライドでも、時間とともにピッチ移動量を変えた際の多くのアーティファクトを抑えられます。&lt;br&gt;&lt;b&gt;範囲&lt;/b&gt; - 内部リングバッファーの長さです。&lt;br&gt;変更すると一部のパラメーターの最小値と最大値が変わります。対象は各選択肢に記載されています。&lt;br&gt;最短バッファーでは対応できない値が必要なら増やします。それ以外は最小値のままが最適です。&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Granular Pitch Shifter Help</source>
+        <translation>グラニュラーピッチシフターのヘルプ</translation>
     </message>
 </context>
 <context>
@@ -8510,15 +8529,15 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::KickerInstrumentView</name>
     <message>
         <source>Start frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>開始周波数：</translation>
     </message>
     <message>
         <source>End frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>終了周波数：</translation>
     </message>
     <message>
         <source>Frequency slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数の傾き：</translation>
     </message>
     <message>
         <source>Gain:</source>
@@ -8526,15 +8545,15 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Envelope length:</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ長：</translation>
     </message>
     <message>
         <source>Envelope slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープの傾き：</translation>
     </message>
     <message>
         <source>Click:</source>
-        <translation type="unfinished"></translation>
+        <translation>クリック音：</translation>
     </message>
     <message>
         <source>Noise:</source>
@@ -8542,11 +8561,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Start distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>開始時の歪み：</translation>
     </message>
     <message>
         <source>End distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>終了時の歪み：</translation>
     </message>
 </context>
 <context>

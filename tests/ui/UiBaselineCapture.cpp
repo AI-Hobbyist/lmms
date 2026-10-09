@@ -642,14 +642,18 @@ private slots:
 				QVERIFY(panel);
 				const auto preset = settings(effect);
 				showEditor(panel, evidencePrefix + '-' + name);
-				if (name == "frequencyshifter" && !selectedPlugins.isEmpty())
+				if ((name == "frequencyshifter" || name == "granularpitchshifter") && !selectedPlugins.isEmpty())
 				{
+					const bool granular = name == "granularpitchshifter";
+					const char* panelContext = granular ? "lmms::gui::GranularPitchShifterControlDialog"
+														: "lmms::gui::FrequencyShifterControlDialog";
+					const char* helpContext
+						= granular ? "lmms::gui::GranularPitchShifterHelpView" : "lmms::gui::FrequencyShifterHelpView";
+					const char* helpTitle = granular ? "Granular Pitch Shifter Help" : "Frequency Shifter Help";
 					QWidget* helpButton = nullptr;
 					for (auto* widget : panel->findChildren<QWidget*>())
 					{
-						if (widget->toolTip()
-							== QCoreApplication::translate(
-								"lmms::gui::FrequencyShifterControlDialog", "Open help window"))
+						if (widget->toolTip() == QCoreApplication::translate(panelContext, "Open help window"))
 						{
 							helpButton = widget;
 						}
@@ -669,9 +673,7 @@ private slots:
 					for (auto* widget : QApplication::allWidgets())
 					{
 						auto* text = qobject_cast<QTextEdit*>(widget);
-						if (text && text->windowTitle()
-							== QCoreApplication::translate(
-								"lmms::gui::FrequencyShifterHelpView", "Frequency Shifter Help"))
+						if (text && text->windowTitle() == QCoreApplication::translate(helpContext, helpTitle))
 						{
 							help = text;
 						}
@@ -679,9 +681,16 @@ private slots:
 					QVERIFY(help);
 					if (qEnvironmentVariable("LMMS_UI_TRANSLATION") != "en")
 					{
-						QVERIFY(!help->toPlainText().startsWith("Frequency Shifter"));
+						QVERIFY(
+							!help->toPlainText().startsWith(granular ? "Granular Pitch Shifter" : "Frequency Shifter"));
 					}
 					showEditor(help, evidencePrefix + "-help");
+					if (granular)
+					{
+						// The plugin owns this static widget; the test GUI must not delete it.
+						help->setParent(nullptr);
+						help->hide();
+					}
 					panel->hide();
 				}
 				checkPreset(effect, preset);

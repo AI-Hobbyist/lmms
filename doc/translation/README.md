@@ -147,3 +147,7 @@ M5-02：前批补充修正 `1150afb55ba9d60b7ab7c37667fa8abfaa2534c6` 推送确�
 M5-03：上一检查点 64ae1368301dc80a01e13ce1d254503f03572272 已推送确认。Eq、FreeBoy、DynamicsProcessor、Flanger、GigPlayer、FrequencyShifter 共 216 键四语质量 PASS。移除 Eq 无效空 source，补上 FrequencyShifter 17 个实际控件提示入口，完整补译其 HTML 帮助并保持标签结构、数值和技术内容。plugin-batches.json 固定已定义批次，避免新增入口使后续插件重新分组；本批保持插件完整，不扩大功能范围。全库 3594 键，中/日/韩剩余空译 650/801/38，占位符异常 0。
 
 四语 QM 生成、eq/frequencyshifter/UiBaselineCapture 前台编译通过，DLL 写入 build/Release/plugins，开发程序仍为 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，真实 Windows 窗口、100% 缩放；五个可用插件面板及 FrequencyShifter 帮助页取得截图，中文/日文帮助及韩文面板字形正常。GigPlayer 当前部署不可用，各语言覆盖记录 MANUAL/PENDING。帮助测试首次假定独立面板有父窗口而失败，修正测试空指针检查后重新编译、四语重测通过，保留失败日志；不修改生产窗口结构。位图标签及其悬浮全文验收继续按 M7 范围处理。
+
+M5-04：M5-03 检查点 8e24a7a0431a9f2e4df373d49a87f89150628eb4 已推送确认后开始。GranularPitchShifter、Kicker 及关联浏览器键共 64 键四语质量 PASS。新增粒子变调器帮助正文/标题和 seconds/octaves 单位提示 4 个必要入口，HTML 结构、数值与含义保留；其他有效译文保持原值。全库 3598 键，中/日/韩剩余空译 611/752/38。
+
+四语 QM 生成、granularpitchshifter/UiBaselineCapture 编译通过，开发程序 build/Release/lmms.exe，插件仍在 build/Release/plugins。四语原生 Windows 实窗各 3 PASS、0 FAIL，100% 缩放，覆盖两插件面板、帮助页及预设恢复，中文/日文帮助字形正常。首次测试关闭 GUI 时，原插件静态帮助对象的父对象删除导致堆错误；测试在捕获后解除静态对象的父对象归属，四语完整清理与退出重新通过。仅调整测试清理，不改插件窗口生命周期；该既有生产生命周期风险记为后续事项。缺失 granularpitchshifter/logo 资源也记为后续事项，不扩张本批翻译范围。

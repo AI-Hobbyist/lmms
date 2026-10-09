@@ -990,7 +990,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Granular pitch shifter</source>
-        <translation type="unfinished"></translation>
+        <translation>粒子变调器</translation>
     </message>
     <message>
         <source>Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS.</source>
@@ -2640,35 +2640,35 @@ Continue?</source>
     </message>
     <message>
         <source>Grain Size</source>
-        <translation type="unfinished"></translation>
+        <translation>粒子大小</translation>
     </message>
     <message>
         <source>Spray</source>
-        <translation type="unfinished"></translation>
+        <translation>位置散布</translation>
     </message>
     <message>
         <source>Jitter</source>
-        <translation type="unfinished"></translation>
+        <translation>音高抖动</translation>
     </message>
     <message>
         <source>Twitch</source>
-        <translation type="unfinished"></translation>
+        <translation>生成时序抖动</translation>
     </message>
     <message>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>音高立体声展宽</translation>
     </message>
     <message>
         <source>Spray Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>位置散布立体声</translation>
     </message>
     <message>
         <source>Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>形状</translation>
     </message>
     <message>
         <source>Fade Length</source>
-        <translation type="unfinished"></translation>
+        <translation>淡化长度</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -2676,23 +2676,23 @@ Continue?</source>
     </message>
     <message>
         <source>Minimum Allowed Latency</source>
-        <translation type="unfinished"></translation>
+        <translation>最小允许延迟</translation>
     </message>
     <message>
         <source>Prefilter</source>
-        <translation type="unfinished"></translation>
+        <translation>预滤波器</translation>
     </message>
     <message>
         <source>Density</source>
-        <translation type="unfinished"></translation>
+        <translation>密度</translation>
     </message>
     <message>
         <source>Glide</source>
-        <translation type="unfinished"></translation>
+        <translation>滑变</translation>
     </message>
     <message>
         <source>Ring Buffer Length</source>
-        <translation type="unfinished"></translation>
+        <translation>环形缓冲区长度</translation>
     </message>
     <message>
         <source>5 Seconds</source>
@@ -2700,19 +2700,19 @@ Continue?</source>
     </message>
     <message>
         <source>10 Seconds (Size)</source>
-        <translation type="unfinished"></translation>
+        <translation>10 秒（粒子大小）</translation>
     </message>
     <message>
         <source>40 Seconds (Size and Pitch)</source>
-        <translation type="unfinished"></translation>
+        <translation>40 秒（大小与音高）</translation>
     </message>
     <message>
         <source>40 Seconds (Size and Spray and Jitter)</source>
-        <translation type="unfinished"></translation>
+        <translation>40 秒（大小、位置散布与音高抖动）</translation>
     </message>
     <message>
         <source>120 Seconds (All of the above)</source>
-        <translation type="unfinished"></translation>
+        <translation>120 秒（以上全部）</translation>
     </message>
 </context>
 <context>
@@ -3002,11 +3002,11 @@ Continue?</source>
     </message>
     <message>
         <source>Start distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>起始失真</translation>
     </message>
     <message>
         <source>End distortion</source>
-        <translation type="unfinished"></translation>
+        <translation>结束失真</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -3026,7 +3026,7 @@ Continue?</source>
     </message>
     <message>
         <source>Frequency slope</source>
-        <translation type="unfinished"></translation>
+        <translation>频率斜率</translation>
     </message>
     <message>
         <source>Start from note</source>
@@ -7977,47 +7977,55 @@ Please make sure you have write permission to the file and the directory contain
     <name>lmms::gui::GranularPitchShifterControlDialog</name>
     <message>
         <source>Grain Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>粒子大小：</translation>
     </message>
     <message>
         <source>Spray:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置散布：</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Jitter:</source>
-        <translation type="unfinished"></translation>
+        <translation>音高抖动：</translation>
+    </message>
+    <message>
+        <source> octaves</source>
+        <translation> 八度</translation>
     </message>
     <message>
         <source>Twitch:</source>
-        <translation type="unfinished"></translation>
+        <translation>生成时序抖动：</translation>
     </message>
     <message>
         <source>Spray Stereo Spread:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置散布立体声展宽：</translation>
     </message>
     <message>
         <source>Grain Shape:</source>
-        <translation type="unfinished"></translation>
+        <translation>粒子形状：</translation>
     </message>
     <message>
         <source>Fade Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>淡化长度：</translation>
     </message>
     <message>
         <source>Feedback:</source>
-        <translation type="unfinished"></translation>
+        <translation>反馈：</translation>
     </message>
     <message>
         <source>Minimum Allowed Latency:</source>
-        <translation type="unfinished"></translation>
+        <translation>最小允许延迟：</translation>
     </message>
     <message>
         <source>Density:</source>
-        <translation type="unfinished"></translation>
+        <translation>密度：</translation>
     </message>
     <message>
         <source>Glide:</source>
-        <translation type="unfinished"></translation>
+        <translation>滑变：</translation>
     </message>
     <message>
         <source>Pitch</source>
@@ -8025,7 +8033,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>音高立体声展宽</translation>
     </message>
     <message>
         <source>Open help window</source>
@@ -8033,7 +8041,18 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Prefilter</source>
-        <translation type="unfinished"></translation>
+        <translation>预滤波器</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::GranularPitchShifterHelpView</name>
+    <message>
+        <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Granular Pitch Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Grain:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The amount of pitch shifting to perform, in 12EDO semitones.&lt;br&gt;&lt;b&gt;Size&lt;/b&gt; - The length of each grain, in Hz.  By default, new grains will be created at double this rate.  &lt;br&gt;In most cases, you&apos;ll want this to be set to higher frequencies when shifting the pitch upward, and vice-versa.  &lt;br&gt;&lt;br&gt;&lt;h3&gt;Random:&lt;/h3&gt;&lt;b&gt;Spray&lt;/b&gt; - The amount of randomization for the playback position of each grain, in seconds.  &lt;br&gt;This does not change when the grain plays, but rather what audio the grain is pulling from.  &lt;br&gt;For example, a value of 0.5 seconds will allow each grain to play back audio from up to half of a second ago.&lt;br&gt;It&apos;s oftentimes recommended to use at least a small amount of Spray, as this will break up the periodicity in the grains, which is usually the main artifact caused by a granular pitch shifter.  &lt;br&gt;This will also make the grains uncorrelated with each other, guaranteeing that a grain Shape value of 2 will always be optimal.&lt;br&gt;&lt;b&gt;Jitter&lt;/b&gt; - The amount of randomization for the pitch of each grain, in octaves.&lt;br&gt;  This does not impact how often grains are created.&lt;br&gt;&lt;b&gt;Twitch&lt;/b&gt; - The amount of randomization for how often new grains are created, in octaves.  &lt;br&gt;Jitter and Twitch both use the same random numbers, so if they&apos;re at the same value, then the grain creation timings will be changed exactly proportionally to their change in pitch.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Stereo:&lt;/h3&gt;&lt;b&gt;Pitch&lt;/b&gt; - The total distance in pitch between both stereo channels, in 12EDO semitones.&lt;br&gt;  Half of the amount of pitch shifting shown will be applied to the right channel, and the opposite to the left channel.&lt;br&gt;&lt;b&gt;Spray&lt;/b&gt; - The allowed distance between each channel&apos;s randomized position with the Spray feature in the Random category.  &lt;br&gt;A value of 1 makes the Spray values in each channel entirely unlinked.&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;&lt;b&gt;Shape&lt;/b&gt; - The shape of each grain&apos;s fades.  In most cases, 2 is the optimal value, providing equal-power fades.  &lt;br&gt;However, when the plugin is performing minimal pitch shifting and has most of its parameters at default, a value of 1 may be more optimal, providing equal-gain fades.  &lt;br&gt;All fades are designed for 50% grain overlap.&lt;br&gt;&lt;b&gt;Fade&lt;/b&gt; - The length of the grain fades.  A value of 1 provides the cleanest fades, causing those fades to reach across the entire grain.  &lt;br&gt;Values below 1 make the fade artifacts more audible, but those fades will only apply to the outer edges of each grain.  &lt;br&gt;A value of 0 will result in clicking sounds due to the fades no longer being present.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Feedback&lt;/b&gt; - The amount of feedback for the pitch shifter.&lt;br&gt;  This feeds a portion of the pitch shifter output back into the input buffer.  Large values can be dangerous.&lt;br&gt;&lt;b&gt;Latency&lt;/b&gt; - The minimum amount of latency the pitch shifter will have.&lt;br&gt;  This granular pitch shifter dynamically changes its latency to be at the minimum possible amount depending on your settings.  &lt;br&gt;If you&apos;d like for this latency to be more predictable, you may increase the value of this parameter until the latency no longer changes.  &lt;br&gt;This parameter may also be used to be set the minimum amount of delay for the feedback.&lt;br&gt;A larger latency amount can remove subtle fluttering artifacts that may result from automating the pitch shifting amount at high speeds.&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Prefilter&lt;/b&gt; - Enables a 12 dB lowpass filter prior to the pitch shifting which automatically adjusts its cutoff to drastically reduce any resulting aliasing.&lt;br&gt;&lt;b&gt;Density&lt;/b&gt; - The multiplier for how often grains are spawned.  &lt;br&gt;This will increase the grain overlap above 50%.  &lt;br&gt;It will create painful piercing sounds if you don&apos;t make use of any of the knobs in the Random category.  &lt;br&gt;Otherwise, you can get some interesting effects similar to unison or a stationary Paulstretch.  &lt;br&gt;Note that this knob uses by far the most CPU out of any parameter in this plugin when increased.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - The length of interpolation for the amount of pitch shifting.&lt;br&gt;  A small amount of glide is very effective for cleaning up many of the artifacts that may result from changing the pitch shift amount over time.  &lt;br&gt;&lt;b&gt;Range&lt;/b&gt; - The length of the pitch shifter&apos;s internal ring buffer.&lt;br&gt;  Changing this will change the minimum and maximum values for some of the other parameters, which are listed in each of the options.&lt;br&gt;  Increase it if you need parameter values that aren&apos;t supported with the minimum buffer length.  Otherwise, it&apos;s best to leave it at its minimum value.&lt;br&gt;</source>
+        <translation>&lt;div style='text-align: center;'&gt;&lt;b&gt;粒子变调器&lt;/b&gt;&lt;br&gt;&lt;br&gt;插件作者：Lost Robot&lt;br&gt;界面作者：thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;粒子：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 变调量，以十二平均律半音为单位。&lt;br&gt;&lt;b&gt;大小&lt;/b&gt; - 每个粒子的长度，以 Hz 表示。默认以此频率的两倍生成新粒子。&lt;br&gt;通常，向上变调时应设为较高频率，向下变调时则相反。&lt;br&gt;&lt;br&gt;&lt;h3&gt;随机：&lt;/h3&gt;&lt;b&gt;位置散布&lt;/b&gt; - 每个粒子播放位置的随机变化量，以秒为单位。&lt;br&gt;这不会改变粒子的播放时刻，只会改变粒子读取的音频位置。&lt;br&gt;例如，设为 0.5 秒时，每个粒子最多可播放半秒之前的音频。&lt;br&gt;通常建议至少加入少量位置散布，以打破粒子的周期性；周期性通常是粒子变调器产生的主要伪影。&lt;br&gt;这也会使粒子之间不相关，保证粒子形状设为 2 时始终最佳。&lt;br&gt;&lt;b&gt;音高抖动&lt;/b&gt; - 每个粒子音高的随机变化量，以八度为单位。&lt;br&gt;这不会影响粒子的生成频率。&lt;br&gt;&lt;b&gt;生成时序抖动&lt;/b&gt; - 新粒子生成频率的随机变化量，以八度为单位。&lt;br&gt;音高抖动与生成时序抖动使用相同的随机数，因此二者取值相同时，粒子生成时序的变化与音高变化完全成比例。&lt;br&gt;&lt;br&gt;&lt;h3&gt;立体声：&lt;/h3&gt;&lt;b&gt;音高&lt;/b&gt; - 两个立体声通道的总音高距离，以十二平均律半音为单位。&lt;br&gt;显示变调量的一半应用于右通道，左通道则应用相反方向的变化。&lt;br&gt;&lt;b&gt;位置散布&lt;/b&gt; - 随机区的位置散布功能中，各通道随机位置之间允许的距离。&lt;br&gt;设为 1 时，各通道的位置散布值完全独立。&lt;br&gt;&lt;h3&gt;形状：&lt;/h3&gt;&lt;b&gt;形状&lt;/b&gt; - 每个粒子的淡入淡出形状。通常 2 为最佳值，提供等功率淡化。&lt;br&gt;但在变调很小且大多数参数为默认值时，1 可能更好，提供等增益淡化。&lt;br&gt;所有淡化都按粒子重叠 50% 设计。&lt;br&gt;&lt;b&gt;淡化&lt;/b&gt; - 粒子淡入淡出的长度。1 提供最干净的淡化，淡化覆盖整个粒子。&lt;br&gt;小于 1 时，淡化伪影更容易听见，但淡化只作用于粒子外缘。&lt;br&gt;0 会取消淡化，从而产生咔嗒声。&lt;br&gt;&lt;br&gt;&lt;h3&gt;延迟：&lt;/h3&gt;&lt;b&gt;反馈&lt;/b&gt; - 变调器的反馈量。&lt;br&gt;将部分变调输出送回输入缓冲区。较大的值可能有危险。&lt;br&gt;&lt;b&gt;延迟量&lt;/b&gt; - 变调器的最小延迟量。&lt;br&gt;此粒子变调器根据设置动态调整延迟，使其始终保持在可能的最小值。&lt;br&gt;若希望延迟更可预测，可增大此参数，直到延迟不再变化。&lt;br&gt;也可用此参数设置反馈的最小延迟量。&lt;br&gt;较大的延迟可消除高速自动化变调量时产生的细微颤动伪影。&lt;br&gt;&lt;h3&gt;其他：&lt;/h3&gt;&lt;b&gt;预滤波器&lt;/b&gt; - 变调前启用 12 dB 低通滤波器，自动调整截止频率以大幅减少混叠。&lt;br&gt;&lt;b&gt;密度&lt;/b&gt; - 粒子生成频率的倍数。&lt;br&gt;这会使粒子的重叠超过 50%。&lt;br&gt;若不使用随机区的任何旋钮，会产生刺耳的尖锐声音。&lt;br&gt;否则可得到类似齐奏或静态 Paulstretch 的有趣效果。&lt;br&gt;请注意，增大此旋钮时，其 CPU 消耗远高于插件的其他参数。&lt;br&gt;&lt;b&gt;滑变&lt;/b&gt; - 变调量的插值时长。&lt;br&gt;少量滑变即可有效消除随时间改变变调量时产生的许多伪影。&lt;br&gt;&lt;b&gt;范围&lt;/b&gt; - 变调器内部环形缓冲区的长度。&lt;br&gt;改变此值会改变其他某些参数的最小值和最大值，各选项中列出了这些参数。&lt;br&gt;若所需参数值超出最小缓冲区长度支持的范围，请增大此值。否则最好保留最小值。&lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>Granular Pitch Shifter Help</source>
+        <translation>粒子变调器帮助</translation>
     </message>
 </context>
 <context>
@@ -8516,7 +8535,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Frequency slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>频率斜率：</translation>
     </message>
     <message>
         <source>Gain:</source>
@@ -8524,11 +8543,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Envelope length:</source>
-        <translation type="unfinished"></translation>
+        <translation>包络长度：</translation>
     </message>
     <message>
         <source>Envelope slope:</source>
-        <translation type="unfinished"></translation>
+        <translation>包络斜率：</translation>
     </message>
     <message>
         <source>Click:</source>
@@ -8540,11 +8559,11 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Start distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>起始失真：</translation>
     </message>
     <message>
         <source>End distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>结束失真：</translation>
     </message>
 </context>
 <context>
