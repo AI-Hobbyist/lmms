@@ -896,7 +896,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>2-operator FM Synth</source>
-        <translation type="unfinished"></translation>
+        <translation>双算子 FM 合成器</translation>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
@@ -4112,11 +4112,11 @@ Continue?</source>
     <name>lmms::NesInstrument</name>
     <message>
         <source>Channel 1 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 启用</translation>
     </message>
     <message>
         <source>Channel 1 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 粗调</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
@@ -4124,39 +4124,39 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 1 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 启用包络</translation>
     </message>
     <message>
         <source>Channel 1 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 包络循环</translation>
     </message>
     <message>
         <source>Channel 1 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 包络长度</translation>
     </message>
     <message>
         <source>Channel 1 duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 占空比</translation>
     </message>
     <message>
         <source>Channel 1 sweep enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 启用扫频</translation>
     </message>
     <message>
         <source>Channel 1 sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 扫频量</translation>
     </message>
     <message>
         <source>Channel 1 sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 1 扫频速率</translation>
     </message>
     <message>
         <source>Channel 2 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 启用</translation>
     </message>
     <message>
         <source>Channel 2 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 粗调</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
@@ -4164,31 +4164,31 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 2 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 启用包络</translation>
     </message>
     <message>
         <source>Channel 2 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 包络循环</translation>
     </message>
     <message>
         <source>Channel 2 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 包络长度</translation>
     </message>
     <message>
         <source>Channel 2 duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 占空比</translation>
     </message>
     <message>
         <source>Channel 2 sweep enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 启用扫频</translation>
     </message>
     <message>
         <source>Channel 2 sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 扫频量</translation>
     </message>
     <message>
         <source>Channel 2 sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 2 扫频速率</translation>
     </message>
     <message>
         <source>Channel 3 enable</source>
@@ -4196,7 +4196,7 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 3 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 3 粗调</translation>
     </message>
     <message>
         <source>Channel 3 volume</source>
@@ -4204,7 +4204,7 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 4 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 启用</translation>
     </message>
     <message>
         <source>Channel 4 volume</source>
@@ -4212,35 +4212,35 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 4 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 启用包络</translation>
     </message>
     <message>
         <source>Channel 4 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 包络循环</translation>
     </message>
     <message>
         <source>Channel 4 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 包络长度</translation>
     </message>
     <message>
         <source>Channel 4 noise mode</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 噪声模式</translation>
     </message>
     <message>
         <source>Channel 4 frequency mode</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 频率模式</translation>
     </message>
     <message>
         <source>Channel 4 noise frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 噪声频率</translation>
     </message>
     <message>
         <source>Channel 4 noise frequency sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 噪声频率扫频</translation>
     </message>
     <message>
         <source>Channel 4 quantize</source>
-        <translation type="unfinished"></translation>
+        <translation>通道 4 量化</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -4259,103 +4259,103 @@ Continue?</source>
     </message>
     <message>
         <source>Op 1 attack</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 起音</translation>
     </message>
     <message>
         <source>Op 1 decay</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 衰减</translation>
     </message>
     <message>
         <source>Op 1 sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 持续</translation>
     </message>
     <message>
         <source>Op 1 release</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 释放</translation>
     </message>
     <message>
         <source>Op 1 level</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 电平</translation>
     </message>
     <message>
         <source>Op 1 level scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 电平缩放</translation>
     </message>
     <message>
         <source>Op 1 frequency multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 频率倍数</translation>
     </message>
     <message>
         <source>Op 1 feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 反馈</translation>
     </message>
     <message>
         <source>Op 1 key scaling rate</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 键位速率缩放</translation>
     </message>
     <message>
         <source>Op 1 percussive envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 打击包络</translation>
     </message>
     <message>
         <source>Op 1 tremolo</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 震音</translation>
     </message>
     <message>
         <source>Op 1 vibrato</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 颤音</translation>
     </message>
     <message>
         <source>Op 1 waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 1 波形</translation>
     </message>
     <message>
         <source>Op 2 attack</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 起音</translation>
     </message>
     <message>
         <source>Op 2 decay</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 衰减</translation>
     </message>
     <message>
         <source>Op 2 sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 持续</translation>
     </message>
     <message>
         <source>Op 2 release</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 释放</translation>
     </message>
     <message>
         <source>Op 2 level</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 电平</translation>
     </message>
     <message>
         <source>Op 2 level scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 电平缩放</translation>
     </message>
     <message>
         <source>Op 2 frequency multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 频率倍数</translation>
     </message>
     <message>
         <source>Op 2 key scaling rate</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 键位速率缩放</translation>
     </message>
     <message>
         <source>Op 2 percussive envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 打击包络</translation>
     </message>
     <message>
         <source>Op 2 tremolo</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 震音</translation>
     </message>
     <message>
         <source>Op 2 vibrato</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 颤音</translation>
     </message>
     <message>
         <source>Op 2 waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>算子 2 波形</translation>
     </message>
     <message>
         <source>FM</source>
@@ -4363,11 +4363,11 @@ Continue?</source>
     </message>
     <message>
         <source>Vibrato depth</source>
-        <translation type="unfinished"></translation>
+        <translation>颤音深度</translation>
     </message>
     <message>
         <source>Tremolo depth</source>
-        <translation type="unfinished"></translation>
+        <translation>震音深度</translation>
     </message>
 </context>
 <context>
@@ -4401,7 +4401,7 @@ Continue?</source>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>振荡器 %1 立体声失谐</translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
@@ -4436,7 +4436,7 @@ Continue?</source>
     <name>lmms::OscilloscopeControls</name>
     <message>
         <source>Amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <source>Length</source>
@@ -4444,7 +4444,7 @@ Continue?</source>
     </message>
     <message>
         <source>Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>相位</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -4509,11 +4509,11 @@ Continue?</source>
     </message>
     <message>
         <source>Absolute value</source>
-        <translation type="unfinished"></translation>
+        <translation>绝对值</translation>
     </message>
     <message>
         <source>Amount multiplicator</source>
-        <translation type="unfinished"></translation>
+        <translation>调制量倍数</translation>
     </message>
 </context>
 <context>
@@ -10610,15 +10610,15 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Enable sweep 1</source>
-        <translation type="unfinished"></translation>
+        <translation>启用扫频 1</translation>
     </message>
     <message>
         <source>Sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>扫频量</translation>
     </message>
     <message>
         <source>Sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>扫频速率</translation>
     </message>
     <message>
         <source>12.5% Duty cycle</source>
@@ -10650,7 +10650,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Enable sweep 2</source>
-        <translation type="unfinished"></translation>
+        <translation>启用扫频 2</translation>
     </message>
     <message>
         <source>Enable channel 3</source>
@@ -10662,7 +10662,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Frequency sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>频率扫频</translation>
     </message>
     <message>
         <source>Enable channel 4</source>
@@ -10732,7 +10732,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Osc %1 waveform:</source>
-        <translation type="unfinished"></translation>
+        <translation>振荡器 %1 波形：</translation>
     </message>
     <message>
         <source>Osc %1 volume:</source>
@@ -10744,7 +10744,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>振荡器 %1 立体声失谐</translation>
     </message>
     <message>
         <source>cents</source>
@@ -10752,7 +10752,103 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
-        <translation type="unfinished"></translation>
+        <translation>振荡器 %1 谐波：</translation>
+    </message>
+    <message>
+        <source>Octave below</source>
+        <translation>下方八度</translation>
+    </message>
+    <message>
+        <source>Fifth below</source>
+        <translation>下方五度</translation>
+    </message>
+    <message>
+        <source>Fundamental</source>
+        <translation>基频</translation>
+    </message>
+    <message>
+        <source>2nd harmonic</source>
+        <translation>第 2 谐波</translation>
+    </message>
+    <message>
+        <source>3rd harmonic</source>
+        <translation>第 3 谐波</translation>
+    </message>
+    <message>
+        <source>4th harmonic</source>
+        <translation>第 4 谐波</translation>
+    </message>
+    <message>
+        <source>5th harmonic</source>
+        <translation>第 5 谐波</translation>
+    </message>
+    <message>
+        <source>6th harmonic</source>
+        <translation>第 6 谐波</translation>
+    </message>
+    <message>
+        <source>7th harmonic</source>
+        <translation>第 7 谐波</translation>
+    </message>
+    <message>
+        <source>8th harmonic</source>
+        <translation>第 8 谐波</translation>
+    </message>
+    <message>
+        <source>9th harmonic</source>
+        <translation>第 9 谐波</translation>
+    </message>
+    <message>
+        <source>10th harmonic</source>
+        <translation>第 10 谐波</translation>
+    </message>
+    <message>
+        <source>11th harmonic</source>
+        <translation>第 11 谐波</translation>
+    </message>
+    <message>
+        <source>12th harmonic</source>
+        <translation>第 12 谐波</translation>
+    </message>
+    <message>
+        <source>13th harmonic</source>
+        <translation>第 13 谐波</translation>
+    </message>
+    <message>
+        <source>14th harmonic</source>
+        <translation>第 14 谐波</translation>
+    </message>
+    <message>
+        <source>15th harmonic</source>
+        <translation>第 15 谐波</translation>
+    </message>
+    <message>
+        <source>16th harmonic</source>
+        <translation>第 16 谐波</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>正弦波</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>锯齿波</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>方波</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>三角波</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation>Moog 锯齿波</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>指数波</translation>
     </message>
 </context>
 <context>
@@ -10778,15 +10874,15 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Window Size</source>
-        <translation type="unfinished"></translation>
+        <translation>窗口大小</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>偏移</translation>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>幅度比例</translation>
     </message>
 </context>
 <context>
@@ -10808,7 +10904,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PatmanView</name>
     <message>
         <source>Open patch</source>
-        <translation type="unfinished"></translation>
+        <translation>打开音色文件</translation>
     </message>
     <message>
         <source>Loop</source>
@@ -10940,7 +11036,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Amount multiplicator:</source>
-        <translation type="unfinished"></translation>
+        <translation>调制量倍数：</translation>
     </message>
     <message>
         <source>ATCK</source>
@@ -10960,7 +11056,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>TRSH</source>
-        <translation type="unfinished"></translation>
+        <translation>阈值</translation>
     </message>
     <message>
         <source>Treshold:</source>
@@ -10972,7 +11068,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Absolute value</source>
-        <translation type="unfinished"></translation>
+        <translation>绝对值</translation>
     </message>
 </context>
 <context>

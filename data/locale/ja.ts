@@ -896,15 +896,15 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>2-operator FM Synth</source>
-        <translation type="unfinished"></translation>
+        <translation>2オペレーター FM シンセ</translation>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>オルガン風の音色を作る加算合成シンセ</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>GUS 互換パッチ音源</translation>
     </message>
     <message>
         <source>Plugin for controlling knobs with sound peaks</source>
@@ -998,7 +998,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Oscilloscope plugin to display the incoming audio waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音声の波形を表示するオシロスコープ</translation>
     </message>
     <message>
         <source>A 2-band distortion and slew rate limiter plugin.</source>
@@ -4112,11 +4112,11 @@ Continue?</source>
     <name>lmms::NesInstrument</name>
     <message>
         <source>Channel 1 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1の有効</translation>
     </message>
     <message>
         <source>Channel 1 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1の粗調整</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
@@ -4124,39 +4124,39 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 1 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のエンベロープ有効</translation>
     </message>
     <message>
         <source>Channel 1 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のエンベロープループ</translation>
     </message>
     <message>
         <source>Channel 1 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のエンベロープ長</translation>
     </message>
     <message>
         <source>Channel 1 duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のデューティ比</translation>
     </message>
     <message>
         <source>Channel 1 sweep enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のスイープ有効</translation>
     </message>
     <message>
         <source>Channel 1 sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のスイープ量</translation>
     </message>
     <message>
         <source>Channel 1 sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル1のスイープ速度</translation>
     </message>
     <message>
         <source>Channel 2 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2の有効</translation>
     </message>
     <message>
         <source>Channel 2 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2の粗調整</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
@@ -4164,39 +4164,39 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 2 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のエンベロープ有効</translation>
     </message>
     <message>
         <source>Channel 2 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のエンベロープループ</translation>
     </message>
     <message>
         <source>Channel 2 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のエンベロープ長</translation>
     </message>
     <message>
         <source>Channel 2 duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のデューティ比</translation>
     </message>
     <message>
         <source>Channel 2 sweep enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のスイープ有効</translation>
     </message>
     <message>
         <source>Channel 2 sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のスイープ量</translation>
     </message>
     <message>
         <source>Channel 2 sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル2のスイープ速度</translation>
     </message>
     <message>
         <source>Channel 3 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル3の有効</translation>
     </message>
     <message>
         <source>Channel 3 coarse detune</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル3の粗調整</translation>
     </message>
     <message>
         <source>Channel 3 volume</source>
@@ -4204,7 +4204,7 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 4 enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4の有効</translation>
     </message>
     <message>
         <source>Channel 4 volume</source>
@@ -4212,35 +4212,35 @@ Continue?</source>
     </message>
     <message>
         <source>Channel 4 envelope enable</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のエンベロープ有効</translation>
     </message>
     <message>
         <source>Channel 4 envelope loop</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のエンベロープループ</translation>
     </message>
     <message>
         <source>Channel 4 envelope length</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のエンベロープ長</translation>
     </message>
     <message>
         <source>Channel 4 noise mode</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のノイズモード</translation>
     </message>
     <message>
         <source>Channel 4 frequency mode</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4の周波数モード</translation>
     </message>
     <message>
         <source>Channel 4 noise frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のノイズ周波数</translation>
     </message>
     <message>
         <source>Channel 4 noise frequency sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4のノイズ周波数スイープ</translation>
     </message>
     <message>
         <source>Channel 4 quantize</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4の量子化</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -4259,115 +4259,115 @@ Continue?</source>
     </message>
     <message>
         <source>Op 1 attack</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のアタック</translation>
     </message>
     <message>
         <source>Op 1 decay</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のディケイ</translation>
     </message>
     <message>
         <source>Op 1 sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のサステイン</translation>
     </message>
     <message>
         <source>Op 1 release</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のリリース</translation>
     </message>
     <message>
         <source>Op 1 level</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のレベル</translation>
     </message>
     <message>
         <source>Op 1 level scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のレベルスケーリング</translation>
     </message>
     <message>
         <source>Op 1 frequency multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1の周波数の倍率</translation>
     </message>
     <message>
         <source>Op 1 feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のフィードバック</translation>
     </message>
     <message>
         <source>Op 1 key scaling rate</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のキースケーリングレート</translation>
     </message>
     <message>
         <source>Op 1 percussive envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のパーカッシブエンベロープ</translation>
     </message>
     <message>
         <source>Op 1 tremolo</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のトレモロ</translation>
     </message>
     <message>
         <source>Op 1 vibrato</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1のビブラート</translation>
     </message>
     <message>
         <source>Op 1 waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター1の波形</translation>
     </message>
     <message>
         <source>Op 2 attack</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のアタック</translation>
     </message>
     <message>
         <source>Op 2 decay</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のディケイ</translation>
     </message>
     <message>
         <source>Op 2 sustain</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のサステイン</translation>
     </message>
     <message>
         <source>Op 2 release</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のリリース</translation>
     </message>
     <message>
         <source>Op 2 level</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のレベル</translation>
     </message>
     <message>
         <source>Op 2 level scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のレベルスケーリング</translation>
     </message>
     <message>
         <source>Op 2 frequency multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2の周波数の倍率</translation>
     </message>
     <message>
         <source>Op 2 key scaling rate</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のキースケーリングレート</translation>
     </message>
     <message>
         <source>Op 2 percussive envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のパーカッシブエンベロープ</translation>
     </message>
     <message>
         <source>Op 2 tremolo</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のトレモロ</translation>
     </message>
     <message>
         <source>Op 2 vibrato</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2のビブラート</translation>
     </message>
     <message>
         <source>Op 2 waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>オペレーター2の波形</translation>
     </message>
     <message>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <source>Vibrato depth</source>
-        <translation type="unfinished"></translation>
+        <translation>ビブラートの深さ</translation>
     </message>
     <message>
         <source>Tremolo depth</source>
-        <translation type="unfinished"></translation>
+        <translation>トレモロの深さ</translation>
     </message>
 </context>
 <context>
@@ -4389,7 +4389,7 @@ Continue?</source>
     </message>
     <message>
         <source>Osc %1 harmonic</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター%1の倍音</translation>
     </message>
     <message>
         <source>Osc %1 volume</source>
@@ -4401,7 +4401,7 @@ Continue?</source>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター%1のステレオデチューン</translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
@@ -4436,15 +4436,15 @@ Continue?</source>
     <name>lmms::OscilloscopeControls</name>
     <message>
         <source>Amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Length</translation>
+        <translation>長さ</translation>
     </message>
     <message>
         <source>Phase</source>
-        <translation>Phase</translation>
+        <translation>位相</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -4485,11 +4485,11 @@ Continue?</source>
     <name>lmms::PeakControllerEffectControls</name>
     <message>
         <source>Base value</source>
-        <translation type="unfinished"></translation>
+        <translation>基準値</translation>
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation>Modulation amount</translation>
+        <translation>変調量</translation>
     </message>
     <message>
         <source>Attack</source>
@@ -4501,19 +4501,19 @@ Continue?</source>
     </message>
     <message>
         <source>Treshold</source>
-        <translation type="unfinished"></translation>
+        <translation>しきい値</translation>
     </message>
     <message>
         <source>Mute output</source>
-        <translation type="unfinished"></translation>
+        <translation>出力をミュート</translation>
     </message>
     <message>
         <source>Absolute value</source>
-        <translation type="unfinished"></translation>
+        <translation>絶対値</translation>
     </message>
     <message>
         <source>Amount multiplicator</source>
-        <translation type="unfinished"></translation>
+        <translation>変調量の倍率</translation>
     </message>
 </context>
 <context>
@@ -10606,35 +10606,35 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Enable envelope 1 loop</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ1のループを有効化</translation>
     </message>
     <message>
         <source>Enable sweep 1</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ1を有効化</translation>
     </message>
     <message>
         <source>Sweep amount</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ量</translation>
     </message>
     <message>
         <source>Sweep rate</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ速度</translation>
     </message>
     <message>
         <source>12.5% Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>12.5% デューティ比</translation>
     </message>
     <message>
         <source>25% Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>25% デューティ比</translation>
     </message>
     <message>
         <source>50% Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>50% デューティ比</translation>
     </message>
     <message>
         <source>75% Duty cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>75% デューティ比</translation>
     </message>
     <message>
         <source>Enable channel 2</source>
@@ -10642,51 +10642,51 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Enable envelope 2</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ2を有効化</translation>
     </message>
     <message>
         <source>Enable envelope 2 loop</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ2のループを有効化</translation>
     </message>
     <message>
         <source>Enable sweep 2</source>
-        <translation type="unfinished"></translation>
+        <translation>スイープ2を有効化</translation>
     </message>
     <message>
         <source>Enable channel 3</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル3を有効化</translation>
     </message>
     <message>
         <source>Noise Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>ノイズ周波数</translation>
     </message>
     <message>
         <source>Frequency sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数スイープ</translation>
     </message>
     <message>
         <source>Enable channel 4</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル4を有効化</translation>
     </message>
     <message>
         <source>Enable envelope 4</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ4を有効化</translation>
     </message>
     <message>
         <source>Enable envelope 4 loop</source>
-        <translation type="unfinished"></translation>
+        <translation>エンベロープ4のループを有効化</translation>
     </message>
     <message>
         <source>Quantize noise frequency when using note frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>ノート周波数使用時にノイズ周波数を量子化</translation>
     </message>
     <message>
         <source>Use note frequency for noise</source>
-        <translation type="unfinished"></translation>
+        <translation>ノート周波数をノイズに使用</translation>
     </message>
     <message>
         <source>Noise mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ノイズモード</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -10713,14 +10713,14 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Frequency multiplier</source>
-        <translation type="unfinished"></translation>
+        <translation>周波数の倍率</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::OrganicInstrumentView</name>
     <message>
         <source>Distortion:</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み：</translation>
     </message>
     <message>
         <source>Volume:</source>
@@ -10728,7 +10728,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Randomise</source>
-        <translation type="unfinished"></translation>
+        <translation>ランダム化</translation>
     </message>
     <message>
         <source>Osc %1 waveform:</source>
@@ -10744,7 +10744,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター%1のステレオデチューン</translation>
     </message>
     <message>
         <source>cents</source>
@@ -10752,7 +10752,103 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
-        <translation type="unfinished"></translation>
+        <translation>オシレーター%1の倍音：</translation>
+    </message>
+    <message>
+        <source>Octave below</source>
+        <translation>1オクターブ下</translation>
+    </message>
+    <message>
+        <source>Fifth below</source>
+        <translation>5度下</translation>
+    </message>
+    <message>
+        <source>Fundamental</source>
+        <translation>基音</translation>
+    </message>
+    <message>
+        <source>2nd harmonic</source>
+        <translation>第2倍音</translation>
+    </message>
+    <message>
+        <source>3rd harmonic</source>
+        <translation>第3倍音</translation>
+    </message>
+    <message>
+        <source>4th harmonic</source>
+        <translation>第4倍音</translation>
+    </message>
+    <message>
+        <source>5th harmonic</source>
+        <translation>第5倍音</translation>
+    </message>
+    <message>
+        <source>6th harmonic</source>
+        <translation>第6倍音</translation>
+    </message>
+    <message>
+        <source>7th harmonic</source>
+        <translation>第7倍音</translation>
+    </message>
+    <message>
+        <source>8th harmonic</source>
+        <translation>第8倍音</translation>
+    </message>
+    <message>
+        <source>9th harmonic</source>
+        <translation>第9倍音</translation>
+    </message>
+    <message>
+        <source>10th harmonic</source>
+        <translation>第10倍音</translation>
+    </message>
+    <message>
+        <source>11th harmonic</source>
+        <translation>第11倍音</translation>
+    </message>
+    <message>
+        <source>12th harmonic</source>
+        <translation>第12倍音</translation>
+    </message>
+    <message>
+        <source>13th harmonic</source>
+        <translation>第13倍音</translation>
+    </message>
+    <message>
+        <source>14th harmonic</source>
+        <translation>第14倍音</translation>
+    </message>
+    <message>
+        <source>15th harmonic</source>
+        <translation>第15倍音</translation>
+    </message>
+    <message>
+        <source>16th harmonic</source>
+        <translation>第16倍音</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>正弦波</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>ノコギリ波</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>矩形波</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>三角波</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation>Moog ノコギリ波</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>指数波</translation>
     </message>
 </context>
 <context>
@@ -10778,15 +10874,15 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Window Size</source>
-        <translation type="unfinished"></translation>
+        <translation>ウィンドウサイズ</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>オフセット</translation>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>スケール</translation>
     </message>
 </context>
 <context>
@@ -10808,7 +10904,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PatmanView</name>
     <message>
         <source>Open patch</source>
-        <translation type="unfinished"></translation>
+        <translation>パッチを開く</translation>
     </message>
     <message>
         <source>Loop</source>
@@ -10820,11 +10916,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Tune</source>
-        <translation type="unfinished"></translation>
+        <translation>チューン</translation>
     </message>
     <message>
         <source>Tune mode</source>
-        <translation type="unfinished"></translation>
+        <translation>チューニングモード</translation>
     </message>
     <message>
         <source>No file selected</source>
@@ -10920,31 +11016,31 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PeakControllerEffectControlDialog</name>
     <message>
         <source>BASE</source>
-        <translation>BASE</translation>
+        <translation>基準</translation>
     </message>
     <message>
         <source>Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>基準：</translation>
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>変調量</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation>Modulation amount:</translation>
+        <translation>変調量：</translation>
     </message>
     <message>
         <source>MULT</source>
-        <translation>MULT</translation>
+        <translation>倍率</translation>
     </message>
     <message>
         <source>Amount multiplicator:</source>
-        <translation type="unfinished"></translation>
+        <translation>変調量の倍率：</translation>
     </message>
     <message>
         <source>ATCK</source>
-        <translation>ATCK</translation>
+        <translation>アタック</translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -10952,7 +11048,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>DCAY</source>
-        <translation>ATCK</translation>
+        <translation>ディケイ</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -10960,7 +11056,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>TRSH</source>
-        <translation>TRSH</translation>
+        <translation>しきい値</translation>
     </message>
     <message>
         <source>Treshold:</source>
@@ -10968,11 +11064,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Mute output</source>
-        <translation type="unfinished"></translation>
+        <translation>出力をミュート</translation>
     </message>
     <message>
         <source>Absolute value</source>
-        <translation type="unfinished"></translation>
+        <translation>絶対値</translation>
     </message>
 </context>
 <context>
@@ -11486,7 +11582,7 @@ Shift を押しながらクリックするとオートメーションエディ�
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Input gain:</translation>
+        <translation>入力ゲイン：</translation>
     </message>
     <message>
         <source>Size</source>
@@ -11510,7 +11606,7 @@ Shift を押しながらクリックするとオートメーションエディ�
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Output gain:</translation>
+        <translation>出力ゲイン：</translation>
     </message>
 </context>
 <context>

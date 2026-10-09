@@ -48,36 +48,32 @@ class OrganicInstrumentView;
 
 const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
-const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
-	"Octave below",
-	"Fifth below",
-	"Fundamental",
-	"2nd harmonic",
-	"3rd harmonic",
-	"4th harmonic",
-	"5th harmonic",
-	"6th harmonic",
-	"7th harmonic",
-	"8th harmonic",
-	"9th harmonic",
-	"10th harmonic",
-	"11th harmonic",
-	"12th harmonic",
-	"13th harmonic",
-	"14th harmonic",
-	"15th harmonic",
-	"16th harmonic"
-	};
-	
-const QString WAVEFORM_NAMES[6] = {
-	"Sine wave",
-	"Saw wave",
-	"Square wave",
-	"Triangle wave",
-	"Moog saw wave",
-	"Exponential wave"
-	};
-	
+const QString HARMONIC_NAMES[NUM_HARMONICS] = {QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Octave below"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Fifth below"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Fundamental"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "2nd harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "3rd harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "4th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "5th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "6th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "7th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "8th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "9th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "10th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "11th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "12th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "13th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "14th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "15th harmonic"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "16th harmonic")};
+
+const QString WAVEFORM_NAMES[6] = {QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Sine wave"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Saw wave"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Square wave"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Triangle wave"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Moog saw wave"),
+	QT_TRANSLATE_NOOP("lmms::gui::OrganicInstrumentView", "Exponential wave")};
+
 const float CENT = 1.0f / 1200.0f;
 
 class OscillatorObject : public Model

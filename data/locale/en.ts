@@ -10725,6 +10725,102 @@ Warning: This operation can not be undone.</source>
         <source>Osc %1 harmonic:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Octave below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fifth below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fundamental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2nd harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3rd harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>9th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>10th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>11th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>13th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>14th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>15th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16th harmonic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::Oscilloscope</name>

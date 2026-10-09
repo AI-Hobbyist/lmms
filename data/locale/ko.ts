@@ -998,7 +998,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Oscilloscope plugin to display the incoming audio waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>입력 오디오 파형을 표시하는 오실로스코프 플러그인</translation>
     </message>
     <message>
         <source>A 2-band distortion and slew rate limiter plugin.</source>
@@ -4436,7 +4436,7 @@ Continue?</source>
     <name>lmms::OscilloscopeControls</name>
     <message>
         <source>Amplitude</source>
-        <translation type="unfinished"></translation>
+        <translation>진폭</translation>
     </message>
     <message>
         <source>Length</source>
@@ -10754,6 +10754,102 @@ Warning: This operation can not be undone.</source>
         <source>Osc %1 harmonic:</source>
         <translation>Osc %1 하모닉:</translation>
     </message>
+    <message>
+        <source>Octave below</source>
+        <translation>한 옥타브 아래</translation>
+    </message>
+    <message>
+        <source>Fifth below</source>
+        <translation>5도 아래</translation>
+    </message>
+    <message>
+        <source>Fundamental</source>
+        <translation>기본음</translation>
+    </message>
+    <message>
+        <source>2nd harmonic</source>
+        <translation>2차 배음</translation>
+    </message>
+    <message>
+        <source>3rd harmonic</source>
+        <translation>3차 배음</translation>
+    </message>
+    <message>
+        <source>4th harmonic</source>
+        <translation>4차 배음</translation>
+    </message>
+    <message>
+        <source>5th harmonic</source>
+        <translation>5차 배음</translation>
+    </message>
+    <message>
+        <source>6th harmonic</source>
+        <translation>6차 배음</translation>
+    </message>
+    <message>
+        <source>7th harmonic</source>
+        <translation>7차 배음</translation>
+    </message>
+    <message>
+        <source>8th harmonic</source>
+        <translation>8차 배음</translation>
+    </message>
+    <message>
+        <source>9th harmonic</source>
+        <translation>9차 배음</translation>
+    </message>
+    <message>
+        <source>10th harmonic</source>
+        <translation>10차 배음</translation>
+    </message>
+    <message>
+        <source>11th harmonic</source>
+        <translation>11차 배음</translation>
+    </message>
+    <message>
+        <source>12th harmonic</source>
+        <translation>12차 배음</translation>
+    </message>
+    <message>
+        <source>13th harmonic</source>
+        <translation>13차 배음</translation>
+    </message>
+    <message>
+        <source>14th harmonic</source>
+        <translation>14차 배음</translation>
+    </message>
+    <message>
+        <source>15th harmonic</source>
+        <translation>15차 배음</translation>
+    </message>
+    <message>
+        <source>16th harmonic</source>
+        <translation>16차 배음</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>사인파</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>톱니파</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>사각파</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>삼각파</translation>
+    </message>
+    <message>
+        <source>Moog saw wave</source>
+        <translation>Moog 톱니파</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>지수파</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::Oscilloscope</name>
@@ -10778,11 +10874,11 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>Window Size</source>
-        <translation type="unfinished"></translation>
+        <translation>창 크기</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>오프셋</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -10920,7 +11016,7 @@ Warning: This operation can not be undone.</source>
     <name>lmms::gui::PeakControllerEffectControlDialog</name>
     <message>
         <source>BASE</source>
-        <translation>BASE</translation>
+        <translation>기준</translation>
     </message>
     <message>
         <source>Base:</source>
@@ -10928,7 +11024,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>변조량</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -10936,7 +11032,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>MULT</source>
-        <translation>MULT</translation>
+        <translation>배수</translation>
     </message>
     <message>
         <source>Amount multiplicator:</source>
@@ -10944,7 +11040,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>ATCK</source>
-        <translation>ATCK</translation>
+        <translation>어택</translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -10952,7 +11048,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>DCAY</source>
-        <translation>DCAY</translation>
+        <translation>감쇠</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -10960,7 +11056,7 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <source>TRSH</source>
-        <translation>TRSH</translation>
+        <translation>임계값</translation>
     </message>
     <message>
         <source>Treshold:</source>
