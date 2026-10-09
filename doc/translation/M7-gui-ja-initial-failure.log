@@ -1,0 +1,47 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+MidiImport::tryImport(): not a Standard MIDI file
+Error reading song: song node not found
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Microsoft YaHei UI", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Tahoma", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "SimSun", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Arial", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Gulim", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "MS UI Gothic", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Segoe UI Emoji", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Segoe UI Symbol", script 11
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QWARN  : UiBaselineCapture::finalTranslations() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/ui/Release\plugins\SVSCompute.dll
+QWARN  : UiBaselineCapture::finalTranslations() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/ui/Release\plugins\SVSCompute.dll
+QINFO  : UiBaselineCapture::finalTranslations() Hover target QLabel QRect(276,0 10x39) QRegion(0,0 10x39) true cursor QPoint(702,277) target global QPoint(702,277) widget at cursor QLabel(0x1601fc47b50, name="svsSynthesisStatus") active window lmms::gui::SVSPianoRoll(0x3ccaafe920) target window lmms::gui::SVSPianoRoll(0x3ccaafe920)
+QINFO  : UiBaselineCapture::finalTranslations() Floating tooltip false QObject(0x0) expected source QLabel(0x1601fc47b50, name="svsSynthesisStatus") QFlags<Qt::WindowType>(ToolTip)
+QINFO  : UiBaselineCapture::finalTranslations() Floating tooltip false QObject(0x0) expected source QLabel(0x1601fc47b50, name="svsSynthesisStatus") QFlags<Qt::WindowType>(ToolTip)
+QINFO  : UiBaselineCapture::finalTranslations() Floating tooltip false QObject(0x0) expected source QLabel(0x1601fc47b50, name="svsSynthesisStatus") QFlags<Qt::WindowType>(ToolTip)
+FAIL!  : UiBaselineCapture::finalTranslations() 'tooltip' returned FALSE. (Visible tooltip missing: SVS ���`�ɤ��o���Ǥ���Ԫ�ΥΩ`�ɤ򱣳֤��ޤ���)
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(155) : failure location
+PASS   : UiBaselineCapture::installedLaunch()
+PASS   : UiBaselineCapture::cleanupTestCase()
+Totals: 3 passed, 1 failed, 0 skipped, 0 blacklisted, 42187ms
+********* Finished testing of UiBaselineCapture *********

@@ -98,7 +98,8 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	auto swapInputs = new LedCheckBox(tr("Swap inputs"), this, tr("Swap inputs"), LedCheckBox::LedColor::Green);
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
-	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));
+	swapInputs->setToolTip(tr("Swap inputs") + '\n' + tr("Swap left and right input channels for reflections"));
+	swapInputs->setFixedWidth(76);
 }
 
 

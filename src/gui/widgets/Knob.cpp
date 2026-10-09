@@ -525,12 +525,13 @@ void Knob::drawLabel(QPainter& p)
 			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 		}
 		auto fm = p.fontMetrics();
-		const auto x = (width() - fm.horizontalAdvance(m_label)) / 2;
+		const auto label = fm.elidedText(m_label, Qt::ElideRight, width());
+		const auto x = (width() - fm.horizontalAdvance(label)) / 2;
 		const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
 		const auto y = height() - descent; 
 
 		p.setPen(isEnabled() ? textColor() : palette().color(QPalette::Disabled, QPalette::Text));
-		p.drawText(x, y, m_label);
+		p.drawText(x, y, label);
 	}
 }
 
@@ -540,6 +541,13 @@ void Knob::paintEvent(QPaintEvent*)
 
 	drawKnob(&p);
 	drawLabel(p);
+}
+
+QString Knob::getDynamicFloatingText(const QString& currentValue) const
+{
+	const auto labelFont = fixedFontSizeLabelRendering() ? adjustedToPixelSize(font(), SMALL_FONT_SIZE) : font();
+	const auto description = FloatModelEditorBase::getDynamicFloatingText(currentValue);
+	return QFontMetrics(labelFont).horizontalAdvance(m_label) > width() ? m_label + '\n' + description : description;
 }
 
 bool Knob::event(QEvent* event)

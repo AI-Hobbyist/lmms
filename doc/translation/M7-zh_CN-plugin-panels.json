@@ -1,0 +1,110 @@
+[
+    {
+        "plugin": "slicert",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "zynaddsubfx",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "malletsstk",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "freeboy",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vestige",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS unloaded host wrapper; foreign editor and sound MANUAL/PENDING",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lomm",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "multitapecho",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "vibedstrings",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "xpressive",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "monstro",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "organic",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "eq",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitcrush",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "waveshaper",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "spectrumanalyzer",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "lb302",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "frequencyshifter",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "compressor",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    }
+]

@@ -88,7 +88,9 @@ void LedCheckBox::paintEvent( QPaintEvent * pe )
 									: palette().base().color());
 		p.drawRoundedRect(indicator, 3, 3);
 		p.setPen(palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Text));
-		p.drawText(rect().adjusted(diameter + 5, 0, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, text());
+		const auto textRect = rect().adjusted(diameter + 5, 0, 0, 0);
+		p.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter,
+			p.fontMetrics().elidedText(text(), Qt::ElideRight, textRect.width()));
 		return;
 	}
 	if (!m_legacyMode)
@@ -153,11 +155,13 @@ void LedCheckBox::paintLegacy(QPaintEvent * pe)
 	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 
 	p.drawPixmap(0, 0, model()->value() ? m_ledOnPixmap : m_ledOffPixmap);
+	const auto label
+		= p.fontMetrics().elidedText(text(), Qt::ElideRight, std::max(0, width() - m_ledOffPixmap.width() - 5));
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText(m_ledOffPixmap.width() + 4, 11, text());
+	p.drawText(m_ledOffPixmap.width() + 4, 11, label);
 	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText(m_ledOffPixmap.width() + 3, 10, text());
+	p.drawText(m_ledOffPixmap.width() + 3, 10, label);
 }
 
 void LedCheckBox::paintNonLegacy(QPaintEvent * pe)
@@ -170,7 +174,7 @@ void LedCheckBox::paintNonLegacy(QPaintEvent * pe)
 
 	QRect r = rect();
 	r -= QMargins(m_ledOffPixmap.width() + 5, 0, 0, 0);
-	p.drawText(r, text());
+	p.drawText(r, p.fontMetrics().elidedText(text(), Qt::ElideRight, r.width()));
 }
 
 

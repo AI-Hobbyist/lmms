@@ -85,7 +85,10 @@ if ($buildExitCode -ne 0) { Get-Content build.log; exit $buildExitCode }
 | M1 | 入口统一、英文 source 迁移、四语目录同步完成 | lmms / UiBaselineCapture / SVSIntegrationTest 构建及两组测试 PASS | Windows Qt、100%，四语入口及导出对话框截图 PASS | 本阶段提交推送后确认远端一致 |
 | M2 | SVS 307 键补齐，品牌/模板保留已记录 | 四语资源、受影响目标构建、307 键质量检查 PASS | 四语导入、设置、空声库编辑器，Windows 100% PASS | 本阶段提交推送后确认远端一致 |
 | M3 | SVC 144 键补齐 | 四语资源、编译、质量检查 PASS | 四语原生重启的空片段/设置场景；实时参数和过载 MANUAL/PENDING | 本阶段提交推送后确认远端一致 |
-| M4～M7 | TODO | 未执行 | 未执行 | 未提交 |
+| M4 | DONE | 主程序/VST 1381 键 | 四语质量、资源与编译 PASS；100% 原生实窗 PASS | 独立提交推送，详见本阶段记录 |
+| M5 | DONE | 十二批原生插件补译 | 每批质量/编译和四语原生实窗 PASS；外部依赖明确待验 | 每批独立提交推送 |
+| M6 | DONE | 3877 键，候选/声明/同原文复核 CLOSED | 全量 Release、静态与受影响回归 PASS；四语实窗各 3 PASS | 独立提交推送 |
+| M7 | DONE | 最终四语场景矩阵和必要省略/全文提示 | 全量 Release、最终测试编译、静态 PASS；四语实窗各组 5/3/4 PASS | 独立提交推送并核对远端；非阻塞人工项仍待验 |
 
 M0 提取曾因输入列表带双引号被 lupdate 当成文件名失败，移除列表内引号后通过；没有变更任何 TS 或业务代码。
 
@@ -200,3 +203,22 @@ M5 检查点 1c91d9fa5d9328a96f0fd4c43ac44bda979c0f00 已推送核对。当前 3
 回归记录：项目进程、VST 路径迁移、ScanRootsWidget、CatalogIo、PluginCatalog、SVC 缓存/播放及 SVCIntegrationTest 通过。Mapper 旧中文错误断言改为迁移后的英文源文；原“空声库必拒绝”夹具与既有允许未选声库行为不一致，改为缺失一半绑定标识的无效夹具，复测通过，不改变生产行为。SVS 资源/声明/批量歌词测试原来选择目录首个声库，当前排序选到 DiffSinger；明确选择测试要求的 SVSExample，保留完整断言。首次 CTest 全量 SVS 未启用嵌入 GUI、含旧中文导入控制器断言并超过 60 秒，失败日志保留；不报告该全量测试通过。受影响路径使用嵌入原生 GUI 分组验证，最终结果见 M6-svs-regression.log。测试改动过程中名称冲突与替换错误的编译日志保留，最终编译重新通过。
 
 M6 最终受影响 SVS 分组 11 PASS、0 FAIL（9 条路径加初始化/清理）。已有 LADSPA 支持模块重新部署到既有 build/Release/plugins/ladspa，22 个 DLL 的源/部署 SHA-256 一致，见 M6-ladspa-deployment.json；没有创建新部署目录。
+
+
+## M7 最终实窗验收
+
+M6 检查点 `9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c` 推送确认后开始。只修正本计划授权的长标签省略与全文悬浮：Knob 保留原说明、数值与单位并补充被省略的名称；LedCheckBox 在既有边界省略，MultitapEcho/WaveShaper 的完整名称加入原提示；Bitcrush 标签限制在原列宽；SlicerT 页脚省略并提供原说明；歌词表格各单元格保留全文提示；SVS 状态在原工具栏与片段页脚省略，原状态全文保持。未改变字体、主题、控件位置、音频算法、预设或协议。
+
+前台全量 Release 编译成功，最终测试程序编译成功。开发程序为 `build/Release/lmms.exe`，60 个启用插件 DLL 在 `build/Release/plugins` 原位核对；SVS 引擎沿既有 `build/Release/svs` 加载。四语源 QM 与 `build/Release/data/locale` 部署文件逐字节和 SHA-256 一致，详见 `M7-deployment.json`。SID/GigPlayer 当前禁用且没有旧 DLL；Vibed 的实际目标 `vibedstrings` 已四语实窗验证，撤销 M5-11 的“未部署”判断。
+
+四语分别在全新进程加载目标语言和对应 Qt 标准按钮目录，使用正常 Windows Qt 平台、既定主题、100% 缩放。每种语言主场景组 5 PASS、插件组 3 PASS、导出/滚动补充组 4 PASS，均 0 FAIL（包含各组初始化与清理，不能相加冒充独立场景数量）。测试实际显示窗口，等待稳定渲染后交互，通过 QScreen 捕获真实窗口，再正常关闭；没有使用 offscreen 或 Computer Use。开发程序另外清除测试资源路径覆盖后启动，Win32 DPI=96，捕获真实窗口并正常退出。`M7-environment-*.json` 分别记录实际目标语言、系统语言和 DPR；中日韩字形正常。
+
+场景结果和证据路径见 `M7-scene-matrix.json`：主窗口/菜单/设置、扫描错误与 MIDI 原生错误弹窗、SVSExample 声库参数/歌词/音素/曲线、音名与简谱、SVS 导入/导出选项及音频导出、SVC 空状态和固定设置、DiffSinger 固定选项、内存策略长说明通过。SVS 长状态在 1100/900 宽度下保持省略显示与全文一致；歌词表格诊断实际悬浮全文通过；声库参数和曲线的现有滚动区域可读取长内容。
+
+18 个代表原生插件在四语新进程中显示并验证，适用的预设保存/恢复通过。补验 Monstro 矩阵、频谱高级设置、STK 9/10 预设、Xpressive 帮助末尾与 SlicerT 页脚两项悬浮说明。代表截图确认日语 Bitcrush/MultitapEcho/WaveShaper 的窄标签省略明确、全文可悬浮读取，中日韩文字正常；英文位图、品牌和用户/第三方数据按范围保留。
+
+初次测试发现激活 Qt tooltip 会使其销毁、独立效果器测试窗口不符合生产 EffectView 的 MDI 容器，以及 tooltip 瞬态/延迟隐藏导致截图不稳定。仅修正测试路径：复用生产容器，等待可见且对应目标的真实提示，捕获时不激活提示窗口，关闭后等待隐藏完成；失败日志保留。实窗还发现 SVS 状态最小宽度为零时不可见，将最小宽度设为一个省略号并重新编译、四语重测通过。标准确认/取消按钮原先测试程序未加载 Qt 目录，现与生产程序加载方式一致，未修改生产字体或按钮。最终提取首次漏用 `-I include/` 造成上下文误判，恢复既定命令后质量检查 PASS，失败日志保留。
+
+最终静态统计仍为 3877 键，中/日/韩译文 3723/3714/3721，同原文保留 154/163/156，英文 3877 源文回退；四语缺键、空译、unfinished、占位符、复数、HTML、换行及助记符质量 PASS。1306 候选、25 声明、779 条逐语言同原文复核全部 CLOSED。日志见 `M7-extraction.log`、`M7-audit.log`、`M7-quality.log`、`M7-selfcheck.log`；没有修改其他语言目录。
+
+人工验收尚未完成，明确为非阻塞 `MANUAL/PENDING`：DiffSinger 实际模型合成/音高重录/DirectML 运算、实时 RVC 参数与 A/B 过载、外部项目格式完整转换与损失弹窗、Carla 运行依赖、外部 LV2 样本，以及禁用的 SID/GigPlayer。矩阵逐项记录原因和恢复方法。测试入口副本的 SVSCompute 路径告警不代表生产 DLL 缺失，也不作为实际 AI 运算通过的证据；生产 DLL 原位存在。根据计划“自动检查通过且非阻塞人工项待执行时，可完成阶段提交推送检查点”，M0～M7 实施检查点完成；未将人工项记为 PASS。

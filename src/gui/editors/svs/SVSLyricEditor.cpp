@@ -145,7 +145,11 @@ void SVSLyricEditor::preview()
 			status += "\n" + nativeTranslation::svsPronunciationDiagnostic(reading.diagnostic);
 		const QStringList cells{QString::number(before.tick), before.lyric, after.lyric, status};
 		for (int column = 0; column < 4; ++column)
-			m_table->setItem(row, column, new QTableWidgetItem(cells[column]));
+		{
+			auto* item = new QTableWidgetItem(cells[column]);
+			item->setToolTip(cells[column]);
+			m_table->setItem(row, column, item);
+		}
 		++row;
 	}
 	m_diagnostic->setText(QCoreApplication::translate("lmms::gui::SVSLyricEditor",

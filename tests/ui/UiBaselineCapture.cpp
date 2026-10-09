@@ -4,6 +4,7 @@
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QGridLayout>
+#include <QHelpEvent>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -11,6 +12,7 @@
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QProgressBar>
@@ -21,9 +23,13 @@
 #include <QScrollBar>
 #include <QSlider>
 #include <QSpinBox>
+#include <QTabWidget>
+#include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTextEdit>
+#include <QTimer>
 #include <QToolButton>
+#include <QToolTip>
 #include <QTranslator>
 #include <QtTest>
 
@@ -31,6 +37,7 @@
 #include "AutomationClip.h"
 #include "AutomationEditor.h"
 #include "AutomationTrack.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "Controller.h"
 #include "ControllerRackView.h"
@@ -40,10 +47,12 @@
 #include "EffectControls.h"
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
+#include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
+#include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
@@ -70,6 +79,7 @@
 #include "SampleClip.h"
 #include "SampleTrack.h"
 #include "SetupDialog.h"
+#include "SimpleTextFloat.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "SubWindow.h"
@@ -88,16 +98,204 @@ class UiBaselineCapture : public QObject
 	Q_OBJECT
 	QTemporaryDir m_config;
 	QTranslator m_startupTranslator;
+	QTranslator m_qtStartupTranslator;
 	std::unique_ptr<GuiApplication> m_gui;
 	QString m_output;
 	QList<Plugin*> m_toolPlugins;
+	void hoverCapture(QWidget* target, const QString& expected, const QString& name)
+	{
+		QVERIFY(target->isVisible());
+		const auto point = target->rect().center();
+		QTest::mouseMove(target, point);
+		QTest::qWait(200);
+		if (qobject_cast<Knob*>(target))
+		{
+			QMouseEvent move(QEvent::MouseMove, QPointF(point), QPointF(target->mapToGlobal(point)), Qt::NoButton,
+				Qt::NoButton, Qt::NoModifier);
+			QApplication::sendEvent(target, &move);
+		}
+		if (!qobject_cast<Knob*>(target))
+		{
+			QHelpEvent help(QEvent::ToolTip, point, target->mapToGlobal(point));
+			QApplication::sendEvent(target, &help);
+		}
+		auto findTooltip = [&]() -> QLabel* {
+			for (auto* widget : QApplication::allWidgets())
+			{
+				auto* label = qobject_cast<QLabel*>(widget);
+				if (label && qobject_cast<Knob*>(target))
+				{
+					auto* floating = qobject_cast<SimpleTextFloat*>(label->window());
+					if (!floating || floating->source() != target) { continue; }
+				}
+				if (label && label->isVisible() && label->window()->windowType() == Qt::ToolTip
+					&& label->text().contains(expected))
+				{
+					return label;
+				}
+			}
+			return nullptr;
+		};
+		QLabel* tooltip = nullptr;
+		QTRY_VERIFY_WITH_TIMEOUT((tooltip = findTooltip()) != nullptr, 5000);
+		QTest::qWait(100);
+		tooltip = findTooltip();
+		if (!tooltip)
+		{
+			qInfo() << "Hover target" << target->metaObject()->className() << target->geometry()
+					<< target->visibleRegion() << target->isEnabled() << "cursor" << QCursor::pos() << "target global"
+					<< target->mapToGlobal(target->rect().center()) << "widget at cursor"
+					<< QApplication::widgetAt(QCursor::pos()) << "active window" << QApplication::activeWindow()
+					<< "target window" << target->window();
+			for (auto* widget : QApplication::allWidgets())
+			{
+				if (auto* floating = qobject_cast<SimpleTextFloat*>(widget))
+				{
+					qInfo() << "Floating tooltip" << floating->isVisible() << floating->source() << "expected source"
+							<< target << floating->windowType();
+				}
+			}
+		}
+		QVERIFY2(tooltip, qPrintable("Visible tooltip missing: " + expected));
+		QVERIFY(!tooltip->text().isEmpty());
+		capture(tooltip->window(), name);
+		QToolTip::hideText();
+		QTest::mouseMove(m_gui->mainWindow(), QPoint(5, 5));
+		QTest::qWait(400);
+	}
+	void finalPluginHover(QWidget* panel, const QString& name)
+	{
+		if (!qEnvironmentVariableIsSet("LMMS_UI_FINAL_VALIDATION")) { return; }
+		const bool wasVisible = panel->isVisible();
+		panel->show();
+		if (panel->parentWidget())
+		{
+			panel->parentWidget()->show();
+			panel->parentWidget()->raise();
+		}
+		panel->raise();
+		panel->window()->raise();
+		panel->window()->activateWindow();
+		QVERIFY(QTest::qWaitForWindowExposed(panel->window()));
+		QTest::qWait(600);
+		const auto prefix = qEnvironmentVariable("LMMS_UI_PLUGIN_PREFIX") + '-' + name;
+		const char* viewContext = name == "monstro" ? "lmms::gui::MonstroView" : "lmms::gui::SaControlsDialog";
+		const char* viewAction = name == "monstro" ? "Matrix view" : "Access advanced settings";
+		if (name == "monstro" || name == "spectrumanalyzer")
+		{
+			QWidget* button = nullptr;
+			for (auto* widget : panel->findChildren<QWidget*>())
+			{
+				if (widget->toolTip() == QCoreApplication::translate(viewContext, viewAction)) { button = widget; }
+			}
+			QVERIFY(button);
+			QTest::mouseClick(button, Qt::LeftButton);
+			capture(panel->window(), prefix + "-alternate-view");
+			for (auto* knob : panel->findChildren<Knob*>())
+			{
+				if (knob->isVisible())
+				{
+					hoverCapture(knob, QString{}, prefix + "-alternate-tooltip");
+					break;
+				}
+			}
+			if (name == "monstro")
+			{
+				for (auto* widget : panel->findChildren<QWidget*>())
+				{
+					if (widget->toolTip() == QCoreApplication::translate(viewContext, "Operators view"))
+					{
+						QTest::mouseClick(widget, Qt::LeftButton);
+						break;
+					}
+				}
+			}
+			else
+			{
+				QTest::mouseClick(button, Qt::LeftButton);
+			}
+		}
+		if (name == "malletsstk")
+		{
+			for (auto* combo : panel->findChildren<ComboBox*>())
+			{
+				if (combo->isVisible())
+				{
+					const auto original = combo->model()->value();
+					for (const auto preset : {9, 10})
+					{
+						combo->model()->setValue(preset);
+						QCOMPARE(combo->model()->value(), preset);
+						capture(panel->window(), prefix + "-preset-" + QString::number(preset));
+					}
+					combo->model()->setValue(original);
+					break;
+				}
+			}
+		}
+		for (auto* led : panel->findChildren<LedCheckBox*>())
+		{
+			if (led->isVisible() && !led->text().isEmpty() && led->toolTip().contains(led->text()))
+			{
+				hoverCapture(led, led->text(), prefix + "-label-tooltip");
+				break;
+			}
+		}
+		Knob* representativeKnob = nullptr;
+		for (auto* knob : panel->findChildren<Knob*>())
+		{
+			if (knob->isVisible() && !knob->getLabel().isEmpty())
+			{
+				if (!representativeKnob) { representativeKnob = knob; }
+				if (knob->fontMetrics().horizontalAdvance(knob->getLabel()) > knob->width())
+				{
+					representativeKnob = knob;
+					break;
+				}
+			}
+		}
+		if (representativeKnob)
+		{
+			const auto expected = representativeKnob->fontMetrics().horizontalAdvance(representativeKnob->getLabel())
+					> representativeKnob->width()
+				? representativeKnob->getLabel()
+				: QString{};
+			hoverCapture(representativeKnob, expected, prefix + "-knob-tooltip");
+		}
+		if (name == "slicert")
+		{
+			for (const auto* source : {"Threshold", "Fade Out"})
+			{
+				const auto title = QCoreApplication::translate("lmms::gui::SlicerTView", source);
+				QWidget* control = nullptr;
+				for (auto* widget : panel->findChildren<QWidget*>())
+				{
+					auto* knob = qobject_cast<Knob*>(widget);
+					const auto tooltip = knob ? knob->toolTip() : widget->toolTip();
+					if (widget->isVisible() && tooltip.startsWith(title + '\n')) { control = widget; }
+				}
+				QVERIFY(control);
+				hoverCapture(control, title, prefix + '-' + QString::fromLatin1(source).replace(' ', '-') + "-tooltip");
+			}
+		}
+		if (!wasVisible)
+		{
+			panel->hide();
+			if (auto* frame = qobject_cast<QMdiSubWindow*>(panel->parentWidget())) { frame->hide(); }
+		}
+	}
 	void capture(QWidget* widget, const QString& name)
 	{
-		widget->show();
-		widget->raise();
-		widget->activateWindow();
-		QVERIFY(QTest::qWaitForWindowExposed(widget->window()));
-		QTest::qWait(600);
+		// Native tooltip windows are already stable when captured by hoverCapture.
+		// Activating them dismisses the tooltip and can delete the widget.
+		if (widget->windowType() != Qt::ToolTip)
+		{
+			widget->show();
+			widget->raise();
+			widget->activateWindow();
+			QVERIFY(QTest::qWaitForWindowExposed(widget->window()));
+			QTest::qWait(600);
+		}
 		const auto image = widget->screen()->grabWindow(widget->window()->winId());
 		QVERIFY(!image.isNull());
 		QVERIFY(image.save(m_output + '/' + name + ".png"));
@@ -135,6 +333,12 @@ private slots:
 			QVERIFY(m_startupTranslator.load(
 				QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), startupLanguage)));
 			QCoreApplication::installTranslator(&m_startupTranslator);
+			if (startupLanguage != "en")
+			{
+				QVERIFY(m_qtStartupTranslator.load(
+					QString("%1/locale/qt_%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), startupLanguage)));
+				QCoreApplication::installTranslator(&m_qtStartupTranslator);
+			}
 		}
 		auto* config = ConfigManager::inst();
 		config->loadConfigFile(m_config.filePath("ui-config.xml"));
@@ -146,6 +350,7 @@ private slots:
 			config->setSTKDir(stkDir);
 		}
 		config->setValue("app", "configured", "1");
+		if (!startupLanguage.isEmpty()) { config->setValue("app", "language", startupLanguage); }
 		config->setValue("audioengine", "audiodev", AudioDummy::name());
 		m_gui = std::make_unique<GuiApplication>();
 		auto* window = m_gui->mainWindow();
@@ -156,8 +361,8 @@ private slots:
 		QVERIFY(QTest::qWaitForWindowExposed(window));
 		QJsonObject environment{{"qt", qVersion()}, {"platform", QGuiApplication::platformName()},
 			{"scale", window->devicePixelRatioF()}, {"font", window->font().toString()}, {"theme", "default"},
-			{"windowWidth", window->width()}, {"windowHeight", window->height()}, {"language", QLocale().name()},
-			{"simulatedScale", qEnvironmentVariable("QT_SCALE_FACTOR")}};
+			{"windowWidth", window->width()}, {"windowHeight", window->height()}, {"language", startupLanguage},
+			{"systemLocale", QLocale().name()}, {"simulatedScale", qEnvironmentVariable("QT_SCALE_FACTOR")}};
 		QFile metadata(m_output + "/environment.json");
 		QVERIFY(metadata.open(QIODevice::WriteOnly));
 		metadata.write(QJsonDocument(environment).toJson());
@@ -675,6 +880,7 @@ private slots:
 				QVERIFY(window->isVisible());
 				QVERIFY(!window->visibleRegion().isEmpty());
 				capture(m_gui->mainWindow(), evidencePrefix + '-' + name);
+				finalPluginHover(window, name);
 				if (name == "xpressive" && !selectedPlugins.isEmpty())
 				{
 					QWidget* helpButton = nullptr;
@@ -706,6 +912,12 @@ private slots:
 					}
 					QVERIFY(help->isVisible());
 					capture(m_gui->mainWindow(), evidencePrefix + "-help");
+					if (qEnvironmentVariableIsSet("LMMS_UI_FINAL_VALIDATION"))
+					{
+						help->verticalScrollBar()->setValue(help->verticalScrollBar()->maximum());
+						QCOMPARE(help->verticalScrollBar()->value(), help->verticalScrollBar()->maximum());
+						capture(m_gui->mainWindow(), evidencePrefix + "-help-bottom");
+					}
 					help->parentWidget()->hide();
 				}
 				window->toggleVisibility(false);
@@ -727,9 +939,15 @@ private slots:
 				}
 				chain->appendEffect(effect);
 				auto* panel = effect->controls()->createView();
+				if (panel && qEnvironmentVariableIsSet("LMMS_UI_FINAL_VALIDATION"))
+				{
+					// EffectView uses this same production container for effect controls.
+					m_gui->mainWindow()->addWindowedWidget(panel);
+				}
 				QVERIFY(panel);
 				const auto preset = settings(effect);
 				showEditor(panel, evidencePrefix + '-' + name);
+				finalPluginHover(panel, name);
 				if ((name == "frequencyshifter" || name == "granularpitchshifter" || name == "slewdistortion")
 					&& !selectedPlugins.isEmpty())
 				{
@@ -798,6 +1016,7 @@ private slots:
 				auto* panel = plugin->createView(m_gui->mainWindow());
 				QVERIFY(panel);
 				showEditor(panel, evidencePrefix + '-' + name);
+				finalPluginHover(panel, name);
 			}
 			coverage.append(QJsonObject{{"plugin", name}, {"status", "BASELINE CAPTURED"},
 				{"scope",
@@ -976,6 +1195,254 @@ private slots:
 		}
 		song->setModified(false);
 	}
+	void finalTranslations()
+	{
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		QVERIFY(!language.isEmpty());
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		const auto prefix = "M7-" + language;
+		QFile invalidMidi(m_config.filePath("invalid-日本語-한국어.mid"));
+		QVERIFY(invalidMidi.open(QIODevice::WriteOnly));
+		QCOMPARE(invalidMidi.write("invalid-midi"), qint64(12));
+		invalidMidi.close();
+		int midiDialogs = 0;
+		QTimer dismissMidi;
+		connect(&dismissMidi, &QTimer::timeout, this, [&] {
+			for (auto* widget : QApplication::topLevelWidgets())
+			{
+				auto* message = qobject_cast<QMessageBox*>(widget);
+				if (message && message->isVisible())
+				{
+					dismissMidi.stop();
+					capture(message, prefix + "-midi-error-" + QString::number(++midiDialogs));
+					message->done(QMessageBox::Ok);
+					dismissMidi.start(500);
+					break;
+				}
+			}
+		});
+		dismissMidi.start(500);
+		ImportFilter::import(invalidMidi.fileName(), Engine::getSong());
+		dismissMidi.stop();
+		QVERIFY(midiDialogs > 0);
+		capture(m_gui->mainWindow(), prefix + "-main");
+		auto* menuBar = m_gui->mainWindow()->menuBar();
+		QVERIFY(!menuBar->actions().isEmpty());
+		auto* menu = menuBar->actions().first()->menu();
+		QVERIFY(menu);
+		menu->popup(menuBar->mapToGlobal(menuBar->actionGeometry(menuBar->actions().first()).bottomLeft()));
+		capture(menu, prefix + "-menu");
+		menu->close();
+		for (const auto tab : {SetupDialog::ConfigTab::GeneralSettings, SetupDialog::ConfigTab::VstSettings,
+				 SetupDialog::ConfigTab::SvsSettings})
+		{
+			SetupDialog settings(tab);
+			const auto suffix = QString::number(static_cast<int>(tab));
+			capture(&settings, prefix + "-settings-" + suffix);
+			for (auto* scroll : settings.findChildren<QScrollArea*>())
+			{
+				if (scroll->isVisible() && scroll->verticalScrollBar()->maximum() > 0)
+				{
+					scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+					capture(&settings, prefix + "-settings-bottom-" + suffix);
+				}
+			}
+			if (auto* memory = settings.findChild<QComboBox*>("svsComputeMemoryPolicy"))
+			{
+				if (memory->isVisible()) { hoverCapture(memory, memory->toolTip(), prefix + "-compute-tooltip"); }
+			}
+			for (auto* tabs : settings.findChildren<QTabWidget*>())
+			{
+				for (int index = 0; index < tabs->count(); ++index)
+				{
+					if (tabs->tabText(index).contains("DiffSinger"))
+					{
+						tabs->setCurrentIndex(index);
+						capture(&settings, prefix + "-diffsinger-settings");
+					}
+				}
+			}
+			settings.close();
+		}
+		{
+			ScanRootsWidget roots({}, "Invalid VST scan roots JSON");
+			roots.resize(800, 400);
+			capture(&roots, prefix + "-scan-error");
+			roots.close();
+			SVSProjectImportDialog dialog(QJsonObject{{"id", "test"}, {"name", "Test format"}});
+			capture(&dialog, prefix + "-svs-import");
+			dialog.close();
+			ExportProjectDialog exportDialog(m_config.filePath("export.wav"), ExportProjectDialog::Mode::ExportProject);
+			capture(&exportDialog, prefix + "-export");
+			exportDialog.close();
+		}
+		auto* svcTrack = new SVCTrack(Engine::getSong());
+		svcTrack->setName("User model 日本語 한국어");
+		{
+			SVCWindow window(svcTrack);
+			capture(&window, prefix + "-svc-empty");
+			window.close();
+			SVCSettingsPage settings;
+			settings.resize(1000, 720);
+			capture(&settings, prefix + "-svc-settings");
+			settings.close();
+		}
+		delete svcTrack;
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "final-note";
+		note.duration = 96;
+		note.pitch = 60;
+		note.lyric = "日本語 한국어 中文";
+		note.language = "ja";
+		clip->setNotes({note});
+		{
+			SVSLyricEditor lyrics(clip, {note.id});
+			capture(&lyrics, prefix + "-lyrics");
+			auto* table = lyrics.findChild<QTableWidget*>("svsBatchLyricPreview");
+			QVERIFY(table && table->item(0, 3));
+			QCOMPARE(table->item(0, 3)->toolTip(), table->item(0, 3)->text());
+			const auto point = table->visualItemRect(table->item(0, 3)).center();
+			QTest::mouseMove(table->viewport(), point);
+			QTest::qWait(200);
+			QHelpEvent help(QEvent::ToolTip, point, table->viewport()->mapToGlobal(point));
+			QApplication::sendEvent(table->viewport(), &help);
+			QTest::qWait(600);
+			QCOMPARE(QToolTip::text(), table->item(0, 3)->text());
+			for (auto* widget : QApplication::topLevelWidgets())
+			{
+				if (widget->isVisible() && widget->windowType() == Qt::ToolTip)
+				{
+					capture(widget, prefix + "-lyric-tooltip");
+					break;
+				}
+			}
+			QToolTip::hideText();
+			QTest::qWait(400);
+			lyrics.close();
+		}
+		QDomDocument document;
+		auto node = document.createElement("svsclip");
+		node.setAttribute("seed", "invalid");
+		clip->loadSettings(node);
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			capture(&editor, prefix + "-svs-wide");
+			auto* status = editor.findChild<QLabel*>("svsSynthesisStatus");
+			QVERIFY(status);
+			const auto fullText = nativeTranslation::svsStatus(clip->status());
+			QCOMPARE(status->toolTip(), fullText);
+			auto* toolbar = editor.findChild<QScrollArea*>("svsToolbarScroll");
+			QVERIFY(toolbar);
+			toolbar->ensureWidgetVisible(status);
+			QTest::qWait(600);
+			QVERIFY(status->width() >= status->fontMetrics().horizontalAdvance(QString(QChar(0x2026))));
+			QVERIFY(!status->visibleRegion().isEmpty());
+			capture(&editor, prefix + "-svs-toolbar-end");
+			hoverCapture(status, fullText, prefix + "-svs-status-tooltip");
+			editor.resize(900, 600);
+			QCoreApplication::processEvents();
+			toolbar->ensureWidgetVisible(status);
+			capture(&editor, prefix + "-svs-narrow");
+			QCOMPARE(status->toolTip(), fullText);
+			editor.close();
+		}
+		delete track;
+	}
+	void finalProjectDialog()
+	{
+		const auto prefix = "M7-" + qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		const QJsonObject format{{"id", "test"}, {"name", "Test format"},
+			{"exportPolicy", QJsonObject{{"singing", 1}, {"audio", 1}}},
+			{"outputDefaults", QJsonObject{{"use_edited_pitch", true}}}};
+		const QJsonObject project{{"track_list",
+			QJsonArray{QJsonObject{{"type_", "Singing"}, {"title", "日本語 한국어 中文"}},
+				QJsonObject{{"type_", "Instrumental"}, {"title", "User accompaniment"}}}}};
+		SVSProjectExportDialog dialog(format, project);
+		QCOMPARE(dialog.windowTitle(), QCoreApplication::translate("SVSProjectUI", "Export SVS project"));
+		capture(&dialog, prefix + "-svs-project-export");
+		dialog.close();
+	}
+	void finalVoiceScenes()
+	{
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		const auto prefix = "M7-" + language;
+		const auto voices = svs::Registry::instance().voices();
+		const auto voice = std::find_if(voices.cbegin(), voices.cend(),
+			[](const auto& candidate) { return candidate.pluginId == "org.lmms.svs.example"; });
+		QVERIFY(voice != voices.cend());
+		auto* track = new SVSTrack(Engine::getSong());
+		track->bindVoice(voice->pluginId, voice->id);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "voice-scene-note";
+		note.duration = 96;
+		note.pitch = 60;
+		note.lyric = "你";
+		note.language = "zh";
+		clip->setNotes({note});
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			capture(&editor, prefix + "-voice-editor");
+			auto* config = ConfigManager::inst();
+			const auto previousLabels = config->value("ui", "printnotelabels", "0");
+			const auto previousMode = config->value("ui", "notelabelmode", "pitch");
+			config->setValue("ui", "printnotelabels", "1");
+			auto* labels = editor.findChild<QToolButton*>("noteLabelDisplayButton");
+			QVERIFY(labels && labels->isEnabled() && labels->menu());
+			labels->menu()->popup(labels->mapToGlobal(labels->rect().bottomLeft()));
+			capture(labels->menu(), prefix + "-note-label-menu");
+			labels->menu()->close();
+			for (auto* action : labels->menu()->actions())
+			{
+				if (action->data().toString() == "numbered") { action->trigger(); }
+			}
+			QCOMPARE(config->value("ui", "notelabelmode"), QString("numbered"));
+			capture(&editor, prefix + "-numbered-notes");
+			config->setValue("ui", "notelabelmode", previousMode);
+			config->setValue("ui", "printnotelabels", previousLabels);
+			int scrollIndex = 0;
+			for (auto* scroll : editor.findChildren<QScrollArea*>())
+			{
+				if (scroll->isVisible() && scroll->horizontalScrollBar()->maximum() > 0)
+				{
+					scroll->horizontalScrollBar()->setValue(scroll->horizontalScrollBar()->maximum());
+					capture(&editor, prefix + "-voice-horizontal-end-" + QString::number(++scrollIndex));
+				}
+				if (scroll->isVisible() && scroll->verticalScrollBar()->maximum() > 0)
+				{
+					scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+					capture(&editor, prefix + "-voice-parameters-bottom-" + QString::number(++scrollIndex));
+				}
+			}
+			editor.close();
+		}
+		delete track;
+		SVSSettingsPage settings;
+		settings.resize(1000, 720);
+		settings.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&settings));
+		for (auto* tabs : settings.findChildren<QTabWidget*>())
+		{
+			for (int index = 0; index < tabs->count(); ++index)
+			{
+				if (tabs->tabText(index).contains("DiffSinger")) { tabs->setCurrentIndex(index); }
+			}
+		}
+		capture(&settings, prefix + "-diffsinger-full");
+		for (auto* scroll : settings.findChildren<QScrollArea*>())
+		{
+			if (scroll->isVisible() && scroll->verticalScrollBar()->maximum() > 0)
+			{
+				scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+				capture(&settings, prefix + "-diffsinger-bottom");
+			}
+		}
+		settings.close();
+	}
 	void installedLaunch()
 	{
 		const auto executable = qEnvironmentVariable("LMMS_UI_INSTALLED_EXE");
@@ -996,10 +1463,14 @@ private slots:
 		QProcess child;
 		child.setProcessEnvironment(environment);
 		child.setWorkingDirectory(QFileInfo(executable).absolutePath());
-		child.start(executable,
-			{"--config", m_config.filePath("ui-config.xml"),
-				QFileInfo(qEnvironmentVariable("LMMS_UI_FIXTURE")).absolutePath()
-					+ "/modernization/modernization.mmp"});
+		QStringList arguments{"--config", m_config.filePath("ui-config.xml")};
+		const bool finalValidation = qEnvironmentVariableIsSet("LMMS_UI_FINAL_VALIDATION");
+		if (!finalValidation)
+		{
+			arguments.append(
+				QFileInfo(qEnvironmentVariable("LMMS_UI_FIXTURE")).absolutePath() + "/modernization/modernization.mmp");
+		}
+		child.start(executable, arguments);
 		QVERIFY(child.waitForStarted(5000));
 		struct WindowSearch
 		{
@@ -1023,18 +1494,21 @@ private slots:
 			return search.window != nullptr;
 		};
 		QTRY_VERIFY_WITH_TIMEOUT(findWindow(), 15000);
+		if (finalValidation) { QCOMPARE(GetDpiForWindow(search.window), UINT(96)); }
 		ShowWindow(search.window, SW_RESTORE);
 		SetForegroundWindow(search.window);
 		QTest::qWait(2000);
 		QCOMPARE(child.state(), QProcess::Running);
 		const auto image = m_gui->mainWindow()->screen()->grabWindow(reinterpret_cast<WId>(search.window));
 		QVERIFY(!image.isNull());
-		QVERIFY(image.save(m_output + "/S01-installed-executable.png"));
+		const auto evidenceName = finalValidation ? "M7-installed-" + qEnvironmentVariable("LMMS_UI_TRANSLATION")
+												  : QString("S01-installed-executable");
+		QVERIFY(image.save(m_output + '/' + evidenceName + ".png"));
 		PostMessageW(search.window, WM_CLOSE, 0, 0);
 		QVERIFY(child.waitForFinished(10000));
 		QCOMPARE(child.exitStatus(), QProcess::NormalExit);
 		QCOMPARE(child.exitCode(), 0);
-		QFile log(m_output + "/installed-executable.log");
+		QFile log(m_output + '/' + evidenceName + ".log");
 		QVERIFY(log.open(QIODevice::WriteOnly));
 		log.write(child.readAllStandardOutput() + child.readAllStandardError());
 #else

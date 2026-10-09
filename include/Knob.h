@@ -165,6 +165,7 @@ public:
 
 
 protected:
+	QString getDynamicFloatingText(const QString& currentValue) const override;
 	bool event(QEvent* event) override;
 	void paintEvent(QPaintEvent*) override;
 

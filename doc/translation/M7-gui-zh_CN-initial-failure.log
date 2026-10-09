@@ -1,0 +1,71 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QWARN  : UiBaselineCapture::initTestCase() ???????? D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll??????????????�
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+MidiImport::tryImport(): not a Standard MIDI file
+Error reading song: song node not found
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Microsoft YaHei UI", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Tahoma", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "SimSun", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Arial", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Gulim", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "MS UI Gothic", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Segoe UI Emoji", script 11
+QINFO  : UiBaselineCapture::finalTranslations() qt.text.font.db: OpenType support missing for "Segoe UI Symbol", script 11
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+A crash occurred in D:\UserData\Desktop\Project\lmms\build\tests\ui\Release\lmms.exe.
+While testing finalTranslations
+Function time: 11365ms Total time: 24525ms
+
+Exception address: 0x00007FFD41AF4449
+Exception code   : 0xc0000005
+Nearby symbol    : QWidgetPrivate::associatedScreen
+
+Stack:
+#  1: QTest::CrashHandler::prepareStackTrace() - 0x00007FFDA6AF9C00
+#  2: ImeExtension() - 0x00007FFD611CEE40
+#  3: PcDownloadPicIconAndNotify() - 0x00007FFD5B0682A0
+#  4: UnhandledExceptionFilter() - 0x00007FFE085BED90
+#  5: strncpy() - 0x00007FFE0B327150
+#  6: _C_specific_handler() - 0x00007FFE0B2E4670
+#  7: _chkstk() - 0x00007FFE0B325460
+#  8: RtlWow64GetCurrentMachine() - 0x00007FFE0B28B6D0
+#  9: KiUserExceptionDispatcher() - 0x00007FFE0B324E10
+# 10: QWidgetPrivate::associatedScreen() - 0x00007FFD41AF4440
+# 11: QWidget::screen() - 0x00007FFD41B07C30
+# 12: lmms::Lv2ControlBase::getPlugin() - 0x00007FF6F4E55320
+# 13: lmms::Engine::getSong() - 0x00007FF6F4E5A080
+# 14: lmms::EffectChain::effectCount() - 0x00007FF6F4E56D70
+# 15: QMetaMethodInvoker::invokeImpl() - 0x00007FFD40853FD0
+# 16: QMetaMethod::invokeImpl() - 0x00007FFD40853DB0
+# 17: QTest::ignoreMessage() - 0x00007FFDA6AD5E80
+# 18: QTest::ignoreMessage() - 0x00007FFDA6AD5E80
+# 19: QTest::ignoreMessage() - 0x00007FFDA6AD5E80
+# 20: QTest::ignoreMessage() - 0x00007FFDA6AD5E80
+# 21: QTest::qRun() - 0x00007FFDA6ADB310
+# 22: QTest::qExec() - 0x00007FFDA6AD8840
+# 23: lmms::TypedAutomatableModel<int>::value() - 0x00007FF6F4E6C5E0
+# 24: lmms::gui::TabBar::widgetShown() - 0x00007FF6F50E9680
+# 25: BaseThreadInitThunk() - 0x00007FFE09DACD70
+# 26: RtlUserThreadStart() - 0x00007FFE0B26CAC0

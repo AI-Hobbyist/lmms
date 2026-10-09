@@ -1,0 +1,40 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin frequencyshifter
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin compressor
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lb302
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin spectrumanalyzer
+FAIL!  : UiBaselineCapture::pluginPanels() 'tooltip' returned FALSE. (Visible tooltip missing: )
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(135) : failure location
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin waveshaper
+FAIL!  : UiBaselineCapture::pluginPanels() 'tooltip' returned FALSE. (Visible tooltip missing: )
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(135) : failure location
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin bitcrush
+FAIL!  : UiBaselineCapture::pluginPanels() 'tooltip' returned FALSE. (Visible tooltip missing: )
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(135) : failure location
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin xpressive
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin eq
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin organic
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin monstro
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vibedstrings
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin multitapecho
+FAIL!  : UiBaselineCapture::pluginPanels() 'tooltip' returned FALSE. (Visible tooltip missing: )
+D:\UserData\Desktop\Project\lmms\tests\ui\UiBaselineCapture.cpp(135) : failure location
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin freeboy
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin lomm
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin vestige
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin zynaddsubfx
+QDEBUG : UiBaselineCapture::pluginPanels() QtXmlWrapper::loadXMLfile(): empty data
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin malletsstk
+QINFO  : UiBaselineCapture::pluginPanels() Capturing plugin slicert
+PASS   : UiBaselineCapture::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 59277ms
+********* Finished testing of UiBaselineCapture *********

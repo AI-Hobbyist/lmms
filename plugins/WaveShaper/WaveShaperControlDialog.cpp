@@ -103,7 +103,8 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	auto clipInputToggle = new LedCheckBox(tr("Clip input"), this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
-	clipInputToggle->setToolTip(tr("Clip input signal to 0 dB"));
+	clipInputToggle->setToolTip(tr("Clip input") + '\n' + tr("Clip input signal to 0 dB"));
+	clipInputToggle->setFixedWidth(89);
 
 	connect( resetButton, SIGNAL (clicked () ),
 			_controls, SLOT ( resetClicked() ) );

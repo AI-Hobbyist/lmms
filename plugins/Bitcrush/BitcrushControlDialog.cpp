@@ -111,6 +111,15 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	levels->move( 92, 32 );
 	levels->setModel( & controls->m_levels );
 	levels->setHintText( tr( "Levels:" ) , "" );
+
+	// Keep labels within their existing columns; hover retains the full name and value.
+	inGain->setFixedWidth(42);
+	inNoise->setFixedWidth(56);
+	outGain->setFixedWidth(41);
+	outClip->setFixedWidth(41);
+	rate->setFixedWidth(32);
+	stereoDiff->setFixedWidth(64);
+	levels->setFixedWidth(44);
 }
 
 

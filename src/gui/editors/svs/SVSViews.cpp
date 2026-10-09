@@ -70,6 +70,42 @@
 
 namespace lmms::gui {
 namespace {
+class SVSStatusLabel final : public QLabel
+{
+public:
+	SVSStatusLabel(const QString& text, QWidget* parent)
+		: QLabel(parent)
+	{
+		setObjectName("svsSynthesisStatus");
+		setText(text);
+	}
+	void setText(const QString& text)
+	{
+		QLabel::setText(text);
+		setToolTip(text);
+	}
+	QSize sizeHint() const override
+	{
+		auto result = QLabel::sizeHint();
+		result.setWidth(std::min(240, result.width()));
+		return result;
+	}
+	QSize minimumSizeHint() const override
+	{
+		auto result = QLabel::minimumSizeHint();
+		result.setWidth(fontMetrics().horizontalAdvance(QString(QChar(0x2026))));
+		return result;
+	}
+
+protected:
+	void paintEvent(QPaintEvent*) override
+	{
+		QPainter painter(this);
+		style()->drawItemText(&painter, contentsRect(), alignment(), palette(), isEnabled(),
+			fontMetrics().elidedText(text(), Qt::ElideRight, contentsRect().width()), QPalette::WindowText);
+	}
+};
+
 // Global base values are declared by the selected engine/voice, never named here.
 class SVSGlobalControls final : public QWidget
 {
@@ -623,7 +659,8 @@ void SVSClipView::paintEvent(QPaintEvent*)
 	}
 	p.setPen(palette().text().color());
 	p.drawText(3, 12, m_clip->name());
-	p.drawText(3, height() - 3, nativeTranslation::svsStatus(m_clip->status()));
+	p.drawText(3, height() - 3,
+		p.fontMetrics().elidedText(nativeTranslation::svsStatus(m_clip->status()), Qt::ElideRight, width() - 6));
 	if (cornerRadius() > 0)
 	{
 		paintFlatBorder(p);
@@ -731,7 +768,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto* render = new QPushButton(tr("Synthesize"), this);
 	toolbar->addWidget(render);
 	connect(render, &QPushButton::clicked, clip, &SVSClip::synthesize);
-	auto* status = new QLabel(nativeTranslation::svsStatus(clip->status()), this);
+	auto* status = new SVSStatusLabel(nativeTranslation::svsStatus(clip->status()), this);
 	toolbar->addWidget(status);
 	connect(clip, &Clip::dataChanged, this, [clip, status, render] {
 		status->setText(nativeTranslation::svsStatus(clip->status()));

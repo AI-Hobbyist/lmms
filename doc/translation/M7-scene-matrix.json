@@ -1,0 +1,706 @@
+{
+  "milestone": "M7",
+  "implementation_checkpoint": "DONE",
+  "manual_validation": "PENDING (non-blocking under plan)",
+  "base_commit": "9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c",
+  "executable": "build/Release/lmms.exe",
+  "plugin_directory": "build/Release/plugins",
+  "platform": "native Windows Qt",
+  "scale": "100% / DPR 1 / production DPI 96",
+  "code_complete_before_gui": true,
+  "offscreen_used": false,
+  "static_key_count": 3877,
+  "static_quality": "PASS",
+  "enabled_plugin_dlls": 60,
+  "representative_plugins": [
+    "bitcrush",
+    "multitapecho",
+    "waveshaper",
+    "slicert",
+    "vibedstrings",
+    "xpressive",
+    "monstro",
+    "organic",
+    "spectrumanalyzer",
+    "malletsstk",
+    "compressor",
+    "eq",
+    "freeboy",
+    "frequencyshifter",
+    "lomm",
+    "zynaddsubfx",
+    "vestige",
+    "lb302"
+  ],
+  "languages": [
+    {
+      "language": "zh_CN",
+      "environment": "M7-environment-zh_CN.json",
+      "tests": {
+        "gui": {
+          "passed": 5,
+          "failed": 0,
+          "log": "M7-gui-zh_CN.log"
+        },
+        "plugins": {
+          "passed": 3,
+          "failed": 0,
+          "log": "M7-plugins-zh_CN.log"
+        },
+        "extra": {
+          "passed": 4,
+          "failed": 0,
+          "log": "M7-extra-zh_CN.log"
+        }
+      },
+      "scenes": [
+        {
+          "id": "main-menu-settings",
+          "description": "主窗口、菜单、常规/VST/SVS 设置、标准确认取消按钮",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-main.png",
+            "M7-zh_CN-menu.png",
+            "M7-zh_CN-settings-0.png",
+            "M7-zh_CN-settings-5.png",
+            "M7-zh_CN-settings-6.png"
+          ]
+        },
+        {
+          "id": "svs-editor",
+          "description": "SVSExample 参数、歌词/音素、曲线、音名/简谱及横向滚动全文",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-voice-editor.png",
+            "M7-zh_CN-note-label-menu.png",
+            "M7-zh_CN-numbered-notes.png"
+          ]
+        },
+        {
+          "id": "svs-long-text",
+          "description": "歌词诊断全文、状态省略与悬浮全文、1100/900 宽度一致性",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-lyrics.png",
+            "M7-zh_CN-lyric-tooltip.png",
+            "M7-zh_CN-svs-wide.png",
+            "M7-zh_CN-svs-toolbar-end.png",
+            "M7-zh_CN-svs-narrow.png",
+            "M7-zh_CN-svs-status-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-static-settings",
+          "description": "DiffSinger 固定设置、声库空状态及 DirectML/内存策略说明",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-diffsinger-settings.png",
+            "M7-zh_CN-diffsinger-full.png",
+            "M7-zh_CN-compute-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-project-dialogs",
+          "description": "SVS 导入/导出选项及音频导出对话框；保留第三方格式与用户轨道名称",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-svs-import.png",
+            "M7-zh_CN-svs-project-export.png",
+            "M7-zh_CN-export.png"
+          ]
+        },
+        {
+          "id": "svc-static",
+          "description": "SVC 空片段、A/B 固定操作及连接/重试等设置",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-svc-empty.png",
+            "M7-zh_CN-svc-settings.png"
+          ]
+        },
+        {
+          "id": "vst-midi-errors",
+          "description": "扫描 JSON 错误、VeSTige 未加载宿主及 MIDI 导入失败原生弹窗",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-scan-error.png",
+            "M7-zh_CN-midi-error-1.png",
+            "M7-zh_CN-midi-error-2.png",
+            "M7-zh_CN-plugin-vestige.png"
+          ]
+        },
+        {
+          "id": "plugins",
+          "description": "18 个原生插件面板；适用的预设保存/恢复、旋钮和复选框完整提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-plugin-bitcrush.png",
+            "M7-zh_CN-plugin-multitapecho.png",
+            "M7-zh_CN-plugin-waveshaper.png",
+            "M7-zh_CN-plugin-slicert.png",
+            "M7-zh_CN-plugin-vibedstrings.png",
+            "M7-zh_CN-plugin-xpressive.png",
+            "M7-zh_CN-plugin-monstro.png",
+            "M7-zh_CN-plugin-organic.png",
+            "M7-zh_CN-plugin-spectrumanalyzer.png",
+            "M7-zh_CN-plugin-malletsstk.png",
+            "M7-zh_CN-plugin-compressor.png",
+            "M7-zh_CN-plugin-eq.png",
+            "M7-zh_CN-plugin-freeboy.png",
+            "M7-zh_CN-plugin-frequencyshifter.png",
+            "M7-zh_CN-plugin-lomm.png",
+            "M7-zh_CN-plugin-zynaddsubfx.png",
+            "M7-zh_CN-plugin-vestige.png",
+            "M7-zh_CN-plugin-lb302.png"
+          ]
+        },
+        {
+          "id": "advanced-plugin-scenes",
+          "description": "Monstro 矩阵、频谱高级参数、STK 9/10 预设、Xpressive 帮助末尾、SlicerT 两个页脚提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-zh_CN-plugin-monstro-alternate-view.png",
+            "M7-zh_CN-plugin-spectrumanalyzer-alternate-view.png",
+            "M7-zh_CN-plugin-malletsstk-preset-9.png",
+            "M7-zh_CN-plugin-malletsstk-preset-10.png",
+            "M7-zh_CN-plugin-help-bottom.png",
+            "M7-zh_CN-plugin-slicert-Threshold-tooltip.png",
+            "M7-zh_CN-plugin-slicert-Fade-Out-tooltip.png"
+          ]
+        },
+        {
+          "id": "development-restart",
+          "description": "开发程序新进程选择当前语言，原位资源加载；Win32 DPI=96，正常退出",
+          "result": "PASS",
+          "evidence": [
+            "M7-installed-zh_CN.png",
+            "M7-installed-zh_CN.log"
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ja",
+      "environment": "M7-environment-ja.json",
+      "tests": {
+        "gui": {
+          "passed": 5,
+          "failed": 0,
+          "log": "M7-gui-ja.log"
+        },
+        "plugins": {
+          "passed": 3,
+          "failed": 0,
+          "log": "M7-plugins-ja.log"
+        },
+        "extra": {
+          "passed": 4,
+          "failed": 0,
+          "log": "M7-extra-ja.log"
+        }
+      },
+      "scenes": [
+        {
+          "id": "main-menu-settings",
+          "description": "主窗口、菜单、常规/VST/SVS 设置、标准确认取消按钮",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-main.png",
+            "M7-ja-menu.png",
+            "M7-ja-settings-0.png",
+            "M7-ja-settings-5.png",
+            "M7-ja-settings-6.png"
+          ]
+        },
+        {
+          "id": "svs-editor",
+          "description": "SVSExample 参数、歌词/音素、曲线、音名/简谱及横向滚动全文",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-voice-editor.png",
+            "M7-ja-note-label-menu.png",
+            "M7-ja-numbered-notes.png"
+          ]
+        },
+        {
+          "id": "svs-long-text",
+          "description": "歌词诊断全文、状态省略与悬浮全文、1100/900 宽度一致性",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-lyrics.png",
+            "M7-ja-lyric-tooltip.png",
+            "M7-ja-svs-wide.png",
+            "M7-ja-svs-toolbar-end.png",
+            "M7-ja-svs-narrow.png",
+            "M7-ja-svs-status-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-static-settings",
+          "description": "DiffSinger 固定设置、声库空状态及 DirectML/内存策略说明",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-diffsinger-settings.png",
+            "M7-ja-diffsinger-full.png",
+            "M7-ja-compute-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-project-dialogs",
+          "description": "SVS 导入/导出选项及音频导出对话框；保留第三方格式与用户轨道名称",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-svs-import.png",
+            "M7-ja-svs-project-export.png",
+            "M7-ja-export.png"
+          ]
+        },
+        {
+          "id": "svc-static",
+          "description": "SVC 空片段、A/B 固定操作及连接/重试等设置",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-svc-empty.png",
+            "M7-ja-svc-settings.png"
+          ]
+        },
+        {
+          "id": "vst-midi-errors",
+          "description": "扫描 JSON 错误、VeSTige 未加载宿主及 MIDI 导入失败原生弹窗",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-scan-error.png",
+            "M7-ja-midi-error-1.png",
+            "M7-ja-midi-error-2.png",
+            "M7-ja-plugin-vestige.png"
+          ]
+        },
+        {
+          "id": "plugins",
+          "description": "18 个原生插件面板；适用的预设保存/恢复、旋钮和复选框完整提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-plugin-bitcrush.png",
+            "M7-ja-plugin-multitapecho.png",
+            "M7-ja-plugin-waveshaper.png",
+            "M7-ja-plugin-slicert.png",
+            "M7-ja-plugin-vibedstrings.png",
+            "M7-ja-plugin-xpressive.png",
+            "M7-ja-plugin-monstro.png",
+            "M7-ja-plugin-organic.png",
+            "M7-ja-plugin-spectrumanalyzer.png",
+            "M7-ja-plugin-malletsstk.png",
+            "M7-ja-plugin-compressor.png",
+            "M7-ja-plugin-eq.png",
+            "M7-ja-plugin-freeboy.png",
+            "M7-ja-plugin-frequencyshifter.png",
+            "M7-ja-plugin-lomm.png",
+            "M7-ja-plugin-zynaddsubfx.png",
+            "M7-ja-plugin-vestige.png",
+            "M7-ja-plugin-lb302.png"
+          ]
+        },
+        {
+          "id": "advanced-plugin-scenes",
+          "description": "Monstro 矩阵、频谱高级参数、STK 9/10 预设、Xpressive 帮助末尾、SlicerT 两个页脚提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-ja-plugin-monstro-alternate-view.png",
+            "M7-ja-plugin-spectrumanalyzer-alternate-view.png",
+            "M7-ja-plugin-malletsstk-preset-9.png",
+            "M7-ja-plugin-malletsstk-preset-10.png",
+            "M7-ja-plugin-help-bottom.png",
+            "M7-ja-plugin-slicert-Threshold-tooltip.png",
+            "M7-ja-plugin-slicert-Fade-Out-tooltip.png"
+          ]
+        },
+        {
+          "id": "development-restart",
+          "description": "开发程序新进程选择当前语言，原位资源加载；Win32 DPI=96，正常退出",
+          "result": "PASS",
+          "evidence": [
+            "M7-installed-ja.png",
+            "M7-installed-ja.log"
+          ]
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "environment": "M7-environment-en.json",
+      "tests": {
+        "gui": {
+          "passed": 5,
+          "failed": 0,
+          "log": "M7-gui-en.log"
+        },
+        "plugins": {
+          "passed": 3,
+          "failed": 0,
+          "log": "M7-plugins-en.log"
+        },
+        "extra": {
+          "passed": 4,
+          "failed": 0,
+          "log": "M7-extra-en.log"
+        }
+      },
+      "scenes": [
+        {
+          "id": "main-menu-settings",
+          "description": "主窗口、菜单、常规/VST/SVS 设置、标准确认取消按钮",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-main.png",
+            "M7-en-menu.png",
+            "M7-en-settings-0.png",
+            "M7-en-settings-5.png",
+            "M7-en-settings-6.png"
+          ]
+        },
+        {
+          "id": "svs-editor",
+          "description": "SVSExample 参数、歌词/音素、曲线、音名/简谱及横向滚动全文",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-voice-editor.png",
+            "M7-en-note-label-menu.png",
+            "M7-en-numbered-notes.png"
+          ]
+        },
+        {
+          "id": "svs-long-text",
+          "description": "歌词诊断全文、状态省略与悬浮全文、1100/900 宽度一致性",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-lyrics.png",
+            "M7-en-lyric-tooltip.png",
+            "M7-en-svs-wide.png",
+            "M7-en-svs-toolbar-end.png",
+            "M7-en-svs-narrow.png",
+            "M7-en-svs-status-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-static-settings",
+          "description": "DiffSinger 固定设置、声库空状态及 DirectML/内存策略说明",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-diffsinger-settings.png",
+            "M7-en-diffsinger-full.png",
+            "M7-en-compute-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-project-dialogs",
+          "description": "SVS 导入/导出选项及音频导出对话框；保留第三方格式与用户轨道名称",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-svs-import.png",
+            "M7-en-svs-project-export.png",
+            "M7-en-export.png"
+          ]
+        },
+        {
+          "id": "svc-static",
+          "description": "SVC 空片段、A/B 固定操作及连接/重试等设置",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-svc-empty.png",
+            "M7-en-svc-settings.png"
+          ]
+        },
+        {
+          "id": "vst-midi-errors",
+          "description": "扫描 JSON 错误、VeSTige 未加载宿主及 MIDI 导入失败原生弹窗",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-scan-error.png",
+            "M7-en-midi-error-1.png",
+            "M7-en-midi-error-2.png",
+            "M7-en-plugin-vestige.png"
+          ]
+        },
+        {
+          "id": "plugins",
+          "description": "18 个原生插件面板；适用的预设保存/恢复、旋钮和复选框完整提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-plugin-bitcrush.png",
+            "M7-en-plugin-multitapecho.png",
+            "M7-en-plugin-waveshaper.png",
+            "M7-en-plugin-slicert.png",
+            "M7-en-plugin-vibedstrings.png",
+            "M7-en-plugin-xpressive.png",
+            "M7-en-plugin-monstro.png",
+            "M7-en-plugin-organic.png",
+            "M7-en-plugin-spectrumanalyzer.png",
+            "M7-en-plugin-malletsstk.png",
+            "M7-en-plugin-compressor.png",
+            "M7-en-plugin-eq.png",
+            "M7-en-plugin-freeboy.png",
+            "M7-en-plugin-frequencyshifter.png",
+            "M7-en-plugin-lomm.png",
+            "M7-en-plugin-zynaddsubfx.png",
+            "M7-en-plugin-vestige.png",
+            "M7-en-plugin-lb302.png"
+          ]
+        },
+        {
+          "id": "advanced-plugin-scenes",
+          "description": "Monstro 矩阵、频谱高级参数、STK 9/10 预设、Xpressive 帮助末尾、SlicerT 两个页脚提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-en-plugin-monstro-alternate-view.png",
+            "M7-en-plugin-spectrumanalyzer-alternate-view.png",
+            "M7-en-plugin-malletsstk-preset-9.png",
+            "M7-en-plugin-malletsstk-preset-10.png",
+            "M7-en-plugin-help-bottom.png",
+            "M7-en-plugin-slicert-Threshold-tooltip.png",
+            "M7-en-plugin-slicert-Fade-Out-tooltip.png"
+          ]
+        },
+        {
+          "id": "development-restart",
+          "description": "开发程序新进程选择当前语言，原位资源加载；Win32 DPI=96，正常退出",
+          "result": "PASS",
+          "evidence": [
+            "M7-installed-en.png",
+            "M7-installed-en.log"
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ko",
+      "environment": "M7-environment-ko.json",
+      "tests": {
+        "gui": {
+          "passed": 5,
+          "failed": 0,
+          "log": "M7-gui-ko.log"
+        },
+        "plugins": {
+          "passed": 3,
+          "failed": 0,
+          "log": "M7-plugins-ko.log"
+        },
+        "extra": {
+          "passed": 4,
+          "failed": 0,
+          "log": "M7-extra-ko.log"
+        }
+      },
+      "scenes": [
+        {
+          "id": "main-menu-settings",
+          "description": "主窗口、菜单、常规/VST/SVS 设置、标准确认取消按钮",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-main.png",
+            "M7-ko-menu.png",
+            "M7-ko-settings-0.png",
+            "M7-ko-settings-5.png",
+            "M7-ko-settings-6.png"
+          ]
+        },
+        {
+          "id": "svs-editor",
+          "description": "SVSExample 参数、歌词/音素、曲线、音名/简谱及横向滚动全文",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-voice-editor.png",
+            "M7-ko-note-label-menu.png",
+            "M7-ko-numbered-notes.png"
+          ]
+        },
+        {
+          "id": "svs-long-text",
+          "description": "歌词诊断全文、状态省略与悬浮全文、1100/900 宽度一致性",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-lyrics.png",
+            "M7-ko-lyric-tooltip.png",
+            "M7-ko-svs-wide.png",
+            "M7-ko-svs-toolbar-end.png",
+            "M7-ko-svs-narrow.png",
+            "M7-ko-svs-status-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-static-settings",
+          "description": "DiffSinger 固定设置、声库空状态及 DirectML/内存策略说明",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-diffsinger-settings.png",
+            "M7-ko-diffsinger-full.png",
+            "M7-ko-compute-tooltip.png"
+          ]
+        },
+        {
+          "id": "svs-project-dialogs",
+          "description": "SVS 导入/导出选项及音频导出对话框；保留第三方格式与用户轨道名称",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-svs-import.png",
+            "M7-ko-svs-project-export.png",
+            "M7-ko-export.png"
+          ]
+        },
+        {
+          "id": "svc-static",
+          "description": "SVC 空片段、A/B 固定操作及连接/重试等设置",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-svc-empty.png",
+            "M7-ko-svc-settings.png"
+          ]
+        },
+        {
+          "id": "vst-midi-errors",
+          "description": "扫描 JSON 错误、VeSTige 未加载宿主及 MIDI 导入失败原生弹窗",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-scan-error.png",
+            "M7-ko-midi-error-1.png",
+            "M7-ko-midi-error-2.png",
+            "M7-ko-plugin-vestige.png"
+          ]
+        },
+        {
+          "id": "plugins",
+          "description": "18 个原生插件面板；适用的预设保存/恢复、旋钮和复选框完整提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-plugin-bitcrush.png",
+            "M7-ko-plugin-multitapecho.png",
+            "M7-ko-plugin-waveshaper.png",
+            "M7-ko-plugin-slicert.png",
+            "M7-ko-plugin-vibedstrings.png",
+            "M7-ko-plugin-xpressive.png",
+            "M7-ko-plugin-monstro.png",
+            "M7-ko-plugin-organic.png",
+            "M7-ko-plugin-spectrumanalyzer.png",
+            "M7-ko-plugin-malletsstk.png",
+            "M7-ko-plugin-compressor.png",
+            "M7-ko-plugin-eq.png",
+            "M7-ko-plugin-freeboy.png",
+            "M7-ko-plugin-frequencyshifter.png",
+            "M7-ko-plugin-lomm.png",
+            "M7-ko-plugin-zynaddsubfx.png",
+            "M7-ko-plugin-vestige.png",
+            "M7-ko-plugin-lb302.png"
+          ]
+        },
+        {
+          "id": "advanced-plugin-scenes",
+          "description": "Monstro 矩阵、频谱高级参数、STK 9/10 预设、Xpressive 帮助末尾、SlicerT 两个页脚提示",
+          "result": "PASS",
+          "evidence": [
+            "M7-ko-plugin-monstro-alternate-view.png",
+            "M7-ko-plugin-spectrumanalyzer-alternate-view.png",
+            "M7-ko-plugin-malletsstk-preset-9.png",
+            "M7-ko-plugin-malletsstk-preset-10.png",
+            "M7-ko-plugin-help-bottom.png",
+            "M7-ko-plugin-slicert-Threshold-tooltip.png",
+            "M7-ko-plugin-slicert-Fade-Out-tooltip.png"
+          ]
+        },
+        {
+          "id": "development-restart",
+          "description": "开发程序新进程选择当前语言，原位资源加载；Win32 DPI=96，正常退出",
+          "result": "PASS",
+          "evidence": [
+            "M7-installed-ko.png",
+            "M7-installed-ko.log"
+          ]
+        }
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "id": "diffsinger-render-pitch-directml",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "当前没有配置可合成且支持自动音高的 DiffSinger 模型；测试入口副本不含 SVSCompute 运行库，不能据此验收实际 DirectML 运算。生产 build/Release/plugins/SVSCompute.dll 已部署。",
+      "restore": "在现有开发部署配置可用 DiffSinger 声库和模型服务，使用 build/Release/lmms.exe 实窗验证实际合成、DirectML 状态与音高重录；不改 SDK/布局。"
+    },
+    {
+      "id": "svc-rvc-live-ab-overload",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "缺少连接中的 RVC 服务、模型与音频样本；已验证空状态和固定设置。",
+      "restore": "连接既有 RVC API，加载模型和音频样本，实窗检查实际参数、转换状态与 A/B 过载提示。"
+    },
+    {
+      "id": "external-project-conversion",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "本阶段验证生产导入/导出对话框；没有外部格式转换器与完整有损输入样本，未验收实际第三方转换/损失弹窗。",
+      "restore": "配置既有项目格式处理器和有损样本，四语实窗完成导入/导出及损失/失败提示；本地控制器回归见 M6-svs-regression.log。"
+    },
+    {
+      "id": "carla",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "Carla 运行依赖/JACK 环境不可用；不以启动或卸载异常扩大翻译修改。",
+      "restore": "恢复 Carla/JACK 运行环境，在现有 build/Release/plugins 下验证 Rack/Patchbay 原生宿主窗口。"
+    },
+    {
+      "id": "lv2",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "没有外部 LV2 乐器/效果器样本。",
+      "restore": "提供有效外部 LV2 样本，在原开发安装验证宿主固定提示；第三方 GUI 原文保留。"
+    },
+    {
+      "id": "disabled-sid-gigplayer",
+      "languages": [
+        "zh_CN",
+        "ja",
+        "en",
+        "ko"
+      ],
+      "result": "MANUAL/PENDING",
+      "reason": "当前配置禁用 SID/GigPlayer；原部署目录无残留 DLL，见 M7-deployment.json。",
+      "restore": "后续需要时使用原配置和已有依赖启用对应目标，仍原位部署后四语实窗验收。"
+    }
+  ],
+  "visual_inspection": {
+    "result": "PASS",
+    "languages": [
+      "zh_CN",
+      "ja",
+      "en",
+      "ko"
+    ],
+    "notes": "检查原生窗口截图：中日韩字形正常；日语 Bitcrush/MultitapEcho/WaveShaper 和 SlicerT 页脚省略可见，悬浮全文及原说明/数值/单位保留；现有水平滚动提供声库状态/曲线全文。英文位图、品牌、用户项目/歌词和外部元数据按范围保留。"
+  },
+  "test_harness_diagnostics": "初次悬浮测试激活 tooltip 导致 Qt 删除窗口、独立效果器测试窗不符合 EffectView 的 MDI 容器、瞬态 tooltip 与延迟隐藏等已按生产真实窗口路径修正；失败日志保留。原始静态提取漏 -I include/ 已按既定命令纠正。"
+}

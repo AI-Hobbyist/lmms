@@ -1,0 +1,28 @@
+warning: in the working copy of 'plugins/MultitapEcho/MultitapEchoControlDialog.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'plugins/SlicerT/SlicerTView.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'plugins/WaveShaper/WaveShaperControlDialog.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSViews.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c",
+  "working_diff_sha256": "2bf0e1b8e1ef62beb659c10410afa7512431440bba4234a51bbedbac9e627ede",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1131,
+  "key_count": 3877,
+  "summary": {
+    "zh_CN": {
+      "same-source": 154,
+      "translated": 3723
+    },
+    "ja": {
+      "same-source": 163,
+      "translated": 3714
+    },
+    "en": {
+      "source": 3877
+    },
+    "ko": {
+      "same-source": 156,
+      "translated": 3721
+    }
+  }
+}
