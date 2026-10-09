@@ -4956,6 +4956,24 @@ void PianoRoll::updatePositionAccompany()
 			autoScroll( pos );
 		}
 	}
+	else if (s->isPlaying() && s->playMode() == Song::PlayMode::Song && hasValidMidiClip() && isVisible())
+	{
+		// Song playback scans only this clip; the piano roll keeps clip-relative time.
+		const auto start = m_midiClip->startPosition();
+		const auto end = start + m_midiClip->length();
+		if (m_midiClip->getTrack()->trackContainer() != s || t < start || t >= end)
+		{
+			m_positionLine->hide();
+			return;
+		}
+		const TimePos local = t - start - m_midiClip->startTimeOffset();
+		m_timeLine->timeline()->setTicks(local, false);
+		if (m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled)
+		{
+			autoScroll(local);
+		}
+		updatePositionLinePos();
+	}
 }
 
 

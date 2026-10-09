@@ -109,6 +109,11 @@
 #include "SetupDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
+#include "InstrumentTrack.h"
+#include "MidiClip.h"
+#include "Note.h"
+#include "PianoRoll.h"
+#include "PositionLine.h"
 #include "TimeLineWidget.h"
 #include "Timeline.h"
 #include "SubWindow.h"
@@ -197,6 +202,105 @@ private slots:
 		}
 		else
 			Engine::destroy();
+	}
+	void midiPianoRollSongSweepNative()
+	{
+		QVERIFY(m_guiApplication);
+		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
+		auto* song = Engine::getSong();
+		song->clearProject();
+		auto* window = m_guiApplication->pianoRoll();
+		auto* mainWindow = m_guiApplication->mainWindow();
+		const bool mainWasVisible = mainWindow->isVisible();
+		auto* roll = window->findChild<gui::PianoRoll*>();
+		QVERIFY(roll);
+		auto* localTimeline = roll->findChild<gui::TimeLineWidget*>();
+		auto* pointer = roll->findChild<gui::PositionLine*>();
+		QScrollBar* horizontal = nullptr;
+		for (auto* bar : roll->findChildren<QScrollBar*>())
+		{
+			if (bar->orientation() == Qt::Horizontal)
+			{
+				horizontal = bar;
+			}
+		}
+		QVERIFY(localTimeline && pointer && horizontal);
+		const auto originalMode = localTimeline->autoScroll();
+		const auto cleanup = qScopeGuard([&] {
+			song->stop();
+			window->setCurrentMidiClip(nullptr);
+			window->hide();
+			if (!mainWasVisible)
+			{
+				mainWindow->hide();
+			}
+			localTimeline->setAutoScroll(originalMode);
+			song->clearProject();
+		});
+		auto* track = static_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, song));
+		track->setMuted(true);
+		auto* clip = static_cast<MidiClip*>(track->createClip(384));
+		clip->addNote(Note(TimePos(3072), TimePos(24), 60), false);
+		clip->setAutoResize(false);
+		clip->changeLength(3072);
+		clip->setStartTimeOffset(-24);
+		auto* other = static_cast<MidiClip*>(track->createClip(4608));
+		other->addNote(Note(TimePos(3072), TimePos(0), 64), false);
+		window->setCurrentMidiClip(clip);
+		mainWindow->resize(1400, 1000);
+		mainWindow->show();
+		window->resize(1200, 700);
+		window->show();
+		QVERIFY(QTest::qWaitForWindowExposed(window));
+		QTest::qWait(600);
+		localTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
+		song->playSong();
+		auto& timeline = song->getTimeline(Song::PlayMode::Song);
+		horizontal->setValue(0);
+		timeline.setTicks(100);
+		QCOMPARE(horizontal->value(), 0);
+		QVERIFY(!pointer->isVisible());
+		timeline.setTicks(384 + 1000);
+		QCOMPARE(localTimeline->timeline()->ticks(), 1024);
+		QVERIFY(horizontal->value() > 0);
+		QVERIFY(pointer->isVisible());
+		const int pointerBefore = pointer->x();
+		const int scrollBefore = horizontal->value();
+		localTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Disabled);
+		timeline.setTicks(384 + 1050);
+		QCOMPARE(horizontal->value(), scrollBefore);
+		QVERIFY(pointer->isVisible());
+		QVERIFY(pointer->x() > pointerBefore);
+		localTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
+		timeline.setTicks(384 + 2000);
+		QVERIFY(horizontal->value() > scrollBefore);
+		QTest::qWait(700);
+		QVERIFY(
+			roll->screen()->grabWindow(roll->winId()).save("doc/svs/validation/MIDI-piano-roll-song-sweep-native.png"));
+		const int afterSweep = horizontal->value();
+		const int localAfterSweep = localTimeline->timeline()->ticks();
+		timeline.setTicks(5000);
+		QCOMPARE(horizontal->value(), afterSweep);
+		QCOMPARE(localTimeline->timeline()->ticks(), localAfterSweep);
+		QVERIFY(!pointer->isVisible());
+		// A loop entering this clip again starts a fresh clip-relative sweep.
+		timeline.setTicks(384);
+		QCOMPARE(localTimeline->timeline()->ticks(), 24);
+		QCOMPARE(horizontal->value(), 0);
+		QVERIFY(pointer->isVisible());
+		timeline.setTicks(384 + 1000);
+		QVERIFY(horizontal->value() > 0);
+		localTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Stepped);
+		timeline.setTicks(384);
+		QCOMPARE(horizontal->value(), 0);
+		timeline.setTicks(384 + 2500);
+		QVERIFY(horizontal->value() > 0);
+		song->stop();
+		song->playMidiClip(clip, false);
+		localTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
+		localTimeline->timeline()->setTicks(1200);
+		QVERIFY(horizontal->value() > 0);
+		QVERIFY(pointer->isVisible());
 	}
 	void svsFollowSongTimelineNative()
 	{
