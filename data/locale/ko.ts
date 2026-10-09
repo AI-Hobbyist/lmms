@@ -6786,7 +6786,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>FDBK</source>
-        <translation>FDBK</translation>
+        <translation>피드백</translation>
     </message>
     <message>
         <source>Feedback amount:</source>
@@ -6802,11 +6802,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>양</translation>
     </message>
     <message>
         <source>LFO amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 변조량:</translation>
     </message>
     <message>
         <source>Out gain</source>
@@ -6821,7 +6821,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::DispersionControlDialog</name>
     <message>
         <source>AMOUNT</source>
-        <translation>AMOUNT</translation>
+        <translation>양</translation>
     </message>
     <message>
         <source>Number of all-pass filters</source>
@@ -6829,7 +6829,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -6841,7 +6841,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation>공진</translation>
     </message>
     <message>
         <source>Resonance:</source>
@@ -6853,7 +6853,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>FEED</source>
-        <translation>FEED</translation>
+        <translation>피드백</translation>
     </message>
     <message>
         <source>Feedback:</source>
@@ -6876,7 +6876,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::DualFilterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Cutoff frequency</source>
@@ -6884,7 +6884,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation>공진</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -6900,7 +6900,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>MIX</source>
-        <translation>MIX</translation>
+        <translation>믹스</translation>
     </message>
     <message>
         <source>Mix</source>

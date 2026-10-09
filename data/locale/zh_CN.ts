@@ -982,7 +982,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>An all-pass filter allowing for extremely high orders.</source>
-        <translation type="unfinished"></translation>
+        <translation>支持极高阶数的全通滤波器。</translation>
     </message>
     <message>
         <source>A frequency shifter (not a pitch shifter) and barberpole phaser plugin</source>
@@ -1892,7 +1892,7 @@ Continue?</source>
     </message>
     <message>
         <source>Knee</source>
-        <translation type="unfinished"></translation>
+        <translation>拐点</translation>
     </message>
     <message>
         <source>Hold</source>
@@ -1904,19 +1904,19 @@ Continue?</source>
     </message>
     <message>
         <source>RMS Size</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS 窗口大小</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>中间/侧边</translation>
     </message>
     <message>
         <source>Peak Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值模式</translation>
     </message>
     <message>
         <source>Lookahead Length</source>
-        <translation type="unfinished"></translation>
+        <translation>前瞻时长</translation>
     </message>
     <message>
         <source>Input Balance</source>
@@ -1940,7 +1940,7 @@ Continue?</source>
     </message>
     <message>
         <source>Blend</source>
-        <translation type="unfinished"></translation>
+        <translation>混合</translation>
     </message>
     <message>
         <source>Stereo Balance</source>
@@ -1948,11 +1948,11 @@ Continue?</source>
     </message>
     <message>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>自动补偿增益</translation>
     </message>
     <message>
         <source>Audition</source>
-        <translation type="unfinished"></translation>
+        <translation>试听</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -1960,27 +1960,27 @@ Continue?</source>
     </message>
     <message>
         <source>Auto Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>自动起音</translation>
     </message>
     <message>
         <source>Auto Release</source>
-        <translation type="unfinished"></translation>
+        <translation>自动释音</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>前瞻</translation>
     </message>
     <message>
         <source>Tilt</source>
-        <translation type="unfinished"></translation>
+        <translation>倾斜</translation>
     </message>
     <message>
         <source>Tilt Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>倾斜频率</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声联动</translation>
     </message>
     <message>
         <source>Mix</source>
@@ -2044,7 +2044,7 @@ Continue?</source>
     </message>
     <message>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"></translation>
+        <translation>消除直流偏移</translation>
     </message>
 </context>
 <context>
@@ -2171,7 +2171,7 @@ Continue?</source>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation>SV Notch</translation>
+        <translation>状态变量陷波</translation>
     </message>
     <message>
         <source>Fast Formant</source>
@@ -2179,7 +2179,7 @@ Continue?</source>
     </message>
     <message>
         <source>Tripole</source>
-        <translation>Tripole</translation>
+        <translation>三极滤波</translation>
     </message>
 </context>
 <context>
@@ -6335,11 +6335,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::CompressorControlDialog</name>
     <message>
         <source>Threshold:</source>
-        <translation type="unfinished"></translation>
+        <translation>阈值：</translation>
     </message>
     <message>
         <source>Volume at which the compression begins to take place</source>
-        <translation type="unfinished"></translation>
+        <translation>开始压缩时的音量</translation>
     </message>
     <message>
         <source>Ratio:</source>
@@ -6347,7 +6347,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>How far the compressor must turn the volume down after crossing the threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>超过阈值后压缩器需要降低音量的程度</translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -6355,7 +6355,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Speed at which the compressor starts to compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩器开始压缩音频的速度</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -6363,31 +6363,31 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Speed at which the compressor ceases to compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩器停止压缩音频的速度</translation>
     </message>
     <message>
         <source>Knee:</source>
-        <translation type="unfinished"></translation>
+        <translation>拐点：</translation>
     </message>
     <message>
         <source>Smooth out the gain reduction curve around the threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑阈值附近的增益衰减曲线</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>范围：</translation>
     </message>
     <message>
         <source>Maximum gain reduction</source>
-        <translation type="unfinished"></translation>
+        <translation>最大增益衰减</translation>
     </message>
     <message>
         <source>Lookahead Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>前瞻时长：</translation>
     </message>
     <message>
         <source>How long the compressor has to react to the sidechain signal ahead of time</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩器提前响应侧链信号的时间</translation>
     </message>
     <message>
         <source>Hold:</source>
@@ -6395,87 +6395,87 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Delay between attack and release stages</source>
-        <translation type="unfinished"></translation>
+        <translation>起音与释音阶段之间的延迟</translation>
     </message>
     <message>
         <source>RMS Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS 窗口大小：</translation>
     </message>
     <message>
         <source>Size of the RMS buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS 缓冲区大小</translation>
     </message>
     <message>
         <source>Input Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>输入平衡：</translation>
     </message>
     <message>
         <source>Bias the input audio to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>将输入音频偏向左/右或中间/侧边</translation>
     </message>
     <message>
         <source>Output Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>输出平衡：</translation>
     </message>
     <message>
         <source>Bias the output audio to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>将输出音频偏向左/右或中间/侧边</translation>
     </message>
     <message>
         <source>Stereo Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声平衡：</translation>
     </message>
     <message>
         <source>Bias the sidechain signal to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>将侧链信号偏向左/右或中间/侧边</translation>
     </message>
     <message>
         <source>Stereo Link Blend:</source>
-        <translation type="unfinished"></translation>
+        <translation>立体声联动混合：</translation>
     </message>
     <message>
         <source>Blend between unlinked/maximum/average/minimum stereo linking modes</source>
-        <translation type="unfinished"></translation>
+        <translation>混合独立/最大/平均/最小立体声联动模式</translation>
     </message>
     <message>
         <source>Tilt Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>倾斜增益：</translation>
     </message>
     <message>
         <source>Bias the sidechain signal to the low or high frequencies.  -6 db is lowpass, 6 db is highpass.</source>
-        <translation type="unfinished"></translation>
+        <translation>将侧链信号偏向低频或高频。-6 db 为低通，6 db 为高通。</translation>
     </message>
     <message>
         <source>Tilt Frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>倾斜频率：</translation>
     </message>
     <message>
         <source>Center frequency of sidechain tilt filter</source>
-        <translation type="unfinished"></translation>
+        <translation>侧链倾斜滤波器的中心频率</translation>
     </message>
     <message>
         <source>Mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>混合：</translation>
     </message>
     <message>
         <source>Balance between wet and dry signals</source>
-        <translation type="unfinished"></translation>
+        <translation>平衡湿信号与干信号</translation>
     </message>
     <message>
         <source>Auto Attack:</source>
-        <translation type="unfinished"></translation>
+        <translation>自动起音：</translation>
     </message>
     <message>
         <source>Automatically control attack value depending on crest factor</source>
-        <translation type="unfinished"></translation>
+        <translation>根据峰值因数自动控制起音值</translation>
     </message>
     <message>
         <source>Auto Release:</source>
-        <translation type="unfinished"></translation>
+        <translation>自动释音：</translation>
     </message>
     <message>
         <source>Automatically control release value depending on crest factor</source>
-        <translation type="unfinished"></translation>
+        <translation>根据峰值因数自动控制释音值</translation>
     </message>
     <message>
         <source>Output gain</source>
@@ -6487,7 +6487,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Output volume</source>
-        <translation type="unfinished"></translation>
+        <translation>输出音量</translation>
     </message>
     <message>
         <source>Input gain</source>
@@ -6495,47 +6495,47 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Input volume</source>
-        <translation type="unfinished"></translation>
+        <translation>输入音量</translation>
     </message>
     <message>
         <source>Root Mean Square</source>
-        <translation type="unfinished"></translation>
+        <translation>均方根</translation>
     </message>
     <message>
         <source>Use RMS of the input</source>
-        <translation type="unfinished"></translation>
+        <translation>使用输入均方根</translation>
     </message>
     <message>
         <source>Peak</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值</translation>
     </message>
     <message>
         <source>Use absolute value of the input</source>
-        <translation type="unfinished"></translation>
+        <translation>使用输入绝对值</translation>
     </message>
     <message>
         <source>Left/Right</source>
-        <translation type="unfinished"></translation>
+        <translation>左/右</translation>
     </message>
     <message>
         <source>Compress left and right audio</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩左/右通道音频</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>中间/侧边</translation>
     </message>
     <message>
         <source>Compress mid and side audio</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩中间/侧边音频</translation>
     </message>
     <message>
         <source>Compressor</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩器</translation>
     </message>
     <message>
         <source>Compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>压缩音频</translation>
     </message>
     <message>
         <source>Limiter</source>
@@ -6543,75 +6543,75 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Set Ratio to infinity (is not guaranteed to limit audio volume)</source>
-        <translation type="unfinished"></translation>
+        <translation>将压缩比设为无穷大（不保证限制音频音量）</translation>
     </message>
     <message>
         <source>Unlinked</source>
-        <translation type="unfinished"></translation>
+        <translation>独立</translation>
     </message>
     <message>
         <source>Compress each channel separately</source>
-        <translation type="unfinished"></translation>
+        <translation>分别压缩各通道</translation>
     </message>
     <message>
         <source>Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>最大</translation>
     </message>
     <message>
         <source>Compress based on the loudest channel</source>
-        <translation type="unfinished"></translation>
+        <translation>按最大音量通道压缩</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>平均</translation>
     </message>
     <message>
         <source>Compress based on the averaged channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>按通道平均音量压缩</translation>
     </message>
     <message>
         <source>Minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>最小</translation>
     </message>
     <message>
         <source>Compress based on the quietest channel</source>
-        <translation type="unfinished"></translation>
+        <translation>按最小音量通道压缩</translation>
     </message>
     <message>
         <source>Blend</source>
-        <translation type="unfinished"></translation>
+        <translation>混合</translation>
     </message>
     <message>
         <source>Blend between stereo linking modes</source>
-        <translation type="unfinished"></translation>
+        <translation>混合立体声联动模式</translation>
     </message>
     <message>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>自动补偿增益</translation>
     </message>
     <message>
         <source>Automatically change makeup gain depending on threshold, knee, and ratio settings</source>
-        <translation type="unfinished"></translation>
+        <translation>根据阈值、拐点和压缩比设置自动调整补偿增益</translation>
     </message>
     <message>
         <source>Soft Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>软削波</translation>
     </message>
     <message>
         <source>Play the delta signal</source>
-        <translation type="unfinished"></translation>
+        <translation>播放差分信号</translation>
     </message>
     <message>
         <source>Use the compressor&apos;s output as the sidechain input</source>
-        <translation type="unfinished"></translation>
+        <translation>将压缩器输出作为侧链输入</translation>
     </message>
     <message>
         <source>Lookahead Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>启用前瞻</translation>
     </message>
     <message>
         <source>Enable Lookahead, which introduces 20 milliseconds of latency</source>
-        <translation type="unfinished"></translation>
+        <translation>启用前瞻，会引入 20 毫秒延迟</translation>
     </message>
 </context>
 <context>
@@ -6731,47 +6731,47 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::CrossoverEQControlDialog</name>
     <message>
         <source>Band 1/2 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 1/2 分频点</translation>
     </message>
     <message>
         <source>Band 2/3 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 2/3 分频点</translation>
     </message>
     <message>
         <source>Band 3/4 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 3/4 分频点</translation>
     </message>
     <message>
         <source>Band 1 gain</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 1 增益</translation>
     </message>
     <message>
         <source>Band 2 gain</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 2 增益</translation>
     </message>
     <message>
         <source>Band 3 gain</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 3 增益</translation>
     </message>
     <message>
         <source>Band 4 gain</source>
-        <translation type="unfinished"></translation>
+        <translation>频段 4 增益</translation>
     </message>
     <message>
         <source>Mute band 1</source>
-        <translation type="unfinished"></translation>
+        <translation>静音频段 1</translation>
     </message>
     <message>
         <source>Mute band 2</source>
-        <translation type="unfinished"></translation>
+        <translation>静音频段 2</translation>
     </message>
     <message>
         <source>Mute band 3</source>
-        <translation type="unfinished"></translation>
+        <translation>静音频段 3</translation>
     </message>
     <message>
         <source>Mute band 4</source>
-        <translation type="unfinished"></translation>
+        <translation>静音频段 4</translation>
     </message>
 </context>
 <context>
@@ -6782,7 +6782,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Delay time:</source>
-        <translation type="unfinished"></translation>
+        <translation>延迟时间：</translation>
     </message>
     <message>
         <source>FDBK</source>
@@ -6790,11 +6790,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Feedback amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>反馈量：</translation>
     </message>
     <message>
         <source>RATE</source>
-        <translation type="unfinished"></translation>
+        <translation>速率</translation>
     </message>
     <message>
         <source>LFO frequency:</source>
@@ -6806,11 +6806,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>LFO amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 调制量：</translation>
     </message>
     <message>
         <source>Out gain</source>
-        <translation type="unfinished"></translation>
+        <translation>输出增益</translation>
     </message>
     <message>
         <source>Gain:</source>
@@ -6821,11 +6821,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::DispersionControlDialog</name>
     <message>
         <source>AMOUNT</source>
-        <translation type="unfinished"></translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>Number of all-pass filters</source>
-        <translation type="unfinished"></translation>
+        <translation>全通滤波器数量</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -6849,27 +6849,27 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>octaves</source>
-        <translation type="unfinished"></translation>
+        <translation>八度</translation>
     </message>
     <message>
         <source>FEED</source>
-        <translation type="unfinished"></translation>
+        <translation>反馈</translation>
     </message>
     <message>
         <source>Feedback:</source>
-        <translation type="unfinished"></translation>
+        <translation>反馈：</translation>
     </message>
     <message>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"></translation>
+        <translation>消除直流偏移</translation>
     </message>
     <message>
         <source>DC</source>
-        <translation type="unfinished"></translation>
+        <translation>DC</translation>
     </message>
     <message>
         <source>Remove DC Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>消除直流偏移</translation>
     </message>
 </context>
 <context>
@@ -6916,11 +6916,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Enable/disable filter 1</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/禁用滤波器 1</translation>
     </message>
     <message>
         <source>Enable/disable filter 2</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/禁用滤波器 2</translation>
     </message>
 </context>
 <context>

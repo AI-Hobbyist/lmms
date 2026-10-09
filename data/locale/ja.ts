@@ -820,7 +820,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>A dynamic range compressor.</source>
-        <translation type="unfinished"></translation>
+        <translation>ダイナミックレンジコンプレッサー。</translation>
     </message>
     <message>
         <source>A 4-band Crossover Equalizer</source>
@@ -982,7 +982,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>An all-pass filter allowing for extremely high orders.</source>
-        <translation type="unfinished"></translation>
+        <translation>非常に高い次数に対応するオールパスフィルター。</translation>
     </message>
     <message>
         <source>A frequency shifter (not a pitch shifter) and barberpole phaser plugin</source>
@@ -1892,67 +1892,67 @@ Continue?</source>
     </message>
     <message>
         <source>Knee</source>
-        <translation type="unfinished"></translation>
+        <translation>ニー</translation>
     </message>
     <message>
         <source>Hold</source>
-        <translation>Hold</translation>
+        <translation>ホールド</translation>
     </message>
     <message>
         <source>Range</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲</translation>
     </message>
     <message>
         <source>RMS Size</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS バッファーサイズ</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>ミッド／サイド</translation>
     </message>
     <message>
         <source>Peak Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ピークモード</translation>
     </message>
     <message>
         <source>Lookahead Length</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド時間</translation>
     </message>
     <message>
         <source>Input Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>入力バランス</translation>
     </message>
     <message>
         <source>Output Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>出力バランス</translation>
     </message>
     <message>
         <source>Limiter</source>
-        <translation type="unfinished"></translation>
+        <translation>リミッター</translation>
     </message>
     <message>
         <source>Output Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>出力ゲイン</translation>
     </message>
     <message>
         <source>Input Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ゲイン</translation>
     </message>
     <message>
         <source>Blend</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレンド</translation>
     </message>
     <message>
         <source>Stereo Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオバランス</translation>
     </message>
     <message>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>自動メイクアップゲイン</translation>
     </message>
     <message>
         <source>Audition</source>
-        <translation type="unfinished"></translation>
+        <translation>試聴</translation>
     </message>
     <message>
         <source>Feedback</source>
@@ -1960,27 +1960,27 @@ Continue?</source>
     </message>
     <message>
         <source>Auto Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>自動アタック</translation>
     </message>
     <message>
         <source>Auto Release</source>
-        <translation type="unfinished"></translation>
+        <translation>自動リリース</translation>
     </message>
     <message>
         <source>Lookahead</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド</translation>
     </message>
     <message>
         <source>Tilt</source>
-        <translation type="unfinished"></translation>
+        <translation>ティルト</translation>
     </message>
     <message>
         <source>Tilt Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>ティルト周波数</translation>
     </message>
     <message>
         <source>Stereo Link</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオリンク</translation>
     </message>
     <message>
         <source>Mix</source>
@@ -2028,7 +2028,7 @@ Continue?</source>
     <name>lmms::DispersionControls</name>
     <message>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -2044,7 +2044,7 @@ Continue?</source>
     </message>
     <message>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"></translation>
+        <translation>DC オフセット除去</translation>
     </message>
 </context>
 <context>
@@ -2063,7 +2063,7 @@ Continue?</source>
     </message>
     <message>
         <source>Q/Resonance 1</source>
-        <translation>Q/Resonance 1</translation>
+        <translation>Q／レゾナンス 1</translation>
     </message>
     <message>
         <source>Gain 1</source>
@@ -2087,7 +2087,7 @@ Continue?</source>
     </message>
     <message>
         <source>Q/Resonance 2</source>
-        <translation>Q/Resonance 2</translation>
+        <translation>Q／レゾナンス 2</translation>
     </message>
     <message>
         <source>Gain 2</source>
@@ -2111,7 +2111,7 @@ Continue?</source>
     </message>
     <message>
         <source>Notch</source>
-        <translation>Notch</translation>
+        <translation>ノッチ</translation>
     </message>
     <message>
         <source>All-pass</source>
@@ -2171,15 +2171,15 @@ Continue?</source>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation>SV Notch</translation>
+        <translation>状態変数ノッチ</translation>
     </message>
     <message>
         <source>Fast Formant</source>
-        <translation>Fast Formant</translation>
+        <translation>高速フォルマント</translation>
     </message>
     <message>
         <source>Tripole</source>
-        <translation>Tripole</translation>
+        <translation>3 極フィルター</translation>
     </message>
 </context>
 <context>
@@ -6337,11 +6337,11 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::CompressorControlDialog</name>
     <message>
         <source>Threshold:</source>
-        <translation type="unfinished"></translation>
+        <translation>しきい値：</translation>
     </message>
     <message>
         <source>Volume at which the compression begins to take place</source>
-        <translation type="unfinished"></translation>
+        <translation>圧縮を開始する音量</translation>
     </message>
     <message>
         <source>Ratio:</source>
@@ -6349,7 +6349,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>How far the compressor must turn the volume down after crossing the threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>しきい値を超えたときにコンプレッサーが音量を下げる程度</translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -6357,7 +6357,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Speed at which the compressor starts to compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>コンプレッサーが音声の圧縮を開始する速度</translation>
     </message>
     <message>
         <source>Release:</source>
@@ -6365,119 +6365,119 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Speed at which the compressor ceases to compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>コンプレッサーが音声の圧縮を解除する速度</translation>
     </message>
     <message>
         <source>Knee:</source>
-        <translation type="unfinished"></translation>
+        <translation>ニー：</translation>
     </message>
     <message>
         <source>Smooth out the gain reduction curve around the threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>しきい値付近のゲインリダクション曲線を滑らかにする</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>範囲：</translation>
     </message>
     <message>
         <source>Maximum gain reduction</source>
-        <translation type="unfinished"></translation>
+        <translation>最大ゲインリダクション</translation>
     </message>
     <message>
         <source>Lookahead Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド時間：</translation>
     </message>
     <message>
         <source>How long the compressor has to react to the sidechain signal ahead of time</source>
-        <translation type="unfinished"></translation>
+        <translation>コンプレッサーがサイドチェイン信号に先行して反応する時間</translation>
     </message>
     <message>
         <source>Hold:</source>
-        <translation>Hold:</translation>
+        <translation>ホールド：</translation>
     </message>
     <message>
         <source>Delay between attack and release stages</source>
-        <translation type="unfinished"></translation>
+        <translation>アタックとリリースの間の遅延</translation>
     </message>
     <message>
         <source>RMS Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS バッファーサイズ：</translation>
     </message>
     <message>
         <source>Size of the RMS buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS バッファーのサイズ</translation>
     </message>
     <message>
         <source>Input Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>入力バランス：</translation>
     </message>
     <message>
         <source>Bias the input audio to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音声を左／右またはミッド／サイドに偏らせる</translation>
     </message>
     <message>
         <source>Output Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>出力バランス：</translation>
     </message>
     <message>
         <source>Bias the output audio to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音声を左／右またはミッド／サイドに偏らせる</translation>
     </message>
     <message>
         <source>Stereo Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオバランス：</translation>
     </message>
     <message>
         <source>Bias the sidechain signal to the left/right or mid/side</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチェイン信号を左／右またはミッド／サイドに偏らせる</translation>
     </message>
     <message>
         <source>Stereo Link Blend:</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオリンクのブレンド：</translation>
     </message>
     <message>
         <source>Blend between unlinked/maximum/average/minimum stereo linking modes</source>
-        <translation type="unfinished"></translation>
+        <translation>非リンク／最大／平均／最小のステレオリンクモードをブレンド</translation>
     </message>
     <message>
         <source>Tilt Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>ティルトゲイン：</translation>
     </message>
     <message>
         <source>Bias the sidechain signal to the low or high frequencies.  -6 db is lowpass, 6 db is highpass.</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチェイン信号を低域または高域に偏らせます。-6 db はローパス、6 db はハイパスです。</translation>
     </message>
     <message>
         <source>Tilt Frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>ティルト周波数：</translation>
     </message>
     <message>
         <source>Center frequency of sidechain tilt filter</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドチェインのティルトフィルターの中心周波数</translation>
     </message>
     <message>
         <source>Mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>ミックス：</translation>
     </message>
     <message>
         <source>Balance between wet and dry signals</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェット信号とドライ信号のバランス</translation>
     </message>
     <message>
         <source>Auto Attack:</source>
-        <translation type="unfinished"></translation>
+        <translation>自動アタック：</translation>
     </message>
     <message>
         <source>Automatically control attack value depending on crest factor</source>
-        <translation type="unfinished"></translation>
+        <translation>クレストファクターに応じてアタック値を自動制御</translation>
     </message>
     <message>
         <source>Auto Release:</source>
-        <translation type="unfinished"></translation>
+        <translation>自動リリース：</translation>
     </message>
     <message>
         <source>Automatically control release value depending on crest factor</source>
-        <translation type="unfinished"></translation>
+        <translation>クレストファクターに応じてリリース値を自動制御</translation>
     </message>
     <message>
         <source>Output gain</source>
@@ -6489,7 +6489,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Output volume</source>
-        <translation type="unfinished"></translation>
+        <translation>出力音量</translation>
     </message>
     <message>
         <source>Input gain</source>
@@ -6497,123 +6497,123 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>Input volume</source>
-        <translation type="unfinished"></translation>
+        <translation>入力音量</translation>
     </message>
     <message>
         <source>Root Mean Square</source>
-        <translation type="unfinished"></translation>
+        <translation>二乗平均平方根</translation>
     </message>
     <message>
         <source>Use RMS of the input</source>
-        <translation type="unfinished"></translation>
+        <translation>入力の RMS を使用</translation>
     </message>
     <message>
         <source>Peak</source>
-        <translation type="unfinished"></translation>
+        <translation>ピーク</translation>
     </message>
     <message>
         <source>Use absolute value of the input</source>
-        <translation type="unfinished"></translation>
+        <translation>入力の絶対値を使用</translation>
     </message>
     <message>
         <source>Left/Right</source>
-        <translation type="unfinished"></translation>
+        <translation>左／右</translation>
     </message>
     <message>
         <source>Compress left and right audio</source>
-        <translation type="unfinished"></translation>
+        <translation>左右の音声を圧縮</translation>
     </message>
     <message>
         <source>Mid/Side</source>
-        <translation type="unfinished"></translation>
+        <translation>ミッド／サイド</translation>
     </message>
     <message>
         <source>Compress mid and side audio</source>
-        <translation type="unfinished"></translation>
+        <translation>ミッドとサイドの音声を圧縮</translation>
     </message>
     <message>
         <source>Compressor</source>
-        <translation type="unfinished"></translation>
+        <translation>コンプレッサー</translation>
     </message>
     <message>
         <source>Compress the audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音声を圧縮</translation>
     </message>
     <message>
         <source>Limiter</source>
-        <translation type="unfinished"></translation>
+        <translation>リミッター</translation>
     </message>
     <message>
         <source>Set Ratio to infinity (is not guaranteed to limit audio volume)</source>
-        <translation type="unfinished"></translation>
+        <translation>比率を無限大に設定（音量が制限される保証はありません）</translation>
     </message>
     <message>
         <source>Unlinked</source>
-        <translation type="unfinished"></translation>
+        <translation>非リンク</translation>
     </message>
     <message>
         <source>Compress each channel separately</source>
-        <translation type="unfinished"></translation>
+        <translation>各チャンネルを個別に圧縮</translation>
     </message>
     <message>
         <source>Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>最大</translation>
     </message>
     <message>
         <source>Compress based on the loudest channel</source>
-        <translation type="unfinished"></translation>
+        <translation>最も大きい音量のチャンネルに基づき圧縮</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>平均</translation>
     </message>
     <message>
         <source>Compress based on the averaged channel volume</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネルの平均音量に基づき圧縮</translation>
     </message>
     <message>
         <source>Minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>最小</translation>
     </message>
     <message>
         <source>Compress based on the quietest channel</source>
-        <translation type="unfinished"></translation>
+        <translation>最も小さい音量のチャンネルに基づき圧縮</translation>
     </message>
     <message>
         <source>Blend</source>
-        <translation type="unfinished"></translation>
+        <translation>ブレンド</translation>
     </message>
     <message>
         <source>Blend between stereo linking modes</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオリンクモード間のブレンド</translation>
     </message>
     <message>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>自動メイクアップゲイン</translation>
     </message>
     <message>
         <source>Automatically change makeup gain depending on threshold, knee, and ratio settings</source>
-        <translation type="unfinished"></translation>
+        <translation>しきい値、ニー、比率の設定に応じてメイクアップゲインを自動調整</translation>
     </message>
     <message>
         <source>Soft Clip</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトクリップ</translation>
     </message>
     <message>
         <source>Play the delta signal</source>
-        <translation type="unfinished"></translation>
+        <translation>差分信号を再生</translation>
     </message>
     <message>
         <source>Use the compressor&apos;s output as the sidechain input</source>
-        <translation type="unfinished"></translation>
+        <translation>コンプレッサーの出力をサイドチェイン入力に使用</translation>
     </message>
     <message>
         <source>Lookahead Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッド有効</translation>
     </message>
     <message>
         <source>Enable Lookahead, which introduces 20 milliseconds of latency</source>
-        <translation type="unfinished"></translation>
+        <translation>ルックアヘッドを有効化（20 ミリ秒の遅延が発生）</translation>
     </message>
 </context>
 <context>
@@ -6733,15 +6733,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::CrossoverEQControlDialog</name>
     <message>
         <source>Band 1/2 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域 1／2 のクロスオーバー</translation>
     </message>
     <message>
         <source>Band 2/3 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域 2／3 のクロスオーバー</translation>
     </message>
     <message>
         <source>Band 3/4 crossover</source>
-        <translation type="unfinished"></translation>
+        <translation>帯域 3／4 のクロスオーバー</translation>
     </message>
     <message>
         <source>Band 1 gain</source>
@@ -6800,15 +6800,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>LFO frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 周波数：</translation>
     </message>
     <message>
         <source>AMNT</source>
-        <translation>AMNT</translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>LFO amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 変調量：</translation>
     </message>
     <message>
         <source>Out gain</source>
@@ -6823,15 +6823,15 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <name>lmms::gui::DispersionControlDialog</name>
     <message>
         <source>AMOUNT</source>
-        <translation type="unfinished"></translation>
+        <translation>量</translation>
     </message>
     <message>
         <source>Number of all-pass filters</source>
-        <translation type="unfinished"></translation>
+        <translation>オールパスフィルターの数</translation>
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -6855,30 +6855,30 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <source>FEED</source>
-        <translation type="unfinished"></translation>
+        <translation>帰還</translation>
     </message>
     <message>
         <source>Feedback:</source>
-        <translation type="unfinished"></translation>
+        <translation>帰還：</translation>
     </message>
     <message>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"></translation>
+        <translation>DC オフセット除去</translation>
     </message>
     <message>
         <source>DC</source>
-        <translation type="unfinished"></translation>
+        <translation>DC</translation>
     </message>
     <message>
         <source>Remove DC Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>DC オフセットを除去</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::DualFilterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Cutoff frequency</source>

@@ -139,3 +139,7 @@ M4 检查点 `f036467a1584780e9f8b91b4d5ebc81300cfe9b2` 已推送并确认远端
 
 M5-01 实窗补充：推送 `16f6990a30263fcce62533a271798d04e1af0522` 后复核韩语截图，确认 BitInvader 的 Interpolation/Normalize 原来仅提示被翻译，显示标签仍使用字面量。以既有 tr 入口替换两个标签，不增加键、不改控件位置、预设或算法。新增真实 LedCheckBox 文本断言，四语重新启动实窗复测。首次测试编译遇到 LedCheckBox::text() 非 const 接口，调整测试遍历指针后通过，不修改生产接口；失败日志保留。
 补充验证结果：四语 BitInvader 复测各 3 PASS，实际标签和截图均命中译文，100% 缩放；M5-01 103 键质量再次 PASS。
+
+M5-02：前批补充修正 `1150afb55ba9d60b7ab7c37667fa8abfaa2534c6` 推送确认后开始。Compressor/CrossoverEQ/Delay/Dispersion/DualFilter 共 192 键四语质量 PASS；中/日/韩分别修改 109/114/12 个待译或同原文项，保留 Moog 专名、DC 缩写与 Hz 单位，逐语言理由已记录。全库剩余空译 736/861/52，全部为后续插件批次。
+
+本批仅译文，无 C++ 变更，按计划生成四语 QM 并复用已编译的原生窗口测试程序。四语 pluginPanels 各 3 PASS、0 FAIL，100% 缩放，五个真实效果器窗及预设保存/恢复检查通过。代表截图确认中日韩字形正常。CodeGraph 核对 CompressorControlDialog：面板英文标识来自 controlsBox 与按钮位图，运行时参数提示使用 tr；保留既有位图，不改主题/控件设计，实际悬浮提示的可读性留 M7。开发加载目录仍为 build/Release/plugins。
