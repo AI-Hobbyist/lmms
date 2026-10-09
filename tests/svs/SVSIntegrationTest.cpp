@@ -184,6 +184,47 @@ private slots:
 		else
 			Engine::destroy();
 	}
+	void relativeConfigurationPaths()
+	{
+		auto* config = ConfigManager::inst();
+		config->saveConfigFile();
+		const auto original = m_configuration.filePath("svs-test-config.xml");
+		const auto previousDirectory = QDir::currentPath();
+		const auto restore = qScopeGuard([&] {
+			QDir::setCurrent(previousDirectory);
+			config->loadConfigFile(original);
+		});
+		const auto path = m_configuration.filePath("relative-paths.xml");
+		QFile file(path);
+		QVERIFY(file.open(QIODevice::WriteOnly));
+		const QByteArray xml = "<lmms><paths workingdir=\"lmms-workspace/\" "
+							   "vstdir=\"lmms-workspace/vst/\" gigdir=\"lmms-workspace/samples/gig/\" "
+							   "sf2dir=\"lmms-workspace/samples/soundfonts/\" "
+							   "ladspadir=\"lmms-workspace/plugins/ladspa/\" theme=\"data:/themes/default/\" /></lmms>";
+		QCOMPARE(file.write(xml), qint64(xml.size()));
+		file.close();
+		QVERIFY(QDir::setCurrent(m_configuration.path()));
+		config->loadConfigFile(path);
+		const QDir application(QCoreApplication::applicationDirPath());
+		QCOMPARE(config->workingDir(), application.absoluteFilePath("lmms-workspace/"));
+		QCOMPARE(config->vstDir(), application.absoluteFilePath("lmms-workspace/vst/"));
+		QCOMPARE(config->gigDir(), application.absoluteFilePath("lmms-workspace/samples/gig/"));
+		QCOMPARE(config->sf2Dir(), application.absoluteFilePath("lmms-workspace/samples/soundfonts/"));
+		QCOMPARE(config->ladspaDir(), application.absoluteFilePath("lmms-workspace/plugins/ladspa/"));
+		config->setSF2Dir(m_configuration.filePath("external-soundfonts/"));
+		config->saveConfigFile();
+		QVERIFY(file.open(QIODevice::ReadOnly));
+		QDomDocument document;
+		QVERIFY(document.setContent(file.readAll()));
+		file.close();
+		const auto paths = document.documentElement().firstChildElement("paths");
+		QCOMPARE(paths.attribute("workingdir"), QString("lmms-workspace/"));
+		QCOMPARE(paths.attribute("vstdir"), QString("lmms-workspace/vst/"));
+		QCOMPARE(paths.attribute("sf2dir"), m_configuration.filePath("external-soundfonts/"));
+		QCOMPARE(paths.attribute("theme"), QString("data:/themes/default/"));
+		config->loadConfigFile(path);
+		QCOMPARE(config->workingDir(), application.absoluteFilePath("lmms-workspace/"));
+	}
 	void nativeLadspaPluginHost()
 	{
 #ifdef Q_OS_WIN

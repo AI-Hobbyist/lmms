@@ -58,6 +58,21 @@ static inline QString ensureTrailingSlash(const QString & s )
 	return s;
 }
 
+namespace {
+QString resolveConfigPath(const QString& path)
+{
+	if (path.isEmpty() || path.contains(':') || QDir::isAbsolutePath(path)) { return path; }
+	return QDir(qApp->applicationDirPath()).absoluteFilePath(path);
+}
+
+QString portableConfigPath(const QString& path)
+{
+	if (path.isEmpty() || !QDir::isAbsolutePath(path)) { return path; }
+	const auto relative = QDir(qApp->applicationDirPath()).relativeFilePath(path);
+	if (relative == ".." || relative.startsWith("../") || QDir::isAbsolutePath(relative)) { return path; }
+	return path.endsWith('/') || path.endsWith('\\') ? ensureTrailingSlash(relative) : relative;
+}
+} // namespace
 
 ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
@@ -554,6 +569,12 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 				node = node.nextSibling();
 			}
 
+			for (const auto* name : {"theme", "workingdir", "vstdir", "gigdir", "sf2dir", "ladspadir", "stkdir",
+					 "defaultsf2", "backgroundtheme"})
+			{
+				setValue("paths", name, resolveConfigPath(value("paths", name)));
+			}
+
 			if(value("paths", "theme") != "")
 			{
 				m_themeDir = value("paths", "theme");
@@ -684,6 +705,11 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "defaultsf2", m_sf2File);
 #endif
 	setValue("paths", "backgroundtheme", m_backgroundPicFile);
+	for (const auto* name : {"theme", "workingdir", "vstdir", "gigdir", "sf2dir", "ladspadir", "stkdir",
+			 "defaultsf2", "backgroundtheme"})
+	{
+		setValue("paths", name, portableConfigPath(value("paths", name)));
+	}
 
 	QDomDocument doc("lmms-config-file");
 
@@ -761,7 +787,11 @@ void ConfigManager::initPortableWorkingDir()
 
 void ConfigManager::initInstalledWorkingDir()
 {
+#ifdef LMMS_BUILD_WIN32
+	m_workingDir = qApp->applicationDirPath() + "/lmms-workspace/";
+#else
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
+#endif
 	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
 	// Detect < 1.2.0 working directory as a courtesy
 	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
