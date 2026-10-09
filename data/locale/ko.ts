@@ -511,87 +511,87 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>Pitch detection method</source>
-        <translation type="unfinished"></translation>
+        <translation>피치 검출 방식</translation>
     </message>
     <message>
         <source>Index rate</source>
-        <translation type="unfinished"></translation>
+        <translation>인덱스 비율</translation>
     </message>
     <message>
         <source>Index mode</source>
-        <translation type="unfinished"></translation>
+        <translation>인덱스 모드</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation type="unfinished"></translation>
+        <translation>인덱스</translation>
     </message>
     <message>
         <source>Protect unvoiced consonants</source>
-        <translation type="unfinished"></translation>
+        <translation>무성 자음 보호</translation>
     </message>
     <message>
         <source>Filter radius</source>
-        <translation type="unfinished"></translation>
+        <translation>필터 반경</translation>
     </message>
     <message>
         <source>Volume envelope mix</source>
-        <translation type="unfinished"></translation>
+        <translation>음량 엔벌로프 믹스</translation>
     </message>
     <message>
         <source>Output sample rate</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 샘플레이트</translation>
     </message>
     <message>
         <source>Chunk duration</source>
-        <translation type="unfinished"></translation>
+        <translation>청크 길이</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>끄기</translation>
     </message>
     <message>
         <source>Required</source>
-        <translation type="unfinished"></translation>
+        <translation>필수</translation>
     </message>
     <message>
         <source>Speaker 0</source>
-        <translation type="unfinished"></translation>
+        <translation>화자 0</translation>
     </message>
     <message>
         <source>Automatic / no index</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 / 인덱스 없음</translation>
     </message>
     <message>
         <source>This weight has no usable index</source>
-        <translation type="unfinished"></translation>
+        <translation>이 가중치에는 사용 가능한 인덱스가 없습니다</translation>
     </message>
     <message>
         <source>Backend did not report availability</source>
-        <translation type="unfinished"></translation>
+        <translation>백엔드가 사용 가능 여부를 보고하지 않았습니다</translation>
     </message>
     <message>
         <source>Weight is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>가중치 사용 불가</translation>
     </message>
     <message>
         <source>Index is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>인덱스 사용 불가</translation>
     </message>
     <message>
         <source>Multiple compatible indexes require an explicit selection</source>
-        <translation type="unfinished"></translation>
+        <translation>호환되는 인덱스가 여러 개 있습니다. 명시적으로 선택하세요</translation>
     </message>
     <message>
         <source>Hz (0 = model rate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hz (0 = 모델 샘플레이트)</translation>
     </message>
     <message>
         <source>semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>반음</translation>
     </message>
 </context>
 <context>
@@ -1123,27 +1123,27 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Audio received; validating completion</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 수신 완료, 완료 상태 검증 중</translation>
     </message>
     <message>
         <source>Backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>백엔드 전처리</translation>
     </message>
     <message>
         <source>Backend processing</source>
-        <translation type="unfinished"></translation>
+        <translation>백엔드 처리</translation>
     </message>
     <message>
         <source>Uploading: %1 bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>업로드 중: %1바이트</translation>
     </message>
     <message>
         <source>Upload complete; backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>업로드 완료, 백엔드 전처리</translation>
     </message>
     <message>
         <source>Failed: %1; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>실패: %1. 부분 결과 유지</translation>
     </message>
     <message>
         <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
@@ -1167,15 +1167,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Select a weight</source>
-        <translation type="unfinished"></translation>
+        <translation>가중치 선택</translation>
     </message>
     <message>
         <source>Unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 불가</translation>
     </message>
     <message>
         <source>Unavailable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 불가: %1</translation>
     </message>
     <message>
         <source>SVS plugin settings</source>
@@ -4541,7 +4541,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::ProjectRenderer</name>
     <message>
         <source>SVC track &apos;%1&apos;: &apos;%2&apos; needs a successful re-render before export.</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 트랙 &apos;%1&apos;: &apos;%2&apos;을(를) 성공적으로 다시 변환해야 내보낼 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -4574,82 +4574,82 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SVCClip</name>
     <message>
         <source>SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 오디오</translation>
     </message>
     <message>
         <source>Audio import failed</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 가져오기 실패</translation>
     </message>
     <message>
         <source>Cannot read source audio</source>
-        <translation type="unfinished"></translation>
+        <translation>원본 오디오를 읽을 수 없습니다</translation>
     </message>
     <message>
         <source>Needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>재변환 필요</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 가져오기</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished"></translation>
+        <translation>대기 중</translation>
     </message>
     <message>
         <source>Segment %1/%2, backend chunk %3/%4; replaced %5%</source>
-        <translation type="unfinished"></translation>
+        <translation>구간 %1/%2, 백엔드 청크 %3/%4. %5% 교체 완료</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>완료</translation>
     </message>
     <message>
         <source>Queued next segment</source>
-        <translation type="unfinished"></translation>
+        <translation>다음 구간 대기 중</translation>
     </message>
     <message>
         <source>Cancelled; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>취소됨, 부분 결과</translation>
     </message>
     <message>
         <source>Failed; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>실패, 부분 결과</translation>
     </message>
     <message>
         <source>Source missing; import audio again</source>
-        <translation type="unfinished"></translation>
+        <translation>원본 오디오 없음, 다시 가져오세요</translation>
     </message>
     <message>
         <source>Source changed; needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>원본 오디오 변경됨, 재변환 필요</translation>
     </message>
     <message>
         <source>Result missing or incomplete; original audio restored</source>
-        <translation type="unfinished"></translation>
+        <translation>결과가 없거나 불완전합니다. 원본 오디오를 복원했습니다</translation>
     </message>
 </context>
 <context>
     <name>lmms::SVCTrack</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>음량</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>팬</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>믹서 채널</translation>
     </message>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>가창 변환</translation>
     </message>
 </context>
 <context>
@@ -11420,273 +11420,277 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVCBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>검색</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 오디오 가져오기</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 (*.wav *.flac *.ogg *.mp3);;모든 파일 (*)</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 가져오기</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>다시 변환</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>이름 변경</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCLabelButton</name>
     <message>
         <source>Open SVC plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 플러그인 열기</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>다시 변환</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCSettingsPage</name>
     <message>
         <source>Configure each SVC engine independently. Leave Bearer token empty for a local server without authentication. Tokens stay in memory unless saved in Windows Credential Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>각 SVC 엔진을 개별적으로 설정합니다. 인증이 없는 로컬 서버는 Bearer 토큰을 비워 두세요. Windows 자격 증명 관리자에 저장하지 않으면 토큰은 메모리에만 유지됩니다.</translation>
     </message>
     <message>
         <source>Defaults for new SVC tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>새 SVC 트랙의 기본값</translation>
     </message>
     <message>
         <source>Silence threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>무음 임계값</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>길이 임계값</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>강제 분할 길이</translation>
     </message>
     <message>
         <source>Automatic reconnection (all SVC engines)</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 재연결 (모든 SVC 엔진)</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 초</translation>
     </message>
     <message>
         <source>Reconnect interval</source>
-        <translation type="unfinished"></translation>
+        <translation>재연결 간격</translation>
     </message>
     <message>
         <source>Maximum retries</source>
-        <translation type="unfinished"></translation>
+        <translation>최대 재시도 횟수</translation>
     </message>
     <message>
         <source>Start automatic reconnection</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 재연결 시작</translation>
     </message>
     <message>
         <source>Save token in Windows Credential Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows 자격 증명 관리자에 토큰 저장</translation>
     </message>
     <message>
         <source>API address</source>
-        <translation type="unfinished"></translation>
+        <translation>API 주소</translation>
     </message>
     <message>
         <source>Bearer token (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearer 토큰 (선택 사항)</translation>
     </message>
     <message>
         <source>Test connection / refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>연결 테스트 / 새로 고침</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCTrackView</name>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>가창 변환</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>믹서 채널</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>트랙 음량</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>팬</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1: %2</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWaveform</name>
     <message>
         <source>Click to seek; Shift-drag to select a loop</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 재생 위치 이동, Shift+드래그로 반복 구간 선택</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 원본</translation>
     </message>
     <message>
         <source>B · Converted (pending = silence)</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 변환된 오디오 (미처리 = 무음)</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWindow</name>
     <message>
         <source>Singing Voice Conversion — %1</source>
-        <translation type="unfinished"></translation>
+        <translation>가창 변환 — %1</translation>
     </message>
     <message>
         <source>Audio clip</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 클립</translation>
     </message>
     <message>
         <source>Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>엔진</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>모델</translation>
     </message>
     <message>
         <source>Weights</source>
-        <translation type="unfinished"></translation>
+        <translation>가중치</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>화자</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 가져오기</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>다시 변환</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>SVC settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 설정</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>저장</translation>
     </message>
     <message>
         <source>Silence</source>
-        <translation type="unfinished"></translation>
+        <translation>무음</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>길이 임계값</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>강제 분할 길이</translation>
     </message>
     <message>
         <source>Play / Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>재생 / 일시 정지</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 원본</translation>
     </message>
     <message>
         <source>B · Converted</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 변환된 오디오</translation>
     </message>
     <message>
         <source>A+B · Overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B · 겹쳐 듣기</translation>
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation>반복</translation>
     </message>
     <message>
         <source>A gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A 게인</translation>
     </message>
     <message>
         <source>B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>B 게인</translation>
     </message>
     <message>
         <source>0 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>0 dB</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>게인</translation>
     </message>
     <message>
         <source>Backend range unavailable; entering a value extends the slider range</source>
-        <translation type="unfinished"></translation>
+        <translation>백엔드 범위를 알 수 없습니다. 값을 입력하면 슬라이더 범위가 확장됩니다</translation>
     </message>
     <message>
         <source>%1 — backend range unavailable; enter a value to extend the knob display range</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — 백엔드 범위를 알 수 없습니다. 값을 입력하면 노브 표시 범위가 확장됩니다</translation>
     </message>
     <message>
         <source>Enter a finite value of the declared numeric type</source>
-        <translation type="unfinished"></translation>
+        <translation>지정된 숫자 유형의 유한한 값을 입력하세요</translation>
     </message>
     <message>
         <source>Unavailable for the selected model or parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 모델 또는 매개변수에서 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Unavailable for the selected weight</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 가중치에서 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Import audio to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>시작하려면 오디오를 가져오세요</translation>
     </message>
     <message>
         <source>A+B overload: lower A or B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B 과부하: A 또는 B 게인을 낮추세요</translation>
     </message>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 오디오 가져오기</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 (*.wav *.flac *.ogg *.mp3);;모든 파일 (*)</translation>
     </message>
 </context>
 <context>
@@ -12601,7 +12605,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy current clip to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 클립을 SVC 트랙으로 복사</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -12613,7 +12617,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 트랙으로 복사</translation>
     </message>
     <message>
         <source>Could not save the copied audio sample.</source>
@@ -13176,7 +13180,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVC</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC</translation>
     </message>
     <message>
         <source>Some changes require restarting.</source>
@@ -15058,110 +15062,110 @@ Latency: %2 ms</source>
     <name>lmms::svc::Catalog</name>
     <message>
         <source>Reference identity</source>
-        <translation type="unfinished"></translation>
+        <translation>참조용 항등 변환</translation>
     </message>
     <message>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>연결 안 됨</translation>
     </message>
     <message>
         <source>Discovering backend capabilities</source>
-        <translation type="unfinished"></translation>
+        <translation>백엔드 기능 검색 중</translation>
     </message>
     <message>
         <source>Reconnect interval must be 1–86400 seconds; maximum retries must be 1–1000</source>
-        <translation type="unfinished"></translation>
+        <translation>재연결 간격은 1–86400초, 최대 재시도 횟수는 1–1000이어야 합니다</translation>
     </message>
     <message>
         <source>Offline: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>오프라인: %1</translation>
     </message>
     <message>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>연결됨</translation>
     </message>
     <message>
         <source>Offline: %1 — automatic retries exhausted (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>오프라인: %1 — 자동 재시도 횟수 소진 (%2)</translation>
     </message>
     <message>
         <source>Offline: %1 — retry %2/%3 in %4 s</source>
-        <translation type="unfinished"></translation>
+        <translation>오프라인: %1 — %4초 후 재시도 %2/%3</translation>
     </message>
     <message>
         <source>Cannot create SVC engine context</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 엔진 컨텍스트를 만들 수 없습니다</translation>
     </message>
     <message>
         <source>Invalid SVC engine ID</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 SVC 엔진 ID</translation>
     </message>
     <message>
         <source>Engine capability ID mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>엔진 기능 ID가 일치하지 않습니다</translation>
     </message>
     <message>
         <source>Unsupported SVC engine ABI</source>
-        <translation type="unfinished"></translation>
+        <translation>지원되지 않는 SVC 엔진 ABI</translation>
     </message>
     <message>
         <source>Unknown SVC engine</source>
-        <translation type="unfinished"></translation>
+        <translation>알 수 없는 SVC 엔진</translation>
     </message>
     <message>
         <source>Use an HTTP(S) API address without embedded credentials, query or fragment</source>
-        <translation type="unfinished"></translation>
+        <translation>자격 증명, 쿼리 또는 프래그먼트가 포함되지 않은 HTTP(S) API 주소를 사용하세요</translation>
     </message>
     <message>
         <source>Windows Credential Manager could not save the token</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows 자격 증명 관리자에 토큰을 저장할 수 없습니다</translation>
     </message>
     <message>
         <source>Persistent SVC credentials require OS credential storage</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 자격 증명을 영구 저장하려면 OS 자격 증명 저장소가 필요합니다</translation>
     </message>
     <message>
         <source>Selected SVC model or engine is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 SVC 모델 또는 엔진을 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Selected SVC weight or speaker is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 SVC 가중치 또는 화자를 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Unavailable SVC option: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>사용할 수 없는 SVC 옵션: %1</translation>
     </message>
     <message>
         <source>SVC parameter is outside the backend range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 매개변수가 백엔드 범위를 벗어났습니다: %1</translation>
     </message>
     <message>
         <source>Invalid special-value range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 특수 값 범위: %1</translation>
     </message>
 </context>
 <context>
     <name>lmms::svc::ConversionService</name>
     <message>
         <source>Import audio before rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>변환 전에 오디오를 가져오세요</translation>
     </message>
     <message>
         <source>SVC queue is full; try again</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 대기열이 가득 찼습니다. 다시 시도하세요</translation>
     </message>
     <message>
         <source>Queued for silence analysis and conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>무음 분석 및 변환 대기 중</translation>
     </message>
     <message>
         <source>Cancelled; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>취소됨, 부분 결과 유지</translation>
     </message>
     <message>
         <source>Analyzing silence and splitting input</source>
-        <translation type="unfinished"></translation>
+        <translation>무음 분석 및 입력 분할 중</translation>
     </message>
 </context>
 <context>

@@ -55,6 +55,9 @@
 #include "PianoRoll.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
+#include "SVCSettingsPage.h"
+#include "SVCTrack.h"
+#include "SVCWindow.h"
 #include "SVSCanvas.h"
 #include "SVSClip.h"
 #include "SVSParameterPanel.h"
@@ -81,6 +84,7 @@ class UiBaselineCapture : public QObject
 {
 	Q_OBJECT
 	QTemporaryDir m_config;
+	QTranslator m_startupTranslator;
 	std::unique_ptr<GuiApplication> m_gui;
 	QString m_output;
 	QList<Plugin*> m_toolPlugins;
@@ -122,6 +126,13 @@ private slots:
 		m_output = qEnvironmentVariable("LMMS_UI_EVIDENCE");
 		QVERIFY(!m_output.isEmpty());
 		QVERIFY(QDir().mkpath(m_output));
+		const auto startupLanguage = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		if (!startupLanguage.isEmpty())
+		{
+			QVERIFY(m_startupTranslator.load(
+				QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), startupLanguage)));
+			QCoreApplication::installTranslator(&m_startupTranslator);
+		}
 		auto* config = ConfigManager::inst();
 		config->loadConfigFile(m_config.filePath("ui-config.xml"));
 		config->setWorkingDir(m_config.path() + '/');
@@ -250,6 +261,39 @@ private slots:
 				editor.close();
 			}
 			delete track;
+			QCoreApplication::removeTranslator(&translator);
+		}
+	}
+	void svcTranslations()
+	{
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		const auto startupLanguage = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		QVERIFY(!startupLanguage.isEmpty());
+		for (const auto& language : QStringList{startupLanguage})
+		{
+			QTranslator translator;
+			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
+			QCoreApplication::installTranslator(&translator);
+			auto* track = new SVCTrack(Engine::getSong());
+			track->setName("User model 日本語 한국어");
+			{
+				SVCWindow window(track);
+				QCOMPARE(window.windowTitle(),
+					QCoreApplication::translate("lmms::gui::SVCWindow", "Singing Voice Conversion — %1")
+						.arg(track->name()));
+				const auto modes = window.findChild<QComboBox*>("svcAuditionMode");
+				QVERIFY(modes);
+				QCOMPARE(modes->itemText(2), QCoreApplication::translate("lmms::gui::SVCWindow", "A+B · Overlay"));
+				QCOMPARE(nativeTranslation::rvcText("RVC", "pitch_shift"),
+					QCoreApplication::translate("NativeRVC", "Pitch shift"));
+				capture(&window, "M3-empty-" + language);
+				window.close();
+			}
+			delete track;
+			SVCSettingsPage settings;
+			settings.resize(1000, 720);
+			capture(&settings, "M3-settings-" + language);
+			settings.close();
 			QCoreApplication::removeTranslator(&translator);
 		}
 	}

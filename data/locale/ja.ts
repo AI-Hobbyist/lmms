@@ -511,87 +511,87 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Pitch detection method</source>
-        <translation type="unfinished"></translation>
+        <translation>ピッチ検出方法</translation>
     </message>
     <message>
         <source>Index rate</source>
-        <translation type="unfinished"></translation>
+        <translation>インデックスの比率</translation>
     </message>
     <message>
         <source>Index mode</source>
-        <translation type="unfinished"></translation>
+        <translation>インデックスモード</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation type="unfinished"></translation>
+        <translation>インデックス</translation>
     </message>
     <message>
         <source>Protect unvoiced consonants</source>
-        <translation type="unfinished"></translation>
+        <translation>無声子音を保護</translation>
     </message>
     <message>
         <source>Filter radius</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター半径</translation>
     </message>
     <message>
         <source>Volume envelope mix</source>
-        <translation type="unfinished"></translation>
+        <translation>音量エンベロープのミックス</translation>
     </message>
     <message>
         <source>Output sample rate</source>
-        <translation type="unfinished"></translation>
+        <translation>出力サンプルレート</translation>
     </message>
     <message>
         <source>Chunk duration</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンクの長さ</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>オフ</translation>
     </message>
     <message>
         <source>Required</source>
-        <translation type="unfinished"></translation>
+        <translation>必須</translation>
     </message>
     <message>
         <source>Speaker 0</source>
-        <translation type="unfinished"></translation>
+        <translation>話者 0</translation>
     </message>
     <message>
         <source>Automatic / no index</source>
-        <translation type="unfinished"></translation>
+        <translation>自動 / インデックスなし</translation>
     </message>
     <message>
         <source>This weight has no usable index</source>
-        <translation type="unfinished"></translation>
+        <translation>この重みには利用できるインデックスがありません</translation>
     </message>
     <message>
         <source>Backend did not report availability</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドが利用可能状況を報告していません</translation>
     </message>
     <message>
         <source>Weight is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>重みを利用できません</translation>
     </message>
     <message>
         <source>Index is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>インデックスを利用できません</translation>
     </message>
     <message>
         <source>Multiple compatible indexes require an explicit selection</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のあるインデックスが複数あります。明示的に選択してください</translation>
     </message>
     <message>
         <source>Hz (0 = model rate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hz（0 = モデルのサンプルレート）</translation>
     </message>
     <message>
         <source>semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>半音</translation>
     </message>
 </context>
 <context>
@@ -1123,27 +1123,27 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Audio received; validating completion</source>
-        <translation type="unfinished"></translation>
+        <translation>音声を受信しました。完了状態を検証中</translation>
     </message>
     <message>
         <source>Backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドの前処理</translation>
     </message>
     <message>
         <source>Backend processing</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドの処理</translation>
     </message>
     <message>
         <source>Uploading: %1 bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>アップロード中：%1 バイト</translation>
     </message>
     <message>
         <source>Upload complete; backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>アップロード完了。バックエンドの前処理</translation>
     </message>
     <message>
         <source>Failed: %1; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>失敗：%1。部分的な結果を保持</translation>
     </message>
     <message>
         <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
@@ -1167,15 +1167,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Select a weight</source>
-        <translation type="unfinished"></translation>
+        <translation>重みを選択</translation>
     </message>
     <message>
         <source>Unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>利用不可</translation>
     </message>
     <message>
         <source>Unavailable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>利用不可：%1</translation>
     </message>
     <message>
         <source>SVS plugin settings</source>
@@ -4543,7 +4543,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::ProjectRenderer</name>
     <message>
         <source>SVC track &apos;%1&apos;: &apos;%2&apos; needs a successful re-render before export.</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC トラック「%1」：「%2」は再変換が成功するまでエクスポートできません。</translation>
     </message>
 </context>
 <context>
@@ -4576,82 +4576,82 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SVCClip</name>
     <message>
         <source>SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 音声</translation>
     </message>
     <message>
         <source>Audio import failed</source>
-        <translation type="unfinished"></translation>
+        <translation>音声のインポートに失敗しました</translation>
     </message>
     <message>
         <source>Cannot read source audio</source>
-        <translation type="unfinished"></translation>
+        <translation>元の音声を読み込めません</translation>
     </message>
     <message>
         <source>Needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>再変換が必要</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音声をインポート</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished"></translation>
+        <translation>待機中</translation>
     </message>
     <message>
         <source>Segment %1/%2, backend chunk %3/%4; replaced %5%</source>
-        <translation type="unfinished"></translation>
+        <translation>区間 %1/%2、バックエンドチャンク %3/%4。%5% を置換済み</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>完了</translation>
     </message>
     <message>
         <source>Queued next segment</source>
-        <translation type="unfinished"></translation>
+        <translation>次の区間が待機中</translation>
     </message>
     <message>
         <source>Cancelled; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル済み。部分的な結果</translation>
     </message>
     <message>
         <source>Failed; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>失敗。部分的な結果</translation>
     </message>
     <message>
         <source>Source missing; import audio again</source>
-        <translation type="unfinished"></translation>
+        <translation>元の音声が見つかりません。再インポートしてください</translation>
     </message>
     <message>
         <source>Source changed; needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>元の音声が変更されました。再変換が必要</translation>
     </message>
     <message>
         <source>Result missing or incomplete; original audio restored</source>
-        <translation type="unfinished"></translation>
+        <translation>結果が見つからないか不完全です。元の音声を復元しました</translation>
     </message>
 </context>
 <context>
     <name>lmms::SVCTrack</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>パン</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>ミキサーチャンネル</translation>
     </message>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声変換</translation>
     </message>
 </context>
 <context>
@@ -11411,273 +11411,277 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVCBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 音声をインポート</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>音声 (*.wav *.flac *.ogg *.mp3);;すべてのファイル (*)</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音声をインポート</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>再変換</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCLabelButton</name>
     <message>
         <source>Open SVC plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC プラグインを開く</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>再変換</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCSettingsPage</name>
     <message>
         <source>Configure each SVC engine independently. Leave Bearer token empty for a local server without authentication. Tokens stay in memory unless saved in Windows Credential Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>各 SVC エンジンを個別に設定します。認証なしのローカルサーバーでは Bearer トークンを空にしてください。Windows 資格情報マネージャーに保存しない限り、トークンはメモリ内にのみ保持されます。</translation>
     </message>
     <message>
         <source>Defaults for new SVC tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい SVC トラックの初期値</translation>
     </message>
     <message>
         <source>Silence threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>無音のしきい値</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>長さのしきい値</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>強制分割の長さ</translation>
     </message>
     <message>
         <source>Automatic reconnection (all SVC engines)</source>
-        <translation type="unfinished"></translation>
+        <translation>自動再接続（すべての SVC エンジン）</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Reconnect interval</source>
-        <translation type="unfinished"></translation>
+        <translation>再接続間隔</translation>
     </message>
     <message>
         <source>Maximum retries</source>
-        <translation type="unfinished"></translation>
+        <translation>再試行回数の上限</translation>
     </message>
     <message>
         <source>Start automatic reconnection</source>
-        <translation type="unfinished"></translation>
+        <translation>自動再接続を開始</translation>
     </message>
     <message>
         <source>Save token in Windows Credential Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンを Windows 資格情報マネージャーに保存</translation>
     </message>
     <message>
         <source>API address</source>
-        <translation type="unfinished"></translation>
+        <translation>API アドレス</translation>
     </message>
     <message>
         <source>Bearer token (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearer トークン（任意）</translation>
     </message>
     <message>
         <source>Test connection / refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>接続テスト / 更新</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCTrackView</name>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声変換</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>ミキサーチャンネル</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>トラック音量</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>パン</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：%2</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWaveform</name>
     <message>
         <source>Click to seek; Shift-drag to select a loop</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックで再生位置を移動。Shift+ドラッグでループ範囲を選択</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 元の音声</translation>
     </message>
     <message>
         <source>B · Converted (pending = silence)</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 変換後（未処理 = 無音）</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWindow</name>
     <message>
         <source>Singing Voice Conversion — %1</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声変換 — %1</translation>
     </message>
     <message>
         <source>Audio clip</source>
-        <translation type="unfinished"></translation>
+        <translation>音声クリップ</translation>
     </message>
     <message>
         <source>Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>エンジン</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>モデル</translation>
     </message>
     <message>
         <source>Weights</source>
-        <translation type="unfinished"></translation>
+        <translation>重み</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>話者</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音声をインポート</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>再変換</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>SVC settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 設定</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Silence</source>
-        <translation type="unfinished"></translation>
+        <translation>無音</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>長さのしきい値</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>強制分割の長さ</translation>
     </message>
     <message>
         <source>Play / Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>再生 / 一時停止</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 元の音声</translation>
     </message>
     <message>
         <source>B · Converted</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 変換後</translation>
     </message>
     <message>
         <source>A+B · Overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B · 重ね合わせ</translation>
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation>ループ</translation>
     </message>
     <message>
         <source>A gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A ゲイン</translation>
     </message>
     <message>
         <source>B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>B ゲイン</translation>
     </message>
     <message>
         <source>0 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>0 dB</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>ゲイン</translation>
     </message>
     <message>
         <source>Backend range unavailable; entering a value extends the slider range</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドの範囲が不明です。値を入力するとスライダーの範囲が広がります</translation>
     </message>
     <message>
         <source>%1 — backend range unavailable; enter a value to extend the knob display range</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — バックエンドの範囲が不明です。値を入力するとノブの表示範囲が広がります</translation>
     </message>
     <message>
         <source>Enter a finite value of the declared numeric type</source>
-        <translation type="unfinished"></translation>
+        <translation>宣言された数値型の有限値を入力してください</translation>
     </message>
     <message>
         <source>Unavailable for the selected model or parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したモデルまたはパラメーターでは利用できません</translation>
     </message>
     <message>
         <source>Unavailable for the selected weight</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した重みでは利用できません</translation>
     </message>
     <message>
         <source>Import audio to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>音声をインポートして開始してください</translation>
     </message>
     <message>
         <source>A+B overload: lower A or B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B の過負荷：A または B のゲインを下げてください</translation>
     </message>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 音声をインポート</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>音声 (*.wav *.flac *.ogg *.mp3);;すべてのファイル (*)</translation>
     </message>
 </context>
 <context>
@@ -12592,7 +12596,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy current clip to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のクリップを SVC トラックにコピー</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -12604,7 +12608,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC トラックにコピー</translation>
     </message>
     <message>
         <source>Could not save the copied audio sample.</source>
@@ -13167,7 +13171,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVC</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC</translation>
     </message>
     <message>
         <source>Some changes require restarting.</source>
@@ -15049,110 +15053,110 @@ Latency: %2 ms</source>
     <name>lmms::svc::Catalog</name>
     <message>
         <source>Reference identity</source>
-        <translation type="unfinished"></translation>
+        <translation>参照用の恒等変換</translation>
     </message>
     <message>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>未接続</translation>
     </message>
     <message>
         <source>Discovering backend capabilities</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドの機能を取得中</translation>
     </message>
     <message>
         <source>Reconnect interval must be 1–86400 seconds; maximum retries must be 1–1000</source>
-        <translation type="unfinished"></translation>
+        <translation>再接続間隔は 1–86400 秒、再試行回数の上限は 1–1000 にしてください</translation>
     </message>
     <message>
         <source>Offline: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>オフライン：%1</translation>
     </message>
     <message>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>接続済み</translation>
     </message>
     <message>
         <source>Offline: %1 — automatic retries exhausted (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>オフライン：%1 — 自動再試行の上限に達しました（%2）</translation>
     </message>
     <message>
         <source>Offline: %1 — retry %2/%3 in %4 s</source>
-        <translation type="unfinished"></translation>
+        <translation>オフライン：%1 — %4 秒後に再試行 %2/%3</translation>
     </message>
     <message>
         <source>Cannot create SVC engine context</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC エンジンのコンテキストを作成できません</translation>
     </message>
     <message>
         <source>Invalid SVC engine ID</source>
-        <translation type="unfinished"></translation>
+        <translation>無効な SVC エンジン ID</translation>
     </message>
     <message>
         <source>Engine capability ID mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>エンジンの機能 ID が一致しません</translation>
     </message>
     <message>
         <source>Unsupported SVC engine ABI</source>
-        <translation type="unfinished"></translation>
+        <translation>未対応の SVC エンジン ABI</translation>
     </message>
     <message>
         <source>Unknown SVC engine</source>
-        <translation type="unfinished"></translation>
+        <translation>不明な SVC エンジン</translation>
     </message>
     <message>
         <source>Use an HTTP(S) API address without embedded credentials, query or fragment</source>
-        <translation type="unfinished"></translation>
+        <translation>資格情報・クエリ・フラグメントを含まない HTTP(S) API アドレスを使用してください</translation>
     </message>
     <message>
         <source>Windows Credential Manager could not save the token</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows 資格情報マネージャーにトークンを保存できませんでした</translation>
     </message>
     <message>
         <source>Persistent SVC credentials require OS credential storage</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 資格情報の永続保存には OS の資格情報ストレージが必要です</translation>
     </message>
     <message>
         <source>Selected SVC model or engine is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した SVC モデルまたはエンジンを利用できません</translation>
     </message>
     <message>
         <source>Selected SVC weight or speaker is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した SVC の重みまたは話者を利用できません</translation>
     </message>
     <message>
         <source>Unavailable SVC option: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>利用できない SVC オプション：%1</translation>
     </message>
     <message>
         <source>SVC parameter is outside the backend range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC パラメーターがバックエンドの範囲外です：%1</translation>
     </message>
     <message>
         <source>Invalid special-value range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>無効な特殊値の範囲：%1</translation>
     </message>
 </context>
 <context>
     <name>lmms::svc::ConversionService</name>
     <message>
         <source>Import audio before rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>変換前に音声をインポートしてください</translation>
     </message>
     <message>
         <source>SVC queue is full; try again</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC の待機キューがいっぱいです。再試行してください</translation>
     </message>
     <message>
         <source>Queued for silence analysis and conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>無音解析と変換の待機中</translation>
     </message>
     <message>
         <source>Cancelled; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル済み。部分的な結果を保持</translation>
     </message>
     <message>
         <source>Analyzing silence and splitting input</source>
-        <translation type="unfinished"></translation>
+        <translation>無音を解析して入力を分割中</translation>
     </message>
 </context>
 <context>

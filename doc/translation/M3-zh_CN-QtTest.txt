@@ -1,0 +1,11 @@
+********* Start testing of UiBaselineCapture *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : UiBaselineCapture::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QWARN  : UiBaselineCapture::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll: ????????????î•
+QWARN  : UiBaselineCapture::initTestCase() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlarack.dll: ????????????î•
+QDEBUG : UiBaselineCapture::initTestCase() SVS: SVSExample engine initialized
+PASS   : UiBaselineCapture::initTestCase()
+PASS   : UiBaselineCapture::svcTranslations()
+PASS   : UiBaselineCapture::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 15103ms
+********* Finished testing of UiBaselineCapture *********

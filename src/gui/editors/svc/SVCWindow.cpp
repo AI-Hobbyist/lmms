@@ -535,6 +535,14 @@ void SVCWindow::refreshModels()
 	choices(m_models,
 		svc::Catalog::instance().engine(m_engines->currentData().toString()).capabilities.value("models").toArray(),
 		m_track->selection().value("model_id").toString());
+	if (m_engines->currentData().toString() == "reference")
+	{
+		const auto index = m_models->findData("identity");
+		if (index >= 0)
+		{
+			m_models->setItemText(index, QCoreApplication::translate("lmms::svc::Catalog", "Reference identity"));
+		}
+	}
 	m_updating = false;
 	auto selection = m_track->selection();
 	if (m_models->currentIndex() >= 0) { selection.insert("model_id", m_models->currentData().toString()); }
@@ -590,7 +598,9 @@ void SVCWindow::refreshParameters()
 		const auto parameter = entry.toObject();
 		const auto id = parameter.value("id").toString();
 		const auto engine = m_engines->currentData().toString();
-		const auto displayName = nativeTranslation::rvcText(engine, parameter.value("name").toString());
+		const auto displayName = engine == "reference" && id == "gain"
+			? tr("Gain")
+			: nativeTranslation::rvcText(engine, parameter.value("name").toString());
 		const auto displayUnit = nativeTranslation::rvcText(engine, parameter.value("unit").toString());
 		if (!m_parameters.contains(id))
 		{

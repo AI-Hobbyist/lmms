@@ -1,0 +1,28 @@
+{
+  "source_commit": "10272cf192df0b0716f6e73c2475b82f85e3f5fa",
+  "working_diff_sha256": "80ef872578a386a777a1e732020d5676f96fe494576ff691c09cefd08c5cfcf1",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1131,
+  "key_count": 3577,
+  "summary": {
+    "zh_CN": {
+      "same-source": 142,
+      "translated": 2246,
+      "empty": 1189
+    },
+    "ja": {
+      "same-source": 377,
+      "translated": 1721,
+      "empty": 1476,
+      "placeholder-error": 3
+    },
+    "en": {
+      "source": 3577
+    },
+    "ko": {
+      "same-source": 199,
+      "translated": 3217,
+      "empty": 161
+    }
+  }
+}

@@ -11624,6 +11624,10 @@ Shift-click to open the note in Automation Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Backend range unavailable; entering a value extends the slider range</source>
         <translation type="unfinished"></translation>
     </message>

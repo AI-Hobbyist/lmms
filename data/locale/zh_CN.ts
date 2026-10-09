@@ -557,87 +557,87 @@ https://github.com/LMMS/lmms/wiki/Creating-a-localization
     </message>
     <message>
         <source>Pitch detection method</source>
-        <translation type="unfinished"></translation>
+        <translation>音高检测方法</translation>
     </message>
     <message>
         <source>Index rate</source>
-        <translation type="unfinished"></translation>
+        <translation>索引比例</translation>
     </message>
     <message>
         <source>Index mode</source>
-        <translation type="unfinished"></translation>
+        <translation>索引模式</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation type="unfinished"></translation>
+        <translation>索引</translation>
     </message>
     <message>
         <source>Protect unvoiced consonants</source>
-        <translation type="unfinished"></translation>
+        <translation>保护清辅音</translation>
     </message>
     <message>
         <source>Filter radius</source>
-        <translation type="unfinished"></translation>
+        <translation>滤波半径</translation>
     </message>
     <message>
         <source>Volume envelope mix</source>
-        <translation type="unfinished"></translation>
+        <translation>音量包络混合</translation>
     </message>
     <message>
         <source>Output sample rate</source>
-        <translation type="unfinished"></translation>
+        <translation>输出采样率</translation>
     </message>
     <message>
         <source>Chunk duration</source>
-        <translation type="unfinished"></translation>
+        <translation>分块时长</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Required</source>
-        <translation type="unfinished"></translation>
+        <translation>必需</translation>
     </message>
     <message>
         <source>Speaker 0</source>
-        <translation type="unfinished"></translation>
+        <translation>说话人 0</translation>
     </message>
     <message>
         <source>Automatic / no index</source>
-        <translation type="unfinished"></translation>
+        <translation>自动 / 无索引</translation>
     </message>
     <message>
         <source>This weight has no usable index</source>
-        <translation type="unfinished"></translation>
+        <translation>此权重没有可用索引</translation>
     </message>
     <message>
         <source>Backend did not report availability</source>
-        <translation type="unfinished"></translation>
+        <translation>后端未报告可用状态</translation>
     </message>
     <message>
         <source>Weight is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>权重不可用</translation>
     </message>
     <message>
         <source>Index is unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>索引不可用</translation>
     </message>
     <message>
         <source>Multiple compatible indexes require an explicit selection</source>
-        <translation type="unfinished"></translation>
+        <translation>存在多个兼容索引，请明确选择</translation>
     </message>
     <message>
         <source>Hz (0 = model rate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hz（0 = 模型采样率）</translation>
     </message>
     <message>
         <source>semitones</source>
-        <translation type="unfinished"></translation>
+        <translation>半音</translation>
     </message>
 </context>
 <context>
@@ -1169,27 +1169,27 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Audio received; validating completion</source>
-        <translation type="unfinished"></translation>
+        <translation>已接收音频；正在验证完成状态</translation>
     </message>
     <message>
         <source>Backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>后端预处理</translation>
     </message>
     <message>
         <source>Backend processing</source>
-        <translation type="unfinished"></translation>
+        <translation>后端处理</translation>
     </message>
     <message>
         <source>Uploading: %1 bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>正在上传：%1 字节</translation>
     </message>
     <message>
         <source>Upload complete; backend preprocessing</source>
-        <translation type="unfinished"></translation>
+        <translation>上传完成；后端预处理</translation>
     </message>
     <message>
         <source>Failed: %1; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>失败：%1；保留部分结果</translation>
     </message>
     <message>
         <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
@@ -1213,15 +1213,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Select a weight</source>
-        <translation type="unfinished"></translation>
+        <translation>选择权重</translation>
     </message>
     <message>
         <source>Unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>不可用</translation>
     </message>
     <message>
         <source>Unavailable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>不可用：%1</translation>
     </message>
     <message>
         <source>SVS plugin settings</source>
@@ -4587,7 +4587,7 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::ProjectRenderer</name>
     <message>
         <source>SVC track &apos;%1&apos;: &apos;%2&apos; needs a successful re-render before export.</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 轨道“%1”：“%2”需要成功重新转换后才能导出。</translation>
     </message>
 </context>
 <context>
@@ -4620,82 +4620,82 @@ Reason: &quot;%2&quot;</source>
     <name>lmms::SVCClip</name>
     <message>
         <source>SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 音频</translation>
     </message>
     <message>
         <source>Audio import failed</source>
-        <translation type="unfinished"></translation>
+        <translation>音频导入失败</translation>
     </message>
     <message>
         <source>Cannot read source audio</source>
-        <translation type="unfinished"></translation>
+        <translation>无法读取源音频</translation>
     </message>
     <message>
         <source>Needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>需要重新转换</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>导入音频</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished"></translation>
+        <translation>排队中</translation>
     </message>
     <message>
         <source>Segment %1/%2, backend chunk %3/%4; replaced %5%</source>
-        <translation type="unfinished"></translation>
+        <translation>片段 %1/%2，后端分块 %3/%4；已替换 %5%</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>完成</translation>
     </message>
     <message>
         <source>Queued next segment</source>
-        <translation type="unfinished"></translation>
+        <translation>下一段已排队</translation>
     </message>
     <message>
         <source>Cancelled; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>已取消；部分结果</translation>
     </message>
     <message>
         <source>Failed; partial result</source>
-        <translation type="unfinished"></translation>
+        <translation>失败；部分结果</translation>
     </message>
     <message>
         <source>Source missing; import audio again</source>
-        <translation type="unfinished"></translation>
+        <translation>源音频缺失；请重新导入</translation>
     </message>
     <message>
         <source>Source changed; needs re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>源音频已更改；需要重新转换</translation>
     </message>
     <message>
         <source>Result missing or incomplete; original audio restored</source>
-        <translation type="unfinished"></translation>
+        <translation>结果缺失或不完整；已恢复原音频</translation>
     </message>
 </context>
 <context>
     <name>lmms::SVCTrack</name>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>声像</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>混音器通道</translation>
     </message>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声转换</translation>
     </message>
 </context>
 <context>
@@ -11460,181 +11460,181 @@ Shift-click to open the note in Automation Editor</source>
     <name>lmms::gui::SVCBrowser</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>导入 SVC 音频</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>音频 (*.wav *.flac *.ogg *.mp3);;所有文件 (*)</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>导入音频</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>重新转换</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished"></translation>
+        <translation>更改名称</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCLabelButton</name>
     <message>
         <source>Open SVC plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>打开 SVC 插件</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>重新转换</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCSettingsPage</name>
     <message>
         <source>Configure each SVC engine independently. Leave Bearer token empty for a local server without authentication. Tokens stay in memory unless saved in Windows Credential Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>分别配置每个 SVC 引擎。对于无身份验证的本地服务器，请将 Bearer 令牌留空。除非保存到 Windows 凭据管理器，否则令牌仅保存在内存中。</translation>
     </message>
     <message>
         <source>Defaults for new SVC tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>新 SVC 轨道的默认值</translation>
     </message>
     <message>
         <source>Silence threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>静音阈值</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>长度阈值</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>强制长度</translation>
     </message>
     <message>
         <source>Automatic reconnection (all SVC engines)</source>
-        <translation type="unfinished"></translation>
+        <translation>自动重连（所有 SVC 引擎）</translation>
     </message>
     <message>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Reconnect interval</source>
-        <translation type="unfinished"></translation>
+        <translation>重连间隔</translation>
     </message>
     <message>
         <source>Maximum retries</source>
-        <translation type="unfinished"></translation>
+        <translation>最大重试次数</translation>
     </message>
     <message>
         <source>Start automatic reconnection</source>
-        <translation type="unfinished"></translation>
+        <translation>启动自动重连</translation>
     </message>
     <message>
         <source>Save token in Windows Credential Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>将令牌保存到 Windows 凭据管理器</translation>
     </message>
     <message>
         <source>API address</source>
-        <translation type="unfinished"></translation>
+        <translation>API 地址</translation>
     </message>
     <message>
         <source>Bearer token (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearer 令牌（可选）</translation>
     </message>
     <message>
         <source>Test connection / refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>测试连接 / 刷新</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCTrackView</name>
     <message>
         <source>Singing Voice Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声转换</translation>
     </message>
     <message>
         <source>Mixer channel</source>
-        <translation type="unfinished"></translation>
+        <translation>混音器通道</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation type="unfinished"></translation>
+        <translation>VOL</translation>
     </message>
     <message>
         <source>Track volume</source>
-        <translation type="unfinished"></translation>
+        <translation>轨道音量</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished"></translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished"></translation>
+        <translation>声像</translation>
     </message>
     <message>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：%2</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWaveform</name>
     <message>
         <source>Click to seek; Shift-drag to select a loop</source>
-        <translation type="unfinished"></translation>
+        <translation>单击定位；Shift 拖动选择循环区域</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 原音</translation>
     </message>
     <message>
         <source>B · Converted (pending = silence)</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 转换音频（待处理 = 静音）</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::SVCWindow</name>
     <message>
         <source>Singing Voice Conversion — %1</source>
-        <translation type="unfinished"></translation>
+        <translation>歌声转换 — %1</translation>
     </message>
     <message>
         <source>Audio clip</source>
-        <translation type="unfinished"></translation>
+        <translation>音频片段</translation>
     </message>
     <message>
         <source>Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>引擎</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>模型</translation>
     </message>
     <message>
         <source>Weights</source>
-        <translation type="unfinished"></translation>
+        <translation>权重</translation>
     </message>
     <message>
         <source>Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>说话人</translation>
     </message>
     <message>
         <source>Import audio</source>
-        <translation type="unfinished"></translation>
+        <translation>导入音频</translation>
     </message>
     <message>
         <source>Re-render</source>
-        <translation type="unfinished"></translation>
+        <translation>重新转换</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -11642,91 +11642,95 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>SVC settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 设置</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Silence</source>
-        <translation type="unfinished"></translation>
+        <translation>静音</translation>
     </message>
     <message>
         <source>Length threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>长度阈值</translation>
     </message>
     <message>
         <source>Forced length</source>
-        <translation type="unfinished"></translation>
+        <translation>强制长度</translation>
     </message>
     <message>
         <source>Play / Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>播放 / 暂停</translation>
     </message>
     <message>
         <source>A · Original</source>
-        <translation type="unfinished"></translation>
+        <translation>A · 原音</translation>
     </message>
     <message>
         <source>B · Converted</source>
-        <translation type="unfinished"></translation>
+        <translation>B · 转换音频</translation>
     </message>
     <message>
         <source>A+B · Overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B · 叠加</translation>
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation>循环</translation>
     </message>
     <message>
         <source>A gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A 增益</translation>
     </message>
     <message>
         <source>B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>B 增益</translation>
     </message>
     <message>
         <source>0 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>0 dB</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Backend range unavailable; entering a value extends the slider range</source>
-        <translation type="unfinished"></translation>
+        <translation>后端范围不可用；输入数值可扩展滑块范围</translation>
     </message>
     <message>
         <source>%1 — backend range unavailable; enter a value to extend the knob display range</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — 后端范围不可用；输入数值可扩展旋钮显示范围</translation>
     </message>
     <message>
         <source>Enter a finite value of the declared numeric type</source>
-        <translation type="unfinished"></translation>
+        <translation>请输入声明数值类型的有限值</translation>
     </message>
     <message>
         <source>Unavailable for the selected model or parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>所选模型或参数不可用</translation>
     </message>
     <message>
         <source>Unavailable for the selected weight</source>
-        <translation type="unfinished"></translation>
+        <translation>所选权重不可用</translation>
     </message>
     <message>
         <source>Import audio to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>请导入音频以开始</translation>
     </message>
     <message>
         <source>A+B overload: lower A or B gain</source>
-        <translation type="unfinished"></translation>
+        <translation>A+B 过载：请降低 A 或 B 增益</translation>
     </message>
     <message>
         <source>Import SVC audio</source>
-        <translation type="unfinished"></translation>
+        <translation>导入 SVC 音频</translation>
     </message>
     <message>
         <source>Audio (*.wav *.flac *.ogg *.mp3);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>音频 (*.wav *.flac *.ogg *.mp3);;所有文件 (*)</translation>
     </message>
 </context>
 <context>
@@ -12641,7 +12645,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy current clip to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>将当前片段复制到 SVC 轨道</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -12653,7 +12657,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>Copy to SVC track</source>
-        <translation type="unfinished"></translation>
+        <translation>复制到 SVC 轨道</translation>
     </message>
     <message>
         <source>Could not save the copied audio sample.</source>
@@ -13216,7 +13220,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>SVC</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC</translation>
     </message>
     <message>
         <source>Some changes require restarting.</source>
@@ -15098,110 +15102,110 @@ Latency: %2 ms</source>
     <name>lmms::svc::Catalog</name>
     <message>
         <source>Reference identity</source>
-        <translation type="unfinished"></translation>
+        <translation>参考恒等转换</translation>
     </message>
     <message>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>未连接</translation>
     </message>
     <message>
         <source>Discovering backend capabilities</source>
-        <translation type="unfinished"></translation>
+        <translation>正在发现后端能力</translation>
     </message>
     <message>
         <source>Reconnect interval must be 1–86400 seconds; maximum retries must be 1–1000</source>
-        <translation type="unfinished"></translation>
+        <translation>重连间隔必须为 1–86400 秒；最大重试次数必须为 1–1000</translation>
     </message>
     <message>
         <source>Offline: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>离线：%1</translation>
     </message>
     <message>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>已连接</translation>
     </message>
     <message>
         <source>Offline: %1 — automatic retries exhausted (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>离线：%1 — 自动重试次数已用尽（%2）</translation>
     </message>
     <message>
         <source>Offline: %1 — retry %2/%3 in %4 s</source>
-        <translation type="unfinished"></translation>
+        <translation>离线：%1 — %4 秒后重试 %2/%3</translation>
     </message>
     <message>
         <source>Cannot create SVC engine context</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建 SVC 引擎上下文</translation>
     </message>
     <message>
         <source>Invalid SVC engine ID</source>
-        <translation type="unfinished"></translation>
+        <translation>无效 SVC 引擎 ID</translation>
     </message>
     <message>
         <source>Engine capability ID mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>引擎能力 ID 不匹配</translation>
     </message>
     <message>
         <source>Unsupported SVC engine ABI</source>
-        <translation type="unfinished"></translation>
+        <translation>不支持的 SVC 引擎 ABI</translation>
     </message>
     <message>
         <source>Unknown SVC engine</source>
-        <translation type="unfinished"></translation>
+        <translation>未知 SVC 引擎</translation>
     </message>
     <message>
         <source>Use an HTTP(S) API address without embedded credentials, query or fragment</source>
-        <translation type="unfinished"></translation>
+        <translation>请使用不含内嵌凭据、查询或片段的 HTTP(S) API 地址</translation>
     </message>
     <message>
         <source>Windows Credential Manager could not save the token</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows 凭据管理器无法保存令牌</translation>
     </message>
     <message>
         <source>Persistent SVC credentials require OS credential storage</source>
-        <translation type="unfinished"></translation>
+        <translation>持久保存 SVC 凭据需要操作系统凭据存储</translation>
     </message>
     <message>
         <source>Selected SVC model or engine is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>所选 SVC 模型或引擎不可用</translation>
     </message>
     <message>
         <source>Selected SVC weight or speaker is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>所选 SVC 权重或说话人不可用</translation>
     </message>
     <message>
         <source>Unavailable SVC option: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>不可用 SVC 选项：%1</translation>
     </message>
     <message>
         <source>SVC parameter is outside the backend range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 参数超出后端范围：%1</translation>
     </message>
     <message>
         <source>Invalid special-value range: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无效特殊值范围：%1</translation>
     </message>
 </context>
 <context>
     <name>lmms::svc::ConversionService</name>
     <message>
         <source>Import audio before rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>转换前请导入音频</translation>
     </message>
     <message>
         <source>SVC queue is full; try again</source>
-        <translation type="unfinished"></translation>
+        <translation>SVC 队列已满；请重试</translation>
     </message>
     <message>
         <source>Queued for silence analysis and conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>已排队等待静音分析和转换</translation>
     </message>
     <message>
         <source>Cancelled; partial result retained</source>
-        <translation type="unfinished"></translation>
+        <translation>已取消；保留部分结果</translation>
     </message>
     <message>
         <source>Analyzing silence and splitting input</source>
-        <translation type="unfinished"></translation>
+        <translation>正在分析静音并分割输入</translation>
     </message>
 </context>
 <context>

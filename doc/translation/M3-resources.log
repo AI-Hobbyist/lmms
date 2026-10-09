@@ -1,0 +1,13 @@
+PASS: M3, 144 keys × four languages; coverage, placeholders, plural forms, same-source decisions, HTML, newlines and mnemonics
+Updating 'data/locale/zh_CN.qm'...
+    Generated 2388 translation(s) (2388 finished and 0 unfinished)
+    Ignored 1189 untranslated source text(s)
+Updating 'data/locale/ja.qm'...
+    Generated 2101 translation(s) (2101 finished and 0 unfinished)
+    Ignored 1476 untranslated source text(s)
+Updating 'data/locale/en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+    Ignored 3577 untranslated source text(s)
+Updating 'data/locale/ko.qm'...
+    Generated 3416 translation(s) (3416 finished and 0 unfinished)
+    Ignored 161 untranslated source text(s)
