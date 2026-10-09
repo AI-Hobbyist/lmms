@@ -1,112 +1,66 @@
 #include "CpuModel.h"
-#include "ModelSeed.h"
-#include <cmath>
-#include <algorithm>
-#include <limits>
+
+#include <cstdlib>
 #include <thread>
+
 namespace diffsinger {
 namespace {
-size_t width(ONNXTensorElementDataType type)
+svs_compute::Context& computeContext()
 {
-	if (type == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT)
-	{
-		return 4;
-	}
-	if (type == ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64)
-	{
-		return 8;
-	}
-	if (type == ONNX_TENSOR_ELEMENT_DATA_TYPE_BOOL)
-	{
-		return 1;
-	}
-	throw std::runtime_error("Unsupported ONNX tensor type: " + std::to_string(type));
+	static const auto directory = [] {
+		const auto configured = std::getenv("SVS_COMPUTE_RUNTIME_DIR");
+		return configured && *configured ? fs::u8path(configured)
+										 : packageDirectory().parent_path().parent_path() / "svs" / "compute";
+	}();
+#ifdef _WIN32
+	static svs_compute::Library library(directory.parent_path().parent_path() / "plugins" / "SVSCompute.dll");
+#else
+	static svs_compute::Library library(directory.parent_path().parent_path() / "plugins" / "libSVSCompute.so");
+#endif
+	static auto context = library.context(directory);
+	return context;
 }
-size_t count(const std::vector<int64_t>& shape)
-{
-	size_t total = 1;
-	if (shape.size() > 8)
-	{
-		throw std::runtime_error("Tensor rank exceeds bound");
-	}
-	for (const auto dimension : shape)
-	{
-		if (dimension < 0 || uint64_t(dimension) > 128 * 1024 * 1024
-			|| total > 128 * 1024 * 1024 / std::max(int64_t(1), dimension))
-		{
-			throw std::runtime_error("Tensor dimensions exceed bound");
-		}
-		total *= size_t(dimension);
-	}
-	return total;
-}
-void finite(const Tensor& tensor)
-{
-	if (tensor.type == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT)
-	{
-		for (const auto value : tensor.values<float>())
-		{
-			if (!std::isfinite(value))
-			{
-				throw std::runtime_error("Non-finite tensor value");
-			}
-		}
-	}
-}
-}
-void CpuModel::resetSession()
-{
-	m_session = Ort::Session(nullptr);
-	Ort::SessionOptions options;
-	options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
-	options.SetIntraOpNumThreads(std::max(1u, std::min(4u, std::thread::hardware_concurrency())));
-	options.SetInterOpNumThreads(1);
-	options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
-	if (m_seededModel.empty())
-	{
-		m_session = Ort::Session(m_environment, m_path.c_str(), options);
-	}
-	else
-	{
-		options.AddConfigEntry(
-			"session.model_external_initializers_file_folder_path", m_path.parent_path().u8string().c_str());
-		m_session = Ort::Session(m_environment, m_seededModel.data(), m_seededModel.size(), options);
-	}
-}
+} // namespace
 CpuModel::CpuModel(Ort::Env& environment, const fs::path& path, std::string stage, uint32_t seed)
 	: m_stage(std::move(stage))
 	, m_path(path)
-	, m_environment(environment)
 {
+	(void)environment;
 	try
 	{
-		m_seededModel = ModelSeed(path, seed).read(path);
-		resetSession();
-		Ort::AllocatorWithDefaultOptions allocator;
-		for (size_t i = 0; i < m_session.GetInputCount(); ++i)
+		const auto root = fs::canonical(path.parent_path()).u8string();
+		const auto relative = path.filename().u8string();
+		const auto fingerprint = std::to_string(fs::file_size(path)) + ":"
+			+ std::to_string(fs::last_write_time(path).time_since_epoch().count());
+		const svsc_model_desc descriptor{sizeof(descriptor), seed, root.c_str(), relative.c_str(), fingerprint.c_str()};
+		m_computeModel.emplace(computeContext().model(descriptor));
+		const auto signature = Json::parse(m_computeModel->signature());
+		for (const auto& port : signature.at("inputs"))
 		{
-			const auto name = m_session.GetInputNameAllocated(i, allocator);
-			const auto type = m_session.GetInputTypeInfo(i);
-			const auto info = type.GetTensorTypeAndShapeInfo();
-			m_inputs.push_back({name.get(), info.GetElementType(), info.GetShape()});
+			m_inputs.push_back({port.at("name").get<std::string>(),
+								ONNXTensorElementDataType(port.at("dtype").get<uint32_t>()),
+								port.at("dims").get<std::vector<int64_t>>()});
 		}
-		for (size_t i = 0; i < m_session.GetOutputCount(); ++i)
+		for (const auto& port : signature.at("outputs"))
 		{
-			const auto name = m_session.GetOutputNameAllocated(i, allocator);
-			const auto type = m_session.GetOutputTypeInfo(i);
-			const auto info = type.GetTensorTypeAndShapeInfo();
-			m_outputs.push_back({name.get(), info.GetElementType(), info.GetShape()});
+			m_outputs.push_back({port.at("name").get<std::string>(),
+								 ONNXTensorElementDataType(port.at("dtype").get<uint32_t>()),
+								 port.at("dims").get<std::vector<int64_t>>()});
 		}
+		const svsc_session_desc options{sizeof(options), 0, "cpu", "cpu", m_stage.c_str(), ""};
+		m_computeSession.emplace(m_computeModel->session(options));
 	}
 	catch (const std::exception& error)
 	{
 		throw std::runtime_error(m_stage + " / " + path.u8string() + ": " + error.what());
 	}
 }
+
 bool CpuModel::accepts(const std::string& name) const
 {
 	return std::any_of(m_inputs.begin(), m_inputs.end(), [&](const auto& port) { return port.name == name; });
 }
+
 Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 {
 	try
@@ -115,77 +69,74 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 		{
 			throw std::runtime_error("Cancelled");
 		}
-		// Reset only stochastic sessions so equal seeded requests do not depend
-		// on how many previous Run calls advanced an operator's RNG.
-		if (!m_seededModel.empty())
+		std::vector<svsc_tensor> tensors;
+		for (const auto& input : inputs)
 		{
-			resetSession();
+			const auto& tensor = input.second;
+			tensors.push_back({sizeof(svsc_tensor), uint32_t(tensor.type), input.first.c_str(),
+							   uint32_t(tensor.dimensions.size()), 0, tensor.dimensions.data(), tensor.bytes.size(),
+							   tensor.bytes.data()});
 		}
-		if (inputs.size() != m_inputs.size())
-		{
-			throw std::runtime_error("Input count does not match model signature");
-		}
-		const auto memory = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-		std::vector<Ort::Value> values;
-		std::vector<const char*> names, outputs;
-		for (const auto& port : m_inputs)
-		{
-			const auto found = inputs.find(port.name);
-			if (found == inputs.end())
+		auto run = m_computeSession->createRun();
+		std::atomic<bool> complete{false};
+		std::thread cancellation([&] {
+			while (!complete.load())
 			{
-				throw std::runtime_error("Missing input " + port.name);
-			}
-			const auto& tensor = found->second;
-			if (port.type != tensor.type || port.dimensions.size() != tensor.dimensions.size()
-				|| count(tensor.dimensions) * width(tensor.type) != tensor.bytes.size())
-			{
-				throw std::runtime_error("Invalid type/rank/byte count for input " + port.name);
-			}
-			for (size_t i = 0; i < port.dimensions.size(); ++i)
-			{
-				if (port.dimensions[i] >= 0 && port.dimensions[i] != tensor.dimensions[i])
+				if (cancelled.load())
 				{
-					throw std::runtime_error("Invalid shape for input " + port.name);
+					try
+					{
+						run.cancel();
+					}
+					catch (...)
+					{
+					}
+					return;
 				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
 			}
-			finite(tensor);
-			names.push_back(port.name.c_str());
-			values.push_back(Ort::Value::CreateTensor(memory, const_cast<uint8_t*>(tensor.bytes.data()),
-				tensor.bytes.size(), tensor.dimensions.data(), tensor.dimensions.size(), tensor.type));
-		}
-		for (const auto& port : m_outputs)
+		});
+		try
 		{
-			outputs.push_back(port.name.c_str());
-		}
-		Ort::RunOptions options;
-		auto result
-			= m_session.Run(options, names.data(), values.data(), values.size(), outputs.data(), outputs.size());
-		if (cancelled.load())
-		{
-			throw std::runtime_error("Cancelled");
-		}
-		Tensors tensors;
-		for (size_t i = 0; i < result.size(); ++i)
-		{
-			if (!result[i].IsTensor())
+			auto result = run.run(tensors);
+			complete.store(true);
+			cancellation.join();
+			if (cancelled.load())
 			{
-				throw std::runtime_error("Non-tensor model output");
+				throw std::runtime_error("Cancelled");
 			}
-			const auto info = result[i].GetTensorTypeAndShapeInfo();
-			Tensor tensor{info.GetElementType(), info.GetShape(), {}};
-			tensor.bytes.resize(count(tensor.dimensions) * width(tensor.type));
-			if (!tensor.bytes.empty())
+			Tensors output;
+			const auto& view = result.value();
+			for (uint32_t i = 0; i < view.tensor_count; ++i)
 			{
-				std::memcpy(tensor.bytes.data(), result[i].GetTensorRawData(), tensor.bytes.size());
+				const auto& value = view.tensors[i];
+				Tensor tensor{ONNXTensorElementDataType(value.dtype), {}, {}};
+				if (value.rank)
+				{
+					tensor.dimensions.assign(value.dims, value.dims + value.rank);
+				}
+				tensor.bytes.resize(size_t(value.byte_count));
+				if (value.byte_count)
+				{
+					std::memcpy(tensor.bytes.data(), value.data, size_t(value.byte_count));
+				}
+				output.emplace(value.name, std::move(tensor));
 			}
-			finite(tensor);
-			tensors.emplace(m_outputs[i].name, std::move(tensor));
+			return output;
 		}
-		return tensors;
+		catch (...)
+		{
+			complete.store(true);
+			if (cancellation.joinable())
+			{
+				cancellation.join();
+			}
+			throw;
+		}
 	}
 	catch (const std::exception& error)
 	{
 		throw std::runtime_error(m_stage + " / " + m_path.u8string() + ": " + error.what());
 	}
 }
-}
+} // namespace diffsinger

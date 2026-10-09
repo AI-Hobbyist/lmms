@@ -1,0 +1,27 @@
+PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch
+PASS tensor codec / identity / corruption / bounded LRU / audition preservation
+PASS 芙宁娜 frames=101983 sha256=3c486f8013e340ac9d9ce68526e8bd4b8c97990a2979b21b87c08c166939bac8
+AUDITION fu2_ning2_na4-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\7112ade729c26fbc80f8a73cb3c5e7a1b6a58a2fb8754d3797f6a20696ff598a.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS seed identity / natural-rest chunk placement / tempo with nonzero content origin / PCM preflight bound
+PASS 那维莱特 frames=101983 sha256=f2f211c2ba7bacdd3529cb583f995cdd6123a1a53ccc3b2c9f5cfcbee0e5c3ad
+AUDITION na4_wei2_lai2_te4-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\bc0ffd1db8965dcb073340e448381c7abadc99481d5fca2625916eb242affde7.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 纳西妲 frames=102540 sha256=de153859cb8399352ff1f1cd4a6be319a20cdb760609b967c71dab96a2f8578f
+AUDITION na4_xi1_da2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\f31509e7d2223e85cf64e93613d5ca43569321d0148b156fdecf03c649498f46.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 温迪 frames=101983 sha256=308f87cf47c0d22392da381069ac2442b8a5ebc12c7b42e59786b92c76023ec2
+AUDITION wen1_di2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\c65a4edde8590f66a556040bc305d114e466285e089dd97efc98d1075441522b.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 希格雯 frames=101425 sha256=3b921964a5b832d1a6f21afba50b206acc8a5c3bc713acbf469c3785c5f69b07
+AUDITION xi1_ge2_wen2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\fa203717d3a74f1c9f79bfb733bda1971a0e7279b87cf052179f596772aad01a.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 遐蝶 frames=103097 sha256=d584edd85ba19fd09ecdfa52f06fcd1138f4547481bcc375c3cc0a1fb2cd7b18
+AUDITION xia2_die2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\4241f7c2716a00a6e6a0b11153307043a2276c44d19bdd1c145cb78012972437.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation

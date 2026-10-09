@@ -1,0 +1,2 @@
+PASS voice=compute-fixture sampleRate=32000 energy=320 ownership/cancel/origin
+PASS ABI 1.0 voices=1 SDK-only conformance

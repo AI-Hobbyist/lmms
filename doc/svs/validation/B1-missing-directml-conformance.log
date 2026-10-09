@@ -1,0 +1,57 @@
+{
+  "cpu": {
+    "effectiveBackend": "cpu",
+    "effectiveDevice": "cpu",
+    "workerEpoch": "svsc-17254509736850517683-1",
+    "runtimeVersion": "svs-compute-1/ort-1.23.0/dml-1.15.4",
+    "runMilliseconds": 5.7538,
+    "providerEvidence": {
+      "dmlNodes": 0,
+      "cpuNodes": 1,
+      "nodes": [
+        {
+          "name": "Add_0_kernel_time",
+          "provider": "CPUExecutionProvider",
+          "durationUs": 1760.0
+        }
+      ],
+      "scope": "session-profile"
+    },
+    "requestedBackend": "cpu",
+    "requestedDevice": "cpu",
+    "stage": "conformance"
+  },
+  "devices": {
+    "runtimeVersion": "svs-compute-1/ort-1.23.0/dml-1.15.4",
+    "devices": [
+      {
+        "backend": "cpu",
+        "device": "cpu",
+        "name": "CPU",
+        "available": true
+      },
+      {
+        "backend": "directml",
+        "device": "dxgi:00000000:000148ca",
+        "name": "AMD Radeon 780M Graphics",
+        "vendorId": 4098,
+        "deviceId": 6400,
+        "dedicatedBytes": 536870912,
+        "available": false,
+        "reason": "Optional DirectML runtime is missing"
+      },
+      {
+        "backend": "directml",
+        "device": "dxgi:00000000:00016a3c",
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11609,
+        "dedicatedBytes": 8282701824,
+        "available": false,
+        "reason": "Optional DirectML runtime is missing"
+      }
+    ]
+  },
+  "crashIsolation": "PASS"
+}
+PASS: ownership, tensor validation, cancellation, CPU constraints, LUID and crash epoch

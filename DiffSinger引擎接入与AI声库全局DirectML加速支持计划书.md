@@ -234,7 +234,7 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | A3 | DONE | 六包 CPU 全链、稳定 seed、SHA 音频/tensor 缓存、受限分块、tempo、导出/重开、只读参考曲线实窗通过；本阶段提交推送后进入 A4 | 已保留六份试听；主观听感 MANUAL/PENDING |
 | A4 | DONE | 既有 Release/58 个插件原位部署、独立 SDK/旧示例、完整 SVS 68/0、原生 GUI 5/0、实际 Release 与空声库启动 3/0；通用音域/背景波形、前缀/拼音/颜色/加粗波形通过，见 A4 验收 | 主观听感 MANUAL/PENDING |
 | B0 | PASS | 共享 C ABI/策略/依赖/容差冻结；两块真实 LUID 的 DML Add 节点；六包 48/48 DML session；纯 C 头与缺设备负向通过，见 B0 验收 | 实际模型 DML 推理在 B3 验收 |
-| B1 | NOT STARTED | — | — |
+| B1 | PASS | 原生共享客户端/独立 worker/SDK RAII；六包 CPU 全链、第二 AI 插件、两 GPU LUID/DML 节点、取消/缺库/崩溃 epoch、旧 ABI 通过，见 B1 验收 | 非 Windows 运行未在本机验证 |
 | B2 | NOT STARTED | — | — |
 | B3 | NOT STARTED | — | 多GPU视本机条件 |
 | B4 | NOT STARTED | — | 听感/体验待实施后验收 |
@@ -263,3 +263,5 @@ A4 完成证据见 [A4 验收](doc/svs/DiffSinger-A4-validation.md)。本轮 A0�
 ## B 阶段实施（2026-10-09 新授权）
 
 用户已明确授权依次实施 B0～B4，每阶段分别提交推送。以上 A 阶段限定语属于历史检查点，不限制本次 B 实施。B0 自动验收通过，详见 [B0 验收](doc/svs/DiffSinger-B0-validation.md)；确认本阶段推送后才开始 B1。B1～B4 尚未完成，不宣称全局 GPU 加速完成。
+
+B1 自动验收已通过，详见 [B1 验收](doc/svs/DiffSinger-B1-validation.md)。本阶段提交并确认推送后才进入 B2；全局设置与真实 acoustic GPU 比较仍待 B2/B3。

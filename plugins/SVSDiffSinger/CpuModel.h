@@ -1,10 +1,13 @@
 #ifndef DIFFSINGER_CPU_MODEL_H
 #define DIFFSINGER_CPU_MODEL_H
-#include "NativeRuntime.h"
-#include "VoiceCatalog.h"
 #include <atomic>
 #include <cstring>
+#include <optional>
 #include <stdexcept>
+
+#include "NativeRuntime.h"
+#include "VoiceCatalog.h"
+#include "svs_compute.hpp"
 namespace diffsinger {
 struct Tensor
 {
@@ -52,11 +55,9 @@ private:
 	};
 	std::string m_stage;
 	fs::path m_path;
-	Ort::Env& m_environment;
-	std::string m_seededModel;
-	void resetSession();
-	Ort::Session m_session{nullptr};
+	std::optional<svs_compute::Model> m_computeModel;
+	std::optional<svs_compute::Session> m_computeSession;
 	std::vector<Port> m_inputs, m_outputs;
 };
-}
+} // namespace diffsinger
 #endif

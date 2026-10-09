@@ -108,3 +108,20 @@ ORT MIT and DirectML redistributable license/notices accompany deployment.
 
 Sources: [official DML EP options](https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html),
 [versioned provider API](https://github.com/microsoft/onnxruntime/blob/v1.23.0/include/onnxruntime/core/providers/dml/dml_provider_factory.h).
+
+## Native C++ consumer (B1)
+
+Include `svs_compute.hpp` and load the deployed client library by absolute path.
+The wrapper requires C++17 and the platform dynamic loader; it links neither Qt
+nor ORT. Create a context with the explicit worker runtime directory, authorize a
+model root plus relative ONNX path, inspect its signature, then create a session
+and a single-use Run. Supply tensors matching the signature. `Result::value()`
+borrows views for the Result lifetime; copy output bytes before destroying it.
+All wrappers retain their parents and library, including while handles are copied.
+Use a separate thread to call `Run::cancel()` while synchronous inference runs.
+
+The Windows deployment places the client in `plugins/SVSCompute.dll` and the
+worker/native dependencies in `svs/compute` relative to the executable. CPU and
+DML workers are independent processes; GPU libraries are optional for CPU use.
+`SVSComputeExample` demonstrates a complete minimal AI plugin consuming the ABI
+without LMMS or Qt. It deliberately uses a synthetic model, not singing assets.

@@ -1,0 +1,8 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ComputeClient.cpp
+  ComputeTransport.cpp
+  正在生成代码...
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/src/core/svs/compute/Release/SVSCompute.lib 和对象 D:/UserData/Desktop/Project/lmms/build/src/core/svs/compute/Release/SVSCompute.exp
+  SVSCompute.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\plugins\SVSCompute.dll

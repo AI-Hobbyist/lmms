@@ -439,9 +439,10 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 			? "/repredict=" + input.at("pitchPredictionRequests").dump()
 			: std::string{};
 		const auto stageSeed = stage == "pitch" ? m_pitchSeed : m_seed;
-		const auto key = TensorCache::key("CPU/ORT1.23.0/native.v2/seed=" + std::to_string(stageSeed)
-				+ "/pinyin621f8ca9/" + m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
-			inputs);
+		const auto key
+			= TensorCache::key("CPU/svs-compute-1/ORT1.23.0/DML1.15.4/native.v3/seed=" + std::to_string(stageSeed)
+					+ "/pinyin621f8ca9/" + m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
+				inputs);
 		Tensors out;
 		if (cancelled.load()) { throw std::runtime_error("Cancelled"); }
 		if (!cache.load(key, out))
