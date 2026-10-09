@@ -23,3 +23,13 @@
 ## 额外检查 / 后续问题
 
 旧 `missingPluginCachedPlayback` 用例未通过：继承嵌入 GUI 环境时，子进程指定空资源目录导致启动失败；取消该 GUI 环境后，子进程在 `cachedRestoreWithoutPlugin` 恢复缓存音频断言失败。此处是明确绑定的缺失插件分支，未进入新预览路径；本次未改缓存恢复，未宣称该附加检查通过。日志为 `validation/SVS-unselected-existing-cache-failure.log`，记录待单独诊断。
+
+## 交付
+
+功能提交 `ffbca917b935bf2e49e7deebd3c751e6a756e0ea` 已推送 master。
+
+增量包：`build/packages/lmms-enhanced-incremental-ffbca917b-20261009-153649-win64.zip`，55883032 bytes，SHA256 `19D7913E5532ADBE1C707D0D9EE6FC9A5A23D5C4EAA1E85DAD14E84EBC9B3D9F`。沿用 `lmms-enhanced-full-236c5f3fe-win64.zip` 全量基包，包含已发布运行文件与此功能，按已有安装入口覆盖安装版。包内 3425 个运行文件和四个安装入口校验通过；不打包个人配置、声库及试听缓存。
+
+编译主程序 `build/Release/lmms.exe`，6264832 bytes，SHA256 `2C88D51C3AC799C8A738EB9C3465757F577D6771C1910C2AC4B00B8F7E6CF620`，与包内清单一致。
+
+安装器 VerifyOnly 已验证 3425 payload、6 条允许的示例移除路径及安装路径，未修改任何安装目录。日志见 `validation/SVS-unselected-package.log` 和 `validation/SVS-unselected-package-verify.log`。
