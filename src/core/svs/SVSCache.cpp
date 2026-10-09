@@ -1,17 +1,20 @@
 #include "SVSCache.h"
-#include "ConfigManager.h"
+
 #include <QCryptographicHash>
 #include <QDataStream>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSaveFile>
 #include <QStandardPaths>
-#include <QDateTime>
 #include <QtEndian>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+
+#include "ConfigManager.h"
+#include "SVSComputePolicy.h"
 namespace lmms::svs {
 namespace {
 QJsonValue feedbackIds(const QJsonValue& value, const QMap<QString, QString>& ids)
@@ -56,8 +59,8 @@ QMap<QString, QString> noteIds(const Input& input, bool restore)
 	}
 	return result;
 }
-std::shared_ptr<const Audio> bindCachedAudio(
-	const std::shared_ptr<const Audio>& source, const Input& input, const QString& key)
+std::shared_ptr<const Audio> bindCachedAudio(const std::shared_ptr<const Audio>& source, const Input& input,
+											 const QString& key)
 {
 	auto audio = std::make_shared<Audio>(*source);
 	QString error;
@@ -65,6 +68,7 @@ std::shared_ptr<const Audio> bindCachedAudio(
 		return {};
 	audio->revision = input.revision;
 	audio->feedback = feedbackIds(source->feedback, noteIds(input, true)).toObject();
+	markComputeCacheHit(audio->feedback);
 	audio->cacheKey = key;
 	audio->cacheInputHash = Cache::editableKey(input);
 	return audio;
@@ -140,7 +144,7 @@ DiskFiles diskFiles(const QString& root)
 	for (const auto& directory : QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
 	{
 		for (const auto& file : QDir(directory.absoluteFilePath())
-				 .entryInfoList({"*.svsmeta", "*.svscache"}, QDir::Files | QDir::NoSymLinks))
+									.entryInfoList({"*.svsmeta", "*.svscache"}, QDir::Files | QDir::NoSymLinks))
 		{
 			if (!validKey(file.completeBaseName()))
 				continue;
@@ -165,11 +169,11 @@ DiskFiles diskFiles(const QString& root)
 	}
 	return result;
 }
-}
+} // namespace
 Cache& Cache::instance()
 {
 	static Cache cache(ConfigManager::inst()->workingDir() + "cache/SVS", 128 * 1024 * 1024, 512 * 1024 * 1024,
-		QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/svs-v1");
+					   QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/svs-v1");
 	return cache;
 }
 Cache::Cache(QString directory, qint64 memoryLimit, qint64 diskLimit, QString legacyDirectory)
@@ -205,10 +209,23 @@ QString Cache::key(const Input& input, const QString& identity)
 	{
 		auto compute = document["computePolicy"].toObject();
 		for (const auto& field :
-			QStringList{"requestedBackend", "requestedDevice", "policyRevision", "fallbackReason", "supported"})
+			 QStringList{"requestedBackend", "requestedDevice", "policyRevision", "fallbackReason", "supported"})
 		{
 			compute.remove(field);
 		}
+		QMap<QString, QJsonObject> orderedOverrides;
+		for (const auto& value : compute["stageOverrides"].toArray())
+		{
+			auto stage = value.toObject();
+			stage.remove("reason");
+			orderedOverrides[stage["stage"].toString()] = stage;
+		}
+		QJsonArray overrides;
+		for (const auto& stage : orderedOverrides)
+		{
+			overrides.append(stage);
+		}
+		compute["stageOverrides"] = overrides;
 		document["computePolicy"] = compute;
 	}
 	if (document["pluginId"].toString() == "org.lmms.svs.diffsinger")
@@ -220,9 +237,14 @@ QString Cache::key(const Input& input, const QString& identity)
 	}
 	QJsonArray notes;
 	for (const auto& note : input.notes)
-		notes.append(QJsonObject{{"tick", note.tick}, {"duration", note.duration}, {"pitch", note.pitch},
-			{"lyric", note.lyric}, {"language", note.language}, {"pronunciation", note.pronunciation},
-			{"parameters", note.parameters}, {"phonemes", note.phonemes}});
+		notes.append(QJsonObject{{"tick", note.tick},
+								 {"duration", note.duration},
+								 {"pitch", note.pitch},
+								 {"lyric", note.lyric},
+								 {"language", note.language},
+								 {"pronunciation", note.pronunciation},
+								 {"parameters", note.parameters},
+								 {"phonemes", note.phonemes}});
 	document["notes"] = notes;
 	document["pluginIdentity"] = identity;
 	document["voiceId"] = input.voiceId;
@@ -246,8 +268,8 @@ QString Cache::editableKey(const Input& source)
 void Cache::remember(const QString& key, std::shared_ptr<const Audio> audio)
 {
 	const auto cost = qint64(audio->samples.size() * sizeof(float) + audio->waveform.bytes()
-		+ QJsonDocument(audio->feedback).toJson(QJsonDocument::Compact).size()
-		+ (audio->mapping.tempo ? audio->mapping.tempo->bytes() : 0));
+							 + QJsonDocument(audio->feedback).toJson(QJsonDocument::Compact).size()
+							 + (audio->mapping.tempo ? audio->mapping.tempo->bytes() : 0));
 	if (cost > m_memoryLimit)
 		return;
 	if (m_entries.contains(key))
@@ -399,11 +421,14 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 	if (bytes.isEmpty())
 		return;
 	const auto sha = QString::fromLatin1(QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex());
-	const auto metadata
-		= QJsonDocument(QJsonObject{{"key", key}, {"audioSHA256", sha}, {"editableHash", audio->cacheInputHash},
-							{"rate", int(audio->rate)}, {"startSeconds", audio->startSeconds},
-							{"startTick", audio->startTick}, {"feedback", audio->feedback}})
-			  .toJson(QJsonDocument::Compact);
+	const auto metadata = QJsonDocument(QJsonObject{{"key", key},
+													{"audioSHA256", sha},
+													{"editableHash", audio->cacheInputHash},
+													{"rate", int(audio->rate)},
+													{"startSeconds", audio->startSeconds},
+													{"startTick", audio->startTick},
+													{"feedback", audio->feedback}})
+							  .toJson(QJsonDocument::Compact);
 	if (metadata.size() > MaximumMetadata || bytes.size() + metadata.size() > std::min(m_diskLimit, MaximumFile))
 		return;
 	const auto directory = engineDirectory(input.document["pluginId"].toString());
@@ -430,7 +455,7 @@ void Cache::trimDisk()
 {
 	auto files = diskFiles(m_directory);
 	std::sort(files.indices.begin(), files.indices.end(),
-		[](const auto& a, const auto& b) { return a.lastModified() < b.lastModified(); });
+			  [](const auto& a, const auto& b) { return a.lastModified() < b.lastModified(); });
 	for (const auto& file : files.indices)
 	{
 		if (files.bytes <= m_diskLimit)
@@ -464,4 +489,4 @@ void Cache::clearMemory()
 	m_entries.clear();
 	m_memoryBytes = 0;
 }
-}
+} // namespace lmms::svs

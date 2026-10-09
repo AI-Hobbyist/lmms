@@ -1,18 +1,20 @@
 /* Word grouping follows DiffSingerForTuneLab; Copyright (c) 2026 Jingang, MIT. */
 #include "Duration.h"
-#include "Speaker.h"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <set>
+
+#include "Speaker.h"
 namespace diffsinger {
 namespace {
 Tensor ints(const std::vector<int64_t>& values)
 {
 	return Tensor::make(ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64, {1, int64_t(values.size())}, values);
 }
-}
-Duration::Duration(Ort::Env& environment, std::shared_ptr<const VoicePackage> voice)
+} // namespace
+Duration::Duration(Ort::Env& environment, std::shared_ptr<const VoicePackage> voice, const Json& policy)
 	: m_voice(std::move(voice))
 	, m_pronunciation(m_voice)
 {
@@ -20,12 +22,14 @@ Duration::Duration(Ort::Env& environment, std::shared_ptr<const VoicePackage> vo
 	if (found != m_voice->stages.end() && found->second.values.value("predict_dur", true))
 	{
 		const auto& stage = found->second;
-		m_linguistic = std::make_unique<CpuModel>(environment, stage.models.at("linguistic"), "duration.linguistic");
-		m_duration = std::make_unique<CpuModel>(environment, stage.models.at("dur"), "duration");
+		const auto resolved = voiceComputePolicy(*m_voice, policy);
+		m_linguistic = std::make_unique<CpuModel>(environment, stage.models.at("linguistic"), "duration.linguistic", 1,
+												  resolved);
+		m_duration = std::make_unique<CpuModel>(environment, stage.models.at("dur"), "duration", 1, resolved);
 	}
 }
 DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sdk::TempoMap& tempo, double origin,
-	const Json& parameters, const std::atomic<bool>& cancelled)
+							   const Json& parameters, const std::atomic<bool>& cancelled)
 {
 	if (input.size() > 4096)
 	{
@@ -35,6 +39,18 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 	if (input.empty())
 	{
 		return result;
+	}
+	if (cancelled.load())
+	{
+		throw std::runtime_error("Cancelled");
+	}
+	if (m_linguistic)
+	{
+		m_linguistic->beginRequest();
+	}
+	if (m_duration)
+	{
+		m_duration->beginRequest();
 	}
 	auto notes = input;
 	std::stable_sort(notes.begin(), notes.end(), [](const auto& a, const auto& b) { return a.start < b.start; });
@@ -85,7 +101,7 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 			auto& previous = resolved.back();
 			size_t next = previous.leading + 1;
 			while (next < previous.symbols.size()
-				&& m_pronunciation.type(previous.symbols[next], previous.note.language) == "consonant")
+				   && m_pronunciation.type(previous.symbols[next], previous.note.language) == "consonant")
 			{
 				++next;
 			}
@@ -112,8 +128,8 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 		}
 		else if (note.phonemes.contains("symbols"))
 		{
-			symbols = m_pronunciation.map(
-				note.phonemes.at("symbols").get<std::vector<std::string>>(), note.language, "acoustic");
+			symbols = m_pronunciation.map(note.phonemes.at("symbols").get<std::vector<std::string>>(), note.language,
+										  "acoustic");
 		}
 		else
 		{
@@ -126,7 +142,7 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 			if (!answer.value("generated", false))
 			{
 				throw std::runtime_error("Pronunciation / note " + note.id + ": "
-					+ answer.value("diagnostic", std::string("Unknown lyric")));
+										 + answer.value("diagnostic", std::string("Unknown lyric")));
 			}
 			symbols
 				= m_pronunciation.map(answer.value("phonemes", std::vector<std::string>{}), note.language, "acoustic");
@@ -183,8 +199,8 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 	for (auto& item : resolved)
 	{
 		item.flat = tokens.size();
-		const auto symbols = m_pronunciation.map(
-			item.symbols, item.note.language, stageIt == m_voice->stages.end() ? "acoustic" : "duration");
+		const auto symbols = m_pronunciation.map(item.symbols, item.note.language,
+												 stageIt == m_voice->stages.end() ? "acoustic" : "duration");
 		divisions.back() += int64_t(item.leading);
 		divisions.push_back(int64_t(symbols.size() - item.leading));
 		wordDurations.push_back(std::max(int64_t(1), frameAt(item.end) - frameAt(item.note.start)));
@@ -215,12 +231,14 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 		if (m_linguistic->accepts("tokens_b"))
 		{
 			inputs["tokens_b"] = ints(tokens);
-			inputs["blend"] = Tensor::make(
-				ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, {1, int64_t(tokens.size())}, std::vector<float>(tokens.size(), 0));
+			inputs["blend"] = Tensor::make(ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, {1, int64_t(tokens.size())},
+										   std::vector<float>(tokens.size(), 0));
 		}
 		auto encoded = m_linguistic->run(inputs, cancelled);
+		result.computeStages.push_back(m_linguistic->execution());
 		Tensors dur{{"encoder_out", std::move(encoded.at("encoder_out"))},
-			{"x_masks", std::move(encoded.at("x_masks"))}, {"ph_midi", ints(pitches)}};
+					{"x_masks", std::move(encoded.at("x_masks"))},
+					{"ph_midi", ints(pitches)}};
 		if (m_duration->accepts("spk_embed"))
 		{
 			const auto embedding = speakerEmbedding(*m_voice, stage, parameters);
@@ -230,10 +248,11 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 			{
 				repeated.insert(repeated.end(), embedding.begin(), embedding.end());
 			}
-			dur["spk_embed"] = Tensor::make(
-				ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, {1, int64_t(tokens.size()), int64_t(embedding.size())}, repeated);
+			dur["spk_embed"] = Tensor::make(ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT,
+											{1, int64_t(tokens.size()), int64_t(embedding.size())}, repeated);
 		}
 		result.predictions = m_duration->run(dur, cancelled).at("ph_dur_pred").values<float>();
+		result.computeStages.push_back(m_duration->execution());
 		if (result.predictions.size() != tokens.size())
 		{
 			throw std::runtime_error("Duration output length does not match phonemes");
@@ -348,15 +367,18 @@ DurationPlan Duration::predict(const std::vector<NoteInput>& input, const svs_sd
 		for (const auto& phone : local)
 		{
 			result.phones.push_back(phone);
-			feedback.push_back({{"symbol", phone.symbol}, {"startSeconds", phone.start},
-				{"durationSeconds", phone.end - phone.start}, {"manual", phone.manual}});
+			feedback.push_back({{"symbol", phone.symbol},
+								{"startSeconds", phone.start},
+								{"durationSeconds", phone.end - phone.start},
+								{"manual", phone.manual}});
 		}
 		if (!item.note.id.empty())
 		{
-			result.feedback.push_back({{"noteId", item.note.id}, {"phonemes", feedback},
-				{"generated", !item.note.phonemes.contains("segments")}});
+			result.feedback.push_back({{"noteId", item.note.id},
+									   {"phonemes", feedback},
+									   {"generated", !item.note.phonemes.contains("segments")}});
 		}
 	}
 	return result;
 }
-}
+} // namespace diffsinger

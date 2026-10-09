@@ -1,16 +1,17 @@
 /* Native DiffSinger pronunciation/duration; PCM synthesis is stage A3. */
-#include "svs.h"
-#include "VoiceCatalog.h"
-#include "NativeRuntime.h"
-#include "Pronunciation.h"
-#include "Duration.h"
-#include "Speaker.h"
-#include "Synthesis.h"
 #include <algorithm>
 #include <cstring>
+#include <mutex>
 #include <new>
 #include <string>
-#include <mutex>
+
+#include "Duration.h"
+#include "NativeRuntime.h"
+#include "Pronunciation.h"
+#include "Speaker.h"
+#include "Synthesis.h"
+#include "VoiceCatalog.h"
+#include "svs.h"
 
 namespace {
 using diffsinger::Json;
@@ -31,6 +32,7 @@ struct Session
 	std::shared_ptr<const diffsinger::VoicePackage> voice;
 	std::vector<diffsinger::NoteInput> notes;
 	Json input = Json::object();
+	Json computePolicy = Json::object();
 	std::unique_ptr<diffsinger::Duration> duration;
 	std::unique_ptr<diffsinger::Synthesis> synthesis;
 	std::vector<float> audio;
@@ -181,28 +183,47 @@ svs_status SVS_CALL capabilities(svs_engine handle, const char* id, const char*,
 		const auto info = voice->declaration();
 		auto phonemes = Json::array();
 		for (auto item = voice->stages.at("acoustic").phonemes.begin();
-			item != voice->stages.at("acoustic").phonemes.end(); ++item)
+			 item != voice->stages.at("acoustic").phonemes.end(); ++item)
 		{
 			phonemes.push_back(item.key());
 		}
-		Json schema{{"schemaVersion", 1}, {"languages", info["languages"]},
-			{"defaultLanguage", info["defaultLanguage"]}, {"noteLanguage", info["languages"].size() > 1},
-			{"parameters", Json::array()}, {"feedbackParameters", Json::array()},
-			{"pronunciation", {{"phonemeSet", "diffsinger:" + voice->fingerprint}, {"phonemes", phonemes}}},
-			{"synthesis",
-				{{"available", true}, {"cancel", true}, {"concurrent", false}, {"channels", 2}, {"format", "float32"},
-					{"backend", "CPU"}}}};
-		schema["phonemes"] = {{"timingEditable", true}, {"attributesEditable", false}, {"minimumDurationSeconds", .005},
-			{"maximumLeadSeconds", .15}};
+		Json schema{{"schemaVersion", 1},
+					{"languages", info["languages"]},
+					{"defaultLanguage", info["defaultLanguage"]},
+					{"noteLanguage", info["languages"].size() > 1},
+					{"parameters", Json::array()},
+					{"feedbackParameters", Json::array()},
+					{"pronunciation", {{"phonemeSet", "diffsinger:" + voice->fingerprint}, {"phonemes", phonemes}}},
+					{"synthesis",
+					 {{"available", true},
+					  {"cancel", true},
+					  {"concurrent", false},
+					  {"channels", 2},
+					  {"format", "float32"},
+					  {"backend", "shared-compute"}}}};
+		schema["phonemes"] = {{"timingEditable", true},
+							  {"attributesEditable", false},
+							  {"minimumDurationSeconds", .005},
+							  {"maximumLeadSeconds", .15}};
 		schema["pronunciation"]["parser"] = "diffsinger.native.v1";
 		schema["pronunciation"]["continuation"] = "-";
 		schema["synthesis"]["segmented"] = {{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}};
+		schema["compute"]
+			= {{"protocolVersion", 1},
+			   {"runtime", "svs-compute-1"},
+			   {"supportedBackends", Json::array({"cpu", "directml"})},
+			   {"stageConstraints", diffsinger::voiceComputePolicy(*voice, Json::object()).at("stageOverrides")}};
 		const auto choices = diffsinger::speakerChoices(*voice);
 		if (!choices.empty())
 		{
-			schema["parameters"].push_back(
-				{{"id", "diffsinger.speaker"}, {"name", "Speaker"}, {"group", "Voice"}, {"scope", "track"},
-					{"type", "enum"}, {"default", choices[0]["id"]}, {"choices", choices}, {"curve", false}});
+			schema["parameters"].push_back({{"id", "diffsinger.speaker"},
+											{"name", "Speaker"},
+											{"group", "Voice"},
+											{"scope", "track"},
+											{"type", "enum"},
+											{"default", choices[0]["id"]},
+											{"choices", choices},
+											{"curve", false}});
 		}
 		diffsinger::Synthesis::declareParameters(*voice, schema);
 		return text(schema.dump().c_str(), out);
@@ -234,7 +255,7 @@ svs_status SVS_CALL openResource(svs_engine handle, const char* id, svs_resource
 				auto result = std::make_unique<ResourceHandle>();
 				result->resource = resource;
 				*info = {sizeof(*info), resource->id.c_str(), resource->mime.c_str(), resource->bytes.size(),
-					resource->sha256.c_str()};
+						 resource->sha256.c_str()};
 				*out = result.release();
 				return SVS_OK;
 			}
@@ -246,8 +267,8 @@ svs_status SVS_CALL openResource(svs_engine handle, const char* id, svs_resource
 		return SVS_FAILED;
 	}
 }
-svs_status SVS_CALL readResource(
-	svs_engine engine, svs_resource handle, uint64_t offset, void* destination, uint64_t capacity, uint64_t* count)
+svs_status SVS_CALL readResource(svs_engine engine, svs_resource handle, uint64_t offset, void* destination,
+								 uint64_t capacity, uint64_t* count)
 {
 	if (!engine || !handle || !count || (!destination && capacity))
 	{
@@ -289,8 +310,8 @@ svs_status SVS_CALL pronunciation(svs_engine handle, const char* id, const char*
 		{
 			return SVS_INVALID_INPUT;
 		}
-		return text(
-			diffsinger::Pronunciation(voice).resolve(Json::parse(request ? request : "{}")).dump().c_str(), out);
+		return text(diffsinger::Pronunciation(voice).resolve(Json::parse(request ? request : "{}")).dump().c_str(),
+					out);
 	}
 	catch (const std::exception& error)
 	{
@@ -446,9 +467,17 @@ svs_status SVS_CALL render(svs_session handle, svs_result* out)
 		{
 			throw std::runtime_error("Invalid tempo points");
 		}
+		const auto policy = session.input.value("computePolicy", Json::object());
+		if (policy != session.computePolicy)
+		{
+			session.duration.reset();
+			session.synthesis.reset();
+			session.computePolicy = policy;
+		}
 		if (!session.duration)
 		{
-			session.duration = std::make_unique<diffsinger::Duration>(session.engine->environment, session.voice);
+			session.duration
+				= std::make_unique<diffsinger::Duration>(session.engine->environment, session.voice, policy);
 		}
 		const double origin = session.input.value("position", 0.) - session.input.value("contentOffset", 0.);
 		const auto plan = session.duration->predict(
@@ -458,8 +487,10 @@ svs_status SVS_CALL render(svs_session handle, svs_result* out)
 		{
 			if (!phone.noteId.empty())
 			{
-				phones.push_back({{"noteId", phone.noteId}, {"symbol", phone.symbol}, {"startSeconds", phone.start},
-					{"durationSeconds", phone.end - phone.start}});
+				phones.push_back({{"noteId", phone.noteId},
+								  {"symbol", phone.symbol},
+								  {"startSeconds", phone.start},
+								  {"durationSeconds", phone.end - phone.start}});
 			}
 		}
 		activeStage = "synthesis";
@@ -467,22 +498,36 @@ svs_status SVS_CALL render(svs_session handle, svs_result* out)
 		{
 			session.synthesis = std::make_unique<diffsinger::Synthesis>(session.engine->environment, session.voice);
 		}
-		auto rendered = session.synthesis->render(
-			plan, session.notes, session.input, tempo, origin, session.rate, session.cancelled);
+		auto rendered = session.synthesis->render(plan, session.notes, session.input, tempo, origin, session.rate,
+												  session.cancelled);
 		rendered.feedback["phonemes"] = phones;
 		rendered.feedback["pronunciations"] = plan.feedback;
+		for (const auto& execution : plan.computeStages)
+		{
+			rendered.feedback["computeStages"].push_back(execution);
+		}
 		session.feedback = rendered.feedback.dump();
 		session.audio = std::move(rendered.stereo);
 		session.error.clear();
-		*out = {sizeof(*out), session.rate, 2, session.audio.size() / 2, tempo.secondsAt(origin) + rendered.start,
-			session.audio.data(), session.feedback.c_str(), nullptr, nullptr};
+		*out = {sizeof(*out),
+				session.rate,
+				2,
+				session.audio.size() / 2,
+				tempo.secondsAt(origin) + rendered.start,
+				session.audio.data(),
+				session.feedback.c_str(),
+				nullptr,
+				nullptr};
 		return SVS_OK;
 	}
 	catch (const std::exception& error)
 	{
-		session.error = Json{{"stage", activeStage}, {"voiceId", session.voice->id},
-			{"path", session.voice->root.u8string()}, {"message", error.what()}}
-							.dump();
+		session.error = Json{
+			{"stage", activeStage},
+			{"voiceId", session.voice->id},
+			{"path", session.voice->root.u8string()},
+			{"message",
+			 error.what()}}.dump();
 		*out = {sizeof(*out), session.rate, 2, 0, 0, nullptr, nullptr, session.error.c_str(), nullptr};
 		return session.cancelled ? SVS_CANCELLED : SVS_FAILED;
 	}
@@ -508,7 +553,7 @@ void SVS_CALL releaseResult(svs_session handle, svs_result* result)
 		*result = {};
 	}
 }
-}
+} // namespace
 SVS_EXPORT svs_status SVS_CALL svs_get_api(uint32_t major, uint32_t minor, uint32_t size, svs_api* out)
 {
 	if (major != SVS_ABI_MAJOR || !out || size < SVS_API_REQUIRED_SIZE)

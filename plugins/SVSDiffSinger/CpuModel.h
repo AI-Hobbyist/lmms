@@ -2,6 +2,7 @@
 #define DIFFSINGER_CPU_MODEL_H
 #include <atomic>
 #include <cstring>
+#include <functional>
 #include <optional>
 #include <stdexcept>
 
@@ -39,10 +40,20 @@ struct Tensor
 	}
 };
 using Tensors = std::map<std::string, Tensor>;
+// Native diagnostic observer. Empty in normal synthesis; scoped to the calling thread.
+using InferenceObserver
+	= std::function<void(const fs::path&, const std::string&, uint32_t, const Tensors&, const Tensors&, const Json&)>;
+InferenceObserver exchangeInferenceObserver(InferenceObserver observer);
+Json voiceComputePolicy(const VoicePackage& voice, Json policy);
 class CpuModel
 {
 public:
-	CpuModel(Ort::Env& environment, const fs::path& path, std::string stage, uint32_t seed = 1);
+	CpuModel(Ort::Env& environment, const fs::path& path, std::string stage, uint32_t seed = 1,
+			 const Json& policy = Json::object());
+	void setComputePolicy(const Json& policy);
+	void beginRequest();
+	std::string computeIdentity() const;
+	const Json& execution() const { return m_execution; }
 	bool accepts(const std::string& name) const;
 	Tensors run(const Tensors& inputs, const std::atomic<bool>& cancelled);
 
@@ -54,10 +65,16 @@ private:
 		std::vector<int64_t> dimensions;
 	};
 	std::string m_stage;
+	uint32_t m_seed = 1;
 	fs::path m_path;
 	std::optional<svs_compute::Model> m_computeModel;
 	std::optional<svs_compute::Session> m_computeSession;
 	std::vector<Port> m_inputs, m_outputs;
+	std::string m_backend, m_device, m_fallbackReason;
+	std::string m_requestedBackend, m_requestedDevice;
+	Json m_policy = Json::object();
+	bool m_cpuOnly = false;
+	Json m_execution = Json::object();
 };
 } // namespace diffsinger
 #endif

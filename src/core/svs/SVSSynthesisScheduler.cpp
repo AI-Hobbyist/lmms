@@ -11,6 +11,24 @@
 #include "SVSTempoSnapshot.h"
 #include "Song.h"
 namespace lmms::svs {
+namespace {
+void recordCompletedCompute(Input& input, std::shared_ptr<const Audio>& audio)
+{
+	if (!audio || !input.document.contains("computePolicy"))
+	{
+		return;
+	}
+	auto stages = audio->feedback["computeStages"].toArray();
+	if (audio->feedback["computeExecution"].isObject())
+	{
+		stages.append(audio->feedback["computeExecution"]);
+	}
+	recordComputeExecution(input.document, stages);
+	auto tagged = std::make_shared<Audio>(*audio);
+	tagged->feedback["computePolicy"] = input.document["computePolicy"];
+	audio = std::move(tagged);
+}
+} // namespace
 SynthesisScheduler& SynthesisScheduler::instance()
 {
 	static SynthesisScheduler scheduler(
@@ -53,11 +71,12 @@ void SynthesisScheduler::shutdown()
 	m_active = 0;
 }
 std::shared_ptr<RenderControl> SynthesisScheduler::submit(std::shared_ptr<Plugin> plugin, Input input, int priority,
-	StateCallback state, ResultCallback result, PartialCallback partial, QVector<SynthesisSegment> retained)
+														  StateCallback state, ResultCallback result,
+														  PartialCallback partial, QVector<SynthesisSegment> retained)
 {
 	auto job
 		= std::make_shared<Job>(Job{std::move(plugin), std::move(input), priority, std::make_shared<RenderControl>(),
-			std::move(state), std::move(result), std::move(partial), std::move(retained)});
+									std::move(state), std::move(result), std::move(partial), std::move(retained)});
 	job->usesComputePolicy = job->input.document.contains("computePolicy");
 	if (m_stopping)
 	{
@@ -91,14 +110,14 @@ void SynthesisScheduler::dispatch()
 	m_queue.erase(
 		std::remove_if(m_queue.begin(), m_queue.end(), [](const auto& job) { return job->control->cancelled.load(); }),
 		m_queue.end());
-	std::stable_sort(
-		m_queue.begin(), m_queue.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
+	std::stable_sort(m_queue.begin(), m_queue.end(),
+					 [](const auto& a, const auto& b) { return a->priority > b->priority; });
 	while (m_active < m_budget)
 	{
 		// Plugin currently serializes instance access; do not spend worker slots
 		// waiting for a non-concurrent engine's mutex.
-		auto next = std::find_if(
-			m_queue.begin(), m_queue.end(), [this](const auto& job) { return !m_busy.contains(job->plugin.get()); });
+		auto next = std::find_if(m_queue.begin(), m_queue.end(),
+								 [this](const auto& job) { return !m_busy.contains(job->plugin.get()); });
 		if (next == m_queue.end())
 			break;
 		auto job = *next;
@@ -121,8 +140,8 @@ void SynthesisScheduler::dispatch()
 						+ input.document["contentEndTick"].toDouble();
 					QJsonArray points;
 					if (!std::isfinite(end) || end > MaxSongLength
-						|| !input.tempoSnapshot->buildMap(
-							int(std::ceil(std::max(0., end))), points, error, job->control))
+						|| !input.tempoSnapshot->buildMap(int(std::ceil(std::max(0., end))), points, error,
+														  job->control))
 					{
 						if (error.isEmpty())
 							error = "Invalid SVS tempo extent";
@@ -189,7 +208,8 @@ void SynthesisScheduler::dispatch()
 									}
 									publish();
 									for (int index = 0;
-										index < segments.size() && error.isEmpty() && !job->control->cancelled; ++index)
+										 index < segments.size() && error.isEmpty() && !job->control->cancelled;
+										 ++index)
 									{
 										QMetaObject::invokeMethod(
 											this,
@@ -202,6 +222,8 @@ void SynthesisScheduler::dispatch()
 										if (segment.audio)
 											continue;
 										segment.audio = job->plugin->render(segment.input, error, job->control);
+										recordCompletedCompute(segment.input, segment.audio);
+										segment.signature = Cache::editableKey(segment.input);
 										if (!segment.audio)
 										{
 											if (error.isEmpty())
@@ -211,7 +233,7 @@ void SynthesisScheduler::dispatch()
 										}
 										if (cacheable && !job->control->cancelled)
 											Cache::instance().put(Cache::key(segment.input, job->plugin->identity()),
-												segment.input, segment.audio);
+																  segment.input, segment.audio);
 										publish();
 									}
 									if (error.isEmpty() && !job->control->cancelled)
@@ -233,9 +255,11 @@ void SynthesisScheduler::dispatch()
 						}
 						if (result && cacheable && fresh && !job->control->cancelled)
 						{
-							Cache::instance().put(key, job->input, result);
+							recordCompletedCompute(job->input, result);
+							const auto completedKey = Cache::key(job->input, job->plugin->identity());
+							Cache::instance().put(completedKey, job->input, result);
 							auto tagged = std::make_shared<Audio>(*result);
-							tagged->cacheKey = key;
+							tagged->cacheKey = completedKey;
 							tagged->cacheInputHash = Cache::editableKey(job->input);
 							result = std::move(tagged);
 						}
@@ -244,9 +268,7 @@ void SynthesisScheduler::dispatch()
 			}
 			if (result && job->usesComputePolicy)
 			{
-				auto tagged = std::make_shared<Audio>(*result);
-				tagged->feedback["computePolicy"] = job->input.document["computePolicy"];
-				result = std::move(tagged);
+				recordCompletedCompute(job->input, result);
 			}
 			QMetaObject::invokeMethod(
 				this,
@@ -266,4 +288,4 @@ void SynthesisScheduler::dispatch()
 		}));
 	}
 }
-}
+} // namespace lmms::svs

@@ -1,9 +1,12 @@
 #include "SVSSegmentedSynthesis.h"
-#include "SVSCache.h"
-#include "SVSCurve.h"
+
 #include <QJsonArray>
 #include <algorithm>
 #include <cmath>
+
+#include "SVSCache.h"
+#include "SVSComputePolicy.h"
+#include "SVSCurve.h"
 namespace lmms::svs {
 bool supportsSegmentedSynthesis(const Input& input)
 {
@@ -96,10 +99,16 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 			QJsonObject localRequests;
 			for (const auto& note : group)
 			{
-				if (requests.contains(note.id)) { localRequests[note.id] = requests[note.id]; }
+				if (requests.contains(note.id))
+				{
+					localRequests[note.id] = requests[note.id];
+				}
 			}
 			segment.input.document.remove("pitchPredictionRequests");
-			if (!localRequests.isEmpty()) { segment.input.document["pitchPredictionRequests"] = localRequests; }
+			if (!localRequests.isEmpty())
+			{
+				segment.input.document["pitchPredictionRequests"] = localRequests;
+			}
 		}
 		segment.signature = Cache::editableKey(segment.input);
 		result.append(std::move(segment));
@@ -113,7 +122,8 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 	return result;
 }
 std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const TimeMapping& mapping,
-	const QVector<SynthesisSegment>& segments, QString& error, bool complete)
+													   const QVector<SynthesisSegment>& segments, QString& error,
+													   bool complete)
 {
 	error.clear();
 	if (segments.isEmpty())
@@ -128,6 +138,10 @@ std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const
 		auto audio = std::make_shared<Audio>(*segments.front().audio);
 		audio->revision = input.revision;
 		audio->complete = complete;
+		if (segments.front().cached)
+		{
+			markComputeCacheHit(audio->feedback);
+		}
 		return audio;
 	}
 	const double begin = segments.front().startSeconds, end = segments.back().endSeconds;
@@ -145,16 +159,32 @@ std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const
 	audio->startSeconds = begin;
 	audio->startTick = mapping.resultStartTick(begin);
 	audio->samples.resize(size_t(frames) * 2, 0);
-	QJsonArray states, pitch, phonemes, diagnostics;
+	QJsonArray states, pitch, phonemes, diagnostics, computeStages;
 	QJsonObject curves, pronunciations;
 	for (int index = 0; index < segments.size(); ++index)
 	{
 		const auto& segment = segments[index];
-		states.append(QJsonObject{{"current", index + 1}, {"total", segments.size()}, {"ready", bool(segment.audio)},
-			{"cached", segment.cached}, {"signature", segment.signature}});
+		states.append(QJsonObject{{"current", index + 1},
+								  {"total", segments.size()},
+								  {"ready", bool(segment.audio)},
+								  {"cached", segment.cached},
+								  {"signature", segment.signature}});
 		if (!segment.audio)
 			continue;
 		const auto& part = *segment.audio;
+		auto computeFeedback = part.feedback;
+		if (segment.cached)
+		{
+			markComputeCacheHit(computeFeedback);
+		}
+		for (const auto& value : computeFeedback["computeStages"].toArray())
+		{
+			computeStages.append(value);
+		}
+		if (computeFeedback["computeExecution"].isObject())
+		{
+			computeStages.append(computeFeedback["computeExecution"]);
+		}
 		if (part.rate != input.rate)
 		{
 			error = "SVS segment sample rate mismatch";
@@ -230,9 +260,17 @@ std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const
 			curves[it.key()] = merged;
 		}
 	}
-	audio->feedback = {{"segments", states}, {"pitch", pitch}, {"phonemes", phonemes},
-		{"pronunciations", pronunciations}, {"dictionaryDiagnostics", diagnostics}, {"curves", curves}};
+	audio->feedback = {{"segments", states},
+					   {"pitch", pitch},
+					   {"phonemes", phonemes},
+					   {"pronunciations", pronunciations},
+					   {"dictionaryDiagnostics", diagnostics},
+					   {"curves", curves}};
+	if (!computeStages.isEmpty())
+	{
+		audio->feedback["computeStages"] = computeStages;
+	}
 	audio->waveform.build(audio->samples);
 	return audio;
 }
-}
+} // namespace lmms::svs

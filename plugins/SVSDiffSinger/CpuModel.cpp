@@ -2,9 +2,11 @@
 
 #include <cstdlib>
 #include <thread>
+#include <utility>
 
 namespace diffsinger {
 namespace {
+thread_local InferenceObserver inferenceObserver;
 svs_compute::Context& computeContext()
 {
 	static const auto directory = [] {
@@ -21,8 +23,46 @@ svs_compute::Context& computeContext()
 	return context;
 }
 } // namespace
-CpuModel::CpuModel(Ort::Env& environment, const fs::path& path, std::string stage, uint32_t seed)
+InferenceObserver exchangeInferenceObserver(InferenceObserver observer)
+{
+	return std::exchange(inferenceObserver, std::move(observer));
+}
+Json voiceComputePolicy(const VoicePackage& voice, Json policy)
+{
+	if (!policy.is_object())
+	{
+		throw std::runtime_error("Compute policy must be an object");
+	}
+	if (!policy.contains("stageOverrides"))
+	{
+		policy["stageOverrides"] = Json::array();
+	}
+	for (const auto& stage : voice.stages)
+	{
+		if (stage.second.values.value("force_on_cpu", false))
+		{
+			for (const auto& model : stage.second.models)
+			{
+				const auto name = stage.first == "duration"
+					? (model.first == "linguistic" ? "duration.linguistic" : "duration")
+					: stage.first + "/" + model.first;
+				const Json constraint{{"stage", name},
+									  {"effectiveBackend", "cpu"},
+									  {"effectiveDevice", "cpu"},
+									  {"reason", "Voice configuration force_on_cpu=true"}};
+				if (std::find(policy["stageOverrides"].begin(), policy["stageOverrides"].end(), constraint)
+					== policy["stageOverrides"].end())
+				{
+					policy["stageOverrides"].push_back(constraint);
+				}
+			}
+		}
+	}
+	return policy;
+}
+CpuModel::CpuModel(Ort::Env& environment, const fs::path& path, std::string stage, uint32_t seed, const Json& policy)
 	: m_stage(std::move(stage))
+	, m_seed(seed)
 	, m_path(path)
 {
 	(void)environment;
@@ -47,12 +87,92 @@ CpuModel::CpuModel(Ort::Env& environment, const fs::path& path, std::string stag
 								 ONNXTensorElementDataType(port.at("dtype").get<uint32_t>()),
 								 port.at("dims").get<std::vector<int64_t>>()});
 		}
-		const svsc_session_desc options{sizeof(options), 0, "cpu", "cpu", m_stage.c_str(), ""};
-		m_computeSession.emplace(m_computeModel->session(options));
+		setComputePolicy(policy);
 	}
 	catch (const std::exception& error)
 	{
 		throw std::runtime_error(m_stage + " / " + path.u8string() + ": " + error.what());
+	}
+}
+
+void CpuModel::setComputePolicy(const Json& policy)
+{
+	if (!policy.is_object())
+	{
+		throw std::runtime_error("Compute policy must be an object");
+	}
+	auto backend = policy.value("effectiveBackend", std::string("cpu"));
+	auto device = policy.value("effectiveDevice", std::string("cpu"));
+	if (backend != "cpu" && backend != "directml")
+	{
+		throw std::runtime_error("Unsupported compute backend");
+	}
+	std::string reason;
+	for (const auto& constraint : policy.value("stageOverrides", Json::array()))
+	{
+		const auto stage = constraint.value("stage", std::string{});
+		if (!stage.empty()
+			&& (m_stage == stage || m_stage.rfind(stage + "/", 0) == 0 || m_stage.rfind(stage + ".", 0) == 0)
+			&& constraint.value("effectiveBackend", "") == "cpu")
+		{
+			backend = "cpu";
+			device = "cpu";
+			reason = constraint.value("reason", std::string("Configured CPU-only stage"));
+			break;
+		}
+	}
+	const auto requestedBackend = policy.value("effectiveBackend", std::string("cpu"));
+	const auto requestedDevice = policy.value("effectiveDevice", std::string("cpu"));
+	m_policy = policy;
+	m_cpuOnly = !reason.empty();
+	if (m_computeSession && requestedBackend == m_requestedBackend && requestedDevice == m_requestedDevice)
+	{
+		return;
+	}
+	m_computeSession.reset();
+	m_execution = Json::object();
+	m_fallbackReason = reason;
+	const svsc_session_desc options{sizeof(options), 0, backend.c_str(), device.c_str(), m_stage.c_str(), ""};
+	try
+	{
+		m_computeSession.emplace(m_computeModel->session(options));
+	}
+	catch (const svs_compute::Error& error)
+	{
+		if (backend != "directml"
+			|| (error.status != SVSC_BACKEND_FAILURE && error.status != SVSC_UNAVAILABLE
+				&& error.status != SVSC_WORKER_LOST))
+		{
+			throw;
+		}
+		m_fallbackReason = error.what();
+		backend = "cpu";
+		device = "cpu";
+		const svsc_session_desc cpu{sizeof(cpu), 0, "cpu", "cpu", m_stage.c_str(), ""};
+		m_computeSession.emplace(m_computeModel->session(cpu));
+	}
+	m_backend = backend;
+	m_device = device;
+	m_requestedBackend = requestedBackend;
+	m_requestedDevice = requestedDevice;
+	m_execution = {{"stage", m_stage},
+				   {"requestedBackend", requestedBackend},
+				   {"requestedDevice", requestedDevice},
+				   {"effectiveBackend", m_backend},
+				   {"effectiveDevice", m_device},
+				   {"fallbackReason", m_fallbackReason}};
+}
+
+std::string CpuModel::computeIdentity() const
+{
+	return m_backend + "/" + m_device + "/svs-compute-1/ORT1.23.0/DML1.15.4/native.v4";
+}
+void CpuModel::beginRequest()
+{
+	if (!m_cpuOnly && m_requestedBackend == "directml" && m_backend == "cpu")
+	{
+		m_computeSession.reset();
+		setComputePolicy(m_policy);
 	}
 }
 
@@ -107,6 +227,13 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 			}
 			Tensors output;
 			const auto& view = result.value();
+			m_execution = Json::parse(view.execution_json);
+			m_execution["requestedBackend"] = m_requestedBackend;
+			m_execution["requestedDevice"] = m_requestedDevice;
+			if (!m_fallbackReason.empty())
+			{
+				m_execution["fallbackReason"] = m_fallbackReason;
+			}
 			for (uint32_t i = 0; i < view.tensor_count; ++i)
 			{
 				const auto& value = view.tensors[i];
@@ -122,6 +249,10 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 				}
 				output.emplace(value.name, std::move(tensor));
 			}
+			if (inferenceObserver)
+			{
+				inferenceObserver(m_path, m_stage, m_seed, inputs, output, m_execution);
+			}
 			return output;
 		}
 		catch (...)
@@ -133,6 +264,27 @@ Tensors CpuModel::run(const Tensors& inputs, const std::atomic<bool>& cancelled)
 			}
 			throw;
 		}
+	}
+	catch (const svs_compute::Error& error)
+	{
+		if (cancelled.load())
+		{
+			throw std::runtime_error("Cancelled");
+		}
+		if (m_backend != "directml"
+			|| (error.status != SVSC_BACKEND_FAILURE && error.status != SVSC_WORKER_LOST
+				&& error.status != SVSC_UNAVAILABLE))
+		{
+			throw std::runtime_error(m_stage + " / " + m_path.u8string() + ": " + error.what());
+		}
+		// Retry the complete validated stage once. CPU errors and cancellation never recurse.
+		m_fallbackReason = error.what();
+		m_computeSession.reset();
+		const svsc_session_desc cpu{sizeof(cpu), 0, "cpu", "cpu", m_stage.c_str(), ""};
+		m_computeSession.emplace(m_computeModel->session(cpu));
+		m_backend = "cpu";
+		m_device = "cpu";
+		return run(inputs, cancelled);
 	}
 	catch (const std::exception& error)
 	{

@@ -451,6 +451,7 @@ class Server
 				  {"workerEpoch", epoch},
 				  {"runtimeVersion", RuntimeVersion},
 				  {"runMilliseconds", milliseconds},
+				  {"resources", device.resourceUsage()},
 				  {"providerEvidence", model.providers}}}};
 	}
 

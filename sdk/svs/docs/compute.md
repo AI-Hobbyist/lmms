@@ -1,8 +1,9 @@
 # Shared compute contract (ABI 1.0, B0 freeze)
 
 `svs_compute.h` is a separate optional C ABI. Existing `svs.h` 1.0–1.3
-tables and required prefixes remain unchanged. This header declares the
-contract; B1 delivers its implementation. A header alone is not compute support.
+tables and required prefixes remain unchanged. The native shared runtime implements
+this contract; callers still need the deployed client library and worker.
+A header alone is not compute support.
 All strings are UTF-8, all handles are opaque 64-bit identities; zero is invalid.
 Calling convention is cdecl. Consumers negotiate major/minor and table size;
 unknown major, larger required table, short descriptors and unknown enum values fail.
@@ -62,7 +63,8 @@ whole-stage fallback. Report node providers rather than claiming all-GPU executi
 
 An AI engine opts in with `compute: {"protocolVersion":1,
 "runtime":"svs-compute-1","supportedBackends":["cpu","directml"],
-"stageConstraints":[{"stage":"vocoder","backend":"cpu","reason":"force_on_cpu"}]}`.
+"stageConstraints":[{"stage":"vocoder/model","effectiveBackend":"cpu",
+"effectiveDevice":"cpu","reason":"force_on_cpu"}]}`.
 Absent/unknown declarations receive CPU; traditional engines receive CPU and are
 not invalidated by GPU policy changes. No mandatory change to the legacy plugin ABI.
 
@@ -82,6 +84,22 @@ algorithm versions and seed. Revision is a stale-result gate, not an audio conte
 hash. Display switches do not affect cache. Mid-run fallback rekeys storage using
 actual route; never store fallback PCM under a DML-success key. Missing-plugin
 cache recovery keeps existing compatibility rules.
+
+DiffSinger reports `feedback.computeStages`, one entry per model stage. Stage IDs
+are `duration.linguistic`, `duration`, and `<stage>/<model-role>` for pitch,
+variance, acoustic and vocoder. `force_on_cpu=true` from the actual stage
+configuration takes priority; an unconstrained vocoder may use DirectML.
+An engine using the single-stage example can report `feedback.computeExecution`.
+The host records these effective stage routes before storing PCM and updating
+retained segment signatures. Diagnostic reason text and override ordering do not
+change content identity; different effective stage routes do.
+
+Tensor and PCM cache hits set `cacheHit=true` and omit provider evidence and run timing:
+reading a tensor file is not evidence of a GPU run. Actual worker runs can include
+Windows working-set/peak working-set bytes and sampled DXGI local memory usage,
+budget and peak observed usage. The observed GPU peak is sampled after runs, not
+a continuous driver high-water measurement. A failed GPU stage is retried once on
+CPU within its request; the next uncancelled request may try the selected GPU again.
 
 ## Frozen numerical acceptance (before GPU comparison)
 

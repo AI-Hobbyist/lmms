@@ -1,0 +1,14 @@
+PASS controlled backend error / one CPU replay / next-request DML recovery: GPU OOM 0x8007000E
+PASS controlled backend error / one CPU replay / next-request DML recovery: Unsupported DML graph
+PASS controlled backend error / one CPU replay / next-request DML recovery: GPU initialization failed
+PASS bounded batch 0 successful=3/4; budget recovered
+PASS bounded batch 1 successful=3/4; budget recovered
+PASS bounded batch 2 successful=3/4; budget recovered
+PASS bounded batch 3 successful=3/4; budget recovered
+PASS bounded batch 4 successful=3/4; budget recovered
+PASS bounded batch 5 successful=1/4; budget recovered
+PASS bounded batch 6 successful=2/4; budget recovered
+PASS bounded batch 7 successful=3/4; budget recovered
+PASS bounded batch 8 successful=2/4; budget recovered
+PASS bounded batch 9 successful=3/4; budget recovered
+PASS actual missing LUID init / bounded CPU retry failure / invalid tensor / cancellation / 10x4 same-device sessions

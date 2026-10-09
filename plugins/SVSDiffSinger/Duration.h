@@ -21,18 +21,19 @@ struct DurationPlan
 	std::vector<Phone> phones;
 	std::vector<float> predictions;
 	Json feedback = Json::array();
+	Json computeStages = Json::array();
 };
 class Duration
 {
 public:
-	Duration(Ort::Env&, std::shared_ptr<const VoicePackage>);
+	Duration(Ort::Env&, std::shared_ptr<const VoicePackage>, const Json& policy = Json::object());
 	DurationPlan predict(const std::vector<NoteInput>&, const svs_sdk::TempoMap&, double tempoOrigin,
-		const Json& parameters, const std::atomic<bool>&);
+						 const Json& parameters, const std::atomic<bool>&);
 
 private:
 	std::shared_ptr<const VoicePackage> m_voice;
 	Pronunciation m_pronunciation;
 	std::unique_ptr<CpuModel> m_linguistic, m_duration;
 };
-}
+} // namespace diffsinger
 #endif

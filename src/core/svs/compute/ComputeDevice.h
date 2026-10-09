@@ -3,6 +3,11 @@
 #include <onnxruntime_cxx_api.h>
 
 #include "ComputeCommon.h"
+#ifdef _WIN32
+#include <windows.h>
+
+#include <psapi.h>
+#endif
 #ifdef SVSC_HAS_DML
 #include <windows.h>
 
@@ -20,6 +25,8 @@ struct Device
 	Microsoft::WRL::ComPtr<ID3D12Device> d3d;
 	Microsoft::WRL::ComPtr<IDMLDevice> dml;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
+	Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter;
+	uint64_t peakObservedLocalBytes = 0;
 #endif
 	void configure(Ort::SessionOptions& options, const std::string& backend, const std::string& id)
 	{
@@ -75,6 +82,7 @@ struct Device
 			}
 			require(D3D12CreateDevice(selected.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&d3d)),
 					"D3D12 initialization");
+			selected.As(&adapter);
 			require(DMLCreateDevice(d3d.Get(), DML_CREATE_DEVICE_FLAG_NONE, IID_PPV_ARGS(&dml)), "DML initialization");
 			D3D12_COMMAND_QUEUE_DESC desc{};
 			desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
@@ -87,6 +95,30 @@ struct Device
 #else
 		throw Error(SVSC_UNAVAILABLE, "DirectML is unavailable in this CPU runtime/platform");
 #endif
+	}
+	Json resourceUsage()
+	{
+		Json resources = Json::object();
+#ifdef _WIN32
+		PROCESS_MEMORY_COUNTERS counters{};
+		counters.cb = sizeof(counters);
+		if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
+		{
+			resources["workingSetBytes"] = uint64_t(counters.WorkingSetSize);
+			resources["peakWorkingSetBytes"] = uint64_t(counters.PeakWorkingSetSize);
+		}
+#endif
+#ifdef SVSC_HAS_DML
+		DXGI_QUERY_VIDEO_MEMORY_INFO local{};
+		if (adapter && SUCCEEDED(adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &local)))
+		{
+			peakObservedLocalBytes = std::max(peakObservedLocalBytes, uint64_t(local.CurrentUsage));
+			resources["gpuLocalBytes"] = uint64_t(local.CurrentUsage);
+			resources["gpuPeakObservedLocalBytes"] = peakObservedLocalBytes;
+			resources["gpuLocalBudgetBytes"] = uint64_t(local.Budget);
+		}
+#endif
+		return resources;
 	}
 };
 } // namespace svsc

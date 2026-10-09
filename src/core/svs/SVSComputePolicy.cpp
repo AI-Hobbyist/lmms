@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QJsonDocument>
+#include <QMap>
 #include <cstdlib>
 #include <filesystem>
 #include <map>
@@ -18,7 +19,10 @@ std::map<QString, QJsonObject> probeResults;
 std::filesystem::path runtimeDirectory()
 {
 	const auto configured = std::getenv("SVS_COMPUTE_RUNTIME_DIR");
-	if (configured && *configured) { return std::filesystem::u8path(configured); }
+	if (configured && *configured)
+	{
+		return std::filesystem::u8path(configured);
+	}
 	return std::filesystem::u8path(QCoreApplication::applicationDirPath().toUtf8().constData()) / "svs" / "compute";
 }
 svs_compute::Library library(const std::filesystem::path& directory)
@@ -34,7 +38,10 @@ svs_compute::Library library(const std::filesystem::path& directory)
 QJsonObject probeDevice(const QString& id, bool fresh)
 {
 	std::lock_guard<std::mutex> lock(probeMutex);
-	if (!fresh && probeResults.count(id)) { return probeResults.at(id); }
+	if (!fresh && probeResults.count(id))
+	{
+		return probeResults.at(id);
+	}
 	// A fresh worker resolves the LUID again, detecting hardware removal before any cache lookup.
 	QJsonObject result;
 	try
@@ -63,18 +70,37 @@ QJsonObject requestedComputePolicy()
 	auto* config = ConfigManager::inst();
 	const auto backend = config->value("svs", "computeBackend", "cpu");
 	return {{"requestedBackend", backend},
-		{"requestedDevice", backend == "cpu" ? "cpu" : config->value("svs", "computeDevice", "cpu")},
-		{"policyRevision", double(config->value("svs", "computePolicyRevision", "0").toULongLong())}};
+			{"requestedDevice", backend == "cpu" ? "cpu" : config->value("svs", "computeDevice", "cpu")},
+			{"policyRevision", double(config->value("svs", "computePolicyRevision", "0").toULongLong())}};
 }
 QJsonObject resolveComputePolicy(const QJsonObject& requested, const QString& engineType, const QJsonObject& compute,
-	const std::function<QJsonObject(const QString&)>& probe)
+								 const std::function<QJsonObject(const QString&)>& probe)
 {
-	if (engineType != "ai") { return {}; }
+	if (engineType != "ai")
+	{
+		return {};
+	}
 	auto policy = requested;
 	policy["effectiveBackend"] = "cpu";
 	policy["effectiveDevice"] = "cpu";
 	policy["runtimeVersion"] = RuntimeVersion;
-	policy["stageOverrides"] = compute["stageConstraints"].toArray();
+	QMap<QString, QJsonObject> constraints;
+	for (const auto& value : compute["stageConstraints"].toArray())
+	{
+		const auto entry = value.toObject();
+		const auto stage = entry["stage"].toString();
+		if (!stage.isEmpty() && entry["effectiveBackend"].toString(entry["backend"].toString()) == "cpu")
+		{
+			constraints[stage] = {
+				{"stage", stage}, {"effectiveBackend", "cpu"}, {"effectiveDevice", "cpu"}, {"reason", entry["reason"]}};
+		}
+	}
+	QJsonArray overrides;
+	for (const auto& entry : constraints)
+	{
+		overrides.append(entry);
+	}
+	policy["stageOverrides"] = overrides;
 	policy["fallbackReason"] = "";
 	const auto backends = compute["supportedBackends"].toArray();
 	const bool supported = compute["protocolVersion"].toInt() == 1 && compute["runtime"].toString() == "svs-compute-1"
@@ -86,7 +112,10 @@ QJsonObject resolveComputePolicy(const QJsonObject& requested, const QString& en
 		return policy;
 	}
 	const auto backend = requested["requestedBackend"].toString("cpu");
-	if (backend == "cpu") { return policy; }
+	if (backend == "cpu")
+	{
+		return policy;
+	}
 	if (backend != "directml" || !backends.contains("directml"))
 	{
 		policy["fallbackReason"] = "Requested backend is not supported by this AI engine";
@@ -127,7 +156,10 @@ QJsonArray computeDevices(QString& error)
 		for (const auto& entry : devices)
 		{
 			const auto device = entry.toObject();
-			if (device["backend"].toString() == "directml") { probeResults[device["device"].toString()] = device; }
+			if (device["backend"].toString() == "directml")
+			{
+				probeResults[device["device"].toString()] = device;
+			}
 		}
 		return devices;
 	}
@@ -139,13 +171,79 @@ QJsonArray computeDevices(QString& error)
 }
 void refreshComputePolicy(QJsonObject& document)
 {
-	if (!document.contains("computePolicy")) { return; }
+	if (!document.contains("computePolicy"))
+	{
+		return;
+	}
 	const auto policy = resolveComputePolicy(document["computePolicy"].toObject(), "ai",
-		document["capabilities"].toObject()["compute"].toObject(),
-		[](const QString& id) { return probeDevice(id, true); });
+											 document["capabilities"].toObject()["compute"].toObject(),
+											 [](const QString& id) { return probeDevice(id, true); });
 	document["computePolicy"] = policy;
 	document["computeBackend"] = policy["effectiveBackend"];
 	document["computeDevice"] = policy["effectiveDevice"];
+}
+void markComputeCacheHit(QJsonObject& feedback)
+{
+	auto cached = [](QJsonObject execution) {
+		execution["cacheHit"] = true;
+		for (const auto& field : QStringList{"providerEvidence", "runMilliseconds", "resources", "workerEpoch"})
+		{
+			execution.remove(field);
+		}
+		return execution;
+	};
+	if (feedback.value("computeExecution").isObject())
+	{
+		feedback["computeExecution"] = cached(feedback["computeExecution"].toObject());
+	}
+	if (feedback.value("computeStages").isArray())
+	{
+		QJsonArray stages;
+		for (const auto& execution : feedback["computeStages"].toArray())
+		{
+			stages.append(cached(execution.toObject()));
+		}
+		feedback["computeStages"] = stages;
+	}
+}
+void recordComputeExecution(QJsonObject& document, const QJsonArray& stages)
+{
+	if (!document.contains("computePolicy"))
+	{
+		return;
+	}
+	auto policy = document["computePolicy"].toObject();
+	QMap<QString, QJsonObject> overrides;
+	for (const auto& value : policy["stageOverrides"].toArray())
+	{
+		const auto entry = value.toObject();
+		overrides[entry["stage"].toString()] = entry;
+	}
+	for (const auto& value : stages)
+	{
+		const auto execution = value.toObject();
+		const auto stage = execution["stage"].toString();
+		const auto backend = execution["effectiveBackend"].toString();
+		const auto device = execution["effectiveDevice"].toString();
+		if (stage.isEmpty() || (backend != "cpu" && backend != "directml") || device.isEmpty())
+		{
+			continue;
+		}
+		if (backend != policy["effectiveBackend"].toString() || device != policy["effectiveDevice"].toString())
+		{
+			overrides[stage] = {{"stage", stage},
+								{"effectiveBackend", backend},
+								{"effectiveDevice", device},
+								{"reason", execution["fallbackReason"]}};
+		}
+	}
+	QJsonArray resolved;
+	for (const auto& entry : overrides)
+	{
+		resolved.append(entry);
+	}
+	policy["stageOverrides"] = resolved;
+	document["computePolicy"] = policy;
 }
 bool applyComputeSettings(const QString& backend, const QString& device)
 {

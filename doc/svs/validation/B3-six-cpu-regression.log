@@ -1,0 +1,33 @@
+PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch
+PASS tensor codec / identity / corruption / bounded LRU / audition preservation
+PASS 芙宁娜 frames=101983 sha256=e75d67bc17a44f3426cde0f499c9b6114864cfbd91eeda6afeb59c903fc94c6c
+PERFORMANCE warm render/cache ms=10.8849
+AUDITION fu2_ning2_na4-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\a2e50e977fbcf4f07cbe8be7c1b2dbc6e6355874798d2e29eab814d19b61a84d.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS seed identity / natural-rest chunk placement / tempo with nonzero content origin / PCM preflight bound
+PASS 那维莱特 frames=101983 sha256=658b2ca8e3665fe4846e1ae69e12757a90d25c112ab7331aed37c386bb884aeb
+PERFORMANCE warm render/cache ms=11.2566
+AUDITION na4_wei2_lai2_te4-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\2a5a278cdfe6fe62ad7223caeeda1658183e8bae6ff87d134d2329bcc32e41e1.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 纳西妲 frames=102540 sha256=887c6d1d975b24a552acfb844aafaf34518cbefc6ae67a5d9f678fa6e465bd85
+PERFORMANCE warm render/cache ms=20.6244
+AUDITION na4_xi1_da2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\eb84772c96025c4e5effaad963db98579c48d78eadc091932c3010425b015c04.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 温迪 frames=101983 sha256=c6eff5d01eaae1756b4f512b9477e849ef8cfbef7f7c069bc691b382a717f164
+PERFORMANCE warm render/cache ms=9.7406
+AUDITION wen1_di2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\971c17d81ca5101f7fdab76b37553bcc122120448dd5c790e0c75b0b193b1814.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 希格雯 frames=101425 sha256=6f07c7e670017633fda75a29f4078999a54f0854e9f273244999b51ac8e972cb
+PERFORMANCE warm render/cache ms=10.1133
+AUDITION xi1_ge2_wen2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\5b8068d3d070c7ffd0146113a3b5f7299307af7403893b2a107d34318595009e.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation
+PASS 遐蝶 frames=103097 sha256=012c008ee2878198b46927b90f709b1135bf8f75faa494d1dcf01daea6f98532
+PERFORMANCE warm render/cache ms=9.7292
+AUDITION xia2_die2-A3-nihao-CPU D:\UserData\Desktop\Project\lmms\cache\SVS\DiffSinger\41ac82f0533907265540b3a45dcf7e9a6d874dfa499139759a071e8767d8e9fa.wav
+PASS cached replay and actual pitch-conditioned PCM change
+PASS stable seed without cache / model controls / manual phonemes / cancellation

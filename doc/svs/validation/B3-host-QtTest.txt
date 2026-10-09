@@ -1,0 +1,22 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::computeStageCacheIdentity()
+PASS   : SVSIntegrationTest::globalComputePolicy()
+QINFO  : SVSIntegrationTest::sharedAiHostPolicy() {"effectiveBackend":"directml","effectiveDevice":"dxgi:00000000:000148ca","providerEvidence":{"cpuNodes":0,"dmlNodes":1,"nodes":[{"durationUs":786,"name":"DmlFusedNode_0_0_kernel_time","provider":"DmlExecutionProvider"}],"scope":"session-profile"},"requestedBackend":"directml","requestedDevice":"dxgi:00000000:000148ca","resources":{"gpuLocalBudgetBytes":7930034996,"gpuLocalBytes":8478720,"gpuPeakObservedLocalBytes":8478720,"peakWorkingSetBytes":76648448,"workingSetBytes":76648448},"runMilliseconds":5.6716,"runtimeVersion":"svs-compute-1/ort-1.23.0/dml-1.15.4","stage":"test-acoustic","workerEpoch":"svsc-16508004726016699486-7"}
+QINFO  : SVSIntegrationTest::sharedAiHostPolicy() ********* Start testing of SVSIntegrationTest *********?
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11?
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized?
+PASS   : SVSIntegrationTest::initTestCase()?
+PASS   : SVSIntegrationTest::computePolicyRestartChild()?
+PASS   : SVSIntegrationTest::cleanupTestCase()?
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 380ms?
+********* Finished testing of SVSIntegrationTest *********?
+
+PASS   : SVSIntegrationTest::sharedAiHostPolicy()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 3938ms
+********* Finished testing of SVSIntegrationTest *********

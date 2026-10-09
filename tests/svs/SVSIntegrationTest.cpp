@@ -1,29 +1,30 @@
-#include <QtTest>
-#include <QJsonDocument>
-#include <QDataStream>
-#include <QCryptographicHash>
-#include <QLineEdit>
+#include <QAction>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QMenu>
+#include <QCryptographicHash>
+#include <QDataStream>
 #include <QDialogButtonBox>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
+#include <QFrame>
+#include <QJsonDocument>
+#include <QLayout>
+#include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <QTimer>
-#include "SampleClip.h"
-#include "SampleTrack.h"
-#include "SampleBuffer.h"
-#include "PathUtil.h"
-#include <QLayout>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QFrame>
+#include <QSpinBox>
+#include <QTimer>
 #include <QToolButton>
-#include <QAction>
+#include <QtTest>
+
+#include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "SampleClip.h"
+#include "SampleTrack.h"
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
 #include <tlhelp32.h>
@@ -159,8 +160,8 @@ private slots:
 			if (qEnvironmentVariableIsSet("SVS_TEST_AVATAR_PATH"))
 				ConfigManager::inst()->setValue("svs", "testAvatarPath", qEnvironmentVariable("SVS_TEST_AVATAR_PATH"));
 			if (qEnvironmentVariableIsSet("SVS_TEST_PORTRAIT_PATH"))
-				ConfigManager::inst()->setValue(
-					"svs", "testPortraitPath", qEnvironmentVariable("SVS_TEST_PORTRAIT_PATH"));
+				ConfigManager::inst()->setValue("svs", "testPortraitPath",
+												qEnvironmentVariable("SVS_TEST_PORTRAIT_PATH"));
 			ConfigManager::inst()->setWorkingDir(m_configuration.path() + "/");
 			ConfigManager::inst()->setValue("app", "configured", "1");
 			ConfigManager::inst()->setValue("audioengine", "audiodev", AudioDummy::name());
@@ -242,7 +243,7 @@ private slots:
 		const auto plugin = PluginFactory::instance()->pluginInfo("ladspaeffect");
 		QVERIFY(!plugin.isNull());
 		QCOMPARE(plugin.file.canonicalFilePath(),
-			QFileInfo(qEnvironmentVariable("LMMS_PLUGIN_DIR") + "/ladspaeffect.dll").canonicalFilePath());
+				 QFileInfo(qEnvironmentVariable("LMMS_PLUGIN_DIR") + "/ladspaeffect.dll").canonicalFilePath());
 		QVERIFY(plugin.descriptor->subPluginFeatures);
 		Plugin::Descriptor::SubPluginFeatures::KeyList keys;
 		plugin.descriptor->subPluginFeatures->listSubPluginKeys(plugin.descriptor, keys);
@@ -291,7 +292,7 @@ private slots:
 #ifdef Q_OS_WIN
 		const auto lockedPath = QDir::toNativeSeparators(destination.filePath(names[1]));
 		const auto locked = CreateFileW(reinterpret_cast<LPCWSTR>(lockedPath.utf16()), GENERIC_READ, 0, nullptr,
-			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+										OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		QVERIFY(locked != INVALID_HANDLE_VALUE);
 		auto close = qScopeGuard([&] { CloseHandle(locked); });
 		QVERIFY(!svs::ProjectOutput::commit(plan, error));
@@ -305,8 +306,8 @@ private slots:
 		for (const auto& name : names)
 			QCOMPARE(read(destination.filePath(name)), "new-" + name.toUtf8());
 		QVERIFY(QDir(destination.path())
-				.entryList({".lmms-svs-export-*"}, QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot)
-				.isEmpty());
+					.entryList({".lmms-svs-export-*"}, QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot)
+					.isEmpty());
 		QVERIFY(write(staging.filePath("new-name.txt"), "new"));
 		const auto changed
 			= svs::ProjectOutput::prepare({staging.filePath("new-name.txt")}, staging.path(), destination.path());
@@ -317,7 +318,7 @@ private slots:
 		QTemporaryDir outside;
 		QVERIFY(write(outside.filePath("outside.txt"), "outside"));
 		QVERIFY(!svs::ProjectOutput::prepare({outside.filePath("outside.txt")}, staging.path(), destination.path())
-				.valid());
+					 .valid());
 	}
 	void projectExportMappingAndAudio()
 	{
@@ -417,13 +418,14 @@ private slots:
 		QCOMPARE(tempos.size(), 2);
 		QCOMPARE(tempos[1].toObject()["position"].toInt(), 480);
 		QCOMPARE(tempos[1].toObject()["bpm"].toInt(), 240);
-		const auto imported = svs::ProjectMapper::prepareImport(
-			prepared.project, {"missing-engine", "missing-voice", "test", "zh"}, {});
+		const auto imported = svs::ProjectMapper::prepareImport(prepared.project,
+																{"missing-engine", "missing-voice", "test", "zh"}, {});
 		QVERIFY2(imported.valid(), qPrintable(imported.error));
-		const auto savedCurve = QJsonDocument::fromJson(
-			imported.document.elementsByTagName("svsclip").at(0).toElement().attribute("curves").toUtf8())
-									.object()["svs.pitch"]
-									.toObject();
+		const auto savedCurve
+			= QJsonDocument::fromJson(
+				  imported.document.elementsByTagName("svsclip").at(0).toElement().attribute("curves").toUtf8())
+				  .object()["svs.pitch"]
+				  .toObject();
 		svs::Curve reread;
 		QString error;
 		QVERIFY(svs::Curve::fromJson(savedCurve, reread, error));
@@ -456,8 +458,11 @@ private slots:
 		for (const auto& file : prepared.audioFiles)
 			assets.append(QJsonObject{{"source", directory.filePath(file.fileName)}, {"name", file.fileName}});
 		const auto exportedName = QStringLiteral("导出-日本語-한국어.json");
-		QVERIFY(bridge.start({{"operation", "exportProject"}, {"formatId", "json"}, {"path", exportedName},
-			{"project", prepared.project}, {"assets", assets}}));
+		QVERIFY(bridge.start({{"operation", "exportProject"},
+							  {"formatId", "json"},
+							  {"path", exportedName},
+							  {"project", prepared.project},
+							  {"assets", assets}}));
 		QTRY_COMPARE_WITH_TIMEOUT(converted.size(), 1, 30000);
 		const auto response = converted[0][0].toJsonObject();
 		QVERIFY2(response["status"].toString() == "success", qPrintable(QJsonDocument(response).toJson()));
@@ -472,8 +477,8 @@ private slots:
 			{{"operation", "importProject"}, {"formatId", "json"}, {"path", delivered.filePath(exportedName)}}));
 		QTRY_COMPARE_WITH_TIMEOUT(converted.size(), 1, 30000);
 		const auto importedResponse = converted[0][0].toJsonObject();
-		QVERIFY2(
-			importedResponse["status"].toString() == "success", qPrintable(QJsonDocument(importedResponse).toJson()));
+		QVERIFY2(importedResponse["status"].toString() == "success",
+				 qPrintable(QJsonDocument(importedResponse).toJson()));
 		const auto importedTracks = importedResponse["project"].toObject()["track_list"].toArray();
 		QCOMPARE(importedTracks.size(), 3);
 		const auto readNotes = importedTracks[0].toObject()["note_list"].toArray();
@@ -485,7 +490,7 @@ private slots:
 				QCOMPARE(actual[field.key()], field.value());
 		}
 		QCOMPARE(importedTracks[1].toObject()["audio_file_path"].toString(),
-			QDir::toNativeSeparators(delivered.filePath("audio-1.wav")));
+				 QDir::toNativeSeparators(delivered.filePath("audio-1.wav")));
 		bridge.releaseTask();
 	}
 	void projectExportSnapshotIsReadOnly()
@@ -562,9 +567,10 @@ private slots:
 				break;
 			}
 		QVERIFY(!voice.id.isEmpty());
-		const auto project = QJsonDocument::fromJson(
-			R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"中文歌声","note_list":[{"start_pos":961,"length":479,"key_number":60,"lyric":"你","pronunciation":"ni"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2881,-100],[2881,6000],[3121,6050],[3181,5980],[3241,6020],[3301,5980],[3361,5980],[3361,-100],[3600,6400],[3840,6420],[3840,-100],[1073741823,-100]]}}},{"type_":"Singing","title":"日本語 한국어","note_list":[{"start_pos":480,"length":480,"key_number":64,"lyric":"あ"}],"edited_params":{}}]})")
-								 .object();
+		const auto project
+			= QJsonDocument::fromJson(
+				  R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"中文歌声","note_list":[{"start_pos":961,"length":479,"key_number":60,"lyric":"你","pronunciation":"ni"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2881,-100],[2881,6000],[3121,6050],[3181,5980],[3241,6020],[3301,5980],[3361,5980],[3361,-100],[3600,6400],[3840,6420],[3840,-100],[1073741823,-100]]}}},{"type_":"Singing","title":"日本語 한국어","note_list":[{"start_pos":480,"length":480,"key_number":64,"lyric":"あ"}],"edited_params":{}}]})")
+				  .object();
 		const svs::ProjectVoice binding{voice.pluginId, voice.id, voice.name, voice.language};
 		const auto imported = svs::ProjectMapper::prepareImport(project, binding, {});
 		QVERIFY2(imported.valid(), qPrintable(imported.error));
@@ -630,7 +636,7 @@ private slots:
 		QVERIFY(song->isModified());
 		QCOMPARE(song->tracks().front()->name(), beforeName);
 		QCOMPARE(static_cast<SVSClip*>(song->tracks().front()->getClip(0))->curves().value("svs.pitch").toJson(),
-			curve.toJson());
+				 curve.toJson());
 		song->clearProject();
 	}
 	void projectImportNativeWindows()
@@ -644,7 +650,7 @@ private slots:
 			QProcess child;
 			child.setProcessEnvironment(environment);
 			child.start(QCoreApplication::applicationFilePath(),
-				{"projectImportNativeWindows", "-o", report + ",txt", "-o", "-,txt"});
+						{"projectImportNativeWindows", "-o", report + ",txt", "-o", "-,txt"});
 			QVERIFY(child.waitForStarted(5000));
 			QVERIFY(child.waitForFinished(30000));
 			QFile result(report);
@@ -669,12 +675,16 @@ private slots:
 		QVERIFY(menu->isVisible());
 		QVERIFY(menu->screen()->grabWindow(menu->winId()).save("doc/svs/project/M2-native-menu.png"));
 		menu->hide();
-		const QJsonObject format{{"id", "svp"}, {"name", "Synthesizer V"},
+		const QJsonObject format{
+			{"id", "svp"},
+			{"name", "Synthesizer V"},
 			{"inputDefaults", QJsonObject{{"import_pitch", true}, {"pitch", "full"}}},
 			{"inputSchema",
-				QJsonObject{{"properties",
-					QJsonObject{{"import_pitch", QJsonObject{{"title", "Import pitch"}, {"type", "boolean"}}},
-						{"pitch", QJsonObject{{"title", "Pitch mode"}, {"enum", QJsonArray{"plain", "full"}}}}}}}}};
+			 QJsonObject{
+				 {"properties",
+				  QJsonObject{
+					  {"import_pitch", QJsonObject{{"title", "Import pitch"}, {"type", "boolean"}}},
+					  {"pitch", QJsonObject{{"title", "Pitch mode"}, {"enum", QJsonArray{"plain", "full"}}}}}}}}};
 		auto* song = Engine::getSong();
 		const bool modified = song->isModified();
 		const auto fileName = song->projectFileName();
@@ -702,9 +712,10 @@ private slots:
 		QCOMPARE(dialog.selectedVoice().pluginId, selected[0].toString());
 		QCOMPARE(dialog.selectedVoice().voiceId, selected[1].toString());
 		QCOMPARE(song->tracks().size(), count);
-		const auto project = QJsonDocument::fromJson(
-			R"({"song_tempo_list":[{"position":0,"bpm":120}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"原工程音高线","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2520,6050],[2640,5980],[2760,6030],[2880,6000],[2880,-100],[3360,6200],[3600,6250],[3600,-100],[1073741823,-100]]}}}]})")
-								 .object();
+		const auto project
+			= QJsonDocument::fromJson(
+				  R"({"song_tempo_list":[{"position":0,"bpm":120}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"原工程音高线","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2520,6050],[2640,5980],[2760,6030],[2880,6000],[2880,-100],[3360,6200],[3600,6250],[3600,-100],[1073741823,-100]]}}}]})")
+				  .object();
 		QString error;
 		const auto prepared = svs::ProjectMapper::prepareImport(project, dialog.selectedVoice(), {});
 		QVERIFY2(gui::SVSProjectController::commitImport(prepared, *song, error), qPrintable(error));
@@ -745,7 +756,7 @@ private slots:
 			QProcess child;
 			child.setProcessEnvironment(environment);
 			child.start(QCoreApplication::applicationFilePath(),
-				{"projectImportNoVoices", "-o", report + ",txt", "-o", "-,txt"});
+						{"projectImportNoVoices", "-o", report + ",txt", "-o", "-,txt"});
 			QVERIFY(child.waitForStarted(5000));
 			QVERIFY(child.waitForFinished(30000));
 			QFile result(report);
@@ -786,7 +797,7 @@ private slots:
 			QProcess child;
 			child.setProcessEnvironment(environment);
 			child.start(QCoreApplication::applicationFilePath(),
-				{"projectImportControllerFlow", "-o", report + ",txt", "-o", "-,txt"});
+						{"projectImportControllerFlow", "-o", report + ",txt", "-o", "-,txt"});
 			QVERIFY(child.waitForStarted(5000));
 			QVERIFY(child.waitForFinished(120000));
 			QFile result(report);
@@ -818,13 +829,16 @@ private slots:
 		for (int i = 0; i < 48000; ++i)
 			stream << qint16(1000 * std::sin(i * .03));
 		audio.close();
-		auto project = QJsonDocument::fromJson(
-			R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"完整导入","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2640,6050],[2880,6000],[2880,-100],[1073741823,-100]]}}}]})")
-						   .object();
+		auto project
+			= QJsonDocument::fromJson(
+				  R"({"song_tempo_list":[{"position":0,"bpm":120},{"position":960,"bpm":150}],"time_signature_list":[{"bar_index":0,"numerator":4,"denominator":4}],"track_list":[{"type_":"Singing","title":"完整导入","note_list":[{"start_pos":480,"length":480,"key_number":60,"lyric":"你好"}],"edited_params":{"pitch":{"points":[[-192000,-100],[2400,6000],[2640,6050],[2880,6000],[2880,-100],[1073741823,-100]]}}}]})")
+				  .object();
 		auto tracks = project["track_list"].toArray();
 		for (const auto offset : {0, 960})
-			tracks.append(QJsonObject{{"type_", "Instrumental"}, {"title", QString("audio-%1").arg(offset)},
-				{"audio_file_path", wave}, {"offset", offset}});
+			tracks.append(QJsonObject{{"type_", "Instrumental"},
+									  {"title", QString("audio-%1").arg(offset)},
+									  {"audio_file_path", wave},
+									  {"offset", offset}});
 		project["track_list"] = tracks;
 		const auto source = m_configuration.filePath(QStringLiteral("工程-日本語-한국어.json"));
 		QFile file(source);
@@ -882,8 +896,9 @@ private slots:
 					picker->setProperty("filterCapturePending", true);
 					QTimer::singleShot(600, picker, [picker] {
 						picker->setProperty("filterCapturePending", false);
-						QVERIFY(picker->screen()->grabWindow(picker->winId())
-							.save("doc/svs/project/supported-formats-native-import.png"));
+						QVERIFY(picker->screen()
+									->grabWindow(picker->winId())
+									.save("doc/svs/project/supported-formats-native-import.png"));
 					});
 					picker->setDirectory(QFileInfo(selectedPath).absolutePath());
 				}
@@ -897,8 +912,8 @@ private slots:
 					QFile trace("doc/svs/project/M2-controller-flow-events.txt");
 					if (trace.open(QIODevice::WriteOnly | QIODevice::Append))
 						trace.write((picker->directory().path() + " | " + picker->selectedNameFilter() + " | "
-							+ picker->selectedFiles().join('|') + "\n")
-								.toUtf8());
+									 + picker->selectedFiles().join('|') + "\n")
+										.toUtf8());
 				}
 				if (!picker->property("filterCapturePending").toBool())
 					QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
@@ -922,9 +937,9 @@ private slots:
 				{
 					++unsavedShown;
 					message
-						->button(choice == "cancel-unsaved" ? QMessageBox::Cancel
-								: choice == "save-failure"	? QMessageBox::Save
-															: QMessageBox::Discard)
+						->button(choice == "cancel-unsaved"		? QMessageBox::Cancel
+									 : choice == "save-failure" ? QMessageBox::Save
+																: QMessageBox::Discard)
 						->click();
 				}
 				else if (message->standardButtons().testFlag(QMessageBox::Yes))
@@ -1071,7 +1086,7 @@ private slots:
 			QProcess child;
 			child.setProcessEnvironment(environment);
 			child.start(QCoreApplication::applicationFilePath(),
-				{"projectExportNativeFlow", "-o", report + ",txt", "-o", "-,txt"});
+						{"projectExportNativeFlow", "-o", report + ",txt", "-o", "-,txt"});
 			QVERIFY(child.waitForStarted(5000));
 			QVERIFY(child.waitForFinished(90000));
 			QFile result(report);
@@ -1157,8 +1172,9 @@ private slots:
 					picker->setProperty("filterCapturePending", true);
 					QTimer::singleShot(600, picker, [picker] {
 						picker->setProperty("filterCapturePending", false);
-						QVERIFY(picker->screen()->grabWindow(picker->winId())
-							.save("doc/svs/project/supported-formats-native-export.png"));
+						QVERIFY(picker->screen()
+									->grabWindow(picker->winId())
+									.save("doc/svs/project/supported-formats-native-export.png"));
 					});
 					if (choice == "loss-cancel")
 						for (const auto& filter : picker->nameFilters())
@@ -1196,8 +1212,8 @@ private slots:
 						QVERIFY(buttons->button(QDialogButtonBox::Ok)->isEnabled());
 						QTest::qWait(700);
 						QVERIFY(modal->screen()
-								->grabWindow(modal->winId())
-								.save("doc/svs/project/M3-native-export-options.png"));
+									->grabWindow(modal->winId())
+									.save("doc/svs/project/M3-native-export-options.png"));
 					}
 					buttons->button(QDialogButtonBox::Ok)->click();
 				}
@@ -1218,8 +1234,8 @@ private slots:
 					}
 					message
 						->button((choice == "loss-cancel" || (choice == "overwrite-cancel" && overwrite))
-								? QMessageBox::Cancel
-								: QMessageBox::Yes)
+									 ? QMessageBox::Cancel
+									 : QMessageBox::Yes)
 						->click();
 				}
 				else
@@ -1251,7 +1267,7 @@ private slots:
 			QCOMPARE(file.readAll(), QByteArray("original-output"));
 		};
 		for (const auto& action :
-			QStringList{"file-cancel", "options-cancel", "loss-cancel", "overwrite-cancel", "process-cancel"})
+			 QStringList{"file-cancel", "options-cancel", "loss-cancel", "overwrite-cancel", "process-cancel"})
 		{
 			choice = action;
 			elapsed.restart();
@@ -1290,7 +1306,7 @@ private slots:
 		const auto project = response["project"].toObject();
 		QCOMPARE(project["track_list"].toArray().size(), 2);
 		QCOMPARE(project["track_list"].toArray()[0].toObject()["note_list"].toArray()[0].toObject()["lyric"].toString(),
-			QStringLiteral("你好あ안녕"));
+				 QStringLiteral("你好あ안녕"));
 		bridge.releaseTask();
 		Engine::projectJournal()->undo();
 		QCOMPARE(first->notes()[0].lyric, QStringLiteral("你好あ안녕"));
@@ -1307,7 +1323,7 @@ private slots:
 			QProcess process;
 			process.setProcessEnvironment(environment);
 			process.start(QCoreApplication::applicationFilePath(),
-				{"embeddedWindowLifecycle", "-o", report + ",txt", "-o", "-,txt"});
+						  {"embeddedWindowLifecycle", "-o", report + ",txt", "-o", "-,txt"});
 			QVERIFY(process.waitForStarted(5000));
 			QVERIFY(process.waitForFinished(30000));
 			QFile result(report);
@@ -1405,8 +1421,8 @@ private slots:
 				gui::SVSSettingsPage reopened;
 				reopened.findChild<QTabWidget*>("svsEngineTabs")
 					->setCurrentWidget(reopened.findChild<QWidget*>("svsEnginePage." + voice.pluginId));
-				QCOMPARE(
-					reopened.findChild<QComboBox*>("svsComputeBackend")->currentData().toString(), QString("directml"));
+				QCOMPARE(reopened.findChild<QComboBox*>("svsComputeBackend")->currentData().toString(),
+						 QString("directml"));
 				QVERIFY(reopened.findChild<QComboBox*>("svsComputeDevice")->isEnabled());
 				QCOMPARE(reopened.findChild<QComboBox*>("svsComputeDevice")->currentData(), selectedDevice);
 				QTRY_VERIFY(reopened.findChild<QDoubleSpinBox*>("svsParameter.track.example.outputGain"));
@@ -1450,8 +1466,8 @@ private slots:
 				vstSettings.raise();
 				QTest::qWait(200);
 				QVERIFY(vstSettings.screen()
-						->grabWindow(vstSettings.winId())
-						.save("doc/svs/validation/SVS-settings-vst-window.png"));
+							->grabWindow(vstSettings.winId())
+							.save("doc/svs/validation/SVS-settings-vst-window.png"));
 				vstSettings.reject();
 			}
 			auto* sampleTrack = new SVSTrack(Engine::getSong());
@@ -1525,7 +1541,7 @@ private slots:
 		QVERIFY(editor->isWindow());
 		QVERIFY(editor->isVisible());
 		QVERIFY2(editor->windowFlags().testFlag(Qt::WindowCloseButtonHint),
-			"Detached SVS editor must expose an enabled native close button for reattachment");
+				 "Detached SVS editor must expose an enabled native close button for reattachment");
 #ifdef Q_OS_WIN
 		const auto closeState
 			= GetMenuState(GetSystemMenu(reinterpret_cast<HWND>(editor->winId()), FALSE), SC_CLOSE, MF_BYCOMMAND);
@@ -1584,8 +1600,8 @@ private slots:
 				clip->setNotes({note});
 				canvas->setScroll(0, 66);
 				canvas->setTool(gui::SVSCanvas::Tool::Freehand);
-				const QVector<QPointF> pitchPoints{
-					{0, 60}, {40, 64}, {80, 60}, {140, 64}, {180, 60}, {240, 63}, {300, 61}};
+				const QVector<QPointF> pitchPoints{{0, 60},	  {40, 64},	 {80, 60}, {140, 64},
+												   {180, 60}, {240, 63}, {300, 61}};
 				QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, canvas->curvePointAt(0, 60).toPoint());
 				for (const auto& p : pitchPoints)
 					QTest::mouseMove(canvas, canvas->curvePointAt(p.x(), p.y()).toPoint());
@@ -1609,8 +1625,8 @@ private slots:
 			QTest::qWait(300);
 			const auto capture = editor->screen()->grabWindow(editor->winId());
 			QVERIFY(!capture.isNull());
-			QVERIFY(capture.save(qEnvironmentVariable(
-				"SVS_PARAMETER_WINDOW_CAPTURE_PATH", "doc/svs/validation/SVS-parameter-layout-native-window.png")));
+			QVERIFY(capture.save(qEnvironmentVariable("SVS_PARAMETER_WINDOW_CAPTURE_PATH",
+													  "doc/svs/validation/SVS-parameter-layout-native-window.png")));
 			if (qEnvironmentVariableIsSet("SVS_WINDOW_CHROME_CAPTURE_PATH"))
 			{
 				const auto rect = editor->frameGeometry();
@@ -1728,8 +1744,17 @@ private slots:
 		QCOMPARE(api.create_session(engine, "full", &session), svs_status(SVS_OK));
 		auto destroySession = qScopeGuard([&] { api.destroy_session(session); });
 		const svs_note note{sizeof(svs_note), "sdk-note", 0, 48, 0, .5, 60, "la", "en", "", "{}", "{}"};
-		const svs_snapshot snapshot{sizeof(svs_snapshot), "sdk-clip", 1, 2, 77, "full", 32000, &note, 1, .5,
-			"{\"secondsPerTick\":0.010416666666666666,\"position\":0,\"curves\":{}}"};
+		const svs_snapshot snapshot{sizeof(svs_snapshot),
+									"sdk-clip",
+									1,
+									2,
+									77,
+									"full",
+									32000,
+									&note,
+									1,
+									.5,
+									"{\"secondsPerTick\":0.010416666666666666,\"position\":0,\"curves\":{}}"};
 		QCOMPARE(api.submit(session, &snapshot), svs_status(SVS_OK));
 		const char* ranges = nullptr;
 		QCOMPARE(api.query_ranges(session, &ranges), svs_status(SVS_OK));
@@ -1776,8 +1801,8 @@ private slots:
 		QCOMPARE(api.query_engine_settings(engine, "[]", &invalidSettings), svs_status(SVS_INVALID_INPUT));
 		QVERIFY(!invalidSettings);
 		svs_api oldTable{};
-		QCOMPARE(
-			get(SVS_ABI_MAJOR, 1, uint32_t(offsetof(svs_api, query_engine_settings)), &oldTable), svs_status(SVS_OK));
+		QCOMPARE(get(SVS_ABI_MAJOR, 1, uint32_t(offsetof(svs_api, query_engine_settings)), &oldTable),
+				 svs_status(SVS_OK));
 		QVERIFY(!SVS_HAS_FIELD(oldTable, svs_api, query_engine_settings));
 		QVERIFY(!oldTable.query_engine_settings);
 		auto resource = [&] {
@@ -1859,8 +1884,9 @@ private slots:
 					note.language = languages[trackIndex];
 					note.lyric = lyrics[trackIndex];
 					if (trackIndex < 3)
-						note.parameters = {{"example.power", 90 + index % 20}, {"example.soft", index % 8 == 0},
-							{"example.label", QString("note %1").arg(index)}};
+						note.parameters = {{"example.power", 90 + index % 20},
+										   {"example.soft", index % 8 == 0},
+										   {"example.label", QString("note %1").arg(index)}};
 					notes << note;
 				}
 				svs::Curves curves;
@@ -1882,7 +1908,8 @@ private slots:
 					mode.interpolation = "step";
 					mode.evaluator.interpolation = svs_sdk::Interpolation::Step;
 					mode.evaluator.points = {{0, 0, 0, 0, true, false, "basic"},
-						{192, 0, 0, 0, true, false, "advanced"}, {384, 0, 0, 0, true, false, "basic"}};
+											 {192, 0, 0, 0, true, false, "advanced"},
+											 {384, 0, 0, 0, true, false, "basic"}};
 					curves[mode.id] = mode;
 					if (trackIndex == 0 && clipIndex == 0)
 					{
@@ -1939,7 +1966,7 @@ private slots:
 			elapsed.start();
 			const QPointF local = body + QPoint(24 + sample % 8, 0);
 			QMouseEvent event(QEvent::MouseMove, local, QPointF(canvas.mapToGlobal(local.toPoint())), Qt::NoButton,
-				Qt::LeftButton, Qt::NoModifier);
+							  Qt::LeftButton, Qt::NoModifier);
 			QCoreApplication::sendEvent(&canvas, &event);
 			canvas.repaint();
 			QCoreApplication::processEvents();
@@ -1960,7 +1987,7 @@ private slots:
 		QElapsedTimer wait;
 		wait.start();
 		while (std::any_of(clips.begin(), clips.end(), [](const auto* clip) { return !clip->audio(); })
-			&& wait.elapsed() < 30000)
+			   && wait.elapsed() < 30000)
 		{
 			QElapsedTimer elapsed;
 			elapsed.start();
@@ -1974,13 +2001,18 @@ private slots:
 		QVERIFY(scheduler.peakActiveCount() <= scheduler.budget());
 		QVERIFY(svs::Cache::instance().memoryBytes() <= 128u * 1024 * 1024);
 		QVERIFY(svs::Cache::instance().diskBytes() <= 512u * 1024 * 1024);
-		QJsonObject record{{"dataset", "4 tracks x 16 clips x 64 notes; one 4096-anchor curve"}, {"coldCache", true},
-			{"previewSamples", latency.size()}, {"previewP95Ms", p95}, {"guiLongestBlockMs", longestBlock},
-			{"samplesDuringSynthesis", concurrentSamples}, {"synthesisAndInteractionMs", synthesis.elapsed()},
-			{"peakActive", scheduler.peakActiveCount()}, {"budget", scheduler.budget()},
-			{"memoryCacheBytes", double(svs::Cache::instance().memoryBytes())},
-			{"diskCacheBytes", double(svs::Cache::instance().diskBytes())},
-			{"scope", "Deterministic example and native host only; not a real model benchmark"}};
+		QJsonObject record{{"dataset", "4 tracks x 16 clips x 64 notes; one 4096-anchor curve"},
+						   {"coldCache", true},
+						   {"previewSamples", latency.size()},
+						   {"previewP95Ms", p95},
+						   {"guiLongestBlockMs", longestBlock},
+						   {"samplesDuringSynthesis", concurrentSamples},
+						   {"synthesisAndInteractionMs", synthesis.elapsed()},
+						   {"peakActive", scheduler.peakActiveCount()},
+						   {"budget", scheduler.budget()},
+						   {"memoryCacheBytes", double(svs::Cache::instance().memoryBytes())},
+						   {"diskCacheBytes", double(svs::Cache::instance().diskBytes())},
+						   {"scope", "Deterministic example and native host only; not a real model benchmark"}};
 		QFile report(QDir(output).filePath("performance.json"));
 		QVERIFY(report.open(QIODevice::WriteOnly));
 		QVERIFY(report.write(QJsonDocument(record).toJson()) > 0);
@@ -2043,7 +2075,7 @@ private slots:
 		QElapsedTimer wait;
 		wait.start();
 		while (std::any_of(clips.begin(), clips.end(), [](const auto* clip) { return !clip->audio(); })
-			&& wait.elapsed() < 30000)
+			   && wait.elapsed() < 30000)
 			QTest::qWait(5);
 		for (auto* clip : clips)
 			QVERIFY2(clip->audio() != nullptr, qPrintable(clip->status()));
@@ -2069,8 +2101,8 @@ private slots:
 		QCOMPARE(first->notes(), notes);
 		QCOMPARE(first->curves(), curves);
 		QCOMPARE(static_cast<SVSTrack*>(first->getTrack())->portraitSettings(), portrait);
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		const auto wavePath = QDir(output).filePath("SVSExample-demo.wav");
 		song->setExportLoop(false);
 		song->setRenderBetweenMarkers(false);
@@ -2140,8 +2172,8 @@ private slots:
 		QTRY_VERIFY_WITH_TIMEOUT(!isolated.scanning(), 30000);
 		const auto voices = isolated.voices();
 		QCOMPARE(std::count_if(voices.begin(), voices.end(),
-					 [](const auto& voice) { return voice.pluginId == "org.lmms.svs.test.duplicate"; }),
-			2);
+							   [](const auto& voice) { return voice.pluginId == "org.lmms.svs.test.duplicate"; }),
+				 2);
 		const auto diagnostics = isolated.diagnostics().join('\n');
 		QVERIFY2(diagnostics.contains("Duplicate SVS plugin ID"), qPrintable(diagnostics));
 		QVERIFY(diagnostics.contains("SVS architecture mismatch"));
@@ -2173,11 +2205,14 @@ private slots:
 		note.tick = 24;
 		note.duration = 48;
 		input.notes = {note};
-		input.document = {{"position", 192.}, {"contentOffset", 24.}, {"secondsPerTick", 1. / 96},
-			{"capabilities", schema}, {"curves", QJsonObject{}},
-			{"tempoMap",
-				QJsonArray{QJsonObject{{"tick", 0.}, {"secondsPerTick", 1. / 96}},
-					QJsonObject{{"tick", 192.}, {"secondsPerTick", 1. / 192}}}}};
+		input.document = {{"position", 192.},
+						  {"contentOffset", 24.},
+						  {"secondsPerTick", 1. / 96},
+						  {"capabilities", schema},
+						  {"curves", QJsonObject{}},
+						  {"tempoMap",
+						   QJsonArray{QJsonObject{{"tick", 0.}, {"secondsPerTick", 1. / 96}},
+									  QJsonObject{{"tick", 192.}, {"secondsPerTick", 1. / 192}}}}};
 		const auto audio = plugin.render(input, error);
 		QVERIFY2(audio != nullptr, qPrintable(error));
 		QCOMPARE(audio->rate, uint32_t(32000));
@@ -2240,7 +2275,7 @@ private slots:
 		QProcess process;
 		process.setProcessEnvironment(environment);
 		process.start(QCoreApplication::applicationFilePath(),
-			{"cachedRestoreWithoutPlugin", "-o", report + ",txt", "-o", "-,txt"});
+					  {"cachedRestoreWithoutPlugin", "-o", report + ",txt", "-o", "-,txt"});
 		QVERIFY(process.waitForStarted(5000));
 		QVERIFY(process.waitForFinished(15000));
 		QFile childResult(report);
@@ -2290,8 +2325,8 @@ private slots:
 		QVERIFY(copy->audio()->feedback["pronunciations"].toObject().contains(copy->notes()[0].id));
 		delete copy;
 		const auto path = QFileInfo(fixture).dir().filePath("cached.wav");
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		{
 			RenderManager manager(settings, ProjectRenderer::ExportFileFormat::Wave, path);
 			QSignalSpy done(&manager, &RenderManager::finished);
@@ -2526,7 +2561,7 @@ private slots:
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
 		const OutputSettings settings(Engine::audioEngine()->outputSampleRate(), 192,
-			OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+									  OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
 		const auto mixedPath = directory.filePath("mixed.wav");
 		{
 			RenderManager manager(settings, ProjectRenderer::ExportFileFormat::Wave, mixedPath);
@@ -2553,7 +2588,8 @@ private slots:
 			energy += mixed[i] * mixed[i];
 		}
 		QVERIFY(energy > 1);
-		QVERIFY2(error < 1e-6,
+		QVERIFY2(
+			error < 1e-6,
 			qPrintable(
 				QString("Cached playback/export max sample error: %1 index=%2 live=%3 export=%4 interior=%5 rate=%6")
 					.arg(error, 0, 'g', 12)
@@ -2642,8 +2678,8 @@ private slots:
 		QTRY_VERIFY_WITH_TIMEOUT(a->audio() && b->audio(), 10000);
 		QTemporaryDir baseline, frozen;
 		QVERIFY(baseline.isValid() && frozen.isValid());
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		{
 			RenderManager manager(settings, ProjectRenderer::ExportFileFormat::Wave, baseline.path());
 			QSignalSpy done(&manager, &RenderManager::finished);
@@ -2709,8 +2745,8 @@ private slots:
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		const auto path = directory.filePath("changed-running.wav");
 		Engine::audioEngine()->storeAudioDevice();
 		auto restore = qScopeGuard([] { Engine::audioEngine()->restoreAudioDevice(); });
@@ -2803,7 +2839,7 @@ private slots:
 		QVERIFY(directory.isValid());
 		const auto path = directory.filePath("tempo.wav");
 		const OutputSettings settings(Engine::audioEngine()->outputSampleRate(), 192,
-			OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+									  OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
 		{
 			RenderManager manager(settings, ProjectRenderer::ExportFileFormat::Wave, path);
 			QSignalSpy done(&manager, &RenderManager::finished);
@@ -2822,7 +2858,7 @@ private slots:
 		}
 		QVERIFY(energy > 1);
 		QVERIFY2(error < 1e-6,
-			qPrintable(QString("Variable tempo cached playback/export sample error: %1").arg(error, 0, 'g', 12)));
+				 qPrintable(QString("Variable tempo cached playback/export sample error: %1").arg(error, 0, 'g', 12)));
 	}
 	void deletedTrackExportPreparation()
 	{
@@ -2845,8 +2881,8 @@ private slots:
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
 		const auto path = directory.filePath("deleted.wav");
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		Engine::audioEngine()->storeAudioDevice();
 		auto restore = qScopeGuard([] { Engine::audioEngine()->restoreAudioDevice(); });
 		ProjectRenderer renderer(settings, ProjectRenderer::ExportFileFormat::Wave, path);
@@ -2892,8 +2928,8 @@ private slots:
 		tempo->putValue(0, 120, false);
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		const auto previousVolume = track->volumeModel()->value();
 		for (bool changeTempo : {false, true})
 		{
@@ -2944,8 +2980,8 @@ private slots:
 		clip->setNotes({note});
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
-		const OutputSettings settings(
-			32000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		auto readPCM = [](const QString& path) {
 			QFile file(path);
 			if (!file.open(QIODevice::ReadOnly))
@@ -3035,6 +3071,65 @@ private slots:
 			QVERIFY(!song->isExporting());
 			QVERIFY(!QFileInfo::exists(cancelledPath));
 		}
+	}
+	void computeStageCacheIdentity()
+	{
+			QJsonObject traditional{{"fixture", "unchanged"}};
+			const auto original = traditional;
+			svs::markComputeCacheHit(traditional);
+			QCOMPARE(traditional, original);
+		svs::Input gpu;
+		gpu.secondsPerTick = 1. / 96.;
+		gpu.rate = 48000;
+		gpu.document["computePolicy"] = QJsonObject{{"effectiveBackend", "directml"},
+													{"effectiveDevice", "dxgi:00000000:00016a3c"},
+													{"runtimeVersion", "fixture-runtime"},
+													{"stageOverrides", QJsonArray{}}};
+		const auto gpuKey = svs::Cache::key(gpu, "fixture");
+		auto mixed = gpu;
+		const QJsonArray stages{QJsonObject{{"stage", "acoustic/acoustic"},
+											{"effectiveBackend", "cpu"},
+											{"effectiveDevice", "cpu"},
+											{"fallbackReason", "GPU OOM fixture"}},
+								QJsonObject{{"stage", "vocoder/model"},
+											{"effectiveBackend", "cpu"},
+											{"effectiveDevice", "cpu"},
+											{"fallbackReason", "Configured CPU-only stage"}}};
+		svs::recordComputeExecution(mixed.document, stages);
+		const auto mixedKey = svs::Cache::key(mixed, "fixture");
+		QVERIFY(gpuKey != mixedKey);
+		auto reasonOnly = mixed;
+		QJsonArray reordered{stages[1], stages[0]};
+		auto alternate = reordered[0].toObject();
+		alternate["fallbackReason"] = "different diagnostic text";
+		reordered[0] = alternate;
+		svs::recordComputeExecution(reasonOnly.document, reordered);
+		QCOMPARE(svs::Cache::key(reasonOnly, "fixture"), mixedKey);
+		QTemporaryDir directory;
+		svs::Cache cache(directory.path(), 1024 * 1024, 1024 * 1024);
+		auto audio = std::make_shared<svs::Audio>();
+		audio->rate = mixed.rate;
+		audio->samples = {.1f, -.1f, .2f, -.2f};
+		audio->feedback["computePolicy"] = mixed.document["computePolicy"];
+		audio->feedback["computeExecution"] = QJsonObject{{"stage", "acoustic/acoustic"},
+														  {"effectiveBackend", "cpu"},
+														  {"effectiveDevice", "cpu"},
+														  {"providerEvidence", QJsonObject{{"cpuNodes", 1}}},
+														  {"runMilliseconds", 2}};
+		cache.put(mixedKey, mixed, audio);
+		QVERIFY(!cache.get(gpuKey, gpu));
+		const auto restored = cache.get(mixedKey, mixed);
+		QVERIFY(restored);
+		QCOMPARE(restored->feedback["computePolicy"], mixed.document["computePolicy"]);
+		QCOMPARE(restored->samples, audio->samples);
+		QVERIFY(restored->feedback["computeExecution"].toObject()["cacheHit"].toBool());
+		QVERIFY(!restored->feedback["computeExecution"].toObject().contains("providerEvidence"));
+		svs::Cache disk(directory.path(), 0, 1024 * 1024);
+		const auto diskRestored = disk.get(mixedKey, mixed);
+		QVERIFY(diskRestored);
+		QCOMPARE(diskRestored->feedback["computePolicy"], mixed.document["computePolicy"]);
+		QCOMPARE(diskRestored->samples, audio->samples);
+		QVERIFY(!diskRestored->feedback["computeExecution"].toObject().contains("runMilliseconds"));
 	}
 	void globalComputePolicy()
 	{
@@ -3214,6 +3309,8 @@ private slots:
 		auto* clip = static_cast<SVSClip*>(track->createClip(0));
 		svs::Note note;
 		note.id = "shared-compute-note";
+		// Ensure the provider assertion observes this run rather than a prior test's cached PCM.
+		note.lyric = QUuid::createUuid().toString();
 		note.duration = 48;
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
@@ -3312,7 +3409,7 @@ private slots:
 					 .toObject()["export-note"]
 					 .toObject()["text"]
 					 .toString(),
-			QString("hello"));
+				 QString("hello"));
 		QCOMPARE(clip->notes()[0].lyric, QString("world"));
 		auto failed = captured;
 		failed[0].input.document["developmentFaults"] = QJsonObject{{"fail", true}};
@@ -3394,10 +3491,10 @@ private slots:
 		QCOMPARE(song->getTempo(), 60);
 		QCoreApplication::processEvents();
 		QVERIFY2(clip->audio() == changed,
-			qPrintable(clip->status()
-				+ " before=" + QString::fromUtf8(QJsonDocument(before).toJson(QJsonDocument::Compact)) + " after="
-				+ QString::fromUtf8(QJsonDocument(svs::TempoSource::forSong(*song).snapshot()->toJson())
-						.toJson(QJsonDocument::Compact))));
+				 qPrintable(clip->status() + " before="
+							+ QString::fromUtf8(QJsonDocument(before).toJson(QJsonDocument::Compact)) + " after="
+							+ QString::fromUtf8(QJsonDocument(svs::TempoSource::forSong(*song).snapshot()->toJson())
+													.toJson(QJsonDocument::Compact))));
 		song->stop();
 		QCoreApplication::processEvents();
 		QCOMPARE(clip->audio(), changed);
@@ -3450,11 +3547,11 @@ private slots:
 			const auto values = song->automatedValuesAt(tick);
 			const auto expected = values.contains(&song->tempoModel())
 				? int(std::clamp(values.value(&song->tempoModel()), float(song->tempoModel().minValue()),
-					  float(song->tempoModel().maxValue())))
+								 float(song->tempoModel().maxValue())))
 				: 120;
 			QCOMPARE(snapshot->tempoAt(tick), expected);
 			QVERIFY(std::abs(mapping.globalSeconds(tick + 1) - mapping.globalSeconds(tick) - 60. / (expected * 48))
-				< 1e-10);
+					< 1e-10);
 		}
 		a->putValue(96, 220, false);
 		b->setMuted(true);
@@ -3491,7 +3588,8 @@ private slots:
 		input.revision = 1;
 		input.secondsPerTick = .01;
 		QJsonArray points{QJsonObject{{"tick", 0}, {"secondsPerTick", .01}},
-			QJsonObject{{"tick", 192}, {"secondsPerTick", .02}}, QJsonObject{{"tick", 384}, {"secondsPerTick", .005}}};
+						  QJsonObject{{"tick", 192}, {"secondsPerTick", .02}},
+						  QJsonObject{{"tick", 384}, {"secondsPerTick", .005}}};
 		svs::Curve curve;
 		curve.id = "svs.pitch";
 		curve.unit = "semitone";
@@ -3504,8 +3602,13 @@ private slots:
 		auto plugin = svs::Registry::instance().plugin(voice.pluginId);
 		QString error;
 		auto capabilities = plugin->capabilities("full", {}, error);
-		input.document = {{"position", 96}, {"contentOffset", 24}, {"tempoMap", points}, {"secondsPerTick", .01},
-			{"capabilities", capabilities}, {"language", "en"}, {"curves", svs::curvesToJson({{curve.id, curve}})}};
+		input.document = {{"position", 96},
+						  {"contentOffset", 24},
+						  {"tempoMap", points},
+						  {"secondsPerTick", .01},
+						  {"capabilities", capabilities},
+						  {"language", "en"},
+						  {"curves", svs::curvesToJson({{curve.id, curve}})}};
 		svs::TimeMapping mapping;
 		QVERIFY(svs::readTimeMapping(input.document, .01, mapping, error));
 		input.duration = mapping.localSeconds(384);
@@ -3513,10 +3616,11 @@ private slots:
 		note.id = "variable-note";
 		note.tick = 0;
 		note.duration = 360;
-		note.phonemes = {{"phonemeSet", "example.multilingual.v1"}, {"symbols", QJsonArray{"l", "a"}},
-			{"segments",
-				QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -6}, {"durationTicks", 12}},
-					QJsonObject{{"symbol", "a"}, {"startTick", 6}, {"durationTicks", 354}}}}};
+		note.phonemes = {{"phonemeSet", "example.multilingual.v1"},
+						 {"symbols", QJsonArray{"l", "a"}},
+						 {"segments",
+						  QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -6}, {"durationTicks", 12}},
+									 QJsonObject{{"symbol", "a"}, {"startTick", 6}, {"durationTicks", 354}}}}};
 		input.notes = {note};
 		auto audio = plugin->render(input, error);
 		QVERIFY2(audio != nullptr, qPrintable(error));
@@ -3532,8 +3636,8 @@ private slots:
 		const auto phonemes = audio->feedback["phonemes"].toArray();
 		QCOMPARE(phonemes.size(), 2);
 		QVERIFY(std::abs(phonemes[1].toObject()["durationSeconds"].toDouble()
-					- (mapping.localSeconds(360) - mapping.localSeconds(6)))
-			< 1e-10);
+						 - (mapping.localSeconds(360) - mapping.localSeconds(6)))
+				< 1e-10);
 		for (double tick : {0., 119.5, 120., 120.5, 312., 359.})
 		{
 			const auto frame = size_t(mapping.samplePosition(tick, audio->startTick, audio->rate));
@@ -3554,8 +3658,8 @@ private slots:
 		QVERIFY(cached);
 		QVERIFY(cached->mapping.tempo);
 		QVERIFY(std::abs(cached->mapping.samplePosition(240, cached->startTick, 48000)
-					- mapping.samplePosition(240, -6, 48000))
-			< 1e-7);
+						 - mapping.samplePosition(240, -6, 48000))
+				< 1e-7);
 		input.document["tempoMap"] = QJsonArray{QJsonObject{{"tick", 0}, {"secondsPerTick", 0}}};
 		QVERIFY(!plugin->render(input, error));
 		QVERIFY(error.contains("tempo"));
@@ -3579,8 +3683,11 @@ private slots:
 		svs::Note note;
 		note.id = "busy-note";
 		input.notes = {note};
-		input.document = {{"capabilities", track->capabilities().original}, {"language", "en"}, {"secondsPerTick", .01},
-			{"developmentFaults", QJsonObject{{"delayMs", 1000}, {"nonce", QUuid::createUuid().toString()}}}};
+		input.document
+			= {{"capabilities", track->capabilities().original},
+			   {"language", "en"},
+			   {"secondsPerTick", .01},
+			   {"developmentFaults", QJsonObject{{"delayMs", 1000}, {"nonce", QUuid::createUuid().toString()}}}};
 		svs::SynthesisScheduler scheduler(1);
 		bool completed = false;
 		scheduler.submit(plugin, input, 0, [](const auto&) {}, [&](auto, const auto&) { completed = true; });
@@ -3701,14 +3808,14 @@ private slots:
 		protectedCopy->saveSettings(protectedDocument, protectedNode);
 		QCOMPARE(protectedNode.attribute("id"), protectedCopy->id());
 		QCOMPARE(protectedNode.firstChildElement("notes").firstChildElement("note").attribute("id"),
-			protectedCopy->notes()[0].id);
+				 protectedCopy->notes()[0].id);
 		QCOMPARE(protectedNode.attribute("schemaVersion"), QString("99"));
 		QCOMPARE(protectedNode.attribute("curves"), future.attribute("curves"));
 		QCOMPARE(protectedNode.firstChildElement("notes")
 					 .firstChildElement("note")
 					 .firstChildElement("vendorState")
 					 .attribute("value"),
-			QString("x"));
+				 QString("x"));
 		delete protectedCopy;
 		auto badTrack = source.documentElement().cloneNode(true).toElement();
 		badTrack.setAttribute("schemaVersion", 99);
@@ -3779,7 +3886,7 @@ private slots:
 		QVERIFY(right->notes()[0].phonemes.isEmpty());
 		for (double tick = 0; tick <= 120; tick += .25)
 			QVERIFY(std::abs(clip->curves()[curve.id].valueAt(tick)->toDouble() - curve.valueAt(tick + 24)->toDouble())
-				< 1e-8);
+					< 1e-8);
 		for (double tick = 0; tick <= 264; tick += .25)
 			QVERIFY(
 				std::abs(right->curves()[curve.id].valueAt(tick)->toDouble() - curve.valueAt(tick + 144)->toDouble())
@@ -3823,10 +3930,11 @@ private slots:
 		note.id = "origin-note";
 		note.tick = 0;
 		note.duration = 96;
-		note.phonemes = {{"phonemeSet", "example.multilingual.v1"}, {"symbols", QJsonArray{"l", "a"}},
-			{"segments",
-				QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -6.}, {"durationTicks", 12.}},
-					QJsonObject{{"symbol", "a"}, {"startTick", 6.}, {"durationTicks", 90.}}}}};
+		note.phonemes = {{"phonemeSet", "example.multilingual.v1"},
+						 {"symbols", QJsonArray{"l", "a"}},
+						 {"segments",
+						  QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -6.}, {"durationTicks", 12.}},
+									 QJsonObject{{"symbol", "a"}, {"startTick", 6.}, {"durationTicks", 90.}}}}};
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
 		auto original = clip->audio();
@@ -3898,14 +4006,15 @@ private slots:
 		note.id = "original-note";
 		note.lyric = "hello";
 		input.notes = {note};
-		input.document = {{"clipId", input.clipId}, {"position", 192}, {"contentOffset", 24}, {"tempo", 120},
-			{"voiceVersion", "1"}, {"trackParameters", QJsonObject{{"gain", 1}}}};
+		input.document
+			= {{"clipId", input.clipId}, {"position", 192},		{"contentOffset", 24},
+			   {"tempo", 120},			 {"voiceVersion", "1"}, {"trackParameters", QJsonObject{{"gain", 1}}}};
 		auto audio = std::make_shared<svs::Audio>();
 		audio->samples.resize(2000, .25f);
 		audio->waveform.build(audio->samples);
 		audio->revision = 1;
 		audio->feedback = {{"phonemes", QJsonArray{QJsonObject{{"noteId", note.id}, {"symbol", "hello"}}}},
-			{"pronunciations", QJsonObject{{note.id, QJsonObject{{"text", "hello"}}}}}};
+						   {"pronunciations", QJsonObject{{note.id, QJsonObject{{"text", "hello"}}}}}};
 		const auto key = svs::Cache::key(input, "plugin-version");
 		cache.put(key, input, audio);
 		QVERIFY(cache.memoryBytes() <= 9000);
@@ -3977,8 +4086,9 @@ private slots:
 		input.secondsPerTick = .01;
 		input.duration = .2;
 		input.notes = {svs::Note{}};
-		input.document = {{"capabilities", plugin->capabilities("full", {}, error)}, {"language", "en"},
-			{"developmentFaults", QJsonObject{{"delayMs", 150}, {"lateReturn", true}}}};
+		input.document = {{"capabilities", plugin->capabilities("full", {}, error)},
+						  {"language", "en"},
+						  {"developmentFaults", QJsonObject{{"delayMs", 150}, {"lateReturn", true}}}};
 		QSemaphore entered, finished;
 		int published = 0;
 		svs::SynthesisScheduler scheduler(1);
@@ -4019,9 +4129,10 @@ private slots:
 		note.id = "note";
 		note.duration = 19.2;
 		input.notes = {note};
-		input.document
-			= {{"capabilities", plugin->capabilities("full", {}, error)}, {"secondsPerTick", input.secondsPerTick},
-				{"language", "en"}, {"developmentFaults", QJsonObject{{"delayMs", 100}, {"lateReturn", true}}}};
+		input.document = {{"capabilities", plugin->capabilities("full", {}, error)},
+						  {"secondsPerTick", input.secondsPerTick},
+						  {"language", "en"},
+						  {"developmentFaults", QJsonObject{{"delayMs", 100}, {"lateReturn", true}}}};
 		svs::SynthesisScheduler scheduler(2);
 		int oldResults = 0, newResults = 0;
 		QStringList states;
@@ -4047,8 +4158,8 @@ private slots:
 		QTRY_COMPARE_WITH_TIMEOUT(newResults, 1, 5000);
 		QVERIFY(published);
 		QCOMPARE(published->revision, uint64_t(2));
-		QCOMPARE(
-			published->feedback["pronunciations"].toObject()["note"].toObject()["text"].toString(), QString("hello"));
+		QCOMPARE(published->feedback["pronunciations"].toObject()["note"].toObject()["text"].toString(),
+				 QString("hello"));
 		QCOMPARE(oldResults, 0);
 		QCOMPARE(scheduler.activeCount(), 0);
 		QCOMPARE(scheduler.peakActiveCount(), 1);
@@ -4096,7 +4207,7 @@ private slots:
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 5000);
 		QCOMPARE(clip->audio()->feedback["pronunciations"].toObject()["note"].toObject()["text"].toString(),
-			QString("hello"));
+				 QString("hello"));
 		clip->setNotes({svs::Note{}});
 		delete track;
 		QTRY_COMPARE_WITH_TIMEOUT(svs::SynthesisScheduler::instance().activeCount(), 0, 5000);
@@ -4145,7 +4256,7 @@ private slots:
 		QCOMPARE(clip->curves()[curve.id].evaluator.points[0].valueId, std::string("basic"));
 		auto* mime = new QMimeData;
 		mime->setData("application/x-lmms-svs-curve",
-			QJsonDocument(QJsonObject{{"curve", curve.toJson()}, {"length", 48.}}).toJson());
+					  QJsonDocument(QJsonObject{{"curve", curve.toJson()}, {"length", 48.}}).toJson());
 		QApplication::clipboard()->setMimeData(mime);
 		const auto before = clip->curves();
 		auto readOnly = *mode;
@@ -4209,8 +4320,8 @@ private slots:
 		QVERIFY(svs::absolutePitchToOffset(edited, stepped, offset, error));
 		for (double tick = 0; tick <= 600; tick += .25)
 			QVERIFY(std::abs(offset.valueAt(tick)->toDouble() + stepped.valueAt(tick)->toDouble()
-						- edited.valueAt(tick)->toDouble())
-				< 1e-9);
+							 - edited.valueAt(tick)->toDouble())
+					< 1e-9);
 		const auto voice = svs::Registry::instance().voices().first();
 		auto plugin = svs::Registry::instance().plugin(voice.pluginId);
 		auto schema = plugin->capabilities("full", {}, error);
@@ -4237,8 +4348,10 @@ private slots:
 		note.tick = 0;
 		note.duration = 600;
 		input.notes = {note};
-		input.document = {{"capabilities", schema}, {"language", "en"}, {"secondsPerTick", input.secondsPerTick},
-			{"curves", svs::curvesToJson({{edited.id, edited}})}};
+		input.document = {{"capabilities", schema},
+						  {"language", "en"},
+						  {"secondsPerTick", input.secondsPerTick},
+						  {"curves", svs::curvesToJson({{edited.id, edited}})}};
 		auto absolute = plugin->render(input, error);
 		QVERIFY2(absolute != nullptr, qPrintable(error));
 		input.document["capabilities"] = relativeSchema;
@@ -4350,9 +4463,9 @@ private slots:
 		note.pronunciation = "la";
 		note.parameters = {{"example.power", 80}};
 		note.phonemes = {{"symbols", QJsonArray{"l", "a"}},
-			{"segments",
-				QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -12}, {"durationTicks", 120}},
-					QJsonObject{{"symbol", "a"}, {"startTick", 108}, {"durationTicks", 84}}}}};
+						 {"segments",
+						  QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", -12}, {"durationTicks", 120}},
+									 QJsonObject{{"symbol", "a"}, {"startTick", 108}, {"durationTicks", 84}}}}};
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
 		svs::Curve curve;
@@ -4561,7 +4674,8 @@ private slots:
 		last.lyric = "la";
 		clip->setNotes({first, held, last});
 		const auto original = clip->notes();
-		QCOMPARE(gui::SVSLyricEditor::splitLyrics(QString::fromUtf8("hello 世界 きゃ -")),
+		QCOMPARE(
+			gui::SVSLyricEditor::splitLyrics(QString::fromUtf8("hello 世界 きゃ -")),
 			QStringList({"hello", QString::fromUtf8("世"), QString::fromUtf8("界"), QString::fromUtf8("きゃ"), "-"}));
 		{
 			gui::SVSLyricEditor dialog(clip, {"a", "b", "c"});
@@ -4740,10 +4854,11 @@ private slots:
 		note.tick = 48;
 		note.duration = 48;
 		note.lyric = "la";
-		note.phonemes = {{"phonemeSet", track->capabilities().phonemeSetId}, {"symbols", QJsonArray{"l", "a"}},
-			{"segments",
-				QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", 24}},
-					QJsonObject{{"symbol", "a"}, {"startTick", 24}, {"durationTicks", 24}}}}};
+		note.phonemes = {{"phonemeSet", track->capabilities().phonemeSetId},
+						 {"symbols", QJsonArray{"l", "a"}},
+						 {"segments",
+						  QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", 24}},
+									 QJsonObject{{"symbol", "a"}, {"startTick", 24}, {"durationTicks", 24}}}}};
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
 		gui::SVSResultStrip strip(clip);
@@ -4794,7 +4909,7 @@ private slots:
 		auto energy = [secondsPerTick](const auto& audio, double from, double to) {
 			double result = 0;
 			for (size_t frame = size_t(from * secondsPerTick * audio->rate);
-				frame < size_t(to * secondsPerTick * audio->rate); ++frame)
+				 frame < size_t(to * secondsPerTick * audio->rate); ++frame)
 				result += audio->samples[frame * 2] * audio->samples[frame * 2];
 			return result;
 		};
@@ -4885,8 +5000,8 @@ private slots:
 		editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-backgroundColor: #abcdef; }");
 		editor.ensurePolished();
 		QCOMPARE(renderColor(), QColor("#abcdef"));
-		editor.setStyleSheet(
-			"lmms--gui--SVSPianoRoll { qproperty-gridLineColor: #112233; qproperty-beatLineColor: #446655; qproperty-barLineColor: #77aa88; }");
+		editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-gridLineColor: #112233; qproperty-beatLineColor: "
+							 "#446655; qproperty-barLineColor: #77aa88; }");
 		editor.ensurePolished();
 		clip->movePosition(TimePos(12));
 		canvas->setScroll(0, 72);
@@ -4900,7 +5015,7 @@ private slots:
 				return image.pixelColor(point);
 			};
 			QCOMPARE(pixel(double(DefaultTicksPerBar) / Engine::getSong()->getTimeSigModel().getDenominator() - 12),
-				QColor("#446655"));
+					 QColor("#446655"));
 			QCOMPARE(pixel(TimePos::ticksPerBar() - 12), QColor("#77aa88"));
 		};
 		verifyGrid();
@@ -4959,7 +5074,7 @@ private slots:
 			gesture.update(tick, tick / 100.);
 		const auto& curve = gesture.preview;
 		QVERIFY2(std::abs(curve.derivativeAt(20)) < 1e-9,
-			"Freehand stroke must ease in with TuneLab's zero endpoint tangent");
+				 "Freehand stroke must ease in with TuneLab's zero endpoint tangent");
 		QVERIFY(std::abs(curve.derivativeAt(60)) < 1e-9);
 		int interior = 0;
 		for (const auto& point : curve.evaluator.points)
@@ -5015,8 +5130,10 @@ private slots:
 		mapping.secondsPerTick = .01;
 		QJsonArray samples;
 		for (int i = 0; i < 3; ++i)
-			samples.append(QJsonObject{{"noteId", "first"}, {"startSeconds", i * .04}, {"durationSeconds", .04},
-				{"value", i == 1 ? 64. : 60.}});
+			samples.append(QJsonObject{{"noteId", "first"},
+									   {"startSeconds", i * .04},
+									   {"durationSeconds", .04},
+									   {"value", i == 1 ? 64. : 60.}});
 		const auto curves = gui::feedbackPitchCurves(samples, mapping);
 		QCOMPARE(curves.size(), 1);
 		const auto& curve = curves[0];
@@ -5140,13 +5257,19 @@ private slots:
 	}
 	void nativePencilCurveRenders()
 	{
-		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		if (!m_guiApplication)
+		{
+			QSKIP("Native Windows GUI required");
+		}
 		const auto root = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
-		if (root.isEmpty()) { QSKIP("DiffSinger voice required"); }
+		if (root.isEmpty())
+		{
+			QSKIP("DiffSinger voice required");
+		}
 		QString error;
 		QVERIFY2(svs::Registry::instance().refreshCatalog(
 					 "org.lmms.svs.diffsinger", {{"diffsinger.voicebankDirectories", QJsonArray{root}}}, error),
-			qPrintable(error));
+				 qPrintable(error));
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
 		const auto cleanup = qScopeGuard([&] { delete track; });
 		for (const auto& voice : svs::Registry::instance().voices())
@@ -5220,8 +5343,9 @@ private slots:
 		svs::Curve reference;
 		const auto* absolute = track->capabilities().parameter(absoluteId, "clip");
 		QVERIFY(absolute);
-		QVERIFY2(svs::Curve::fromJson(clip->audio()->feedback["curves"].toObject()[absoluteId].toObject(),
-			reference, error, absolute), qPrintable(error));
+		QVERIFY2(svs::Curve::fromJson(clip->audio()->feedback["curves"].toObject()[absoluteId].toObject(), reference,
+									  error, absolute),
+				 qPrintable(error));
 		const auto pixels = lane->grab().toImage();
 		const QColor expected(absolute->color);
 		for (double tick : {24., 60., 120.})
@@ -5233,13 +5357,13 @@ private slots:
 			for (int y = point.y() - 3; y <= point.y() + 3; ++y)
 			{
 				const auto pixel = pixels.pixelColor(point.x(), y);
-				found |= std::abs(pixel.red() - expected.red()) < 20
-					&& std::abs(pixel.green() - expected.green()) < 20
+				found |= std::abs(pixel.red() - expected.red()) < 20 && std::abs(pixel.green() - expected.green()) < 20
 					&& std::abs(pixel.blue() - expected.blue()) < 20;
 			}
 			QVERIFY2(found, "Editable absolute default must match the read-only reference");
 		}
-		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-absolute-reference-native.png"));
+		QVERIFY(
+			editor.screen()->grabWindow(editor.winId()).save("doc/svs/validation/SVS-absolute-reference-native.png"));
 		QTest::mousePress(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(48, -10).toPoint());
 		QTest::mouseRelease(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(96, -8).toPoint());
 		const auto authored = clip->curves().value(absoluteId);
@@ -5257,7 +5381,10 @@ private slots:
 	}
 	void nativeSidebarLanguages()
 	{
-		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		if (!m_guiApplication)
+		{
+			QSKIP("Native Windows GUI required");
+		}
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
 		const auto cleanup = qScopeGuard([&] { delete track; });
 		track->bindVoice("org.lmms.svs.example", "full");
@@ -5292,9 +5419,15 @@ private slots:
 	}
 	void nativePitchRecordingHistory()
 	{
-		if (!m_guiApplication) { QSKIP("Native Windows GUI required"); }
+		if (!m_guiApplication)
+		{
+			QSKIP("Native Windows GUI required");
+		}
 		const auto root = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
-		if (root.isEmpty()) { QSKIP("Automatic-pitch voice required"); }
+		if (root.isEmpty())
+		{
+			QSKIP("Automatic-pitch voice required");
+		}
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
 		const auto cleanup = qScopeGuard([&] { delete track; });
 		track->bindVoice("org.lmms.svs.example", "full");
@@ -5315,9 +5448,10 @@ private slots:
 		QVERIFY(clip->editorState()["pitchRecordings"].toArray().isEmpty());
 		QString error;
 		QVERIFY2(
-			svs::Registry::instance().refreshCatalog("org.lmms.svs.diffsinger",
+			svs::Registry::instance().refreshCatalog(
+				"org.lmms.svs.diffsinger",
 				{{"diffsinger.voicebankDirectories", QJsonArray{root}},
-					{"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
+				 {"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
 				error),
 			qPrintable(error));
 		for (const auto& voice : svs::Registry::instance().voices())
@@ -5362,12 +5496,13 @@ private slots:
 		QTest::mouseClick(record, Qt::LeftButton);
 		QCOMPARE(clip->editorState()["pitchRecordings"].toArray().size(), 3);
 		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id].toObject()["seed"].toDouble(),
-			double(UINT32_MAX));
+				 double(UINT32_MAX));
 		QCOMPARE(takes->currentIndex(), 2);
 		QVERIFY(fixed->isChecked());
 		QTest::mouseClick(record, Qt::LeftButton);
 		QCOMPARE(clip->editorState()["pitchRecordingCurrent"].toInt(), 3);
-		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id].toObject()["seed"].toDouble(), double(UINT32_MAX));
+		QCOMPARE(clip->editorState()["pitchPredictionRequests"].toObject()[first.id].toObject()["seed"].toDouble(),
+				 double(UINT32_MAX));
 		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 180000);
 		QVERIFY2(clip->audio(), qPrintable(clip->status()));
 		QTest::qWait(700);
@@ -5390,14 +5525,21 @@ private slots:
 	}
 	void nativePitchResetContextActions()
 	{
-		if (!m_guiApplication) { QSKIP("Native GUI required"); }
+		if (!m_guiApplication)
+		{
+			QSKIP("Native GUI required");
+		}
 		const auto voiceRoot = qEnvironmentVariable("SVS_DIFFSINGER_EXTERNAL_VOICE_ROOT");
-		if (voiceRoot.isEmpty()) { QSKIP("Automatic-pitch voice required"); }
+		if (voiceRoot.isEmpty())
+		{
+			QSKIP("Automatic-pitch voice required");
+		}
 		QString catalogError;
 		QVERIFY2(
-			svs::Registry::instance().refreshCatalog("org.lmms.svs.diffsinger",
+			svs::Registry::instance().refreshCatalog(
+				"org.lmms.svs.diffsinger",
 				{{"diffsinger.voicebankDirectories", QJsonArray{voiceRoot}},
-					{"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
+				 {"diffsinger.vocoderDirectories", QJsonArray{qEnvironmentVariable("SVS_DIFFSINGER_VOCODER_ROOT")}}},
 				catalogError),
 			qPrintable(catalogError));
 		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
@@ -5447,12 +5589,18 @@ private slots:
 			QTimer timeout;
 			timeout.setSingleShot(true);
 			connect(&timeout, &QTimer::timeout, &canvas, [] {
-				if (auto* popup = QApplication::activePopupWidget()) { popup->close(); }
+				if (auto* popup = QApplication::activePopupWidget())
+				{
+					popup->close();
+				}
 			});
 			timeout.start(2000);
 			QTimer::singleShot(200, &canvas, [&] {
 				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
-				if (!menu) { return; }
+				if (!menu)
+				{
+					return;
+				}
 				if (capture)
 				{
 					menu->screen()->grabWindow(menu->winId()).save("doc/svs/validation/SVS-pitch-context-native.png");
@@ -5504,7 +5652,7 @@ private slots:
 		QCOMPARE(QJsonDocument::fromJson(node.attribute("editorState").toUtf8())
 					 .object()["pitchPredictionRequests"]
 					 .toObject(),
-			requests);
+				 requests);
 		canvas.close();
 	}
 	void curveUndoAndSelectionMove()
@@ -5555,8 +5703,8 @@ private slots:
 		QCOMPARE(journal->undoDepth(), beforeMove + 1);
 		for (double tick = 0; tick <= note.duration; tick += .5)
 			QVERIFY(std::abs(shape.valueAt(tick)->toDouble()
-						- clip->curves()["svs.pitch"].valueAt(from + 24 + tick)->toDouble())
-				< 1e-8);
+							 - clip->curves()["svs.pitch"].valueAt(from + 24 + tick)->toDouble())
+					< 1e-8);
 		QTest::keyClick(&canvas, Qt::Key_Z, Qt::ControlModifier);
 		QCOMPARE(clip->curves(), drawn);
 		QCOMPARE(clip->notes()[0].tick, from);
@@ -5689,7 +5837,8 @@ private slots:
 		QCOMPARE(clip->notes(), before);
 		QCOMPARE(canvas->tool(), gui::SVSCanvas::Tool::Freehand);
 		const gui::SVSCanvas::Tool tools[]{gui::SVSCanvas::Tool::Notes, gui::SVSCanvas::Tool::Pencil,
-			gui::SVSCanvas::Tool::Freehand, gui::SVSCanvas::Tool::Anchor, gui::SVSCanvas::Tool::Smooth};
+										   gui::SVSCanvas::Tool::Freehand, gui::SVSCanvas::Tool::Anchor,
+										   gui::SVSCanvas::Tool::Smooth};
 		for (int i = 0; i < 5; ++i)
 		{
 			QTest::keyClick(canvas, Qt::Key_1 + i);
@@ -5699,8 +5848,8 @@ private slots:
 				QCOMPARE(lane->tool(), tools[i]);
 		}
 		QTest::keyClick(canvas, Qt::Key_1);
-		QTest::mouseDClick(
-			canvas, Qt::LeftButton, Qt::NoModifier, canvas->noteRect(clip->notes()[0]).center().toPoint());
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+						   canvas->noteRect(clip->notes()[0]).center().toPoint());
 		auto* lyric = canvas->findChild<QLineEdit*>("svsInlineLyric");
 		QVERIFY(lyric->isVisibleTo(canvas));
 		lyric->setText(QString::fromUtf8("你好"));
@@ -5749,13 +5898,16 @@ private slots:
 		b.tick = 96;
 		b.pitch = 63;
 		auto segment = [](const char* symbol, double start, double duration, double weight) {
-			return QJsonObject{{"symbol", symbol}, {"startTick", start}, {"durationTicks", duration},
-				{"stretchWeight", weight}, {"fixtureExtra", "retained"}};
+			return QJsonObject{{"symbol", symbol},
+							   {"startTick", start},
+							   {"durationTicks", duration},
+							   {"stretchWeight", weight},
+							   {"fixtureExtra", "retained"}};
 		};
 		a.phonemes = {{"symbols", QJsonArray{"l", "a"}},
-			{"segments", QJsonArray{segment("l", -12, 10, 0), segment("a", -2, 32, 1)}}};
+					  {"segments", QJsonArray{segment("l", -12, 10, 0), segment("a", -2, 32, 1)}}};
 		b.phonemes = {{"symbols", QJsonArray{"l", "a"}},
-			{"segments", QJsonArray{segment("l", -18, 18, 0), segment("a", 0, 48, 1)}}};
+					  {"segments", QJsonArray{segment("l", -18, 18, 0), segment("a", 0, 48, 1)}}};
 		const QVector<svs::Note> original{a, b};
 		clip->setNotes(original);
 		QWidget window;
@@ -5799,7 +5951,7 @@ private slots:
 					QCOMPARE(changed[which].pitch, note.pitch);
 					QCOMPARE(changed[which].tick, head ? note.tick + delta : note.tick);
 					QCOMPARE(changed[which].tick + changed[which].duration,
-						head ? note.tick + note.duration : note.tick + note.duration + delta);
+							 head ? note.tick + note.duration : note.tick + note.duration + delta);
 					if (which == 0 && !head && delta > 0)
 					{
 						QCOMPARE(changed[1].tick, 108.);
@@ -5865,7 +6017,7 @@ private slots:
 		QCOMPARE(clip->notes()[1].tick, 96.);
 		QCOMPARE(journal->undoDepth(), depth + 1);
 		QCOMPARE(clip->notes()[1].phonemes["segments"].toArray()[0].toObject()["fixtureExtra"].toString(),
-			QString("retained"));
+				 QString("retained"));
 		QTest::keyClick(strip, Qt::Key_Z, Qt::ControlModifier);
 		QCOMPARE(clip->notes(), original);
 		// Same x, different vertical half: shared note boundary changes both notes.
@@ -5937,8 +6089,8 @@ private slots:
 		for (double tick = 0; tick <= 300; tick += .5)
 			if (tick != 120)
 				QVERIFY(std::abs(single[parameter.id].valueAt(tick)->toDouble()
-							- original[parameter.id].valueAt(tick)->toDouble())
-					< 1e-10);
+								 - original[parameter.id].valueAt(tick)->toDouble())
+						< 1e-10);
 		QCOMPARE(journal->undoDepth(), depth + 1);
 		QTest::keyClick(&lane, Qt::Key_Z, Qt::ControlModifier);
 		QCOMPARE(clip->curves(), original);
@@ -5952,8 +6104,8 @@ private slots:
 			QCOMPARE(reset[parameter.id].valueAt(tick), std::optional<QJsonValue>(parameter.defaultValue));
 		for (double tick : {20., 50., 170., 280.})
 			QVERIFY(std::abs(reset[parameter.id].valueAt(tick)->toDouble()
-						- original[parameter.id].valueAt(tick)->toDouble())
-				< 1e-8);
+							 - original[parameter.id].valueAt(tick)->toDouble())
+					< 1e-8);
 		QCOMPARE(clip->notes(), QVector<svs::Note>{note});
 		QCOMPARE(journal->undoDepth(), depth + 1);
 		QTest::keyClick(&lane, Qt::Key_Z, Qt::ControlModifier);
@@ -6072,9 +6224,9 @@ private slots:
 		note.duration = 48;
 		note.lyric = "la";
 		note.phonemes = {{"symbols", QJsonArray{"l", "a"}},
-			{"segments",
-				QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", .6}},
-					QJsonObject{{"symbol", "a"}, {"startTick", .6}, {"durationTicks", 47.4}}}}};
+						 {"segments",
+						  QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", .6}},
+									 QJsonObject{{"symbol", "a"}, {"startTick", .6}, {"durationTicks", 47.4}}}}};
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
 		gui::SVSCanvas canvas(clip);
@@ -6094,9 +6246,10 @@ private slots:
 		QVERIFY(adjusted[0].toObject()["durationTicks"].toDouble() + 1e-8 >= .48);
 		canvas.close();
 		note.phonemes["symbols"] = QJsonArray{"l", "a", "a"};
-		note.phonemes["segments"] = QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", .6}},
-			QJsonObject{{"symbol", "a"}, {"startTick", .6}, {"durationTicks", .6}},
-			QJsonObject{{"symbol", "a"}, {"startTick", 1.2}, {"durationTicks", 46.8}}};
+		note.phonemes["segments"]
+			= QJsonArray{QJsonObject{{"symbol", "l"}, {"startTick", 0}, {"durationTicks", .6}},
+						 QJsonObject{{"symbol", "a"}, {"startTick", .6}, {"durationTicks", .6}},
+						 QJsonObject{{"symbol", "a"}, {"startTick", 1.2}, {"durationTicks", 46.8}}};
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
 		gui::SVSResultStrip strip(clip);
@@ -6144,9 +6297,9 @@ private slots:
 			for (const auto& note : {a, b})
 			{
 				QTest::mousePress(&canvas, Qt::LeftButton, Qt::AltModifier,
-					canvas.pointAt(note.tick, note.pitch).toPoint() + QPoint(0, 6));
+								  canvas.pointAt(note.tick, note.pitch).toPoint() + QPoint(0, 6));
 				QTest::mouseRelease(&canvas, Qt::LeftButton, Qt::AltModifier,
-					canvas.pointAt(note.tick + note.duration, note.pitch).toPoint() + QPoint(0, 6));
+									canvas.pointAt(note.tick + note.duration, note.pitch).toPoint() + QPoint(0, 6));
 				QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
 				QCOMPARE(clip->status(), QString("Ready"));
 			}
@@ -6204,9 +6357,9 @@ private slots:
 		QVERIFY(!parameter->writable);
 		svs::Curve level;
 		QString error;
-		QVERIFY2(svs::Curve::fromJson(
-					 audio->feedback["curves"].toObject()["example.level"].toObject(), level, error, parameter),
-			qPrintable(error));
+		QVERIFY2(svs::Curve::fromJson(audio->feedback["curves"].toObject()["example.level"].toObject(), level, error,
+									  parameter),
+				 qPrintable(error));
 		QVERIFY(level.evaluator.points.size() > 2);
 		bool nonzero = false;
 		for (const auto& point : level.evaluator.points)
@@ -6241,8 +6394,8 @@ private slots:
 		QTest::mouseClick(peakTab, Qt::RightButton);
 		auto capture = [&] {
 			QTest::qWait(100);
-			return editor.screen()->grabWindow(
-				0, editor.mapToGlobal(QPoint()).x(), editor.mapToGlobal(QPoint()).y(), editor.width(), editor.height());
+			return editor.screen()->grabWindow(0, editor.mapToGlobal(QPoint()).x(), editor.mapToGlobal(QPoint()).y(),
+											   editor.width(), editor.height());
 		};
 		const auto on = capture();
 		QTest::mouseClick(tab, Qt::RightButton);
@@ -6304,7 +6457,7 @@ private slots:
 				return nullptr;
 			QTest::mouseClick(tab, Qt::LeftButton);
 			return editor.findChild<gui::SVSCanvas*>("svsParameterLane." + key.mid(key.indexOf(':') + 1)
-				+ (key.startsWith("feedback:") ? ".feedback" : ".input"));
+													 + (key.startsWith("feedback:") ? ".feedback" : ".input"));
 		};
 		auto* tension = select("input:example.tension");
 		QVERIFY(tension);
@@ -6351,8 +6504,8 @@ private slots:
 		auto* tab = editor.findChild<QToolButton*>("svsParameterTab.input:example.tension");
 		QVERIFY(tab);
 		QTest::mouseClick(tab, Qt::RightButton);
-		QCOMPARE(
-			clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool(), false);
+		QCOMPARE(clip->editorState()["lanes"].toObject()["input:example.tension"].toObject()["visible"].toBool(),
+				 false);
 		QTest::mouseClick(tab, Qt::LeftButton);
 		QVERIFY(tab->isChecked());
 		QCOMPARE(clip->editorState()["selectedParameter"].toString(), QString("input:example.tension"));
@@ -6383,7 +6536,7 @@ private slots:
 						const auto actual = image.pixelColor(x, y);
 						const auto coverage
 							= ((actual.red() - background.red()) * dr + (actual.green() - background.green()) * dg
-								  + (actual.blue() - background.blue()) * db)
+							   + (actual.blue() - background.blue()) * db)
 							/ length;
 						// A one-pixel antialiased overlay may blend with the background; its RGB
 						// must still be the declared color at a common coverage in all channels.
@@ -6400,7 +6553,7 @@ private slots:
 		auto* gender = select("input:example.gender");
 		QVERIFY(gender);
 		QCOMPARE(gender->curvePointAt(10, -1).y(),
-			gender->curvePointAt(10, 1).y() + gender->height() - 30.); // 24px ruler + 6px inset
+				 gender->curvePointAt(10, 1).y() + gender->height() - 30.); // 24px ruler + 6px inset
 		track->bindVoice(voice.pluginId, "minimal");
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
 		QVERIFY(tab->isHidden());
@@ -6482,7 +6635,7 @@ private slots:
 		checkWave();
 		auto wheel = [&](QPointF point, int delta) {
 			QWheelEvent event(point, canvas->mapToGlobal(point.toPoint()), QPoint(), QPoint(0, delta), Qt::NoButton,
-				Qt::NoModifier, Qt::NoScrollPhase, false);
+							  Qt::NoModifier, Qt::NoScrollPhase, false);
 			QCoreApplication::sendEvent(canvas, &event);
 			QVERIFY(event.isAccepted());
 		};
@@ -6512,7 +6665,7 @@ private slots:
 			bars->setCurrentIndex(index);
 			QVERIFY(QMetaObject::invokeMethod(bars, "activated", Q_ARG(int, index)));
 			QVERIFY(std::abs(canvas->tickAt(canvas->width()) - canvas->scrollTick() - count * TimePos::ticksPerBar())
-				< 1e-8);
+					< 1e-8);
 			QCOMPARE(parameters->horizontalZoom(), canvas->horizontalZoom());
 			QCOMPARE(bars->currentIndex(), index);
 		}
@@ -6706,7 +6859,7 @@ private slots:
 		QTest::mouseDClick(lane, Qt::LeftButton, Qt::NoModifier, lane->curvePointAt(48, 100).toPoint());
 		QVERIFY(clip->curves()[curve.id].valueAt(48).has_value());
 		QVERIFY(std::abs(clip->curves()[curve.id].valueAt(48)->toDouble() - 100.)
-			<= std::max(1., 200. / (lane->height() - 30.)));
+				<= std::max(1., 200. / (lane->height() - 30.)));
 		clip->setEditorData({note}, original);
 		auto* journal = Engine::projectJournal();
 		const bool previous = journal->isJournalling();
@@ -6965,8 +7118,8 @@ private slots:
 		auto* config = ConfigManager::inst();
 		const auto previous = config->value("svsEngineSettings", key);
 		auto restore = qScopeGuard([&] { config->setValue("svsEngineSettings", key, previous); });
-		config->setValue(
-			"svsEngineSettings", key, QString::fromUtf8(QJsonDocument(populated).toJson(QJsonDocument::Compact)));
+		config->setValue("svsEngineSettings", key,
+						 QString::fromUtf8(QJsonDocument(populated).toJson(QJsonDocument::Compact)));
 		finished.clear();
 		elapsed.restart();
 		QTest::mouseClick(rescan, Qt::LeftButton);
@@ -6978,8 +7131,8 @@ private slots:
 			QCOMPARE(QGuiApplication::platformName(), QString("windows"));
 			QTest::qWait(100);
 			QVERIFY(page.screen()
-					->grabWindow(page.winId())
-					.save("doc/svs/validation/SVS-async-catalog-native-scanning.png"));
+						->grabWindow(page.winId())
+						.save("doc/svs/validation/SVS-async-catalog-native-scanning.png"));
 		}
 		page.close();
 		QTRY_VERIFY_WITH_TIMEOUT(!registry.scanning(id), 30000);
@@ -7008,17 +7161,17 @@ private slots:
 		auto& registry = svs::Registry::instance();
 		const QString id = "org.lmms.svs.diffsinger";
 		QString error;
-		const QJsonObject populated{
-			{"diffsinger.voicebankDirectories", QJsonArray{fixture}}, {"diffsinger.renderSteps", 5}};
+		const QJsonObject populated{{"diffsinger.voicebankDirectories", QJsonArray{fixture}},
+									{"diffsinger.renderSteps", 5}};
 		QVERIFY2(registry.refreshCatalog(id, populated, error), qPrintable(error));
 		svs::Voice voice;
 		for (const auto& item : registry.voices())
 			if (item.pluginId == id && item.name == QString::fromUtf8("芙宁娜"))
 				voice = item;
 		QVERIFY(!voice.id.isEmpty());
-		QVERIFY2(registry.refreshCatalog(
-					 id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}}, error),
-			qPrintable(error));
+		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}},
+										 error),
+				 qPrintable(error));
 		registry.refreshCatalogAsync(id, populated);
 		QVERIFY(registry.scanning(id));
 		auto* track = new SVSTrack(Engine::getSong());
@@ -7058,9 +7211,9 @@ private slots:
 		const QString id = "org.lmms.svs.diffsinger";
 		QString error;
 		QVERIFY2(registry.plugin(id), qPrintable(registry.diagnostics().join('\n')));
-		QVERIFY2(registry.refreshCatalog(
-					 id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}}, error),
-			qPrintable(error));
+		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}},
+										 error),
+				 qPrintable(error));
 		gui::PluginBrowser browser(nullptr);
 		auto* tree = browser.findChild<QTreeWidget*>();
 		QVERIFY(tree);
@@ -7080,7 +7233,7 @@ private slots:
 		const auto fixture = qEnvironmentVariable("SVS_DIFFSINGER_FIXTURE_ROOT");
 		QVERIFY2(!fixture.isEmpty(), "Explicit DiffSinger voicebank fixture required");
 		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{fixture}}}, error),
-			qPrintable(error));
+				 qPrintable(error));
 		QVERIFY(group());
 		QCOMPARE(group()->text(0), QString("DiffSinger"));
 		QCOMPARE(group()->childCount(), 6);
@@ -7132,7 +7285,7 @@ private slots:
 		QTRY_COMPARE_WITH_TIMEOUT(body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")
 									  ->findChildren<QLineEdit*>("svsDirectoryPath")
 									  .size(),
-			2, 10000);
+								  2, 10000);
 		auto* path = body->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")
 						 ->findChildren<QLineEdit*>("svsDirectoryPath")
 						 .last();
@@ -7144,7 +7297,7 @@ private slots:
 		QCOMPARE(QJsonDocument::fromJson(config->value("svsEngineSettings", key).toUtf8())
 					 .object()["diffsinger.vocoderDirectories"]
 					 .toArray(),
-			QJsonArray({defaultRoot, m_configuration.path()}));
+				 QJsonArray({defaultRoot, m_configuration.path()}));
 		page.close();
 		gui::SVSSettingsPage reopened;
 		reopened.resize(1100, 800);
@@ -7152,24 +7305,24 @@ private slots:
 		QVERIFY(QTest::qWaitForWindowExposed(&reopened));
 		auto* reopenedBody = reopened.findChild<QWidget*>("svsEnginePage." + id);
 		reopened.findChild<QTabWidget*>("svsEngineTabs")->setCurrentWidget(reopenedBody);
-		QTRY_VERIFY_WITH_TIMEOUT(
-			reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories"), 10000);
+		QTRY_VERIFY_WITH_TIMEOUT(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories"),
+								 10000);
 		QTRY_VERIFY_WITH_TIMEOUT(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")
 									 ->findChild<QLineEdit*>("svsDirectoryPath"),
-			10000);
+								 10000);
 		QCOMPARE(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")
 					 ->findChildren<QLineEdit*>("svsDirectoryPath")
 					 .size(),
-			2);
+				 2);
 		QCOMPARE(reopenedBody->findChild<QWidget*>("svsParameter.track.diffsinger.vocoderDirectories")
 					 ->findChildren<QLineEdit*>("svsDirectoryPath")
 					 .last()
 					 ->text(),
-			m_configuration.path());
+				 m_configuration.path());
 		QTest::qWait(500);
 		QVERIFY(reopened.screen()
-				->grabWindow(reopened.winId())
-				.save("doc/svs/validation/DiffSinger-global-vocoder-native-settings.png"));
+					->grabWindow(reopened.winId())
+					.save("doc/svs/validation/DiffSinger-global-vocoder-native-settings.png"));
 		reopened.close();
 	}
 	void diffSingerCatalogSettingsAndResources()
@@ -7184,9 +7337,9 @@ private slots:
 		QVERIFY2(plugin, "Native DiffSinger engine must be deployed");
 		QVERIFY(plugin->hasCatalogQuery());
 		QString error;
-		QVERIFY2(registry.refreshCatalog(
-					 id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}}, error),
-			qPrintable(error));
+		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}},
+										 error),
+				 qPrintable(error));
 		int count = 0;
 		for (const auto& voice : registry.voices())
 			if (voice.pluginId == id)
@@ -7240,7 +7393,7 @@ private slots:
 		config->loadConfigFile(m_configuration.filePath("svs-test-config.xml"));
 		QCOMPARE(config->value("svsEngineSettings", key), saved);
 		QCOMPARE(QJsonDocument::fromJson(saved.toUtf8()).object()["diffsinger.voicebankDirectories"].toArray(),
-			QJsonArray{root});
+				 QJsonArray{root});
 		gui::SVSImageLoader loader;
 		loader.request(selected.package, selected.avatar, {120, 120});
 		QTRY_VERIFY_WITH_TIMEOUT(!loader.image().isNull(), 10000);
@@ -7267,15 +7420,15 @@ private slots:
 		}
 		const auto notes = clip->notes();
 		QSignalSpy changes(&registry, &svs::Registry::catalogChanged);
-		QVERIFY2(registry.refreshCatalog(
-					 id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}}, error),
-			qPrintable(error));
+		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{m_configuration.path()}}},
+										 error),
+				 qPrintable(error));
 		QVERIFY(!changes.isEmpty());
 		QCOMPARE(track->voiceId(), selected.id);
 		QCOMPARE(clip->notes()[0].lyric, notes[0].lyric);
 		QCOMPARE(clip->notes()[0].parameters, notes[0].parameters);
 		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{root}}}, error),
-			qPrintable(error));
+				 qPrintable(error));
 		QCOMPARE(track->voiceId(), selected.id);
 		QCOMPARE(track->voice().version, selected.version);
 		page.close();
@@ -7301,7 +7454,7 @@ private slots:
 					 .object()["diffsinger.voicebankDirectories"]
 					 .toArray()
 					 .size(),
-			0);
+				 0);
 		reopened.close();
 	}
 	void diffSingerPronunciationAndSpeakerPersistence()
@@ -7313,7 +7466,7 @@ private slots:
 		const QString id = "org.lmms.svs.diffsinger";
 		QString error;
 		QVERIFY2(registry.refreshCatalog(id, {{"diffsinger.voicebankDirectories", QJsonArray{root}}}, error),
-			qPrintable(error));
+				 qPrintable(error));
 		svs::Voice voice;
 		for (const auto& candidate : registry.voices())
 			if (candidate.pluginId == id && candidate.name == QString::fromUtf8("芙宁娜"))
@@ -7348,8 +7501,8 @@ private slots:
 		note.pronunciation = "ni3";
 		note.parameters = {{"future", 7}};
 		note.phonemes = {{"segments",
-			QJsonArray{QJsonObject{{"symbol", "zh/n"}, {"startTick", -9.6}, {"durationTicks", 9.6}},
-				QJsonObject{{"symbol", "zh/i"}, {"startTick", 0}, {"durationTicks", 48}}}}};
+						  QJsonArray{QJsonObject{{"symbol", "zh/n"}, {"startTick", -9.6}, {"durationTicks", 9.6}},
+									 QJsonObject{{"symbol", "zh/i"}, {"startTick", 0}, {"durationTicks", 48}}}}};
 		clip->setNotes({note});
 		QDomDocument saved;
 		auto state = saved.createElement("test");
@@ -7369,7 +7522,7 @@ private slots:
 			panel.setWindowFlag(Qt::Tool);
 		}
 		panel.refresh(cap.parameters, "track", {track->parameters()}, {},
-			[&](const QString& key, const QJsonValue& value) { track->setParameter(key, value); });
+					  [&](const QString& key, const QJsonValue& value) { track->setParameter(key, value); });
 		panel.resize(350, 200);
 		panel.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&panel));
@@ -7395,9 +7548,10 @@ private slots:
 		const auto previous = config->value("svsEngineSettings", key);
 		auto restore = qScopeGuard([&] { config->setValue("svsEngineSettings", key, previous); });
 		const QJsonObject settings{{"diffsinger.voicebankDirectories", QJsonArray{root}},
-			{"diffsinger.vocoderDirectories", QJsonArray{vocoders}}, {"diffsinger.renderSteps", 5}};
-		config->setValue(
-			"svsEngineSettings", key, QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
+								   {"diffsinger.vocoderDirectories", QJsonArray{vocoders}},
+								   {"diffsinger.renderSteps", 5}};
+		config->setValue("svsEngineSettings", key,
+						 QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
 		auto& registry = svs::Registry::instance();
 		QString error;
 		QVERIFY2(registry.refreshCatalog(id, settings, error), qPrintable(error));
@@ -7452,7 +7606,10 @@ private slots:
 			bool connected = false;
 			for (const auto& curve : curves)
 			{
-				if (curve.valueAt(95) && curve.valueAt(97)) { connected = true; }
+				if (curve.valueAt(95) && curve.valueAt(97))
+				{
+					connected = true;
+				}
 			}
 			QVERIFY2(connected, "Real predicted pitch must remain continuous across adjacent la notes");
 		}
@@ -7469,9 +7626,9 @@ private slots:
 			canvas->setZoom(4, 1);
 			QTest::qWait(700);
 			QVERIFY(editor.screen()
-					->grabWindow(editor.winId())
-					.save(continuityTest ? "doc/svs/validation/DiffSinger-continuous-pitch-native.png"
-										 : "doc/svs/validation/DiffSinger-deepseek-native-ready.png"));
+						->grabWindow(editor.winId())
+						.save(continuityTest ? "doc/svs/validation/DiffSinger-continuous-pitch-native.png"
+											 : "doc/svs/validation/DiffSinger-deepseek-native-ready.png"));
 			editor.close();
 		}
 	}
@@ -7485,7 +7642,7 @@ private slots:
 		QString error;
 		QVERIFY2(registry.refreshCatalog(
 					 id, {{"diffsinger.voicebankDirectories", QJsonArray{root}}, {"diffsinger.renderSteps", 5}}, error),
-			qPrintable(error));
+				 qPrintable(error));
 		svs::Voice voice;
 		for (const auto& candidate : registry.voices())
 			if (candidate.pluginId == id && candidate.name == QString::fromUtf8("芙宁娜"))
@@ -7575,16 +7732,16 @@ private slots:
 				QCOMPARE(clip->audio(), audio);
 				QTest::qWait(700);
 				QVERIFY(editor.screen()
-						->grabWindow(editor.winId())
-						.save("doc/svs/validation/A3-native-reference-" + name + ".png"));
+							->grabWindow(editor.winId())
+							.save("doc/svs/validation/A3-native-reference-" + name + ".png"));
 				editor.close();
 			}
 		}
 		QTemporaryDir directory;
 		QVERIFY(directory.isValid());
 		const auto path = directory.filePath("diffsinger.wav");
-		const OutputSettings settings(
-			48000, 192, OutputSettings::BitDepth::Depth32Bit, OutputSettings::StereoMode::Stereo);
+		const OutputSettings settings(48000, 192, OutputSettings::BitDepth::Depth32Bit,
+									  OutputSettings::StereoMode::Stereo);
 		{
 			RenderManager manager(settings, ProjectRenderer::ExportFileFormat::Wave, path);
 			QSignalSpy done(&manager, &RenderManager::finished);
@@ -7629,12 +7786,13 @@ private slots:
 		QVERIFY2(svs::Curve::fromJson(curve.toJson(), parsed, error), qPrintable(error));
 		svs::Input input;
 		input.secondsPerTick = .01;
-		input.document = {{"secondsPerTick", .01},
-			{"capabilities",
+		input.document
+			= {{"secondsPerTick", .01},
+			   {"capabilities",
 				QJsonObject{{"synthesis",
-					QJsonObject{
-						{"segmented", QJsonObject{{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}}}}}}},
-			{"curves", svs::curvesToJson({{curve.id, curve}})}};
+							 QJsonObject{{"segmented",
+										  QJsonObject{{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}}}}}}},
+			   {"curves", svs::curvesToJson({{curve.id, curve}})}};
 		svs::Note note;
 		note.id = "edited-curve";
 		note.duration = 192;
@@ -7644,10 +7802,11 @@ private slots:
 		const auto segments = svs::planSynthesisSegments(input, mapping, error);
 		QVERIFY2(error.isEmpty(), qPrintable(error));
 		QCOMPARE(segments.size(), 1);
-		const auto json = QJsonDocument::fromJson(
-			QJsonDocument(segments[0].input.document["curves"].toObject()).toJson(QJsonDocument::Compact))
-							  .object()[curve.id]
-							  .toObject();
+		const auto json
+			= QJsonDocument::fromJson(
+				  QJsonDocument(segments[0].input.document["curves"].toObject()).toJson(QJsonDocument::Compact))
+				  .object()[curve.id]
+				  .toObject();
 		QVERIFY2(svs::Curve::fromJson(json, parsed, error), qPrintable(error));
 		QCOMPARE(parsed.evaluator.points.size(), curve.evaluator.points.size());
 		for (size_t index = 0; index < curve.evaluator.points.size(); ++index)
@@ -7664,11 +7823,14 @@ private slots:
 		input.rate = 48000;
 		input.secondsPerTick = .01;
 		input.revision = 2;
-		input.document = {{"position", 192}, {"contentOffset", 12}, {"secondsPerTick", .01},
+		input.document = {
+			{"position", 192},
+			{"contentOffset", 12},
+			{"secondsPerTick", .01},
 			{"capabilities",
-				QJsonObject{{"synthesis",
-					QJsonObject{
-						{"segmented", QJsonObject{{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}}}}}}}};
+			 QJsonObject{{"synthesis",
+						  QJsonObject{{"segmented",
+									   QJsonObject{{"split", "rests"}, {"version", 1}, {"paddingSeconds", .65}}}}}}}};
 		svs::Note note;
 		note.id = "first";
 		note.duration = 48;
@@ -7753,10 +7915,10 @@ private slots:
 		const auto previousSettings = config->value("svsEngineSettings", settingsKey);
 		auto restoreSettings
 			= qScopeGuard([&] { config->setValue("svsEngineSettings", settingsKey, previousSettings); });
-		const QJsonObject settings{
-			{"diffsinger.voicebankDirectories", QJsonArray{root}}, {"diffsinger.renderSteps", 5}};
+		const QJsonObject settings{{"diffsinger.voicebankDirectories", QJsonArray{root}},
+								   {"diffsinger.renderSteps", 5}};
 		config->setValue("svsEngineSettings", settingsKey,
-			QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
+						 QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
 		QString error;
 		auto& registry = svs::Registry::instance();
 		QVERIFY2(registry.refreshCatalog(id, settings, error), qPrintable(error));
@@ -7800,7 +7962,7 @@ private slots:
 							   stable.tick + stable.duration, original->startTick, original->rate)));
 				QVERIFY(to * 2 <= audio->samples.size());
 				QVERIFY(std::equal(original->samples.begin() + from * 2, original->samples.begin() + to * 2,
-					audio->samples.begin() + from * 2));
+								   audio->samples.begin() + from * 2));
 			}
 		};
 		svs::Cache::instance().clearMemory();
@@ -7817,9 +7979,9 @@ private slots:
 			QTRY_VERIFY_WITH_TIMEOUT(clip->status().contains("1/3"), 10000);
 			QTest::qWait(100);
 			QVERIFY(m_guiApplication->mainWindow()
-					->screen()
-					->grabWindow(m_guiApplication->mainWindow()->winId())
-					.save("doc/svs/validation/SVS-segments-native-progress.png"));
+						->screen()
+						->grabWindow(m_guiApplication->mainWindow()->winId())
+						.save("doc/svs/validation/SVS-segments-native-progress.png"));
 		}
 		QTRY_VERIFY_WITH_TIMEOUT(clip->status() == "Ready", 180000);
 		compareRetained(clip->audio());
@@ -7874,8 +8036,8 @@ private slots:
 		const auto frozenAudio = clip->audio();
 		auto regions = svs::ExportSnapshot::capture(*Engine::getSong(), frozenAudio->rate);
 		regions.erase(std::remove_if(regions.begin(), regions.end(),
-						  [track](const auto& region) { return region.track != track; }),
-			regions.end());
+									 [track](const auto& region) { return region.track != track; }),
+					  regions.end());
 		svs::ExportSnapshot frozen(regions);
 		frozen.prepare();
 		note.pitch = 63;
@@ -7921,10 +8083,11 @@ private slots:
 			config->setValue("svs", "showVoicePitchRanges", oldRanges);
 			config->setValue("svs", "showBackgroundWaveform", oldWave);
 		});
-		QJsonObject settings{{"diffsinger.voicebankDirectories", QJsonArray{root}}, {"diffsinger.renderSteps", 5},
-			{"diffsinger.showPhonemeLanguagePrefix", true}};
-		config->setValue(
-			"svsEngineSettings", key, QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
+		QJsonObject settings{{"diffsinger.voicebankDirectories", QJsonArray{root}},
+							 {"diffsinger.renderSteps", 5},
+							 {"diffsinger.showPhonemeLanguagePrefix", true}};
+		config->setValue("svsEngineSettings", key,
+						 QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
 		config->setValue("svs", "showVoicePitchRanges", "1");
 		config->setValue("svs", "showBackgroundWaveform", "0");
 		QString error;
@@ -8016,9 +8179,9 @@ private slots:
 		editor.raise();
 		editor.activateWindow();
 		QTRY_VERIFY_WITH_TIMEOUT(!QJsonDocument::fromJson(config->value("svsEngineSettings", key).toUtf8())
-									 .object()["diffsinger.showPhonemeLanguagePrefix"]
-									 .toBool(),
-			5000);
+									  .object()["diffsinger.showPhonemeLanguagePrefix"]
+									  .toBool(),
+								 5000);
 		const auto off = capture();
 		QVERIFY(off.save("doc/svs/validation/A4-native-ranges-pinyin-prefix-off.png"));
 		QVERIFY(on.toImage().copy(stripRect) != off.toImage().copy(stripRect));
@@ -8041,7 +8204,7 @@ private slots:
 		const auto hidden = capture();
 		QVERIFY(hidden.save("doc/svs/validation/A4-native-ranges-hidden.png"));
 		QVERIFY(on.toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), QSize(60, canvas->height())))
-			!= hidden.toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), QSize(60, canvas->height()))));
+				!= hidden.toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), QSize(60, canvas->height()))));
 		QCOMPARE(clip->audio(), audio);
 		auto* background = reopened.findChild<QCheckBox*>("svsShowBackgroundWaveform");
 		QVERIFY(background);
@@ -8061,10 +8224,10 @@ private slots:
 		QTest::qWait(500);
 		QVERIFY(clipView->grab().toImage() != plainClip);
 		QVERIFY(mainWindow->screen()
-				->grabWindow(mainWindow->winId())
-				.save("doc/svs/validation/A4-native-background-waveform.png"));
+					->grabWindow(mainWindow->winId())
+					.save("doc/svs/validation/A4-native-background-waveform.png"));
 		QVERIFY(capture().toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), canvas->size()))
-			== hidden.toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), canvas->size())));
+				== hidden.toImage().copy(QRect(canvas->mapTo(&editor, QPoint()), canvas->size())));
 		QCOMPARE(clip->audio(), audio);
 		QCOMPARE(svs::Cache::key(clip->captureInput(48000), "presentation"), cacheKey);
 		gui::SVSSettingsPage waveReopened;
@@ -8082,9 +8245,9 @@ private slots:
 		QVERIFY(document.setContent(saved.readAll()));
 		QCOMPARE(document.elementsByTagName("svs").at(0).toElement().attribute("showVoicePitchRanges"), QString("0"));
 		QVERIFY(!QJsonDocument::fromJson(
-			document.elementsByTagName("svsEngineSettings").at(0).toElement().attribute(key).toUtf8())
-				.object()["diffsinger.showPhonemeLanguagePrefix"]
-				.toBool(true));
+					 document.elementsByTagName("svsEngineSettings").at(0).toElement().attribute(key).toUtf8())
+					 .object()["diffsinger.showPhonemeLanguagePrefix"]
+					 .toBool(true));
 		config->setValue("svs", "showVoicePitchRanges", "1");
 		track->bindVoice(missing.pluginId, missing.id);
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
@@ -8107,12 +8270,12 @@ private slots:
 		const auto previous = config->value("svsEngineSettings", key);
 		auto restore = qScopeGuard([&] { config->setValue("svsEngineSettings", key, previous); });
 		const QJsonObject settings{{"diffsinger.voicebankDirectories",
-									   QJsonArray {
-										   root
-									   }},
-			{"diffsinger.renderSteps", 5}};
-		config->setValue(
-			"svsEngineSettings", key, QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
+									QJsonArray {
+										root
+									}},
+								   {"diffsinger.renderSteps", 5}};
+		config->setValue("svsEngineSettings", key,
+						 QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
 		QString error;
 		QVERIFY2(svs::Registry::instance().refreshCatalog(id, settings, error), qPrintable(error));
 		svs::Voice voice;
@@ -8148,7 +8311,7 @@ private slots:
 		QProcess process;
 		process.setProcessChannelMode(QProcess::MergedChannels);
 		connect(&process, &QProcess::readyReadStandardOutput, this,
-			[&] { qInfo().noquote() << process.readAllStandardOutput(); });
+				[&] { qInfo().noquote() << process.readAllStandardOutput(); });
 		process.start(executable, {"--config", m_configuration.filePath("svs-test-config.xml"), project});
 		QVERIFY(process.waitForStarted(5000));
 		auto stop = qScopeGuard([&] {
@@ -8259,8 +8422,8 @@ private slots:
 		QTest::qWait(2000);
 		QCOMPARE(process.state(), QProcess::Running);
 		QVERIFY(QGuiApplication::primaryScreen()
-				->grabWindow(WId(window.handle))
-				.save("doc/svs/validation/A4-native-empty-release.png"));
+					->grabWindow(WId(window.handle))
+					.save("doc/svs/validation/A4-native-empty-release.png"));
 		PostMessageW(window.handle, WM_CLOSE, 0, 0);
 		QTRY_COMPARE_WITH_TIMEOUT(process.state(), QProcess::NotRunning, 10000);
 		QCOMPARE(process.exitStatus(), QProcess::NormalExit);
@@ -8286,7 +8449,7 @@ private slots:
 		audio->waveform.build(audio->samples);
 		const auto key = svs::Cache::key(input, "native-version");
 		QCOMPARE(cache.engineDirectory(input.document["pluginId"].toString()),
-			QDir(directory.path()).filePath("DiffSinger"));
+				 QDir(directory.path()).filePath("DiffSinger"));
 		input.document["cacheDirectory"] = "other-machine/cache/SVS/DiffSinger";
 		QCOMPARE(svs::Cache::key(input, "native-version"), key);
 		cache.put(key, input, audio);
@@ -8299,8 +8462,8 @@ private slots:
 		const auto sha = info["audioSHA256"].toString();
 		QFile wave(QDir(cache.engineDirectory(input.document["pluginId"].toString())).filePath(sha + ".wav"));
 		QVERIFY(wave.open(QIODevice::ReadOnly));
-		QCOMPARE(
-			QString::fromLatin1(QCryptographicHash::hash(wave.readAll(), QCryptographicHash::Sha256).toHex()), sha);
+		QCOMPARE(QString::fromLatin1(QCryptographicHash::hash(wave.readAll(), QCryptographicHash::Sha256).toHex()),
+				 sha);
 		wave.close();
 		QVERIFY(!QFileInfo::exists(directory.filePath(key + ".wav")));
 		// A previous-version combined cache remains readable without migration.
@@ -8354,7 +8517,7 @@ private slots:
 		QVERIFY(soft);
 		QCOMPARE(soft->checkState(), Qt::PartiallyChecked);
 		panel.refresh(cap.parameters, "note",
-			{QJsonObject{{"example.label", "one"}}, QJsonObject{{"example.label", "two"}}}, {}, setter);
+					  {QJsonObject{{"example.label", "one"}}, QJsonObject{{"example.label", "two"}}}, {}, setter);
 		QCOMPARE(label->placeholderText(), QString("Mixed"));
 		panel.show();
 		panel.activateWindow();
@@ -8382,8 +8545,8 @@ private slots:
 		QString error;
 		svs::Capabilities full, minimal;
 		QVERIFY2(svs::Capabilities::parse(plugin->capabilities("full", {}, error), full, error), qPrintable(error));
-		QVERIFY2(
-			svs::Capabilities::parse(plugin->capabilities("minimal", {}, error), minimal, error), qPrintable(error));
+		QVERIFY2(svs::Capabilities::parse(plugin->capabilities("minimal", {}, error), minimal, error),
+				 qPrintable(error));
 		QCOMPARE(full.parameter("example.tension", "clip")->color, QString("#AFD867"));
 		auto colored = full.original;
 		auto colorParameters = colored["parameters"].toArray();
@@ -8419,8 +8582,12 @@ private slots:
 		QVERIFY(!svs::Capabilities::parse(schema, invalid, error));
 		auto resources = full.original;
 		auto resourceParameters = resources["parameters"].toArray();
-		resourceParameters.append(QJsonObject{{"id", "test.resource"}, {"name", "Resource"}, {"scope", "clip"},
-			{"type", "string"}, {"default", "first"}, {"resourceIds", QJsonArray{"first", "second"}}});
+		resourceParameters.append(QJsonObject{{"id", "test.resource"},
+											  {"name", "Resource"},
+											  {"scope", "clip"},
+											  {"type", "string"},
+											  {"default", "first"},
+											  {"resourceIds", QJsonArray{"first", "second"}}});
 		resources["parameters"] = resourceParameters;
 		svs::Capabilities constrained;
 		QVERIFY(svs::Capabilities::parse(resources, constrained, error));
@@ -8434,8 +8601,8 @@ private slots:
 		QVERIFY(selector);
 		QCOMPARE(selector->itemData(1).toString(), QString("second"));
 		QCOMPARE(svs::selectedValue({QJsonObject{}, QJsonObject{}}, "x").state, svs::ValueState::Unset);
-		QCOMPARE(
-			svs::selectedValue({QJsonObject{{"x", 1}}, QJsonObject{{"x", 1}}}, "x").state, svs::ValueState::Common);
+		QCOMPARE(svs::selectedValue({QJsonObject{{"x", 1}}, QJsonObject{{"x", 1}}}, "x").state,
+				 svs::ValueState::Common);
 		QCOMPARE(svs::selectedValue({QJsonObject{{"x", 1}}, QJsonObject{}}, "x").state, svs::ValueState::Mixed);
 		QFile dictionaryFile(voices[0].package + "/zh.json");
 		QVERIFY(dictionaryFile.open(QIODevice::ReadOnly));

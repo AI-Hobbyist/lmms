@@ -1,11 +1,13 @@
 #include "Synthesis.h"
+
+#include <cmath>
+#include <numeric>
+#include <random>
+#include <set>
+
 #include "Speaker.h"
 #include "WordTiming.h"
 #include "svs_curve.hpp"
-#include <cmath>
-#include <numeric>
-#include <set>
-#include <random>
 namespace diffsinger {
 namespace {
 Tensor floats(const std::vector<float>& values)
@@ -115,7 +117,7 @@ private:
 	std::map<std::string, svs_sdk::Curve> m_curves;
 };
 void speaker(CpuModel& model, Tensors& in, const VoicePackage& voice, const StageConfig& stage, const Json& params,
-	int64_t frames)
+			 int64_t frames)
 {
 	if (!model.accepts("spk_embed"))
 	{
@@ -131,16 +133,16 @@ void speaker(CpuModel& model, Tensors& in, const VoicePackage& voice, const Stag
 	in["spk_embed"]
 		= Tensor::make<float>(ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, {1, frames, int64_t(embedding.size())}, values);
 }
-Json feedbackCurve(
-	const std::string& id, const std::string& unit, const std::vector<float>& values, const std::vector<double>& ticks)
+Json feedbackCurve(const std::string& id, const std::string& unit, const std::vector<float>& values,
+				   const std::vector<double>& ticks)
 {
 	Json points = Json::array();
 	for (size_t f = 0; f < values.size(); ++f)
 	{
 		points.push_back({{"tick", ticks[f]}, {"value", values[f]}});
 	}
-	return {{"id", id}, {"scope", "clip"}, {"type", "float"}, {"unit", unit}, {"mode", "absolute"},
-		{"interpolation", "linear"}, {"points", points}};
+	return {{"id", id},			  {"scope", "clip"},		   {"type", "float"}, {"unit", unit},
+			{"mode", "absolute"}, {"interpolation", "linear"}, {"points", points}};
 }
 } // namespace
 Synthesis::Synthesis(Ort::Env& environment, std::shared_ptr<const VoicePackage> voice)
@@ -156,20 +158,32 @@ CpuModel& Synthesis::model(const std::string& stage, const std::string& role)
 	auto& result = m_models[key];
 	if (!result)
 	{
-		result = std::make_unique<CpuModel>(
-			m_environment, m_voice->stages.at(stage).models.at(role), key, stage == "pitch" ? m_pitchSeed : m_seed);
+		result = std::make_unique<CpuModel>(m_environment, m_voice->stages.at(stage).models.at(role), key,
+											stage == "pitch" ? m_pitchSeed : m_seed,
+											voiceComputePolicy(*m_voice, m_computePolicy));
 	}
 	return *result;
 }
 void Synthesis::declareParameters(const VoicePackage& voice, Json& schema)
 {
-	schema["pitch"] = {{"input", "absolute"}, {"feedback", true}, {"unit", "semitone"},
-		{"prediction", voice.stages.count("pitch") != 0}};
+	schema["pitch"] = {{"input", "absolute"},
+					   {"feedback", true},
+					   {"unit", "semitone"},
+					   {"prediction", voice.stages.count("pitch") != 0}};
 	auto parameter = [&](const std::string& id, const std::string& name, const std::string& unit, double minimum,
 						 double maximum, double value, bool feedback) {
-		Json p{{"id", id}, {"name", name}, {"group", "DiffSinger"}, {"scope", "clip"}, {"type", "float"},
-			{"unit", unit}, {"min", minimum}, {"max", maximum}, {"default", value}, {"curve", true},
-			{"interpolation", "linear"}, {"mode", "absolute"}};
+		Json p{{"id", id},
+			   {"name", name},
+			   {"group", "DiffSinger"},
+			   {"scope", "clip"},
+			   {"type", "float"},
+			   {"unit", unit},
+			   {"min", minimum},
+			   {"max", maximum},
+			   {"default", value},
+			   {"curve", true},
+			   {"interpolation", "linear"},
+			   {"mode", "absolute"}};
 		const bool offset = id.find(".offset") != std::string::npos;
 		p["color"] = id.find("energy") != std::string::npos ? (offset ? "#F5A3C5" : "#E573A5")
 			: id.find("breathiness") != std::string::npos	? (offset ? "#A3F5DB" : "#73E5C2")
@@ -203,9 +217,9 @@ void Synthesis::declareParameters(const VoicePackage& voice, Json& schema)
 			const bool predicted
 				= voice.stages.count("variance") && voice.stages.at("variance").values.value("predict_" + name, false);
 			parameter("diffsinger." + name, name + " (absolute)", name == "tension" ? "ratio" : "dB",
-				name == "tension" ? -10 : -96, name == "tension" ? 10 : 0, 0, predicted);
+					  name == "tension" ? -10 : -96, name == "tension" ? 10 : 0, 0, predicted);
 			parameter("diffsinger." + name + ".offset", name + " offset", name == "tension" ? "ratio" : "dB",
-				name == "tension" ? -5 : -12, name == "tension" ? 5 : 12, 0, false);
+					  name == "tension" ? -5 : -12, name == "tension" ? 5 : 12, 0, false);
 		}
 	}
 	if (config.value("use_key_shift_embed", false))
@@ -222,7 +236,8 @@ void Synthesis::declareParameters(const VoicePackage& voice, Json& schema)
 	}
 }
 SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<NoteInput>& notes, const Json& input,
-	const svs_sdk::TempoMap& tempo, double origin, uint32_t rate, const std::atomic<bool>& cancelled)
+								  const svs_sdk::TempoMap& tempo, double origin, uint32_t rate,
+								  const std::atomic<bool>& cancelled)
 {
 	if (cancelled.load())
 	{
@@ -233,6 +248,17 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		throw std::runtime_error("Invalid output sample rate");
 	}
 	SynthesisResult result;
+	const auto policy = input.value("computePolicy", Json::object());
+	if (policy != m_computePolicy)
+	{
+		m_models.clear();
+		m_computePolicy = policy;
+	}
+	for (const auto& model : m_models)
+	{
+		model.second->beginRequest();
+	}
+	result.feedback["computeStages"] = Json::array();
 	if (plan.phones.empty())
 	{
 		return result;
@@ -325,6 +351,10 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 			if (offset + chunk.stereo.size() > result.stereo.size())
 				result.stereo.resize(offset + chunk.stereo.size(), 0);
 			std::copy(chunk.stereo.begin(), chunk.stereo.end(), result.stereo.begin() + offset);
+			for (const auto& execution : chunk.feedback.at("computeStages"))
+			{
+				result.feedback["computeStages"].push_back(execution);
+			}
 			for (const auto& sample : chunk.feedback.at("pitch"))
 				result.feedback["pitch"].push_back(sample);
 			for (auto it = chunk.feedback.at("curves").begin(); it != chunk.feedback.at("curves").end(); ++it)
@@ -367,7 +397,7 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		spans.push_back(phone);
 	}
 	spans.push_back({"SP", phones.back().language, "", phones.back().end, start + frames * frameSeconds,
-		phones.back().pitch, false});
+					 phones.back().pitch, false});
 	std::vector<int64_t> durations;
 	int64_t previous = 0;
 	for (const auto& span : spans)
@@ -386,14 +416,20 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	const Curves curves(input);
 	const auto parameters = input.value("trackParameters", Json::object());
 	const int steps = input.value("engineSettings", Json::object()).value("diffsinger.renderSteps", 20);
-	if (steps < 1 || steps > 100) { throw std::runtime_error("Invalid rendering steps"); }
+	if (steps < 1 || steps > 100)
+	{
+		throw std::runtime_error("Invalid rendering steps");
+	}
 	const auto seedValue = input.value("seed", Json(m_defaultSeed));
 	if (!seedValue.is_number_unsigned() && !seedValue.is_number_integer())
 	{
 		throw std::runtime_error("Seed must be an integer");
 	}
 	const auto seed = seedValue.get<int64_t>();
-	if (seed < 0 || seed > UINT32_MAX) { throw std::runtime_error("Seed exceeds uint32 range"); }
+	if (seed < 0 || seed > UINT32_MAX)
+	{
+		throw std::runtime_error("Seed exceeds uint32 range");
+	}
 	if (m_seed != uint32_t(seed))
 	{
 		m_models.clear();
@@ -408,9 +444,15 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	int newestTake = -1;
 	for (const auto& request : pitchRequests)
 	{
-		if (!request.is_object() || !request.contains("seed")) { continue; }
+		if (!request.is_object() || !request.contains("seed"))
+		{
+			continue;
+		}
 		const auto take = request.value("take", 0);
-		if (take <= newestTake) { continue; }
+		if (take <= newestTake)
+		{
+			continue;
+		}
 		const auto requestedSeed = request.at("seed").get<double>();
 		if (!std::isfinite(requestedSeed) || requestedSeed < 0 || requestedSeed > UINT32_MAX
 			|| std::floor(requestedSeed) != requestedSeed)
@@ -424,7 +466,10 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	{
 		for (auto it = m_models.begin(); it != m_models.end();)
 		{
-			if (it->first.rfind("pitch/", 0) == 0) { it = m_models.erase(it); }
+			if (it->first.rfind("pitch/", 0) == 0)
+			{
+				it = m_models.erase(it);
+			}
 			else
 			{
 				++it;
@@ -439,18 +484,36 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 			? "/repredict=" + input.at("pitchPredictionRequests").dump()
 			: std::string{};
 		const auto stageSeed = stage == "pitch" ? m_pitchSeed : m_seed;
-		const auto key
-			= TensorCache::key("CPU/svs-compute-1/ORT1.23.0/DML1.15.4/native.v3/seed=" + std::to_string(stageSeed)
-					+ "/pinyin621f8ca9/" + m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
-				inputs);
+		const auto identity = [&] {
+			return target.computeIdentity() + "/seed=" + std::to_string(stageSeed) + "/pinyin621f8ca9/"
+				+ m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest;
+		};
+		const auto key = TensorCache::key(identity(), inputs);
 		Tensors out;
-		if (cancelled.load()) { throw std::runtime_error("Cancelled"); }
-		if (!cache.load(key, out))
+		if (cancelled.load())
+		{
+			throw std::runtime_error("Cancelled");
+		}
+		const bool cached = cache.load(key, out);
+		if (!cached)
 		{
 			out = target.run(inputs, cancelled);
-			cache.save(key, out);
+			cache.save(TensorCache::key(identity(), inputs), out);
 		}
-		if (cancelled.load()) { throw std::runtime_error("Cancelled"); }
+		auto execution = target.execution();
+		execution["cacheHit"] = cached;
+		if (cached)
+		{
+			execution.erase("providerEvidence");
+			execution.erase("runMilliseconds");
+			execution.erase("resources");
+			execution.erase("workerEpoch");
+		}
+		result.feedback["computeStages"].push_back(execution);
+		if (cancelled.load())
+		{
+			throw std::runtime_error("Cancelled");
+		}
 		return out;
 	};
 	auto tokens = [&](const std::string& stage) {
@@ -531,10 +594,12 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	{
 		const auto encoded = linguistic("pitch");
 		auto& target = model("pitch", "pitch");
-		Tensors in{{"encoder_out", encoded.at("encoder_out")}, {"ph_dur", longs(durations)},
-			{"note_midi", floats(noteMidi)}, {"note_dur", longs(noteDuration)},
-			{"pitch", floats(std::vector<float>(size_t(frames), 60.f))},
-			{"retake", booleans(std::vector<uint8_t>(size_t(frames), 1), {1, frames})}};
+		Tensors in{{"encoder_out", encoded.at("encoder_out")},
+				   {"ph_dur", longs(durations)},
+				   {"note_midi", floats(noteMidi)},
+				   {"note_dur", longs(noteDuration)},
+				   {"pitch", floats(std::vector<float>(size_t(frames), 60.f))},
+				   {"retake", booleans(std::vector<uint8_t>(size_t(frames), 1), {1, frames})}};
 		if (target.accepts("note_rest"))
 		{
 			in["note_rest"] = booleans(noteRest, {1, int64_t(noteRest.size())});
@@ -635,8 +700,8 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 			{
 				item.second[f] = float(curves.value("diffsinger." + item.first, ticks[f], item.second[f]));
 			}
-			item.second[f] = std::clamp(
-				item.second[f], item.first == "tension" ? -10.f : -96.f, item.first == "tension" ? 10.f : 0.f);
+			item.second[f] = std::clamp(item.second[f], item.first == "tension" ? -10.f : -96.f,
+										item.first == "tension" ? 10.f : 0.f);
 		}
 		in[item.first] = floats(item.second);
 		if (predicted.count(item.first))
@@ -722,4 +787,4 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	}
 	return result;
 }
-}
+} // namespace diffsinger
