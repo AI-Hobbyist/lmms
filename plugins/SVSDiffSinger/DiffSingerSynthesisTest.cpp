@@ -287,7 +287,8 @@ int run(int argc, char** argv)
 				repredict["pitchPredictionRequests"]
 					= {{note.id, std::to_string(std::chrono::steady_clock::now().time_since_epoch().count())}};
 				const auto predicted = synthesis.render(plan, notes, repredict, tempo, 0, 48000, cancel);
-				require(digest(predicted.stereo) == digest(result.stereo), "Re-prediction changed deterministic seed");
+				require(predicted.feedback.at("pitch") != result.feedback.at("pitch"),
+					"New random prediction request did not change the predicted pitch");
 				const auto after = tensorFiles();
 				size_t fresh = 0;
 				for (const auto& path : after)
@@ -295,7 +296,9 @@ int run(int argc, char** argv)
 					if (!before.count(path)) { ++fresh; }
 				}
 				require(fresh > 0, "Re-prediction reused all previous tensors instead of running pitch");
-				synthesis.render(plan, notes, repredict, tempo, 0, 48000, cancel);
+				require(digest(synthesis.render(plan, notes, repredict, tempo, 0, 48000, cancel).stereo)
+						== digest(predicted.stereo),
+					"Repeating one prediction request changed its audio");
 				require(tensorFiles() == after, "Repeating one prediction request did not reuse its tensors");
 				std::cout << "PASS fresh pitch request executed inference and wrote " << fresh
 						  << " new SHA256 tensors; repeated request reused them" << std::endl;

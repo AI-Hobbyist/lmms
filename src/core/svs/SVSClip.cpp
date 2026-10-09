@@ -18,6 +18,7 @@
 #include <QUuid>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QCryptographicHash>
 namespace lmms {
 bool SVSClip::readOnly() const
 {
@@ -437,8 +438,11 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 	input.document = {{"clipId", m_id}, {"voiceId", track->voiceId()}, {"pluginId", track->pluginId()},
 		{"position", int(startPosition())}, {"contentOffset", -int(startTimeOffset())}, {"tempo", tempo->baseTempo},
 		{"tempoSource", tempo->toJson()}, {"contentEndTick", contentEnd}};
-	if (!m_globalParameters.isEmpty())
-		input.document["globalParameters"] = m_globalParameters;
+	// Clip IDs are random UUIDs; retain the chosen seed across cache replay and project reload.
+	input.document["seed"] = double(
+		QString::fromLatin1(QCryptographicHash::hash(m_id.toUtf8(), QCryptographicHash::Sha256).toHex().left(8))
+			.toUInt(nullptr, 16));
+	if (!m_globalParameters.isEmpty()) input.document["globalParameters"] = m_globalParameters;
 	input.document["trackParameters"] = track->parameters();
 	input.document["clipParameters"] = m_parameters;
 	input.document["engineSettings"] = QJsonDocument::fromJson(

@@ -22,7 +22,9 @@ private:
 	std::shared_ptr<const VoicePackage> m_voice;
 	Pronunciation m_pronunciation;
 	std::map<std::string, std::unique_ptr<CpuModel>> m_models;
-	uint32_t m_seed = 1;
+	uint32_t m_defaultSeed = 0;
+	uint32_t m_seed = 0;
+	uint32_t m_pitchSeed = 0;
 	CpuModel& model(const std::string& stage, const std::string& role);
 };
 }

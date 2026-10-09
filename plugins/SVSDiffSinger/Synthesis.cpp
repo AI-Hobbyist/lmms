@@ -5,6 +5,7 @@
 #include <cmath>
 #include <numeric>
 #include <set>
+#include <random>
 namespace diffsinger {
 namespace {
 Tensor floats(const std::vector<float>& values)
@@ -141,11 +142,12 @@ Json feedbackCurve(
 	return {{"id", id}, {"scope", "clip"}, {"type", "float"}, {"unit", unit}, {"mode", "absolute"},
 		{"interpolation", "linear"}, {"points", points}};
 }
-}
+} // namespace
 Synthesis::Synthesis(Ort::Env& environment, std::shared_ptr<const VoicePackage> voice)
 	: m_environment(environment)
 	, m_voice(std::move(voice))
 	, m_pronunciation(m_voice)
+	, m_defaultSeed(std::random_device{}())
 {
 }
 CpuModel& Synthesis::model(const std::string& stage, const std::string& role)
@@ -154,7 +156,8 @@ CpuModel& Synthesis::model(const std::string& stage, const std::string& role)
 	auto& result = m_models[key];
 	if (!result)
 	{
-		result = std::make_unique<CpuModel>(m_environment, m_voice->stages.at(stage).models.at(role), key, m_seed);
+		result = std::make_unique<CpuModel>(
+			m_environment, m_voice->stages.at(stage).models.at(role), key, stage == "pitch" ? m_pitchSeed : m_seed);
 	}
 	return *result;
 }
@@ -382,24 +385,35 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 	const Curves curves(input);
 	const auto parameters = input.value("trackParameters", Json::object());
 	const int steps = input.value("engineSettings", Json::object()).value("diffsinger.renderSteps", 20);
-	if (steps < 1 || steps > 100)
-	{
-		throw std::runtime_error("Invalid rendering steps");
-	}
-	const auto seedValue = input.value("seed", Json(1));
+	if (steps < 1 || steps > 100) { throw std::runtime_error("Invalid rendering steps"); }
+	const auto seedValue = input.value("seed", Json(m_defaultSeed));
 	if (!seedValue.is_number_unsigned() && !seedValue.is_number_integer())
 	{
 		throw std::runtime_error("Seed must be an integer");
 	}
 	const auto seed = seedValue.get<int64_t>();
-	if (seed < 0 || seed > UINT32_MAX)
-	{
-		throw std::runtime_error("Seed exceeds uint32 range");
-	}
+	if (seed < 0 || seed > UINT32_MAX) { throw std::runtime_error("Seed exceeds uint32 range"); }
 	if (m_seed != uint32_t(seed))
 	{
 		m_models.clear();
 		m_seed = uint32_t(seed);
+	}
+	const auto pitchRequests = input.value("pitchPredictionRequests", Json::object());
+	const auto pitchSeed = pitchRequests.empty() ? m_seed
+		: uint32_t(std::stoul(TensorCache::key("pitch-seed/" + pitchRequests.dump(), {{"seed", longs({m_seed})}})
+								 .substr(0, 8),
+			  nullptr, 16));
+	if (m_pitchSeed != pitchSeed)
+	{
+		for (auto it = m_models.begin(); it != m_models.end();)
+		{
+			if (it->first.rfind("pitch/", 0) == 0) { it = m_models.erase(it); }
+			else
+			{
+				++it;
+			}
+		}
+		m_pitchSeed = pitchSeed;
 	}
 	TensorCache cache(fs::u8path(input.value("cacheDirectory", std::string())));
 	auto run = [&](const std::string& stage, const std::string& role, const Tensors& inputs) {
@@ -407,23 +421,18 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		const auto pitchRequest = stage == "pitch" && input.contains("pitchPredictionRequests")
 			? "/repredict=" + input.at("pitchPredictionRequests").dump()
 			: std::string{};
-		const auto key = TensorCache::key("CPU/ORT1.23.0/native.v2/seed=" + std::to_string(m_seed) + "/pinyin621f8ca9/"
-				+ m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
+		const auto stageSeed = stage == "pitch" ? m_pitchSeed : m_seed;
+		const auto key = TensorCache::key("CPU/ORT1.23.0/native.v2/seed=" + std::to_string(stageSeed)
+				+ "/pinyin621f8ca9/" + m_voice->fingerprint + "/" + stage + "/" + role + pitchRequest,
 			inputs);
 		Tensors out;
-		if (cancelled.load())
-		{
-			throw std::runtime_error("Cancelled");
-		}
+		if (cancelled.load()) { throw std::runtime_error("Cancelled"); }
 		if (!cache.load(key, out))
 		{
 			out = target.run(inputs, cancelled);
 			cache.save(key, out);
 		}
-		if (cancelled.load())
-		{
-			throw std::runtime_error("Cancelled");
-		}
+		if (cancelled.load()) { throw std::runtime_error("Cancelled"); }
 		return out;
 	};
 	auto tokens = [&](const std::string& stage) {
