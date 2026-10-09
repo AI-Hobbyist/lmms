@@ -1,0 +1,185 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::relativeConfigurationPaths()
+SKIP   : SVSIntegrationTest::nativeLadspaPluginHost() Explicit native development plugin directory and GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(243) : failure location
+PASS   : SVSIntegrationTest::projectExportFileGroupTransaction()
+PASS   : SVSIntegrationTest::projectExportMappingAndAudio()
+PASS   : SVSIntegrationTest::projectExportSnapshotIsReadOnly()
+PASS   : SVSIntegrationTest::projectImportPersistenceAndRollback()
+PASS   : SVSIntegrationTest::projectImportNativeWindows()
+PASS   : SVSIntegrationTest::projectImportNoVoices()
+PASS   : SVSIntegrationTest::projectImportControllerFlow()
+PASS   : SVSIntegrationTest::projectExportNativeFlow()
+PASS   : SVSIntegrationTest::embeddedWindowLifecycle()
+PASS   : SVSIntegrationTest::sdkResourcesAndServices()
+PASS   : SVSIntegrationTest::releaseDemonstrationAndPerformance()
+PASS   : SVSIntegrationTest::releaseDemonstrationRuntime()
+QDEBUG : SVSIntegrationTest::sdkManifestDiagnostics() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::sdkManifestDiagnostics()
+PASS   : SVSIntegrationTest::sdkMinimalNativeTiming()
+PASS   : SVSIntegrationTest::missingPluginCachedPlayback()
+PASS   : SVSIntegrationTest::cachedRestoreWithoutPlugin()
+SKIP   : SVSIntegrationTest::nativeSvsMuteAndSolo() Native GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2374) : failure location
+PASS   : SVSIntegrationTest::mutedSvsDefersSynthesis()
+QWARN  : SVSIntegrationTest::cachedPlaybackAndTrackExports() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::cachedPlaybackAndTrackExports() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+PASS   : SVSIntegrationTest::cachedPlaybackAndTrackExports()
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+QWARN  : SVSIntegrationTest::frozenTrackExportBatch() QString::replace(): called on an invalid QRegularExpression object (pattern is '[\0000-?"*/:<>?\\|?]')
+PASS   : SVSIntegrationTest::frozenTrackExportBatch()
+PASS   : SVSIntegrationTest::runningExportContextGuard(mix)
+PASS   : SVSIntegrationTest::runningExportContextGuard(tempo)
+PASS   : SVSIntegrationTest::runningExportContextGuard(delete-track)
+PASS   : SVSIntegrationTest::variableTempoFileExport()
+PASS   : SVSIntegrationTest::deletedTrackExportPreparation()
+PASS   : SVSIntegrationTest::exportContextMutationRejected()
+PASS   : SVSIntegrationTest::nativeSVSFileExport()
+PASS   : SVSIntegrationTest::computeStageCacheIdentity()
+PASS   : SVSIntegrationTest::globalComputePolicy()
+PASS   : SVSIntegrationTest::nativeComputeSettings()
+SKIP   : SVSIntegrationTest::computePolicyRestartChild() Child-only policy persistence check
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(3320) : failure location
+PASS   : SVSIntegrationTest::exportSnapshotPreparation()
+PASS   : SVSIntegrationTest::tempoSnapshotPipelineAndPlayback()
+PASS   : SVSIntegrationTest::immutableTempoAutomationSnapshot()
+PASS   : SVSIntegrationTest::variableTempoMappingAndPlugin()
+PASS   : SVSIntegrationTest::asynchronousVoiceDeclaration()
+QWARN  : SVSIntegrationTest::persistenceAndMigrationProtection() Error loading icon pixmap "piano": "File not found"
+PASS   : SVSIntegrationTest::persistenceAndMigrationProtection()
+PASS   : SVSIntegrationTest::arrangementSplitAndTrackClone()
+JO-ID 8400413 already in use by svsclip!
+JO-ID 8400413 already in use by svsclip!
+JO-ID 8397654 already in use by svsclip!
+JO-ID 8397654 already in use by svsclip!
+JO-ID 8416020 already in use by svstrack!
+PASS   : SVSIntegrationTest::resultOriginAndCopyPosition()
+PASS   : SVSIntegrationTest::cacheIdentityBudgetAndRecovery()
+PASS   : SVSIntegrationTest::schedulerShutdownWaitsForWorkers()
+QDEBUG : SVSIntegrationTest::synthesisCancellationAndBudget() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::synthesisCancellationAndBudget()
+PASS   : SVSIntegrationTest::finalEditorInteractionGates()
+PASS   : SVSIntegrationTest::relativePitchUsesDeclaredReference()
+PASS   : SVSIntegrationTest::continuationChainAndNavigation()
+JO-ID 8389185 already in use by svsclip!
+JO-ID 8389185 already in use by svsclip!
+JO-ID 8405756 already in use by svstrack!
+PASS   : SVSIntegrationTest::noteSplitReparsesPhonemes()
+JO-ID 8413952 already in use by svsclip!
+JO-ID 8411999 already in use by svstrack!
+PASS   : SVSIntegrationTest::portraitResourcesAndPreferences()
+PASS   : SVSIntegrationTest::batchLyricsAndPronunciation()
+PASS   : SVSIntegrationTest::continuousCurves()
+PASS   : SVSIntegrationTest::waveformPyramid()
+PASS   : SVSIntegrationTest::phonemeConstraintsAcrossTempoChanges()
+JO-ID 8418887 already in use by svsclip!
+JO-ID 8396160 already in use by svstrack!
+PASS   : SVSIntegrationTest::phonemeBoundariesAndAttributes()
+PASS   : SVSIntegrationTest::canvasThemeProperties()
+PASS   : SVSIntegrationTest::curveRangeTransactions()
+PASS   : SVSIntegrationTest::freehandMonotonicInterpolation()
+PASS   : SVSIntegrationTest::feedbackPitchInterpolation()
+JO-ID 8417913 already in use by svsclip!
+JO-ID 8419516 already in use by svstrack!
+PASS   : SVSIntegrationTest::pitchDrawingAndPluginEvaluation()
+SKIP   : SVSIntegrationTest::nativePencilCurveRenders() Native Windows GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5312) : failure location
+SKIP   : SVSIntegrationTest::nativeSidebarLanguages() Native Windows GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5436) : failure location
+SKIP   : SVSIntegrationTest::nativePitchRecordingHistory() Native Windows GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5474) : failure location
+SKIP   : SVSIntegrationTest::nativePitchResetContextActions() Native GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5580) : failure location
+PASS   : SVSIntegrationTest::curveUndoAndSelectionMove()
+PASS   : SVSIntegrationTest::noteTransactionsAndInlineLyrics()
+PASS   : SVSIntegrationTest::optimizedTuneLabNoteAndToolSemantics()
+PASS   : SVSIntegrationTest::tuneLabStretchAlignmentNativeWindow()
+PASS   : SVSIntegrationTest::optimizedTuneLabParameterResetSemantics()
+PASS   : SVSIntegrationTest::automaticNoteStretchRenders()
+PASS   : SVSIntegrationTest::stretchShortPhonemeRenders()
+PASS   : SVSIntegrationTest::generatedPhonemeDragRenders()
+PASS   : SVSIntegrationTest::readOnlyReferenceNativeWindow()
+JO-ID 8397396 already in use by svsclip!
+JO-ID 8402201 already in use by svstrack!
+PASS   : SVSIntegrationTest::parameterLaneDrawingAndPersistence()
+PASS   : SVSIntegrationTest::noteWaveformAndViewportZoom()
+JO-ID 8421234 already in use by svsclip!
+JO-ID 8412016 already in use by svstrack!
+PASS   : SVSIntegrationTest::globalSidebarVoiceAndRelativeValues()
+JO-ID 8407322 already in use by svsclip!
+JO-ID 8407322 already in use by svsclip!
+JO-ID 8400814 already in use by svstrack!
+PASS   : SVSIntegrationTest::globalParameterCurveAndScrollSynchronization()
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_yellow": "File not found"
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_off": "File not found"
+QWARN  : SVSIntegrationTest::nativePluginVoiceAndImageSettings() Error loading icon pixmap "led_green": "File not found"
+JO-ID 8400147 already in use by svsclip!
+JO-ID 8409515 already in use by svstrack!
+PASS   : SVSIntegrationTest::nativePluginVoiceAndImageSettings()
+PASS   : SVSIntegrationTest::compactEditorLayoutAndNoteLabels()
+PASS   : SVSIntegrationTest::asynchronousVoicebankScanning()
+PASS   : SVSIntegrationTest::exportWhileVoicebankScanning()
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "plugins": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "close": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "zoom": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "sample_track": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "audiofileprocessor/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "bitinvader/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "carlapatchbay/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "carlarack/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "freeboy/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "kicker/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "lb302/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "malletsstk/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "monstro/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "nes/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "opulenz/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "organic/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "patman/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "sf2player/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "sfxr/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "slicert/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "tripleoscillator/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "vestige/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "vibedstrings/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "watsyn/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "xpressive/logo": "File not found"
+QWARN  : SVSIntegrationTest::svsBrowserEngineGroups() Error loading icon pixmap "zynaddsubfx/logo": "File not found"
+PASS   : SVSIntegrationTest::svsBrowserEngineGroups()
+PASS   : SVSIntegrationTest::diffSingerGlobalVocoderSettings()
+QWARN  : SVSIntegrationTest::diffSingerCatalogSettingsAndResources() Error loading icon pixmap "piano": "File not found"
+PASS   : SVSIntegrationTest::diffSingerCatalogSettingsAndResources()
+JO-ID 8411944 already in use by svsclip!
+JO-ID 8414605 already in use by svstrack!
+PASS   : SVSIntegrationTest::diffSingerPronunciationAndSpeakerPersistence()
+SKIP   : SVSIntegrationTest::diffSingerExternalVoiceRendering() Explicit external voice and shared vocoder fixtures required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(7602) : failure location
+JO-ID 8389673 already in use by svsclip!
+JO-ID 8403387 already in use by svstrack!
+PASS   : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport()
+PASS   : SVSIntegrationTest::segmentedEditedCurveAnchors()
+PASS   : SVSIntegrationTest::segmentedPlanDependenciesAndAssembly()
+PASS   : SVSIntegrationTest::diffSingerSegmentedRendering()
+SKIP   : SVSIntegrationTest::diffSingerPresentationAndSettings() Native embedded GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(8167) : failure location
+SKIP   : SVSIntegrationTest::diffSingerReleaseWindow() Explicit development Release executable and external voicebanks required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(8356) : failure location
+PASS   : SVSIntegrationTest::engineCacheDirectoriesAndLegacyRead()
+PASS   : SVSIntegrationTest::parameterPanelStateAndFocus()
+PASS   : SVSIntegrationTest::capabilitiesAndDictionaries()
+QWARN  : SVSIntegrationTest::verticalSlice() Error loading icon pixmap "piano": "File not found"
+JO-ID 8393863 already in use by svsclip!
+JO-ID 8392912 already in use by svstrack!
+PASS   : SVSIntegrationTest::verticalSlice()
+JO-ID 8389788 already in use by svsclip!
+JO-ID 8407864 already in use by svstrack!
+PASS   : SVSIntegrationTest::renderedParametersAndPersistence()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 88 passed, 0 failed, 10 skipped, 0 blacklisted, 434486ms
+********* Finished testing of SVSIntegrationTest *********

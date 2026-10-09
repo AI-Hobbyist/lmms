@@ -17,6 +17,8 @@ namespace {
 using diffsinger::Json;
 struct Engine
 {
+	Engine() { diffsinger::acquireComputeRuntime(); }
+	~Engine() { diffsinger::releaseComputeRuntime(); }
 	Ort::Env environment{ORT_LOGGING_LEVEL_WARNING, "DiffSinger"};
 	std::shared_ptr<const diffsinger::Catalog> catalog = std::make_shared<diffsinger::Catalog>();
 	std::mutex scanMutex;
@@ -448,6 +450,7 @@ svs_status SVS_CALL render(svs_session handle, svs_result* out)
 		{
 			throw std::runtime_error("No submitted snapshot");
 		}
+		const auto models = diffsinger::retainComputeModels();
 		svs_sdk::TempoMap tempo;
 		std::vector<svs_sdk::TempoPoint> points;
 		const auto map = session.input.value("tempoMap", Json::array());

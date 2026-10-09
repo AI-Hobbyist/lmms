@@ -1,0 +1,652 @@
+[
+  {
+    "Path": "bin/SVSComputeAbiCheck.exe",
+    "Bytes": 10240,
+    "SHA256": "7F36893C2549A8EED955CF1D43E8E2B0DCEF82DA8CE66563D84343B0FF8560DE"
+  },
+  {
+    "Path": "bin/SVSComputeConformance.exe",
+    "Bytes": 211456,
+    "SHA256": "1E67FAFB1C0039DBCA81C10E1978DABA465F51F825EFCB18A79B8A9E4684F2B7"
+  },
+  {
+    "Path": "bin/SVSComputeConsumer.exe",
+    "Bytes": 38912,
+    "SHA256": "7CA8314231B1E08D8B0C4144679E91FE67A304D30426C72B76C587EA980C9DF3"
+  },
+  {
+    "Path": "bin/SVSConformance.exe",
+    "Bytes": 119808,
+    "SHA256": "466CCD6496C5D19AD9FC95B0403426326E746DF52835E79019B1D18A356EA742"
+  },
+  {
+    "Path": "include/svs/svs_compute.h",
+    "Bytes": 3804,
+    "SHA256": "39A007D6773B4454297D70D594C37249C4C8998BBECE9B90FD32218E3B062331"
+  },
+  {
+    "Path": "include/svs/svs_compute.hpp",
+    "Bytes": 8031,
+    "SHA256": "400E3EE798840F976E7D66166A9CC98508BE6248D6DA97EBDBA7F2BC30FCBDBD"
+  },
+  {
+    "Path": "include/svs/svs_curve.hpp",
+    "Bytes": 4010,
+    "SHA256": "4222FA3F66714A95C216D8F822C14A1BDFB03EC9F5000BCC043E976B2B9E17F6"
+  },
+  {
+    "Path": "include/svs/svs_time.hpp",
+    "Bytes": 2235,
+    "SHA256": "C7944C8D1036B8C2F1C7866146BB2C25B93BEB1B009EAD372E99EA26AC4CAAFF"
+  },
+  {
+    "Path": "include/svs/svs.h",
+    "Bytes": 6501,
+    "SHA256": "DEFFA9DEA5243A48BFC66D380EAC736C8B1685585633BD6844B66E2282BEED2B"
+  },
+  {
+    "Path": "include/svs/svs.hpp",
+    "Bytes": 8853,
+    "SHA256": "C5140BB5B02D6E5F4CAC3F35D5FB31A74C4849557E1FF9FC00266597900A8D18"
+  },
+  {
+    "Path": "lib/SVSCompute.lib",
+    "Bytes": 1758,
+    "SHA256": "9B4FC2D9494E031D4AD200148F739A0AE394F98FE72A7FE8D4980E0BF4208232"
+  },
+  {
+    "Path": "lib/cmake/SVSSDK/SVSSDKConfig.cmake",
+    "Bytes": 997,
+    "SHA256": "8CF75EEC2CA62812A2E3F35287265896F899B92B41A417A71298F79CB131AFAC"
+  },
+  {
+    "Path": "lib/cmake/SVSSDK/SVSSDKConfigVersion.cmake",
+    "Bytes": 2821,
+    "SHA256": "3742C68E902A02B9C8A2EE2814B849AA8E069E5BB3FC28A0F85463EE6E2E3049"
+  },
+  {
+    "Path": "lib/cmake/SVSSDK/SVSSDKTargets.cmake",
+    "Bytes": 4216,
+    "SHA256": "F2EC312FCE0AEA6F3909405B5F9C34FC791773EE3DC36130AAE8BDB1504790E9"
+  },
+  {
+    "Path": "plugins/SVSCompute.dll",
+    "Bytes": 312320,
+    "SHA256": "D6002D6A7CAFEFFCC261F30C9B595A3BBD98C15E7DD0E2B208CAD4D3F0E8341F"
+  },
+  {
+    "Path": "share/svs-sdk/LICENSE",
+    "Bytes": 17987,
+    "SHA256": "AB15FD526BD8DD18A9E77EBC139656BF4D33E97FC7238CD11BF60E2B9B8666C6"
+  },
+  {
+    "Path": "share/svs-sdk/README.md",
+    "Bytes": 7648,
+    "SHA256": "7901F1DD70608220F3F6D601DFD68C33242E962C6290C07BE0F5413DD24D730B"
+  },
+  {
+    "Path": "share/svs-sdk/docs/api.md",
+    "Bytes": 9416,
+    "SHA256": "50FB052F2B9747CCBF65298D59A92FFCA99D0904B92FB4FE108A20641678279C"
+  },
+  {
+    "Path": "share/svs-sdk/docs/compute.md",
+    "Bytes": 11642,
+    "SHA256": "C02FBA6A5ED43DF32F68071C798E975FC6F99CA5802339EBB656A891CDADEF03"
+  },
+  {
+    "Path": "share/svs-sdk/docs/EngineSettings.md",
+    "Bytes": 6878,
+    "SHA256": "E9252D435181047C148906CFEE85B11EBC082427913661311DC5E09C6DEA0B2B"
+  },
+  {
+    "Path": "share/svs-sdk/docs/formats.md",
+    "Bytes": 9926,
+    "SHA256": "EBDA11DD8FA969ECD9E0716F71E02D413ACF4DDE30329BAA2735EEE2FECEFAF7"
+  },
+  {
+    "Path": "share/svs-sdk/docs/packages.md",
+    "Bytes": 4280,
+    "SHA256": "EAE753F6446C77E057808009BEC8953E2891483B3C68F39017E264F77DE40CF4"
+  },
+  {
+    "Path": "share/svs-sdk/docs/validation.md",
+    "Bytes": 2485,
+    "SHA256": "AF3B241BC5B8EC8D68C4D5C1FA1B824368990D740B4F568953E50B9597AC15A5"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/CMakeLists.txt",
+    "Bytes": 8760,
+    "SHA256": "A2CAB82B4CFF9FE229C2DAB847E32089F5D773C79C6C77EEA1725142F64D5485"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeAbiCheck.c",
+    "Bytes": 570,
+    "SHA256": "CCC1840114B0B604A2A0607CE16BE006CDA1C4BCF939ACC159C7E0160848EF31"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeClient.cpp",
+    "Bytes": 20810,
+    "SHA256": "22EA7D4941846DB6E9C523335EEE9152B171B6F78623F0C6E97F5EF3DCE085C4"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeCommon.h",
+    "Bytes": 2875,
+    "SHA256": "FD541DD986522C6914E9DA425EB7CAC2D561787BFA4F6A7117B5BF3745BE22A2"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeConformance.cpp",
+    "Bytes": 12043,
+    "SHA256": "3AEB3EA2858AA05B51D3AE8320F794A8791269308C159412F032713A39BF92F3"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeDevice.h",
+    "Bytes": 3996,
+    "SHA256": "728DD9E07EC87396247BC2A15335E343E7A0AE4F6B2CE585F791CBBA1689C0EE"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeExample.cpp",
+    "Bytes": 9170,
+    "SHA256": "BE615F025589CC8F1C76B97732D70874AF0074396D0CE5B5C9185ACC644F21C0"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeFixture.h",
+    "Bytes": 3921,
+    "SHA256": "E5D85CCC7508B16F7089E08033FBA3108A47B9ACA5E0FD0B91093C89BE0B89F8"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeModelSeed.h",
+    "Bytes": 6239,
+    "SHA256": "35866EFDBD765B14DA49B68B7BF56B5AD838C3AD325802FF943262AD99AB896B"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeProbe.cpp",
+    "Bytes": 7175,
+    "SHA256": "80E03FEF8B8DD5ADB0A0511CA50C5FFD6D687CD61D265D89F0F9CF4A92ACF4F2"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeResidency.h",
+    "Bytes": 3827,
+    "SHA256": "834B0E24B8C0AB60B62772905265B80EA8C64F7FB3D14C1CEF2A607BDAADBAE2"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeTransport.cpp",
+    "Bytes": 7321,
+    "SHA256": "006A913FAC69A3B2C75274DFA0EE21CB3B4F6958F76CCB995D713EF968EFD1C5"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeTransport.h",
+    "Bytes": 5876,
+    "SHA256": "F770311B0DB2B3297FBAEAD76424C8A47B0A4BFF3C20F4BE1D8BBFF27EF3D894"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/ComputeWorker.cpp",
+    "Bytes": 18467,
+    "SHA256": "CCE0E6C45BDAEE61B7D8257842F646CD1651E0DA935D65020CD9AD1E66BB1082"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/dependencies.lock.json",
+    "Bytes": 1159,
+    "SHA256": "D3EE409C97C3CFA5E0EC9C2BAAF154B421830DFD62D889D930034577B7C17121"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute/WriteComputeFixture.cpp",
+    "Bytes": 318,
+    "SHA256": "4D7F418B7E61B8C489150102ECEA8DA8B8F440F9B2A4F7E2A47D1C5317830A0B"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute-consumer/CMakeLists.txt",
+    "Bytes": 462,
+    "SHA256": "CC82EC7A0BA6E6E8E894FC218F225D833BE0C063B26E2E6D4869DB47C90AFAE5"
+  },
+  {
+    "Path": "share/svs-sdk/examples/compute-consumer/main.cpp",
+    "Bytes": 1688,
+    "SHA256": "5B7E99A6E19654A840E55253D3DDA95C169DDC24E51BB748C358E25891C6B692"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/CMakeLists.txt",
+    "Bytes": 10180,
+    "SHA256": "27519B606C32DF16076AF92B6EE7996AD6FC7FEB6092A9A7521B3131BD89766F"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/CpuModel.cpp",
+    "Bytes": 9913,
+    "SHA256": "198C694F6E3A428C770557A2B77FA89C1C20A1917A3D6DF680CE48C7175B253C"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/CpuModel.h",
+    "Bytes": 2618,
+    "SHA256": "6F6A74187113E6535F035FFA6FBAD36A7BE2CA1A704C845FEAE461EF30C0DEE8"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/DiffSingerAbiTest.cpp",
+    "Bytes": 6503,
+    "SHA256": "3746ED34E0793FCE4A22CA665EF9A2E0E21859A7600D88C22F564684B4517B6C"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/DiffSingerCatalogTest.cpp",
+    "Bytes": 17877,
+    "SHA256": "7632F9B606BBC44112BDEC5588C3B6C0AA9718969E265C618C6167F3C9C60897"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/DiffSingerDurationTest.cpp",
+    "Bytes": 11564,
+    "SHA256": "912A5E59897BFB243D6B9DF7A071B73FFDC9A5334248FD3F79482F8446D87E7C"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/DiffSingerModelProbe.cpp",
+    "Bytes": 7858,
+    "SHA256": "4F67A1FEA98E2839781F5DFBA0E784486BF70B4D2DF8352F22261E2643C0D495"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/DiffSingerSynthesisTest.cpp",
+    "Bytes": 34049,
+    "SHA256": "1123CB16220CECD6D75CB5462BDED67D8DA3523A7BCF7968E04766034433424E"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Duration.cpp",
+    "Bytes": 14299,
+    "SHA256": "E70A3623681DA6A46103F625D48B7524874D7C642BB3DBD8C77A55BCDC7D36EB"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Duration.h",
+    "Bytes": 1088,
+    "SHA256": "29A5C13E30429851510BD3E9B5145ED0DC0A48E10363D340DEA679ECC1E1BB35"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Hash.h",
+    "Bytes": 4065,
+    "SHA256": "04A7BBAF370A3B6854D86147C5A441158DD790F08D31D4ED5A6B05D9A53175BA"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/InferenceComparison.h",
+    "Bytes": 7810,
+    "SHA256": "4264AB0BD1478B2F8342CC22565AABB8E3D021FD8C6F8A3A148DFA9C57CAE7B8"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/manifest.json.in",
+    "Bytes": 365,
+    "SHA256": "4F69AB52B5FED645ED9D151A5751AA2C24A9955B1CEDE0CB29CC7D90013D42EF"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/ModelSeed.h",
+    "Bytes": 6240,
+    "SHA256": "BD39FDA58A474F08FD98BAE6C06383DDC78E396D53EA2E8748B11B7D01591A7F"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/NativeRuntime.cpp",
+    "Bytes": 2327,
+    "SHA256": "4EFC4E5B1036B921EBD8FF498A753C62D9FE119BAA989CB2A325AE7EC49B8236"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/NativeRuntime.h",
+    "Bytes": 389,
+    "SHA256": "DD97C2EC6580E160EA897FE10862378F99D065EA5883EEB885F4CF1D3A1AA78E"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Pronunciation.cpp",
+    "Bytes": 12341,
+    "SHA256": "E50CEE238DBB49081CFD920FEE5843743176EA0EDAF2435F5668095B3F8C9E9D"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Pronunciation.h",
+    "Bytes": 960,
+    "SHA256": "500DA70C321632A59EA334047591239EBF7CF60975F3D49435EA26982A6A99BA"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/README.md",
+    "Bytes": 5096,
+    "SHA256": "216E780CA9774DAF0C36481EA36F92755A3A383CB55785E674E648087D7242B6"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Speaker.cpp",
+    "Bytes": 3227,
+    "SHA256": "FF6AA6B2191D868E2D8ADAF7FF0080AA5A8002A9F5CA7EE9E18B0336DDE6FD48"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Speaker.h",
+    "Bytes": 260,
+    "SHA256": "EB56F9BDDF5D79CF724CBE3C2F39093188D844020D2394EA1112FE2BFA68F99D"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/SVSDiffSinger.cpp",
+    "Bytes": 17532,
+    "SHA256": "CFBD8A18B94ED3DA63C107E9EFE3C1735E48544BD48AD53A05EB1A55701BB39B"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Synthesis.cpp",
+    "Bytes": 28924,
+    "SHA256": "A37ADAB02B1E41A380D70D858C2B6C29D273F7523EF8D30E58805DE3EC5179EB"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/Synthesis.h",
+    "Bytes": 971,
+    "SHA256": "D76014A723A56013E8C9EEE18602AA2A2269DFA77162E37249C7D1FF8BD8CCDB"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/TensorCache.cpp",
+    "Bytes": 9016,
+    "SHA256": "C33E329775A71CCFDAF40ABE0A45220EE3F3F43F583D14092DE9CDC26AFAEBD2"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/TensorCache.h",
+    "Bytes": 598,
+    "SHA256": "7A4B3BD8C7B77F7317387ABAD5F5C50257BBF6080F5DCF1E8DD20A2FE7693A6E"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/VOCODERS.md",
+    "Bytes": 899,
+    "SHA256": "1F5927C3D532B717879267825979386188BB6C2ED7EFD2D52AC694B92EF87D5A"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/VoiceCatalog.cpp",
+    "Bytes": 29592,
+    "SHA256": "8A723DFD7A8535FD67B4AAE3D9B32D8CB39324172FED9D013CC9C250EE8B9427"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/VoiceCatalog.h",
+    "Bytes": 1536,
+    "SHA256": "7EC742C1662A89775F729554C99DB0AB66CCBBCA7790D729741FDF6CFB126AFD"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/WordTiming.h",
+    "Bytes": 1330,
+    "SHA256": "10EA89F543EF19D254F289AD0AA88B49A9F338684691541010E808D88479AE56"
+  },
+  {
+    "Path": "share/svs-sdk/examples/diffsinger/licenses/tlds-MIT.txt",
+    "Bytes": 1085,
+    "SHA256": "6DECBC0464519F8CC18A1DABAEE9EDF2A0C08A41C19F268C04F7C1A41BBDDD70"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/avatar-lite.svg",
+    "Bytes": 249,
+    "SHA256": "18C7E656FE73BE588B945B833C3DCE5DE6ADB913051F678E92FBB9B46B3B9B5D"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/avatar.svg",
+    "Bytes": 249,
+    "SHA256": "634AE0ABD819BCBC5382E82EAFD95B957A28FA262B3C160BB2EA9486DBE6B723"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/CMakeLists.txt",
+    "Bytes": 3054,
+    "SHA256": "605CCCECA6D93811A5AEE23176FEA4282AF9FB6442BD3D34F9B39DB6F2838A40"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/en.json",
+    "Bytes": 498,
+    "SHA256": "115F73C98A1725066AFADD748128A5284C9298F3C284BEE08C551532FB6231EE"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/full.json",
+    "Bytes": 4694,
+    "SHA256": "B6EF37491CFCB704A7CF7B7E04FF1355283657E813E8E67AE46E6AA2B4248D9D"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/ja.json",
+    "Bytes": 810,
+    "SHA256": "29809FCB41733CD95C4203662997460912272EC01F78659D70CBEA54F5ED3AF5"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/Json.h",
+    "Bytes": 6026,
+    "SHA256": "C32B9ADD5581C33CB79844B48C30308595A6DA05A7F87009B7CDA2507D3269F1"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/manifest.json",
+    "Bytes": 321,
+    "SHA256": "C4622CAA1D829DB5966C09D88313612E59E62D023E73C415DFFEA96307BF40E6"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/manifest.json.in",
+    "Bytes": 453,
+    "SHA256": "F1354F0C08D0B63BE93D4A76D84ED045170B5224B2E58CBC1D2E02A70E8CB37B"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/minimal.json",
+    "Bytes": 820,
+    "SHA256": "042A600D0CB2B5997ADAE4A68B7C363B7D322B1E3A27A4731B3B787ADC287F33"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/portrait-lite.svg",
+    "Bytes": 381,
+    "SHA256": "2E7E4CDCBB364AD00FDDC58A56AC3092C9834A7EF4449483683B24FD4969950B"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/portrait.svg",
+    "Bytes": 381,
+    "SHA256": "67216A2D957C0981F2F3DE45C615B662D166903FC64D44D32A91A5C5B5F00437"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/Schemas.h.in",
+    "Bytes": 708,
+    "SHA256": "9DD1D10C56C6FF550AF0FD0FA0C96522557BD3D90031EEDEF837C089FBEAC223"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/SVSExample-demo.mmp",
+    "Bytes": 1693456,
+    "SHA256": "9F25DCEC61D6E3A5E6939091409311C0C58B262000DAEC0C7511EB04022ABB50"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/SVSExample.cpp",
+    "Bytes": 31294,
+    "SHA256": "BE6C25FF4824219AC22E5FFC077002DFAD0274F5A244E9AAF0E382B9EEE5BCB8"
+  },
+  {
+    "Path": "share/svs-sdk/examples/full/zh.json",
+    "Bytes": 998,
+    "SHA256": "1550AD7920D261EFE198F8B43D571BFA06583B057E82B2AC092C9DCA53E90B57"
+  },
+  {
+    "Path": "share/svs-sdk/examples/minimal/CMakeLists.txt",
+    "Bytes": 1644,
+    "SHA256": "4FC2E6165CF8DF709408F9D881481C598282C47817D8D5ED8A7513D30AF53F84"
+  },
+  {
+    "Path": "share/svs-sdk/examples/minimal/manifest.json.in",
+    "Bytes": 315,
+    "SHA256": "B7132E8E121C035A35396B882186FC1431899EB0FCB519CB2DBCC7F452C2B207"
+  },
+  {
+    "Path": "share/svs-sdk/examples/minimal/minimal.c",
+    "Bytes": 8458,
+    "SHA256": "7B4F417EE462812B592A160F038289619CC6B5D7A02714E05823EC0F9D5B674A"
+  },
+  {
+    "Path": "share/svs-sdk/tools/CMakeLists.txt",
+    "Bytes": 499,
+    "SHA256": "E102A36BDACDB860F4854B1CC05EB2DBB4F68E7A36D9233D35D4770D3D9D6846"
+  },
+  {
+    "Path": "share/svs-sdk/tools/Json.h",
+    "Bytes": 6026,
+    "SHA256": "C32B9ADD5581C33CB79844B48C30308595A6DA05A7F87009B7CDA2507D3269F1"
+  },
+  {
+    "Path": "share/svs-sdk/tools/SVSConformance.cpp",
+    "Bytes": 15843,
+    "SHA256": "0B7382D157BAA5E47BD655ADF1C21641FAA4EED7619A6382419EDDC68EC277DA"
+  },
+  {
+    "Path": "svs/compute/dependencies.lock.json",
+    "Bytes": 1159,
+    "SHA256": "D3EE409C97C3CFA5E0EC9C2BAAF154B421830DFD62D889D930034577B7C17121"
+  },
+  {
+    "Path": "svs/compute/DirectML.dll",
+    "Bytes": 18527776,
+    "SHA256": "9C9E6D822561C6C41B90E6994B3E8857CF1D66DBFB1E0C4C799C7C89B4E92DA1"
+  },
+  {
+    "Path": "svs/compute/onnxruntime_providers_shared.dll",
+    "Bytes": 22048,
+    "SHA256": "3B27E1417D12B73A6A34D80414C083E359E092D2F0CE572D7E67BE8CDBE9E825"
+  },
+  {
+    "Path": "svs/compute/onnxruntime.dll",
+    "Bytes": 17201208,
+    "SHA256": "F5131591EDAC6B0A8090D0E329040A49319D7A689CB5B465235FBF7030FA8027"
+  },
+  {
+    "Path": "svs/compute/SVSComputeWorker.exe",
+    "Bytes": 299520,
+    "SHA256": "D3380284DE36BDA2D67259A1F8834C2F51D803A8A3A185F2F4D5C28D351E2E1C"
+  },
+  {
+    "Path": "svs/compute/licenses/directml/LICENSE-CODE.txt",
+    "Bytes": 1093,
+    "SHA256": "903DF5512F7D02609FED0C780A9B704F5A3EEB6E4D84EBE42A29845C81899A3C"
+  },
+  {
+    "Path": "svs/compute/licenses/directml/LICENSE.txt",
+    "Bytes": 10439,
+    "SHA256": "A05138E3A085FF60A44881EEDFA58DCCB03ECC1D7B1F6AE888418E8C2FEC4B8D"
+  },
+  {
+    "Path": "svs/compute/licenses/directml/ThirdPartyNotices.txt",
+    "Bytes": 4577,
+    "SHA256": "2C95795C13FF48A58B6ED916F37901C23D964B5D9D601AF422F17AD2172E7950"
+  },
+  {
+    "Path": "svs/compute/licenses/json/LICENSE.MIT",
+    "Bytes": 1076,
+    "SHA256": "46A65CFFD1EA955132D95A8DD921640714A8D6B537D2E4E482D31145AE95B603"
+  },
+  {
+    "Path": "svs/compute/licenses/onnxruntime/LICENSE",
+    "Bytes": 1094,
+    "SHA256": "C250D6278F0B47A6439FB7592B08B58A55EB9F535AA49A1DB63211C3F982B674"
+  },
+  {
+    "Path": "svs/compute/licenses/onnxruntime/ThirdPartyNotices.txt",
+    "Bytes": 333022,
+    "SHA256": "E00F828E0A33DE591A355AE6606D2625F5758DA7D2C844DB7821C9DD3E3647B6"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/manifest.json",
+    "Bytes": 333,
+    "SHA256": "3AA1C3FB440F5BBF5ECA6BF3A006BD10A5D0C74D0CCB99F6077E92D3E6E5FD1D"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/onnxruntime.dll",
+    "Bytes": 14107168,
+    "SHA256": "B4B7F9AED3CF6B04000F595BDDCBDF12E87214BC401D1B81BEADAE3DBF28D2BD"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/SVSDiffSinger.dll",
+    "Bytes": 824320,
+    "SHA256": "79E2C92A0BFC30B495CCEAED5C1A81D4D3F992925CC4093A5950DBE5FECAEA65"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/data/LICENSE-phrase-pinyin-data",
+    "Bytes": 1066,
+    "SHA256": "89AC55DF747E4776088C3E77531EF61B973A1A59DD8E6A4548A58996DA9A4F70"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/data/LICENSE-pinyin-data",
+    "Bytes": 1076,
+    "SHA256": "9C048697BE2502A16E8BCB282D5D465A07295B2DEF0FFB05A269C5D39DBE1586"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/data/phrases.txt",
+    "Bytes": 1256063,
+    "SHA256": "DCC769607C220B312FEA3E71CB63421298B4B891B1F7356A95AB58F2C96FFF81"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/data/pinyin.txt",
+    "Bytes": 985318,
+    "SHA256": "621F8CA9EFF8519F47E2B17B564FD318161E13BCA07EEA8C8E04993CD5D3B52E"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/licenses/tlds-MIT.txt",
+    "Bytes": 1085,
+    "SHA256": "6DECBC0464519F8CC18A1DABAEE9EDF2A0C08A41C19F268C04F7C1A41BBDDD70"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/licenses/json/LICENSE.MIT",
+    "Bytes": 1076,
+    "SHA256": "46A65CFFD1EA955132D95A8DD921640714A8D6B537D2E4E482D31145AE95B603"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/licenses/onnxruntime/LICENSE",
+    "Bytes": 1094,
+    "SHA256": "C250D6278F0B47A6439FB7592B08B58A55EB9F535AA49A1DB63211C3F982B674"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/licenses/onnxruntime/ThirdPartyNotices.txt",
+    "Bytes": 333022,
+    "SHA256": "E00F828E0A33DE591A355AE6606D2625F5758DA7D2C844DB7821C9DD3E3647B6"
+  },
+  {
+    "Path": "svs/SVSDiffSinger/licenses/yaml-cpp/LICENSE",
+    "Bytes": 1061,
+    "SHA256": "AA6FCC27BE034E41E21DD832F9175BFE694A48491D9E14FF0FA278E19AD14F1B"
+  },
+  {
+    "Path": "svs/SVSExample/avatar-lite.svg",
+    "Bytes": 249,
+    "SHA256": "18C7E656FE73BE588B945B833C3DCE5DE6ADB913051F678E92FBB9B46B3B9B5D"
+  },
+  {
+    "Path": "svs/SVSExample/avatar.svg",
+    "Bytes": 249,
+    "SHA256": "634AE0ABD819BCBC5382E82EAFD95B957A28FA262B3C160BB2EA9486DBE6B723"
+  },
+  {
+    "Path": "svs/SVSExample/en.json",
+    "Bytes": 498,
+    "SHA256": "115F73C98A1725066AFADD748128A5284C9298F3C284BEE08C551532FB6231EE"
+  },
+  {
+    "Path": "svs/SVSExample/ja.json",
+    "Bytes": 810,
+    "SHA256": "29809FCB41733CD95C4203662997460912272EC01F78659D70CBEA54F5ED3AF5"
+  },
+  {
+    "Path": "svs/SVSExample/manifest.json",
+    "Bytes": 426,
+    "SHA256": "360C61956249798949F6A76E3B7C068B8396DF82269CD739407DB0FFFE166F23"
+  },
+  {
+    "Path": "svs/SVSExample/portrait-lite.svg",
+    "Bytes": 381,
+    "SHA256": "2E7E4CDCBB364AD00FDDC58A56AC3092C9834A7EF4449483683B24FD4969950B"
+  },
+  {
+    "Path": "svs/SVSExample/portrait.svg",
+    "Bytes": 381,
+    "SHA256": "67216A2D957C0981F2F3DE45C615B662D166903FC64D44D32A91A5C5B5F00437"
+  },
+  {
+    "Path": "svs/SVSExample/SVSExample-demo.mmp",
+    "Bytes": 1693456,
+    "SHA256": "9F25DCEC61D6E3A5E6939091409311C0C58B262000DAEC0C7511EB04022ABB50"
+  },
+  {
+    "Path": "svs/SVSExample/SVSExample.dll",
+    "Bytes": 141824,
+    "SHA256": "B7D5952E24FC39A594E41FD1746BBAE55E49DFD8AE3ED0D9E12DEE4C2A8B3CDE"
+  },
+  {
+    "Path": "svs/SVSExample/zh.json",
+    "Bytes": 998,
+    "SHA256": "1550AD7920D261EFE198F8B43D571BFA06583B057E82B2AC092C9DCA53E90B57"
+  },
+  {
+    "Path": "svs/SVSMinimal/manifest.json",
+    "Bytes": 281,
+    "SHA256": "C816841EC97C85C63A035BF62231E450741AC4956927A2A50E5BE7231FAFEF8D"
+  },
+  {
+    "Path": "svs/SVSMinimal/SVSMinimal.dll",
+    "Bytes": 14848,
+    "SHA256": "52771F34D9FF5972EEC95880194B2C6E07CD949F0845653294C817A96186BA13"
+  },
+  {
+    "Path": "svs/vocoders/README.md",
+    "Bytes": 899,
+    "SHA256": "1F5927C3D532B717879267825979386188BB6C2ED7EFD2D52AC694B92EF87D5A"
+  }
+]

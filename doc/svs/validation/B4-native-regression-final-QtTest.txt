@@ -1,0 +1,21 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+QINFO  : SVSIntegrationTest::nativeLadspaPluginHost() LADSPA keys 202 native plugin host shares the initialized Engine
+PASS   : SVSIntegrationTest::nativeLadspaPluginHost()
+PASS   : SVSIntegrationTest::nativeSvsMuteAndSolo()
+PASS   : SVSIntegrationTest::nativePencilCurveRenders()
+PASS   : SVSIntegrationTest::nativeSidebarLanguages()
+PASS   : SVSIntegrationTest::nativePitchRecordingHistory()
+FAIL!  : SVSIntegrationTest::nativePitchResetContextActions() QTestLib: This test case check ("(clip->status()) == (QString("Ready"))") failed because the requested timeout (10000 ms) was too short, 13250 ms would have been sufficient this time.
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5631) : failure location
+FAIL!  : SVSIntegrationTest::diffSingerPresentationAndSettings() Compared values are not the same
+   Actual   : clip->audio()
+   Expected : audio
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(8280) : failure location
+PASS   : SVSIntegrationTest::diffSingerExternalVoiceRendering()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 8 passed, 2 failed, 0 skipped, 0 blacklisted, 179185ms
+********* Finished testing of SVSIntegrationTest *********

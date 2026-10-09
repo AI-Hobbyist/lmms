@@ -143,3 +143,37 @@ worker/native dependencies in `svs/compute` relative to the executable. CPU and
 DML workers are independent processes; GPU libraries are optional for CPU use.
 `SVSComputeExample` demonstrates a complete minimal AI plugin consuming the ABI
 without LMMS or Qt. It deliberately uses a synthetic model, not singing assets.
+
+## Global model memory policy (B4)
+
+The optional ABI 1.0 tail advertises `SVSC_FEATURE_MEMORY_POLICY`. Negotiate
+`SVSC_API_REQUIRED_SIZE` for the original required prefix, then check the returned
+size and feature bit before calling `set_memory_policy`, `begin_render`,
+`end_render`, or `memory_status`. Existing mandatory-prefix consumers remain
+compatible. The C++17 wrapper performs these checks automatically.
+
+`Library::setMemoryPolicy("idle", 60)` is the default. `immediate` releases
+models when the last complete render finishes; `idle` releases after the chosen
+idle time (1–86400 seconds); `resident` keeps loaded models until normal cleanup
+or existing cache limits require eviction. This policy is shared by all contexts
+and CPU/accelerator workers in the client. CPU releases model RAM; DirectML also
+releases the model's GPU session/device resources. Allocator/driver caches may
+retain part of their working set; the option does not promise zero process RAM.
+
+Hold `Library::retainModels()` or `Context::retainModels()` across the complete
+multi-stage render, including segments and failure/cancellation cleanup. Nested
+leases are supported. Individual session initialization and runs are protected
+internally, but a whole-render lease prevents immediate or idle eviction between
+stages. Destroy the lease to start the idle timer or release immediately. Release
+does not invalidate session handles or owned output tensors: a later run lazily
+loads the same model and route again. `Context::memoryStatus()` reports policy,
+active leases, resident sessions and release errors for diagnostics.
+
+Destroy contexts and their child handles before unloading the engine library.
+On Windows, do this from normal engine cleanup, outside `DllMain` and DLL static
+destructors: the last context waits for the residency monitor to exit.
+
+LMMS persists the three choices and custom timeout in global SVS settings.
+Changing residency does not change audio/cache identity or invalidate existing
+PCM. `examples/compute-consumer` uses only public SDK headers and the platform
+loader, with no LMMS, Qt or ORT link dependency.

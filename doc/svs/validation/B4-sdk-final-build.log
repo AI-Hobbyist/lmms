@@ -1,0 +1,60 @@
+CMake is re-running because D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/CMakeFiles/generate.stamp is out-of-date.
+  the file 'D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/CMakeFiles/cmake.verify_globs'
+  is newer than 'D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Using the multi-header code from D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_json-src/include/
+CMake Deprecation Warning at D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/_deps/diffsinger_yaml-src/CMakeLists.txt:2 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Configuring done (3.0s)
+-- Generating done (0.6s)
+-- Build files have been written to: D:/UserData/Desktop/Project/lmms/build/svs-sdk-external
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  1>Checking Build System
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\svs\SVSExample\SVSExample.dll
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  SVSMinimal.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\examples\minimal\Release\SVSMinimal.dll
+  SVSComputeFixtureWriter.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\compute\Release\SVSComputeFixtureWriter.exe
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerCatalog.lib
+  SVSComputeExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\Release\svs\SVSComputeExample\SVSComputeExample.dll
+  CpuModel.cpp
+  Duration.cpp
+  Synthesis.cpp
+  TensorCache.cpp
+  正在生成代码...
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerInference.lib
+  SVSDiffSinger.cpp
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/Release/SVSDiffSinger.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/diffsinger/Release/SVSDiffSinger.exp
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\svs\SVSDiffSinger\SVSDiffSinger.dll
+  DiffSingerAbiTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerAbiTest.exe
+  DiffSingerCatalogTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerCatalogTest.exe
+  DiffSingerModelProbe.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerModelProbe.exe
+  DiffSingerDurationTest.cpp
+  DiffSingerSynthesisTest.cpp
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  SVSComputeConsumer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\examples\compute-consumer\Release\SVSComputeConsumer.exe
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  SVSComputeConformance.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\compute\Release\SVSComputeConformance.exe
+  ComputeClient.cpp
+  SVSComputeAbiCheck.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\compute\Release\SVSComputeAbiCheck.exe
+  SVSConformance.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\tools\Release\SVSConformance.exe
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/src/core/svs/compute/CMakeLists.txt
+  SVSComputeProbe.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\Release\svs\compute\SVSComputeProbe.exe
+  SVSComputeWorker.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\Release\svs\compute\SVSComputeWorker.exe
+    正在创建库 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/compute/Release/SVSCompute.lib 和对象 D:/UserData/Desktop/Project/lmms/build/svs-sdk-external/compute/Release/SVSCompute.exp
+  SVSCompute.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\Release\plugins\SVSCompute.dll
+  DiffSingerDurationTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerDurationTest.exe
+  DiffSingerSynthesisTest.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\diffsinger\Release\DiffSingerSynthesisTest.exe

@@ -128,6 +128,7 @@ void SynthesisScheduler::dispatch()
 		m_peak = std::max(m_peak, m_active);
 		job->state("Rendering");
 		m_pool.start(QRunnable::create([this, job] {
+			auto models = job->usesComputePolicy ? retainComputeModels() : std::shared_ptr<void>{};
 			QString error;
 			std::shared_ptr<const Audio> result;
 			QVector<SynthesisSegment> completedSegments;

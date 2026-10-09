@@ -156,6 +156,32 @@ int main(int argc, char** argv)
 			cancellation.join();
 		}
 		options.device = "dxgi:ffffffff:ffffffff";
+		{
+			const svsc_session_desc cpuOptions{sizeof(cpuOptions), 0, "cpu", "cpu", "memory-cpu", ""};
+			auto cpuSession = model.session(cpuOptions);
+			library.setMemoryPolicy("resident", 1);
+			cpuSession.createRun().run(inputs);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1300));
+			require(Json::parse(context.memoryStatus())["cpu"]["residentSessions"].get<unsigned>() > 0,
+					"CPU resident policy unexpectedly released models");
+			auto lease = library.retainModels();
+			library.setMemoryPolicy("idle", 1);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1300));
+			require(Json::parse(context.memoryStatus())["cpu"]["residentSessions"].get<unsigned>() > 0,
+					"CPU idle policy released an active render");
+			lease.reset();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			require(Json::parse(context.memoryStatus())["cpu"]["residentSessions"] == 0, "CPU idle release failed");
+			auto reloaded = cpuSession.createRun().run(inputs);
+			require(static_cast<const float*>(reloaded.value().tensors[0].data)[0] == 5, "CPU model reload failed");
+			library.setMemoryPolicy("immediate", 60);
+			cpuSession.createRun().run(inputs);
+			const auto released = Json::parse(context.memoryStatus());
+			require(released["cpu"]["residentSessions"] == 0 && released["releaseError"] == "",
+					"CPU immediate release failed");
+			std::cout << "MEMORY CPU release " << released.dump() << std::endl;
+			library.setMemoryPolicy("idle", 60);
+		}
 		options.cpu_only_reason = "force_on_cpu";
 		{
 			auto result = model.session(options).createRun().run(inputs);
@@ -181,6 +207,7 @@ int main(int argc, char** argv)
 			const auto id = device["device"].get<std::string>();
 			options.device = id.c_str();
 			options.allow_cpu_fallback = 0;
+			library.setMemoryPolicy("resident", 1);
 			auto result = model.session(options).createRun().run(inputs);
 			const auto route = Json::parse(result.value().execution_json);
 			require(route["effectiveDevice"] == id && route["providerEvidence"]["dmlNodes"].get<unsigned>() > 0,
@@ -189,6 +216,38 @@ int main(int argc, char** argv)
 			{
 				require(static_cast<const float*>(result.value().tensors[0].data)[i] == 5, "DML numerical mismatch");
 			}
+			auto session = model.session(options);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1300));
+			require(Json::parse(context.memoryStatus())["gpu"]["residentSessions"].get<unsigned>() > 0,
+					"Resident policy unexpectedly released models");
+			auto lease = library.retainModels();
+			library.setMemoryPolicy("idle", 1);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1300));
+			require(Json::parse(context.memoryStatus())["gpu"]["residentSessions"].get<unsigned>() > 0,
+					"Idle policy released models during rendering");
+			lease.reset();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			const auto released = Json::parse(context.memoryStatus());
+			require(released["gpu"]["residentSessions"] == 0 && released["releaseError"] == "",
+					"Idle policy failed to release resident models");
+			std::cout << "MEMORY idle release " << released.dump() << std::endl;
+			auto reloaded = session.createRun().run(inputs);
+			require(Json::parse(reloaded.value().execution_json)["providerEvidence"]["dmlNodes"].get<unsigned>() > 0,
+					"Released session did not reload on the selected GPU");
+			lease = library.retainModels();
+			library.setMemoryPolicy("immediate", 60);
+			auto firstStage = session.createRun().run(inputs);
+			auto secondStage = session.createRun().run(inputs);
+			require(Json::parse(context.memoryStatus())["gpu"]["residentSessions"].get<unsigned>() > 0,
+					"Immediate policy released models between render stages");
+			lease.reset();
+			const auto immediate = Json::parse(context.memoryStatus());
+			require(immediate["gpu"]["residentSessions"] == 0 && immediate["releaseError"] == "",
+					"Immediate policy failed after render completion");
+			require(static_cast<const float*>(secondStage.value().tensors[0].data)[0] == 5,
+					"GPU release invalidated retained result ownership");
+			std::cout << "MEMORY immediate release " << immediate.dump() << std::endl;
+			library.setMemoryPolicy("idle", 60);
 		}
 #ifdef _WIN32
 		options.backend = "cpu";

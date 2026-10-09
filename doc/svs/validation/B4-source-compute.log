@@ -1,0 +1,102 @@
+MEMORY CPU release {"policy":"immediate","idleSeconds":60,"activeRenders":0,"releaseError":"","gpu":{},"cpu":{"version":1,"epoch":"svsc-14052642717194216324-1","request":29,"status":0,"workerProcessId":37952,"residentSessions":0,"sessionHandles":5,"trimCount":3,"resources":{"workingSetBytes":31539200,"peakWorkingSetBytes":59564032}}}
+MEMORY idle release {"policy":"idle","idleSeconds":1,"activeRenders":0,"releaseError":"","gpu":{"version":1,"epoch":"svsc-8299391255161783613-18","request":8,"status":0,"workerProcessId":59400,"residentSessions":0,"sessionHandles":1,"trimCount":1,"resources":{"workingSetBytes":47538176,"peakWorkingSetBytes":76533760,"gpuLocalBytes":0,"gpuPeakObservedLocalBytes":8478720,"gpuLocalBudgetBytes":7930034996}},"cpu":{"version":1,"epoch":"svsc-14052642717194216324-1","request":41,"status":0,"workerProcessId":37952,"residentSessions":0,"sessionHandles":5,"trimCount":4,"resources":{"workingSetBytes":31547392,"peakWorkingSetBytes":59564032}}}
+MEMORY immediate release {"policy":"immediate","idleSeconds":60,"activeRenders":0,"releaseError":"","gpu":{"version":1,"epoch":"svsc-8299391255161783613-18","request":14,"status":0,"workerProcessId":59400,"residentSessions":0,"sessionHandles":1,"trimCount":2,"resources":{"workingSetBytes":48746496,"peakWorkingSetBytes":77778944,"gpuLocalBytes":0,"gpuPeakObservedLocalBytes":8478720,"gpuLocalBudgetBytes":7930034996}},"cpu":{"version":1,"epoch":"svsc-14052642717194216324-1","request":44,"status":0,"workerProcessId":37952,"residentSessions":0,"sessionHandles":5,"trimCount":5,"resources":{"workingSetBytes":31547392,"peakWorkingSetBytes":59564032}}}
+MEMORY idle release {"policy":"idle","idleSeconds":1,"activeRenders":0,"releaseError":"","gpu":{"version":1,"epoch":"svsc-17200775720583230238-23","request":8,"status":0,"workerProcessId":79748,"residentSessions":0,"sessionHandles":1,"trimCount":1,"resources":{"workingSetBytes":73228288,"peakWorkingSetBytes":96288768,"gpuLocalBytes":0,"gpuPeakObservedLocalBytes":13078528,"gpuLocalBudgetBytes":7477395456}},"cpu":{"version":1,"epoch":"svsc-14052642717194216324-1","request":48,"status":0,"workerProcessId":37952,"residentSessions":0,"sessionHandles":5,"trimCount":6,"resources":{"workingSetBytes":31547392,"peakWorkingSetBytes":59564032}}}
+MEMORY immediate release {"policy":"immediate","idleSeconds":60,"activeRenders":0,"releaseError":"","gpu":{"version":1,"epoch":"svsc-17200775720583230238-23","request":14,"status":0,"workerProcessId":79748,"residentSessions":0,"sessionHandles":1,"trimCount":2,"resources":{"workingSetBytes":75001856,"peakWorkingSetBytes":99028992,"gpuLocalBytes":0,"gpuPeakObservedLocalBytes":13078528,"gpuLocalBudgetBytes":7477395456}},"cpu":{"version":1,"epoch":"svsc-14052642717194216324-1","request":51,"status":0,"workerProcessId":37952,"residentSessions":0,"sessionHandles":5,"trimCount":7,"resources":{"workingSetBytes":31547392,"peakWorkingSetBytes":59564032}}}
+{
+  "cpu": {
+    "effectiveBackend": "cpu",
+    "effectiveDevice": "cpu",
+    "workerEpoch": "svsc-14052642717194216324-1",
+    "runtimeVersion": "svs-compute-1/ort-1.23.0/dml-1.15.4",
+    "runMilliseconds": 6.2634,
+    "resources": {
+      "workingSetBytes": 31649792,
+      "peakWorkingSetBytes": 31670272
+    },
+    "providerEvidence": {
+      "dmlNodes": 0,
+      "cpuNodes": 1,
+      "nodes": [
+        {
+          "name": "Add_0_kernel_time",
+          "provider": "CPUExecutionProvider",
+          "durationUs": 127.0
+        }
+      ],
+      "scope": "session-profile"
+    },
+    "requestedBackend": "cpu",
+    "requestedDevice": "cpu",
+    "stage": "conformance"
+  },
+  "devices": {
+    "runtimeVersion": "svs-compute-1/ort-1.23.0/dml-1.15.4",
+    "devices": [
+      {
+        "backend": "cpu",
+        "device": "cpu",
+        "name": "CPU",
+        "available": true
+      },
+      {
+        "backend": "directml",
+        "device": "dxgi:00000000:000148ca",
+        "name": "AMD Radeon 780M Graphics",
+        "vendorId": 4098,
+        "deviceId": 6400,
+        "dedicatedBytes": 536870912,
+        "version": 1,
+        "epoch": "svsc-2193891677927497657-16",
+        "request": 2,
+        "status": 0,
+        "workerProcessId": 58336,
+        "available": true,
+        "effectiveBackend": "directml",
+        "effectiveDevice": "dxgi:00000000:000148ca",
+        "providerEvidence": {
+          "dmlNodes": 1,
+          "cpuNodes": 0,
+          "nodes": [
+            {
+              "name": "DmlFusedNode_0_0_kernel_time",
+              "provider": "DmlExecutionProvider",
+              "durationUs": 1003.0
+            }
+          ],
+          "scope": "session-profile"
+        }
+      },
+      {
+        "backend": "directml",
+        "device": "dxgi:00000000:00016a3c",
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11609,
+        "dedicatedBytes": 8282701824,
+        "version": 1,
+        "epoch": "svsc-5776238196538895077-17",
+        "request": 2,
+        "status": 0,
+        "workerProcessId": 49244,
+        "available": true,
+        "effectiveBackend": "directml",
+        "effectiveDevice": "dxgi:00000000:00016a3c",
+        "providerEvidence": {
+          "dmlNodes": 1,
+          "cpuNodes": 0,
+          "nodes": [
+            {
+              "name": "DmlFusedNode_0_0_kernel_time",
+              "provider": "DmlExecutionProvider",
+              "durationUs": 877.0
+            }
+          ],
+          "scope": "session-profile"
+        }
+      }
+    ]
+  },
+  "crashIsolation": "PASS"
+}
+PASS: ownership, tensor validation, cancellation, CPU constraints, LUID and crash epoch

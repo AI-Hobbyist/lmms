@@ -4,6 +4,7 @@
 #include <regex>
 #include <set>
 
+#include "ComputeResidency.h"
 #include "ComputeTransport.h"
 
 namespace svsc {
@@ -37,6 +38,13 @@ struct Context : Object
 		: Object(Kind::Context)
 		, directory(std::move(path))
 	{
+		Residency::instance().contextOpened();
+	}
+	~Context() override
+	{
+		cpu.reset();
+		dml.reset();
+		Residency::instance().contextClosed();
 	}
 	std::shared_ptr<Worker> worker(const std::string& backend, const std::string& id)
 	{
@@ -57,6 +65,7 @@ struct Context : Object
 		if (!value)
 		{
 			value = std::make_shared<Worker>(directory, backend, id);
+			Residency::instance().add(value);
 		}
 		return value;
 	}
@@ -234,6 +243,7 @@ void backend(const char* type, const char* id)
 }
 void initialize(Session& session, const std::string& type, const std::string& id)
 {
+	RenderLease lease;
 	const auto worker = session.model->context->worker(type, id);
 	const auto response = worker->rpc({{"op", "session"}, {"model", session.model->descriptor}}, 120);
 	session.worker = worker;
@@ -469,6 +479,7 @@ svsc_status SVSC_CALL run(svsc_handle handle, const svsc_tensor* inputs, uint32_
 		*output = 0;
 	}
 	return call([&] {
+		RenderLease lease;
 		if (!output || !inputs || !count || count > 256)
 		{
 			throw Error(SVSC_INVALID_ARGUMENT, "Invalid run tensor count");
@@ -667,9 +678,44 @@ const char* SVSC_CALL error()
 	return lastError.c_str();
 }
 
+svsc_status SVSC_CALL setMemoryPolicy(const char* policy, uint32_t seconds)
+{
+	return call([&] {
+		if (!policy)
+		{
+			throw Error(SVSC_INVALID_ARGUMENT, "Missing memory policy");
+		}
+		Residency::instance().configure(policy, seconds);
+	});
+}
+svsc_status SVSC_CALL beginRender()
+{
+	return call([] { Residency::instance().begin(); });
+}
+svsc_status SVSC_CALL endRender()
+{
+	return call([] { Residency::instance().end(); });
+}
+svsc_status SVSC_CALL memoryStatus(svsc_handle handle, char** output)
+{
+	return call([&] {
+		const auto context = get<Context>(handle, Kind::Context);
+		auto report = Residency::instance().status();
+		std::shared_ptr<Worker> worker, cpu;
+		{
+			std::lock_guard<std::mutex> lock(context->mutex);
+			worker = context->dml;
+			cpu = context->cpu;
+		}
+		report["gpu"] = worker && !worker->lost.load() ? worker->rpc({{"op", "memory"}}) : Json::object();
+		report["cpu"] = cpu && !cpu->lost.load() ? cpu->rpc({{"op", "memory"}}) : Json::object();
+		outputString(report, output);
+	});
+}
+
 const svsc_api api{sizeof(svsc_api),
 				   SVSC_ABI_VERSION,
-				   SVSC_FEATURE_CPU | SVSC_FEATURE_ISOLATED_WORKER | SVSC_FEATURE_CANCEL
+				   SVSC_FEATURE_CPU | SVSC_FEATURE_ISOLATED_WORKER | SVSC_FEATURE_CANCEL | SVSC_FEATURE_MEMORY_POLICY
 #ifdef SVSC_HAS_DML
 					   | SVSC_FEATURE_DIRECTML
 #endif
@@ -691,7 +737,11 @@ const svsc_api api{sizeof(svsc_api),
 				   release,
 				   release,
 				   releaseString,
-				   error};
+				   error,
+				   setMemoryPolicy,
+				   beginRender,
+				   endRender,
+				   memoryStatus};
 } // namespace svsc
 
 extern "C" SVSC_EXPORT svsc_status SVSC_CALL svsc_get_api(uint32_t version, uint32_t size, const svsc_api** output)
@@ -700,7 +750,8 @@ extern "C" SVSC_EXPORT svsc_status SVSC_CALL svsc_get_api(uint32_t version, uint
 	{
 		*output = nullptr;
 	}
-	if (!output || (version >> 16) != 1 || (version & 0xffff) > 0 || size > sizeof(svsc_api) || size < sizeof(svsc_api))
+	if (!output || (version >> 16) != 1 || (version & 0xffff) > 0 || size > sizeof(svsc_api)
+		|| size < SVSC_API_REQUIRED_SIZE)
 	{
 		return SVSC_VERSION_MISMATCH;
 	}

@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <functional>
+#include <memory>
 
 namespace lmms::svs {
 class ComputePolicyUpdates : public QObject
@@ -24,6 +25,8 @@ void refreshComputePolicy(QJsonObject& document);
 // Resolve stage routes reported by a completed render before writing its audio cache.
 void recordComputeExecution(QJsonObject& document, const QJsonArray& stages);
 void markComputeCacheHit(QJsonObject& feedback);
+void applyComputeMemorySettings(const QString& policy, int idleSeconds);
+std::shared_ptr<void> retainComputeModels();
 bool applyComputeSettings(const QString& backend, const QString& device);
 } // namespace lmms::svs
 #endif

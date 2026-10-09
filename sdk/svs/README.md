@@ -7,12 +7,12 @@ This SDK builds native Singing Voice Synthesis plugins independently of LMMS. Th
 Use a C11/C++17 compiler and CMake. With Visual Studio on Windows, the minimal C example enables MSVC's C11 atomics support. Run each command in the foreground; capture and check its exit code before continuing:
 
 ```powershell
-& cmake -S sdk/svs -B build/svs-sdk -G 'Visual Studio 18 2026' -A x64 -DCMAKE_INSTALL_PREFIX="$PWD/build/svs-sdk-install" 2>&1 | Tee-Object -FilePath 'build.log' -Encoding utf8
+& cmake -S sdk/svs -B build/svs-sdk-external -G 'Visual Studio 18 2026' -A x64 -DCMAKE_INSTALL_PREFIX="$PWD/build/svs-sdk-install" 2>&1 | Tee-Object -FilePath 'build.log' -Encoding utf8
 $buildExitCode = $LASTEXITCODE
 if ($buildExitCode -ne 0) { Get-Content build.log -Tail 80; exit $buildExitCode }
 ```
 
-Repeat that logging/exit-code pattern for `cmake --build build/svs-sdk --config Release`, then `cmake --install build/svs-sdk --config Release`. In a standalone SDK source archive, use `-S .` instead of `-S sdk/svs`. On other platforms select the corresponding generator/compiler.
+Repeat that logging/exit-code pattern for `cmake --build build/svs-sdk-external --config Release`, then `cmake --install build/svs-sdk-external --config Release`. In a standalone SDK source archive, use `-S .` instead of `-S sdk/svs`. On other platforms select the corresponding generator/compiler.
 
 The installation contains `include/svs`, `lib/cmake/SVSSDK`, documentation and example/tool sources under `share/svs-sdk`, plugin packages under `svs`, and `bin/SVSConformance`. Consumers use `find_package(SVSSDK CONFIG REQUIRED)` and `target_link_libraries(my_plugin PRIVATE SVSSDK::SDK)` with `CMAKE_PREFIX_PATH` pointing to this installation. The installed full and minimal example directories can each be configured and built independently. The installed tool sources also form a standalone CMake project.
 
@@ -28,11 +28,11 @@ Read [api.md](docs/api.md) for ABI, ownership and threads, [formats.md](docs/for
 
 ABI 1.2 adds the optional engine-wide settings query and C++ helpers, preserving the ABI 1.0 mandatory prefix. See [EngineSettings.md](docs/EngineSettings.md) for engine names/types, global option descriptors, AI backend/device placeholders and immutable synthesis settings. The full example provides an output-gain option; the minimal C example remains a legacy-prefix compatibility fixture.
 
-## Native DiffSinger CPU engine
+## Native DiffSinger CPU / DirectML engine
 
 Enable `SVS_SDK_BUILD_DIFFSINGER=ON` and set `LMMS_ONNX_ROOT` to the official extracted ONNX Runtime CPU 1.23.0 SDK. The independent SDK build does not link LMMS or Qt. JSON, YAML and Mandarin pronunciation dependencies are frozen with SHA256 checks in the engine CMake file. The installation includes engine source under `share/svs-sdk/examples/diffsinger`; it can be built against the installed `SVSSDK::SDK` target. See [packages.md](docs/packages.md) for optional pitch range metadata.
 
-Deploy the entire `svs/SVSDiffSinger` folder, including `SVSDiffSinger.dll`, matching `onnxruntime.dll`, `manifest.json`, `data` and `licenses`. No singer models, reference application files, .NET or Python runtime are distributed. The empty engine catalog is valid. Configure **Settings → SVS → DiffSinger → Voicebank directories**, apply and rescan to load authorized external voicebanks. DirectML remains a placeholder in this A-series implementation; actual inference uses CPU.
+Deploy the entire `svs/SVSDiffSinger` folder, including `SVSDiffSinger.dll`, matching `onnxruntime.dll`, `manifest.json`, `data` and `licenses`. No singer models, reference application files, .NET or Python runtime are distributed. The empty engine catalog is valid. Configure **Settings → SVS → DiffSinger → Voicebank directories**, apply and rescan to load authorized external voicebanks. Enable `SVS_SDK_BUILD_COMPUTE=ON`, set `LMMS_ONNX_DML_ROOT` and `LMMS_DIRECTML_ROOT` to the frozen native dependencies, and deploy `plugins/SVSCompute.dll` together with the complete `svs/compute` directory and its licenses. Settings → SVS selects CPU or a successfully probed DirectML device globally. Each stage reports its actual route; voicebank CPU constraints and one-time backend fallback are respected. CPU execution remains available without a GPU.
 
 The native engine resolves supported dictionary entries/manual phonemes and Mandarin lyrics, predicts duration, pitch and enabled variance controls, then runs the acoustic model and vocoder. Other declared languages remain selectable; missing language G2P support produces a diagnostic rather than claiming full language synthesis. Resolved pronunciation is displayed above each note; the original lyric remains inside it. Available feedback reference curves are declared read-only by the selected voicebank.
 

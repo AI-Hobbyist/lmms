@@ -44,6 +44,9 @@ using Tensors = std::map<std::string, Tensor>;
 using InferenceObserver
 	= std::function<void(const fs::path&, const std::string&, uint32_t, const Tensors&, const Tensors&, const Json&)>;
 InferenceObserver exchangeInferenceObserver(InferenceObserver observer);
+void acquireComputeRuntime();
+void releaseComputeRuntime();
+std::shared_ptr<svs_compute::RenderLease> retainComputeModels();
 Json voiceComputePolicy(const VoicePackage& voice, Json policy);
 class CpuModel
 {

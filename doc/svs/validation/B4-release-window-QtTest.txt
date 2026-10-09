@@ -1,0 +1,31 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() SVS: SVSExample engine initialized?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot load library D:\UserData\Desktop\Project\lmms\build\Release\plugins\carlapatchbay.dll: ???????????????
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() SVS: SVSExample engine initialized?
+
+PASS   : SVSIntegrationTest::diffSingerReleaseWindow()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 53444ms
+********* Finished testing of SVSIntegrationTest *********

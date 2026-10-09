@@ -1,4 +1,4 @@
-﻿param([string]$ProductCommit, [string]$BaseManifest)
+param([string]$ProductCommit, [string]$BaseManifest)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
@@ -63,6 +63,22 @@ foreach ($file in Get-ChildItem -LiteralPath $diffSingerPackage -File -Recurse) 
         continue
     }
     $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
+}
+$computeClient = Join-Path $runtime 'plugins/SVSCompute.dll'
+if (-not (Test-Path -LiteralPath $computeClient -PathType Leaf)) {
+    throw 'Deployed shared compute client missing.'
+}
+$computePackage = Join-Path $runtime 'svs/compute'
+foreach ($file in Get-ChildItem -LiteralPath $computePackage -File -Recurse) {
+    if ($file.Name -match '\.(pdb|lib|exp|disabled)$') {
+        continue
+    }
+    $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
+}
+foreach ($required in @('SVSComputeWorker.exe', 'onnxruntime.dll', 'onnxruntime_providers_shared.dll', 'DirectML.dll', 'dependencies.lock.json', 'licenses/directml/LICENSE.txt', 'licenses/onnxruntime/LICENSE')) {
+    if (-not $payload.ContainsKey("svs/compute/$required")) {
+        throw "Incomplete shared compute runtime: $required"
+    }
 }
 foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imageformats', 'networkinformation', 'platforms', 'styles', 'tls')) {
     $folder = Join-Path $runtime $directory
@@ -175,7 +191,7 @@ LMMS 增强分支全量替换包（Windows x64）
 
 本包为完整运行文件，并非差分包：主程序、52 个启用 UI 插件、3 个导入导出插件、
 支持库、VST 32/64 位辅助程序、Zyn 辅助程序、Qt/音频运行库、预设/采样/主题与 SVS 示例。
-包含原生 DiffSinger CPU 完整依赖文件夹、空拍分段增量渲染、当前段/总段进度和参数配色；SDK 保持 ABI 1.0–1.3 兼容。
+包含原生 DiffSinger CPU/DirectML 完整依赖文件夹、共享计算 worker 与许可；SVS 全局选择实际设备，按阶段显示执行后端。模型内存管理默认空闲 60 秒释放，也可立即释放或常驻；CPU/GPU 通用。SDK 保持旧 ABI 兼容。
 包含官方默认工程模板：TripleOscillator、Sample track、Pattern 0、Automation track；Pattern Editor 包含 Kicker。
 包含 SVS 工程导入导出菜单、隔离 CPython/LibreSVIP 运行时和第三方许可文本；有损格式会在写入前具名提示。
 用户 templates/default.mpt 优先于官方模板。如果此前自行设置了空白模板，请先备份并停用该覆盖文件，再新建工程。

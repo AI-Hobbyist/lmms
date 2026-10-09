@@ -1,6 +1,7 @@
 /* Independent SVS Compute ABI 1.0. No dependency on Qt, STL or ONNX Runtime. */
 #ifndef SVS_COMPUTE_H
 #define SVS_COMPUTE_H
+#include <stddef.h>
 #include <stdint.h>
 #ifdef _WIN32
 #define SVSC_CALL __cdecl
@@ -22,6 +23,7 @@ extern "C" {
 #define SVSC_FEATURE_DIRECTML UINT64_C(2)
 #define SVSC_FEATURE_ISOLATED_WORKER UINT64_C(4)
 #define SVSC_FEATURE_CANCEL UINT64_C(8)
+#define SVSC_FEATURE_MEMORY_POLICY UINT64_C(16)
 #define SVSC_MAX_RANK 8u
 #define SVSC_MAX_BUFFER_BYTES UINT64_C(536870912)
 
@@ -110,7 +112,13 @@ typedef struct svsc_api
 	void(SVSC_CALL* destroy_context)(svsc_handle context);
 	void(SVSC_CALL* release_string)(char* string);
 	const char*(SVSC_CALL* last_error)(void);
+	/* Optional tail. The ABI 1.0 prefix remains compatible. Policy applies to all contexts in this client. */
+	svsc_status(SVSC_CALL* set_memory_policy)(const char* policy, uint32_t idle_seconds);
+	svsc_status(SVSC_CALL* begin_render)(void);
+	svsc_status(SVSC_CALL* end_render)(void);
+	svsc_status(SVSC_CALL* memory_status)(svsc_handle context, char** json);
 } svsc_api;
+#define SVSC_API_REQUIRED_SIZE ((uint32_t)offsetof(svsc_api, set_memory_policy))
 
 SVSC_EXPORT svsc_status SVSC_CALL svsc_get_api(uint32_t version, uint32_t size, const svsc_api** api);
 

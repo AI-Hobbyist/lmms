@@ -68,6 +68,16 @@ ComputePolicyUpdates& ComputePolicyUpdates::instance()
 QJsonObject requestedComputePolicy()
 {
 	auto* config = ConfigManager::inst();
+	try
+	{
+		static auto runtime = library(runtimeDirectory());
+		runtime.setMemoryPolicy(config->value("svs", "computeMemoryPolicy", "idle").toUtf8().constData(),
+								std::clamp(config->value("svs", "computeIdleSeconds", "60").toInt(), 1, 86400));
+	}
+	catch (const std::exception& error)
+	{
+		qWarning("SVS compute memory policy: %s", error.what());
+	}
 	const auto backend = config->value("svs", "computeBackend", "cpu");
 	return {{"requestedBackend", backend},
 			{"requestedDevice", backend == "cpu" ? "cpu" : config->value("svs", "computeDevice", "cpu")},
@@ -260,5 +270,28 @@ bool applyComputeSettings(const QString& backend, const QString& device)
 	config->setValue("svs", "computePolicyRevision", QString::number(revision + 1));
 	emit ComputePolicyUpdates::instance().changed();
 	return true;
+}
+void applyComputeMemorySettings(const QString& policy, int idleSeconds)
+{
+	if (policy != "immediate" && policy != "idle" && policy != "resident")
+	{
+		return;
+	}
+	auto* config = ConfigManager::inst();
+	config->setValue("svs", "computeMemoryPolicy", policy);
+	config->setValue("svs", "computeIdleSeconds", QString::number(std::clamp(idleSeconds, 1, 86400)));
+	requestedComputePolicy();
+}
+std::shared_ptr<void> retainComputeModels()
+{
+	try
+	{
+		return library(runtimeDirectory()).retainModels();
+	}
+	catch (const std::exception& error)
+	{
+		qWarning("SVS compute render lease: %s", error.what());
+		return {};
+	}
 }
 } // namespace lmms::svs

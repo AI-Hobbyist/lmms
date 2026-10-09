@@ -12,6 +12,7 @@
 #include <QScrollArea>
 #include <QSet>
 #include <QSlider>
+#include <QSpinBox>
 #include <QStandardItemModel>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -73,15 +74,37 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 		}
 	}
 	form->addRow(tr("Device"), m_device);
+	m_memoryPolicy = new QComboBox(body);
+	m_memoryPolicy->setObjectName("svsComputeMemoryPolicy");
+	m_memoryPolicy->addItem(tr("Release immediately after rendering"), "immediate");
+	m_memoryPolicy->addItem(tr("Release automatically when idle (default)"), "idle");
+	m_memoryPolicy->addItem(tr("Keep models resident"), "resident");
+	form->addRow(tr("AI model memory management"), m_memoryPolicy);
+	m_memoryPolicy->setToolTip(tr("Applies to all AI computation backends: CPU model memory and GPU model video "
+								  "memory. Released models reload when needed."));
+	m_idleSeconds = new QSpinBox(body);
+	m_idleSeconds->setObjectName("svsComputeIdleSeconds");
+	m_idleSeconds->setRange(1, 86400);
+	m_idleSeconds->setSuffix(tr(" s"));
+	form->addRow(tr("Idle time before release"), m_idleSeconds);
+	connect(m_memoryPolicy, qOverload<int>(&QComboBox::currentIndexChanged), this,
+			[this] { m_idleSeconds->setEnabled(m_memoryPolicy->currentData().toString() == "idle"); });
 	auto* hint = new QLabel(
 		tr("AI engines using shared compute follow this backend. DirectML devices must pass a real inference probe. "
 		   "Unavailable devices use CPU and report the reason; unsupported AI engines use CPU."),
 		body);
 	hint->setObjectName("svsComputeHint");
 	hint->setWordWrap(true);
-	if (!probeError.isEmpty()) { hint->setText(hint->text() + "\n" + probeError); }
+	if (!probeError.isEmpty())
+	{
+		hint->setText(hint->text() + "\n" + probeError);
+	}
 	controls->addWidget(hint);
 	auto* config = ConfigManager::inst();
+	m_memoryPolicy->setCurrentIndex(
+		std::max(0, m_memoryPolicy->findData(config->value("svs", "computeMemoryPolicy", "idle"))));
+	m_idleSeconds->setValue(std::clamp(config->value("svs", "computeIdleSeconds", "60").toInt(), 1, 86400));
+	m_idleSeconds->setEnabled(m_memoryPolicy->currentData().toString() == "idle");
 	m_backend->setCurrentIndex(std::max(0, m_backend->findData(config->value("svs", "computeBackend", "cpu"))));
 	const auto savedDevice = config->value("svs", "computeDevice", "cpu");
 	if (m_device->findData(savedDevice) < 0)
@@ -93,8 +116,8 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	m_pitchRanges = new QCheckBox(tr("Show voicebank pitch ranges"), body);
 	m_pitchRanges->setObjectName("svsShowVoicePitchRanges");
 	m_pitchRanges->setChecked(config->value("svs", "showVoicePitchRanges", "1").toInt() != 0);
-	m_pitchRanges->setToolTip(tr(
-		"Mark available, comfortable and weak pitches on the keyboard and show their ranges in the sidebar when the voicebank declares them."));
+	m_pitchRanges->setToolTip(tr("Mark available, comfortable and weak pitches on the keyboard and show their ranges "
+								 "in the sidebar when the voicebank declares them."));
 	controls->addWidget(m_pitchRanges);
 	m_backgroundWaveform = new QCheckBox(tr("Show translucent background waveform"), body);
 	m_backgroundWaveform->setObjectName("svsShowBackgroundWaveform");
@@ -155,31 +178,32 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 			rescan->setToolTip(tr("Rescan the applied voicebank directories. Apply directory changes first."));
 			pageLayout->insertWidget(pageLayout->count() - 1, rescan);
 			connect(rescan, &QPushButton::clicked, this, [key = installed.id] {
-				const auto settings = QJsonDocument::fromJson(
-					ConfigManager::inst()
-						->value("svsEngineSettings", "engine_" + QString::fromLatin1(key.toUtf8().toHex()))
-						.toUtf8())
-										  .object();
+				const auto settings
+					= QJsonDocument::fromJson(
+						  ConfigManager::inst()
+							  ->value("svsEngineSettings", "engine_" + QString::fromLatin1(key.toUtf8().toHex()))
+							  .toUtf8())
+						  .object();
 				svs::Registry::instance().refreshCatalogAsync(key, settings);
 			});
 			connect(&svs::Registry::instance(), &svs::Registry::catalogScanStarted, page,
-				[this, key = installed.id, status, rescan](const QString& id) {
-					if (id != key)
-						return;
-					status->setText(tr("Scanning voicebanks…"));
-					rescan->setEnabled(false);
-				});
+					[this, key = installed.id, status, rescan](const QString& id) {
+						if (id != key)
+							return;
+						status->setText(tr("Scanning voicebanks…"));
+						rescan->setEnabled(false);
+					});
 			connect(&svs::Registry::instance(), &svs::Registry::catalogScanFinished, page,
-				[this, key = installed.id, status, rescan](const QString& id, const QString& error) {
-					if (id != key)
-						return;
-					rescan->setEnabled(true);
-					int count = 0;
-					for (const auto& voice : svs::Registry::instance().voices())
-						if (voice.pluginId == key)
-							++count;
-					status->setText(error.isEmpty() ? tr("Voicebanks found: %1").arg(count) : error);
-				});
+					[this, key = installed.id, status, rescan](const QString& id, const QString& error) {
+						if (id != key)
+							return;
+						rescan->setEnabled(true);
+						int count = 0;
+						for (const auto& voice : svs::Registry::instance().voices())
+							if (voice.pluginId == key)
+								++count;
+						status->setText(error.isEmpty() ? tr("Voicebanks found: %1").arg(count) : error);
+					});
 			rescan->setEnabled(!svs::Registry::instance().scanning(installed.id));
 		}
 		m_engine->addTab(page, engineLabel(voice));
@@ -208,7 +232,7 @@ SVSSettingsPage::SVSSettingsPage(QWidget* parent)
 	stepsForm->addRow(tr("Rendering steps (1–100)"), stepsRow);
 	aiLayout->addLayout(stepsForm);
 	connect(m_aiSteps, &QSlider::valueChanged, stepsValue,
-		[stepsValue](int value) { stepsValue->setText(QString::number(value)); });
+			[stepsValue](int value) { stepsValue->setText(QString::number(value)); });
 	aiLayout->addStretch();
 	m_engine->addTab(aiExample, tr("AI example (AI)"));
 	controls->addWidget(m_engine);
@@ -234,13 +258,14 @@ void SVSSettingsPage::refreshEngine()
 	const auto key = voice.pluginId;
 	if (!m_values.contains(key))
 		m_values[key] = QJsonDocument::fromJson(
-			ConfigManager::inst()
-				->value("svsEngineSettings", "engine_" + QString::fromLatin1(key.toUtf8().toHex()))
-				.toUtf8())
+							ConfigManager::inst()
+								->value("svsEngineSettings", "engine_" + QString::fromLatin1(key.toUtf8().toHex()))
+								.toUtf8())
 							.object();
 	const auto values = m_values[key];
-	const QJsonObject context{{"engineSettings", values}, {"computeBackend", m_backend->currentData().toString()},
-		{"computeDevice", m_device->currentData().toString()}};
+	const QJsonObject context{{"engineSettings", values},
+							  {"computeBackend", m_backend->currentData().toString()},
+							  {"computeDevice", m_device->currentData().toString()}};
 	auto plugin = svs::Registry::instance().plugin(key);
 	m_status->setText(tr("Loading engine options…"));
 	QPointer<SVSSettingsPage> target(this);
@@ -264,10 +289,12 @@ void SVSSettingsPage::refreshEngine()
 				schema[i] = parameter;
 			}
 			if (error.isEmpty())
-				svs::Capabilities::parse(
-					{{"schemaVersion", 1}, {"parameters", schema}, {"feedbackParameters", QJsonArray{}},
-						{"languages", QJsonArray{"en"}}, {"defaultLanguage", "en"}},
-					parsed, error);
+				svs::Capabilities::parse({{"schemaVersion", 1},
+										  {"parameters", schema},
+										  {"feedbackParameters", QJsonArray{}},
+										  {"languages", QJsonArray{"en"}},
+										  {"defaultLanguage", "en"}},
+										 parsed, error);
 			if (!target)
 				return;
 			QMetaObject::invokeMethod(
@@ -296,25 +323,27 @@ void SVSSettingsPage::refreshEngine()
 					for (const auto& catalogVoice : svs::Registry::instance().voices())
 						if (catalogVoice.pluginId == key)
 							++count;
-					target->m_status->setText(svs::Registry::instance().scanning(key) ? tr("Scanning voicebanks…")
+					target->m_status->setText(
+						svs::Registry::instance().scanning(key) ? tr("Scanning voicebanks…")
 							: count == 0 ? tr("No voicebanks found. Configure directories and apply, then rescan.")
 							: parsed.parameters.isEmpty() ? tr("This engine does not declare additional options.")
 														  : tr("Voicebanks found: %1").arg(count));
 					target->m_parameters->refresh(parsed.parameters, "track", {values}, values,
-						[target, key](const QString& id, const QJsonValue& value) {
-							if (!target)
-								return;
-							target->m_values[key][id] = value;
-							// Refresh after the parameter setter has returned; refreshing synchronously
-							// replaces the std::function which is currently executing this callback.
-							QMetaObject::invokeMethod(
-								target,
-								[target] {
-									if (target)
-										target->refreshEngine();
-								},
-								Qt::QueuedConnection);
-						});
+												  [target, key](const QString& id, const QJsonValue& value) {
+													  if (!target)
+														  return;
+													  target->m_values[key][id] = value;
+													  // Refresh after the parameter setter has returned; refreshing
+													  // synchronously replaces the std::function which is currently
+													  // executing this callback.
+													  QMetaObject::invokeMethod(
+														  target,
+														  [target] {
+															  if (target)
+																  target->refreshEngine();
+														  },
+														  Qt::QueuedConnection);
+												  });
 				},
 				Qt::QueuedConnection);
 		}));
@@ -322,6 +351,7 @@ void SVSSettingsPage::refreshEngine()
 void SVSSettingsPage::save()
 {
 	auto* config = ConfigManager::inst();
+	svs::applyComputeMemorySettings(m_memoryPolicy->currentData().toString(), m_idleSeconds->value());
 	const bool computeChanged
 		= svs::applyComputeSettings(m_backend->currentData().toString(), m_device->currentData().toString());
 	config->setValue("svs", "aiExampleRenderSteps", QString::number(m_aiSteps->value()));
@@ -358,7 +388,8 @@ void SVSSettingsPage::save()
 		{
 			auto* track = static_cast<SVSTrack*>(base);
 			const bool ai = track->voice().metadata["engineType"].toString() == "ai";
-			if (!changed.contains(track->pluginId()) && !(computeChanged && ai)) continue;
+			if (!changed.contains(track->pluginId()) && !(computeChanged && ai))
+				continue;
 			for (auto* item : track->getClips())
 			{
 				auto* clip = static_cast<SVSClip*>(item);
@@ -367,4 +398,4 @@ void SVSSettingsPage::save()
 			}
 		}
 }
-}
+} // namespace lmms::gui

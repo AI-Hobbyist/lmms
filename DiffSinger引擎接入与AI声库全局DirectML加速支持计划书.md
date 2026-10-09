@@ -237,7 +237,7 @@ GUI只使用原生Windows Qt：构建→实际开发版窗口→稳定渲染→�
 | B1 | PASS | 原生共享客户端/独立 worker/SDK RAII；六包 CPU 全链、第二 AI 插件、两 GPU LUID/DML 节点、取消/缺库/崩溃 epoch、旧 ABI 通过，见 B1 验收 | 非 Windows 运行未在本机验证 |
 | B2 | PASS | 全局策略/有效缓存身份；第二 AI 实际 DML clip/导出、Apply/Cancel/重启、缺设备/旧结果门禁和传统回归；原生主题设置实窗通过，见 B2 验收 | — |
 | B3 | PASS | 六包 48 模型 DML/CPU 数值与反馈对照、六包 CPU 回归、两 GPU 实际链、CPU 约束/一次回退/取消/并发预算、有效阶段缓存通过，见 B3 验收 | 听感 MANUAL/PENDING |
-| B4 | NOT STARTED | — | 听感/体验待实施后验收 |
+| B4 | IN PROGRESS | 独立 SDK/共享运行库安装、完整回归与 Release 实窗验收进行中；包含用户追加的通用模型内存管理 | 听感/体验 MANUAL/PENDING |
 
 计划编制交付检查已在 `05cd61c5f` 完成。本轮授权仅顺序实施 A0～A4，各阶段分别提交推送；B 保持未开始。
 
@@ -269,3 +269,17 @@ B1 自动验收已通过，详见 [B1 验收](doc/svs/DiffSinger-B1-validation.m
 B2 必需自动验收已通过，详见 [B2 验收](doc/svs/DiffSinger-B2-validation.md)。本阶段提交并确认推送后进入 B3；真实声库 GPU 全链比较仍待验收。
 
 B3 必需自动验收已通过，详见 [B3 验收](doc/svs/DiffSinger-B3-validation.md)。本阶段提交并确认推送后进入 B4；独立 SDK/Release 交付与完整回归仍待完成。
+
+B4 用户追加（2026-10-09）：SVS AI 全局选项增加模型驻留策略：渲染完成后立即释放／空闲后自动释放（默认）／保持模型常驻。空闲时间可自定义，默认 60 秒。所有计算后端通用：CPU 释放模型内存，GPU 释放模型显存。修改驻留策略不更改音频身份；渲染租约期间不释放，结束/取消后按策略回收，下一请求自动重新加载；保存/重启及 CPU/DML 生命周期均验证。
+
+B4 必需自动验收已通过，详见 [B4 验收](doc/svs/DiffSinger-B4-validation.md)：完整 SVS 88 passed / 0 failed；10 个有前提用例另行执行通过。最终 GPU/Release 实窗专项 6 passed / 0 failed，旧 GUI fixture 修复复验 4 passed / 0 failed。CPU 与两 GPU 三种驻留策略、公开 SDK 消费方、SDK 源码 ZIP 独立重建、包内真实推理及原位 DLL/替换包哈希均通过。主观听感/操作体验仍为非阻塞 MANUAL/PENDING。
+
+| 检查点 | 状态/提交 |
+| --- | --- |
+| B0 | 已提交推送 `a4f948e7a` |
+| B1 | 已提交推送 `d65e271ac` |
+| B2 | 已提交推送 `3bb156fee` |
+| B3 | 已提交推送 `d37677308` |
+| B4 | 自动验收完成；本记录所属检查点提交推送后完成 B0～B4 |
+
+用户后续交付要求：B4 检查点完成后，删除 DAW 部署中的 SVS 示例 DLL，仅保留可用引擎及计算依赖；参考代码保留。生成基于已有全量替换包的增量包，安装器同步清理对应示例 DLL/扫描 manifest，另行记录并提交推送交付检查点。

@@ -37,6 +37,8 @@ SVSClip::SVSClip(Track* track)
 	: Clip(track)
 	, m_id(QUuid::createUuid().toString(QUuid::WithoutBraces))
 {
+	m_seed = QString::fromLatin1(QCryptographicHash::hash(m_id.toUtf8(), QCryptographicHash::Sha256).toHex().left(8))
+				 .toUInt(nullptr, 16);
 	changeLength(TimePos::ticksPerBar());
 	setName("SVS");
 	connect(track->getMutedModel(), &BoolModel::dataChanged, this, [this, track] {
@@ -181,7 +183,10 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 }
 void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
 {
-	if (readOnly() || !supportsPitchRecording() || ranges.isEmpty()) { return; }
+	if (readOnly() || !supportsPitchRecording() || ranges.isEmpty())
+	{
+		return;
+	}
 	auto requests = m_editorState["pitchPredictionRequests"].toObject();
 	auto recordings = m_editorState["pitchRecordings"].toArray();
 	if (recordings.isEmpty())
@@ -192,25 +197,38 @@ void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
 	const auto options = m_editorState["pitchRecordingOptions"].toObject();
 	const double seed
 		= options["fixed"].toBool() ? options["seed"].toDouble() : double(QRandomGenerator::global()->generate());
-	if (!std::isfinite(seed) || seed < 0 || seed > UINT32_MAX || std::floor(seed) != seed) { return; }
+	if (!std::isfinite(seed) || seed < 0 || seed > UINT32_MAX || std::floor(seed) != seed)
+	{
+		return;
+	}
 	const int recording = recordings.size();
 	auto curves = m_curves;
 	bool changed = false;
 	for (const auto& range : ranges)
 	{
-		if (!std::isfinite(range.first) || !std::isfinite(range.second) || range.first >= range.second) { continue; }
+		if (!std::isfinite(range.first) || !std::isfinite(range.second) || range.first >= range.second)
+		{
+			continue;
+		}
 		for (const auto& note : m_notes)
 		{
 			if (note.tick < range.second && note.tick + note.duration > range.first)
 			{
 				requests[note.id] = QJsonObject{{"request", QUuid::createUuid().toString(QUuid::WithoutBraces)},
-					{"seed", seed}, {"take", recording}};
+												{"seed", seed},
+												{"take", recording}};
 				changed = true;
 			}
 		}
-		if (curves.contains("svs.pitch")) { curves["svs.pitch"].replaceRange(range.first, range.second, svs::Curve{}); }
+		if (curves.contains("svs.pitch"))
+		{
+			curves["svs.pitch"].replaceRange(range.first, range.second, svs::Curve{});
+		}
 	}
-	if (!changed) { return; }
+	if (!changed)
+	{
+		return;
+	}
 
 	addJournalCheckPoint();
 	m_editorState["pitchPredictionRequests"] = requests;
@@ -270,8 +288,8 @@ bool SVSClip::setParameter(const QString& id, const QJsonValue& value)
 }
 QJsonValue SVSClip::parameterBase(const svs::Parameter& p) const
 {
-	return svs::parameterBase(
-		p, static_cast<const SVSTrack*>(getTrack())->parameters(), m_parameters, m_globalParameters);
+	return svs::parameterBase(p, static_cast<const SVSTrack*>(getTrack())->parameters(), m_parameters,
+							  m_globalParameters);
 }
 bool SVSClip::setGlobalParameter(const QString& id, const QJsonValue& value)
 {
@@ -303,8 +321,8 @@ bool SVSClip::importDictionary(const QByteArray& bytes, QString& error)
 		return false;
 	}
 	svs::Dictionary dictionary;
-	if (!svs::Dictionary::parse(
-			bytes, static_cast<SVSTrack*>(getTrack())->capabilities().phonemeSet, dictionary, error))
+	if (!svs::Dictionary::parse(bytes, static_cast<SVSTrack*>(getTrack())->capabilities().phonemeSet, dictionary,
+								error))
 		return false;
 	const auto& cap = static_cast<SVSTrack*>(getTrack())->capabilities();
 	if (dictionary.phonemeSet != cap.phonemeSetId || !cap.languages.contains(dictionary.language))
@@ -418,8 +436,8 @@ void SVSClip::synthesize()
 				emit target->dataChanged();
 			}
 		},
-		[target, current, rate = input.rate, cachedOnly = !plugin](
-			std::shared_ptr<const svs::Audio> result, const QString& error) {
+		[target, current, rate = input.rate, cachedOnly = !plugin](std::shared_ptr<const svs::Audio> result,
+																   const QString& error) {
 			if (!current())
 				return;
 			if (result && !result->cacheKey.isEmpty())
@@ -483,21 +501,26 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 	double contentEnd = -int(startTimeOffset()) + int(length());
 	for (const auto& note : m_notes)
 		contentEnd = std::max(contentEnd, note.tick + note.duration);
-	input.document = {{"clipId", m_id}, {"voiceId", track->voiceId()}, {"pluginId", track->pluginId()},
-		{"position", int(startPosition())}, {"contentOffset", -int(startTimeOffset())}, {"tempo", tempo->baseTempo},
-		{"tempoSource", tempo->toJson()}, {"contentEndTick", contentEnd}};
-	// Clip IDs are random UUIDs; retain the chosen seed across cache replay and project reload.
-	input.document["seed"] = double(
-		QString::fromLatin1(QCryptographicHash::hash(m_id.toUtf8(), QCryptographicHash::Sha256).toHex().left(8))
-			.toUInt(nullptr, 16));
-	if (!m_globalParameters.isEmpty()) input.document["globalParameters"] = m_globalParameters;
+	input.document = {{"clipId", m_id},
+					  {"voiceId", track->voiceId()},
+					  {"pluginId", track->pluginId()},
+					  {"position", int(startPosition())},
+					  {"contentOffset", -int(startTimeOffset())},
+					  {"tempo", tempo->baseTempo},
+					  {"tempoSource", tempo->toJson()},
+					  {"contentEndTick", contentEnd}};
+	// Entity IDs may change during cloning; the synthesis seed remains part of the content.
+	input.document["seed"] = double(m_seed);
+	if (!m_globalParameters.isEmpty())
+		input.document["globalParameters"] = m_globalParameters;
 	input.document["trackParameters"] = track->parameters();
 	input.document["clipParameters"] = m_parameters;
-	input.document["engineSettings"] = QJsonDocument::fromJson(
-		ConfigManager::inst()
-			->value("svsEngineSettings", "engine_" + QString::fromLatin1(track->pluginId().toUtf8().toHex()))
-			.toUtf8())
-										   .object();
+	input.document["engineSettings"]
+		= QJsonDocument::fromJson(
+			  ConfigManager::inst()
+				  ->value("svsEngineSettings", "engine_" + QString::fromLatin1(track->pluginId().toUtf8().toHex()))
+				  .toUtf8())
+			  .object();
 	const auto compute
 		= svs::resolveComputePolicy(svs::requestedComputePolicy(), track->voice().metadata["engineType"].toString(),
 									track->capabilities().original["compute"].toObject());
@@ -515,17 +538,26 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 	input.document["projectDictionaries"] = m_projectDictionaryData;
 	QJsonArray dictionaries;
 	for (const auto& dictionary : track->dictionaries())
-		dictionaries.append(QJsonObject{{"id", dictionary.id}, {"version", dictionary.version},
-			{"hash", dictionary.hash}, {"language", dictionary.language}, {"phonemeSet", dictionary.phonemeSet},
-			{"entries", dictionary.entries}});
+		dictionaries.append(QJsonObject{{"id", dictionary.id},
+										{"version", dictionary.version},
+										{"hash", dictionary.hash},
+										{"language", dictionary.language},
+										{"phonemeSet", dictionary.phonemeSet},
+										{"entries", dictionary.entries}});
 	input.document["voiceDictionaries"] = dictionaries;
 	auto pitchRequests = m_editorState["pitchPredictionRequests"].toObject();
 	QJsonObject activeRequests;
 	for (const auto& note : m_notes)
 	{
-		if (pitchRequests.contains(note.id)) { activeRequests[note.id] = pitchRequests[note.id]; }
+		if (pitchRequests.contains(note.id))
+		{
+			activeRequests[note.id] = pitchRequests[note.id];
+		}
 	}
-	if (!activeRequests.isEmpty()) { input.document["pitchPredictionRequests"] = activeRequests; }
+	if (!activeRequests.isEmpty())
+	{
+		input.document["pitchPredictionRequests"] = activeRequests;
+	}
 	input.document["queryCapabilities"] = true;
 	input.document["voiceVersion"] = track->voice().version;
 	input.document["pluginVersion"] = track->voice().metadata["pluginVersion"];
@@ -621,6 +653,7 @@ void SVSClip::saveSettings(QDomDocument& doc, QDomElement& node)
 	}
 	node.setAttribute("schemaVersion", 1);
 	node.setAttribute("id", m_id);
+	node.setAttribute("seed", QString::number(m_seed));
 	node.setAttribute("pos", node.parentNode().nodeName() == "clipboard" ? -1 : int(startPosition()));
 	node.setAttribute("len", int(length()));
 	node.setAttribute("off", int(startTimeOffset()));
@@ -634,11 +667,11 @@ void SVSClip::saveSettings(QDomDocument& doc, QDomElement& node)
 	node.setAttribute("cacheSampleRate", m_cacheRate);
 	node.setAttribute("cacheComputePolicy",
 					  QString::fromUtf8(QJsonDocument(m_cacheComputePolicy).toJson(QJsonDocument::Compact)));
-	node.setAttribute(
-		"globalParameters", QString::fromUtf8(QJsonDocument(m_globalParameters).toJson(QJsonDocument::Compact)));
+	node.setAttribute("globalParameters",
+					  QString::fromUtf8(QJsonDocument(m_globalParameters).toJson(QJsonDocument::Compact)));
 	node.setAttribute("parameters", QString::fromUtf8(QJsonDocument(m_parameters).toJson(QJsonDocument::Compact)));
 	node.setAttribute("projectDictionaries",
-		QString::fromUtf8(QJsonDocument(m_projectDictionaryData).toJson(QJsonDocument::Compact)));
+					  QString::fromUtf8(QJsonDocument(m_projectDictionaryData).toJson(QJsonDocument::Compact)));
 	auto curves = m_unparsedCurves;
 	const auto known = svs::curvesToJson(m_curves);
 	for (auto i = known.begin(); i != known.end(); ++i)
@@ -674,6 +707,16 @@ void SVSClip::loadSettings(const QDomElement& node)
 	m_original.removeAttribute("newEntity");
 	m_notes.clear();
 	m_id = node.attribute("id", m_id);
+	// Preserve legacy projects' previous UUID-derived seed before assigning a clone a new UUID.
+	const auto legacySeed
+		= QString::fromLatin1(QCryptographicHash::hash(m_id.toUtf8(), QCryptographicHash::Sha256).toHex().left(8))
+			  .toUInt(nullptr, 16);
+	bool seedValid = false;
+	m_seed = node.attribute("seed", QString::number(legacySeed)).toUInt(&seedValid);
+	if (!seedValid)
+	{
+		m_migrationDiagnostic = "Invalid SVS seed; original node preserved";
+	}
 	if (node.attribute("pos").toInt() >= 0)
 		movePosition(node.attribute("pos").toInt());
 	changeLength(std::max(1, node.attribute("len").toInt()));
@@ -765,7 +808,7 @@ void SVSClip::loadSettings(const QDomElement& node)
 			m_original.setAttribute("id", m_id);
 			QSet<QString> copiedIds;
 			for (auto note = m_original.firstChildElement("notes").firstChildElement("note"); !note.isNull();
-				note = note.nextSiblingElement("note"))
+				 note = note.nextSiblingElement("note"))
 			{
 				auto identity = identities.value(note.attribute("id"));
 				if (identity.isEmpty() || copiedIds.contains(identity))
@@ -779,4 +822,4 @@ void SVSClip::loadSettings(const QDomElement& node)
 	invalidate();
 	scheduleSynthesis();
 }
-}
+} // namespace lmms

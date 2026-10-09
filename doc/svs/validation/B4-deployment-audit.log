@@ -1,0 +1,4 @@
+PASS: 52 enabled UI plugin DLLs plus 26 executable/shared compute/DiffSinger package files match replacement manifest.
+Deployed top-level plugin/support DLL count: 76
+SID in-place retirement: True
+PASS: no private voice models, SVS audition audio, refs, personal configuration or debug/disabled binaries in package.

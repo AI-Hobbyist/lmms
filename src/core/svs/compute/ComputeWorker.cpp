@@ -141,6 +141,39 @@ class Server
 	std::string backend, id, epoch;
 	uint64_t lastRequest = 0, nextHandle = 1, clock = 0;
 	std::map<uint64_t, std::unique_ptr<Session>> sessions;
+	uint64_t trimCount = 0;
+	Json memoryStatus()
+	{
+		uint64_t resident = 0;
+		for (const auto& item : sessions)
+		{
+			resident += bool(item.second->session);
+		}
+		return {{"residentSessions", resident},
+				{"sessionHandles", sessions.size()},
+				{"trimCount", trimCount},
+				{"resources", device.resourceUsage()}};
+	}
+	Json trim()
+	{
+		if (backend == "cpu" || backend == "directml")
+		{
+			for (auto& item : sessions)
+			{
+				auto& model = *item.second;
+				if (model.session)
+				{
+					model.captureProfile();
+				}
+				model.session = Ort::Session(nullptr);
+				std::string{}.swap(model.seedBytes);
+				model.providers = Json::object();
+			}
+			device.releaseGpu();
+			++trimCount;
+		}
+		return memoryStatus();
+	}
 	Json inventory()
 	{
 		Json devices = Json::array();
@@ -296,7 +329,11 @@ class Server
 		{
 			throw Error(SVSC_INVALID_ARGUMENT, "Input tensor count mismatch");
 		}
-		if (!model.seedBytes.empty())
+		if (!model.session)
+		{
+			model.seedBytes = ModelSeed(model.path, Json::parse(model.key).at("seed").get<uint32_t>()).read(model.path);
+		}
+		if (!model.session || !model.seedBytes.empty())
 		{
 			model.reset(environment, device, backend, id);
 		}
@@ -512,6 +549,14 @@ public:
 			else if (operation == "run")
 			{
 				response.update(run(request));
+			}
+			else if (operation == "trim")
+			{
+				response.update(trim());
+			}
+			else if (operation == "memory")
+			{
+				response.update(memoryStatus());
 			}
 			else if (operation == "release")
 			{

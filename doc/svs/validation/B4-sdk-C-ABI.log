@@ -1,0 +1,1 @@
+Native pure C ABI check: ../../build/svs-sdk-install/bin/SVSComputeAbiCheck.exe; exit code: 0; stdout/stderr empty on success

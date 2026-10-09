@@ -120,6 +120,14 @@ struct Device
 #endif
 		return resources;
 	}
+	void releaseGpu()
+	{
+#ifdef SVSC_HAS_DML
+		queue.Reset();
+		dml.Reset();
+		d3d.Reset();
+#endif
+	}
 };
 } // namespace svsc
 #endif

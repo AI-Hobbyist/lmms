@@ -1,0 +1,58 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::nativeComputeSettings()
+QINFO  : SVSIntegrationTest::sharedAiHostPolicy() {"effectiveBackend":"directml","effectiveDevice":"dxgi:00000000:000148ca","providerEvidence":{"cpuNodes":0,"dmlNodes":1,"nodes":[{"durationUs":1056,"name":"DmlFusedNode_0_0_kernel_time","provider":"DmlExecutionProvider"}],"scope":"session-profile"},"requestedBackend":"directml","requestedDevice":"dxgi:00000000:000148ca","resources":{"gpuLocalBudgetBytes":7930034996,"gpuLocalBytes":8478720,"gpuPeakObservedLocalBytes":8478720,"peakWorkingSetBytes":76611584,"workingSetBytes":76611584},"runMilliseconds":10.9694,"runtimeVersion":"svs-compute-1/ort-1.23.0/dml-1.15.4","stage":"test-acoustic","workerEpoch":"svsc-12813560657692005067-16"}
+QINFO  : SVSIntegrationTest::sharedAiHostPolicy() ********* Start testing of SVSIntegrationTest *********?
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11?
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized?
+PASS   : SVSIntegrationTest::initTestCase()?
+PASS   : SVSIntegrationTest::computePolicyRestartChild()?
+PASS   : SVSIntegrationTest::cleanupTestCase()?
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 391ms?
+********* Finished testing of SVSIntegrationTest *********?
+ 
+PASS   : SVSIntegrationTest::sharedAiHostPolicy()
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "pitch/linguistic") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 357)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "pitch/pitch") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 2685)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "variance/linguistic") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 357)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "variance/variance") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 2341)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "acoustic/acoustic") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 4132)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "vocoder/model") QJsonValue(string, "directml") QJsonValue(bool, false) QJsonValue(double, 225)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "duration.linguistic") QJsonValue(string, "directml") QJsonValue(undefined) QJsonValue(double, 382)
+QINFO  : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport() B4 stage QJsonValue(string, "duration") QJsonValue(string, "directml") QJsonValue(undefined) QJsonValue(double, 72)
+JO-ID 8388933 already in use by svsclip!
+JO-ID 8396309 already in use by svstrack!
+PASS   : SVSIntegrationTest::diffSingerCpuAudioPlaybackAndExport()
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() SVS: SVSExample engine initialized?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+
+QINFO  : SVSIntegrationTest::diffSingerReleaseWindow() SVS: SVSExample engine initialized?
+
+PASS   : SVSIntegrationTest::diffSingerReleaseWindow()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 6 passed, 0 failed, 0 skipped, 0 blacklisted, 85781ms
+********* Finished testing of SVSIntegrationTest *********

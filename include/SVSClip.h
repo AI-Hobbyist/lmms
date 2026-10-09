@@ -1,13 +1,14 @@
 #ifndef LMMS_SVS_CLIP_H
 #define LMMS_SVS_CLIP_H
-#include "Clip.h"
-#include "SVSModel.h"
-#include "SVSCurve.h"
-#include "SVSSegmentedSynthesis.h"
-#include <atomic>
-#include <QPointer>
 #include <QDomElement>
 #include <QJsonArray>
+#include <QPointer>
+#include <atomic>
+
+#include "Clip.h"
+#include "SVSCurve.h"
+#include "SVSModel.h"
+#include "SVSSegmentedSynthesis.h"
 namespace lmms {
 class SVSClip : public Clip
 {
@@ -62,6 +63,7 @@ private:
 	QString m_cacheKey, m_cacheInputHash;
 	QJsonObject m_cacheComputePolicy;
 	uint32_t m_cacheRate = 0;
+	uint32_t m_seed = 0;
 	QVector<svs::Note> m_notes;
 	svs::Curves m_curves;
 	QJsonObject m_editorState;
@@ -74,5 +76,5 @@ private:
 	std::shared_ptr<svs::RenderControl> m_renderControl;
 	QVector<svs::SynthesisSegment> m_segments;
 };
-}
+} // namespace lmms
 #endif

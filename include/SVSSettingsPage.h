@@ -6,6 +6,7 @@ class QLabel;
 class QTabWidget;
 class QSlider;
 class QCheckBox;
+class QSpinBox;
 namespace lmms::gui {
 class SVSSettingsPage : public QWidget
 {
@@ -18,6 +19,8 @@ private:
 	void refreshEngine();
 	QComboBox* m_backend;
 	QComboBox* m_device;
+	QComboBox* m_memoryPolicy;
+	QSpinBox* m_idleSeconds;
 	QSlider* m_aiSteps;
 	QCheckBox* m_pitchRanges;
 	QCheckBox* m_backgroundWaveform;
@@ -29,5 +32,5 @@ private:
 	QVector<svs::Parameter> m_schema;
 	unsigned m_request = 0;
 };
-}
+} // namespace lmms::gui
 #endif

@@ -1,0 +1,8 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  1>Checking Build System
+d:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(551,5): warning MSB8028: 中间目录(SVSComputeConsumer.dir\Release\)包含从另一个项目(SVSComputeConsumer.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。 [D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\examples\compute-consumer\SVSComputeConsumer.vcxproj]
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/build/svs-sdk-install/share/svs-sdk/examples/compute-consumer/CMakeLists.txt
+  main.cpp
+  SVSComputeConsumer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\svs-sdk-external\examples\compute-consumer\Release\SVSComputeConsumer.exe
+  Building Custom Rule D:/UserData/Desktop/Project/lmms/build/svs-sdk-install/share/svs-sdk/examples/compute-consumer/CMakeLists.txt

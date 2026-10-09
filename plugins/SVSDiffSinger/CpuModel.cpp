@@ -1,12 +1,25 @@
 #include "CpuModel.h"
 
 #include <cstdlib>
+#include <mutex>
 #include <thread>
 #include <utility>
 
 namespace diffsinger {
 namespace {
 thread_local InferenceObserver inferenceObserver;
+struct ComputeRuntime
+{
+	std::mutex mutex;
+	size_t engines = 0;
+	std::optional<svs_compute::Library> library;
+	std::optional<svs_compute::Context> context;
+};
+ComputeRuntime& computeRuntime()
+{
+	static ComputeRuntime runtime;
+	return runtime;
+}
 svs_compute::Context& computeContext()
 {
 	static const auto directory = [] {
@@ -14,15 +27,41 @@ svs_compute::Context& computeContext()
 		return configured && *configured ? fs::u8path(configured)
 										 : packageDirectory().parent_path().parent_path() / "svs" / "compute";
 	}();
+	auto& runtime = computeRuntime();
+	std::lock_guard lock(runtime.mutex);
+	if (!runtime.context)
+	{
 #ifdef _WIN32
-	static svs_compute::Library library(directory.parent_path().parent_path() / "plugins" / "SVSCompute.dll");
+		runtime.library.emplace(directory.parent_path().parent_path() / "plugins" / "SVSCompute.dll");
 #else
-	static svs_compute::Library library(directory.parent_path().parent_path() / "plugins" / "libSVSCompute.so");
+		runtime.library.emplace(directory.parent_path().parent_path() / "plugins" / "libSVSCompute.so");
 #endif
-	static auto context = library.context(directory);
-	return context;
+		runtime.context.emplace(runtime.library->context(directory));
+	}
+	return *runtime.context;
 }
 } // namespace
+void acquireComputeRuntime()
+{
+	auto& runtime = computeRuntime();
+	std::lock_guard lock(runtime.mutex);
+	++runtime.engines;
+}
+void releaseComputeRuntime()
+{
+	auto& runtime = computeRuntime();
+	std::lock_guard lock(runtime.mutex);
+	if (--runtime.engines == 0)
+	{
+		// Join the residency monitor while the plugin is still loaded, outside the DLL loader lock.
+		runtime.context.reset();
+		runtime.library.reset();
+	}
+}
+std::shared_ptr<svs_compute::RenderLease> retainComputeModels()
+{
+	return computeContext().retainModels();
+}
 InferenceObserver exchangeInferenceObserver(InferenceObserver observer)
 {
 	return std::exchange(inferenceObserver, std::move(observer));

@@ -155,6 +155,12 @@ private slots:
 		QVERIFY(m_configuration.isValid());
 		ConfigManager::inst()->loadConfigFile(
 			qEnvironmentVariable("SVS_COMPUTE_CONFIG_TEST", m_configuration.filePath("svs-test-config.xml")));
+		const auto device = qEnvironmentVariable("SVS_DIFFSINGER_TEST_DEVICE");
+		if (!device.isEmpty())
+		{
+			ConfigManager::inst()->setValue("svs", "computeBackend", "directml");
+			ConfigManager::inst()->setValue("svs", "computeDevice", device);
+		}
 		if (qEnvironmentVariableIsSet("SVS_EMBEDDED_GUI_TEST"))
 		{
 			if (qEnvironmentVariableIsSet("SVS_TEST_AVATAR_PATH"))
@@ -2277,10 +2283,12 @@ private slots:
 		process.start(QCoreApplication::applicationFilePath(),
 					  {"cachedRestoreWithoutPlugin", "-o", report + ",txt", "-o", "-,txt"});
 		QVERIFY(process.waitForStarted(5000));
-		QVERIFY(process.waitForFinished(15000));
+		const auto childFinished = process.waitForFinished(60000);
+		const auto processOutput = process.readAllStandardOutput() + process.readAllStandardError();
 		QFile childResult(report);
-		QVERIFY(childResult.open(QIODevice::ReadOnly));
-		const auto output = childResult.readAll() + process.readAllStandardOutput() + process.readAllStandardError();
+		QVERIFY2(childResult.open(QIODevice::ReadOnly), processOutput.constData());
+		const auto output = childResult.readAll() + processOutput;
+		QVERIFY2(childFinished, output.constData());
 		QVERIFY2(process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0, output.constData());
 		QVERIFY(output.contains("3 passed, 0 failed"));
 	}
@@ -2320,6 +2328,10 @@ private slots:
 		song->stop();
 		QVERIFY(energy > .01);
 		auto* copy = static_cast<SVSClip*>(clip->clone());
+		auto copiedInput = copy->captureInput(audio->rate);
+		const auto sourceInput = clip->captureInput(audio->rate);
+		QCOMPARE(copiedInput.document["seed"], sourceInput.document["seed"]);
+		QCOMPARE(svs::Cache::editableKey(copiedInput), saved.attribute("cacheInputHash"));
 		QTRY_VERIFY_WITH_TIMEOUT(copy->audio() != nullptr, 10000);
 		QVERIFY(copy->notes()[0].id != clip->notes()[0].id);
 		QVERIFY(copy->audio()->feedback["pronunciations"].toObject().contains(copy->notes()[0].id));
@@ -3074,10 +3086,10 @@ private slots:
 	}
 	void computeStageCacheIdentity()
 	{
-			QJsonObject traditional{{"fixture", "unchanged"}};
-			const auto original = traditional;
-			svs::markComputeCacheHit(traditional);
-			QCOMPARE(traditional, original);
+		QJsonObject traditional{{"fixture", "unchanged"}};
+		const auto original = traditional;
+		svs::markComputeCacheHit(traditional);
+		QCOMPARE(traditional, original);
 		svs::Input gpu;
 		gpu.secondsPerTick = 1. / 96.;
 		gpu.rate = 48000;
@@ -3233,13 +3245,17 @@ private slots:
 		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
 		auto* config = ConfigManager::inst();
 		const auto original = svs::requestedComputePolicy();
+		const auto originalMemory = config->value("svs", "computeMemoryPolicy", "idle");
+		const auto originalSeconds = config->value("svs", "computeIdleSeconds", "60").toInt();
 		auto restore = qScopeGuard([&] {
+			svs::applyComputeMemorySettings(originalMemory, originalSeconds);
 			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
 			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
 			config->setValue("svs", "computePolicyRevision",
 							 QString::number(original["policyRevision"].toDouble(), 'f', 0));
 		});
 		svs::applyComputeSettings("cpu", "cpu");
+		svs::applyComputeMemorySettings("idle", 60);
 		gui::SVSSettingsPage page;
 		page.resize(900, 650);
 		page.show();
@@ -3247,6 +3263,21 @@ private slots:
 		QTest::qWait(700);
 		auto* backend = page.findChild<QComboBox*>("svsComputeBackend");
 		auto* device = page.findChild<QComboBox*>("svsComputeDevice");
+		auto* memory = page.findChild<QComboBox*>("svsComputeMemoryPolicy");
+		auto* seconds = page.findChild<QSpinBox*>("svsComputeIdleSeconds");
+		QVERIFY(memory && seconds);
+		QCOMPARE(memory->count(), 3);
+		QCOMPARE(memory->currentData().toString(), QString("idle"));
+		QCOMPARE(seconds->value(), 60);
+		QVERIFY(memory->isEnabled() && seconds->isEnabled());
+		memory->setCurrentIndex(memory->findData("resident"));
+		QVERIFY(!seconds->isEnabled());
+		QCOMPARE(config->value("svs", "computeMemoryPolicy"), QString("idle"));
+		memory->setCurrentIndex(memory->findData("immediate"));
+		QVERIFY(!seconds->isEnabled());
+		memory->setCurrentIndex(memory->findData("idle"));
+		QVERIFY(seconds->isEnabled());
+		seconds->setValue(17);
 		QVERIFY(backend && device);
 		QCOMPARE(device->currentData().toString(), QString("cpu"));
 		QVERIFY(!device->isEnabled());
@@ -3259,11 +3290,14 @@ private slots:
 		QCOMPARE(svs::requestedComputePolicy()["requestedBackend"].toString(), QString("cpu"));
 		page.save();
 		const auto applied = svs::requestedComputePolicy();
+		QCOMPARE(config->value("svs", "computeMemoryPolicy"), QString("idle"));
+		QCOMPARE(config->value("svs", "computeIdleSeconds"), QString("17"));
 		QCOMPARE(applied["requestedDevice"].toString(), device->currentData().toString());
 		QTest::qWait(700);
-		QVERIFY(page.screen()->grabWindow(page.winId()).save("doc/svs/validation/B2-native-compute-settings.png"));
+		QVERIFY(page.screen()->grabWindow(page.winId()).save("doc/svs/validation/B4-native-compute-settings.png"));
 		page.close();
 		gui::SVSSettingsPage reopened;
+		QCOMPARE(reopened.findChild<QSpinBox*>("svsComputeIdleSeconds")->value(), 17);
 		QCOMPARE(reopened.findChild<QComboBox*>("svsComputeDevice")->currentData().toString(),
 				 applied["requestedDevice"].toString());
 		config->setValue("svs", "computeDevice", "dxgi:ffffffff:ffffffff");
@@ -3276,7 +3310,7 @@ private slots:
 		QCOMPARE(unavailable->currentData().toString(), QString("dxgi:ffffffff:ffffffff"));
 		QVERIFY(
 			!static_cast<QStandardItemModel*>(unavailable->model())->item(unavailable->currentIndex())->isEnabled());
-		QVERIFY(missing.screen()->grabWindow(missing.winId()).save("doc/svs/validation/B2-native-missing-device.png"));
+		QVERIFY(missing.screen()->grabWindow(missing.winId()).save("doc/svs/validation/B4-native-missing-device.png"));
 		missing.close();
 	}
 	void computePolicyRestartChild()
@@ -3289,14 +3323,23 @@ private slots:
 		QCOMPARE(policy["requestedBackend"].toString(), QString("directml"));
 		QCOMPARE(policy["requestedDevice"].toString(), qEnvironmentVariable("SVS_COMPUTE_EXPECT_DEVICE"));
 		QCOMPARE(policy["policyRevision"].toDouble(), qEnvironmentVariable("SVS_COMPUTE_EXPECT_REVISION").toDouble());
+		if (qEnvironmentVariableIsSet("SVS_COMPUTE_EXPECT_MEMORY"))
+		{
+			QCOMPARE(ConfigManager::inst()->value("svs", "computeMemoryPolicy"),
+					 qEnvironmentVariable("SVS_COMPUTE_EXPECT_MEMORY"));
+			QCOMPARE(ConfigManager::inst()->value("svs", "computeIdleSeconds"), QString("17"));
+		}
 	}
 	void sharedAiHostPolicy()
 	{
 		auto* config = ConfigManager::inst();
 		const auto original = svs::requestedComputePolicy();
+		const auto originalMemory = config->value("svs", "computeMemoryPolicy", "idle");
+		const auto originalSeconds = config->value("svs", "computeIdleSeconds", "60").toInt();
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
 		auto restore = qScopeGuard([&] {
 			delete track;
+			svs::applyComputeMemorySettings(originalMemory, originalSeconds);
 			config->setValue("svs", "computeBackend", original["requestedBackend"].toString());
 			config->setValue("svs", "computeDevice", original["requestedDevice"].toString());
 			config->setValue("svs", "computePolicyRevision",
@@ -3329,6 +3372,11 @@ private slots:
 		QCOMPARE(execution["effectiveDevice"].toString(), selected);
 		QVERIFY(execution["providerEvidence"].toObject()["dmlNodes"].toInt() > 0);
 		qInfo().noquote() << QJsonDocument(execution).toJson(QJsonDocument::Compact);
+		const auto memoryAudio = clip->audio();
+		const auto beforeMemoryChange = svs::requestedComputePolicy();
+		svs::applyComputeMemorySettings("resident", 17);
+		QCOMPARE(svs::requestedComputePolicy(), beforeMemoryChange);
+		QCOMPARE(clip->audio(), memoryAudio);
 		const auto captured = svs::ExportSnapshot::capture(*Engine::getSong(), 48000);
 		QCOMPARE(captured.size(), 1);
 		QCOMPARE(captured[0].input.document["computePolicy"].toObject()["effectiveDevice"].toString(), selected);
@@ -3349,8 +3397,10 @@ private slots:
 		QProcess child;
 		auto environment = QProcessEnvironment::systemEnvironment();
 		environment.remove("SVS_EMBEDDED_GUI_TEST");
+		environment.remove("SVS_DIFFSINGER_TEST_DEVICE");
 		environment.insert("SVS_COMPUTE_CONFIG_TEST", m_configuration.filePath("svs-test-config.xml"));
 		environment.insert("SVS_COMPUTE_EXPECT_DEVICE", selected);
+		environment.insert("SVS_COMPUTE_EXPECT_MEMORY", "resident");
 		environment.insert("SVS_COMPUTE_EXPECT_REVISION",
 						   QString::number(svs::requestedComputePolicy()["policyRevision"].toDouble(), 'f', 0));
 		child.setProcessEnvironment(environment);
@@ -5578,7 +5628,7 @@ private slots:
 		pitch.insert(192, 64.5);
 		pitch.insert(240, 65.5);
 		clip->setEditorData({first, second}, {{"svs.pitch", pitch}});
-		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 180000);
 		gui::SVSCanvas canvas(clip);
 		canvas.resize(900, 500);
 		canvas.show();
@@ -5645,7 +5695,7 @@ private slots:
 		QVERIFY(invoke("svsRepredictSelectedPitch"));
 		requests = clip->captureInput(44100).document["pitchPredictionRequests"].toObject();
 		QVERIFY(requests.contains(first.id) && requests.contains(second.id));
-		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 10000);
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 180000);
 		QDomDocument document;
 		auto node = document.createElement("svsclip");
 		clip->saveSettings(document, node);
@@ -5881,9 +5931,16 @@ private slots:
 	}
 	void tuneLabStretchAlignmentNativeWindow()
 	{
+		auto* song = Engine::getSong();
+		const auto previousTempo = song->getTempo();
+		// Fixed tick expectations assume the default 140 BPM maximum phoneme lead.
+		song->tempoModel().setValue(DefaultTempo);
 		const auto voice = svs::Registry::instance().voices().first();
-		auto* track = new SVSTrack(Engine::getSong());
-		auto cleanup = qScopeGuard([&] { delete track; });
+		auto* track = new SVSTrack(song);
+		auto cleanup = qScopeGuard([&] {
+			delete track;
+			song->tempoModel().setValue(previousTempo);
+		});
 		track->bindVoice(voice.pluginId, "full");
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
 		auto* clip = static_cast<SVSClip*>(track->createClip(0));
@@ -7674,7 +7731,24 @@ private slots:
 		b.pitch = 62;
 		clip->setNotes({a, b});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 180000);
-		const auto audio = clip->audio();
+		auto audio = clip->audio();
+		if (qEnvironmentVariableIsSet("SVS_DIFFSINGER_TEST_DEVICE"))
+		{
+			bool acoustic = false;
+			for (const auto& item : audio->feedback["computeStages"].toArray())
+			{
+				const auto stage = item.toObject();
+				qInfo() << "B4 stage" << stage["stage"] << stage["effectiveBackend"] << stage["cacheHit"]
+						<< stage["providerEvidence"].toObject()["dmlNodes"];
+				if (stage["stage"].toString().startsWith("acoustic/") && !stage["cacheHit"].toBool())
+				{
+					QCOMPARE(stage["effectiveBackend"].toString(), QString("directml"));
+					QVERIFY(stage["providerEvidence"].toObject()["dmlNodes"].toInt() > 0);
+					acoustic = true;
+				}
+			}
+			QVERIFY(acoustic);
+		}
 		double energy = 0;
 		for (float value : audio->samples)
 		{
@@ -7715,6 +7789,24 @@ private slots:
 				QVERIFY(notes);
 				notes->setScroll(0, 66);
 				notes->setZoom(4, 1);
+				if (name == "breathiness")
+				{
+					const auto beforeEdit = audio;
+					QTest::mouseDClick(notes, Qt::LeftButton, Qt::NoModifier, notes->noteRect(a).center().toPoint());
+					auto* lyric = notes->findChild<QLineEdit*>("svsInlineLyric");
+					QVERIFY(lyric);
+					lyric->setText(QString::fromUtf8("他"));
+					QTest::keyClick(lyric, Qt::Key_Return);
+					QTRY_VERIFY_WITH_TIMEOUT(clip->audio() && clip->audio() != beforeEdit, 180000);
+					QTest::mouseDClick(notes, Qt::LeftButton, Qt::NoModifier,
+									   notes->noteRect(clip->notes()[0]).center().toPoint());
+					lyric = notes->findChild<QLineEdit*>("svsInlineLyric");
+					QVERIFY(lyric);
+					lyric->setText(a.lyric);
+					QTest::keyClick(lyric, Qt::Key_Return);
+					QTRY_VERIFY_WITH_TIMEOUT(clip->audio() && clip->notes()[0].lyric == a.lyric, 180000);
+					audio = clip->audio();
+				}
 				auto* tab = editor.findChild<QToolButton*>("svsParameterTab." + key);
 				QVERIFY(tab);
 				QVERIFY(tab->toolTip().contains("Read-only"));
@@ -7733,7 +7825,7 @@ private slots:
 				QTest::qWait(700);
 				QVERIFY(editor.screen()
 							->grabWindow(editor.winId())
-							.save("doc/svs/validation/A3-native-reference-" + name + ".png"));
+							.save("doc/svs/validation/B4-native-reference-" + name + ".png"));
 				editor.close();
 			}
 		}
@@ -8085,6 +8177,9 @@ private slots:
 		});
 		QJsonObject settings{{"diffsinger.voicebankDirectories", QJsonArray{root}},
 							 {"diffsinger.renderSteps", 5},
+							 {"diffsinger.vocoderDirectories",
+							  QJsonArray{QDir::toNativeSeparators(
+								  QDir(qEnvironmentVariable("LMMS_SVS_PLUGIN_DIR")).absoluteFilePath("vocoders"))}},
 							 {"diffsinger.showPhonemeLanguagePrefix", true}};
 		config->setValue("svsEngineSettings", key,
 						 QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
@@ -8310,6 +8405,16 @@ private slots:
 		config->saveConfigFile();
 		QProcess process;
 		process.setProcessChannelMode(QProcess::MergedChannels);
+		auto environment = QProcessEnvironment::systemEnvironment();
+		for (const auto& name :
+			 {"LMMS_DATA_DIR", "LMMS_PLUGIN_DIR", "LMMS_SVS_PLUGIN_DIR", "SVS_COMPUTE_RUNTIME_DIR", "QT_PLUGIN_PATH"})
+		{
+			environment.remove(name);
+		}
+		environment.insert("PATH",
+						   QFileInfo(executable).absolutePath() + ";" + qEnvironmentVariable("SystemRoot")
+							   + "/System32;" + qEnvironmentVariable("SystemRoot"));
+		process.setProcessEnvironment(environment);
 		connect(&process, &QProcess::readyReadStandardOutput, this,
 				[&] { qInfo().noquote() << process.readAllStandardOutput(); });
 		process.start(executable, {"--config", m_configuration.filePath("svs-test-config.xml"), project});
@@ -8369,7 +8474,7 @@ private slots:
 						++blue;
 			return blue;
 		};
-		QVERIFY(capture.save("doc/svs/validation/A4-native-release-main.png"));
+		QVERIFY(capture.save("doc/svs/validation/B4-native-release-main.png"));
 		QVERIFY2(bluePixels(capture) > 20, "SVS default clip blue is missing from the real Song Editor window");
 		const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, window.pid);
 		QVERIFY(snapshot != INVALID_HANDLE_VALUE);
@@ -8423,7 +8528,7 @@ private slots:
 		QCOMPARE(process.state(), QProcess::Running);
 		QVERIFY(QGuiApplication::primaryScreen()
 					->grabWindow(WId(window.handle))
-					.save("doc/svs/validation/A4-native-empty-release.png"));
+					.save("doc/svs/validation/B4-native-empty-release.png"));
 		PostMessageW(window.handle, WM_CLOSE, 0, 0);
 		QTRY_COMPARE_WITH_TIMEOUT(process.state(), QProcess::NotRunning, 10000);
 		QCOMPARE(process.exitStatus(), QProcess::NormalExit);

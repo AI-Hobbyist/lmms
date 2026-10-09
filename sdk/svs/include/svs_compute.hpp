@@ -64,6 +64,13 @@ struct LibraryState
 			throw Error(status, api && api->last_error ? api->last_error() : "Compute ABI negotiation failed");
 		}
 	}
+	void requireMemoryPolicy() const
+	{
+		if (api->size < sizeof(svsc_api) || !(api->features & SVSC_FEATURE_MEMORY_POLICY))
+		{
+			throw Error(SVSC_UNAVAILABLE, "Compute runtime does not support memory policy");
+		}
+	}
 };
 struct State
 {
@@ -98,6 +105,22 @@ inline std::string string(std::shared_ptr<State> owner, svsc_status status, char
 	return text.get();
 }
 } // namespace detail
+
+class RenderLease
+{
+	std::shared_ptr<detail::LibraryState> m_library;
+
+public:
+	explicit RenderLease(std::shared_ptr<detail::LibraryState> library)
+		: m_library(std::move(library))
+	{
+		m_library->requireMemoryPolicy();
+		m_library->check(m_library->api->begin_render());
+	}
+	RenderLease(const RenderLease&) = delete;
+	RenderLease& operator=(const RenderLease&) = delete;
+	~RenderLease() { m_library->api->end_render(); }
+};
 
 class Result
 {
@@ -191,6 +214,14 @@ class Context
 	}
 
 public:
+	std::shared_ptr<RenderLease> retainModels() const { return std::make_shared<RenderLease>(m_state->library); }
+	std::string memoryStatus() const
+	{
+		m_state->library->requireMemoryPolicy();
+		char* text = nullptr;
+		const auto status = m_state->library->api->memory_status(m_state->handle, &text);
+		return detail::string(m_state, status, text);
+	}
 	std::string devices() const
 	{
 		char* text = nullptr;
@@ -232,8 +263,9 @@ public:
 		{
 			throw Error(SVSC_UNAVAILABLE, "Cannot load SVSCompute runtime: " + detail::utf8(path));
 		}
-		m_state->check(entry(SVSC_ABI_VERSION, sizeof(svsc_api), &m_state->api));
-		if (!m_state->api || m_state->api->size < sizeof(svsc_api) || m_state->api->abi_version != SVSC_ABI_VERSION)
+		m_state->check(entry(SVSC_ABI_VERSION, SVSC_API_REQUIRED_SIZE, &m_state->api));
+		if (!m_state->api || m_state->api->size < SVSC_API_REQUIRED_SIZE
+			|| m_state->api->abi_version != SVSC_ABI_VERSION)
 		{
 			throw Error(SVSC_VERSION_MISMATCH, "Incompatible SVSCompute ABI");
 		}
@@ -245,6 +277,12 @@ public:
 		return Context(std::make_shared<detail::State>(m_state, handle, m_state->api->destroy_context));
 	}
 	const svsc_api& api() const { return *m_state->api; }
+	void setMemoryPolicy(const char* policy, uint32_t idleSeconds = 60) const
+	{
+		m_state->requireMemoryPolicy();
+		m_state->check(m_state->api->set_memory_policy(policy, idleSeconds));
+	}
+	std::shared_ptr<RenderLease> retainModels() const { return std::make_shared<RenderLease>(m_state); }
 };
 } // namespace svs_compute
 #endif

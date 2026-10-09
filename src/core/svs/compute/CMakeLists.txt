@@ -1,5 +1,14 @@
 set(LMMS_ONNX_DML_ROOT "$ENV{LMMS_ONNX_DML_ROOT}" CACHE PATH "Frozen native ORT DirectML 1.23.0 package")
 set(LMMS_DIRECTML_ROOT "$ENV{LMMS_DIRECTML_ROOT}" CACHE PATH "Frozen DirectML 1.15.4 package")
+if(NOT TARGET nlohmann_json::nlohmann_json)
+	include(FetchContent)
+	set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+	set(JSON_Install OFF CACHE BOOL "" FORCE)
+	FetchContent_Declare(diffsinger_json
+		URL https://github.com/nlohmann/json/archive/55f93686c01528224f448c19128836e7df245f72.tar.gz
+		URL_HASH SHA256=67f4cdd9ca930c9c1e130af4a437c7fc98fab77a2846fc2d2a14b4943831f8ef)
+	FetchContent_MakeAvailable(diffsinger_json)
+endif()
 add_executable(SVSComputeAbiCheck ComputeAbiCheck.c)
 target_link_libraries(SVSComputeAbiCheck PRIVATE SVSSDK::SDK)
 set_property(TARGET SVSComputeAbiCheck PROPERTY C_STANDARD 11)
@@ -83,6 +92,27 @@ if(WIN32 AND LMMS_ONNX_DML_ROOT AND LMMS_DIRECTML_ROOT)
 			"${LMMS_ONNX_DML_ROOT}/runtimes/win-x64/native/onnxruntime_providers_shared.dll"
 			"${LMMS_DIRECTML_ROOT}/bin/x64-win/DirectML.dll"
 			"$<TARGET_FILE_DIR:SVSComputeWorker>")
+	set(svsc_license_directory "${CMAKE_CURRENT_BINARY_DIR}/licenses")
+	include(FetchContent)
+	FetchContent_GetProperties(diffsinger_json SOURCE_DIR svsc_json_source)
+	file(MAKE_DIRECTORY "${svsc_license_directory}/onnxruntime" "${svsc_license_directory}/directml"
+		"${svsc_license_directory}/json")
+	configure_file("${svsc_json_source}/LICENSE.MIT"
+		"${svsc_license_directory}/json/LICENSE.MIT" COPYONLY)
+	configure_file("${LMMS_ONNX_DML_ROOT}/LICENSE" "${svsc_license_directory}/onnxruntime/LICENSE" COPYONLY)
+	configure_file("${LMMS_ONNX_DML_ROOT}/ThirdPartyNotices.txt"
+		"${svsc_license_directory}/onnxruntime/ThirdPartyNotices.txt" COPYONLY)
+	foreach(svsc_notice LICENSE.txt LICENSE-CODE.txt ThirdPartyNotices.txt)
+		configure_file("${LMMS_DIRECTML_ROOT}/${svsc_notice}" "${svsc_license_directory}/directml/${svsc_notice}" COPYONLY)
+	endforeach()
+	add_custom_command(TARGET SVSComputeWorker POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_directory "${svsc_license_directory}" "$<TARGET_FILE_DIR:SVSComputeWorker>/licenses"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/dependencies.lock.json"
+			"$<TARGET_FILE_DIR:SVSComputeWorker>/dependencies.lock.json")
+	install(FILES "${LMMS_ONNX_DML_ROOT}/runtimes/win-x64/native/onnxruntime.dll"
+		"${LMMS_ONNX_DML_ROOT}/runtimes/win-x64/native/onnxruntime_providers_shared.dll"
+		"${LMMS_DIRECTML_ROOT}/bin/x64-win/DirectML.dll" DESTINATION svs/compute)
+	install(DIRECTORY "${svsc_license_directory}/" DESTINATION svs/compute/licenses)
 	add_executable(SVSComputeProbe ComputeProbe.cpp)
 	target_compile_features(SVSComputeProbe PRIVATE cxx_std_17)
 	target_compile_definitions(SVSComputeProbe PRIVATE NOMINMAX)
@@ -105,3 +135,7 @@ else()
 	find_library(svsc_cpu_ort NAMES onnxruntime PATHS "${LMMS_ONNX_ROOT}/lib" NO_DEFAULT_PATH REQUIRED)
 	target_link_libraries(SVSComputeWorker PRIVATE "${svsc_cpu_ort}")
 endif()
+install(TARGETS SVSCompute RUNTIME DESTINATION plugins LIBRARY DESTINATION plugins ARCHIVE DESTINATION lib)
+install(TARGETS SVSComputeWorker RUNTIME DESTINATION svs/compute)
+install(FILES dependencies.lock.json DESTINATION svs/compute)
+install(TARGETS SVSComputeConformance SVSComputeAbiCheck RUNTIME DESTINATION bin)
