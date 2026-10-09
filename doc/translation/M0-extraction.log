@@ -1,0 +1,14 @@
+D:/UserData/Desktop/Project/lmms/include/vsthost/ScanRootsWidget.h:26: Class 'lmms::gui::ScanRootsWidget' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/core/audio/AudioFileDevice.cpp:50: Class 'lmms::gui::ExportProjectDialog' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/core/audio/AudioPortAudio.cpp:224: Class 'lmms::gui::AudioPortAudioSetupWidget::DeviceSelectorWidget' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/core/audio/AudioPortAudio.cpp:276: Class 'lmms::gui::AudioPortAudioSetupWidget' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/core/audio/AudioSdl.cpp:202: Class 'lmms::AudioSdl::setupWidget' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/core/svs/SVSExportSnapshot.cpp:97: Class 'lmms::svs::ExportSnapshot' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/LmmsStyle.cpp:162: Class 'lmms::gui::LmmsStyle' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/editors/svc/SVCViews.cpp:59: Class 'lmms::gui::SVCLabelButton' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/editors/svs/SVSLyricEditor.cpp:69: Class 'lmms::gui::SVSLyricEditor' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/editors/svs/SVSParameterPanel.cpp:126: Class 'lmms::gui::SVSParameterPanel' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/editors/svs/SVSSettingsPage.cpp:32: Class 'lmms::gui::SVSSettingsPage' lacks Q_OBJECT macro
+D:/UserData/Desktop/Project/lmms/src/gui/modals/VersionedSaveDialog.cpp:185: Class 'lmms::gui::SaveOptionsWidget' lacks Q_OBJECT macro
+Updating 'doc/translation/current.ts'...
+    Found 3446 source text(s) (3446 new and 0 already existing)
