@@ -112,6 +112,19 @@ Catalog::Catalog()
 				{"limits", QJsonObject{{"min_seconds", 1}, {"max_seconds", 1}, {"max_upload_bytes", 1}}}};
 		if (!install(profile).isEmpty()) { continue; }
 		m_modules.insert(profile.id, {plugin, info.library});
+		auto* timer = new QTimer(this);
+		timer->setSingleShot(true);
+		m_retryTimers.insert(profile.id, timer);
+		connect(timer, &QTimer::timeout, this, [this, id = profile.id] {
+			if (m_stopping || !m_reconnecting.contains(id) || m_connecting.contains(id)) { return; }
+			if (++m_retryCounts[id] > reconnectPolicy().maximumRetries)
+			{
+				stopRetries(id);
+				emit changed();
+				return;
+			}
+			beginDiscovery(id);
+		});
 		m_status.insert(profile.id, tr("Not connected"));
 		QTimer::singleShot(0, this, [this, id = profile.id] { refresh(id); });
 	}
@@ -121,6 +134,11 @@ Catalog::~Catalog()
 { shutdown(); }
 void Catalog::shutdown()
 {
+	for (auto* timer : m_retryTimers)
+	{
+		timer->stop();
+	}
+	m_reconnecting.clear();
 	{
 		std::lock_guard lock(m_mutex);
 		m_stopping = true;
@@ -131,7 +149,14 @@ void Catalog::shutdown()
 }
 void Catalog::refresh(const QString& id)
 {
+	stopRetries(id);
+	beginDiscovery(id);
+}
+
+void Catalog::beginDiscovery(const QString& id)
+{
 	if (!m_modules.contains(id)) { return; }
+	m_connecting.insert(id);
 	const auto frozen = connection(id);
 	const auto version = ++m_versions[id];
 	auto offline = engine(id);
@@ -151,6 +176,92 @@ void Catalog::refresh(const QString& id)
 		m_worker = std::thread([this] { discover(); });
 	}
 	m_wake.notify_all();
+}
+
+ReconnectPolicy Catalog::reconnectPolicy() const
+{
+	ReconnectPolicy policy;
+	const auto* config = ConfigManager::inst();
+	const auto interval = config->value("svcReconnect", "intervalSeconds", "5").toInt();
+	const auto retries = config->value("svcReconnect", "maximumRetries", "3").toInt();
+	if (interval >= 1 && interval <= 86400) { policy.intervalSeconds = interval; }
+	if (retries >= 1 && retries <= 1000) { policy.maximumRetries = retries; }
+	return policy;
+}
+
+QString Catalog::setReconnectPolicy(const ReconnectPolicy& policy)
+{
+	if (policy.intervalSeconds < 1 || policy.intervalSeconds > 86400 || policy.maximumRetries < 1
+		|| policy.maximumRetries > 1000)
+	{
+		return tr("Reconnect interval must be 1–86400 seconds; maximum retries must be 1–1000");
+	}
+	const auto previous = reconnectPolicy();
+	if (previous.intervalSeconds == policy.intervalSeconds && previous.maximumRetries == policy.maximumRetries)
+	{
+		return {};
+	}
+	for (const auto& id : m_modules.keys())
+	{
+		stopRetries(id);
+	}
+	ConfigManager::inst()->setValue("svcReconnect", "intervalSeconds", QString::number(policy.intervalSeconds));
+	ConfigManager::inst()->setValue("svcReconnect", "maximumRetries", QString::number(policy.maximumRetries));
+	emit changed();
+	return {};
+}
+
+void Catalog::stopRetries(const QString& id)
+{
+	if (auto* timer = m_retryTimers.value(id)) { timer->stop(); }
+	m_reconnecting.remove(id);
+	m_retryCounts.remove(id);
+	if (!m_connecting.contains(id) && !m_connectionErrors.value(id).isEmpty())
+	{
+		m_status.insert(id, tr("Offline: %1").arg(m_connectionErrors.value(id)));
+	}
+}
+
+void Catalog::reconnectDisconnected()
+{
+	if (m_stopping) { return; }
+	for (const auto& id : m_modules.keys())
+	{
+		if (engine(id).api) { continue; }
+		stopRetries(id);
+		m_reconnecting.insert(id);
+		m_retryCounts.insert(id, 0);
+		if (!m_connecting.contains(id)) { m_retryTimers.value(id)->start(0); }
+	}
+}
+
+void Catalog::discoveryFinished(const QString& id, const QString& error)
+{
+	m_connecting.remove(id);
+	m_connectionErrors.insert(id, error);
+	if (error.isEmpty())
+	{
+		stopRetries(id);
+		m_status.insert(id, tr("Connected"));
+		return;
+	}
+	m_status.insert(id, tr("Offline: %1").arg(error));
+	if (!m_reconnecting.contains(id)) { return; }
+	const auto policy = reconnectPolicy();
+	const auto attempts = m_retryCounts.value(id);
+	if (attempts >= policy.maximumRetries)
+	{
+		stopRetries(id);
+		m_status.insert(id, tr("Offline: %1 — automatic retries exhausted (%2)").arg(error).arg(attempts));
+		return;
+	}
+	m_status.insert(id,
+		tr("Offline: %1 — retry %2/%3 in %4 s")
+			.arg(error)
+			.arg(attempts + 1)
+			.arg(policy.maximumRetries)
+			.arg(policy.intervalSeconds));
+	m_retryTimers.value(id)->start(policy.intervalSeconds * 1000);
 }
 void Catalog::discover()
 {
@@ -189,7 +300,7 @@ void Catalog::discover()
 					profile.capabilities = capabilities;
 					result = install(std::move(profile));
 				}
-				m_status.insert(item.id, result.isEmpty() ? tr("Connected") : tr("Offline: %1").arg(result));
+				discoveryFinished(item.id, result);
 				emit changed();
 			},
 			Qt::QueuedConnection);

@@ -7,6 +7,7 @@
 class QLineEdit;
 class QCheckBox;
 class QLabel;
+class QSpinBox;
 namespace lmms::gui {
 class SVCSettingsPage : public QWidget
 {
@@ -27,5 +28,10 @@ private:
 	std::vector<Entry> m_entries;
 	std::vector<std::unique_ptr<FloatModel>> m_defaults;
 	QLabel* m_defaultStatus;
+	QSpinBox* m_retryInterval;
+	QSpinBox* m_maximumRetries;
+	QLabel* m_retryStatus;
+	bool saveReconnectPolicy();
+	bool saveConnections();
 };
 } // namespace lmms::gui

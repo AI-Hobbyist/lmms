@@ -56,6 +56,7 @@ void SVCBrowser::refresh()
 	auto* root = new QTreeWidgetItem(m_tree, {tr("Singing Voice Conversion")});
 	for (const auto& engine : svc::Catalog::instance().engines())
 	{
+		if (!engine.api) { continue; }
 		auto* branch = new QTreeWidgetItem(root, {engine.name});
 		branch->setToolTip(0, svc::Catalog::instance().status(engine.id));
 		for (const auto& value : engine.capabilities.value("models").toArray())

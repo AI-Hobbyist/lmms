@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QVBoxLayout>
 #include <array>
 
@@ -53,6 +54,30 @@ SVCSettingsPage::SVCSettingsPage(QWidget* parent)
 	m_defaultStatus = new QLabel(defaults);
 	defaultsLayout->addRow(m_defaultStatus);
 	layout->addWidget(defaults);
+	auto* reconnect = new QGroupBox(tr("Automatic reconnection (all SVC engines)"), this);
+	auto* reconnectLayout = new QFormLayout(reconnect);
+	const auto policy = svc::Catalog::instance().reconnectPolicy();
+	m_retryInterval = new QSpinBox(reconnect);
+	m_retryInterval->setObjectName("svcReconnectInterval");
+	m_retryInterval->setRange(1, 86400);
+	m_retryInterval->setSuffix(tr(" s"));
+	m_retryInterval->setValue(policy.intervalSeconds);
+	m_maximumRetries = new QSpinBox(reconnect);
+	m_maximumRetries->setObjectName("svcReconnectRetries");
+	m_maximumRetries->setRange(1, 1000);
+	m_maximumRetries->setValue(policy.maximumRetries);
+	reconnectLayout->addRow(tr("Reconnect interval"), m_retryInterval);
+	reconnectLayout->addRow(tr("Maximum retries"), m_maximumRetries);
+	auto* startReconnect = new QPushButton(tr("Start automatic reconnection"), reconnect);
+	startReconnect->setObjectName("svcAutoReconnect");
+	reconnectLayout->addRow(startReconnect);
+	m_retryStatus = new QLabel(reconnect);
+	m_retryStatus->setWordWrap(true);
+	reconnectLayout->addRow(m_retryStatus);
+	connect(startReconnect, &QPushButton::clicked, this, [this] {
+		if (saveReconnectPolicy() && saveConnections()) { svc::Catalog::instance().reconnectDisconnected(); }
+	});
+	layout->addWidget(reconnect);
 	for (const auto& engine : svc::Catalog::instance().engines())
 	{
 		const auto connection = svc::Catalog::instance().connection(engine.id);
@@ -94,9 +119,27 @@ bool SVCSettingsPage::save()
 	m_defaultStatus->setText(
 		svc::setChunkDefaults({m_defaults[0]->value(), m_defaults[1]->value(), m_defaults[2]->value()}));
 	if (!m_defaultStatus->text().isEmpty()) { return false; }
+	return saveReconnectPolicy() && saveConnections();
+}
+
+bool SVCSettingsPage::saveReconnectPolicy()
+{
+	m_retryStatus->setText(
+		svc::Catalog::instance().setReconnectPolicy({m_retryInterval->value(), m_maximumRetries->value()}));
+	return m_retryStatus->text().isEmpty();
+}
+
+bool SVCSettingsPage::saveConnections()
+{
 	bool saved = true;
 	for (const auto& entry : m_entries)
 	{
+		const auto current = svc::Catalog::instance().connection(entry.id);
+		if (current.address == entry.address->text() && current.token == entry.token->text()
+			&& current.remembered == entry.remember->isChecked())
+		{
+			continue;
+		}
 		entry.status->setText(svc::Catalog::instance().setConnection(
 			entry.id, {entry.address->text(), entry.token->text(), entry.remember->isChecked()}));
 		saved &= entry.status->text().isEmpty();

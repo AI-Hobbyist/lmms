@@ -120,6 +120,7 @@ if ((Get-FileHash -LiteralPath $payload['svs-project/bridge.py']).Hash -ne (Get-
 $payload['svs-project/usage.md'] = Join-Path $project 'doc/svs/project/usage.md'
 $payload['LICENSE.txt'] = Join-Path $project 'LICENSE.txt'
 $payload['README.md'] = Join-Path $project 'README.md'
+$payload['SVC-使用说明.md'] = Join-Path $project 'doc/svc/Delivery.md'
 $targets = Get-Content -LiteralPath (Join-Path $project 'doc/ui-modernization/validation/plugin-targets.txt')
 if ($targets.Count -ne 52) {
     throw 'Frozen plugin target count differs.'
@@ -139,6 +140,24 @@ foreach ($required in @('data/themes/default/svs_track.svg')) {
         throw "Incomplete SVS runtime: $required"
     }
 }
+$requiredSvcFiles = @(
+    'plugins/svcrvc.dll'
+    'Qt6Network.dll'
+    'data/themes/default/svc_track.svg'
+    'data/themes/default/svc_render.svg'
+    'data/themes/default/svc_compare.svg'
+)
+foreach ($required in $requiredSvcFiles) {
+    if (-not $payload.ContainsKey($required)) {
+        throw "Incomplete SVC runtime: $required"
+    }
+}
+foreach ($name in @('style.css', 'svc_track.svg', 'svc_render.svg', 'svc_compare.svg')) {
+    $relative = "data/themes/default/$name"
+    if ((Get-FileHash -LiteralPath $payload[$relative]).Hash -ne (Get-FileHash -LiteralPath (Join-Path $project $relative)).Hash) {
+        throw "Stale deployed SVC theme resource: $name"
+    }
+}
 foreach ($required in @('svs/SVSDiffSinger/SVSDiffSinger.dll', 'svs/SVSDiffSinger/onnxruntime.dll', 'svs/SVSDiffSinger/manifest.json', 'data/projects/templates/default.mpt')) {
     if (-not $payload.ContainsKey($required)) {
         throw "Incomplete DiffSinger/default template runtime: $required"
@@ -155,6 +174,7 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
         [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
     })
 $manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records; RemoveFiles = $removedSvs }
+$manifest.EnabledSvcPluginCount = 1
 if ($BaseManifest) {
     $base = Get-Content -LiteralPath $BaseManifest -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($base.Format -ne 1 -or $base.PackageKind -eq 'Incremental' -or -not $base.Files.Count) {
@@ -242,6 +262,7 @@ LMMS 增量覆盖包（Windows x64）
 "@
 }
 $worktreeStatus = @(& git -C $project status --short --untracked-files=no)
+$instructions += "`r`nSVC API 支持与连接配置：SVC-使用说明.md。SVC 图标无背景；模型、参数和重新渲染作用于整条 SVC 轨道。`r`n本地测试 token 留空；生产环境建议服务端要求 Bearer token。`r`n"
 if ($LASTEXITCODE -ne 0) {
     throw 'Cannot identify worktree changes.'
 }

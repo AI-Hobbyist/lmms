@@ -119,28 +119,15 @@ void ConversionService::render(SVCTrack* track)
 		task->working = ConfigManager::inst()->workingDir();
 		try
 		{
-			clip->setStatus(tr("Analyzing silence and splitting input"));
-			const auto source = task->playback->snapshot()->source;
-			const auto limits = task->engine.capabilities.value("limits").toObject();
-			task->segments = segmentAudio(source->stereo.data(), source->frames(), 2, source->rate, task->config,
-				{limits.value("min_seconds").toDouble(), limits.value("max_seconds").toDouble(), UINT64_MAX});
-			const auto inputRate = task->engine.inputRate ? task->engine.inputRate : source->rate;
-			for (const auto& segment : task->segments)
-			{
-				const auto bytes
-					= 44.0 + std::round(double(segment.transmittedFrames()) * inputRate / source->rate) * 2;
-				if (bytes > limits.value("max_upload_bytes").toDouble())
-				{
-					throw std::invalid_argument("SVC request exceeds the backend upload byte limit");
-				}
-			}
 			std::lock_guard lock(m_mutex);
 			if (m_queue.size() >= 32)
 			{
 				clip->setStatus(tr("SVC queue is full; try again"));
 				continue;
 			}
-			task->generation = clip->beginConversion(task->segments);
+			clip->invalidate();
+			task->generation = task->playback->generation();
+			clip->setStatus(tr("Queued for silence analysis and conversion"));
 			m_queue.push_back(task);
 			if (!m_worker.joinable())
 			{
@@ -203,6 +190,38 @@ void ConversionService::work()
 void ConversionService::run(const std::shared_ptr<Task>& task)
 {
 	const auto cancelled = [&] { return m_stopping || task->playback->generation() != task->generation; };
+	if (cancelled()) { return; }
+	try
+	{
+		post(task, [](SVCClip* clip) { clip->setStatus(tr("Analyzing silence and splitting input")); });
+		const auto source = task->playback->snapshot()->source;
+		const auto limits = task->engine.capabilities.value("limits").toObject();
+		task->segments = segmentAudio(source->stereo.data(), source->frames(), 2, source->rate, task->config,
+			{limits.value("min_seconds").toDouble(), limits.value("max_seconds").toDouble(), UINT64_MAX});
+		const auto inputRate = task->engine.inputRate ? task->engine.inputRate : source->rate;
+		for (const auto& segment : task->segments)
+		{
+			const auto bytes = 44.0 + std::round(double(segment.transmittedFrames()) * inputRate / source->rate) * 2;
+			if (bytes > limits.value("max_upload_bytes").toDouble())
+			{
+				throw std::invalid_argument("SVC request exceeds the backend upload byte limit");
+			}
+		}
+		if (cancelled()) { return; }
+		if (!post(task, [task](SVCClip* clip) { task->generation = clip->beginConversion(task->segments); }))
+		{
+			return;
+		}
+		// Only the worker waits for GUI metadata publication; the GUI never waits for analysis or network I/O.
+		std::unique_lock lock(m_mutex);
+		m_wake.wait(lock, [&] { return m_stopping || task->pending == 0; });
+	}
+	catch (const std::exception& exception)
+	{
+		const auto error = QString::fromUtf8(exception.what());
+		post(task, [error](SVCClip* clip) { clip->setStatus(error); });
+		return;
+	}
 	for (uint64_t segment = 0; segment < task->segments.size() && !cancelled(); ++segment)
 	{
 		std::unique_ptr<CachePair> cache;

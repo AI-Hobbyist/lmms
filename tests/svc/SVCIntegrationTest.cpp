@@ -3,10 +3,13 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QLineEdit>
 #include <QPointer>
 #include <QPushButton>
 #include <QScreen>
+#include <QSpinBox>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QtEndian>
 #include <QtTest>
@@ -27,6 +30,7 @@
 #include "SVCCatalog.h"
 #include "SVCClip.h"
 #include "SVCConversion.h"
+#include "SVCSettingsPage.h"
 #include "SVCTrack.h"
 #include "SVCViews.h"
 #include "SVCWindow.h"
@@ -415,8 +419,56 @@ private slots:
 		if (!qEnvironmentVariableIsSet("LMMS_SVC_LIVE")) { QSKIP("Set LMMS_SVC_LIVE for the local RVC host test"); }
 		auto& catalog = svc::Catalog::instance();
 		QVERIFY2(!catalog.engine("RVC").id.isEmpty(), "RVC module must be deployed beside development LMMS");
-		QVERIFY(catalog.setConnection("RVC", {"http://127.0.0.1:8000", "", false}).isEmpty());
-		QTRY_VERIFY_WITH_TIMEOUT(catalog.engine("RVC").api != nullptr, 15000);
+		gui::SVCBrowser browser(nullptr);
+		auto* tree = browser.findChild<QTreeWidget*>("svcBrowserTree");
+		QVERIFY(tree);
+		const auto hasRvcCategory = [&] {
+			const auto* root = tree->topLevelItem(0);
+			if (!root) { return false; }
+			for (int index = 0; index < root->childCount(); ++index)
+			{
+				if (root->child(index)->text(0) == catalog.engine("RVC").name) { return true; }
+			}
+			return false;
+		};
+		QVERIFY(catalog.setConnection("RVC", {"http://127.0.0.1:1", "", false}).isEmpty());
+		QTRY_VERIFY_WITH_TIMEOUT(catalog.status("RVC").startsWith("Offline:"), 30000);
+		QVERIFY(!catalog.engine("RVC").api);
+		QVERIFY(!hasRvcCategory());
+		{
+			gui::SVCSettingsPage settings(nullptr);
+			settings.setWindowTitle(QString::fromUtf8("SVC 引擎异步连接与限次重试"));
+			settings.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&settings));
+			auto* interval = settings.findChild<QSpinBox*>("svcReconnectInterval");
+			auto* retries = settings.findChild<QSpinBox*>("svcReconnectRetries");
+			auto* start = settings.findChild<QPushButton*>("svcAutoReconnect");
+			auto* address = settings.findChild<QLineEdit*>("svcAddress_RVC");
+			QVERIFY(interval && retries && start && address);
+			interval->setValue(1);
+			retries->setValue(2);
+			int heartbeats = 0;
+			QTimer heartbeat;
+			connect(&heartbeat, &QTimer::timeout, this, [&] { ++heartbeats; });
+			heartbeat.start(10);
+			QTest::mouseClick(start, Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(catalog.status("RVC").contains("automatic retries exhausted (2)"), 30000);
+			QVERIFY(heartbeats > 10);
+			QVERIFY(!hasRvcCategory());
+			const auto exhausted = catalog.status("RVC");
+			QTest::qWait(1500);
+			QCOMPARE(catalog.status("RVC"), exhausted);
+			address->setText("http://127.0.0.1:8000");
+			QTest::mouseClick(start, Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(catalog.engine("RVC").api != nullptr, 15000);
+			QVERIFY(hasRvcCategory());
+			QVERIFY(settings.save());
+			QVERIFY(catalog.engine("RVC").api); // Saving unchanged settings does not disconnect healthy engines.
+			QTest::qWait(300);
+			QVERIFY(settings.screen()->grabWindow(settings.winId()).save("build/tests/svc/SVC-M5-settings-native.png"));
+			settings.close();
+		}
+		QVERIFY(catalog.setReconnectPolicy({}).isEmpty());
 		const auto profile = catalog.engine("RVC");
 		QJsonObject model;
 		for (const auto& value : profile.capabilities.value("models").toArray())
@@ -443,6 +495,10 @@ private slots:
 			{"weight_id", model.value("weights").toArray().first().toObject().value("id")}, {"speaker_id", "0"},
 			{"parameters", QJsonObject{{"index_mode", "off"}, {"chunk_seconds", 1}, {"f0_method", "rmvpe"}}}}));
 		bool progressive = false;
+		int conversionHeartbeats = 0;
+		QTimer conversionHeartbeat;
+		connect(&conversionHeartbeat, &QTimer::timeout, this, [&] { ++conversionHeartbeats; });
+		conversionHeartbeat.start(10);
 		connect(clip, &SVCClip::dataChanged, this, [&] {
 			if (!clip->playback()->snapshot()->rendered.empty() && !clip->playback()->finished())
 			{
@@ -462,6 +518,7 @@ private slots:
 			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete() || clip->conversionFailed(), 120000);
 			QVERIFY2(clip->conversionComplete(), qPrintable(clip->status()));
 			QVERIFY(progressive);
+			QVERIFY(conversionHeartbeats > 10);
 			QVERIFY(clip->playback()->finished());
 			QDomDocument saved;
 			auto root = saved.createElement("clip");

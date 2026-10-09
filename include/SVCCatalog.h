@@ -4,6 +4,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QObject>
+#include <QSet>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -13,6 +14,8 @@
 #include "SVCChunking.h"
 #include "svc.h"
 #include "svc_plugin.h"
+
+class QTimer;
 
 namespace lmms::svc {
 struct EngineProfile
@@ -34,6 +37,12 @@ struct Connection
 	bool remembered = false;
 };
 
+struct ReconnectPolicy
+{
+	int intervalSeconds = 5;
+	int maximumRetries = 3;
+};
+
 class Catalog : public QObject
 {
 	Q_OBJECT
@@ -47,6 +56,9 @@ public:
 	QJsonObject requestSelection(const QJsonObject& saved, QString& error) const;
 	void refresh(const QString& id);
 	QString status(const QString& id) const { return m_status.value(id); }
+	ReconnectPolicy reconnectPolicy() const;
+	QString setReconnectPolicy(const ReconnectPolicy& policy);
+	void reconnectDisconnected();
 	void shutdown();
 	~Catalog() override;
 
@@ -66,6 +78,11 @@ private:
 	QHash<QString, Module> m_modules;
 	QHash<QString, QString> m_status;
 	QHash<QString, uint64_t> m_versions;
+	QHash<QString, QTimer*> m_retryTimers;
+	QHash<QString, int> m_retryCounts;
+	QHash<QString, QString> m_connectionErrors;
+	QSet<QString> m_reconnecting;
+	QSet<QString> m_connecting;
 	struct Discovery
 	{
 		QString id;
@@ -79,6 +96,9 @@ private:
 	std::condition_variable m_wake;
 	bool m_stopping = false;
 	void discover();
+	void beginDiscovery(const QString& id);
+	void stopRetries(const QString& id);
+	void discoveryFinished(const QString& id, const QString& error);
 };
 
 bool conditionsMatch(const QJsonObject& conditions, const QJsonObject& values);
