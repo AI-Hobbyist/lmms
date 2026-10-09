@@ -4967,17 +4967,17 @@ private slots:
 		QVERIFY(!clip->curves().contains(absoluteId));
 		// Hide other overlays to ensure pixels come from the editable default,
 		// rather than the corresponding read-only line underneath it.
-		auto state = clip->editorState();
-		auto laneStates = state["lanes"].toObject();
 		for (auto* button : editor.findChildren<QToolButton*>())
 		{
 			const auto name = button->objectName();
-			if (name.startsWith("svsParameterTab."))
-				laneStates[name.mid(QString("svsParameterTab.").size())]
-					= QJsonObject{{"visible", name == absoluteTab->objectName()}};
+			if (name.startsWith("svsParameterTab.") && button != absoluteTab)
+			{
+				const auto key = name.mid(QString("svsParameterTab.").size());
+				if (clip->editorState()["lanes"].toObject()[key].toObject()["visible"].toBool(true))
+					QTest::mouseClick(button, Qt::RightButton);
+				QVERIFY(!clip->editorState()["lanes"].toObject()[key].toObject()["visible"].toBool(true));
+			}
 		}
-		state["lanes"] = laneStates;
-		clip->setEditorState(state);
 		QTest::qWait(700);
 		svs::Curve reference;
 		const auto* absolute = track->capabilities().parameter(absoluteId, "clip");
