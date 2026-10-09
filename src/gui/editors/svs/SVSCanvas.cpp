@@ -547,8 +547,7 @@ double SVSCanvas::snap(double tick, Qt::KeyboardModifiers modifiers) const
 {
 	if (modifiers.testFlag(Qt::AltModifier) || m_quantization <= 0)
 		return tick;
-	const double offset = m_clip ? int(m_clip->startPosition()) + int(m_clip->startTimeOffset()) : 0;
-	return std::round((tick + offset) / m_quantization) * m_quantization - offset;
+	return std::round(tick / m_quantization) * m_quantization;
 }
 QString SVSCanvas::hitNote(const QPointF& point) const
 {
@@ -651,16 +650,15 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 		auto y = TimelineHeight + row * m_rowHeight;
 		painter.drawLine(QPointF(KeyboardWidth, y), QPointF(width(), y));
 	}
-	// Align beats and bars to project time, like the bar labels, including trimmed clips.
-	const double projectOffset = m_clip ? int(m_clip->startPosition()) + int(m_clip->startTimeOffset()) : 0;
+	// Like the instrument piano roll, the grid uses clip content time.
 	auto drawTimeGrid = [&](double ticks, const QColor& lineColor) {
 		if (ticks <= 0)
 			return;
 		painter.setPen(lineColor);
-		for (double projectTick = std::floor((m_scrollTick + projectOffset) / ticks) * ticks;
-			projectTick <= tickAt(width()) + projectOffset; projectTick += ticks)
+		for (double projectTick = std::floor(m_scrollTick / ticks) * ticks; projectTick <= tickAt(width());
+			projectTick += ticks)
 		{
-			const auto x = pointAt(projectTick - projectOffset, 0).x();
+			const auto x = pointAt(projectTick, 0).x();
 			painter.drawLine(QPointF(x, TimelineHeight), QPointF(x, height()));
 		}
 	};
@@ -857,10 +855,9 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 	painter.fillRect(QRect(0, 0, width(), TimelineHeight), palette().window());
 	painter.setPen(palette().windowText().color());
 	const auto bar = TimePos::ticksPerBar();
-	const double offset = m_clip ? int(m_clip->startPosition()) + int(m_clip->startTimeOffset()) : 0;
-	for (int index = int(std::floor((m_scrollTick + offset) / bar)); index <= (tickAt(width()) + offset) / bar; ++index)
+	for (int index = int(std::floor(m_scrollTick / bar)); index <= tickAt(width()) / bar; ++index)
 	{
-		const auto x = pointAt(index * bar - offset, 0).x();
+		const auto x = pointAt(index * bar, 0).x();
 		if (x < KeyboardWidth)
 			continue;
 		painter.drawText(QRectF(x + 3, 0, 80, TimelineHeight), Qt::AlignVCenter, QString::number(index + 1));
@@ -870,7 +867,9 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 		const double local = Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks() - int(m_clip->startPosition())
 			- int(m_clip->startTimeOffset());
 		const auto x = pointAt(local, 0).x();
-		if (x >= KeyboardWidth && x <= width())
+		const auto projectTick = Engine::getSong()->getTimeline(Song::PlayMode::Song).ticks();
+		const bool inClip = projectTick >= int(m_clip->startPosition()) && projectTick < int(m_clip->endPosition());
+		if (x >= KeyboardWidth && x <= width() && (!Engine::getSong()->isPlaying() || inClip))
 		{
 			painter.setPen(color("userPitchColor", QPalette::Highlight));
 			painter.drawLine(QPointF(x, 0), QPointF(x, height()));
@@ -919,11 +918,12 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event)
 	finishLyric(true);
 	if (event->position().y() < TimelineHeight && event->position().x() >= KeyboardWidth)
 	{
+		const double begin = std::max(0, -int(m_clip->startTimeOffset()));
+		const double end = int(m_clip->length()) - int(m_clip->startTimeOffset());
+		const auto local = std::clamp(snap(tickAt(event->position().x()), event->modifiers()), begin, end);
 		Engine::getSong()
 			->getTimeline(Song::PlayMode::Song)
-			.setTicks(std::max(0,
-				int(snap(tickAt(event->position().x()), event->modifiers()) + int(m_clip->startPosition())
-					+ int(m_clip->startTimeOffset()))));
+			.setTicks(std::max(0, int(local + int(m_clip->startPosition()) + int(m_clip->startTimeOffset()))));
 		update();
 		return;
 	}

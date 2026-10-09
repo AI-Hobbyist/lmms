@@ -474,13 +474,8 @@ SVSTrackView::SVSTrackView(SVSTrack* track, TrackContainerView* container)
 	activity->setMuted(track->isMuted());
 	activity->setObjectName("voiceTrackActivity");
 	activity->setFixedSize(8, 28);
-	connect(
-		track, &SVSTrack::playbackActivity, activity,
-		[activity] {
-			activity->activateOnce();
-			activity->noteEnd();
-		},
-		Qt::QueuedConnection);
+	connect(track, &SVSTrack::noteStarted, activity, &FadeButton::activate, Qt::QueuedConnection);
+	connect(track, &SVSTrack::noteEnded, activity, &FadeButton::noteEnd, Qt::QueuedConnection);
 	auto* layout = new QHBoxLayout(getTrackSettingsWidget());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(1);
@@ -875,8 +870,10 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		{
 			return;
 		}
-		const double localTick = song->getTimeline(Song::PlayMode::Song).ticks() - double(int(target->startPosition()))
-			- double(int(target->startTimeOffset()));
+		const auto projectTick = song->getTimeline(Song::PlayMode::Song).ticks();
+		if (projectTick < int(target->startPosition()) || projectTick >= int(target->endPosition())) { return; }
+		const double localTick
+			= projectTick - double(int(target->startPosition())) - double(int(target->startTimeOffset()));
 		const double visibleTicks = canvas->tickAt(canvas->width()) - canvas->scrollTick();
 		if (visibleTicks <= 0)
 		{

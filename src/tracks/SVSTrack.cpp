@@ -75,6 +75,13 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 	, m_bus("SVS", true, &m_volume, &m_pan, &m_mutedModel)
 {
 	Track::setName("SVS");
+	connect(Engine::getSong(), &Song::playbackStateChanged, this, [this] {
+		if (!Engine::getSong()->isPlaying()) { clearNoteActivity(); }
+	});
+	connect(Engine::getSong(), &Song::playbackPositionJumped, this, &SVSTrack::clearNoteActivity);
+	connect(&m_mutedModel, &BoolModel::dataChanged, this, [this] {
+		if (isMuted()) { clearNoteActivity(); }
+	});
 	m_pan.setCenterValue(DefaultPanning);
 	connect(&m_mix, &IntModel::dataChanged, this, [this] { m_bus.setNextMixerChannel(m_mix.value()); });
 	m_portraitSettings = {{"visible", ConfigManager::inst()->value("svs", "portraitVisible", "1") != "0"},
@@ -317,11 +324,33 @@ std::optional<bar_t> SVSTrack::frozenExportLength() const
 		end = std::max(end, region.end);
 	return bar_t(end / TimePos::ticksPerBar());
 }
+void SVSTrack::clearNoteActivity()
+{
+	lock();
+	for (int i = 0; i < m_activeNotes.size(); ++i)
+	{
+		emit noteEnded();
+	}
+	m_activeNotes.clear();
+	m_lastActivityTick = -1;
+	unlock();
+}
 bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
 	if (clipNum >= 0 || isMuted() || !tryLock())
 		return false;
 	bool played = false;
+	QSet<QPair<quintptr, int>> activeNotes;
+	const double tick = int(start) + Engine::getSong()->getTimeline().frameOffset() / Engine::framesPerTick();
+	if (m_lastActivityTick >= 0 && (int(start) < m_lastActivityTick || int(start) > m_lastActivityTick + 1))
+	{
+		for (int i = 0; i < m_activeNotes.size(); ++i)
+		{
+			emit noteEnded();
+		}
+		m_activeNotes.clear();
+	}
+	m_lastActivityTick = int(start);
 	auto playRegion = [&](std::shared_ptr<const svs::Audio> audio, double position, double end, double contentOffset) {
 		if (!audio || int(start) >= end)
 			return false;
@@ -349,14 +378,37 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 		for (auto* base : getClips())
 		{
 			auto* clip = static_cast<SVSClip*>(base);
+			if (!clip->isMuted() && tick >= int(clip->startPosition()) && tick < int(clip->endPosition()))
+			{
+				svs::TimeMapping mapping;
+				mapping.position = int(clip->startPosition());
+				mapping.contentOffset = -int(clip->startTimeOffset());
+				const auto local = mapping.localTick(tick);
+				for (int i = 0; i < clip->notes().size(); ++i)
+				{
+					const auto& note = clip->notes()[i];
+					if (local >= note.tick && local < note.tick + note.duration)
+					{
+						activeNotes.insert({reinterpret_cast<quintptr>(clip), i});
+					}
+				}
+			}
 			if (!clip->isMuted())
 				played = playRegion(clip->audio(), int(clip->startPosition()), int(clip->endPosition()),
 							 -int(clip->startTimeOffset()))
 					|| played;
 		}
 	}
+	for (const auto& note : m_activeNotes)
+	{
+		if (!activeNotes.contains(note)) { emit noteEnded(); }
+	}
+	for (const auto& note : activeNotes)
+	{
+		if (!m_activeNotes.contains(note)) { emit noteStarted(); }
+	}
+	m_activeNotes = std::move(activeNotes);
 	unlock();
-	if (played) { emit playbackActivity(); }
 	return played;
 }
 void SVSTrack::setPortraitSettings(const QJsonObject& input)

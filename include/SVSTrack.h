@@ -6,6 +6,7 @@
 #include "SVSCapabilities.h"
 #include <QDomElement>
 #include <optional>
+#include <QSet>
 namespace lmms {
 class SVSTrack : public Track
 {
@@ -51,9 +52,13 @@ public:
 	QString migrationDiagnostic() const { return m_migrationDiagnostic; }
 
 signals:
-	void playbackActivity();
+	void noteStarted();
+	void noteEnded();
 
 private:
+	void clearNoteActivity();
+	QSet<QPair<quintptr, int>> m_activeNotes;
+	int m_lastActivityTick = -1;
 	std::shared_ptr<const QVector<svs::ExportAudioRegion>> m_exportRegions;
 	QString m_migrationDiagnostic;
 	FloatModel m_volume, m_pan;

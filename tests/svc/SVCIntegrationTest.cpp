@@ -50,6 +50,8 @@
 #include "SVCWindow.h"
 #include "SVSBrowser.h"
 #include "SVSClip.h"
+#include "SVSCanvas.h"
+#include "Timeline.h"
 #include "SVSTrack.h"
 #include "SVSViews.h"
 #include "SampleBuffer.h"
@@ -750,7 +752,13 @@ private slots:
 			}
 			else
 			{
-				emit static_cast<SVSTrack*>(track)->playbackActivity();
+				auto* voiceTrack = static_cast<SVSTrack*>(track);
+				auto* clip = static_cast<SVSClip*>(track->createClip(0));
+				svs::Note note;
+				note.id = "activity";
+				note.duration = 48;
+				clip->setNotes({note});
+				voiceTrack->play(0, 64, 0);
 			}
 			QTest::qWait(30);
 			QVERIFY(lamp->grab().toImage() != idle);
@@ -758,12 +766,108 @@ private slots:
 					->screen()
 					->grabWindow(m_gui->mainWindow()->winId())
 					.save(QString("build/tests/svc/%1-activity-native.png").arg(int(type))));
+			if (type == Track::Type::SVS) { static_cast<SVSTrack*>(track)->play(48, 64, 0); }
 			QTest::qWait(400);
 			QCOMPARE(lamp->grab().toImage(), idle);
 			menu.reset();
 			delete track;
 			QTest::qWait(30);
 		}
+	}
+
+	void svsClipTimelineNative()
+	{
+		auto* song = Engine::getSong();
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
+		auto* clip = static_cast<SVSClip*>(track->createClip(193));
+		clip->setAutoResize(false);
+		clip->changeLength(384);
+		clip->setStartTimeOffset(-24);
+		{
+			gui::SVSPianoRoll editor(clip);
+			editor.resize(900, 600);
+			editor.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&editor));
+			gui::SVSCanvas* canvas = nullptr;
+			for (auto* area : editor.findChildren<gui::SVSCanvas*>())
+			{
+				if (!area->isParameterLane()) { canvas = area; }
+			}
+			QVERIFY(canvas);
+			canvas->setScroll(0, 72);
+			song->getTimeline(Song::PlayMode::Song).setTicks(0);
+			QTest::qWait(100);
+			const auto ruler = canvas->grab(QRect(0, 0, canvas->width(), 24)).toImage();
+			clip->movePosition(577);
+			QTest::qWait(50);
+			QCOMPARE(canvas->grab(QRect(0, 0, canvas->width(), 24)).toImage(), ruler);
+			QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(37, 60).x()), 12));
+			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 577 - 24 + 36);
+			QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(int(canvas->pointAt(0, 60).x()), 12));
+			QCOMPARE(song->getTimeline(Song::PlayMode::Song).ticks(), 577);
+			QTest::qWait(100);
+			QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-clip-timeline-native.png"));
+			editor.close();
+		}
+		delete track;
+		QTest::qWait(30);
+	}
+
+	void svsNoteActivityRhythm()
+	{
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		QTRY_VERIFY(([&] {
+			for (auto* view : m_gui->mainWindow()->findChildren<gui::SVSTrackView*>())
+			{
+				if (view->getTrack() == track) { return true; }
+			}
+			return false;
+		})());
+		auto* clip = static_cast<SVSClip*>(track->createClip(192));
+		clip->setAutoResize(false);
+		clip->changeLength(192);
+		clip->setStartTimeOffset(-24);
+		svs::Note first, second;
+		first.id = "first";
+		first.tick = 24;
+		first.duration = 24;
+		second.id = "second";
+		second.tick = 60;
+		second.duration = 24;
+		clip->setNotes({first, second});
+		QSignalSpy starts(track, &SVSTrack::noteStarted), ends(track, &SVSTrack::noteEnded);
+		for (int tick = 191; tick <= 252; ++tick)
+		{
+			track->play(tick, 64, 0);
+			if (tick == 215)
+			{
+				QCOMPARE(starts.count(), 1);
+				QCOMPARE(ends.count(), 0);
+			}
+			if (tick == 227)
+			{
+				QCOMPARE(starts.count(), 1);
+				QCOMPARE(ends.count(), 1);
+			}
+			if (tick == 239)
+			{
+				QCOMPARE(starts.count(), 2);
+				QCOMPARE(ends.count(), 1);
+			}
+		}
+		QCOMPARE(starts.count(), 2);
+		QCOMPARE(ends.count(), 2);
+		track->play(192, 64, 0); // Seek into the first note.
+		QCOMPARE(starts.count(), 3);
+		track->setMuted(true);
+		QCOMPARE(ends.count(), 3);
+		track->setMuted(false);
+		track->play(228, 64, 0);
+		QCOMPARE(starts.count(), 4);
+		emit Engine::getSong()->playbackStateChanged(); // Stopped/paused clears held notes.
+		QCOMPARE(ends.count(), 4);
+		delete track;
+		QTest::qWait(30);
 	}
 
 	void svsGhostNotes()

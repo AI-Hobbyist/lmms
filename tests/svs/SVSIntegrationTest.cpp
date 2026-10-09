@@ -378,14 +378,15 @@ private slots:
 		QCOMPARE(canvas->scrollTick(), 0.);
 		timeline.setTicks(origin + int(std::ceil(visible)) + 20);
 		QCOMPARE(canvas->scrollTick(), double(int(std::ceil(visible)) + 20));
+		const auto lastInside = canvas->scrollTick();
 		timeline.setTicks(origin + 10000);
-		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
+		QCOMPARE(canvas->scrollTick(), lastInside);
 		timeline.setTicks(origin + 20000);
-		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
+		QCOMPARE(canvas->scrollTick(), lastInside);
 		timeline.setTicks(0);
-		QCOMPARE(canvas->scrollTick(), 0.);
+		QCOMPARE(canvas->scrollTick(), lastInside);
 		mainTimeline->setAutoScroll(gui::TimeLineWidget::AutoScrollState::Continuous);
-		timeline.setTicks(origin + 10000);
+		timeline.setTicks(origin + 3000);
 		QVERIFY(std::abs(canvas->scrollTick() - maximum) < .01);
 		QTest::qWait(700);
 		QVERIFY(
