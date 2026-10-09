@@ -1,9 +1,10 @@
 #ifndef LMMS_SVS_XML_H
 #define LMMS_SVS_XML_H
+#include <QCoreApplication>
 #include <QDomDocument>
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QSet>
 #include <QTextStream>
 namespace lmms::svs {
@@ -48,7 +49,7 @@ inline bool jsonObjectAttribute(const QDomElement& node, const QString& name, QJ
 	const auto document = QJsonDocument::fromJson(bytes, &error);
 	if (error.error != QJsonParseError::NoError || !document.isObject())
 	{
-		diagnostic = "Invalid " + name + " JSON; original SVS node preserved";
+		diagnostic = QCoreApplication::translate("NativeSVS", "Invalid %1 JSON; original SVS node preserved").arg(name);
 		return false;
 	}
 	value = document.object();
@@ -64,7 +65,7 @@ inline bool jsonArrayAttribute(const QDomElement& node, const QString& name, QJs
 	const auto document = QJsonDocument::fromJson(bytes, &error);
 	if (error.error != QJsonParseError::NoError || !document.isArray())
 	{
-		diagnostic = "Invalid " + name + " JSON; original SVS node preserved";
+		diagnostic = QCoreApplication::translate("NativeSVS", "Invalid %1 JSON; original SVS node preserved").arg(name);
 		return false;
 	}
 	value = document.array();
@@ -76,7 +77,8 @@ inline bool supportedXmlSchema(const QDomElement& node, QString& diagnostic)
 	const auto version = node.attribute("schemaVersion", "0").toInt(&valid);
 	if (!valid || version < 0 || version > 1)
 	{
-		diagnostic = "Unsupported SVS schema " + node.attribute("schemaVersion") + "; original node preserved";
+		diagnostic = QCoreApplication::translate("NativeSVS", "Unsupported SVS schema %1; original node preserved")
+						 .arg(node.attribute("schemaVersion"));
 		return false;
 	}
 	return true;

@@ -110,8 +110,9 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 			m_capabilitiesReady = false;
 			m_capabilities = {};
 			m_dictionaries.clear();
-			m_capabilityDiagnostics
-				= next.id.isEmpty() ? QStringList{"Voicebank is missing; project data is retained"} : QStringList{};
+			m_capabilityDiagnostics = next.id.isEmpty() ? QStringList{QCoreApplication::translate("NativeSVS",
+															  "Voicebank is missing; project data is retained")}
+														: QStringList{};
 			for (auto* base : getClips())
 				static_cast<SVSClip*>(base)->invalidate();
 			if (!next.id.isEmpty())
@@ -267,12 +268,14 @@ void SVSTrack::refreshCapabilities(const QJsonObject& editorContext)
 				svs::Dictionary dictionary;
 				QString reason;
 				if (!path.startsWith(root, Qt::CaseInsensitive) || !file.open(QIODevice::ReadOnly))
-					diagnostics << "Missing dictionary: " + resource;
+					diagnostics << QCoreApplication::translate("NativeSVS", "Missing dictionary: %1").arg(resource);
 				else if (!svs::Dictionary::parse(file.read(4 * 1024 * 1024 + 1), parsed.phonemeSet, dictionary, reason))
 					diagnostics << resource + ": " + reason;
 				else if (dictionary.phonemeSet != parsed.phonemeSetId
 					|| !parsed.languages.contains(dictionary.language))
-					diagnostics << resource + ": incompatible dictionary language/phoneme set";
+					diagnostics << QCoreApplication::translate(
+						"NativeSVS", "%1: incompatible dictionary language/phoneme set")
+									   .arg(resource);
 				else
 					dictionaries.push_back(dictionary);
 			}

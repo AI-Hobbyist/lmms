@@ -593,9 +593,193 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
         <source>semitones</source>
         <translation>반음</translation>
     </message>
+    <message>
+        <source>Operating system random generator failed</source>
+        <translation>운영 체제 난수 생성기가 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid cache engine, source or credential-bearing snapshot</source>
+        <translation>캐시 엔진 또는 원본이 올바르지 않거나 스냅샷에 인증 정보가 포함되어 있습니다</translation>
+    </message>
+    <message>
+        <source>Input digest read failed</source>
+        <translation>입력 해시 계산용 읽기에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Input cannot rewind</source>
+        <translation>입력 읽기 위치를 처음으로 되돌릴 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directories</source>
+        <translation>가창 음성 변환 캐시 폴더를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC input cache</source>
+        <translation>가창 음성 변환 입력 캐시를 확보할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC output cache</source>
+        <translation>가창 음성 변환 출력 캐시를 확보할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Input cache write failed</source>
+        <translation>입력 캐시 쓰기에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Cannot save SVC cache manifest</source>
+        <translation>가창 음성 변환 캐시 목록을 저장할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Unable to allocate unique SVC cache identity</source>
+        <translation>고유한 가창 음성 변환 캐시 식별자를 할당할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Silence threshold must be finite and between -120 and 0 dBFS</source>
+        <translation>무음 임계값은 -120~0 dBFS 사이의 유한한 값이어야 합니다</translation>
+    </message>
+    <message>
+        <source>Chunk lengths must be finite and positive</source>
+        <translation>분할 길이는 유한한 양수여야 합니다</translation>
+    </message>
+    <message>
+        <source>Forced chunk length must not exceed the length threshold</source>
+        <translation>강제 분할 길이는 길이 임계값을 초과할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid source format or backend limits</source>
+        <translation>원본 형식 또는 백엔드 제한이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Forced chunk length is shorter than one source sample</source>
+        <translation>강제 분할 길이가 원본 샘플 하나보다 짧습니다</translation>
+    </message>
+    <message>
+        <source>Nonfinite source sample</source>
+        <translation>원본 샘플이 유한한 값이 아닙니다</translation>
+    </message>
+    <message>
+        <source>Configured segment exceeds discovered backend duration or byte limit</source>
+        <translation>설정한 구간이 백엔드에서 확인한 길이 또는 바이트 제한을 초과합니다</translation>
+    </message>
+    <message>
+        <source>Chunk rounding produced an empty segment</source>
+        <translation>분할 위치를 반올림한 결과 빈 구간이 생겼습니다</translation>
+    </message>
+    <message>
+        <source>SVC input WAV exceeds supported size</source>
+        <translation>가창 음성 변환 입력 WAV가 지원 크기를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input WAV</source>
+        <translation>가창 음성 변환 입력 WAV를 기록할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>SVC conversion cancelled</source>
+        <translation>가창 음성 변환이 취소되었습니다</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input samples</source>
+        <translation>가창 음성 변환 입력 샘플을 기록할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot rewind SVC input WAV</source>
+        <translation>가창 음성 변환 입력 WAV의 읽기 위치를 처음으로 되돌릴 수 없습니다</translation>
+    </message>
+    <message>
+        <source>SVC request exceeds the backend upload byte limit</source>
+        <translation>가창 음성 변환 요청이 백엔드 업로드 바이트 제한을 초과합니다</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directory</source>
+        <translation>가창 음성 변환 캐시 폴더를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot prepare SVC input file</source>
+        <translation>가창 음성 변환 입력 파일을 준비할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot read SVC cached input</source>
+        <translation>가창 음성 변환 캐시 입력을 읽을 수 없습니다</translation>
+    </message>
+    <message>
+        <source>SVC backend rejected the frozen request</source>
+        <translation>가창 음성 변환 백엔드가 확정된 요청을 거부했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVC source</source>
+        <translation>가창 음성 변환 원본이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVC segment map</source>
+        <translation>가창 음성 변환 구간 대응이 올바르지 않습니다</translation>
+    </message>
 </context>
 <context>
     <name>NativeSVS</name>
+    <message>
+        <source>Continuation requires an adjacent resolved source note</source>
+        <translation>연속음에는 인접한 해석 완료 원본 노트가 필요합니다</translation>
+    </message>
+    <message>
+        <source>Unresolved pronunciation; original text retained</source>
+        <translation>발음을 해석하지 못했습니다. 원래 텍스트를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Unknown text; original retained</source>
+        <translation>알 수 없는 텍스트입니다. 원래 내용을 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Unsupported note language: %1</source>
+        <translation>지원되지 않는 노트 언어: %1</translation>
+    </message>
+    <message>
+        <source>Illegal phoneme: %1</source>
+        <translation>유효하지 않은 음소: %1</translation>
+    </message>
+    <message>
+        <source>Dirty</source>
+        <translation>합성 필요</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>취소됨</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>대기 중</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>합성 중</translation>
+    </message>
+    <message>
+        <source>Rendering</source>
+        <translation>렌더링 중</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>준비 완료</translation>
+    </message>
+    <message>
+        <source>Queued: capabilities</source>
+        <translation>기능 정보를 기다리는 중</translation>
+    </message>
+    <message>
+        <source>Queued: voicebank scan</source>
+        <translation>음성 라이브러리 검색을 기다리는 중</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin; no valid cached audio</source>
+        <translation>음성 라이브러리 또는 플러그인이 없습니다. 유효한 캐시 오디오도 없습니다</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin: cached audio</source>
+        <translation>음성 라이브러리 또는 플러그인이 없음: 캐시 오디오 사용</translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation>실패: %1</translation>
+    </message>
     <message>
         <source>Mode</source>
         <translation>모드</translation>
@@ -747,6 +931,668 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     <message>
         <source>Expressiveness</source>
         <translation>표현력</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately export changing time signatures; no files were written</source>
+        <translation>이 호스트는 박자 변화를 정확히 내보낼 수 없습니다. 파일은 기록되지 않았습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: the external project does not retain the host effect chain or mixer routing</source>
+        <translation>트랙 %1: 외부 프로젝트는 호스트 이펙트 체인과 믹서 라우팅을 유지하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: read-only fields from an unknown version cannot be exported</source>
+        <translation>트랙 %1 / 클립 %2: 알 수 없는 버전의 읽기 전용 필드를 내보낼 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: voicebank-specific parameters and project dictionaries have no unified-format mapping</source>
+        <translation>트랙 %1 / 클립 %2: 음성 라이브러리 전용 매개변수와 프로젝트 사전에는 통합 형식 대응이 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: audio is missing or undecoded: %3</source>
+        <translation>트랙 %1 / 클립 %2: 오디오가 없거나 디코딩되지 않았습니다: %3</translation>
+    </message>
+    <message>
+        <source>No exportable SVS singing or audio clips</source>
+        <translation>내보낼 수 있는 SVS 가창 또는 오디오 클립이 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid export snapshot</source>
+        <translation>내보내기 스냅샷이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid tempo data</source>
+        <translation>템포 데이터가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid export time range</source>
+        <translation>내보내기 시간 범위가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Global tempo automation is sampled at each integer LMMS tick; all tempo changes on this sampling grid are retained</source>
+        <translation>전역 템포 자동화는 각 정수 LMMS tick에서 샘플링됩니다. 이 샘플링 격자의 모든 템포 변화는 유지됩니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: invalid time range</source>
+        <translation>트랙 %1 / 클립 %2: 시간 범위가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: the target unified model has no clip mute field; clip muting cannot be retained when exporting its data</source>
+        <translation>트랙 %1 / 클립 %2: 대상 통합 모델에는 클립 음소거 필드가 없어 데이터를 내보낼 때 클립 음소거를 유지할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid note data</source>
+        <translation>트랙 %1: 노트 데이터가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: note length is zero at the target integer tick precision</source>
+        <translation>트랙 %1: 대상 정수 tick 정밀도에서 노트 길이가 0입니다</translation>
+    </message>
+    <message>
+        <source>Track %1: note pitch is out of range</source>
+        <translation>트랙 %1: 노트 음높이가 범위를 벗어납니다</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing is quantized to 480 ticks per beat and note keys to integers; edited pitch curves are retained separately</source>
+        <translation>트랙 %1: 노트 시간은 박당 480 tick으로, 노트 키 번호는 정수로 양자화됩니다. 편집한 음높이 곡선은 별도로 유지됩니다</translation>
+    </message>
+    <message>
+        <source>Track %1: note-specific parameters and phoneme durations have no unified-format mapping</source>
+        <translation>트랙 %1: 노트 전용 매개변수와 음소 길이에는 통합 형식 대응이 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: parameter %3 has no defined unified-format semantics</source>
+        <translation>트랙 %1 / 클립 %2: 매개변수 %3에 정의된 통합 형식 의미가 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve does not use absolute semitone units and cannot be exported accurately</source>
+        <translation>트랙 %1: 음높이 곡선이 절대 반음 단위를 사용하지 않아 정확히 내보낼 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch range exceeds the conversion protocol&apos;s supported size</source>
+        <translation>트랙 %1: 음높이 범위가 변환 프로토콜의 지원 크기를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch curve value</source>
+        <translation>트랙 %1: 음높이 곡선 값이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: overlapping clips have conflicting pitch at the same time; the later clip in stable clip order is used, while all overlapping notes are retained</source>
+        <translation>트랙 %1: 겹치는 클립의 음높이가 같은 시점에서 충돌합니다. 안정적인 클립 순서에서 뒤의 클립을 사용하며 겹치는 노트는 모두 유지됩니다</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve is sampled at 480 ticks per beat and integer cents; breaks remain separate</source>
+        <translation>트랙 %1: 음높이 곡선은 박당 480 tick과 정수 센트로 샘플링되며 끊김은 독립적으로 유지됩니다</translation>
+    </message>
+    <message>
+        <source>Audio track %1: %2 clips are split into separate audio entries; track settings are copied to each entry</source>
+        <translation>오디오 트랙 %1: 클립 %2개를 별도의 오디오 항목으로 나누고 트랙 설정을 각 항목에 복사합니다</translation>
+    </message>
+    <message>
+        <source>Audio track %1 / clip %2: the valid range contains no audio samples and will be omitted</source>
+        <translation>오디오 트랙 %1 / 클립 %2: 유효 범위에 오디오 샘플이 없어 생략됩니다</translation>
+    </message>
+    <message>
+        <source>No exportable content lies within the valid clip range</source>
+        <translation>클립의 유효 범위 안에 내보낼 수 있는 내용이 없습니다</translation>
+    </message>
+    <message>
+        <source>Cannot create the export audio staging directory</source>
+        <translation>내보내기 오디오 임시 폴더를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid export audio range</source>
+        <translation>내보내기 오디오 범위가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid companion audio filename</source>
+        <translation>부속 오디오 파일 이름이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Staged audio file already exists: %1</source>
+        <translation>임시 오디오 파일이 이미 있습니다: %1</translation>
+    </message>
+    <message>
+        <source>No valid default voicebank selected</source>
+        <translation>유효한 기본 음성 라이브러리가 선택되지 않았습니다</translation>
+    </message>
+    <message>
+        <source>The project has no time signature</source>
+        <translation>프로젝트에 박자가 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid initial time signature</source>
+        <translation>초기 박자가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>The time signature cannot be mapped exactly to LMMS bar timing</source>
+        <translation>박자를 LMMS 마디 시간에 정확히 대응시킬 수 없습니다</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately import changing time signatures; the project was not replaced</source>
+        <translation>이 호스트는 박자 변화를 정확히 가져올 수 없습니다. 프로젝트는 교체되지 않았습니다</translation>
+    </message>
+    <message>
+        <source>The project has no tempo</source>
+        <translation>프로젝트에 템포가 없습니다</translation>
+    </message>
+    <message>
+        <source>Tempo position or BPM is outside the host&apos;s supported range</source>
+        <translation>템포 위치 또는 BPM이 호스트의 지원 범위를 벗어납니다</translation>
+    </message>
+    <message>
+        <source>Tempo changes conflict at integer tick boundaries</source>
+        <translation>정수 tick 경계에서 템포 변화가 충돌합니다</translation>
+    </message>
+    <message>
+        <source>Tempo %1 tick / %2 BPM quantized to %3 tick / %4 BPM</source>
+        <translation>템포 %1 tick / %2 BPM을 %3 tick / %4 BPM으로 양자화했습니다</translation>
+    </message>
+    <message>
+        <source>The project has no importable tracks</source>
+        <translation>프로젝트에 가져올 수 있는 트랙이 없습니다</translation>
+    </message>
+    <message>
+        <source>Unknown track type: %1</source>
+        <translation>알 수 없는 트랙 형식: %1</translation>
+    </message>
+    <message>
+        <source>Track %1: volume or panning is outside the host&apos;s supported range</source>
+        <translation>트랙 %1: 음량 또는 패닝이 호스트의 지원 범위를 벗어납니다</translation>
+    </message>
+    <message>
+        <source>Track %1: audio is missing or cannot be decoded: %2; the track will be omitted</source>
+        <translation>트랙 %1: 오디오가 없거나 디코딩할 수 없습니다: %2. 이 트랙은 생략됩니다</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid audio time range</source>
+        <translation>트랙 %1: 오디오 시간 범위가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: audio start quantized to an integer tick</source>
+        <translation>트랙 %1: 오디오 시작점을 정수 tick으로 양자화했습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing or pitch is out of range</source>
+        <translation>트랙 %1: 노트 시간 또는 음높이가 범위를 벗어납니다</translation>
+    </message>
+    <message>
+        <source>Track %1: private note tags, phoneme durations or independent vibrato parameters cannot be mapped; resolved pitch is retained</source>
+        <translation>트랙 %1: 노트 전용 태그, 음소 길이 또는 독립 비브라토 매개변수를 대응시킬 수 없습니다. 분석된 음높이는 유지됩니다</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch breakpoint data</source>
+        <translation>트랙 %1: 음높이 제어점 데이터가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: pitch timing or value is out of range</source>
+        <translation>트랙 %1: 음높이 시간 또는 값이 범위를 벗어납니다</translation>
+    </message>
+    <message>
+        <source>Track %1: different pitch segments occur at the same time and cannot be represented without loss</source>
+        <translation>트랙 %1: 같은 시점에 다른 음높이 구간이 있어 손실 없이 표현할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: multiple pitch values occur at the same time</source>
+        <translation>트랙 %1: 같은 시점에 여러 음높이 값이 있습니다</translation>
+    </message>
+    <message>
+        <source>Track %1: parameter %2 has no defined unit mapping for the current voicebank and will be omitted</source>
+        <translation>트랙 %1: 매개변수 %2는 현재 음성 라이브러리에 정의된 단위 대응이 없어 생략됩니다</translation>
+    </message>
+    <message>
+        <source>Export staging or destination directory does not exist</source>
+        <translation>내보내기 임시 폴더 또는 대상 폴더가 없습니다</translation>
+    </message>
+    <message>
+        <source>The converter produced no output files</source>
+        <translation>변환기가 출력 파일을 생성하지 않았습니다</translation>
+    </message>
+    <message>
+        <source>Converter output is invalid or outside the staging directory: %1</source>
+        <translation>변환기 출력이 올바르지 않거나 임시 폴더 밖에 있습니다: %1</translation>
+    </message>
+    <message>
+        <source>Export destination paths conflict or escape the destination directory: %1</source>
+        <translation>내보내기 대상 경로가 충돌하거나 대상 폴더 밖에 있습니다: %1</translation>
+    </message>
+    <message>
+        <source>Export destination is not a replaceable regular file: %1</source>
+        <translation>내보내기 대상이 교체 가능한 일반 파일이 아닙니다: %1</translation>
+    </message>
+    <message>
+        <source>Export file group plan contains invalid paths</source>
+        <translation>내보낼 파일 묶음 계획에 올바르지 않은 경로가 있습니다</translation>
+    </message>
+    <message>
+        <source>Cannot create the export transaction directory on the destination volume</source>
+        <translation>대상 볼륨에 내보내기 처리 폴더를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>
+Rollback could not restore: %1
+Original file backups remain at: %2</source>
+        <translation>
+롤백으로 복원하지 못했습니다: %1
+원본 파일 백업이 다음 위치에 남아 있습니다: %2</translation>
+    </message>
+    <message>
+        <source>Cannot back up the original file: %1
+%2</source>
+        <translation>원본 파일을 백업할 수 없습니다: %1
+%2</translation>
+    </message>
+    <message>
+        <source>Cannot stage the complete export file group: %1</source>
+        <translation>내보낼 파일 묶음 전체를 임시 저장할 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Export destination changed after confirmation: %1</source>
+        <translation>확인 후 내보내기 대상이 변경되었습니다: %1</translation>
+    </message>
+    <message>
+        <source>Cannot commit the exported file: %1</source>
+        <translation>내보낸 파일을 확정할 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Incompatible SVS ABI</source>
+        <translation>SVS ABI가 호환되지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS engine initialization failed</source>
+        <translation>가창 합성 엔진 초기화에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>SVS resource API unavailable</source>
+        <translation>가창 합성 리소스 API를 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid or unavailable SVS resource</source>
+        <translation>가창 합성 리소스가 올바르지 않거나 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Incomplete SVS resource</source>
+        <translation>가창 합성 리소스가 불완전합니다</translation>
+    </message>
+    <message>
+        <source>SVS resource hash mismatch</source>
+        <translation>가창 합성 리소스 해시가 일치하지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS engine settings query failed</source>
+        <translation>가창 합성 엔진 설정 조회에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS engine settings declaration</source>
+        <translation>가창 합성 엔진 설정 선언이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS capability query failed</source>
+        <translation>가창 합성 기능 정보 조회에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid capability JSON</source>
+        <translation>기능 정보 JSON이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Plugin pronunciation parser unavailable</source>
+        <translation>플러그인 발음 분석기를 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>SVS pronunciation query failed</source>
+        <translation>가창 합성 발음 정보 조회에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid pronunciation JSON</source>
+        <translation>발음 정보 JSON이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed (%1)</source>
+        <translation>가창 합성 목록 조회 실패(%1)</translation>
+    </message>
+    <message>
+        <source>Voice session unavailable</source>
+        <translation>음성 라이브러리 세션을 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Snapshot capability query failed</source>
+        <translation>스냅샷 기능 정보 조회에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set incompatible with voice</source>
+        <translation>사전 언어 또는 음소 집합이 음성 라이브러리와 호환되지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range declaration</source>
+        <translation>가창 합성 범위 선언이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range count</source>
+        <translation>가창 합성 범위 수가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range boundaries or ID</source>
+        <translation>가창 합성 범위 경계 또는 식별자가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Non-finite SVS audio</source>
+        <translation>가창 합성 오디오에 유한하지 않은 값이 포함되어 있습니다</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed (%1)</source>
+        <translation>가창 합성 실패(%1)</translation>
+    </message>
+    <message>
+        <source>Invalid SVS manifest: %1</source>
+        <translation>가창 합성 플러그인 매니페스트가 올바르지 않습니다: %1</translation>
+    </message>
+    <message>
+        <source>SVS architecture mismatch: %1 declares %2; host %3</source>
+        <translation>가창 합성 아키텍처 불일치: %1 선언은 %2, 호스트는 %3</translation>
+    </message>
+    <message>
+        <source>SVS platform mismatch: %1 declares %2; host %3</source>
+        <translation>가창 합성 플랫폼 불일치: %1 선언은 %2, 호스트는 %3</translation>
+    </message>
+    <message>
+        <source>Duplicate SVS plugin ID: %1 in %2</source>
+        <translation>가창 합성 플러그인 식별자 중복: %2의 %1</translation>
+    </message>
+    <message>
+        <source>SVS engine unavailable</source>
+        <translation>가창 합성 엔진을 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed</source>
+        <translation>가창 합성 목록 조회에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>SVS catalog worker exception</source>
+        <translation>가창 합성 목록 작업 스레드에서 예외가 발생했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS time origin</source>
+        <translation>SVS 시간 원점이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo map</source>
+        <translation>SVS 템포 맵이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid %1 JSON; original SVS node preserved</source>
+        <translation>%1 JSON이 올바르지 않습니다. 원래 SVS 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Unsupported SVS schema %1; original node preserved</source>
+        <translation>SVS 스키마 %1은 지원되지 않습니다. 원래 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Unsupported capability schema version</source>
+        <translation>지원되지 않는 기능 스키마 버전입니다</translation>
+    </message>
+    <message>
+        <source>Unknown required capability: %1</source>
+        <translation>알 수 없는 필수 기능: %1</translation>
+    </message>
+    <message>
+        <source>%1 must be an array</source>
+        <translation>%1은 배열이어야 합니다</translation>
+    </message>
+    <message>
+        <source>Invalid parameter color: %1</source>
+        <translation>올바르지 않은 매개변수 색상: %1</translation>
+    </message>
+    <message>
+        <source>Invalid resource selector: %1</source>
+        <translation>올바르지 않은 리소스 선택기: %1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate resource ID: %1</source>
+        <translation>올바르지 않거나 중복된 리소스 ID: %1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate parameter: %1</source>
+        <translation>올바르지 않거나 중복된 매개변수: %1</translation>
+    </message>
+    <message>
+        <source>Invalid directory list: %1</source>
+        <translation>올바르지 않은 디렉터리 목록: %1</translation>
+    </message>
+    <message>
+        <source>Non-numeric range: %1</source>
+        <translation>숫자가 아닌 범위: %1</translation>
+    </message>
+    <message>
+        <source>Invalid numeric range: %1</source>
+        <translation>올바르지 않은 숫자 범위: %1</translation>
+    </message>
+    <message>
+        <source>Invalid enum ID: %1</source>
+        <translation>올바르지 않은 열거 ID: %1</translation>
+    </message>
+    <message>
+        <source>Invalid default or interpolation: %1</source>
+        <translation>올바르지 않은 기본값 또는 보간: %1</translation>
+    </message>
+    <message>
+        <source>Invalid capability languages</source>
+        <translation>기능 선언의 언어가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Unsupported pitch mode/unit</source>
+        <translation>지원되지 않는 피치 모드 또는 단위입니다</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires a valid declared absolute referencePitch curve: %1</source>
+        <translation>오프셋 피치에는 선언된 유효한 절대 referencePitch 곡선이 필요합니다: %1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate phoneme symbol</source>
+        <translation>음소 기호가 올바르지 않거나 중복되었습니다</translation>
+    </message>
+    <message>
+        <source>Dictionary requires a phoneme set ID</source>
+        <translation>사전에는 음소 집합 ID가 필요합니다</translation>
+    </message>
+    <message>
+        <source>Invalid segmented synthesis declaration</source>
+        <translation>분할 합성 선언이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Dictionary exceeds limit or is not UTF-8</source>
+        <translation>사전이 한도를 초과하거나 UTF-8이 아닙니다</translation>
+    </message>
+    <message>
+        <source>Dictionary JSON at byte %1: %2</source>
+        <translation>사전 JSON의 바이트 %1: %2</translation>
+    </message>
+    <message>
+        <source>Missing dictionary fields</source>
+        <translation>사전 필드가 누락되었습니다</translation>
+    </message>
+    <message>
+        <source>missing/duplicate entry or no candidates</source>
+        <translation>항목이 누락 또는 중복되었거나 후보가 없습니다</translation>
+    </message>
+    <message>
+        <source>invalid or duplicate reading</source>
+        <translation>발음이 올바르지 않거나 중복되었습니다</translation>
+    </message>
+    <message>
+        <source>illegal phoneme %1</source>
+        <translation>유효하지 않은 음소 %1</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set is incompatible with this voice</source>
+        <translation>사전 언어 또는 음소 집합이 이 음원과 호환되지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS curve %1; original node preserved</source>
+        <translation>SVS 곡선 %1이 올바르지 않습니다. 원래 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS seed; original node preserved</source>
+        <translation>SVS 시드가 올바르지 않습니다. 원래 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS %1; original node preserved</source>
+        <translation>SVS %1이 올바르지 않습니다. 원래 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS note data; original node preserved</source>
+        <translation>SVS 노트 데이터가 올바르지 않습니다. 원래 노드를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid curve metadata</source>
+        <translation>곡선 메타데이터가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Discrete curve requires step interpolation</source>
+        <translation>이산 곡선에는 계단 보간이 필요합니다</translation>
+    </message>
+    <message>
+        <source>Only derived pitch offsets may use unconstrained difference tangents</source>
+        <translation>파생 피치 오프셋만 제약 없는 차분 접선을 사용할 수 있습니다</translation>
+    </message>
+    <message>
+        <source>Invalid curve anchor</source>
+        <translation>곡선 기준점이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid segment interpolation</source>
+        <translation>구간 보간이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid curve tangent or integer value</source>
+        <translation>곡선 접선 또는 정수 값이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid curve gap</source>
+        <translation>곡선 공백 구간이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires an explicit absolute semitone reference curve</source>
+        <translation>오프셋 피치에는 명시적인 절대 반음 참조 곡선이 필요합니다</translation>
+    </message>
+    <message>
+        <source>Reference pitch does not cover the edited pitch range</source>
+        <translation>참조 피치가 편집한 피치 범위를 포함하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Reference pitch has a gap in the edited range</source>
+        <translation>참조 피치의 편집 범위에 공백 구간이 있습니다</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin</source>
+        <translation>음원 또는 플러그인이 누락되었습니다</translation>
+    </message>
+    <message>
+        <source>Missing voice dictionary: %1</source>
+        <translation>누락된 음원 사전: %1</translation>
+    </message>
+    <message>
+        <source>Incompatible voice dictionary: %1</source>
+        <translation>호환되지 않는 음원 사전: %1</translation>
+    </message>
+    <message>
+        <source>SVS export result incomplete or version mismatch</source>
+        <translation>SVS 내보내기 결과가 불완전하거나 버전이 일치하지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed</source>
+        <translation>SVS 합성에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>SVS conversion timed out</source>
+        <translation>SVS 변환 시간이 초과되었습니다</translation>
+    </message>
+    <message>
+        <source>SVS conversion result exceeds size limit</source>
+        <translation>SVS 변환 결과가 크기 한도를 초과합니다</translation>
+    </message>
+    <message>
+        <source>SVS conversion request exceeds size limit</source>
+        <translation>SVS 변환 요청이 크기 한도를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Cannot create SVS conversion task directory</source>
+        <translation>SVS 변환 작업 디렉터리를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Missing SVS output filename</source>
+        <translation>SVS 출력 파일 이름이 누락되었습니다</translation>
+    </message>
+    <message>
+        <source>SVS conversion cancelled</source>
+        <translation>SVS 변환이 취소되었습니다</translation>
+    </message>
+    <message>
+        <source>SVS conversion process terminated unexpectedly</source>
+        <translation>SVS 변환 프로세스가 예기치 않게 종료되었습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS conversion response</source>
+        <translation>SVS 변환 응답이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS output escaped its task directory</source>
+        <translation>SVS 출력이 작업 디렉터리를 벗어났습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS segment context padding</source>
+        <translation>SVS 구간 문맥 패딩이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>SVS segment count exceeds bound</source>
+        <translation>SVS 구간 수가 한도를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Segmented SVS PCM extent exceeds bound</source>
+        <translation>분할된 SVS PCM 길이가 한도를 초과합니다</translation>
+    </message>
+    <message>
+        <source>SVS segment sample rate mismatch</source>
+        <translation>SVS 구간 샘플 레이트가 일치하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo extent</source>
+        <translation>SVS 템포 범위가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Rendering %1/%2</source>
+        <translation>렌더링 중 %1/%2</translation>
+    </message>
+    <message>
+        <source>SVS segment synthesis failed</source>
+        <translation>SVS 구간 합성에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>SVS tempo snapshot exceeds supported song length</source>
+        <translation>SVS 템포 스냅샷이 지원되는 곡 길이를 초과합니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo snapshot</source>
+        <translation>SVS 템포 스냅샷이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview duration</source>
+        <translation>SVS 미리 듣기 길이가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview note</source>
+        <translation>SVS 미리 듣기 노트가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Voicebank is missing; project data is retained</source>
+        <translation>음원이 누락되었습니다. 프로젝트 데이터를 보존했습니다</translation>
+    </message>
+    <message>
+        <source>Missing dictionary: %1</source>
+        <translation>누락된 사전: %1</translation>
+    </message>
+    <message>
+        <source>%1: incompatible dictionary language/phoneme set</source>
+        <translation>%1: 호환되지 않는 사전 언어 또는 음소 집합</translation>
     </message>
 </context>
 <context>
@@ -1584,6 +2430,105 @@ Continue?</source>
     <message>
         <source>Check and export</source>
         <translation>검사 후 내보내기</translation>
+    </message>
+</context>
+<context>
+    <name>VstHostUI</name>
+    <message>
+        <source>Invalid catalog cache records</source>
+        <translation>카탈로그 캐시 레코드가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Supervised catalog publication failed</source>
+        <translation>감독되는 카탈로그 게시에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Invalid catalog publication reply</source>
+        <translation>카탈로그 게시 응답이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Cannot create catalog cache directory</source>
+        <translation>카탈로그 캐시 디렉터리를 만들 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Catalog cache writer is busy</source>
+        <translation>카탈로그 캐시 쓰기 작업이 사용 중입니다</translation>
+    </message>
+    <message>
+        <source>Catalog cache exceeds size limit</source>
+        <translation>카탈로그 캐시가 크기 한도를 초과합니다</translation>
+    </message>
+    <message>
+        <source>discovery capacity</source>
+        <translation>검색 수 한도</translation>
+    </message>
+    <message>
+        <source>catalog worker exception</source>
+        <translation>카탈로그 작업자 예외</translation>
+    </message>
+    <message>
+        <source>Supervised catalog cache read failed: %1</source>
+        <translation>감독되는 카탈로그 캐시 읽기에 실패했습니다: %1</translation>
+    </message>
+    <message>
+        <source>Catalog cache schema/host mismatch or invalid JSON: %1</source>
+        <translation>카탈로그 캐시 스키마 또는 호스트가 일치하지 않거나 JSON이 올바르지 않습니다: %1</translation>
+    </message>
+    <message>
+        <source>Cannot atomically save catalog cache: %1</source>
+        <translation>카탈로그 캐시를 원자적으로 저장할 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Module path or architecture differs from the selected VST3 entry</source>
+        <translation>모듈 경로 또는 아키텍처가 선택한 VST3 항목과 다릅니다</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 module</source>
+        <translation>선택한 VST3 모듈을 검증할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module is ambiguous</source>
+        <translation>선택한 VST3 모듈을 명확히 식별할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>No VST3 binary matches the selected architecture</source>
+        <translation>선택한 아키텍처와 일치하는 VST3 바이너리가 없습니다</translation>
+    </message>
+    <message>
+        <source>The selected VST3 binary path has changed</source>
+        <translation>선택한 VST3 바이너리 경로가 변경되었습니다</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module or bundle resources have changed; rescan before loading</source>
+        <translation>선택한 VST3 모듈 또는 번들 리소스가 변경되었습니다. 불러오기 전에 다시 스캔하세요</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 class version</source>
+        <translation>선택한 VST3 클래스 버전을 검증할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>The selected VST3 class version has changed; rescan before loading</source>
+        <translation>선택한 VST3 클래스 버전이 변경되었습니다. 불러오기 전에 다시 스캔하세요</translation>
+    </message>
+    <message>
+        <source>Truncated PE file</source>
+        <translation>PE 파일이 불완전합니다</translation>
+    </message>
+    <message>
+        <source>Cannot map file</source>
+        <translation>파일을 매핑할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Invalid DOS signature</source>
+        <translation>DOS 서명이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid PE header offset</source>
+        <translation>PE 헤더 오프셋이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid PE file</source>
+        <translation>PE 파일이 올바르지 않습니다</translation>
     </message>
 </context>
 <context>
@@ -12924,6 +13869,46 @@ Seed: %3</source>
 </context>
 <context>
     <name>lmms::gui::ScanRootsWidget</name>
+    <message>
+        <source>Too many VST scan roots (maximum 256)</source>
+        <translation>VST 검색 폴더가 너무 많습니다(최대 256개)</translation>
+    </message>
+    <message>
+        <source>VST scan roots must be absolute paths without NUL characters</source>
+        <translation>VST 검색 폴더는 NUL 문자가 없는 절대 경로여야 합니다</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan format selection</source>
+        <translation>VST 검색 형식 선택이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>VST scan formats must be unique vst2/vst3 entries</source>
+        <translation>VST 검색 형식은 중복 없는 vst2/vst3 항목이어야 합니다</translation>
+    </message>
+    <message>
+        <source>VST scan roots exceed configuration size limit</source>
+        <translation>VST 검색 폴더 설정이 크기 제한을 초과합니다</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan roots JSON</source>
+        <translation>VST 검색 폴더 JSON이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Unsupported VST scan roots schema</source>
+        <translation>지원하지 않는 VST 검색 폴더 설정 형식입니다</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root entry</source>
+        <translation>VST 검색 폴더 항목이 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root fields</source>
+        <translation>VST 검색 폴더 필드가 올바르지 않습니다</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root format</source>
+        <translation>VST 검색 폴더 형식이 올바르지 않습니다</translation>
+    </message>
     <message>
         <source>Directory</source>
         <translation>디렉터리</translation>

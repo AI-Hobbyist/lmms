@@ -1,5 +1,7 @@
 #ifndef LMMS_VSTHOST_VST3_SELECTION_H
 #define LMMS_VSTHOST_VST3_SELECTION_H
+#include <QCoreApplication>
+
 #include "vsthost/CatalogIo.h"
 #include "vsthost/PluginCatalog.h"
 #include "vsthost/Vst3Scanner.h"
@@ -18,7 +20,8 @@ inline bool validateVst3Selection(
 		|| (entry.identity.architecture != Architecture::X86 && entry.identity.architecture != Architecture::X64)
 		|| scanPathKey(path) != scanPathKey(entry.locator.modulePath))
 	{
-		return fail("Module path or architecture differs from the selected VST3 entry");
+		return fail(QCoreApplication::translate(
+			"VstHostUI", "Module path or architecture differs from the selected VST3 entry"));
 	}
 	QByteArray roots;
 	QString rootError;
@@ -29,7 +32,7 @@ inline bool validateVst3Selection(
 	const auto discovered = io.request({{"op", "discover"}, {"roots", QJsonDocument::fromJson(roots).object()}});
 	if (discovered.error != Error::None || !discovered.object.value("modules").isArray())
 	{
-		return fail("Cannot verify the selected VST3 module");
+		return fail(QCoreApplication::translate("VstHostUI", "Cannot verify the selected VST3 module"));
 	}
 	QString module, binary;
 	for (const auto& value : discovered.object.value("modules").toArray())
@@ -42,18 +45,18 @@ inline bool validateVst3Selection(
 		}
 		if (!binary.isEmpty())
 		{
-			return fail("The selected VST3 module is ambiguous");
+			return fail(QCoreApplication::translate("VstHostUI", "The selected VST3 module is ambiguous"));
 		}
 		module = row.value("path").toString();
 		binary = row.value("binary").toString();
 	}
 	if (binary.isEmpty())
 	{
-		return fail("No VST3 binary matches the selected architecture");
+		return fail(QCoreApplication::translate("VstHostUI", "No VST3 binary matches the selected architecture"));
 	}
 	if (!entry.locator.binaryPath.isEmpty() && scanPathKey(binary) != scanPathKey(entry.locator.binaryPath))
 	{
-		return fail("The selected VST3 binary path has changed");
+		return fail(QCoreApplication::translate("VstHostUI", "The selected VST3 binary path has changed"));
 	}
 	if (!entry.locator.fingerprint.isEmpty())
 	{
@@ -62,7 +65,8 @@ inline bool validateVst3Selection(
 		if (hashed.error != Error::None || entry.locator.fingerprint.size() != 32 || encoded.size() != 64
 			|| QByteArray::fromHex(encoded) != entry.locator.fingerprint)
 		{
-			return fail("The selected VST3 module or bundle resources have changed; rescan before loading");
+			return fail(QCoreApplication::translate(
+				"VstHostUI", "The selected VST3 module or bundle resources have changed; rescan before loading"));
 		}
 	}
 	if (!entry.locator.version.isEmpty())
@@ -70,13 +74,14 @@ inline bool validateVst3Selection(
 		const auto scanned = scanVst3(helper.toStdWString(), path.toStdWString(), 15000);
 		if (scanned.error != Error::None)
 		{
-			return fail("Cannot verify the selected VST3 class version");
+			return fail(QCoreApplication::translate("VstHostUI", "Cannot verify the selected VST3 class version"));
 		}
 		const auto found = std::find_if(scanned.classes.begin(), scanned.classes.end(),
 			[&](const auto& info) { return info.cid == entry.identity.cid && info.audioClass(); });
 		if (found == scanned.classes.end() || QString::fromUtf8(found->version) != entry.locator.version)
 		{
-			return fail("The selected VST3 class version has changed; rescan before loading");
+			return fail(QCoreApplication::translate(
+				"VstHostUI", "The selected VST3 class version has changed; rescan before loading"));
 		}
 	}
 	error.clear();

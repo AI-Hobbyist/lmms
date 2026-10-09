@@ -1,10 +1,12 @@
 #ifndef LMMS_SVS_UNSELECTED_PREVIEW_H
 #define LMMS_SVS_UNSELECTED_PREVIEW_H
 
-#include "SVSModel.h"
+#include <QCoreApplication>
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+
+#include "SVSModel.h"
 
 namespace lmms::svs {
 inline std::shared_ptr<const Audio> renderUnselectedPreview(const Input& input, QString& error,
@@ -18,7 +20,7 @@ inline std::shared_ptr<const Audio> renderUnselectedPreview(const Input& input, 
 	const double frames = std::ceil(input.duration * input.rate);
 	if (!std::isfinite(frames) || frames < 0 || frames > 64 * 1024 * 1024 || input.rate == 0)
 	{
-		error = "Invalid SVS preview duration";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS preview duration");
 		return {};
 	}
 	auto audio = std::make_shared<Audio>();
@@ -37,7 +39,7 @@ inline std::shared_ptr<const Audio> renderUnselectedPreview(const Input& input, 
 		const double frequency = 440 * std::exp2((note.pitch - 69) / 12);
 		if (!std::isfinite(start) || !std::isfinite(end) || !std::isfinite(frequency) || end <= start)
 		{
-			error = "Invalid SVS preview note";
+			error = QCoreApplication::translate("NativeSVS", "Invalid SVS preview note");
 			return {};
 		}
 		const auto first = std::size_t(std::clamp(std::ceil(start * input.rate), 0., frames));

@@ -153,7 +153,7 @@ void SynthesisScheduler::dispatch()
 														  job->control))
 					{
 						if (error.isEmpty())
-							error = "Invalid SVS tempo extent";
+							error = QCoreApplication::translate("NativeSVS", "Invalid SVS tempo extent");
 					}
 					else
 					{
@@ -229,7 +229,10 @@ void SynthesisScheduler::dispatch()
 											this,
 											[job, index, total = segments.size()] {
 												if (!job->control->cancelled)
-													job->state(QString("Rendering %1/%2").arg(index + 1).arg(total));
+													job->state(
+														QCoreApplication::translate("NativeSVS", "Rendering %1/%2")
+															.arg(index + 1)
+															.arg(total));
 											},
 											Qt::QueuedConnection);
 										auto& segment = segments[index];
@@ -241,7 +244,8 @@ void SynthesisScheduler::dispatch()
 										if (!segment.audio)
 										{
 											if (error.isEmpty())
-												error = "SVS segment synthesis failed";
+												error = QCoreApplication::translate(
+													"NativeSVS", "SVS segment synthesis failed");
 											error += QString(" [segment=%1/%2]").arg(index + 1).arg(segments.size());
 											break;
 										}

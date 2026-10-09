@@ -593,9 +593,193 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>semitones</source>
         <translation>半音</translation>
     </message>
+    <message>
+        <source>Operating system random generator failed</source>
+        <translation>操作系统随机数生成器失败</translation>
+    </message>
+    <message>
+        <source>Invalid cache engine, source or credential-bearing snapshot</source>
+        <translation>缓存引擎、源数据无效，或快照包含凭据</translation>
+    </message>
+    <message>
+        <source>Input digest read failed</source>
+        <translation>读取输入摘要失败</translation>
+    </message>
+    <message>
+        <source>Input cannot rewind</source>
+        <translation>无法将输入读取位置返回起点</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directories</source>
+        <translation>无法创建歌声转换缓存目录</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC input cache</source>
+        <translation>无法预留歌声转换输入缓存</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC output cache</source>
+        <translation>无法预留歌声转换输出缓存</translation>
+    </message>
+    <message>
+        <source>Input cache write failed</source>
+        <translation>写入输入缓存失败</translation>
+    </message>
+    <message>
+        <source>Cannot save SVC cache manifest</source>
+        <translation>无法保存歌声转换缓存清单</translation>
+    </message>
+    <message>
+        <source>Unable to allocate unique SVC cache identity</source>
+        <translation>无法分配唯一的歌声转换缓存标识</translation>
+    </message>
+    <message>
+        <source>Silence threshold must be finite and between -120 and 0 dBFS</source>
+        <translation>静音阈值必须是 -120 至 0 dBFS 之间的有限值</translation>
+    </message>
+    <message>
+        <source>Chunk lengths must be finite and positive</source>
+        <translation>分块长度必须是有限的正值</translation>
+    </message>
+    <message>
+        <source>Forced chunk length must not exceed the length threshold</source>
+        <translation>强制分块长度不能超过长度阈值</translation>
+    </message>
+    <message>
+        <source>Invalid source format or backend limits</source>
+        <translation>源格式或后端限制无效</translation>
+    </message>
+    <message>
+        <source>Forced chunk length is shorter than one source sample</source>
+        <translation>强制分块长度短于一个源采样</translation>
+    </message>
+    <message>
+        <source>Nonfinite source sample</source>
+        <translation>源采样不是有限值</translation>
+    </message>
+    <message>
+        <source>Configured segment exceeds discovered backend duration or byte limit</source>
+        <translation>配置的分段超过后端报告的时长或字节限制</translation>
+    </message>
+    <message>
+        <source>Chunk rounding produced an empty segment</source>
+        <translation>分块舍入后产生了空分段</translation>
+    </message>
+    <message>
+        <source>SVC input WAV exceeds supported size</source>
+        <translation>歌声转换输入 WAV 超出支持的大小</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input WAV</source>
+        <translation>无法写入歌声转换输入 WAV</translation>
+    </message>
+    <message>
+        <source>SVC conversion cancelled</source>
+        <translation>已取消歌声转换</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input samples</source>
+        <translation>无法写入歌声转换输入采样</translation>
+    </message>
+    <message>
+        <source>Cannot rewind SVC input WAV</source>
+        <translation>无法将歌声转换输入 WAV 读取位置返回起点</translation>
+    </message>
+    <message>
+        <source>SVC request exceeds the backend upload byte limit</source>
+        <translation>歌声转换请求超出后端上传字节限制</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directory</source>
+        <translation>无法创建歌声转换缓存目录</translation>
+    </message>
+    <message>
+        <source>Cannot prepare SVC input file</source>
+        <translation>无法准备歌声转换输入文件</translation>
+    </message>
+    <message>
+        <source>Cannot read SVC cached input</source>
+        <translation>无法读取歌声转换缓存输入</translation>
+    </message>
+    <message>
+        <source>SVC backend rejected the frozen request</source>
+        <translation>歌声转换后端拒绝了已固定的请求</translation>
+    </message>
+    <message>
+        <source>Invalid SVC source</source>
+        <translation>歌声转换源数据无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVC segment map</source>
+        <translation>歌声转换分段映射无效</translation>
+    </message>
 </context>
 <context>
     <name>NativeSVS</name>
+    <message>
+        <source>Continuation requires an adjacent resolved source note</source>
+        <translation>延音需要相邻且已解析的源音符</translation>
+    </message>
+    <message>
+        <source>Unresolved pronunciation; original text retained</source>
+        <translation>读音未解析；已保留原始文本</translation>
+    </message>
+    <message>
+        <source>Unknown text; original retained</source>
+        <translation>未知文本；已保留原文</translation>
+    </message>
+    <message>
+        <source>Unsupported note language: %1</source>
+        <translation>不支持的音符语言：%1</translation>
+    </message>
+    <message>
+        <source>Illegal phoneme: %1</source>
+        <translation>非法音素：%1</translation>
+    </message>
+    <message>
+        <source>Dirty</source>
+        <translation>待合成</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>已取消</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>已排队</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>正在合成</translation>
+    </message>
+    <message>
+        <source>Rendering</source>
+        <translation>正在渲染</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>已就绪</translation>
+    </message>
+    <message>
+        <source>Queued: capabilities</source>
+        <translation>等待能力信息</translation>
+    </message>
+    <message>
+        <source>Queued: voicebank scan</source>
+        <translation>等待声库扫描</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin; no valid cached audio</source>
+        <translation>声库或插件缺失；无有效缓存音频</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin: cached audio</source>
+        <translation>声库或插件缺失：使用缓存音频</translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation>失败：%1</translation>
+    </message>
     <message>
         <source>Mode</source>
         <translation>模式</translation>
@@ -747,6 +931,668 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Expressiveness</source>
         <translation>表现力</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately export changing time signatures; no files were written</source>
+        <translation>当前宿主不能准确导出变化拍号，未写入文件</translation>
+    </message>
+    <message>
+        <source>Track %1: the external project does not retain the host effect chain or mixer routing</source>
+        <translation>轨道 %1：外部工程不保留宿主效果链和混音器路由</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: read-only fields from an unknown version cannot be exported</source>
+        <translation>轨道 %1 / 片段 %2：未知版本的只读字段无法导出</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: voicebank-specific parameters and project dictionaries have no unified-format mapping</source>
+        <translation>轨道 %1 / 片段 %2：声库私有参数和工程词典没有统一格式对应</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: audio is missing or undecoded: %3</source>
+        <translation>轨道 %1 / 片段 %2：音频缺失或未解码：%3</translation>
+    </message>
+    <message>
+        <source>No exportable SVS singing or audio clips</source>
+        <translation>没有可导出的 SVS 歌声或音频片段</translation>
+    </message>
+    <message>
+        <source>Invalid export snapshot</source>
+        <translation>导出快照无效</translation>
+    </message>
+    <message>
+        <source>Invalid tempo data</source>
+        <translation>速度数据无效</translation>
+    </message>
+    <message>
+        <source>Invalid export time range</source>
+        <translation>导出时间范围无效</translation>
+    </message>
+    <message>
+        <source>Global tempo automation is sampled at each integer LMMS tick; all tempo changes on this sampling grid are retained</source>
+        <translation>全局速度自动化按每个整数 LMMS tick 采样；保留该采样网格上的完整速度变化</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: invalid time range</source>
+        <translation>轨道 %1 / 片段 %2：时间范围无效</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: the target unified model has no clip mute field; clip muting cannot be retained when exporting its data</source>
+        <translation>轨道 %1 / 片段 %2：目标统一模型没有片段静音字段，导出其数据时无法保留片段静音</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid note data</source>
+        <translation>轨道 %1：音符数据无效</translation>
+    </message>
+    <message>
+        <source>Track %1: note length is zero at the target integer tick precision</source>
+        <translation>轨道 %1：音符在目标整数 tick 精度下长度为零</translation>
+    </message>
+    <message>
+        <source>Track %1: note pitch is out of range</source>
+        <translation>轨道 %1：音符音高超出范围</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing is quantized to 480 ticks per beat and note keys to integers; edited pitch curves are retained separately</source>
+        <translation>轨道 %1：音符时间量化到 480 tick/拍、音符键号量化为整数；编辑音高曲线单独保留</translation>
+    </message>
+    <message>
+        <source>Track %1: note-specific parameters and phoneme durations have no unified-format mapping</source>
+        <translation>轨道 %1：音符私有参数和音素时长没有统一格式对应</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: parameter %3 has no defined unified-format semantics</source>
+        <translation>轨道 %1 / 片段 %2：参数 %3 没有确定的统一格式语义</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve does not use absolute semitone units and cannot be exported accurately</source>
+        <translation>轨道 %1：音高曲线不是绝对半音单位，无法准确导出</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch range exceeds the conversion protocol&apos;s supported size</source>
+        <translation>轨道 %1：音高范围超出转换协议可处理大小</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch curve value</source>
+        <translation>轨道 %1：音高曲线数值无效</translation>
+    </message>
+    <message>
+        <source>Track %1: overlapping clips have conflicting pitch at the same time; the later clip in stable clip order is used, while all overlapping notes are retained</source>
+        <translation>轨道 %1：重叠片段的音高在同一时间冲突，按片段稳定顺序采用后一个片段；重叠音符仍全部保留</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve is sampled at 480 ticks per beat and integer cents; breaks remain separate</source>
+        <translation>轨道 %1：音高曲线按 480 tick/拍、整数 cent 采样，断点保持独立</translation>
+    </message>
+    <message>
+        <source>Audio track %1: %2 clips are split into separate audio entries; track settings are copied to each entry</source>
+        <translation>音频轨 %1：%2 个片段拆分为独立音频条目，轨道设置复制到每个条目</translation>
+    </message>
+    <message>
+        <source>Audio track %1 / clip %2: the valid range contains no audio samples and will be omitted</source>
+        <translation>音频轨 %1 / 片段 %2：有效范围不包含音频采样，将省略</translation>
+    </message>
+    <message>
+        <source>No exportable content lies within the valid clip range</source>
+        <translation>没有位于片段有效范围内的可导出内容</translation>
+    </message>
+    <message>
+        <source>Cannot create the export audio staging directory</source>
+        <translation>不能创建导出音频暂存目录</translation>
+    </message>
+    <message>
+        <source>Invalid export audio range</source>
+        <translation>导出音频范围无效</translation>
+    </message>
+    <message>
+        <source>Invalid companion audio filename</source>
+        <translation>配套音频文件名无效</translation>
+    </message>
+    <message>
+        <source>Staged audio file already exists: %1</source>
+        <translation>暂存音频文件已存在：%1</translation>
+    </message>
+    <message>
+        <source>No valid default voicebank selected</source>
+        <translation>未选择有效的默认声库</translation>
+    </message>
+    <message>
+        <source>The project has no time signature</source>
+        <translation>工程没有拍号</translation>
+    </message>
+    <message>
+        <source>Invalid initial time signature</source>
+        <translation>初始拍号无效</translation>
+    </message>
+    <message>
+        <source>The time signature cannot be mapped exactly to LMMS bar timing</source>
+        <translation>拍号无法精确映射到 LMMS 小节时间</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately import changing time signatures; the project was not replaced</source>
+        <translation>当前宿主不能准确导入变化拍号，工程未替换</translation>
+    </message>
+    <message>
+        <source>The project has no tempo</source>
+        <translation>工程没有速度</translation>
+    </message>
+    <message>
+        <source>Tempo position or BPM is outside the host&apos;s supported range</source>
+        <translation>速度位置或 BPM 超出宿主可表达范围</translation>
+    </message>
+    <message>
+        <source>Tempo changes conflict at integer tick boundaries</source>
+        <translation>速度变化在整数 tick 边界发生冲突</translation>
+    </message>
+    <message>
+        <source>Tempo %1 tick / %2 BPM quantized to %3 tick / %4 BPM</source>
+        <translation>速度 %1 tick / %2 BPM 量化为 %3 tick / %4 BPM</translation>
+    </message>
+    <message>
+        <source>The project has no importable tracks</source>
+        <translation>工程没有可导入轨道</translation>
+    </message>
+    <message>
+        <source>Unknown track type: %1</source>
+        <translation>未知轨道类型：%1</translation>
+    </message>
+    <message>
+        <source>Track %1: volume or panning is outside the host&apos;s supported range</source>
+        <translation>轨道 %1 音量或声像超出宿主范围</translation>
+    </message>
+    <message>
+        <source>Track %1: audio is missing or cannot be decoded: %2; the track will be omitted</source>
+        <translation>轨道 %1：音频缺失或不可解码：%2；将省略该轨道</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid audio time range</source>
+        <translation>轨道 %1 音频时间范围无效</translation>
+    </message>
+    <message>
+        <source>Track %1: audio start quantized to an integer tick</source>
+        <translation>轨道 %1 音频起点量化到整数 tick</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing or pitch is out of range</source>
+        <translation>轨道 %1 音符时间或音高超出范围</translation>
+    </message>
+    <message>
+        <source>Track %1: private note tags, phoneme durations or independent vibrato parameters cannot be mapped; resolved pitch is retained</source>
+        <translation>轨道 %1：音符私有标签、音素时长或独立颤音参数无法映射；已解析音高保留</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch breakpoint data</source>
+        <translation>轨道 %1 音高断点数据无效</translation>
+    </message>
+    <message>
+        <source>Track %1: pitch timing or value is out of range</source>
+        <translation>轨道 %1 音高时间或数值超出范围</translation>
+    </message>
+    <message>
+        <source>Track %1: different pitch segments occur at the same time and cannot be represented without loss</source>
+        <translation>轨道 %1 同一时间存在不同音高片段，无法无损表达</translation>
+    </message>
+    <message>
+        <source>Track %1: multiple pitch values occur at the same time</source>
+        <translation>轨道 %1 同一时间存在多个音高值</translation>
+    </message>
+    <message>
+        <source>Track %1: parameter %2 has no defined unit mapping for the current voicebank and will be omitted</source>
+        <translation>轨道 %1：参数 %2 与当前声库没有确定的单位对应，将省略</translation>
+    </message>
+    <message>
+        <source>Export staging or destination directory does not exist</source>
+        <translation>导出暂存目录或目标目录不存在</translation>
+    </message>
+    <message>
+        <source>The converter produced no output files</source>
+        <translation>转换器没有生成输出文件</translation>
+    </message>
+    <message>
+        <source>Converter output is invalid or outside the staging directory: %1</source>
+        <translation>转换器输出无效或越出暂存目录：%1</translation>
+    </message>
+    <message>
+        <source>Export destination paths conflict or escape the destination directory: %1</source>
+        <translation>导出文件目标路径冲突或越界：%1</translation>
+    </message>
+    <message>
+        <source>Export destination is not a replaceable regular file: %1</source>
+        <translation>导出目标不是可替换的普通文件：%1</translation>
+    </message>
+    <message>
+        <source>Export file group plan contains invalid paths</source>
+        <translation>导出文件组计划路径无效</translation>
+    </message>
+    <message>
+        <source>Cannot create the export transaction directory on the destination volume</source>
+        <translation>不能创建目标卷导出事务目录</translation>
+    </message>
+    <message>
+        <source>
+Rollback could not restore: %1
+Original file backups remain at: %2</source>
+        <translation>
+回滚未能恢复：%1
+原文件备份保留于：%2</translation>
+    </message>
+    <message>
+        <source>Cannot back up the original file: %1
+%2</source>
+        <translation>不能备份原文件：%1
+%2</translation>
+    </message>
+    <message>
+        <source>Cannot stage the complete export file group: %1</source>
+        <translation>不能暂存完整导出文件组：%1</translation>
+    </message>
+    <message>
+        <source>Export destination changed after confirmation: %1</source>
+        <translation>导出目标在确认后发生变化：%1</translation>
+    </message>
+    <message>
+        <source>Cannot commit the exported file: %1</source>
+        <translation>不能提交导出文件：%1</translation>
+    </message>
+    <message>
+        <source>Incompatible SVS ABI</source>
+        <translation>SVS ABI 不兼容</translation>
+    </message>
+    <message>
+        <source>SVS engine initialization failed</source>
+        <translation>歌声合成引擎初始化失败</translation>
+    </message>
+    <message>
+        <source>SVS resource API unavailable</source>
+        <translation>歌声合成资源 API 不可用</translation>
+    </message>
+    <message>
+        <source>Invalid or unavailable SVS resource</source>
+        <translation>歌声合成资源无效或不可用</translation>
+    </message>
+    <message>
+        <source>Incomplete SVS resource</source>
+        <translation>歌声合成资源不完整</translation>
+    </message>
+    <message>
+        <source>SVS resource hash mismatch</source>
+        <translation>歌声合成资源哈希不匹配</translation>
+    </message>
+    <message>
+        <source>SVS engine settings query failed</source>
+        <translation>查询歌声合成引擎设置失败</translation>
+    </message>
+    <message>
+        <source>Invalid SVS engine settings declaration</source>
+        <translation>歌声合成引擎设置声明无效</translation>
+    </message>
+    <message>
+        <source>SVS capability query failed</source>
+        <translation>查询歌声合成能力失败</translation>
+    </message>
+    <message>
+        <source>Invalid capability JSON</source>
+        <translation>能力信息 JSON 无效</translation>
+    </message>
+    <message>
+        <source>Plugin pronunciation parser unavailable</source>
+        <translation>插件发音解析器不可用</translation>
+    </message>
+    <message>
+        <source>SVS pronunciation query failed</source>
+        <translation>查询歌声合成发音失败</translation>
+    </message>
+    <message>
+        <source>Invalid pronunciation JSON</source>
+        <translation>发音信息 JSON 无效</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed (%1)</source>
+        <translation>查询歌声合成目录失败（%1）</translation>
+    </message>
+    <message>
+        <source>Voice session unavailable</source>
+        <translation>声库会话不可用</translation>
+    </message>
+    <message>
+        <source>Snapshot capability query failed</source>
+        <translation>查询快照能力失败</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set incompatible with voice</source>
+        <translation>词典语言或音素集与声库不兼容</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range declaration</source>
+        <translation>歌声合成范围声明无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range count</source>
+        <translation>歌声合成范围数量无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range boundaries or ID</source>
+        <translation>歌声合成范围边界或标识无效</translation>
+    </message>
+    <message>
+        <source>Non-finite SVS audio</source>
+        <translation>歌声合成音频包含非有限值</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed (%1)</source>
+        <translation>歌声合成失败（%1）</translation>
+    </message>
+    <message>
+        <source>Invalid SVS manifest: %1</source>
+        <translation>歌声合成插件清单无效：%1</translation>
+    </message>
+    <message>
+        <source>SVS architecture mismatch: %1 declares %2; host %3</source>
+        <translation>歌声合成架构不匹配：%1 声明为 %2；宿主为 %3</translation>
+    </message>
+    <message>
+        <source>SVS platform mismatch: %1 declares %2; host %3</source>
+        <translation>歌声合成平台不匹配：%1 声明为 %2；宿主为 %3</translation>
+    </message>
+    <message>
+        <source>Duplicate SVS plugin ID: %1 in %2</source>
+        <translation>歌声合成插件标识重复：%2 中的 %1</translation>
+    </message>
+    <message>
+        <source>SVS engine unavailable</source>
+        <translation>歌声合成引擎不可用</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed</source>
+        <translation>查询歌声合成目录失败</translation>
+    </message>
+    <message>
+        <source>SVS catalog worker exception</source>
+        <translation>歌声合成目录工作线程发生异常</translation>
+    </message>
+    <message>
+        <source>Invalid SVS time origin</source>
+        <translation>SVS 时间原点无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo map</source>
+        <translation>SVS 速度映射无效</translation>
+    </message>
+    <message>
+        <source>Invalid %1 JSON; original SVS node preserved</source>
+        <translation>%1 JSON 无效；已保留原始 SVS 节点</translation>
+    </message>
+    <message>
+        <source>Unsupported SVS schema %1; original node preserved</source>
+        <translation>不支持 SVS 架构 %1；已保留原始节点</translation>
+    </message>
+    <message>
+        <source>Unsupported capability schema version</source>
+        <translation>不支持的能力声明版本</translation>
+    </message>
+    <message>
+        <source>Unknown required capability: %1</source>
+        <translation>未知的必需能力：%1</translation>
+    </message>
+    <message>
+        <source>%1 must be an array</source>
+        <translation>%1 必须为数组</translation>
+    </message>
+    <message>
+        <source>Invalid parameter color: %1</source>
+        <translation>参数颜色无效：%1</translation>
+    </message>
+    <message>
+        <source>Invalid resource selector: %1</source>
+        <translation>资源选择器无效：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate resource ID: %1</source>
+        <translation>资源 ID 无效或重复：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate parameter: %1</source>
+        <translation>参数无效或重复：%1</translation>
+    </message>
+    <message>
+        <source>Invalid directory list: %1</source>
+        <translation>目录列表无效：%1</translation>
+    </message>
+    <message>
+        <source>Non-numeric range: %1</source>
+        <translation>范围不是数值：%1</translation>
+    </message>
+    <message>
+        <source>Invalid numeric range: %1</source>
+        <translation>数值范围无效：%1</translation>
+    </message>
+    <message>
+        <source>Invalid enum ID: %1</source>
+        <translation>枚举 ID 无效：%1</translation>
+    </message>
+    <message>
+        <source>Invalid default or interpolation: %1</source>
+        <translation>默认值或插值无效：%1</translation>
+    </message>
+    <message>
+        <source>Invalid capability languages</source>
+        <translation>能力声明的语言无效</translation>
+    </message>
+    <message>
+        <source>Unsupported pitch mode/unit</source>
+        <translation>不支持的音高模式或单位</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires a valid declared absolute referencePitch curve: %1</source>
+        <translation>偏移音高需要有效声明的绝对 referencePitch 曲线：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate phoneme symbol</source>
+        <translation>音素符号无效或重复</translation>
+    </message>
+    <message>
+        <source>Dictionary requires a phoneme set ID</source>
+        <translation>词典需要音素集 ID</translation>
+    </message>
+    <message>
+        <source>Invalid segmented synthesis declaration</source>
+        <translation>分段合成声明无效</translation>
+    </message>
+    <message>
+        <source>Dictionary exceeds limit or is not UTF-8</source>
+        <translation>词典超出限制或不是 UTF-8 编码</translation>
+    </message>
+    <message>
+        <source>Dictionary JSON at byte %1: %2</source>
+        <translation>词典 JSON 在字节 %1 处出错：%2</translation>
+    </message>
+    <message>
+        <source>Missing dictionary fields</source>
+        <translation>词典字段缺失</translation>
+    </message>
+    <message>
+        <source>missing/duplicate entry or no candidates</source>
+        <translation>条目缺失或重复，或没有候选项</translation>
+    </message>
+    <message>
+        <source>invalid or duplicate reading</source>
+        <translation>读音无效或重复</translation>
+    </message>
+    <message>
+        <source>illegal phoneme %1</source>
+        <translation>非法音素 %1</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set is incompatible with this voice</source>
+        <translation>词典语言或音素集与此声库不兼容</translation>
+    </message>
+    <message>
+        <source>Invalid SVS curve %1; original node preserved</source>
+        <translation>SVS 曲线 %1 无效；已保留原始节点</translation>
+    </message>
+    <message>
+        <source>Invalid SVS seed; original node preserved</source>
+        <translation>SVS 种子无效；已保留原始节点</translation>
+    </message>
+    <message>
+        <source>Invalid SVS %1; original node preserved</source>
+        <translation>SVS %1 无效；已保留原始节点</translation>
+    </message>
+    <message>
+        <source>Invalid SVS note data; original node preserved</source>
+        <translation>SVS 音符数据无效；已保留原始节点</translation>
+    </message>
+    <message>
+        <source>Invalid curve metadata</source>
+        <translation>曲线元数据无效</translation>
+    </message>
+    <message>
+        <source>Discrete curve requires step interpolation</source>
+        <translation>离散曲线需要阶梯插值</translation>
+    </message>
+    <message>
+        <source>Only derived pitch offsets may use unconstrained difference tangents</source>
+        <translation>只有派生音高偏移可使用不受约束的差分切线</translation>
+    </message>
+    <message>
+        <source>Invalid curve anchor</source>
+        <translation>曲线锚点无效</translation>
+    </message>
+    <message>
+        <source>Invalid segment interpolation</source>
+        <translation>分段插值无效</translation>
+    </message>
+    <message>
+        <source>Invalid curve tangent or integer value</source>
+        <translation>曲线切线或整数值无效</translation>
+    </message>
+    <message>
+        <source>Invalid curve gap</source>
+        <translation>曲线间隙无效</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires an explicit absolute semitone reference curve</source>
+        <translation>偏移音高需要明确的绝对半音参考曲线</translation>
+    </message>
+    <message>
+        <source>Reference pitch does not cover the edited pitch range</source>
+        <translation>参考音高未覆盖编辑的音高范围</translation>
+    </message>
+    <message>
+        <source>Reference pitch has a gap in the edited range</source>
+        <translation>参考音高在编辑范围内存在间隙</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin</source>
+        <translation>声库或插件缺失</translation>
+    </message>
+    <message>
+        <source>Missing voice dictionary: %1</source>
+        <translation>声库词典缺失：%1</translation>
+    </message>
+    <message>
+        <source>Incompatible voice dictionary: %1</source>
+        <translation>声库词典不兼容：%1</translation>
+    </message>
+    <message>
+        <source>SVS export result incomplete or version mismatch</source>
+        <translation>SVS 导出结果不完整或版本不匹配</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed</source>
+        <translation>SVS 合成失败</translation>
+    </message>
+    <message>
+        <source>SVS conversion timed out</source>
+        <translation>SVS 转换超时</translation>
+    </message>
+    <message>
+        <source>SVS conversion result exceeds size limit</source>
+        <translation>SVS 转换结果超出大小限制</translation>
+    </message>
+    <message>
+        <source>SVS conversion request exceeds size limit</source>
+        <translation>SVS 转换请求超出大小限制</translation>
+    </message>
+    <message>
+        <source>Cannot create SVS conversion task directory</source>
+        <translation>无法创建 SVS 转换任务目录</translation>
+    </message>
+    <message>
+        <source>Missing SVS output filename</source>
+        <translation>SVS 输出文件名缺失</translation>
+    </message>
+    <message>
+        <source>SVS conversion cancelled</source>
+        <translation>SVS 转换已取消</translation>
+    </message>
+    <message>
+        <source>SVS conversion process terminated unexpectedly</source>
+        <translation>SVS 转换进程意外终止</translation>
+    </message>
+    <message>
+        <source>Invalid SVS conversion response</source>
+        <translation>SVS 转换响应无效</translation>
+    </message>
+    <message>
+        <source>SVS output escaped its task directory</source>
+        <translation>SVS 输出超出任务目录</translation>
+    </message>
+    <message>
+        <source>Invalid SVS segment context padding</source>
+        <translation>SVS 分段上下文填充无效</translation>
+    </message>
+    <message>
+        <source>SVS segment count exceeds bound</source>
+        <translation>SVS 分段数量超出限制</translation>
+    </message>
+    <message>
+        <source>Segmented SVS PCM extent exceeds bound</source>
+        <translation>分段 SVS PCM 长度超出限制</translation>
+    </message>
+    <message>
+        <source>SVS segment sample rate mismatch</source>
+        <translation>SVS 分段采样率不一致</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo extent</source>
+        <translation>SVS 速度范围无效</translation>
+    </message>
+    <message>
+        <source>Rendering %1/%2</source>
+        <translation>正在渲染 %1/%2</translation>
+    </message>
+    <message>
+        <source>SVS segment synthesis failed</source>
+        <translation>SVS 分段合成失败</translation>
+    </message>
+    <message>
+        <source>SVS tempo snapshot exceeds supported song length</source>
+        <translation>SVS 速度快照超出支持的歌曲长度</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo snapshot</source>
+        <translation>SVS 速度快照无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview duration</source>
+        <translation>SVS 试听时长无效</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview note</source>
+        <translation>SVS 试听音符无效</translation>
+    </message>
+    <message>
+        <source>Voicebank is missing; project data is retained</source>
+        <translation>声库缺失；已保留工程数据</translation>
+    </message>
+    <message>
+        <source>Missing dictionary: %1</source>
+        <translation>词典缺失：%1</translation>
+    </message>
+    <message>
+        <source>%1: incompatible dictionary language/phoneme set</source>
+        <translation>%1：词典语言或音素集不兼容</translation>
     </message>
 </context>
 <context>
@@ -1584,6 +2430,105 @@ Continue?</source>
     <message>
         <source>Check and export</source>
         <translation>检查并导出</translation>
+    </message>
+</context>
+<context>
+    <name>VstHostUI</name>
+    <message>
+        <source>Invalid catalog cache records</source>
+        <translation>目录缓存记录无效</translation>
+    </message>
+    <message>
+        <source>Supervised catalog publication failed</source>
+        <translation>受监管的目录发布失败</translation>
+    </message>
+    <message>
+        <source>Invalid catalog publication reply</source>
+        <translation>目录发布响应无效</translation>
+    </message>
+    <message>
+        <source>Cannot create catalog cache directory</source>
+        <translation>无法创建目录缓存目录</translation>
+    </message>
+    <message>
+        <source>Catalog cache writer is busy</source>
+        <translation>目录缓存写入器忙碌</translation>
+    </message>
+    <message>
+        <source>Catalog cache exceeds size limit</source>
+        <translation>目录缓存超出大小限制</translation>
+    </message>
+    <message>
+        <source>discovery capacity</source>
+        <translation>发现数量上限</translation>
+    </message>
+    <message>
+        <source>catalog worker exception</source>
+        <translation>目录工作进程异常</translation>
+    </message>
+    <message>
+        <source>Supervised catalog cache read failed: %1</source>
+        <translation>受监管的目录缓存读取失败：%1</translation>
+    </message>
+    <message>
+        <source>Catalog cache schema/host mismatch or invalid JSON: %1</source>
+        <translation>目录缓存架构或宿主不匹配，或 JSON 无效：%1</translation>
+    </message>
+    <message>
+        <source>Cannot atomically save catalog cache: %1</source>
+        <translation>无法原子保存目录缓存：%1</translation>
+    </message>
+    <message>
+        <source>Module path or architecture differs from the selected VST3 entry</source>
+        <translation>模块路径或架构与所选 VST3 条目不一致</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 module</source>
+        <translation>无法验证所选 VST3 模块</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module is ambiguous</source>
+        <translation>所选 VST3 模块不明确</translation>
+    </message>
+    <message>
+        <source>No VST3 binary matches the selected architecture</source>
+        <translation>没有与所选架构匹配的 VST3 二进制文件</translation>
+    </message>
+    <message>
+        <source>The selected VST3 binary path has changed</source>
+        <translation>所选 VST3 二进制文件路径已改变</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module or bundle resources have changed; rescan before loading</source>
+        <translation>所选 VST3 模块或包资源已改变；请在加载前重新扫描</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 class version</source>
+        <translation>无法验证所选 VST3 类版本</translation>
+    </message>
+    <message>
+        <source>The selected VST3 class version has changed; rescan before loading</source>
+        <translation>所选 VST3 类版本已改变；请在加载前重新扫描</translation>
+    </message>
+    <message>
+        <source>Truncated PE file</source>
+        <translation>PE 文件不完整</translation>
+    </message>
+    <message>
+        <source>Cannot map file</source>
+        <translation>无法映射文件</translation>
+    </message>
+    <message>
+        <source>Invalid DOS signature</source>
+        <translation>DOS 签名无效</translation>
+    </message>
+    <message>
+        <source>Invalid PE header offset</source>
+        <translation>PE 头偏移无效</translation>
+    </message>
+    <message>
+        <source>Invalid PE file</source>
+        <translation>PE 文件无效</translation>
     </message>
 </context>
 <context>
@@ -12924,6 +13869,46 @@ Seed: %3</source>
 </context>
 <context>
     <name>lmms::gui::ScanRootsWidget</name>
+    <message>
+        <source>Too many VST scan roots (maximum 256)</source>
+        <translation>VST 扫描目录过多（最多 256 个）</translation>
+    </message>
+    <message>
+        <source>VST scan roots must be absolute paths without NUL characters</source>
+        <translation>VST 扫描目录必须是绝对路径，且不能包含空字符</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan format selection</source>
+        <translation>VST 扫描格式选择无效</translation>
+    </message>
+    <message>
+        <source>VST scan formats must be unique vst2/vst3 entries</source>
+        <translation>VST 扫描格式只能包含不重复的 vst2/vst3 项</translation>
+    </message>
+    <message>
+        <source>VST scan roots exceed configuration size limit</source>
+        <translation>VST 扫描目录超出配置大小限制</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan roots JSON</source>
+        <translation>VST 扫描目录的 JSON 无效</translation>
+    </message>
+    <message>
+        <source>Unsupported VST scan roots schema</source>
+        <translation>不支持此 VST 扫描目录配置格式</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root entry</source>
+        <translation>VST 扫描目录项无效</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root fields</source>
+        <translation>VST 扫描目录字段无效</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root format</source>
+        <translation>VST 扫描目录格式无效</translation>
+    </message>
     <message>
         <source>Directory</source>
         <translation>目录</translation>

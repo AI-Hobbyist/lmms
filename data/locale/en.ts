@@ -592,9 +592,193 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>semitones</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Operating system random generator failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid cache engine, source or credential-bearing snapshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input digest read failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input cannot rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC input cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC output cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input cache write failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot save SVC cache manifest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to allocate unique SVC cache identity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Silence threshold must be finite and between -120 and 0 dBFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chunk lengths must be finite and positive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forced chunk length must not exceed the length threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid source format or backend limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forced chunk length is shorter than one source sample</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nonfinite source sample</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configured segment exceeds discovered backend duration or byte limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chunk rounding produced an empty segment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVC input WAV exceeds supported size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input WAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVC conversion cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot rewind SVC input WAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVC request exceeds the backend upload byte limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot prepare SVC input file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot read SVC cached input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVC backend rejected the frozen request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVC source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVC segment map</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NativeSVS</name>
+    <message>
+        <source>Continuation requires an adjacent resolved source note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unresolved pronunciation; original text retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown text; original retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported note language: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Illegal phoneme: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dirty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued: capabilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued: voicebank scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin; no valid cached audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin: cached audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Mode</source>
         <translation type="unfinished"></translation>
@@ -745,6 +929,665 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Expressiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This host cannot accurately export changing time signatures; no files were written</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: the external project does not retain the host effect chain or mixer routing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: read-only fields from an unknown version cannot be exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: voicebank-specific parameters and project dictionaries have no unified-format mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: audio is missing or undecoded: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No exportable SVS singing or audio clips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid export snapshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid tempo data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid export time range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global tempo automation is sampled at each integer LMMS tick; all tempo changes on this sampling grid are retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: invalid time range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: the target unified model has no clip mute field; clip muting cannot be retained when exporting its data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: invalid note data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: note length is zero at the target integer tick precision</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: note pitch is out of range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: note timing is quantized to 480 ticks per beat and note keys to integers; edited pitch curves are retained separately</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: note-specific parameters and phoneme durations have no unified-format mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: parameter %3 has no defined unified-format semantics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve does not use absolute semitone units and cannot be exported accurately</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch range exceeds the conversion protocol&apos;s supported size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch curve value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: overlapping clips have conflicting pitch at the same time; the later clip in stable clip order is used, while all overlapping notes are retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve is sampled at 480 ticks per beat and integer cents; breaks remain separate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio track %1: %2 clips are split into separate audio entries; track settings are copied to each entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio track %1 / clip %2: the valid range contains no audio samples and will be omitted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No exportable content lies within the valid clip range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create the export audio staging directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid export audio range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid companion audio filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Staged audio file already exists: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No valid default voicebank selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project has no time signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid initial time signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time signature cannot be mapped exactly to LMMS bar timing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This host cannot accurately import changing time signatures; the project was not replaced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project has no tempo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tempo position or BPM is outside the host&apos;s supported range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tempo changes conflict at integer tick boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tempo %1 tick / %2 BPM quantized to %3 tick / %4 BPM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project has no importable tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown track type: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: volume or panning is outside the host&apos;s supported range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: audio is missing or cannot be decoded: %2; the track will be omitted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: invalid audio time range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: audio start quantized to an integer tick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: note timing or pitch is out of range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: private note tags, phoneme durations or independent vibrato parameters cannot be mapped; resolved pitch is retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch breakpoint data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: pitch timing or value is out of range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: different pitch segments occur at the same time and cannot be represented without loss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: multiple pitch values occur at the same time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1: parameter %2 has no defined unit mapping for the current voicebank and will be omitted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export staging or destination directory does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The converter produced no output files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converter output is invalid or outside the staging directory: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export destination paths conflict or escape the destination directory: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export destination is not a replaceable regular file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export file group plan contains invalid paths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create the export transaction directory on the destination volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+Rollback could not restore: %1
+Original file backups remain at: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot back up the original file: %1
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot stage the complete export file group: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export destination changed after confirmation: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot commit the exported file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible SVS ABI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS engine initialization failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS resource API unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid or unavailable SVS resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incomplete SVS resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS resource hash mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS engine settings query failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS engine settings declaration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS capability query failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid capability JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin pronunciation parser unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS pronunciation query failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid pronunciation JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voice session unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snapshot capability query failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set incompatible with voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range declaration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range boundaries or ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Non-finite SVS audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS manifest: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS architecture mismatch: %1 declares %2; host %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS platform mismatch: %1 declares %2; host %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate SVS plugin ID: %1 in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS engine unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS catalog worker exception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS time origin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid %1 JSON; original SVS node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported SVS schema %1; original node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported capability schema version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown required capability: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 must be an array</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid parameter color: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid resource selector: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate resource ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate parameter: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid directory list: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Non-numeric range: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid numeric range: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid enum ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid default or interpolation: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid capability languages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported pitch mode/unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offset pitch requires a valid declared absolute referencePitch curve: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate phoneme symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dictionary requires a phoneme set ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid segmented synthesis declaration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dictionary exceeds limit or is not UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dictionary JSON at byte %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing dictionary fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>missing/duplicate entry or no candidates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>invalid or duplicate reading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>illegal phoneme %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set is incompatible with this voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS curve %1; original node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS seed; original node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS %1; original node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS note data; original node preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid curve metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discrete curve requires step interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only derived pitch offsets may use unconstrained difference tangents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid curve anchor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid segment interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid curve tangent or integer value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid curve gap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offset pitch requires an explicit absolute semitone reference curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reference pitch does not cover the edited pitch range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reference pitch has a gap in the edited range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing voice dictionary: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible voice dictionary: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS export result incomplete or version mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS conversion timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS conversion result exceeds size limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS conversion request exceeds size limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create SVS conversion task directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing SVS output filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS conversion cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS conversion process terminated unexpectedly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS conversion response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS output escaped its task directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS segment context padding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS segment count exceeds bound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Segmented SVS PCM extent exceeds bound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS segment sample rate mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo extent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1/%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS segment synthesis failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS tempo snapshot exceeds supported song length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo snapshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voicebank is missing; project data is retained</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing dictionary: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1: incompatible dictionary language/phoneme set</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1571,6 +2414,105 @@ Continue?</source>
     </message>
     <message>
         <source>Check and export</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VstHostUI</name>
+    <message>
+        <source>Invalid catalog cache records</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supervised catalog publication failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid catalog publication reply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create catalog cache directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Catalog cache writer is busy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Catalog cache exceeds size limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>discovery capacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>catalog worker exception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supervised catalog cache read failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Catalog cache schema/host mismatch or invalid JSON: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot atomically save catalog cache: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module path or architecture differs from the selected VST3 entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected VST3 module is ambiguous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No VST3 binary matches the selected architecture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected VST3 binary path has changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected VST3 module or bundle resources have changed; rescan before loading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 class version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected VST3 class version has changed; rescan before loading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Truncated PE file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot map file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid DOS signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid PE header offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid PE file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12885,6 +13827,46 @@ Seed: %3</source>
 </context>
 <context>
     <name>lmms::gui::ScanRootsWidget</name>
+    <message>
+        <source>Too many VST scan roots (maximum 256)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VST scan roots must be absolute paths without NUL characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid VST scan format selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VST scan formats must be unique vst2/vst3 entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VST scan roots exceed configuration size limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid VST scan roots JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported VST scan roots schema</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root format</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Directory</source>
         <translation type="unfinished"></translation>

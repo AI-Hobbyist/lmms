@@ -185,3 +185,18 @@ M5-11 视觉后续：WaveShaper 日语 Clip input 标签已命中译文，但固
 M5-12：M5-11 检查点 7a0fcedc0a66fddbe4aef4cd8363cd6503ecb970 已推送确认。Xpressive/ZynAddSubFx 共 66 键四语质量 PASS。Xpressive 新增帮助正文/标题、插值复选框及固定旋钮名称 6 个必要入口，完整补译变量/函数/调制说明并保留公式、数值范围和 HTML 结构；表达式变量 A1/A2/A3 保留并逐语言登记。补齐 ZynAddSubFX 宿主参数与 MIDI 转发，第三方内部编辑器不改写。全库 3633 键，中日韩缺键、空译、unfinished 和占位符异常均为 0；英文为源文回退。
 
 四语 QM 生成、xpressive/UiBaselineCapture 前台编译通过，DLL 写入 build/Release/plugins/xpressive.dll，开发程序 build/Release/lmms.exe。四语 pluginPanels 各 3 PASS、0 FAIL，100% 原生 Windows 实窗，两插件面板、Xpressive 真实帮助页及预设恢复通过。代表截图确认中文帮助、日语插值与韩文宿主字形正常；帮助长文可滚动，最终底部和长提示验收留 M7。Zyn 原始空 XML 调试日志不作为功能失败或新修改范围。M5 十二批已逐批提交推送；M6 继续全库质量和硬编码候选调用方收敛，M7 完成最终场景矩阵。
+
+
+## M6 覆盖收敛
+
+M5 检查点 1c91d9fa5d9328a96f0fd4c43ac44bda979c0f00 已推送核对。当前 3877 键，比 M5 增加 244；66 个旧中文项目诊断迁移为 64 个去重英文键。补齐本地 SVS/SVC 校验、宿主失败、字典、曲线、时间映射、项目桥接、扫描目录及目录缓存诊断入口；不改验证条件、算法、协议标识和外部插件原始错误。原始发音诊断仅在 UI 显示副本上翻译。
+
+中/日/韩有效译文 3723/3714/3721，同原文保留 154/163/156，均有逐语言理由；英文 3877 源文回退。四语缺键、空译、unfinished、占位符及复数异常为 0；HTML、换行、助记符检查 PASS。账本 1306 个硬编码候选、25 个声明及 779 条逐语言同原文复核全部 CLOSED。内部日志、被宿主转换为错误码的异常、动态元数据和标准标识保留有调用方依据。英文审计补查日文/韩文源文、有效覆盖的占位符与两种复数分支，自检 PASS。
+
+前台全量 Release 编译通过，开发程序 build/Release/lmms.exe；启用插件及 VST/Carla 支持 DLL 使用既有 build/Release/plugins。四语 QM 原位更新到 build/Release/data/locale，源文件与部署文件 SHA-256 一致（M6-resources.json）。SID/GigPlayer 当前未启用且该目录没有旧 DLL，无需停用；Carla 目标实际启用弱链接支持，运行依赖仍为最终验收待办。Vibed 实际目标名称是 vibedstrings，M5 使用 vibed 查询未命中；M7 按正确名称补验，纠正此前“未部署”的判断。
+
+四语 translationClosure 各 3 PASS、0 FAIL，原生 Windows Qt、100% 缩放。截图覆盖扫描 JSON 错误、歌词诊断及原始节点保留提示，中日韩字形正常。环境 JSON 的 language 字段为系统 QLocale，实际译文语言由 LMMS_UI_TRANSLATION 和逐语言截图/断言确认。OK/Cancel、窄标签与长文案全文验收留 M7，不以本阶段截图宣称这些项目全部通过。
+
+回归记录：项目进程、VST 路径迁移、ScanRootsWidget、CatalogIo、PluginCatalog、SVC 缓存/播放及 SVCIntegrationTest 通过。Mapper 旧中文错误断言改为迁移后的英文源文；原“空声库必拒绝”夹具与既有允许未选声库行为不一致，改为缺失一半绑定标识的无效夹具，复测通过，不改变生产行为。SVS 资源/声明/批量歌词测试原来选择目录首个声库，当前排序选到 DiffSinger；明确选择测试要求的 SVSExample，保留完整断言。首次 CTest 全量 SVS 未启用嵌入 GUI、含旧中文导入控制器断言并超过 60 秒，失败日志保留；不报告该全量测试通过。受影响路径使用嵌入原生 GUI 分组验证，最终结果见 M6-svs-regression.log。测试改动过程中名称冲突与替换错误的编译日志保留，最终编译重新通过。
+
+M6 最终受影响 SVS 分组 11 PASS、0 FAIL（9 条路径加初始化/清理）。已有 LADSPA 支持模块重新部署到既有 build/Release/plugins/ladspa，22 个 DLL 的源/部署 SHA-256 一致，见 M6-ladspa-deployment.json；没有创建新部署目录。

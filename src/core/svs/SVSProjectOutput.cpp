@@ -1,4 +1,6 @@
 #include "SVSProjectOutput.h"
+
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -41,9 +43,9 @@ ProjectOutputPlan ProjectOutput::prepare(
 	};
 	if (root.isEmpty() || result.directory.isEmpty() || !QFileInfo(root).isDir()
 		|| !QFileInfo(result.directory).isDir())
-		return fail(QStringLiteral("导出暂存目录或目标目录不存在"));
+		return fail(QCoreApplication::translate("NativeSVS", "Export staging or destination directory does not exist"));
 	if (paths.isEmpty())
-		return fail(QStringLiteral("转换器没有生成输出文件"));
+		return fail(QCoreApplication::translate("NativeSVS", "The converter produced no output files"));
 	QSet<QString> targets;
 	for (const auto& path : paths)
 	{
@@ -51,15 +53,21 @@ ProjectOutputPlan ProjectOutput::prepare(
 		const auto canonical = source.canonicalFilePath();
 		if (canonical.isEmpty() || !source.isFile() || source.isSymLink() || !contained(canonical, root)
 			|| source.size() == 0)
-			return fail(QStringLiteral("转换器输出无效或越出暂存目录：%1").arg(path));
+			return fail(QCoreApplication::translate(
+				"NativeSVS", "Converter output is invalid or outside the staging directory: %1")
+					.arg(path));
 		const auto relative = QDir(root).relativeFilePath(canonical);
 		const auto target = QDir::cleanPath(QDir(result.directory).filePath(relative));
 		if (!contained(target, result.directory) || !parentSafe(target, result.directory)
 			|| targets.contains(target.toCaseFolded()))
-			return fail(QStringLiteral("导出文件目标路径冲突或越界：%1").arg(target));
+			return fail(QCoreApplication::translate(
+				"NativeSVS", "Export destination paths conflict or escape the destination directory: %1")
+					.arg(target));
 		const QFileInfo existing(target);
 		if (existing.isSymLink() || (existing.exists() && !existing.isFile()))
-			return fail(QStringLiteral("导出目标不是可替换的普通文件：%1").arg(target));
+			return fail(
+				QCoreApplication::translate("NativeSVS", "Export destination is not a replaceable regular file: %1")
+					.arg(target));
 		targets.insert(target.toCaseFolded());
 		result.files.append({canonical, target, relative});
 		if (existing.exists())
@@ -82,14 +90,14 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		if (QDir::isAbsolutePath(file.relative) || file.relative == ".." || file.relative.startsWith("../")
 			|| target != file.target || !contained(target, plan.directory))
 		{
-			error = QStringLiteral("导出文件组计划路径无效");
+			error = QCoreApplication::translate("NativeSVS", "Export file group plan contains invalid paths");
 			return false;
 		}
 	}
 	auto stopped = [&] { return cancelled && cancelled->load(); };
 	if (stopped())
 	{
-		error = QStringLiteral("已取消");
+		error = QCoreApplication::translate("NativeSVS", "Cancelled");
 		return false;
 	}
 	// Same-volume ready files allow individual replacement by rename. The old
@@ -97,7 +105,8 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 	QTemporaryDir transaction(QDir(plan.directory).filePath(".lmms-svs-export-XXXXXX"));
 	if (!transaction.isValid())
 	{
-		error = QStringLiteral("不能创建目标卷导出事务目录");
+		error = QCoreApplication::translate(
+			"NativeSVS", "Cannot create the export transaction directory on the destination volume");
 		return false;
 	}
 	QVector<QString> ready, backups, createdDirectories;
@@ -134,7 +143,8 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		if (!failures.isEmpty())
 		{
 			transaction.setAutoRemove(false);
-			error += QStringLiteral("\n回滚未能恢复：%1\n原文件备份保留于：%2")
+			error += QCoreApplication::translate(
+				"NativeSVS", "\nRollback could not restore: %1\nOriginal file backups remain at: %2")
 						 .arg(failures.join('\n'), transaction.path());
 		}
 		return false;
@@ -148,14 +158,15 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		backups.append(backup);
 		if (stopped())
 		{
-			error = QStringLiteral("已取消");
+			error = QCoreApplication::translate("NativeSVS", "Cancelled");
 			return rollback();
 		}
 		if (!QDir().mkpath(QFileInfo(copy).absolutePath()) || !QDir().mkpath(QFileInfo(backup).absolutePath())
 			|| !QFile::copy(file.source, copy) || QFileInfo(copy).size() <= 0
 			|| QFileInfo(copy).size() != QFileInfo(file.source).size())
 		{
-			error = QStringLiteral("不能暂存完整导出文件组：%1").arg(file.relative);
+			error = QCoreApplication::translate("NativeSVS", "Cannot stage the complete export file group: %1")
+						.arg(file.relative);
 			return rollback();
 		}
 	}
@@ -167,7 +178,8 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		if (!parentSafe(file.target, plan.directory) || target.isSymLink()
 			|| (target.exists() && (!target.isFile() || !plan.overwrites.contains(file.target))))
 		{
-			error = QStringLiteral("导出目标在确认后发生变化：%1").arg(file.target);
+			error = QCoreApplication::translate("NativeSVS", "Export destination changed after confirmation: %1")
+						.arg(file.target);
 			return rollback();
 		}
 	}
@@ -176,7 +188,7 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		const auto& file = plan.files[index];
 		if (stopped())
 		{
-			error = QStringLiteral("已取消");
+			error = QCoreApplication::translate("NativeSVS", "Cancelled");
 			return rollback();
 		}
 		if (QFileInfo::exists(file.target))
@@ -184,7 +196,8 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 			QFile original(file.target);
 			if (!original.rename(backups[index]))
 			{
-				error = QStringLiteral("不能备份原文件：%1\n%2").arg(file.target, original.errorString());
+				error = QCoreApplication::translate("NativeSVS", "Cannot back up the original file: %1\n%2")
+							.arg(file.target, original.errorString());
 				return rollback();
 			}
 			backedUp.append(index);
@@ -195,13 +208,13 @@ bool ProjectOutput::commit(const ProjectOutputPlan& plan, QString& error, const 
 		const auto& file = plan.files[index];
 		if (stopped())
 		{
-			error = QStringLiteral("已取消");
+			error = QCoreApplication::translate("NativeSVS", "Cancelled");
 			return rollback();
 		}
 		if (!parentSafe(file.target, plan.directory) || !makeParents(file.target) || QFileInfo::exists(file.target)
 			|| !QFile::rename(ready[index], file.target))
 		{
-			error = QStringLiteral("不能提交导出文件：%1").arg(file.target);
+			error = QCoreApplication::translate("NativeSVS", "Cannot commit the exported file: %1").arg(file.target);
 			return rollback();
 		}
 		installed.append(index);

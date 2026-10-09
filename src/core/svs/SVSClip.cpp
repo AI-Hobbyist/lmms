@@ -328,7 +328,8 @@ bool SVSClip::importDictionary(const QByteArray& bytes, QString& error)
 	const auto& cap = static_cast<SVSTrack*>(getTrack())->capabilities();
 	if (dictionary.phonemeSet != cap.phonemeSetId || !cap.languages.contains(dictionary.language))
 	{
-		error = "Dictionary language/phoneme set is incompatible with this voice";
+		error = QCoreApplication::translate(
+			"NativeSVS", "Dictionary language/phoneme set is incompatible with this voice");
 		return false;
 	}
 	addJournalCheckPoint();
@@ -409,7 +410,9 @@ void SVSClip::synthesize()
 	for (const auto& parameter : track->capabilities().parameters)
 		if (parameter.curve && m_unparsedCurves.contains(parameter.id))
 		{
-			m_migrationDiagnostic = "Invalid SVS curve " + parameter.id + "; original node preserved";
+			m_migrationDiagnostic
+				= QCoreApplication::translate("NativeSVS", "Invalid SVS curve %1; original node preserved")
+					  .arg(parameter.id);
 			invalidate();
 			return;
 		}
@@ -733,7 +736,7 @@ void SVSClip::loadSettings(const QDomElement& node)
 	m_seed = node.attribute("seed", QString::number(legacySeed)).toUInt(&seedValid);
 	if (!seedValid)
 	{
-		m_migrationDiagnostic = "Invalid SVS seed; original node preserved";
+		m_migrationDiagnostic = QCoreApplication::translate("NativeSVS", "Invalid SVS seed; original node preserved");
 	}
 	if (node.attribute("pos").toInt() >= 0)
 		movePosition(node.attribute("pos").toInt());
@@ -754,7 +757,8 @@ void SVSClip::loadSettings(const QDomElement& node)
 			bool valid = false;
 			const auto value = node.attribute(field).toInt(&valid);
 			if (!valid || (field == "len" && value <= 0))
-				m_migrationDiagnostic = "Invalid SVS " + field + "; original node preserved";
+				m_migrationDiagnostic
+					= QCoreApplication::translate("NativeSVS", "Invalid SVS %1; original node preserved").arg(field);
 		}
 	svs::jsonObjectAttribute(node, "globalParameters", m_globalParameters, m_migrationDiagnostic);
 	svs::jsonObjectAttribute(node, "parameters", m_parameters, m_migrationDiagnostic);
@@ -776,7 +780,9 @@ void SVSClip::loadSettings(const QDomElement& node)
 	const auto& capabilities = static_cast<SVSTrack*>(getTrack())->capabilities();
 	for (auto i = m_unparsedCurves.begin(); i != m_unparsedCurves.end(); ++i)
 		if (i.key() == "svs.pitch" || capabilities.parameter(i.key(), "clip"))
-			m_migrationDiagnostic = "Invalid SVS curve " + i.key() + "; original node preserved";
+			m_migrationDiagnostic
+				= QCoreApplication::translate("NativeSVS", "Invalid SVS curve %1; original node preserved")
+					  .arg(i.key());
 	const auto notesRoot = node.firstChildElement("notes");
 	m_notesXmlExtras = svs::xmlExtras(notesRoot, {}, {"note"});
 	QSet<QString> ids;
@@ -799,7 +805,8 @@ void SVSClip::loadSettings(const QDomElement& node)
 			|| !std::isfinite(note.pitch) || note.duration <= 0 || note.pitch < 0 || note.pitch > 127
 			|| ids.contains(note.id))
 		{
-			m_migrationDiagnostic = "Invalid SVS note data; original node preserved";
+			m_migrationDiagnostic
+				= QCoreApplication::translate("NativeSVS", "Invalid SVS note data; original node preserved");
 			continue;
 		}
 		ids.insert(note.id);

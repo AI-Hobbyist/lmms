@@ -13,6 +13,61 @@
 #include "vsthost/ScanRoots.h"
 
 namespace lmms::gui {
+// Translate fixed local validation messages only at the display boundary.
+// Stored configuration and validation diagnostics retain their original values.
+inline QString scanRootDisplayError(const QString& error)
+{
+	static const char* const messages[]{
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Too many VST scan roots (maximum 256)"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "VST scan roots must be absolute paths without NUL characters"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Invalid VST scan format selection"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "VST scan formats must be unique vst2/vst3 entries"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "VST scan roots exceed configuration size limit"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Invalid VST scan roots JSON"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Unsupported VST scan roots schema"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Invalid VST scan root entry"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Invalid VST scan root fields"),
+		QT_TRANSLATE_NOOP("lmms::gui::ScanRootsWidget", "Invalid VST scan root format")};
+	for (const auto* message : messages)
+	{
+		if (error == QLatin1String(message))
+		{
+			return QCoreApplication::translate("lmms::gui::ScanRootsWidget", message);
+		}
+	}
+	return error;
+}
+
+inline QString catalogDisplayDiagnostic(const QString& source)
+{
+	static const char* const messages[]{QT_TRANSLATE_NOOP("VstHostUI", "Invalid catalog cache records"),
+		QT_TRANSLATE_NOOP("VstHostUI", "Supervised catalog publication failed"),
+		QT_TRANSLATE_NOOP("VstHostUI", "Invalid catalog publication reply"),
+		QT_TRANSLATE_NOOP("VstHostUI", "Cannot create catalog cache directory"),
+		QT_TRANSLATE_NOOP("VstHostUI", "Catalog cache writer is busy"),
+		QT_TRANSLATE_NOOP("VstHostUI", "Catalog cache exceeds size limit"),
+		QT_TRANSLATE_NOOP("VstHostUI", "discovery capacity"),
+		QT_TRANSLATE_NOOP("VstHostUI", "catalog worker exception")};
+	for (const auto* message : messages)
+	{
+		if (source == QLatin1String(message)) { return QCoreApplication::translate("VstHostUI", message); }
+	}
+	if (source.startsWith("Supervised catalog cache read failed: "))
+	{
+		return QCoreApplication::translate("VstHostUI", "Supervised catalog cache read failed: %1").arg(source.mid(38));
+	}
+	if (source.startsWith("Catalog cache schema/host mismatch or invalid JSON: "))
+	{
+		return QCoreApplication::translate("VstHostUI", "Catalog cache schema/host mismatch or invalid JSON: %1")
+			.arg(source.mid(52));
+	}
+	if (source.startsWith("Cannot atomically save catalog cache: "))
+	{
+		return QCoreApplication::translate("VstHostUI", "Cannot atomically save catalog cache: %1").arg(source.mid(38));
+	}
+	return source;
+}
+
 // Edits a local draft. Configuration is committed only by the settings dialog.
 // No filesystem probes are performed while displaying or validating paths.
 class ScanRootsWidget : public QWidget
@@ -59,7 +114,7 @@ public:
 				this);
 		help->setWordWrap(true);
 		layout->addWidget(help);
-		m_error = new QLabel(loadError, this);
+		m_error = new QLabel(scanRootDisplayError(loadError), this);
 		m_error->setObjectName("vstRootError");
 		m_error->setWordWrap(true);
 		m_error->setVisible(!loadError.isEmpty());
@@ -131,7 +186,7 @@ public:
 	}
 	void showError(const QString& error)
 	{
-		m_error->setText(error);
+		m_error->setText(scanRootDisplayError(error));
 		m_error->setVisible(!error.isEmpty());
 	}
 

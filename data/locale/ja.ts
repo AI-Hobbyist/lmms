@@ -593,9 +593,193 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
         <source>semitones</source>
         <translation>半音</translation>
     </message>
+    <message>
+        <source>Operating system random generator failed</source>
+        <translation>OS の乱数生成器が失敗しました</translation>
+    </message>
+    <message>
+        <source>Invalid cache engine, source or credential-bearing snapshot</source>
+        <translation>キャッシュのエンジンまたはソースが無効、あるいはスナップショットに認証情報が含まれています</translation>
+    </message>
+    <message>
+        <source>Input digest read failed</source>
+        <translation>入力のハッシュ計算用読み取りに失敗しました</translation>
+    </message>
+    <message>
+        <source>Input cannot rewind</source>
+        <translation>入力の読み取り位置を先頭に戻せません</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directories</source>
+        <translation>歌声変換のキャッシュフォルダーを作成できません</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC input cache</source>
+        <translation>歌声変換の入力キャッシュを確保できません</translation>
+    </message>
+    <message>
+        <source>Cannot reserve SVC output cache</source>
+        <translation>歌声変換の出力キャッシュを確保できません</translation>
+    </message>
+    <message>
+        <source>Input cache write failed</source>
+        <translation>入力キャッシュへの書き込みに失敗しました</translation>
+    </message>
+    <message>
+        <source>Cannot save SVC cache manifest</source>
+        <translation>歌声変換のキャッシュ一覧を保存できません</translation>
+    </message>
+    <message>
+        <source>Unable to allocate unique SVC cache identity</source>
+        <translation>歌声変換の一意なキャッシュ識別子を割り当てられません</translation>
+    </message>
+    <message>
+        <source>Silence threshold must be finite and between -120 and 0 dBFS</source>
+        <translation>無音のしきい値には -120～0 dBFS の有限値を指定してください</translation>
+    </message>
+    <message>
+        <source>Chunk lengths must be finite and positive</source>
+        <translation>分割する長さには有限の正の値を指定してください</translation>
+    </message>
+    <message>
+        <source>Forced chunk length must not exceed the length threshold</source>
+        <translation>強制分割の長さは長さのしきい値を超えられません</translation>
+    </message>
+    <message>
+        <source>Invalid source format or backend limits</source>
+        <translation>ソースの形式またはバックエンドの制限が無効です</translation>
+    </message>
+    <message>
+        <source>Forced chunk length is shorter than one source sample</source>
+        <translation>強制分割の長さがソースの 1 サンプルより短くなっています</translation>
+    </message>
+    <message>
+        <source>Nonfinite source sample</source>
+        <translation>ソースのサンプルが有限値ではありません</translation>
+    </message>
+    <message>
+        <source>Configured segment exceeds discovered backend duration or byte limit</source>
+        <translation>設定した区間がバックエンドから取得した長さまたはバイト数の制限を超えています</translation>
+    </message>
+    <message>
+        <source>Chunk rounding produced an empty segment</source>
+        <translation>分割位置を丸めた結果、空の区間が生じました</translation>
+    </message>
+    <message>
+        <source>SVC input WAV exceeds supported size</source>
+        <translation>歌声変換の入力 WAV が対応サイズを超えています</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input WAV</source>
+        <translation>歌声変換の入力 WAV を書き込めません</translation>
+    </message>
+    <message>
+        <source>SVC conversion cancelled</source>
+        <translation>歌声変換をキャンセルしました</translation>
+    </message>
+    <message>
+        <source>Cannot write SVC input samples</source>
+        <translation>歌声変換の入力サンプルを書き込めません</translation>
+    </message>
+    <message>
+        <source>Cannot rewind SVC input WAV</source>
+        <translation>歌声変換の入力 WAV の読み取り位置を先頭に戻せません</translation>
+    </message>
+    <message>
+        <source>SVC request exceeds the backend upload byte limit</source>
+        <translation>歌声変換のリクエストがバックエンドのアップロード容量制限を超えています</translation>
+    </message>
+    <message>
+        <source>Cannot create SVC cache directory</source>
+        <translation>歌声変換のキャッシュフォルダーを作成できません</translation>
+    </message>
+    <message>
+        <source>Cannot prepare SVC input file</source>
+        <translation>歌声変換の入力ファイルを準備できません</translation>
+    </message>
+    <message>
+        <source>Cannot read SVC cached input</source>
+        <translation>歌声変換のキャッシュ入力を読み取れません</translation>
+    </message>
+    <message>
+        <source>SVC backend rejected the frozen request</source>
+        <translation>歌声変換のバックエンドが確定済みのリクエストを拒否しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVC source</source>
+        <translation>歌声変換のソースが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVC segment map</source>
+        <translation>歌声変換の区間マッピングが無効です</translation>
+    </message>
 </context>
 <context>
     <name>NativeSVS</name>
+    <message>
+        <source>Continuation requires an adjacent resolved source note</source>
+        <translation>継続音には隣接する解決済みの元ノートが必要です</translation>
+    </message>
+    <message>
+        <source>Unresolved pronunciation; original text retained</source>
+        <translation>読みを解決できません。元のテキストを保持しました</translation>
+    </message>
+    <message>
+        <source>Unknown text; original retained</source>
+        <translation>不明なテキストです。元の内容を保持しました</translation>
+    </message>
+    <message>
+        <source>Unsupported note language: %1</source>
+        <translation>非対応のノート言語：%1</translation>
+    </message>
+    <message>
+        <source>Illegal phoneme: %1</source>
+        <translation>不正な音素：%1</translation>
+    </message>
+    <message>
+        <source>Dirty</source>
+        <translation>未合成</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>キャンセル済み</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>待機中</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>合成中</translation>
+    </message>
+    <message>
+        <source>Rendering</source>
+        <translation>レンダリング中</translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation>準備完了</translation>
+    </message>
+    <message>
+        <source>Queued: capabilities</source>
+        <translation>機能情報を待機中</translation>
+    </message>
+    <message>
+        <source>Queued: voicebank scan</source>
+        <translation>音源スキャンを待機中</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin; no valid cached audio</source>
+        <translation>音源またはプラグインがありません。有効なキャッシュ音声もありません</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin: cached audio</source>
+        <translation>音源またはプラグインがありません：キャッシュ音声を使用</translation>
+    </message>
+    <message>
+        <source>Failed: %1</source>
+        <translation>失敗：%1</translation>
+    </message>
     <message>
         <source>Mode</source>
         <translation>モード</translation>
@@ -747,6 +931,668 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     <message>
         <source>Expressiveness</source>
         <translation>表現力</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately export changing time signatures; no files were written</source>
+        <translation>このホストでは拍子の変化を正確にエクスポートできません。ファイルは書き込まれていません</translation>
+    </message>
+    <message>
+        <source>Track %1: the external project does not retain the host effect chain or mixer routing</source>
+        <translation>トラック %1：外部プロジェクトにはホストのエフェクトチェーンとミキサーのルーティングは保持されません</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: read-only fields from an unknown version cannot be exported</source>
+        <translation>トラック %1 / クリップ %2：不明なバージョンの読み取り専用フィールドはエクスポートできません</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: voicebank-specific parameters and project dictionaries have no unified-format mapping</source>
+        <translation>トラック %1 / クリップ %2：音源固有のパラメーターとプロジェクト辞書には統一形式での対応がありません</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: audio is missing or undecoded: %3</source>
+        <translation>トラック %1 / クリップ %2：音声がないかデコードされていません：%3</translation>
+    </message>
+    <message>
+        <source>No exportable SVS singing or audio clips</source>
+        <translation>エクスポートできる SVS 歌声または音声クリップがありません</translation>
+    </message>
+    <message>
+        <source>Invalid export snapshot</source>
+        <translation>エクスポート用のスナップショットが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid tempo data</source>
+        <translation>テンポデータが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid export time range</source>
+        <translation>エクスポートの時間範囲が無効です</translation>
+    </message>
+    <message>
+        <source>Global tempo automation is sampled at each integer LMMS tick; all tempo changes on this sampling grid are retained</source>
+        <translation>全体のテンポオートメーションは各整数 LMMS tick でサンプリングされます。このグリッド上のテンポ変化はすべて保持されます</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: invalid time range</source>
+        <translation>トラック %1 / クリップ %2：時間範囲が無効です</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: the target unified model has no clip mute field; clip muting cannot be retained when exporting its data</source>
+        <translation>トラック %1 / クリップ %2：変換先の統一モデルにはクリップのミュート項目がないため、データのエクスポート時にミュートを保持できません</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid note data</source>
+        <translation>トラック %1：ノートデータが無効です</translation>
+    </message>
+    <message>
+        <source>Track %1: note length is zero at the target integer tick precision</source>
+        <translation>トラック %1：変換先の整数 tick 精度ではノートの長さがゼロになります</translation>
+    </message>
+    <message>
+        <source>Track %1: note pitch is out of range</source>
+        <translation>トラック %1：ノートのピッチが範囲外です</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing is quantized to 480 ticks per beat and note keys to integers; edited pitch curves are retained separately</source>
+        <translation>トラック %1：ノートの時間は 1 拍あたり 480 tick、キー番号は整数に量子化されます。編集したピッチ曲線は別途保持されます</translation>
+    </message>
+    <message>
+        <source>Track %1: note-specific parameters and phoneme durations have no unified-format mapping</source>
+        <translation>トラック %1：ノート固有のパラメーターと音素の長さには統一形式での対応がありません</translation>
+    </message>
+    <message>
+        <source>Track %1 / clip %2: parameter %3 has no defined unified-format semantics</source>
+        <translation>トラック %1 / クリップ %2：パラメーター %3 には統一形式での明確な意味がありません</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve does not use absolute semitone units and cannot be exported accurately</source>
+        <translation>トラック %1：ピッチ曲線が絶対半音単位ではないため、正確にエクスポートできません</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch range exceeds the conversion protocol&apos;s supported size</source>
+        <translation>トラック %1：ピッチの範囲が変換プロトコルの対応サイズを超えています</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch curve value</source>
+        <translation>トラック %1：ピッチ曲線の値が無効です</translation>
+    </message>
+    <message>
+        <source>Track %1: overlapping clips have conflicting pitch at the same time; the later clip in stable clip order is used, while all overlapping notes are retained</source>
+        <translation>トラック %1：重なるクリップのピッチが同じ時刻で競合するため、安定したクリップ順序の後のクリップを使用します。重なるノートはすべて保持されます</translation>
+    </message>
+    <message>
+        <source>Track %1: the pitch curve is sampled at 480 ticks per beat and integer cents; breaks remain separate</source>
+        <translation>トラック %1：ピッチ曲線は 1 拍あたり 480 tick と整数セントでサンプリングされ、切れ目は独立したまま保持されます</translation>
+    </message>
+    <message>
+        <source>Audio track %1: %2 clips are split into separate audio entries; track settings are copied to each entry</source>
+        <translation>音声トラック %1：%2 個のクリップを別々の音声項目に分割し、トラック設定を各項目にコピーします</translation>
+    </message>
+    <message>
+        <source>Audio track %1 / clip %2: the valid range contains no audio samples and will be omitted</source>
+        <translation>音声トラック %1 / クリップ %2：有効な範囲に音声サンプルがないため、省略されます</translation>
+    </message>
+    <message>
+        <source>No exportable content lies within the valid clip range</source>
+        <translation>クリップの有効な範囲内にエクスポートできる内容がありません</translation>
+    </message>
+    <message>
+        <source>Cannot create the export audio staging directory</source>
+        <translation>エクスポートする音声の一時保存フォルダーを作成できません</translation>
+    </message>
+    <message>
+        <source>Invalid export audio range</source>
+        <translation>エクスポートする音声の範囲が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid companion audio filename</source>
+        <translation>付随する音声ファイルの名前が無効です</translation>
+    </message>
+    <message>
+        <source>Staged audio file already exists: %1</source>
+        <translation>一時保存する音声ファイルがすでに存在します：%1</translation>
+    </message>
+    <message>
+        <source>No valid default voicebank selected</source>
+        <translation>有効な既定の音源が選択されていません</translation>
+    </message>
+    <message>
+        <source>The project has no time signature</source>
+        <translation>プロジェクトに拍子がありません</translation>
+    </message>
+    <message>
+        <source>Invalid initial time signature</source>
+        <translation>最初の拍子が無効です</translation>
+    </message>
+    <message>
+        <source>The time signature cannot be mapped exactly to LMMS bar timing</source>
+        <translation>拍子を LMMS の小節時間に正確に対応付けられません</translation>
+    </message>
+    <message>
+        <source>This host cannot accurately import changing time signatures; the project was not replaced</source>
+        <translation>このホストでは拍子の変化を正確にインポートできません。プロジェクトは置き換えられていません</translation>
+    </message>
+    <message>
+        <source>The project has no tempo</source>
+        <translation>プロジェクトにテンポがありません</translation>
+    </message>
+    <message>
+        <source>Tempo position or BPM is outside the host&apos;s supported range</source>
+        <translation>テンポの位置または BPM がホストの対応範囲外です</translation>
+    </message>
+    <message>
+        <source>Tempo changes conflict at integer tick boundaries</source>
+        <translation>整数 tick の境界でテンポの変化が競合しています</translation>
+    </message>
+    <message>
+        <source>Tempo %1 tick / %2 BPM quantized to %3 tick / %4 BPM</source>
+        <translation>テンポ %1 tick / %2 BPM を %3 tick / %4 BPM に量子化しました</translation>
+    </message>
+    <message>
+        <source>The project has no importable tracks</source>
+        <translation>プロジェクトにインポートできるトラックがありません</translation>
+    </message>
+    <message>
+        <source>Unknown track type: %1</source>
+        <translation>不明なトラック形式：%1</translation>
+    </message>
+    <message>
+        <source>Track %1: volume or panning is outside the host&apos;s supported range</source>
+        <translation>トラック %1：音量またはパンがホストの対応範囲外です</translation>
+    </message>
+    <message>
+        <source>Track %1: audio is missing or cannot be decoded: %2; the track will be omitted</source>
+        <translation>トラック %1：音声がないかデコードできません：%2。このトラックは省略されます</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid audio time range</source>
+        <translation>トラック %1：音声の時間範囲が無効です</translation>
+    </message>
+    <message>
+        <source>Track %1: audio start quantized to an integer tick</source>
+        <translation>トラック %1：音声の開始位置を整数 tick に量子化しました</translation>
+    </message>
+    <message>
+        <source>Track %1: note timing or pitch is out of range</source>
+        <translation>トラック %1：ノートの時間またはピッチが範囲外です</translation>
+    </message>
+    <message>
+        <source>Track %1: private note tags, phoneme durations or independent vibrato parameters cannot be mapped; resolved pitch is retained</source>
+        <translation>トラック %1：ノート固有のタグ、音素の長さ、独立したビブラートのパラメーターは対応付けられません。解決済みのピッチは保持されます</translation>
+    </message>
+    <message>
+        <source>Track %1: invalid pitch breakpoint data</source>
+        <translation>トラック %1：ピッチの制御点データが無効です</translation>
+    </message>
+    <message>
+        <source>Track %1: pitch timing or value is out of range</source>
+        <translation>トラック %1：ピッチの時間または値が範囲外です</translation>
+    </message>
+    <message>
+        <source>Track %1: different pitch segments occur at the same time and cannot be represented without loss</source>
+        <translation>トラック %1：同じ時刻に異なるピッチ区間があり、損失なく表現できません</translation>
+    </message>
+    <message>
+        <source>Track %1: multiple pitch values occur at the same time</source>
+        <translation>トラック %1：同じ時刻に複数のピッチ値があります</translation>
+    </message>
+    <message>
+        <source>Track %1: parameter %2 has no defined unit mapping for the current voicebank and will be omitted</source>
+        <translation>トラック %1：パラメーター %2 には現在の音源への明確な単位の対応がないため、省略されます</translation>
+    </message>
+    <message>
+        <source>Export staging or destination directory does not exist</source>
+        <translation>エクスポートの一時保存先または出力先が存在しません</translation>
+    </message>
+    <message>
+        <source>The converter produced no output files</source>
+        <translation>変換ツールが出力ファイルを生成しませんでした</translation>
+    </message>
+    <message>
+        <source>Converter output is invalid or outside the staging directory: %1</source>
+        <translation>変換ツールの出力が無効、または一時保存先の外にあります：%1</translation>
+    </message>
+    <message>
+        <source>Export destination paths conflict or escape the destination directory: %1</source>
+        <translation>エクスポート先のパスが競合、または出力先の外にあります：%1</translation>
+    </message>
+    <message>
+        <source>Export destination is not a replaceable regular file: %1</source>
+        <translation>エクスポート先は置き換え可能な通常のファイルではありません：%1</translation>
+    </message>
+    <message>
+        <source>Export file group plan contains invalid paths</source>
+        <translation>エクスポートするファイル群の計画に無効なパスがあります</translation>
+    </message>
+    <message>
+        <source>Cannot create the export transaction directory on the destination volume</source>
+        <translation>出力先のボリュームにエクスポート処理用フォルダーを作成できません</translation>
+    </message>
+    <message>
+        <source>
+Rollback could not restore: %1
+Original file backups remain at: %2</source>
+        <translation>
+ロールバックで復元できませんでした：%1
+元のファイルのバックアップは次の場所に残っています：%2</translation>
+    </message>
+    <message>
+        <source>Cannot back up the original file: %1
+%2</source>
+        <translation>元のファイルをバックアップできません：%1
+%2</translation>
+    </message>
+    <message>
+        <source>Cannot stage the complete export file group: %1</source>
+        <translation>エクスポートするファイル群をすべて一時保存できません：%1</translation>
+    </message>
+    <message>
+        <source>Export destination changed after confirmation: %1</source>
+        <translation>確認後にエクスポート先が変更されました：%1</translation>
+    </message>
+    <message>
+        <source>Cannot commit the exported file: %1</source>
+        <translation>エクスポートしたファイルを確定できません：%1</translation>
+    </message>
+    <message>
+        <source>Incompatible SVS ABI</source>
+        <translation>SVS ABI に互換性がありません</translation>
+    </message>
+    <message>
+        <source>SVS engine initialization failed</source>
+        <translation>歌声合成エンジンの初期化に失敗しました</translation>
+    </message>
+    <message>
+        <source>SVS resource API unavailable</source>
+        <translation>歌声合成のリソース API を利用できません</translation>
+    </message>
+    <message>
+        <source>Invalid or unavailable SVS resource</source>
+        <translation>歌声合成のリソースが無効、または利用できません</translation>
+    </message>
+    <message>
+        <source>Incomplete SVS resource</source>
+        <translation>歌声合成のリソースが不完全です</translation>
+    </message>
+    <message>
+        <source>SVS resource hash mismatch</source>
+        <translation>歌声合成のリソースのハッシュが一致しません</translation>
+    </message>
+    <message>
+        <source>SVS engine settings query failed</source>
+        <translation>歌声合成エンジン設定の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS engine settings declaration</source>
+        <translation>歌声合成エンジン設定の宣言が無効です</translation>
+    </message>
+    <message>
+        <source>SVS capability query failed</source>
+        <translation>歌声合成の機能情報の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Invalid capability JSON</source>
+        <translation>機能情報の JSON が無効です</translation>
+    </message>
+    <message>
+        <source>Plugin pronunciation parser unavailable</source>
+        <translation>プラグインの発音解析器を利用できません</translation>
+    </message>
+    <message>
+        <source>SVS pronunciation query failed</source>
+        <translation>歌声合成の発音情報の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Invalid pronunciation JSON</source>
+        <translation>発音情報の JSON が無効です</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed (%1)</source>
+        <translation>歌声合成の一覧取得に失敗しました（%1）</translation>
+    </message>
+    <message>
+        <source>Voice session unavailable</source>
+        <translation>音源のセッションを利用できません</translation>
+    </message>
+    <message>
+        <source>Snapshot capability query failed</source>
+        <translation>スナップショットの機能情報の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set incompatible with voice</source>
+        <translation>辞書の言語または音素セットが音源に対応していません</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range declaration</source>
+        <translation>歌声合成の範囲宣言が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range count</source>
+        <translation>歌声合成の範囲数が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVS synthesis range boundaries or ID</source>
+        <translation>歌声合成の範囲境界または識別子が無効です</translation>
+    </message>
+    <message>
+        <source>Non-finite SVS audio</source>
+        <translation>歌声合成の音声に有限値でないサンプルがあります</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed (%1)</source>
+        <translation>歌声合成に失敗しました（%1）</translation>
+    </message>
+    <message>
+        <source>Invalid SVS manifest: %1</source>
+        <translation>歌声合成プラグインのマニフェストが無効です：%1</translation>
+    </message>
+    <message>
+        <source>SVS architecture mismatch: %1 declares %2; host %3</source>
+        <translation>歌声合成のアーキテクチャが一致しません：%1 の宣言は %2、ホストは %3 です</translation>
+    </message>
+    <message>
+        <source>SVS platform mismatch: %1 declares %2; host %3</source>
+        <translation>歌声合成のプラットフォームが一致しません：%1 の宣言は %2、ホストは %3 です</translation>
+    </message>
+    <message>
+        <source>Duplicate SVS plugin ID: %1 in %2</source>
+        <translation>歌声合成プラグインの識別子が重複しています：%2 内の %1</translation>
+    </message>
+    <message>
+        <source>SVS engine unavailable</source>
+        <translation>歌声合成エンジンを利用できません</translation>
+    </message>
+    <message>
+        <source>SVS catalog query failed</source>
+        <translation>歌声合成の一覧取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>SVS catalog worker exception</source>
+        <translation>歌声合成の一覧取得ワーカーで例外が発生しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS time origin</source>
+        <translation>SVS 時間原点が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo map</source>
+        <translation>SVS テンポマップが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid %1 JSON; original SVS node preserved</source>
+        <translation>%1 の JSON が無効です。元の SVS ノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Unsupported SVS schema %1; original node preserved</source>
+        <translation>SVS スキーマ %1 は非対応です。元のノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Unsupported capability schema version</source>
+        <translation>非対応の機能スキーマバージョンです</translation>
+    </message>
+    <message>
+        <source>Unknown required capability: %1</source>
+        <translation>不明な必須機能：%1</translation>
+    </message>
+    <message>
+        <source>%1 must be an array</source>
+        <translation>%1 は配列である必要があります</translation>
+    </message>
+    <message>
+        <source>Invalid parameter color: %1</source>
+        <translation>無効なパラメーターの色：%1</translation>
+    </message>
+    <message>
+        <source>Invalid resource selector: %1</source>
+        <translation>無効なリソースセレクター：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate resource ID: %1</source>
+        <translation>無効または重複したリソース ID：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate parameter: %1</source>
+        <translation>無効または重複したパラメーター：%1</translation>
+    </message>
+    <message>
+        <source>Invalid directory list: %1</source>
+        <translation>無効なディレクトリ一覧：%1</translation>
+    </message>
+    <message>
+        <source>Non-numeric range: %1</source>
+        <translation>数値ではない範囲：%1</translation>
+    </message>
+    <message>
+        <source>Invalid numeric range: %1</source>
+        <translation>無効な数値範囲：%1</translation>
+    </message>
+    <message>
+        <source>Invalid enum ID: %1</source>
+        <translation>無効な列挙 ID：%1</translation>
+    </message>
+    <message>
+        <source>Invalid default or interpolation: %1</source>
+        <translation>無効な既定値または補間：%1</translation>
+    </message>
+    <message>
+        <source>Invalid capability languages</source>
+        <translation>機能宣言の言語が無効です</translation>
+    </message>
+    <message>
+        <source>Unsupported pitch mode/unit</source>
+        <translation>非対応のピッチモードまたは単位です</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires a valid declared absolute referencePitch curve: %1</source>
+        <translation>オフセットピッチには宣言済みの有効な絶対 referencePitch カーブが必要です：%1</translation>
+    </message>
+    <message>
+        <source>Invalid or duplicate phoneme symbol</source>
+        <translation>音素記号が無効または重複しています</translation>
+    </message>
+    <message>
+        <source>Dictionary requires a phoneme set ID</source>
+        <translation>辞書には音素セット ID が必要です</translation>
+    </message>
+    <message>
+        <source>Invalid segmented synthesis declaration</source>
+        <translation>分割合成の宣言が無効です</translation>
+    </message>
+    <message>
+        <source>Dictionary exceeds limit or is not UTF-8</source>
+        <translation>辞書が上限を超えているか、UTF-8 ではありません</translation>
+    </message>
+    <message>
+        <source>Dictionary JSON at byte %1: %2</source>
+        <translation>辞書 JSON のバイト %1：%2</translation>
+    </message>
+    <message>
+        <source>Missing dictionary fields</source>
+        <translation>辞書のフィールドが不足しています</translation>
+    </message>
+    <message>
+        <source>missing/duplicate entry or no candidates</source>
+        <translation>項目が不足または重複しているか、候補がありません</translation>
+    </message>
+    <message>
+        <source>invalid or duplicate reading</source>
+        <translation>読みが無効または重複しています</translation>
+    </message>
+    <message>
+        <source>illegal phoneme %1</source>
+        <translation>不正な音素 %1</translation>
+    </message>
+    <message>
+        <source>Dictionary language/phoneme set is incompatible with this voice</source>
+        <translation>辞書の言語または音素セットがこの音源と互換性がありません</translation>
+    </message>
+    <message>
+        <source>Invalid SVS curve %1; original node preserved</source>
+        <translation>SVS カーブ %1 が無効です。元のノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS seed; original node preserved</source>
+        <translation>SVS シードが無効です。元のノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS %1; original node preserved</source>
+        <translation>SVS %1 が無効です。元のノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS note data; original node preserved</source>
+        <translation>SVS ノートデータが無効です。元のノードを保持しました</translation>
+    </message>
+    <message>
+        <source>Invalid curve metadata</source>
+        <translation>カーブのメタデータが無効です</translation>
+    </message>
+    <message>
+        <source>Discrete curve requires step interpolation</source>
+        <translation>離散カーブにはステップ補間が必要です</translation>
+    </message>
+    <message>
+        <source>Only derived pitch offsets may use unconstrained difference tangents</source>
+        <translation>制約のない差分接線を使用できるのは派生ピッチオフセットのみです</translation>
+    </message>
+    <message>
+        <source>Invalid curve anchor</source>
+        <translation>カーブのアンカーが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid segment interpolation</source>
+        <translation>区間の補間が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid curve tangent or integer value</source>
+        <translation>カーブの接線または整数値が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid curve gap</source>
+        <translation>カーブの空白区間が無効です</translation>
+    </message>
+    <message>
+        <source>Offset pitch requires an explicit absolute semitone reference curve</source>
+        <translation>オフセットピッチには明示的な絶対半音の参照カーブが必要です</translation>
+    </message>
+    <message>
+        <source>Reference pitch does not cover the edited pitch range</source>
+        <translation>参照ピッチが編集対象のピッチ範囲をカバーしていません</translation>
+    </message>
+    <message>
+        <source>Reference pitch has a gap in the edited range</source>
+        <translation>参照ピッチの編集範囲に空白区間があります</translation>
+    </message>
+    <message>
+        <source>Missing voice/plugin</source>
+        <translation>音源またはプラグインが見つかりません</translation>
+    </message>
+    <message>
+        <source>Missing voice dictionary: %1</source>
+        <translation>音源の辞書が見つかりません：%1</translation>
+    </message>
+    <message>
+        <source>Incompatible voice dictionary: %1</source>
+        <translation>互換性のない音源の辞書：%1</translation>
+    </message>
+    <message>
+        <source>SVS export result incomplete or version mismatch</source>
+        <translation>SVS 書き出し結果が不完全か、バージョンが一致しません</translation>
+    </message>
+    <message>
+        <source>SVS synthesis failed</source>
+        <translation>SVS 合成に失敗しました</translation>
+    </message>
+    <message>
+        <source>SVS conversion timed out</source>
+        <translation>SVS 変換がタイムアウトしました</translation>
+    </message>
+    <message>
+        <source>SVS conversion result exceeds size limit</source>
+        <translation>SVS 変換結果がサイズ上限を超えています</translation>
+    </message>
+    <message>
+        <source>SVS conversion request exceeds size limit</source>
+        <translation>SVS 変換要求がサイズ上限を超えています</translation>
+    </message>
+    <message>
+        <source>Cannot create SVS conversion task directory</source>
+        <translation>SVS 変換タスクのディレクトリを作成できません</translation>
+    </message>
+    <message>
+        <source>Missing SVS output filename</source>
+        <translation>SVS 出力ファイル名がありません</translation>
+    </message>
+    <message>
+        <source>SVS conversion cancelled</source>
+        <translation>SVS 変換をキャンセルしました</translation>
+    </message>
+    <message>
+        <source>SVS conversion process terminated unexpectedly</source>
+        <translation>SVS 変換プロセスが予期せず終了しました</translation>
+    </message>
+    <message>
+        <source>Invalid SVS conversion response</source>
+        <translation>SVS 変換の応答が無効です</translation>
+    </message>
+    <message>
+        <source>SVS output escaped its task directory</source>
+        <translation>SVS 出力がタスクディレクトリの外にあります</translation>
+    </message>
+    <message>
+        <source>Invalid SVS segment context padding</source>
+        <translation>SVS 区間のコンテキストパディングが無効です</translation>
+    </message>
+    <message>
+        <source>SVS segment count exceeds bound</source>
+        <translation>SVS 区間数が上限を超えています</translation>
+    </message>
+    <message>
+        <source>Segmented SVS PCM extent exceeds bound</source>
+        <translation>分割された SVS PCM の長さが上限を超えています</translation>
+    </message>
+    <message>
+        <source>SVS segment sample rate mismatch</source>
+        <translation>SVS 区間のサンプルレートが一致しません</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo extent</source>
+        <translation>SVS テンポの範囲が無効です</translation>
+    </message>
+    <message>
+        <source>Rendering %1/%2</source>
+        <translation>レンダリング中 %1/%2</translation>
+    </message>
+    <message>
+        <source>SVS segment synthesis failed</source>
+        <translation>SVS 区間の合成に失敗しました</translation>
+    </message>
+    <message>
+        <source>SVS tempo snapshot exceeds supported song length</source>
+        <translation>SVS テンポスナップショットが対応する曲の長さを超えています</translation>
+    </message>
+    <message>
+        <source>Invalid SVS tempo snapshot</source>
+        <translation>SVS テンポスナップショットが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview duration</source>
+        <translation>SVS プレビューの長さが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid SVS preview note</source>
+        <translation>SVS プレビューのノートが無効です</translation>
+    </message>
+    <message>
+        <source>Voicebank is missing; project data is retained</source>
+        <translation>音源が見つかりません。プロジェクトデータを保持しました</translation>
+    </message>
+    <message>
+        <source>Missing dictionary: %1</source>
+        <translation>辞書が見つかりません：%1</translation>
+    </message>
+    <message>
+        <source>%1: incompatible dictionary language/phoneme set</source>
+        <translation>%1：辞書の言語または音素セットに互換性がありません</translation>
     </message>
 </context>
 <context>
@@ -1584,6 +2430,105 @@ Continue?</source>
     <message>
         <source>Check and export</source>
         <translation>確認してエクスポート</translation>
+    </message>
+</context>
+<context>
+    <name>VstHostUI</name>
+    <message>
+        <source>Invalid catalog cache records</source>
+        <translation>カタログキャッシュのレコードが無効です</translation>
+    </message>
+    <message>
+        <source>Supervised catalog publication failed</source>
+        <translation>監視下のカタログ公開に失敗しました</translation>
+    </message>
+    <message>
+        <source>Invalid catalog publication reply</source>
+        <translation>カタログ公開の応答が無効です</translation>
+    </message>
+    <message>
+        <source>Cannot create catalog cache directory</source>
+        <translation>カタログキャッシュのディレクトリを作成できません</translation>
+    </message>
+    <message>
+        <source>Catalog cache writer is busy</source>
+        <translation>カタログキャッシュの書き込み処理が使用中です</translation>
+    </message>
+    <message>
+        <source>Catalog cache exceeds size limit</source>
+        <translation>カタログキャッシュがサイズ上限を超えています</translation>
+    </message>
+    <message>
+        <source>discovery capacity</source>
+        <translation>検出数の上限</translation>
+    </message>
+    <message>
+        <source>catalog worker exception</source>
+        <translation>カタログワーカーの例外</translation>
+    </message>
+    <message>
+        <source>Supervised catalog cache read failed: %1</source>
+        <translation>監視下のカタログキャッシュの読み込みに失敗しました：%1</translation>
+    </message>
+    <message>
+        <source>Catalog cache schema/host mismatch or invalid JSON: %1</source>
+        <translation>カタログキャッシュのスキーマまたはホストが一致しないか、JSON が無効です：%1</translation>
+    </message>
+    <message>
+        <source>Cannot atomically save catalog cache: %1</source>
+        <translation>カタログキャッシュをアトミックに保存できません：%1</translation>
+    </message>
+    <message>
+        <source>Module path or architecture differs from the selected VST3 entry</source>
+        <translation>モジュールのパスまたはアーキテクチャが選択した VST3 項目と異なります</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 module</source>
+        <translation>選択した VST3 モジュールを検証できません</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module is ambiguous</source>
+        <translation>選択した VST3 モジュールを一意に特定できません</translation>
+    </message>
+    <message>
+        <source>No VST3 binary matches the selected architecture</source>
+        <translation>選択したアーキテクチャに一致する VST3 バイナリがありません</translation>
+    </message>
+    <message>
+        <source>The selected VST3 binary path has changed</source>
+        <translation>選択した VST3 バイナリのパスが変更されています</translation>
+    </message>
+    <message>
+        <source>The selected VST3 module or bundle resources have changed; rescan before loading</source>
+        <translation>選択した VST3 モジュールまたはバンドルのリソースが変更されています。読み込む前に再スキャンしてください</translation>
+    </message>
+    <message>
+        <source>Cannot verify the selected VST3 class version</source>
+        <translation>選択した VST3 クラスのバージョンを検証できません</translation>
+    </message>
+    <message>
+        <source>The selected VST3 class version has changed; rescan before loading</source>
+        <translation>選択した VST3 クラスのバージョンが変更されています。読み込む前に再スキャンしてください</translation>
+    </message>
+    <message>
+        <source>Truncated PE file</source>
+        <translation>PE ファイルが不完全です</translation>
+    </message>
+    <message>
+        <source>Cannot map file</source>
+        <translation>ファイルをマッピングできません</translation>
+    </message>
+    <message>
+        <source>Invalid DOS signature</source>
+        <translation>DOS シグネチャが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid PE header offset</source>
+        <translation>PE ヘッダーのオフセットが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid PE file</source>
+        <translation>PE ファイルが無効です</translation>
     </message>
 </context>
 <context>
@@ -12924,6 +13869,46 @@ Seed: %3</source>
 </context>
 <context>
     <name>lmms::gui::ScanRootsWidget</name>
+    <message>
+        <source>Too many VST scan roots (maximum 256)</source>
+        <translation>VST スキャン先が多すぎます（最大 256 個）</translation>
+    </message>
+    <message>
+        <source>VST scan roots must be absolute paths without NUL characters</source>
+        <translation>VST スキャン先には NUL 文字を含まない絶対パスを指定してください</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan format selection</source>
+        <translation>VST スキャン形式の選択が無効です</translation>
+    </message>
+    <message>
+        <source>VST scan formats must be unique vst2/vst3 entries</source>
+        <translation>VST スキャン形式には重複しない vst2/vst3 項目を指定してください</translation>
+    </message>
+    <message>
+        <source>VST scan roots exceed configuration size limit</source>
+        <translation>VST スキャン先が設定サイズの上限を超えています</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan roots JSON</source>
+        <translation>VST スキャン先の JSON が無効です</translation>
+    </message>
+    <message>
+        <source>Unsupported VST scan roots schema</source>
+        <translation>この VST スキャン先の設定形式はサポートされていません</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root entry</source>
+        <translation>VST スキャン先の項目が無効です</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root fields</source>
+        <translation>VST スキャン先のフィールドが無効です</translation>
+    </message>
+    <message>
+        <source>Invalid VST scan root format</source>
+        <translation>VST スキャン先の形式が無効です</translation>
+    </message>
     <message>
         <source>Directory</source>
         <translation>ディレクトリ</translation>

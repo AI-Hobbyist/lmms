@@ -8,6 +8,53 @@
 namespace lmms::gui::nativeTranslation {
 
 // Only display copies are localized. Protocol declarations and saved IDs stay intact.
+inline QString svsPronunciationDiagnostic(const QString& source)
+{
+	static const char* const messages[]{
+		QT_TRANSLATE_NOOP("NativeSVS", "Continuation requires an adjacent resolved source note"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Unresolved pronunciation; original text retained"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Unknown text; original retained")};
+	for (const auto* message : messages)
+	{
+		if (source == QLatin1String(message)) { return QCoreApplication::translate("NativeSVS", message); }
+	}
+	if (source.startsWith("Unsupported note language: "))
+	{
+		return QCoreApplication::translate("NativeSVS", "Unsupported note language: %1").arg(source.mid(27));
+	}
+	if (source.startsWith("Illegal phoneme: "))
+	{
+		QStringList translated;
+		for (const auto& item : source.split("; ", Qt::SkipEmptyParts))
+		{
+			if (!item.startsWith("Illegal phoneme: ")) { return source; }
+			translated.append(QCoreApplication::translate("NativeSVS", "Illegal phoneme: %1").arg(item.mid(17)));
+		}
+		return translated.join("; ");
+	}
+	return source;
+}
+
+inline QString svsStatus(const QString& source)
+{
+	static const char* const statuses[]{QT_TRANSLATE_NOOP("NativeSVS", "Dirty"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Cancelled"), QT_TRANSLATE_NOOP("NativeSVS", "Queued"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Running"), QT_TRANSLATE_NOOP("NativeSVS", "Rendering"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Ready"), QT_TRANSLATE_NOOP("NativeSVS", "Queued: capabilities"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Queued: voicebank scan"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Missing voice/plugin; no valid cached audio"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Missing voice/plugin: cached audio")};
+	for (const auto* status : statuses)
+	{
+		if (source == QLatin1String(status)) { return QCoreApplication::translate("NativeSVS", status); }
+	}
+	if (source.startsWith("Failed: "))
+	{
+		return QCoreApplication::translate("NativeSVS", "Failed: %1").arg(svsStatus(source.mid(8)));
+	}
+	return source;
+}
+
 inline QString svsText(const QString& plugin, const QString& source)
 {
 	const bool example = plugin == "org.lmms.svs.example";

@@ -24,23 +24,24 @@
 
 #include "VstPlugin.h"
 
-#include "communication.h"
-
-#include <QtEndian>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDomElement>
 #include <QFileInfo>
 #include <QLocale>
-#include <QTemporaryFile>
-#include <QSaveFile>
-#include <QTimerEvent>
-#include <QScopedValueRollback>
 #include <QPointer>
+#include <QSaveFile>
+#include <QScopedValueRollback>
+#include <QTemporaryFile>
 #include <QTimer>
+#include <QTimerEvent>
+#include <QtEndian>
 #include <bit>
 #include <charconv>
 #include <cmath>
+
+#include "communication.h"
 
 #if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
@@ -103,11 +104,11 @@ public:
 		{
 		if (!m_file.open(QFile::ReadOnly) || m_file.size() < 64)
 		{
-			throw std::runtime_error("Truncated PE file");
+			throw std::runtime_error(QCoreApplication::translate("VstHostUI", "Truncated PE file").toStdString());
 		}
 		m_map = m_file.map(0, m_file.size());
 		if (m_map == nullptr) {
-			throw std::runtime_error("Cannot map file");
+			throw std::runtime_error(QCoreApplication::translate("VstHostUI", "Cannot map file").toStdString());
 		}
 	}
 	~FileInfo()
@@ -119,16 +120,17 @@ public:
 	{
 		if (m_map[0] != 'M' || m_map[1] != 'Z')
 		{
-			throw std::runtime_error("Invalid DOS signature");
+			throw std::runtime_error(QCoreApplication::translate("VstHostUI", "Invalid DOS signature").toStdString());
 		}
 		const auto peOffset = qFromLittleEndian<std::uint32_t>(m_map + 0x3C);
 		if (peOffset > static_cast<std::uint64_t>(m_file.size() - 6))
 		{
-			throw std::runtime_error("Invalid PE header offset");
+			throw std::runtime_error(
+				QCoreApplication::translate("VstHostUI", "Invalid PE header offset").toStdString());
 		}
 		uchar* peSignature = m_map + peOffset;
 		if (memcmp(peSignature, "PE\0\0", 4)) {
-			throw std::runtime_error("Invalid PE file");
+			throw std::runtime_error(QCoreApplication::translate("VstHostUI", "Invalid PE file").toStdString());
 		}
 		uchar * coffHeader = peSignature + 4;
 		uint16_t machineType = qFromLittleEndian<std::uint16_t>(coffHeader);

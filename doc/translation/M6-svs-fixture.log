@@ -1,0 +1,24 @@
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+PASS   : SVSIntegrationTest::sdkResourcesAndServices()
+QDEBUG : SVSIntegrationTest::sdkManifestDiagnostics() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::sdkManifestDiagnostics()
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::batchLyricsAndPronunciation() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+PASS   : SVSIntegrationTest::batchLyricsAndPronunciation()
+PASS   : SVSIntegrationTest::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 15394ms
+********* Finished testing of SVSIntegrationTest *********

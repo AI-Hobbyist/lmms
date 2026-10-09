@@ -1,21 +1,24 @@
 #include "SVSProjectExport.h"
-#include "AutomationClip.h"
-#include "PathUtil.h"
-#include "SampleClip.h"
-#include "SampleTrack.h"
-#include "Song.h"
-#include "SVSClip.h"
-#include "SVSTrack.h"
-#include <QDomDocument>
+
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QDir>
+#include <QDomDocument>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QMap>
-#include <QSet>
 #include <QSaveFile>
+#include <QSet>
 #include <algorithm>
 #include <cmath>
+
+#include "AutomationClip.h"
+#include "PathUtil.h"
+#include "SVSClip.h"
+#include "SVSTrack.h"
+#include "SampleClip.h"
+#include "SampleTrack.h"
+#include "Song.h"
 
 namespace lmms::svs {
 namespace {
@@ -59,7 +62,8 @@ ProjectExportSnapshot ProjectExport::capture(Song& song)
 	if ((192 * result.numerator) % result.denominator || varyingMeter(meter.numeratorModel())
 		|| varyingMeter(meter.denominatorModel()))
 	{
-		result.error = QStringLiteral("当前宿主不能准确导出变化拍号，未写入文件");
+		result.error = QCoreApplication::translate(
+			"NativeSVS", "This host cannot accurately export changing time signatures; no files were written");
 		return result;
 	}
 	result.tempo = TempoSnapshot::capture(song, song.getTempo());
@@ -79,7 +83,9 @@ ProjectExportSnapshot ProjectExport::capture(Song& song)
 		track.volume = settings.attribute("vol", "100").toDouble() / 100.;
 		track.pan = settings.attribute("pan", "0").toDouble() / 100.;
 		if (!settings.elementsByTagName("effect").isEmpty())
-			result.losses << QStringLiteral("轨道 %1：外部工程不保留宿主效果链和混音器路由").arg(track.name);
+			result.losses << QCoreApplication::translate(
+				"NativeSVS", "Track %1: the external project does not retain the host effect chain or mixer routing")
+								 .arg(track.name);
 		for (auto* baseClip : base->getClips())
 		{
 			result.lastTick = std::max(result.lastTick, int(baseClip->endPosition()));
@@ -94,11 +100,14 @@ ProjectExportSnapshot ProjectExport::capture(Song& song)
 				captured.notes = clip->notes();
 				captured.curves = clip->curves();
 				if (clip->readOnly())
-					result.losses << QStringLiteral("轨道 %1 / 片段 %2：未知版本的只读字段无法导出")
+					result.losses << QCoreApplication::translate(
+						"NativeSVS", "Track %1 / clip %2: read-only fields from an unknown version cannot be exported")
 										 .arg(track.name, captured.name);
 				if (!clip->parameters().isEmpty() || !clip->globalParameters().isEmpty()
 					|| !clip->projectDictionaryData().isEmpty())
-					result.losses << QStringLiteral("轨道 %1 / 片段 %2：声库私有参数和工程词典没有统一格式对应")
+					result.losses << QCoreApplication::translate("NativeSVS",
+						"Track %1 / clip %2: voicebank-specific parameters and project dictionaries have no "
+						"unified-format mapping")
 										 .arg(track.name, captured.name);
 				track.clips.append(std::move(captured));
 			}
@@ -117,7 +126,8 @@ ProjectExportSnapshot ProjectExport::capture(Song& song)
 				if (clip->sampleFile().isEmpty())
 					captured.sourcePath.clear();
 				if (!captured.buffer || captured.buffer->empty())
-					result.losses << QStringLiteral("轨道 %1 / 片段 %2：音频缺失或未解码：%3")
+					result.losses << QCoreApplication::translate(
+						"NativeSVS", "Track %1 / clip %2: audio is missing or undecoded: %3")
 										 .arg(track.name, captured.name, captured.sourcePath);
 				else
 					track.audio.append(std::move(captured));
@@ -127,7 +137,7 @@ ProjectExportSnapshot ProjectExport::capture(Song& song)
 			result.tracks.append(std::move(track));
 	}
 	if (result.tracks.isEmpty())
-		result.error = QStringLiteral("没有可导出的 SVS 歌声或音频片段");
+		result.error = QCoreApplication::translate("NativeSVS", "No exportable SVS singing or audio clips");
 	result.losses.removeDuplicates();
 	return result;
 }
@@ -142,28 +152,28 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 		return result;
 	};
 	if (!snapshot.valid())
-		return reject(snapshot.error.isEmpty() ? QStringLiteral("导出快照无效") : snapshot.error);
+		return reject(snapshot.error.isEmpty() ? QCoreApplication::translate("NativeSVS", "Invalid export snapshot")
+											   : snapshot.error);
 	auto stopped = [&] { return cancelled && cancelled->load(); };
 	const int firstBar = int(std::round(1920. * snapshot.numerator / snapshot.denominator));
 	QJsonArray tempos;
 	int previous = -1;
 	for (int tick = 0; tick <= snapshot.lastTick; ++tick)
 	{
-		if ((tick % 1024) == 0 && stopped())
-			return reject(QStringLiteral("已取消"));
+		if ((tick % 1024) == 0 && stopped()) return reject(QCoreApplication::translate("NativeSVS", "Cancelled"));
 		const int bpm = snapshot.tempo->tempoAt(tick);
-		if (bpm <= 0)
-			return reject(QStringLiteral("速度数据无效"));
+		if (bpm <= 0) return reject(QCoreApplication::translate("NativeSVS", "Invalid tempo data"));
 		if (bpm != previous)
 		{
 			tempos.append(QJsonObject{{"position", double(tick) * 10}, {"bpm", bpm}});
 			previous = bpm;
 		}
 	}
-	if (tempos.isEmpty())
-		return reject(QStringLiteral("导出时间范围无效"));
+	if (tempos.isEmpty()) return reject(QCoreApplication::translate("NativeSVS", "Invalid export time range"));
 	if (!snapshot.tempo->layers.empty())
-		result.losses << QStringLiteral("全局速度自动化按每个整数 LMMS tick 采样；保留该采样网格上的完整速度变化");
+		result.losses << QCoreApplication::translate("NativeSVS",
+			"Global tempo automation is sampled at each integer LMMS tick; all tempo changes on this sampling grid are "
+			"retained");
 	auto secondsBetween = [&](double start, double end) {
 		double seconds = 0;
 		while (start < end)
@@ -177,8 +187,7 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 	QJsonArray tracks;
 	for (const auto& source : snapshot.tracks)
 	{
-		if (stopped())
-			return reject(QStringLiteral("已取消"));
+		if (stopped()) return reject(QCoreApplication::translate("NativeSVS", "Cancelled"));
 		QJsonObject common{{"title", source.name}, {"mute", source.muted}, {"solo", source.solo},
 			{"volume", source.volume}, {"pan", source.pan}};
 		if (source.singing)
@@ -194,16 +203,19 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 			{
 				if (!std::isfinite(clip.position) || !std::isfinite(clip.contentOffset) || !std::isfinite(clip.length)
 					|| clip.position < 0 || clip.length <= 0)
-					return reject(QStringLiteral("轨道 %1 / 片段 %2：时间范围无效").arg(source.name, clip.name));
+					return reject(QCoreApplication::translate("NativeSVS", "Track %1 / clip %2: invalid time range")
+							.arg(source.name, clip.name));
 				if (clip.muted)
-					result.losses << QStringLiteral(
-						"轨道 %1 / 片段 %2：目标统一模型没有片段静音字段，导出其数据时无法保留片段静音")
+					result.losses << QCoreApplication::translate("NativeSVS",
+						"Track %1 / clip %2: the target unified model has no clip mute field; clip muting cannot be "
+						"retained when exporting its data")
 										 .arg(source.name, clip.name);
 				for (const auto& note : clip.notes)
 				{
 					if (!std::isfinite(note.tick) || !std::isfinite(note.duration) || !std::isfinite(note.pitch)
 						|| note.duration <= 0)
-						return reject(QStringLiteral("轨道 %1：音符数据无效").arg(source.name));
+						return reject(
+							QCoreApplication::translate("NativeSVS", "Track %1: invalid note data").arg(source.name));
 					const double start = std::max(note.tick, clip.contentOffset),
 								 end = std::min(note.tick + note.duration, clip.contentOffset + clip.length);
 					if (end <= start)
@@ -212,30 +224,39 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 								 projectEnd = clip.position + end - clip.contentOffset;
 					const auto first = std::llround(projectStart * 10), last = std::llround(projectEnd * 10);
 					if (last <= first)
-						return reject(QStringLiteral("轨道 %1：音符在目标整数 tick 精度下长度为零").arg(source.name));
+						return reject(QCoreApplication::translate(
+							"NativeSVS", "Track %1: note length is zero at the target integer tick precision")
+								.arg(source.name));
 					const auto key = std::llround(note.pitch);
 					if (key < 0 || key > 127)
-						return reject(QStringLiteral("轨道 %1：音符音高超出范围").arg(source.name));
+						return reject(QCoreApplication::translate("NativeSVS", "Track %1: note pitch is out of range")
+								.arg(source.name));
 					if (std::abs(projectStart * 10 - first) > 1e-8 || std::abs(projectEnd * 10 - last) > 1e-8
 						|| std::abs(note.pitch - key) > 1e-8)
-						result.losses << QStringLiteral(
-							"轨道 %1：音符时间量化到 480 tick/拍、音符键号量化为整数；编辑音高曲线单独保留")
+						result.losses << QCoreApplication::translate("NativeSVS",
+							"Track %1: note timing is quantized to 480 ticks per beat and note keys to integers; "
+							"edited pitch curves are retained separately")
 											 .arg(source.name);
 					if (!note.parameters.isEmpty() || !note.phonemes.isEmpty())
-						result.losses
-							<< QStringLiteral("轨道 %1：音符私有参数和音素时长没有统一格式对应").arg(source.name);
+						result.losses << QCoreApplication::translate("NativeSVS",
+							"Track %1: note-specific parameters and phoneme durations have no unified-format mapping")
+											 .arg(source.name);
 					notes.append(QJsonObject{{"start_pos", double(first)}, {"length", double(last - first)},
 						{"key_number", int(key)}, {"lyric", note.lyric}, {"pronunciation", note.pronunciation}});
 				}
 				for (auto i = clip.curves.begin(); i != clip.curves.end(); ++i)
 					if (i.key() != "svs.pitch")
-						result.losses << QStringLiteral("轨道 %1 / 片段 %2：参数 %3 没有确定的统一格式语义")
+						result.losses << QCoreApplication::translate(
+							"NativeSVS", "Track %1 / clip %2: parameter %3 has no defined unified-format semantics")
 											 .arg(source.name, clip.name, i.key());
 				if (!clip.curves.contains("svs.pitch"))
 					continue;
 				const auto& curve = clip.curves["svs.pitch"];
 				if (curve.mode != "absolute" || curve.unit != "semitone")
-					return reject(QStringLiteral("轨道 %1：音高曲线不是绝对半音单位，无法准确导出").arg(source.name));
+					return reject(QCoreApplication::translate("NativeSVS",
+						"Track %1: the pitch curve does not use absolute semitone units and cannot be exported "
+						"accurately")
+							.arg(source.name));
 				const auto& points = curve.evaluator.points;
 				if (points.empty())
 					continue;
@@ -246,12 +267,14 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 				const double origin = clip.position - clip.contentOffset;
 				const qint64 first = std::llround((origin + lower) * 10), last = std::llround((origin + upper) * 10);
 				if (first < 0 || last + firstBar >= 1073741823 || last - first > 4000000)
-					return reject(QStringLiteral("轨道 %1：音高范围超出转换协议可处理大小").arg(source.name));
+					return reject(QCoreApplication::translate(
+						"NativeSVS", "Track %1: the pitch range exceeds the conversion protocol's supported size")
+							.arg(source.name));
 				QMap<int, double> samples;
 				for (qint64 tick = first; tick <= last; ++tick)
 				{
 					if ((tick % 1024) == 0 && stopped())
-						return reject(QStringLiteral("已取消"));
+						return reject(QCoreApplication::translate("NativeSVS", "Cancelled"));
 					samples[int(tick)] = std::clamp(tick / 10. - origin, lower, upper);
 				}
 				for (const auto& point : points)
@@ -271,21 +294,25 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 						continue;
 					}
 					if (!std::isfinite(value.value) || value.value < 0 || value.value > 127)
-						return reject(QStringLiteral("轨道 %1：音高曲线数值无效").arg(source.name));
+						return reject(QCoreApplication::translate("NativeSVS", "Track %1: invalid pitch curve value")
+								.arg(source.name));
 					const bool connected = previousCovered && sample.key() == previousTick + 1
 						&& curve.evaluator.evaluate((previousLocal + sample.value()) / 2).covered;
 					const int cents = int(std::llround(value.value * 100));
 					if (pitch.contains(sample.key()) && pitch.value(sample.key()).value != cents)
-						result.losses << QStringLiteral(
-							"轨道 %1：重叠片段的音高在同一时间冲突，按片段稳定顺序采用后一个片段；重叠音符仍全部保留")
+						result.losses << QCoreApplication::translate("NativeSVS",
+							"Track %1: overlapping clips have conflicting pitch at the same time; the later clip in "
+							"stable clip order is used, while all overlapping notes are retained")
 											 .arg(source.name);
 					pitch[sample.key()] = {cents, !connected};
 					previousCovered = true;
 					previousTick = sample.key();
 					previousLocal = sample.value();
 				}
-				result.losses
-					<< QStringLiteral("轨道 %1：音高曲线按 480 tick/拍、整数 cent 采样，断点保持独立").arg(source.name);
+				result.losses << QCoreApplication::translate("NativeSVS",
+					"Track %1: the pitch curve is sampled at 480 ticks per beat and integer cents; breaks remain "
+					"separate")
+									 .arg(source.name);
 			}
 			std::vector<QJsonObject> ordered;
 			for (const auto& value : notes)
@@ -319,7 +346,9 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 		else
 		{
 			if (source.audio.size() > 1)
-				result.losses << QStringLiteral("音频轨 %1：%2 个片段拆分为独立音频条目，轨道设置复制到每个条目")
+				result.losses << QCoreApplication::translate("NativeSVS",
+					"Audio track %1: %2 clips are split into separate audio entries; track settings are copied to each "
+					"entry")
 									 .arg(source.name)
 									 .arg(source.audio.size());
 			for (int index = 0; index < source.audio.size(); ++index)
@@ -337,7 +366,8 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 					std::llround(secondsBetween(position, audio.position + audio.length) * audio.buffer->sampleRate()));
 				if (skipped < 0 || frames <= 0)
 				{
-					result.losses << QStringLiteral("音频轨 %1 / 片段 %2：有效范围不包含音频采样，将省略")
+					result.losses << QCoreApplication::translate("NativeSVS",
+						"Audio track %1 / clip %2: the valid range contains no audio samples and will be omitted")
 										 .arg(source.name, audio.name);
 					continue;
 				}
@@ -362,7 +392,8 @@ ProjectExportData ProjectExport::build(const ProjectExportSnapshot& snapshot, co
 		}
 	}
 	if (tracks.isEmpty())
-		return reject(QStringLiteral("没有位于片段有效范围内的可导出内容"));
+		return reject(
+			QCoreApplication::translate("NativeSVS", "No exportable content lies within the valid clip range"));
 	result.project = {{"song_tempo_list", tempos},
 		{"time_signature_list",
 			QJsonArray{QJsonObject{
@@ -381,7 +412,7 @@ bool ProjectExport::writeAudioFiles(
 	}
 	if (!QDir().mkpath(directory))
 	{
-		error = QStringLiteral("不能创建导出音频暂存目录");
+		error = QCoreApplication::translate("NativeSVS", "Cannot create the export audio staging directory");
 		return false;
 	}
 	for (const auto& file : prepared.audioFiles)
@@ -391,18 +422,18 @@ bool ProjectExport::writeAudioFiles(
 			|| file.firstFrame + file.frameCount > qint64(buffer->size()) || file.frameCount > (0xffffffffll - 36) / 8
 			|| !std::isfinite(file.audio.amplification))
 		{
-			error = QStringLiteral("导出音频范围无效");
+			error = QCoreApplication::translate("NativeSVS", "Invalid export audio range");
 			return false;
 		}
 		if (file.fileName != QFileInfo(file.fileName).fileName() || file.fileName == "." || file.fileName == "..")
 		{
-			error = QStringLiteral("配套音频文件名无效");
+			error = QCoreApplication::translate("NativeSVS", "Invalid companion audio filename");
 			return false;
 		}
 		const auto path = QDir(directory).filePath(file.fileName);
 		if (QFileInfo::exists(path))
 		{
-			error = QStringLiteral("暂存音频文件已存在：%1").arg(path);
+			error = QCoreApplication::translate("NativeSVS", "Staged audio file already exists: %1").arg(path);
 			return false;
 		}
 		QSaveFile output(path);
@@ -426,7 +457,7 @@ bool ProjectExport::writeAudioFiles(
 			if ((index % 4096) == 0 && cancelled && cancelled->load())
 			{
 				output.cancelWriting();
-				error = QStringLiteral("已取消");
+				error = QCoreApplication::translate("NativeSVS", "Cancelled");
 				return false;
 			}
 			const qint64 source

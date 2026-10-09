@@ -1,5 +1,6 @@
 #include "SVCPlayback.h"
 
+#include <QCoreApplication>
 #include <QtEndian>
 #include <algorithm>
 #include <cmath>
@@ -35,7 +36,10 @@ float PlaybackSnapshot::trackSample(uint64_t frame, unsigned channel) const
 
 PlaybackState::PlaybackState(std::shared_ptr<const SourceAudio> source)
 {
-	if (!source || !source->rate || source->stereo.size() % 2) { throw std::invalid_argument("Invalid SVC source"); }
+	if (!source || !source->rate || source->stereo.size() % 2)
+	{
+		throw std::invalid_argument(QCoreApplication::translate("NativeRVC", "Invalid SVC source").toStdString());
+	}
 	auto snapshot = std::make_shared<PlaybackSnapshot>();
 	snapshot->source = std::move(source);
 	m_snapshot = snapshot;
@@ -59,7 +63,8 @@ uint64_t PlaybackState::begin(const std::vector<Segment>& segments)
 			|| segment.inputStart > segment.start || segment.inputEnd < segment.end
 			|| segment.inputEnd > source->frames() || segment.sampleRate != source->rate)
 		{
-			throw std::invalid_argument("Invalid SVC segment map");
+			throw std::invalid_argument(
+				QCoreApplication::translate("NativeRVC", "Invalid SVC segment map").toStdString());
 		}
 		end = segment.end;
 	}

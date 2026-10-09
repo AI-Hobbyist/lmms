@@ -1,9 +1,11 @@
 #include "SVSCurve.h"
+
+#include <QCoreApplication>
 #include <QJsonArray>
 #include <algorithm>
 #include <cmath>
-#include <numeric>
 #include <limits>
+#include <numeric>
 
 namespace lmms::svs {
 Curve withParameterBase(const Curve& source, const Parameter& p, const QJsonValue& base)
@@ -288,12 +290,12 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 		|| !QStringList{"linear", "hermite", "step"}.contains(result.interpolation)
 		|| !QStringList{"float", "int", "bool", "enum"}.contains(result.type))
 	{
-		error = "Invalid curve metadata";
+		error = QCoreApplication::translate("NativeSVS", "Invalid curve metadata");
 		return false;
 	}
 	if (result.type != "float" && result.interpolation != "step")
 	{
-		error = "Discrete curve requires step interpolation";
+		error = QCoreApplication::translate("NativeSVS", "Discrete curve requires step interpolation");
 		return false;
 	}
 	result.evaluator.interpolation = result.interpolation == "hermite" ? svs_sdk::Interpolation::Hermite
@@ -302,7 +304,8 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 	result.evaluator.constrainTangents = object["constrained"].toBool(true);
 	if (!result.evaluator.constrainTangents && result.mode != "offset")
 	{
-		error = "Only derived pitch offsets may use unconstrained difference tangents";
+		error = QCoreApplication::translate(
+			"NativeSVS", "Only derived pitch offsets may use unconstrained difference tangents");
 		return false;
 	}
 	double previous = -INFINITY;
@@ -316,7 +319,7 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 			|| ((result.type == "float" || result.type == "int")
 				&& (!value.isDouble() || !std::isfinite(value.toDouble()))))
 		{
-			error = "Invalid curve anchor";
+			error = QCoreApplication::translate("NativeSVS", "Invalid curve anchor");
 			return false;
 		}
 		result.insert(tick, value);
@@ -331,7 +334,7 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 			if (!QStringList{"linear", "hermite", "step"}.contains(segment)
 				|| (result.type != "float" && segment != "step"))
 			{
-				error = "Invalid segment interpolation";
+				error = QCoreApplication::translate("NativeSVS", "Invalid segment interpolation");
 				return false;
 			}
 			point.segmentInterpolation = segment == "linear" ? 0 : segment == "hermite" ? 1 : 2;
@@ -340,7 +343,7 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 			|| (p.contains("in") && !p["in"].isDouble()) || (p.contains("out") && !p["out"].isDouble())
 			|| !std::isfinite(point.tangentIn) || !std::isfinite(point.tangentOut))
 		{
-			error = "Invalid curve tangent or integer value";
+			error = QCoreApplication::translate("NativeSVS", "Invalid curve tangent or integer value");
 			return false;
 		}
 		previous = tick;
@@ -351,7 +354,7 @@ bool Curve::fromJson(const QJsonObject& object, Curve& output, QString& error, c
 		auto start = gap["start"].toDouble(NAN), end = gap["end"].toDouble(NAN);
 		if (!std::isfinite(start) || !std::isfinite(end) || start >= end)
 		{
-			error = "Invalid curve gap";
+			error = QCoreApplication::translate("NativeSVS", "Invalid curve gap");
 			return false;
 		}
 		result.evaluator.gaps.push_back({start, end});
@@ -372,7 +375,8 @@ bool absolutePitchToOffset(const Curve& absolute, const Curve& reference, Curve&
 	if (absolute.type != "float" || absolute.mode != "absolute" || reference.type != "float"
 		|| reference.mode != "absolute" || reference.unit != "semitone" || reference.evaluator.points.empty())
 	{
-		error = "Offset pitch requires an explicit absolute semitone reference curve";
+		error = QCoreApplication::translate(
+			"NativeSVS", "Offset pitch requires an explicit absolute semitone reference curve");
 		return false;
 	}
 	Curve result = absolute;
@@ -420,7 +424,7 @@ bool absolutePitchToOffset(const Curve& absolute, const Curve& reference, Curve&
 		const auto a = absolute.evaluator.evaluate(tick), r = reference.evaluator.evaluate(tick);
 		if (a.covered && !r.covered)
 		{
-			error = "Reference pitch does not cover the edited pitch range";
+			error = QCoreApplication::translate("NativeSVS", "Reference pitch does not cover the edited pitch range");
 			return false;
 		}
 		if (i + 1 < ticks.size())
@@ -428,7 +432,7 @@ bool absolutePitchToOffset(const Curve& absolute, const Curve& reference, Curve&
 			const auto middle = std::midpoint(tick, ticks[i + 1]);
 			if (absolute.evaluator.evaluate(middle).covered && !reference.evaluator.evaluate(middle).covered)
 			{
-				error = "Reference pitch has a gap in the edited range";
+				error = QCoreApplication::translate("NativeSVS", "Reference pitch has a gap in the edited range");
 				return false;
 			}
 		}

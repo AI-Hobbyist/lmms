@@ -76,13 +76,15 @@ private slots:
 		auto result = ProjectMapper::prepareImport(project, voice(), {});
 		QVERIFY(!result.valid());
 		QVERIFY(result.document.isNull());
-		QVERIFY(result.error.contains(QStringLiteral("变化拍号")));
+		QVERIFY(result.error.contains(QStringLiteral("changing time signatures")));
 		project = fixture();
 		auto tempos = project["song_tempo_list"].toArray();
 		tempos.insert(1, QJsonObject{{"position", 1}, {"bpm", 140}});
 		project["song_tempo_list"] = tempos;
 		QVERIFY(!ProjectMapper::prepareImport(project, voice(), {}).valid());
-		QVERIFY(!ProjectMapper::prepareImport(fixture(), {}, {}).valid());
+		auto invalidVoice = voice();
+		invalidVoice.voiceId.clear();
+		QVERIFY(!ProjectMapper::prepareImport(fixture(), invalidVoice, {}).valid());
 	}
 	void audioAndQuantizationLosses()
 	{

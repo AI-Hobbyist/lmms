@@ -1,15 +1,18 @@
 #include "SVSTempoSnapshot.h"
-#include "SVSModel.h"
-#include "Song.h"
-#include "Engine.h"
-#include "AutomationTrack.h"
-#include "AutomationClip.h"
-#include "PatternTrack.h"
-#include "PatternClip.h"
-#include "PatternStore.h"
+
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <algorithm>
 #include <cmath>
+
+#include "AutomationClip.h"
+#include "AutomationTrack.h"
+#include "Engine.h"
+#include "PatternClip.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "SVSModel.h"
+#include "Song.h"
 namespace lmms::svs {
 namespace {
 std::vector<TempoSnapshot::Layer> captureLayers(
@@ -194,7 +197,7 @@ bool TempoSnapshot::buildMap(
 	points = {};
 	if (lastTick < 0 || lastTick > MaxSongLength)
 	{
-		error = "SVS tempo snapshot exceeds supported song length";
+		error = QCoreApplication::translate("NativeSVS", "SVS tempo snapshot exceeds supported song length");
 		return false;
 	}
 	int previous = -1;
@@ -208,7 +211,7 @@ bool TempoSnapshot::buildMap(
 		const auto current = tempoAt(tick);
 		if (current <= 0)
 		{
-			error = "Invalid SVS tempo snapshot";
+			error = QCoreApplication::translate("NativeSVS", "Invalid SVS tempo snapshot");
 			return false;
 		}
 		if (current != previous)

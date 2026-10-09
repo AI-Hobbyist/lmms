@@ -1,0 +1,50 @@
+warning: in the working copy of 'include/NativePluginTranslation.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'include/SVSTimeMapping.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'include/SVSXml.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'include/vsthost/ScanRootsWidget.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'include/vsthost/Vst3Selection.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'plugins/VstBase/VstPlugin.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svc/SVCCache.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svc/SVCChunking.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svc/SVCConversion.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svc/SVCPlayback.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSCapabilities.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSClip.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSCurve.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSExportSnapshot.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSPlugin.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSProjectBridge.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSProjectExport.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSProjectMapper.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSProjectOutput.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSSegmentedSynthesis.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSSynthesisScheduler.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSTempoSnapshot.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/core/svs/SVSUnselectedPreview.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSViews.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/modals/SetupDialog.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/tracks/SVSTrack.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "1c91d9fa5d9328a96f0fd4c43ac44bda979c0f00",
+  "working_diff_sha256": "2408d27521f4f504bc840e516a004e6b116d16714f721652eee8f329629d53d7",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1131,
+  "key_count": 3877,
+  "summary": {
+    "zh_CN": {
+      "same-source": 154,
+      "translated": 3723
+    },
+    "ja": {
+      "same-source": 163,
+      "translated": 3714
+    },
+    "en": {
+      "source": 3877
+    },
+    "ko": {
+      "same-source": 156,
+      "translated": 3721
+    }
+  }
+}

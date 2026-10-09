@@ -94,31 +94,33 @@ def stage_for(paths, source):
 
 def status(language, translation_key, message):
     source = translation_key[1]
-    english_fallback = language == "en" and not re.search(r"[\u3400-\u9fff]", source)
+    english_fallback = language == "en" and not re.search(
+        r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]", source
+    )
     if message is None:
         return "source-unlisted" if english_fallback else "missing"
-    if english_fallback:
-        return "source"
     translation = message.find("translation")
     if translation is None:
-        return "empty"
+        return "source" if english_fallback else "empty"
     forms = translation.findall("numerusform")
     texts = ["".join(form.itertext()) for form in forms] if forms else [
         "".join(translation.itertext())
     ]
     if not texts or any(not text.strip() for text in texts):
-        return "empty"
+        return "source" if english_fallback else "empty"
     if translation.get("type") == "unfinished":
-        return "unfinished"
+        return "source" if english_fallback else "unfinished"
     if translation_key[3] == "yes" and not forms:
         return "plural-error"
-    if forms and len(forms) != 1:
-        # All four target languages use one Qt plural form.
+    if forms and len(forms) != (2 if language == "en" else 1):
+        # Qt English uses singular/plural; Chinese, Japanese and Korean use one form.
         return "plural-error"
     if any(Counter(PLACEHOLDER.findall(text)) != Counter(PLACEHOLDER.findall(source))
            for text in texts):
         return "placeholder-error"
-    return "same-source" if all(text == source for text in texts) else "translated"
+    if all(text == source for text in texts):
+        return "source" if english_fallback else "same-source"
+    return "translated"
 
 
 def audit(extraction, output):
@@ -301,6 +303,18 @@ def selfcheck():
     assert status("en", ordinary, None) == "source-unlisted"
     assert status("ja", ordinary, None) == "missing"
     assert status("en", ("Test", "音高", "", "no"), None) == "missing"
+    assert status("en", ("Test", "ピッチ", "", "no"), None) == "missing"
+    assert status("en", ("Test", "음높이", "", "no"), None) == "missing"
+    assert status("en", ordinary, ET.fromstring(
+        "<message><translation>English %2</translation></message>"
+    )) == "placeholder-error"
+    assert status("en", ordinary, ET.fromstring(
+        "<message><translation>English %1</translation></message>"
+    )) == "translated"
+    assert status("en", ("Test", "%n notes", "", "yes"), ET.fromstring(
+        "<message><translation><numerusform>%n note</numerusform>"
+        "<numerusform>%n notes</numerusform></translation></message>"
+    )) == "translated"
     assert status("ja", ordinary, ET.fromstring("<message><translation/></message>")) == "empty"
     assert status("ja", ordinary, ET.fromstring(
         '<message><translation type="unfinished">値 %1</translation></message>'

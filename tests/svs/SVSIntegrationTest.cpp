@@ -1964,7 +1964,13 @@ private slots:
 	}
 	void sdkResourcesAndServices()
 	{
-		const auto voice = svs::Registry::instance().voices().first();
+		const auto& fixtureVoices = svs::Registry::instance().voices();
+		const auto example = std::find_if(
+			fixtureVoices.begin(), fixtureVoices.end(), [](const auto& item) {
+				return item.pluginId == "org.lmms.svs.example";
+			});
+		QVERIFY(example != fixtureVoices.end());
+		const auto voice = *example;
 		auto plugin = svs::Registry::instance().plugin(voice.pluginId);
 		QString mime, error;
 		for (const auto& id : QStringList{"avatar.svg", "portrait.svg", "avatar-lite.svg", "portrait-lite.svg"})
@@ -2420,7 +2426,13 @@ private slots:
 	}
 	void sdkManifestDiagnostics()
 	{
-		const auto source = svs::Registry::instance().voices().first();
+		const auto& fixtureVoices = svs::Registry::instance().voices();
+		const auto example = std::find_if(
+			fixtureVoices.begin(), fixtureVoices.end(), [](const auto& item) {
+				return item.pluginId == "org.lmms.svs.example";
+			});
+		QVERIFY(example != fixtureVoices.end());
+		const auto source = *example;
 		QFile manifest(QDir(source.package).filePath("manifest.json"));
 		QVERIFY(manifest.open(QIODevice::ReadOnly));
 		const auto base = QJsonDocument::fromJson(manifest.readAll()).object();
@@ -5078,7 +5090,13 @@ private slots:
 	void batchLyricsAndPronunciation()
 	{
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
-		auto voice = svs::Registry::instance().voices().first();
+		const auto& fixtureVoices = svs::Registry::instance().voices();
+		const auto example = std::find_if(
+			fixtureVoices.begin(), fixtureVoices.end(), [](const auto& item) {
+				return item.pluginId == "org.lmms.svs.example";
+			});
+		QVERIFY(example != fixtureVoices.end());
+		const auto voice = *example;
 		track->bindVoice(voice.pluginId, "full");
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
 		QTRY_VERIFY_WITH_TIMEOUT(!track->capabilities().languages.isEmpty(), 10000);

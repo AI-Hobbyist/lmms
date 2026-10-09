@@ -547,7 +547,7 @@ SVSClipView::SVSClipView(SVSClip* clip, TrackView* view)
 	, m_clip(clip)
 {
 	connect(clip, &Clip::dataChanged, this, [this] {
-		setToolTip(m_clip->status());
+		setToolTip(nativeTranslation::svsStatus(m_clip->status()));
 		update();
 	});
 	connect(ConfigManager::inst(), &ConfigManager::valueChanged, this,
@@ -623,7 +623,7 @@ void SVSClipView::paintEvent(QPaintEvent*)
 	}
 	p.setPen(palette().text().color());
 	p.drawText(3, 12, m_clip->name());
-	p.drawText(3, height() - 3, m_clip->status());
+	p.drawText(3, height() - 3, nativeTranslation::svsStatus(m_clip->status()));
 	if (cornerRadius() > 0)
 	{
 		paintFlatBorder(p);
@@ -731,10 +731,10 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto* render = new QPushButton(tr("Synthesize"), this);
 	toolbar->addWidget(render);
 	connect(render, &QPushButton::clicked, clip, &SVSClip::synthesize);
-	auto* status = new QLabel(clip->status(), this);
+	auto* status = new QLabel(nativeTranslation::svsStatus(clip->status()), this);
 	toolbar->addWidget(status);
 	connect(clip, &Clip::dataChanged, this, [clip, status, render] {
-		status->setText(clip->status());
+		status->setText(nativeTranslation::svsStatus(clip->status()));
 		render->setEnabled(!clip->readOnly());
 	});
 	render->setEnabled(!clip->readOnly());

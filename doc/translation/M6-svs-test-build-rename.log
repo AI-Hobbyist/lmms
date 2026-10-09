@@ -1,0 +1,80 @@
+适用于 .NET Framework MSBuild 版本 18.10.1-1.26427.6+3cd27c13e
+
+  Checking File Globs
+  ringbuffer.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\ringbuffer.dir\Release\ringbuffer.lib
+  Automatic MOC and UIC for target SVSExample
+  yaml-cpp.vcxproj -> D:\UserData\Desktop\Project\lmms\build\_deps\diffsinger_yaml-build\Release\yaml-cpp.lib
+  svc-sdk.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-sdk.lib
+  weakjack.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\3rdparty\weakjack\Release\weakjack.lib
+  Automatic MOC and UIC for target lmmssvs
+  DiffSingerCatalog.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerCatalog.lib
+  SVSExample.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSExample\SVSExample.dll
+  svc-host.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svc\Release\svc-host.lib
+  svc-reference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\sdk\svc\Release\svc-reference.lib
+  lmmssvs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\core\svs\Release\lmmssvs.lib
+  Automatic MOC and UIC for target lmmsobjs
+  DiffSingerInference.vcxproj -> D:\UserData\Desktop\Project\lmms\build\plugins\SVSDiffSinger\Release\DiffSingerInference.lib
+  SVSDiffSinger.vcxproj -> D:\UserData\Desktop\Project\lmms\build\Release\svs\SVSDiffSinger\SVSDiffSinger.dll
+  lmmsobjs.vcxproj -> D:\UserData\Desktop\Project\lmms\build\src\lmmsobjs.dir\Release\lmmsobjs.lib
+  Automatic MOC for target SVSIntegrationTest
+  SVSIntegrationTest.cpp
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1967,57): error C2039: "fixtureVoices": 不是 "lmms::svs::Registry" 的成员 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\SVSModel.h(120,7):
+      参见“lmms::svs::Registry”的声明
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1967,29): error C2530: “fixtureVoices”: 必须初始化引用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1969,4): error C3536: “fixtureVoices”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1968,29): error C2672: “std::find_if”: 未找到匹配的重载函数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\algorithm(846,19):
+      可能是“_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1968,29):
+          “_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”: 应输入 4 个参数，却提供了 2 个
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xutility(6958,31):
+      或    “_InIt std::find_if(_InIt,const _InIt,_Pr)”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1968,29):
+          “_InIt std::find_if(_InIt,const _InIt,_Pr)”: 应输入 3 个参数，却提供了 2 个
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1968,14): error C2737: “example”: 必须初始化 const 对象 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1970,3): error C3536: “example”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1971,22): error C2100: 无法取消引用类型为“<错误>”的操作数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1976,23): error C3536: “plugin”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1976,15): error C2737: “bytes”: 必须初始化 const 对象 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1978,4): error C3536: “bytes”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2427,57): error C2039: "fixtureVoices": 不是 "lmms::svs::Registry" 的成员 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\SVSModel.h(120,7):
+      参见“lmms::svs::Registry”的声明
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2427,29): error C2530: “fixtureVoices”: 必须初始化引用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2429,4): error C3536: “fixtureVoices”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2428,29): error C2672: “std::find_if”: 未找到匹配的重载函数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\algorithm(846,19):
+      可能是“_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2428,29):
+          “_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”: 应输入 4 个参数，却提供了 2 个
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xutility(6958,31):
+      或    “_InIt std::find_if(_InIt,const _InIt,_Pr)”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2428,29):
+          “_InIt std::find_if(_InIt,const _InIt,_Pr)”: 应输入 3 个参数，却提供了 2 个
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2428,14): error C2737: “example”: 必须初始化 const 对象 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2430,3): error C3536: “example”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(2431,23): error C2100: 无法取消引用类型为“<错误>”的操作数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5089,57): error C2039: "fixtureVoices": 不是 "lmms::svs::Registry" 的成员 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      D:\UserData\Desktop\Project\lmms\include\SVSModel.h(120,7):
+      参见“lmms::svs::Registry”的声明
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5089,29): error C2530: “fixtureVoices”: 必须初始化引用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5091,4): error C3536: “fixtureVoices”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5090,29): error C2672: “std::find_if”: 未找到匹配的重载函数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\algorithm(846,19):
+      可能是“_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5090,29):
+          “_FwdIt std::find_if(_ExPo &&,_FwdIt,_FwdIt,_Pr) noexcept”: 应输入 4 个参数，却提供了 2 个
+      d:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\include\xutility(6958,31):
+      或    “_InIt std::find_if(_InIt,const _InIt,_Pr)”
+          D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5090,29):
+          “_InIt std::find_if(_InIt,const _InIt,_Pr)”: 应输入 3 个参数，却提供了 2 个
+
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5090,14): error C2737: “example”: 必须初始化 const 对象 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5092,3): error C3536: “example”: 初始化之前无法使用 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(5093,22): error C2100: 无法取消引用类型为“<错误>”的操作数 [D:\UserData\Desktop\Project\lmms\build\tests\SVSIntegrationTest.vcxproj]

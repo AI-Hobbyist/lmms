@@ -13,6 +13,7 @@
 #include <QVBoxLayout>
 #include <algorithm>
 
+#include "NativePluginTranslation.h"
 #include "SVSTrack.h"
 namespace lmms::gui {
 svs::Pronunciation editorPronunciation(SVSClip* clip, const svs::Note& note, bool candidates)
@@ -141,7 +142,7 @@ void SVSLyricEditor::preview()
 		if (!after.phonemes.isEmpty() || !after.pronunciation.isEmpty())
 			status += QCoreApplication::translate("lmms::gui::SVSLyricEditor", " — manual override retained");
 		if (!reading.diagnostic.isEmpty())
-			status += "\n" + reading.diagnostic;
+			status += "\n" + nativeTranslation::svsPronunciationDiagnostic(reading.diagnostic);
 		const QStringList cells{QString::number(before.tick), before.lyric, after.lyric, status};
 		for (int column = 0; column < 4; ++column)
 			m_table->setItem(row, column, new QTableWidgetItem(cells[column]));

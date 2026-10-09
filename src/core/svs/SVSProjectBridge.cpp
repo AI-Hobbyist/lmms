@@ -20,7 +20,7 @@ ProjectBridge::ProjectBridge(QObject* parent, QString directory)
 	m_killTimer.setSingleShot(true);
 	connect(&m_timeout, &QTimer::timeout, this, [this] {
 		m_failureCode = "timeout";
-		m_failureMessage = "SVS conversion timed out";
+		m_failureMessage = QCoreApplication::translate("NativeSVS", "SVS conversion timed out");
 		m_process.terminate();
 		m_killTimer.start(1000);
 	});
@@ -35,7 +35,7 @@ ProjectBridge::ProjectBridge(QObject* parent, QString directory)
 		if (m_output.size() > MaximumJson)
 		{
 			m_failureCode = "resultTooLarge";
-			m_failureMessage = "SVS conversion result exceeds size limit";
+			m_failureMessage = QCoreApplication::translate("NativeSVS", "SVS conversion result exceeds size limit");
 			m_process.kill();
 		}
 	});
@@ -77,14 +77,19 @@ bool ProjectBridge::start(QJsonObject request, int timeoutMs)
 	m_output = QJsonDocument(request).toJson(QJsonDocument::Compact);
 	if (m_output.size() > MaximumJson)
 	{
-		QTimer::singleShot(0, this, [this] { fail("requestTooLarge", "SVS conversion request exceeds size limit"); });
+		QTimer::singleShot(0, this, [this] {
+			fail("requestTooLarge",
+				QCoreApplication::translate("NativeSVS", "SVS conversion request exceeds size limit"));
+		});
 		return true;
 	}
 	m_task = std::make_unique<QTemporaryDir>(QDir::tempPath() + "/lmms-svs-project-XXXXXX");
 	if (!m_task->isValid())
 	{
-		QTimer::singleShot(
-			0, this, [this] { fail("temporaryDirectory", "Cannot create SVS conversion task directory"); });
+		QTimer::singleShot(0, this, [this] {
+			fail("temporaryDirectory",
+				QCoreApplication::translate("NativeSVS", "Cannot create SVS conversion task directory"));
+		});
 		return true;
 	}
 	// Output paths are supplied as names; only the bridge chooses the staging root.
@@ -94,7 +99,9 @@ bool ProjectBridge::start(QJsonObject request, int timeoutMs)
 		name = QFileInfo(name).fileName();
 		if (name.isEmpty() || name == "." || name == "..")
 		{
-			QTimer::singleShot(0, this, [this] { fail("invalidPath", "Missing SVS output filename"); });
+			QTimer::singleShot(0, this, [this] {
+				fail("invalidPath", QCoreApplication::translate("NativeSVS", "Missing SVS output filename"));
+			});
 			return true;
 		}
 		request["path"] = m_task->path() + "/output/" + name;
@@ -116,7 +123,7 @@ void ProjectBridge::cancel()
 	if (!busy())
 		return;
 	m_failureCode = "cancelled";
-	m_failureMessage = "SVS conversion cancelled";
+	m_failureMessage = QCoreApplication::translate("NativeSVS", "SVS conversion cancelled");
 	m_timeout.stop();
 	m_process.terminate();
 	m_killTimer.start(1000);
@@ -152,7 +159,8 @@ void ProjectBridge::complete(int code, QProcess::ExitStatus status)
 	}
 	if (code != 0 || status != QProcess::NormalExit)
 	{
-		fail("workerCrashed", "SVS conversion process terminated unexpectedly");
+		fail("workerCrashed",
+			QCoreApplication::translate("NativeSVS", "SVS conversion process terminated unexpectedly"));
 		return;
 	}
 	QJsonParseError parse;
@@ -164,7 +172,7 @@ void ProjectBridge::complete(int code, QProcess::ExitStatus status)
 		|| response["requestId"] != m_requestId || response["formatId"].toString() != m_formatId
 		|| !QStringList{"success", "error", "cancelled"}.contains(responseStatus))
 	{
-		fail("invalidResponse", "Invalid SVS conversion response");
+		fail("invalidResponse", QCoreApplication::translate("NativeSVS", "Invalid SVS conversion response"));
 		return;
 	}
 	if (response.contains("files"))
@@ -175,7 +183,8 @@ void ProjectBridge::complete(int code, QProcess::ExitStatus status)
 			if (canonical.isEmpty() || !canonical.startsWith(root, Qt::CaseInsensitive)
 				|| !QFileInfo(canonical).isFile())
 			{
-				fail("invalidOutput", "SVS output escaped its task directory");
+				fail(
+					"invalidOutput", QCoreApplication::translate("NativeSVS", "SVS output escaped its task directory"));
 				return;
 			}
 		}

@@ -1,0 +1,49 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start  7: SVSProjectProcessTest
+1/8 Test  #7: SVSProjectProcessTest ............   Passed    5.10 sec
+    Start  8: SVSProjectMapperTest
+2/8 Test  #8: SVSProjectMapperTest .............***Failed    0.03 sec
+********* Start testing of SVSProjectMapperTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : SVSProjectMapperTest::initTestCase()
+PASS   : SVSProjectMapperTest::pitchTimeAndVoice()
+FAIL!  : SVSProjectMapperTest::rejectedStructures() '!ProjectMapper::prepareImport(fixture(), {}, {}).valid()' returned FALSE. ()
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSProjectMapperTest.cpp(85) : failure location
+PASS   : SVSProjectMapperTest::audioAndQuantizationLosses()
+PASS   : SVSProjectMapperTest::cleanupTestCase()
+Totals: 4 passed, 1 failed, 0 skipped, 0 blacklisted, 4ms
+********* Finished testing of SVSProjectMapperTest *********
+
+    Start 15: VstPathsMigrationTest
+3/8 Test #15: VstPathsMigrationTest ............   Passed    0.06 sec
+    Start 45: ScanRootsWidget
+4/8 Test #45: ScanRootsWidget ..................   Passed    1.62 sec
+    Start 52: CatalogIo
+5/8 Test #52: CatalogIo ........................   Passed    6.86 sec
+    Start 53: PluginCatalog
+6/8 Test #53: PluginCatalog ....................   Passed   16.06 sec
+    Start 75: SVCChunkCacheTest
+7/8 Test #75: SVCChunkCacheTest ................   Passed    0.12 sec
+    Start 76: SVCPlaybackTest
+8/8 Test #76: SVCPlaybackTest ..................   Passed    0.06 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+M1            =   5.22 sec*proc (2 tests)
+M2            =   0.09 sec*proc (2 tests)
+catalog       =  22.91 sec*proc (2 tests)
+faults        =  22.91 sec*proc (2 tests)
+filesystem    =   6.86 sec*proc (1 test)
+native        =  16.06 sec*proc (1 test)
+project       =   5.13 sec*proc (2 tests)
+settings      =   1.62 sec*proc (1 test)
+svc           =   0.18 sec*proc (2 tests)
+svs           =   5.13 sec*proc (2 tests)
+vsthost       =  24.54 sec*proc (3 tests)
+
+Total Test time (real) =  29.95 sec
+
+The following tests FAILED:
+	  8 - SVSProjectMapperTest (Failed)                     M2 project svs
+Errors while running CTest

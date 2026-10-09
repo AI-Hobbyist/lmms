@@ -61,6 +61,7 @@
 #include "SVCWindow.h"
 #include "SVSCanvas.h"
 #include "SVSClip.h"
+#include "SVSLyricEditor.h"
 #include "SVSParameterPanel.h"
 #include "SVSProjectImportDialog.h"
 #include "SVSSettingsPage.h"
@@ -73,6 +74,7 @@
 #include "SongEditor.h"
 #include "SubWindow.h"
 #include "TabWidget.h"
+#include "vsthost/ScanRootsWidget.h"
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -297,6 +299,59 @@ private slots:
 			settings.close();
 			QCoreApplication::removeTranslator(&translator);
 		}
+	}
+	void translationClosure()
+	{
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		QVERIFY(!language.isEmpty());
+		const auto translated = [](const char* source) { return QCoreApplication::translate("NativeSVS", source); };
+		QCOMPARE(nativeTranslation::svsStatus("Rendering"), translated("Rendering"));
+		QCOMPARE(nativeTranslation::svsStatus("Failed: Queued"), translated("Failed: %1").arg(translated("Queued")));
+		QCOMPARE(nativeTranslation::svsStatus("External engine diagnostic"), QString("External engine diagnostic"));
+		QCOMPARE(nativeTranslation::svsPronunciationDiagnostic("Unsupported note language: ja"),
+			translated("Unsupported note language: %1").arg("ja"));
+		QCOMPARE(nativeTranslation::svsPronunciationDiagnostic("Illegal phoneme: x; Illegal phoneme: y; "),
+			translated("Illegal phoneme: %1").arg("x") + "; " + translated("Illegal phoneme: %1").arg("y"));
+		ScanRootsWidget roots({}, "Invalid VST scan roots JSON");
+		roots.resize(800, 400);
+		QCOMPARE(roots.findChild<QLabel*>("vstRootError")->text(),
+			QCoreApplication::translate("lmms::gui::ScanRootsWidget", "Invalid VST scan roots JSON"));
+		if (language != "en")
+		{
+			QVERIFY(roots.findChild<QLabel*>("vstRootError")->text() != "Invalid VST scan roots JSON");
+		}
+		capture(&roots, "M6-scan-error-" + language);
+		roots.close();
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "closure-note";
+		note.duration = 96;
+		note.pitch = 60;
+		note.lyric = "日本語 한국어 中文";
+		note.language = "ja";
+		clip->setNotes({note});
+		{
+			SVSLyricEditor lyrics(clip, {note.id});
+			capture(&lyrics, "M6-lyric-diagnostic-" + language);
+			lyrics.close();
+		}
+		QString error;
+		QVERIFY(!clip->importDictionary("{}", error));
+		QCOMPARE(error, translated("Missing dictionary fields"));
+		QDomDocument document;
+		auto node = document.createElement("svsclip");
+		node.setAttribute("seed", "invalid");
+		clip->loadSettings(node);
+		QCOMPARE(clip->migrationDiagnostic(), translated("Invalid SVS seed; original node preserved"));
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			capture(&editor, "M6-migration-error-" + language);
+			editor.close();
+		}
+		delete track;
 	}
 	void hostTranslations()
 	{

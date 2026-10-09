@@ -1,0 +1,12 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start 8: SVSProjectMapperTest
+1/1 Test #8: SVSProjectMapperTest .............   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+M2         =   0.04 sec*proc (1 test)
+project    =   0.04 sec*proc (1 test)
+svs        =   0.04 sec*proc (1 test)
+
+Total Test time (real) =   0.06 sec

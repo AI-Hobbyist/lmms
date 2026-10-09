@@ -1,5 +1,6 @@
 #include "SVCConversion.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
@@ -36,7 +37,11 @@ void writeInput(QFile& file, const SourceAudio& source, const Segment& segment, 
 	const std::function<bool()>& cancelled)
 {
 	const auto frames = static_cast<uint64_t>(std::llround(double(segment.transmittedFrames()) * rate / source.rate));
-	if (!frames || frames > (UINT32_MAX - 36) / 2) { throw std::runtime_error("SVC input WAV exceeds supported size"); }
+	if (!frames || frames > (UINT32_MAX - 36) / 2)
+	{
+		throw std::runtime_error(
+			QCoreApplication::translate("NativeRVC", "SVC input WAV exceeds supported size").toStdString());
+	}
 	QByteArray header(44, 0);
 	header.replace(0, 4, "RIFF");
 	qToLittleEndian<uint32_t>(36 + frames * 2, header.data() + 4);
@@ -50,10 +55,17 @@ void writeInput(QFile& file, const SourceAudio& source, const Segment& segment, 
 	qToLittleEndian<uint16_t>(16, header.data() + 34);
 	header.replace(36, 4, "data");
 	qToLittleEndian<uint32_t>(frames * 2, header.data() + 40);
-	if (file.write(header) != header.size()) { throw std::runtime_error("Cannot write SVC input WAV"); }
+	if (file.write(header) != header.size())
+	{
+		throw std::runtime_error(QCoreApplication::translate("NativeRVC", "Cannot write SVC input WAV").toStdString());
+	}
 	for (uint64_t offset = 0; offset < frames;)
 	{
-		if (cancelled()) { throw std::runtime_error("SVC conversion cancelled"); }
+		if (cancelled())
+		{
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "SVC conversion cancelled").toStdString());
+		}
 		const auto count = std::min<uint64_t>(SVC_MAX_FEED / 2, frames - offset);
 		QByteArray bytes(count * 2, 0);
 		for (uint64_t index = 0; index < count; ++index)
@@ -68,10 +80,17 @@ void writeInput(QFile& file, const SourceAudio& source, const Segment& segment, 
 			qToLittleEndian<int16_t>(static_cast<int16_t>(std::clamp(std::llround(value * 32768), -32768LL, 32767LL)),
 				bytes.data() + index * 2);
 		}
-		if (file.write(bytes) != bytes.size()) { throw std::runtime_error("Cannot write SVC input samples"); }
+		if (file.write(bytes) != bytes.size())
+		{
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "Cannot write SVC input samples").toStdString());
+		}
 		offset += count;
 	}
-	if (!file.flush() || !file.seek(0)) { throw std::runtime_error("Cannot rewind SVC input WAV"); }
+	if (!file.flush() || !file.seek(0))
+	{
+		throw std::runtime_error(QCoreApplication::translate("NativeRVC", "Cannot rewind SVC input WAV").toStdString());
+	}
 }
 
 QJsonObject mapping(const Segment& segment)
@@ -209,7 +228,9 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 			const auto bytes = 44.0 + std::round(double(segment.transmittedFrames()) * inputRate / source->rate) * 2;
 			if (bytes > limits.value("max_upload_bytes").toDouble())
 			{
-				throw std::invalid_argument("SVC request exceeds the backend upload byte limit");
+				throw std::invalid_argument(
+					QCoreApplication::translate("NativeRVC", "SVC request exceeds the backend upload byte limit")
+						.toStdString());
 			}
 		}
 		if (cancelled()) { return; }
@@ -234,9 +255,17 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 		{
 			const auto& range = task->segments[segment];
 			const auto directory = QDir(task->working).filePath("cache/svc/" + task->engine.id + "/input");
-			if (!QDir().mkpath(directory)) { throw std::runtime_error("Cannot create SVC cache directory"); }
+			if (!QDir().mkpath(directory))
+			{
+				throw std::runtime_error(
+					QCoreApplication::translate("NativeRVC", "Cannot create SVC cache directory").toStdString());
+			}
 			QTemporaryFile prepared(directory + "/staging-XXXXXX.wav");
-			if (!prepared.open()) { throw std::runtime_error("Cannot prepare SVC input file"); }
+			if (!prepared.open())
+			{
+				throw std::runtime_error(
+					QCoreApplication::translate("NativeRVC", "Cannot prepare SVC input file").toStdString());
+			}
 			const auto source = task->playback->snapshot()->source;
 			writeInput(
 				prepared, *source, range, task->engine.inputRate ? task->engine.inputRate : source->rate, cancelled);
@@ -251,7 +280,8 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 			QFile input(cache->inputPath());
 			if (!input.open(QIODevice::ReadOnly) || (task->engine.inputIsPcm && !input.seek(44)))
 			{
-				throw std::runtime_error("Cannot read SVC cached input");
+				throw std::runtime_error(
+					QCoreApplication::translate("NativeRVC", "Cannot read SVC cached input").toStdString());
 			}
 			struct Context
 			{
@@ -332,7 +362,11 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 			};
 			const auto* api = task->engine.api;
 			void* job = api->start(task->engine.context.get(), &request);
-			if (!job) { throw std::runtime_error("SVC backend rejected the frozen request"); }
+			if (!job)
+			{
+				throw std::runtime_error(
+					QCoreApplication::translate("NativeRVC", "SVC backend rejected the frozen request").toStdString());
+			}
 			svc_status terminal = SVC_OK;
 			while (terminal == SVC_OK && !cancelled())
 			{

@@ -66,7 +66,7 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song, uint32_t rat
 				else if (clip->readOnly())
 					region.diagnostic = clip->migrationDiagnostic();
 				else if (!region.plugin && !clip->captureCachedInput(region.input))
-					region.diagnostic = "Missing voice/plugin";
+					region.diagnostic = QCoreApplication::translate("NativeSVS", "Missing voice/plugin");
 				else if (region.plugin && !track->capabilitiesReady())
 				{
 					region.declarationPending = true;
@@ -284,7 +284,9 @@ void ExportSnapshot::prepare(bool ignore)
 			}
 			if (!region.diagnostic.isEmpty() || (!region.plugin && !region.input.document.contains("cacheOnlyKey")))
 			{
-				receive(index, {}, region.diagnostic.isEmpty() ? "Missing voice/plugin" : region.diagnostic);
+				receive(index, {},
+					region.diagnostic.isEmpty() ? QCoreApplication::translate("NativeSVS", "Missing voice/plugin")
+												: region.diagnostic);
 				continue;
 			}
 			if (region.declarationPending)
@@ -320,7 +322,7 @@ void ExportSnapshot::awaitCatalog(int index)
 	if (region.input.document.contains("cacheOnlyKey"))
 		submit(index, region.input);
 	else
-		receive(index, {}, "Missing voice/plugin");
+		receive(index, {}, QCoreApplication::translate("NativeSVS", "Missing voice/plugin"));
 }
 void ExportSnapshot::submit(int index, Input input)
 {
@@ -372,7 +374,7 @@ void ExportSnapshot::declare(int index)
 					Dictionary dictionary;
 					if (!path.startsWith(root, Qt::CaseInsensitive) || !file.open(QIODevice::ReadOnly))
 					{
-						error = "Missing voice dictionary: " + resource;
+						error = QCoreApplication::translate("NativeSVS", "Missing voice dictionary: %1").arg(resource);
 						break;
 					}
 					if (!Dictionary::parse(file.read(4 * 1024 * 1024 + 1), capabilities.phonemeSet, dictionary, error))
@@ -380,7 +382,8 @@ void ExportSnapshot::declare(int index)
 					if (dictionary.phonemeSet != capabilities.phonemeSetId
 						|| !capabilities.languages.contains(dictionary.language))
 					{
-						error = "Incompatible voice dictionary: " + resource;
+						error = QCoreApplication::translate("NativeSVS", "Incompatible voice dictionary: %1")
+									.arg(resource);
 						break;
 					}
 					dictionaries.append(QJsonObject{{"id", dictionary.id}, {"version", dictionary.version},
@@ -410,12 +413,14 @@ void ExportSnapshot::receive(int index, std::shared_ptr<const Audio> audio, cons
 	if (audio && (!audio->complete || audio->revision != region.input.revision))
 	{
 		audio.reset();
-		region.diagnostic = "SVS export result incomplete or version mismatch";
+		region.diagnostic
+			= QCoreApplication::translate("NativeSVS", "SVS export result incomplete or version mismatch");
 	}
 	if (!audio)
 	{
 		if (region.diagnostic.isEmpty())
-			region.diagnostic = error.isEmpty() ? "SVS synthesis failed" : error;
+			region.diagnostic
+				= error.isEmpty() ? QCoreApplication::translate("NativeSVS", "SVS synthesis failed") : error;
 		m_diagnostics << locate(index, region.diagnostic);
 		if (!m_ignore)
 		{

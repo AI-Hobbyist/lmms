@@ -1,0 +1,88 @@
+Test project D:/UserData/Desktop/Project/lmms/build
+    Start  7: SVSProjectProcessTest
+1/7 Test  #7: SVSProjectProcessTest ............   Passed    6.78 sec
+    Start  8: SVSProjectMapperTest
+2/7 Test  #8: SVSProjectMapperTest .............***Failed    0.02 sec
+********* Start testing of SVSProjectMapperTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : SVSProjectMapperTest::initTestCase()
+PASS   : SVSProjectMapperTest::pitchTimeAndVoice()
+FAIL!  : SVSProjectMapperTest::rejectedStructures() 'result.error.contains(QStringLiteral("变化拍号"))' returned FALSE. ()
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSProjectMapperTest.cpp(79) : failure location
+PASS   : SVSProjectMapperTest::audioAndQuantizationLosses()
+PASS   : SVSProjectMapperTest::cleanupTestCase()
+Totals: 4 passed, 1 failed, 0 skipped, 0 blacklisted, 2ms
+********* Finished testing of SVSProjectMapperTest *********
+
+    Start 15: VstPathsMigrationTest
+3/7 Test #15: VstPathsMigrationTest ............   Passed    0.06 sec
+    Start 18: SVSIntegrationTest
+4/7 Test #18: SVSIntegrationTest ...............***Timeout  60.02 sec
+********* Start testing of SVSIntegrationTest *********
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized
+PASS   : SVSIntegrationTest::initTestCase()
+FAIL!  : SVSIntegrationTest::midiPianoRollSongSweepNative() 'm_guiApplication' returned FALSE. ()
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(209) : failure location
+FAIL!  : SVSIntegrationTest::svsFollowSongTimelineNative() 'm_guiApplication' returned FALSE. ()
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(308) : failure location
+FAIL!  : SVSIntegrationTest::unselectedSingerPreview() 'm_guiApplication' returned FALSE. ()
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(405) : failure location
+PASS   : SVSIntegrationTest::relativeConfigurationPaths()
+SKIP   : SVSIntegrationTest::nativeLadspaPluginHost() Explicit native development plugin directory and GUI required
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(531) : failure location
+PASS   : SVSIntegrationTest::projectExportFileGroupTransaction()
+PASS   : SVSIntegrationTest::projectExportMappingAndAudio()
+PASS   : SVSIntegrationTest::projectExportSnapshotIsReadOnly()
+QWARN  : SVSIntegrationTest::projectImportPersistenceAndRollback() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::projectImportPersistenceAndRollback() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+QWARN  : SVSIntegrationTest::projectImportPersistenceAndRollback() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll
+PASS   : SVSIntegrationTest::projectImportPersistenceAndRollback()
+PASS   : SVSIntegrationTest::projectImportNativeWindows()
+PASS   : SVSIntegrationTest::projectImportNoVoices()
+FAIL!  : SVSIntegrationTest::projectImportControllerFlow() 'child.exitStatus() == QProcess::NormalExit && child.exitCode() == 0' returned FALSE. (********* Start testing of SVSIntegrationTest *********?
+Config: Using QtTest library 6.10.3, Qt 6.10.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11?
+QDEBUG : SVSIntegrationTest::initTestCase() Lv2 plugin SUMMARY: 0 of 0  loaded in 0 msecs.?
+QDEBUG : SVSIntegrationTest::initTestCase() SVS: SVSExample engine initialized?
+PASS   : SVSIntegrationTest::initTestCase()?
+QWARN  : SVSIntegrationTest::projectImportControllerFlow() SVS compute memory policy: Cannot load SVSCompute runtime: D:/UserData/Desktop/Project/lmms/build/tests/Release\plugins\SVSCompute.dll?
+FAIL!  : SVSIntegrationTest::projectImportControllerFlow() 'picker->selectedNameFilter().startsWith(QStringLiteral("所有支持格式 ("))' returned FALSE. ()?
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1182) : failure location?
+FAIL!  : SVSIntegrationTest::projectImportControllerFlow() Compared values are not the same?
+   Actual   (voicesShown): 0?
+   Expected (1)          : 1?
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1259) : failure location?
+PASS   : SVSIntegrationTest::cleanupTestCase()?
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 28739ms?
+********* Finished testing of SVSIntegrationTest *********?
+Cannot connect to named pipe after wait = \\.\pipe\server_jack_default_0 err = 2?
+Cannot connect to server request channel?
+jack server is not running or cannot be started?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock?
+)
+D:\UserData\Desktop\Project\lmms\tests\svs\SVSIntegrationTest.cpp(1099) : failure location
+
+    Start 19: SVCIntegrationTest
+5/7 Test #19: SVCIntegrationTest ...............   Passed   19.30 sec
+    Start 75: SVCChunkCacheTest
+6/7 Test #75: SVCChunkCacheTest ................   Passed    0.16 sec
+    Start 76: SVCPlaybackTest
+7/7 Test #76: SVCPlaybackTest ..................   Passed    0.06 sec
+
+71% tests passed, 2 tests failed out of 7
+
+Label Time Summary:
+M1         =  66.96 sec*proc (3 tests)
+M2         =  19.38 sec*proc (3 tests)
+project    =   6.81 sec*proc (2 tests)
+svc        =  19.51 sec*proc (3 tests)
+svs        =  66.83 sec*proc (3 tests)
+
+Total Test time (real) =  86.44 sec
+
+The following tests FAILED:
+	  8 - SVSProjectMapperTest (Failed)                     M2 project svs
+	 18 - SVSIntegrationTest (Timeout)                      M1 svs
+Errors while running CTest

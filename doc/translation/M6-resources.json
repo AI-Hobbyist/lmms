@@ -1,0 +1,30 @@
+[
+  {
+    "language": "zh_CN",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\zh_CN.qm",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\zh_CN.qm",
+    "sha256": "E3312B0135594C9FEA2BFD491CA23F0A3F59EE77D445B792B35EBD868AAF4E80",
+    "bytes": 378771
+  },
+  {
+    "language": "ja",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\ja.qm",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\ja.qm",
+    "sha256": "AD8B8A06676DF151E5BC5B0D833849248FC69D3175AF33D97547D170F4BD87E6",
+    "bytes": 412946
+  },
+  {
+    "language": "en",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\en.qm",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\en.qm",
+    "sha256": "9959B510B15D18937848AD13007E30459D2E993C67E564BADBFC18F935695C85",
+    "bytes": 16
+  },
+  {
+    "language": "ko",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\ko.qm",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\ko.qm",
+    "sha256": "C611C20AAE165396B4BB9DD12EF3FFB36A8107C8C77272AD3650BCF12C443410",
+    "bytes": 414168
+  }
+]

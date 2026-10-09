@@ -1,0 +1,134 @@
+[
+  {
+    "name": "caps.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\caps.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\caps.dll",
+    "sha256": "9EAC4BFB98F8883608C58D52E8ACD13837934431D3BBF20D7D1AE1E39E5FE3A8"
+  },
+  {
+    "name": "cmt.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\cmt.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\cmt.dll",
+    "sha256": "C5C8C089EB78F28263FD789475DB2CBAAD1BFCABD28CE24E0C87A688C7DC6FA1"
+  },
+  {
+    "name": "tap_autopan.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_autopan.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_autopan.dll",
+    "sha256": "7C6E10D448258050CB936AB03414B30952D218E84A28193D9FBACF0F11357434"
+  },
+  {
+    "name": "tap_chorusflanger.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_chorusflanger.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_chorusflanger.dll",
+    "sha256": "41DC6812C747001FCEBC0A490873B197C2C0BD551BFD93C70F426F61002F9EF8"
+  },
+  {
+    "name": "tap_deesser.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_deesser.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_deesser.dll",
+    "sha256": "2838A5FCA96ABB4A299ECA5ED42E35DB9BA19B98787280CCD4812884290EA89E"
+  },
+  {
+    "name": "tap_doubler.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_doubler.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_doubler.dll",
+    "sha256": "F3B0155ED2F424F837A7A5C63984228801DE8AE9D987F928B4C5B3F5900B9C76"
+  },
+  {
+    "name": "tap_dynamics_m.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_m.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_dynamics_m.dll",
+    "sha256": "6FE22EA5F7E72D0F0ACE99F5A349F6CEF10CF6C1BD432FF28D3A264F102AA4B4"
+  },
+  {
+    "name": "tap_dynamics_st.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_dynamics_st.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_dynamics_st.dll",
+    "sha256": "77CFF60BEAE6C22DF97706356C12350C6A42B3B4BBBAC60AAC70B51C28F59FFE"
+  },
+  {
+    "name": "tap_echo.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_echo.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_echo.dll",
+    "sha256": "BB2FCC46686D6BEABC02D066C1EE1E1BDF4CED286A1F01A6E7B70BAFA4FED13F"
+  },
+  {
+    "name": "tap_eq.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eq.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_eq.dll",
+    "sha256": "4106B3C13F7877281664C27A14FC830C106435B27F4DB3C80084153BB7FEBA09"
+  },
+  {
+    "name": "tap_eqbw.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_eqbw.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_eqbw.dll",
+    "sha256": "1CE4D8D4675CB6F3E21A34B512F28467BBDC4F7012C100A376F2E2C6D1A0B739"
+  },
+  {
+    "name": "tap_limiter.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_limiter.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_limiter.dll",
+    "sha256": "0083A93C6FDBD785A0DACE4F387EC06EB1BF0482BB31DE0ABCCA080D810B7E99"
+  },
+  {
+    "name": "tap_pinknoise.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pinknoise.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_pinknoise.dll",
+    "sha256": "EA81A336FC5C6F1E4676AC6422CF86EB0DBA9838543B1DA32C597804571E4813"
+  },
+  {
+    "name": "tap_pitch.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_pitch.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_pitch.dll",
+    "sha256": "AB75C8B6ABB1D89F0022A9AAA57215B4870E05D956789B662E0DDE3AD1C62BA3"
+  },
+  {
+    "name": "tap_reflector.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reflector.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_reflector.dll",
+    "sha256": "51083EBE13BEBFA385D70C41E8F8CC117662904F63C82325484EC6C38C1EFA9B"
+  },
+  {
+    "name": "tap_reverb.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_reverb.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_reverb.dll",
+    "sha256": "20F9D260673113D13C37E2CF7FF7967D269908112CBA7F859B23F3F28C2FA092"
+  },
+  {
+    "name": "tap_rotspeak.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_rotspeak.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_rotspeak.dll",
+    "sha256": "5FA18B686685929ADF08494A3D8D070106482DF41FF4A0C38710651B8DE5EC3E"
+  },
+  {
+    "name": "tap_sigmoid.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_sigmoid.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_sigmoid.dll",
+    "sha256": "EDFFF0F3D37F2CF690A8E4E7B67E8B0C83BEB4E4928A6A8E05404A465683F871"
+  },
+  {
+    "name": "tap_tremolo.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tremolo.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_tremolo.dll",
+    "sha256": "12ED3259DA9E5C92A49F6EA24818A36CBC30EF07BE0C54FB18691BAA7FA25DA2"
+  },
+  {
+    "name": "tap_tubewarmth.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_tubewarmth.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_tubewarmth.dll",
+    "sha256": "2ED9DA722D7D139CA60DFB3751A587B5FCEA9BFF8D658865954FACAE22AC1157"
+  },
+  {
+    "name": "tap_vibrato.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\tap_vibrato.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\tap_vibrato.dll",
+    "sha256": "4760DDD442525BC8F9413B95FE17C546645AFD676AE30C1F97664FDFFA8F28AC"
+  },
+  {
+    "name": "veal.dll",
+    "source": "D:\\UserData\\Desktop\\Project\\lmms\\build\\plugins\\ladspa\\Release\\veal.dll",
+    "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\ladspa\\veal.dll",
+    "sha256": "0BAEEA775FFF0CB744644B84D60F0A918E49D740F7AD4B6816F06BFC1BAA144B"
+  }
+]

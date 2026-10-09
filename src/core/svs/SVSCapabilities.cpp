@@ -1,10 +1,13 @@
 #include "SVSCapabilities.h"
-#include "SVSCurve.h"
+
+#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QJsonDocument>
-#include <QSet>
 #include <QRegularExpression>
+#include <QSet>
 #include <cmath>
+
+#include "SVSCurve.h"
 
 namespace lmms::svs {
 
@@ -63,7 +66,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 	parsed.original = object;
 	if (object["schemaVersion"].toInt() != 1)
 	{
-		error = "Unsupported capability schema version";
+		error = QCoreApplication::translate("NativeSVS", "Unsupported capability schema version");
 		return false;
 	}
 	for (const auto& required : object["requiredCapabilities"].toArray())
@@ -71,7 +74,8 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 		if (!QStringList{"parameters", "pronunciation", "pitch", "phonemes", "resources", "synthesis"}.contains(
 				required.toString()))
 		{
-			error = "Unknown required capability: " + required.toString();
+			error
+				= QCoreApplication::translate("NativeSVS", "Unknown required capability: %1").arg(required.toString());
 			return false;
 		}
 	}
@@ -82,7 +86,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 		QSet<QString> ids;
 		if (!object[key].isArray())
 		{
-			error = key + " must be an array";
+			error = QCoreApplication::translate("NativeSVS", "%1 must be an array").arg(key);
 			return false;
 		}
 		for (const auto& item : object[key].toArray())
@@ -105,7 +109,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 			if (value.contains("color")
 				&& (!value["color"].isString() || !QRegularExpression("^#[0-9a-fA-F]{6}$").match(p.color).hasMatch()))
 			{
-				error = "Invalid parameter color: " + p.id;
+				error = QCoreApplication::translate("NativeSVS", "Invalid parameter color: %1").arg(p.id);
 				return false;
 			}
 			p.minimum = value["min"].toDouble();
@@ -123,7 +127,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 			{
 				if (p.type != "string" || !value["resourceIds"].isArray() || value["resourceIds"].toArray().isEmpty())
 				{
-					error = "Invalid resource selector: " + p.id;
+					error = QCoreApplication::translate("NativeSVS", "Invalid resource selector: %1").arg(p.id);
 					return false;
 				}
 				for (const auto& resource : value["resourceIds"].toArray())
@@ -131,7 +135,8 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 					const auto id = resource.toString();
 					if (id.isEmpty() || resources.contains(id))
 					{
-						error = "Invalid or duplicate resource ID: " + p.id;
+						error = QCoreApplication::translate("NativeSVS", "Invalid or duplicate resource ID: %1")
+									.arg(p.id);
 						return false;
 					}
 					resources.insert(id);
@@ -143,13 +148,13 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 				|| !QStringList{"float", "int", "bool", "enum", "string", "directory-list"}.contains(p.type)
 				|| !QStringList{"track", "clip", "note", "phoneme"}.contains(p.scope))
 			{
-				error = "Invalid or duplicate parameter: " + identity;
+				error = QCoreApplication::translate("NativeSVS", "Invalid or duplicate parameter: %1").arg(identity);
 				return false;
 			}
 			ids.insert(p.id);
 			if (p.type == "directory-list" && (p.curve || p.maxItems < 1 || p.maxItems > 128))
 			{
-				error = "Invalid directory list: " + identity;
+				error = QCoreApplication::translate("NativeSVS", "Invalid directory list: %1").arg(identity);
 				return false;
 			}
 			if (p.type == "float" || p.type == "int")
@@ -157,7 +162,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 				if (!value["min"].isDouble() || !value["max"].isDouble()
 					|| (value.contains("step") && !value["step"].isDouble()))
 				{
-					error = "Non-numeric range: " + identity;
+					error = QCoreApplication::translate("NativeSVS", "Non-numeric range: %1").arg(identity);
 					return false;
 				}
 				if (!std::isfinite(p.minimum) || !std::isfinite(p.maximum) || !std::isfinite(p.step)
@@ -167,7 +172,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 						&& (std::floor(p.minimum) != p.minimum || std::floor(p.maximum) != p.maximum
 							|| std::floor(p.step) != p.step)))
 				{
-					error = "Invalid numeric range: " + identity;
+					error = QCoreApplication::translate("NativeSVS", "Invalid numeric range: %1").arg(identity);
 					return false;
 				}
 			}
@@ -179,7 +184,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 					auto id = choice.toObject()["id"].toString();
 					if (id.isEmpty() || options.contains(id))
 					{
-						error = "Invalid enum ID: " + identity;
+						error = QCoreApplication::translate("NativeSVS", "Invalid enum ID: %1").arg(identity);
 						return false;
 					}
 					options.insert(id);
@@ -189,7 +194,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 				|| (p.curve && (p.type == "bool" || p.type == "enum" || p.type == "int") && p.interpolation != "step")
 				|| (p.curve && p.type == "string"))
 			{
-				error = "Invalid default or interpolation: " + identity;
+				error = QCoreApplication::translate("NativeSVS", "Invalid default or interpolation: %1").arg(identity);
 				return false;
 			}
 			if (p.curve)
@@ -212,7 +217,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 	if (parsed.languages.isEmpty() || parsed.languages.contains(QString{})
 		|| !parsed.languages.contains(parsed.defaultLanguage))
 	{
-		error = "Invalid capability languages";
+		error = QCoreApplication::translate("NativeSVS", "Invalid capability languages");
 		return false;
 	}
 	parsed.noteLanguage = object["noteLanguage"].toBool();
@@ -222,7 +227,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 	if (!QStringList{"none", "absolute", "offset"}.contains(parsed.pitchInput)
 		|| (parsed.pitchInput != "none" && parsed.pitchUnit != "semitone"))
 	{
-		error = "Unsupported pitch mode/unit";
+		error = QCoreApplication::translate("NativeSVS", "Unsupported pitch mode/unit");
 		return false;
 	}
 	if (parsed.pitchInput == "offset")
@@ -231,7 +236,9 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 		if (!Curve::fromJson(pitch["referencePitch"].toObject(), reference, error) || reference.mode != "absolute"
 			|| reference.type != "float" || reference.unit != "semitone" || reference.evaluator.points.empty())
 		{
-			error = "Offset pitch requires a valid declared absolute referencePitch curve: " + error;
+			error = QCoreApplication::translate(
+				"NativeSVS", "Offset pitch requires a valid declared absolute referencePitch curve: %1")
+						.arg(error);
 			return false;
 		}
 	}
@@ -246,7 +253,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 	{
 		if (symbol.isEmpty() || symbols.contains(symbol))
 		{
-			error = "Invalid or duplicate phoneme symbol";
+			error = QCoreApplication::translate("NativeSVS", "Invalid or duplicate phoneme symbol");
 			return false;
 		}
 		symbols.insert(symbol);
@@ -255,7 +262,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 		parsed.dictionaryResources << resource.toString();
 	if (!parsed.dictionaryResources.isEmpty() && parsed.phonemeSetId.isEmpty())
 	{
-		error = "Dictionary requires a phoneme set ID";
+		error = QCoreApplication::translate("NativeSVS", "Dictionary requires a phoneme set ID");
 		return false;
 	}
 	parsed.phonemeTiming = object["phonemes"].toObject()["timingEditable"].toBool();
@@ -269,7 +276,7 @@ bool Capabilities::parse(const QJsonObject& object, Capabilities& output, QStrin
 		if (segmented["split"].toString() != "rests" || segmented["version"].toDouble() != 1 || !std::isfinite(padding)
 			|| padding < 0 || padding > 2)
 		{
-			error = "Invalid segmented synthesis declaration";
+			error = QCoreApplication::translate("NativeSVS", "Invalid segmented synthesis declaration");
 			return false;
 		}
 	}
@@ -305,14 +312,16 @@ bool Dictionary::parse(const QByteArray& bytes, const QStringList& allowed, Dict
 {
 	if (bytes.size() > 4 * 1024 * 1024 || QString::fromUtf8(bytes).toUtf8() != bytes)
 	{
-		error = "Dictionary exceeds limit or is not UTF-8";
+		error = QCoreApplication::translate("NativeSVS", "Dictionary exceeds limit or is not UTF-8");
 		return false;
 	}
 	QJsonParseError parseError;
 	auto document = QJsonDocument::fromJson(bytes, &parseError);
 	if (parseError.error != QJsonParseError::NoError || !document.isObject())
 	{
-		error = QString("Dictionary JSON at byte %1: %2").arg(parseError.offset).arg(parseError.errorString());
+		error = QCoreApplication::translate("NativeSVS", "Dictionary JSON at byte %1: %2")
+					.arg(parseError.offset)
+					.arg(parseError.errorString());
 		return false;
 	}
 	const auto root = document.object();
@@ -324,7 +333,7 @@ bool Dictionary::parse(const QByteArray& bytes, const QStringList& allowed, Dict
 	if (root["schemaVersion"].toInt() != 1 || result.id.isEmpty() || result.version.isEmpty()
 		|| result.language.isEmpty() || result.phonemeSet.isEmpty() || !root["entries"].isArray())
 	{
-		error = "Missing dictionary fields";
+		error = QCoreApplication::translate("NativeSVS", "Missing dictionary fields");
 		return false;
 	}
 	int index = 0;
@@ -336,7 +345,7 @@ bool Dictionary::parse(const QByteArray& bytes, const QStringList& allowed, Dict
 		const QString location = QString("entries[%1] (%2): ").arg(index++).arg(text);
 		if (text.isEmpty() || result.entries.contains(text) || candidates.isEmpty())
 		{
-			error = location + "missing/duplicate entry or no candidates";
+			error = location + QCoreApplication::translate("NativeSVS", "missing/duplicate entry or no candidates");
 			return false;
 		}
 		QSet<QString> readings;
@@ -347,14 +356,15 @@ bool Dictionary::parse(const QByteArray& bytes, const QStringList& allowed, Dict
 			if (reading.isEmpty() || readings.contains(reading) || !candidate["phonemes"].isArray()
 				|| candidate["phonemes"].toArray().isEmpty())
 			{
-				error = location + "invalid or duplicate reading";
+				error = location + QCoreApplication::translate("NativeSVS", "invalid or duplicate reading");
 				return false;
 			}
 			readings.insert(reading);
 			for (const auto& symbol : candidate["phonemes"].toArray())
 				if (!symbol.isString() || !allowed.contains(symbol.toString()))
 				{
-					error = location + "illegal phoneme " + symbol.toString();
+					error = location
+						+ QCoreApplication::translate("NativeSVS", "illegal phoneme %1").arg(symbol.toString());
 					return false;
 				}
 		}

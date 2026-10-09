@@ -1,5 +1,6 @@
 #include "SVCChunking.h"
 
+#include <QCoreApplication>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -11,16 +12,16 @@ QString ChunkConfig::validate() const
 	if (!std::isfinite(silenceThresholdDbfs) || silenceThresholdDbfs < SilenceMinimum
 		|| silenceThresholdDbfs > SilenceMaximum)
 	{
-		return "Silence threshold must be finite and between -120 and 0 dBFS";
+		return QCoreApplication::translate("NativeRVC", "Silence threshold must be finite and between -120 and 0 dBFS");
 	}
 	if (!std::isfinite(lengthThresholdSeconds) || !std::isfinite(forcedChunkSeconds) || lengthThresholdSeconds <= 0
 		|| forcedChunkSeconds <= 0)
 	{
-		return "Chunk lengths must be finite and positive";
+		return QCoreApplication::translate("NativeRVC", "Chunk lengths must be finite and positive");
 	}
 	if (forcedChunkSeconds > lengthThresholdSeconds)
 	{
-		return "Forced chunk length must not exceed the length threshold";
+		return QCoreApplication::translate("NativeRVC", "Forced chunk length must not exceed the length threshold");
 	}
 	return {};
 }
@@ -36,7 +37,8 @@ std::vector<Segment> segmentAudio(const float* source, uint64_t frames, uint32_t
 		|| limits.maximumSeconds < limits.minimumSeconds || limits.maximumBytes < 44
 		|| limits.maximumSeconds * sampleRate > std::numeric_limits<int64_t>::max())
 	{
-		throw std::invalid_argument("Invalid source format or backend limits");
+		throw std::invalid_argument(
+			QCoreApplication::translate("NativeRVC", "Invalid source format or backend limits").toStdString());
 	}
 	const auto window = std::max<uint64_t>(1, std::llround(0.020 * sampleRate));
 	const auto hop = std::max<uint64_t>(1, std::llround(0.010 * sampleRate));
@@ -45,7 +47,9 @@ std::vector<Segment> segmentAudio(const float* source, uint64_t frames, uint32_t
 	const auto context = std::max<uint64_t>(1, std::llround(0.010 * sampleRate));
 	if (config.forcedChunkSeconds * sampleRate < 1)
 	{
-		throw std::invalid_argument("Forced chunk length is shorter than one source sample");
+		throw std::invalid_argument(
+			QCoreApplication::translate("NativeRVC", "Forced chunk length is shorter than one source sample")
+				.toStdString());
 	}
 
 	std::vector<uint64_t> boundaries{0};
@@ -78,7 +82,11 @@ std::vector<Segment> segmentAudio(const float* source, uint64_t frames, uint32_t
 			for (uint32_t channel = 0; channel < channels; ++channel)
 			{
 				const double value = source[currentEnd * channels + channel];
-				if (!std::isfinite(value)) { throw std::invalid_argument("Nonfinite source sample"); }
+				if (!std::isfinite(value))
+				{
+					throw std::invalid_argument(
+						QCoreApplication::translate("NativeRVC", "Nonfinite source sample").toStdString());
+				}
 				squares[channel] += value * value;
 			}
 		}
@@ -121,7 +129,9 @@ std::vector<Segment> segmentAudio(const float* source, uint64_t frames, uint32_t
 		if (static_cast<double>(segment.transmittedFrames()) / sampleRate > limits.maximumSeconds
 			|| segment.transmittedFrames() > (limits.maximumBytes - 44) / (2 * channels))
 		{
-			throw std::invalid_argument("Configured segment exceeds discovered backend duration or byte limit");
+			throw std::invalid_argument(QCoreApplication::translate(
+				"NativeRVC", "Configured segment exceeds discovered backend duration or byte limit")
+					.toStdString());
 		}
 		result.push_back(segment);
 	};
@@ -140,7 +150,11 @@ std::vector<Segment> segmentAudio(const float* source, uint64_t frames, uint32_t
 		{
 			const double distance = piece * config.forcedChunkSeconds * sampleRate;
 			const auto next = distance >= last - first ? last : first + static_cast<uint64_t>(std::llround(distance));
-			if (next <= position) { throw std::invalid_argument("Chunk rounding produced an empty segment"); }
+			if (next <= position)
+			{
+				throw std::invalid_argument(
+					QCoreApplication::translate("NativeRVC", "Chunk rounding produced an empty segment").toStdString());
+			}
 			append(position, next);
 			position = next;
 			++piece;

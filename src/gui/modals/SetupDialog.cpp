@@ -1029,7 +1029,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 					{
 						const auto& failure = state.report->failures[i];
 						details.append(tr("%1: %2 (error %3)")
-								.arg(failure.path, failure.operation)
+								.arg(failure.path, catalogDisplayDiagnostic(failure.operation))
 								.arg(static_cast<unsigned>(failure.error)));
 					}
 					if (state.report->failures.size() > 32)
@@ -1038,7 +1038,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 					}
 					if (!state.report->cacheError.isEmpty())
 					{
-						details.append(state.report->cacheError);
+						details.append(catalogDisplayDiagnostic(state.report->cacheError));
 					}
 					status->setToolTip(details.join('\n'));
 				}

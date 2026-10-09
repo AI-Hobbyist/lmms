@@ -1,9 +1,11 @@
 #ifndef LMMS_SVS_TIME_MAPPING_H
 #define LMMS_SVS_TIME_MAPPING_H
-#include "svs_time.hpp"
-#include <memory>
-#include <QJsonObject>
+#include <QCoreApplication>
 #include <QJsonArray>
+#include <QJsonObject>
+#include <memory>
+
+#include "svs_time.hpp"
 namespace lmms::svs {
 // Content offset is positive for a left crop. LMMS Clip stores its negation.
 struct TimeMapping
@@ -33,14 +35,14 @@ inline bool readTimeMapping(const QJsonObject& document, double secondsPerTick, 
 	if (!std::isfinite(mapping.position) || !std::isfinite(mapping.contentOffset) || !std::isfinite(secondsPerTick)
 		|| secondsPerTick <= 0)
 	{
-		error = "Invalid SVS time origin";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS time origin");
 		return false;
 	}
 	if (!document.contains("tempoMap"))
 		return true;
 	if (!document["tempoMap"].isArray() || document["tempoMap"].toArray().size() > 2 * 1024 * 1024)
 	{
-		error = "Invalid SVS tempo map";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS tempo map");
 		return false;
 	}
 	std::vector<svs_sdk::TempoPoint> points;
@@ -52,7 +54,7 @@ inline bool readTimeMapping(const QJsonObject& document, double secondsPerTick, 
 	auto tempo = std::make_shared<svs_sdk::TempoMap>();
 	if (!tempo->setPoints(points))
 	{
-		error = "Invalid SVS tempo map";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS tempo map");
 		return false;
 	}
 	mapping.tempo = std::move(tempo);

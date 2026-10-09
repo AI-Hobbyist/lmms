@@ -187,7 +187,7 @@ Plugin::Plugin(const QString& path)
 		|| !d.api.capabilities || !d.api.release_string || !d.api.create_session || !d.api.destroy_session
 		|| !d.api.submit || !d.api.render || !d.api.cancel || !d.api.release_result)
 	{
-		d.error = "Incompatible SVS ABI";
+		d.error = QCoreApplication::translate("NativeSVS", "Incompatible SVS ABI");
 		return;
 	}
 	if (!SVS_HAS_FIELD(d.api, svs_api, pronunciation))
@@ -206,7 +206,7 @@ Plugin::Plugin(const QString& path)
 		d.api.query_catalog = nullptr;
 	svs_host host{sizeof(svs_host), &d.services, hostLog, hostProgress, hostAllocate, hostRelease, hostCompleted};
 	if (d.api.create_engine(&host, &d.engine) != SVS_OK || !d.engine)
-		d.error = "SVS engine initialization failed";
+		d.error = QCoreApplication::translate("NativeSVS", "SVS engine initialization failed");
 }
 Plugin::~Plugin()
 {
@@ -234,7 +234,7 @@ QByteArray Plugin::resource(const QString& id, QString& contentType, QString& er
 	contentType.clear();
 	if (!valid() || !d.api.open_resource || !d.api.read_resource || !d.api.close_resource)
 	{
-		error = "SVS resource API unavailable";
+		error = QCoreApplication::translate("NativeSVS", "SVS resource API unavailable");
 		return {};
 	}
 	const auto key = id.toUtf8();
@@ -249,7 +249,7 @@ QByteArray Plugin::resource(const QString& id, QString& contentType, QString& er
 	if (status != SVS_OK || !handle || info.size < sizeof(info) || !info.content_type || !info.sha256 || !info.id
 		|| id != QString::fromUtf8(info.id) || info.byte_count > 64u * 1024 * 1024)
 	{
-		error = "Invalid or unavailable SVS resource";
+		error = QCoreApplication::translate("NativeSVS", "Invalid or unavailable SVS resource");
 		return {};
 	}
 	QByteArray bytes(qsizetype(info.byte_count), Qt::Uninitialized);
@@ -261,7 +261,7 @@ QByteArray Plugin::resource(const QString& id, QString& contentType, QString& er
 		if (d.api.read_resource(d.engine, handle, offset, bytes.data() + offset, remaining, &read) != SVS_OK || !read
 			|| read > remaining)
 		{
-			error = "Incomplete SVS resource";
+			error = QCoreApplication::translate("NativeSVS", "Incomplete SVS resource");
 			return {};
 		}
 		offset += read;
@@ -269,7 +269,7 @@ QByteArray Plugin::resource(const QString& id, QString& contentType, QString& er
 	const auto hash = QByteArray(info.sha256);
 	if (hash.size() != 64 || QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex() != hash)
 	{
-		error = "SVS resource hash mismatch";
+		error = QCoreApplication::translate("NativeSVS", "SVS resource hash mismatch");
 		return {};
 	}
 	contentType = QString::fromUtf8(info.content_type);
@@ -294,7 +294,7 @@ QJsonObject Plugin::engineSettings(const QString& fallbackVoice, const QJsonObje
 	{
 		if (text)
 			m_impl->api.release_string(m_impl->engine, text);
-		error = "SVS engine settings query failed";
+		error = QCoreApplication::translate("NativeSVS", "SVS engine settings query failed");
 		return {};
 	}
 	QJsonParseError parse;
@@ -303,7 +303,7 @@ QJsonObject Plugin::engineSettings(const QString& fallbackVoice, const QJsonObje
 	if (parse.error != QJsonParseError::NoError || !document.isObject()
 		|| document.object()["schemaVersion"].toInt() != 1)
 	{
-		error = "Invalid SVS engine settings declaration";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS engine settings declaration");
 		return {};
 	}
 	error.clear();
@@ -318,7 +318,7 @@ QJsonObject Plugin::capabilities(const QString& voice, const QJsonObject& contex
 		|| m_impl->api.capabilities(m_impl->engine, voiceBytes.constData(), request.constData(), &text) != SVS_OK
 		|| !text)
 	{
-		error = "SVS capability query failed";
+		error = QCoreApplication::translate("NativeSVS", "SVS capability query failed");
 		return {};
 	}
 	QJsonParseError parse;
@@ -326,7 +326,7 @@ QJsonObject Plugin::capabilities(const QString& voice, const QJsonObject& contex
 	m_impl->api.release_string(m_impl->engine, text);
 	if (parse.error != QJsonParseError::NoError || !document.isObject())
 	{
-		error = "Invalid capability JSON";
+		error = QCoreApplication::translate("NativeSVS", "Invalid capability JSON");
 		return {};
 	}
 	error.clear();
@@ -338,14 +338,14 @@ QJsonObject Plugin::pronunciation(const QString& voice, const QJsonObject& conte
 	const char* text = nullptr;
 	if (!valid() || !m_impl->api.pronunciation)
 	{
-		error = "Plugin pronunciation parser unavailable";
+		error = QCoreApplication::translate("NativeSVS", "Plugin pronunciation parser unavailable");
 		return {};
 	}
 	auto voiceBytes = voice.toUtf8(), request = QJsonDocument(context).toJson(QJsonDocument::Compact);
 	if (m_impl->api.pronunciation(m_impl->engine, voiceBytes.constData(), request.constData(), &text) != SVS_OK
 		|| !text)
 	{
-		error = "SVS pronunciation query failed";
+		error = QCoreApplication::translate("NativeSVS", "SVS pronunciation query failed");
 		return {};
 	}
 	QJsonParseError parse;
@@ -353,7 +353,7 @@ QJsonObject Plugin::pronunciation(const QString& voice, const QJsonObject& conte
 	m_impl->api.release_string(m_impl->engine, text);
 	if (parse.error != QJsonParseError::NoError || !document.isObject())
 	{
-		error = "Invalid pronunciation JSON";
+		error = QCoreApplication::translate("NativeSVS", "Invalid pronunciation JSON");
 		return {};
 	}
 	error.clear();
@@ -380,7 +380,8 @@ QVector<Voice> Plugin::voices(const QString& package, const QString& id, const Q
 	if (status != SVS_OK || !text)
 	{
 		if (diagnostic)
-			*diagnostic = text ? QString::fromUtf8(text) : QString("SVS catalog query failed (%1)").arg(status);
+			*diagnostic = text ? QString::fromUtf8(text)
+							   : QCoreApplication::translate("NativeSVS", "SVS catalog query failed (%1)").arg(status);
 		if (text)
 			m_impl->api.release_string(m_impl->engine, text);
 		return voices;
@@ -461,7 +462,7 @@ std::shared_ptr<const Audio> Plugin::render(
 		return {};
 	if (d.api.create_session(d.engine, voice.constData(), &session) != SVS_OK || !session)
 	{
-		error = "Voice session unavailable";
+		error = QCoreApplication::translate("NativeSVS", "Voice session unavailable");
 		return {};
 	}
 	struct Strings
@@ -507,7 +508,7 @@ std::shared_ptr<const Audio> Plugin::render(
 			d.api.release_string(d.engine, schema);
 		if (status != SVS_OK || queried.isNull() || !queried.isObject() || parse.error != QJsonParseError::NoError)
 		{
-			error = "Snapshot capability query failed";
+			error = QCoreApplication::translate("NativeSVS", "Snapshot capability query failed");
 			d.api.destroy_session(session);
 			return {};
 		}
@@ -607,7 +608,8 @@ std::shared_ptr<const Audio> Plugin::render(
 		else
 			dictionaryDiagnostics.append(QJsonObject{{"dictionaryId", item.toObject()["id"]},
 				{"message",
-					diagnostic.isEmpty() ? QString("Dictionary language/phoneme set incompatible with voice")
+					diagnostic.isEmpty() ? QCoreApplication::translate(
+											   "NativeSVS", "Dictionary language/phoneme set incompatible with voice")
 										 : diagnostic}});
 	}
 	QVector<Note> ordered = input.notes;
@@ -676,7 +678,7 @@ std::shared_ptr<const Audio> Plugin::render(
 			|| !declaration.object()["ranges"].isArray())
 		{
 			d.api.destroy_session(session);
-			error = "Invalid SVS synthesis range declaration";
+			error = QCoreApplication::translate("NativeSVS", "Invalid SVS synthesis range declaration");
 			return {};
 		}
 		ranges = declaration.object()["ranges"].toArray();
@@ -685,7 +687,7 @@ std::shared_ptr<const Audio> Plugin::render(
 		if (ranges.isEmpty() || ranges.size() > 100000)
 		{
 			d.api.destroy_session(session);
-			error = "Invalid SVS synthesis range count";
+			error = QCoreApplication::translate("NativeSVS", "Invalid SVS synthesis range count");
 			return {};
 		}
 		for (const auto& item : ranges)
@@ -697,7 +699,7 @@ std::shared_ptr<const Audio> Plugin::render(
 				|| end <= start)
 			{
 				d.api.destroy_session(session);
-				error = "Invalid SVS synthesis range boundaries or ID";
+				error = QCoreApplication::translate("NativeSVS", "Invalid SVS synthesis range boundaries or ID");
 				return {};
 			}
 			ids.insert(id);
@@ -736,7 +738,7 @@ std::shared_ptr<const Audio> Plugin::render(
 		for (float sample : audio->samples)
 			if (!std::isfinite(sample))
 			{
-				error = "Non-finite SVS audio";
+				error = QCoreApplication::translate("NativeSVS", "Non-finite SVS audio");
 				audio.reset();
 				break;
 			}
@@ -745,7 +747,7 @@ std::shared_ptr<const Audio> Plugin::render(
 	}
 	else
 	{
-		error = QString("SVS synthesis failed (%1)").arg(status);
+		error = QCoreApplication::translate("NativeSVS", "SVS synthesis failed (%1)").arg(status);
 		if (result.error_json)
 		{
 			const auto diagnostic = QJsonDocument::fromJson(result.error_json).object();
@@ -800,7 +802,7 @@ const QVector<Voice>& Registry::voices()
 				|| manifest["apiMajor"].toInt() != SVS_ABI_MAJOR || entry.contains('/') || entry.contains('\\')
 				|| entry.contains(".."))
 			{
-				m_diagnostics << "Invalid SVS manifest: " + package;
+				m_diagnostics << QCoreApplication::translate("NativeSVS", "Invalid SVS manifest: %1").arg(package);
 				continue;
 			}
 			auto architecture = QSysInfo::currentCpuArchitecture();
@@ -812,7 +814,8 @@ const QVector<Voice>& Registry::voices()
 				architecture = "arm64";
 			if (manifest["architecture"].toString() != architecture)
 			{
-				m_diagnostics << QString("SVS architecture mismatch: %1 declares %2; host %3")
+				m_diagnostics << QCoreApplication::translate(
+					"NativeSVS", "SVS architecture mismatch: %1 declares %2; host %3")
 									 .arg(package, manifest["architecture"].toString(), architecture);
 				continue;
 			}
@@ -828,7 +831,8 @@ const QVector<Voice>& Registry::voices()
 #endif
 			if (manifest["platform"].toString() != platform)
 			{
-				m_diagnostics << QString("SVS platform mismatch: %1 declares %2; host %3")
+				m_diagnostics << QCoreApplication::translate(
+					"NativeSVS", "SVS platform mismatch: %1 declares %2; host %3")
 									 .arg(package, manifest["platform"].toString(), platform);
 				continue;
 			}
@@ -841,7 +845,8 @@ const QVector<Voice>& Registry::voices()
 							.canonicalFilePath()
 							.compare(QFileInfo(package).canonicalFilePath(), pathSensitivity)
 						!= 0)
-					m_diagnostics << "Duplicate SVS plugin ID: " + id + " in " + package;
+					m_diagnostics << QCoreApplication::translate("NativeSVS", "Duplicate SVS plugin ID: %1 in %2")
+										 .arg(id, package);
 				continue;
 			}
 			auto plugin = std::make_shared<Plugin>(package + "/" + entry);
@@ -883,7 +888,7 @@ bool Registry::refreshCatalog(const QString& id, const QJsonObject& settings, QS
 		= std::find_if(m_engines.begin(), m_engines.end(), [&](const auto& engine) { return engine.id == id; });
 	if (!plugin || found == m_engines.end())
 	{
-		error = "SVS engine unavailable";
+		error = QCoreApplication::translate("NativeSVS", "SVS engine unavailable");
 		return false;
 	}
 	auto& generation = m_catalogGenerations[id];
@@ -894,7 +899,7 @@ bool Registry::refreshCatalog(const QString& id, const QJsonObject& settings, QS
 	auto next = plugin->voices(found->package, id, catalogContext(id, settings, rescan), &declaration, &error);
 	m_scanning.remove(id);
 	if (error.isEmpty() && !declaration.contains("voices"))
-		error = "SVS catalog query failed";
+		error = QCoreApplication::translate("NativeSVS", "SVS catalog query failed");
 	if (error.isEmpty())
 		publishCatalog(id, std::move(next), declaration);
 	emit catalogScanFinished(id, error);
@@ -908,7 +913,7 @@ void Registry::refreshCatalogAsync(const QString& id, const QJsonObject& setting
 		= std::find_if(m_engines.begin(), m_engines.end(), [&](const auto& engine) { return engine.id == id; });
 	if (!plugin || found == m_engines.end())
 	{
-		emit catalogScanFinished(id, "SVS engine unavailable");
+		emit catalogScanFinished(id, QCoreApplication::translate("NativeSVS", "SVS engine unavailable"));
 		return;
 	}
 	auto& current = m_catalogGenerations[id];
@@ -930,11 +935,11 @@ void Registry::refreshCatalogAsync(const QString& id, const QJsonObject& setting
 		{
 			next = plugin->voices(package, id, context, &declaration, &error);
 			if (error.isEmpty() && !declaration.contains("voices"))
-				error = "SVS catalog query failed";
+				error = QCoreApplication::translate("NativeSVS", "SVS catalog query failed");
 		}
 		catch (...)
 		{
-			error = "SVS catalog worker exception";
+			error = QCoreApplication::translate("NativeSVS", "SVS catalog worker exception");
 		}
 		QMetaObject::invokeMethod(
 			this,

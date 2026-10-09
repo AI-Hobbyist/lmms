@@ -1,5 +1,6 @@
 #include "SVSSegmentedSynthesis.h"
 
+#include <QCoreApplication>
 #include <QJsonArray>
 #include <algorithm>
 #include <cmath>
@@ -23,7 +24,7 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 	const double padding = declaration["paddingSeconds"].toDouble(NAN);
 	if (!std::isfinite(padding) || padding < 0 || padding > 2)
 	{
-		error = "Invalid SVS segment context padding";
+		error = QCoreApplication::translate("NativeSVS", "Invalid SVS segment context padding");
 		return {};
 	}
 	QVector<QVector<Note>> groups;
@@ -52,7 +53,7 @@ QVector<SynthesisSegment> planSynthesisSegments(const Input& input, const TimeMa
 		groups.append(notes);
 	if (groups.size() > 10000)
 	{
-		error = "SVS segment count exceeds bound";
+		error = QCoreApplication::translate("NativeSVS", "SVS segment count exceeds bound");
 		return {};
 	}
 	const auto sourceCurves = input.document["curves"].toObject();
@@ -148,7 +149,7 @@ std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const
 	const double frames = std::ceil((end - begin) * input.rate);
 	if (!std::isfinite(frames) || frames < 0 || frames > 16 * 1024 * 1024)
 	{
-		error = "Segmented SVS PCM extent exceeds bound";
+		error = QCoreApplication::translate("NativeSVS", "Segmented SVS PCM extent exceeds bound");
 		return {};
 	}
 	auto audio = std::make_shared<Audio>();
@@ -187,7 +188,7 @@ std::shared_ptr<const Audio> assembleSynthesisSegments(const Input& input, const
 		}
 		if (part.rate != input.rate)
 		{
-			error = "SVS segment sample rate mismatch";
+			error = QCoreApplication::translate("NativeSVS", "SVS segment sample rate mismatch");
 			return {};
 		}
 		const qint64 offset = std::llround((part.startSeconds - begin) * input.rate),

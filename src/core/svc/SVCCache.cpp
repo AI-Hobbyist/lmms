@@ -1,5 +1,7 @@
 #include "SVCCache.h"
 
+#include <QCoreApplication>
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -52,7 +54,8 @@ QByteArray nonce()
 	if (BCryptGenRandom(nullptr, reinterpret_cast<PUCHAR>(bytes.data()), bytes.size(), BCRYPT_USE_SYSTEM_PREFERRED_RNG)
 		< 0)
 	{
-		throw std::runtime_error("Operating system random generator failed");
+		throw std::runtime_error(
+			QCoreApplication::translate("NativeRVC", "Operating system random generator failed").toStdString());
 	}
 #else
 	for (int index = 0; index < bytes.size(); index += 4)
@@ -73,21 +76,31 @@ std::unique_ptr<CachePair> CachePair::create(
 		|| QRegularExpression("^(COM|LPT)[1-9]$", QRegularExpression::CaseInsensitiveOption).match(engine).hasMatch()
 		|| source.isSequential() || !source.isReadable() || containsCredential(snapshot))
 	{
-		throw std::invalid_argument("Invalid cache engine, source or credential-bearing snapshot");
+		throw std::invalid_argument(
+			QCoreApplication::translate("NativeRVC", "Invalid cache engine, source or credential-bearing snapshot")
+				.toStdString());
 	}
 	const auto initial = source.pos();
 	QCryptographicHash digest(QCryptographicHash::Sha256);
 	while (!source.atEnd())
 	{
 		const auto bytes = source.read(SVC_MAX_FEED);
-		if (bytes.isEmpty() && !source.atEnd()) { throw std::runtime_error("Input digest read failed"); }
+		if (bytes.isEmpty() && !source.atEnd())
+		{
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "Input digest read failed").toStdString());
+		}
 		digest.addData(bytes);
 	}
-	if (!source.seek(initial)) { throw std::runtime_error("Input cannot rewind"); }
+	if (!source.seek(initial))
+	{
+		throw std::runtime_error(QCoreApplication::translate("NativeRVC", "Input cannot rewind").toStdString());
+	}
 	const auto root = QDir(workingDirectory).filePath("cache/svc/" + engine);
 	if (!QDir().mkpath(root + "/input") || !QDir().mkpath(root + "/output"))
 	{
-		throw std::runtime_error("Cannot create SVC cache directories");
+		throw std::runtime_error(
+			QCoreApplication::translate("NativeRVC", "Cannot create SVC cache directories").toStdString());
 	}
 	for (int attempt = 0; attempt < 16; ++attempt)
 	{
@@ -107,14 +120,16 @@ std::unique_ptr<CachePair> CachePair::create(
 		{
 			pair->m_terminal = true;
 			if (QFile::exists(pair->inputPath())) { continue; }
-			throw std::runtime_error("Cannot reserve SVC input cache");
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "Cannot reserve SVC input cache").toStdString());
 		}
 		if (QFile::exists(pair->outputPath()) || !pair->m_output.open(QIODevice::ReadWrite | QIODevice::NewOnly))
 		{
 			pair->m_terminal = true;
 			pair->m_input.remove();
 			if (QFile::exists(pair->outputPath()) || QFile::exists(pair->partialPath())) { continue; }
-			throw std::runtime_error("Cannot reserve SVC output cache");
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "Cannot reserve SVC output cache").toStdString());
 		}
 		while (!source.atEnd())
 		{
@@ -124,16 +139,22 @@ std::unique_ptr<CachePair> CachePair::create(
 				pair->m_terminal = true;
 				pair->m_input.remove();
 				pair->m_output.remove();
-				throw std::runtime_error("Input cache write failed");
+				throw std::runtime_error(
+					QCoreApplication::translate("NativeRVC", "Input cache write failed").toStdString());
 			}
 		}
 		pair->m_input.close();
 		pair->m_metadata.insert("state", "writing");
 		pair->m_metadata.insert("chunks", QJsonArray());
-		if (!pair->saveMetadata()) { throw std::runtime_error("Cannot save SVC cache manifest"); }
+		if (!pair->saveMetadata())
+		{
+			throw std::runtime_error(
+				QCoreApplication::translate("NativeRVC", "Cannot save SVC cache manifest").toStdString());
+		}
 		return pair;
 	}
-	throw std::runtime_error("Unable to allocate unique SVC cache identity");
+	throw std::runtime_error(
+		QCoreApplication::translate("NativeRVC", "Unable to allocate unique SVC cache identity").toStdString());
 }
 
 CachePair::~CachePair()
