@@ -532,6 +532,8 @@ private slots:
 		if (Engine::mixer()->numChannels() < 2)
 			Engine::mixer()->createChannel();
 		QJsonArray coverage;
+		const auto selectedPlugins = qEnvironmentVariable("LMMS_UI_PLUGIN_NAMES").split(',', Qt::SkipEmptyParts);
+		const auto evidencePrefix = qEnvironmentVariable("LMMS_UI_PLUGIN_PREFIX", "S08-plugin");
 		auto settings = [](Plugin* plugin) {
 			QDomDocument doc;
 			auto root = doc.createElement("preset");
@@ -563,6 +565,10 @@ private slots:
 					&& descriptor->type != Plugin::Type::Tool))
 				continue;
 			const auto name = QString::fromUtf8(descriptor->name);
+			if (!selectedPlugins.isEmpty() && !selectedPlugins.contains(name))
+			{
+				continue;
+			}
 			if (name.startsWith("carla"))
 			{
 				coverage.append(QJsonObject{{"plugin", name}, {"status", "MANUAL/PENDING"},
@@ -602,7 +608,7 @@ private slots:
 				window->parentWidget()->move(0, 0);
 				QVERIFY(window->isVisible());
 				QVERIFY(!window->visibleRegion().isEmpty());
-				capture(m_gui->mainWindow(), "S08-plugin-" + name);
+				capture(m_gui->mainWindow(), evidencePrefix + '-' + name);
 				window->toggleVisibility(false);
 				checkPreset(track->instrument(), preset);
 			}
@@ -624,7 +630,7 @@ private slots:
 				auto* panel = effect->controls()->createView();
 				QVERIFY(panel);
 				const auto preset = settings(effect);
-				showEditor(panel, "S08-plugin-" + name);
+				showEditor(panel, evidencePrefix + '-' + name);
 				checkPreset(effect, preset);
 			}
 			else
@@ -634,7 +640,7 @@ private slots:
 				m_toolPlugins.append(plugin);
 				auto* panel = plugin->createView(m_gui->mainWindow());
 				QVERIFY(panel);
-				showEditor(panel, "S08-plugin-" + name);
+				showEditor(panel, evidencePrefix + '-' + name);
 			}
 			coverage.append(QJsonObject{{"plugin", name}, {"status", "BASELINE CAPTURED"},
 				{"scope",
@@ -646,7 +652,22 @@ private slots:
 			QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
 			QTest::qWait(100);
 		}
-		QFile report(m_output + "/plugin-panels.json");
+		QVERIFY(!coverage.isEmpty());
+		for (const auto& name : selectedPlugins)
+		{
+			bool recorded = false;
+			for (const auto& entry : coverage)
+			{
+				recorded |= entry.toObject().value("plugin").toString() == name;
+			}
+			if (!recorded)
+			{
+				coverage.append(QJsonObject{{"plugin", name}, {"status", "MANUAL/PENDING"},
+					{"reason", "Plugin unavailable in the configured development deployment"}});
+			}
+		}
+		const auto reportName = selectedPlugins.isEmpty() ? "plugin-panels" : evidencePrefix + "-panels";
+		QFile report(m_output + '/' + reportName + ".json");
 		QVERIFY(report.open(QIODevice::WriteOnly));
 		report.write(QJsonDocument(coverage).toJson());
 		Engine::getSong()->setModified(false);

@@ -6008,7 +6008,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::gui::BassBoosterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -6134,7 +6134,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>주파수</translation>
     </message>
     <message>
         <source>Sample rate:</source>
@@ -6214,16 +6214,20 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>검색하기..</translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Clear filter text</source>
         <translation>필터 텍스트 지우기</translation>
     </message>
     <message>
         <source>Only show knobs with a connection.</source>
         <translation>연결된 노브만 표시합니다.</translation>
+    </message>
+    <message>
+        <source>Input parameters</source>
+        <translation>입력 매개변수</translation>
+    </message>
+    <message>
+        <source>Output parameters</source>
+        <translation>출력 매개변수</translation>
     </message>
     <message>
         <source> - Parameters</source>

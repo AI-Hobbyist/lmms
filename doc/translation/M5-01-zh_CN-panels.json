@@ -1,0 +1,42 @@
+[
+    {
+        "plugin": "audiofileprocessor",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitinvader",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bassbooster",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "carlarack",
+        "reason": "External Carla engine requires a working JACK/runtime installation; native initialization crashes in this environment",
+        "status": "MANUAL/PENDING"
+    },
+    {
+        "plugin": "amplifier",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "bitcrush",
+        "preset": "UI snapshot and restore/save checked",
+        "scope": "LMMS host/shared controls; artwork exceptions in inventory",
+        "status": "BASELINE CAPTURED"
+    },
+    {
+        "plugin": "carlapatchbay",
+        "reason": "Plugin unavailable in the configured development deployment",
+        "status": "MANUAL/PENDING"
+    }
+]

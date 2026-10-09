@@ -796,11 +796,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
-        <translation type="unfinished"></translation>
+        <translation>楽器トラックでサンプル（ドラムなど）を使うための各種設定を備えたシンプルなサンプラー</translation>
     </message>
     <message>
         <source>Boost your bass the fast and simple way</source>
-        <translation type="unfinished"></translation>
+        <translation>簡単ですばやく低音を強調</translation>
     </message>
     <message>
         <source>Customizable wavetable synthesizer</source>
@@ -808,7 +808,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>An oversampling bitcrusher</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーサンプリング対応ビットクラッシャー</translation>
     </message>
     <message>
         <source>Carla Patchbay Instrument</source>
@@ -1636,7 +1636,7 @@ Continue?</source>
     <name>lmms::AudioFileProcessor</name>
     <message>
         <source>Amplify</source>
-        <translation type="unfinished"></translation>
+        <translation>増幅</translation>
     </message>
     <message>
         <source>Start of sample</source>
@@ -1648,7 +1648,7 @@ Continue?</source>
     </message>
     <message>
         <source>Loopback point</source>
-        <translation type="unfinished"></translation>
+        <translation>ループ戻り位置</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -1664,11 +1664,11 @@ Continue?</source>
     </message>
     <message>
         <source>Interpolation mode</source>
-        <translation type="unfinished"></translation>
+        <translation>補間モード</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Linear</source>
@@ -1676,7 +1676,7 @@ Continue?</source>
     </message>
     <message>
         <source>Sinc</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinc</translation>
     </message>
     <message>
         <source>Sample not found</source>
@@ -1819,7 +1819,7 @@ Continue?</source>
     </message>
     <message>
         <source>Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>補間</translation>
     </message>
     <message>
         <source>Normalize</source>
@@ -5782,7 +5782,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Enable ping-pong loop</source>
-        <translation type="unfinished"></translation>
+        <translation>往復ループを有効化</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
@@ -6010,7 +6010,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>lmms::gui::BassBoosterControlDialog</name>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Frequency:</source>
@@ -6045,50 +6045,50 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Sine wave</translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Triangle wave</translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Saw wave</translation>
+        <translation>のこぎり波</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Square wave</translation>
+        <translation>矩形波</translation>
     </message>
     <message>
         <source>White noise</source>
-        <translation>White noise</translation>
+        <translation>ホワイトノイズ</translation>
     </message>
     <message>
         <source>User-defined wave</source>
-        <translation>User-defined wave</translation>
+        <translation>ユーザー定義の波形</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>波形を滑らかにする</translation>
     </message>
     <message>
         <source>Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>補間</translation>
     </message>
     <message>
         <source>Normalize</source>
-        <translation>Normalize</translation>
+        <translation>正規化</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation>IN</translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation>OUT</translation>
+        <translation>出力</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -6096,7 +6096,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Input gain:</translation>
+        <translation>入力ゲイン：</translation>
     </message>
     <message>
         <source>NOISE</source>
@@ -6108,7 +6108,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Output gain:</translation>
+        <translation>出力ゲイン：</translation>
     </message>
     <message>
         <source>CLIP</source>
@@ -6136,7 +6136,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREQ</translation>
+        <translation>周波数</translation>
     </message>
     <message>
         <source>Sample rate:</source>
@@ -6202,34 +6202,38 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Params</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーター</translation>
     </message>
     <message>
         <source>Available from Carla version 2.1 and up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Carla 2.1 以降で利用できます。</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::CarlaParamsView</name>
     <message>
         <source>Search..</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation type="unfinished"></translation>
+        <translation>検索…</translation>
     </message>
     <message>
         <source>Clear filter text</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルターテキストを消去</translation>
     </message>
     <message>
         <source>Only show knobs with a connection.</source>
-        <translation type="unfinished"></translation>
+        <translation>接続されているノブのみ表示します。</translation>
+    </message>
+    <message>
+        <source>Input parameters</source>
+        <translation>入力パラメーター</translation>
+    </message>
+    <message>
+        <source>Output parameters</source>
+        <translation>出力パラメーター</translation>
     </message>
     <message>
         <source> - Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation> - パラメーター</translation>
     </message>
 </context>
 <context>
@@ -9947,7 +9951,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Other inputs are treated as integer ratios and must be in the form of &apos;a/b&apos; or &apos;a&apos;.
 Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually.</source>
         <translation>音程を 1 行ずつ入力してください。小数点を含む数値はセントとして扱います。
-その他の入力は整数比率として扱い、'a/b' または 'a' の形式にしてください。
+その他の入力は整数比率として扱い、&apos;a/b&apos; または &apos;a&apos; の形式にしてください。
 同度（0.0 セント、比率 1/1）は非表示の最初の値として常に存在するため、手動で入力しないでください。</translation>
     </message>
     <message>
@@ -9984,7 +9988,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
 中央キーから順に進みます。
 指定したマッピング範囲の外ではパターンを繰り返します。
 複数のキーを同じ音階の度数に割り当てることもできます。
-無効 / 未割り当てのキーには 'x' を入力してください。</translation>
+無効 / 未割り当てのキーには &apos;x&apos; を入力してください。</translation>
     </message>
     <message>
         <source>FIRST</source>

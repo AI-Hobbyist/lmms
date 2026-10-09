@@ -759,14 +759,14 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_paramsFilterLineEdit->setCompleter(m_carlaInstrument->m_paramsCompleter);
 
 	// Clear filter line edit button
-	m_clearFilterButton = new QPushButton(tr(""), this);
+	m_clearFilterButton = new QPushButton(QString{}, this);
 	m_clearFilterButton->setIcon(embed::getIconPixmap("edit_erase"));
 	m_clearFilterButton->setToolTip(tr("Clear filter text"));
 	sizePolicy.setHeightForWidth(m_clearFilterButton->sizePolicy().hasHeightForWidth());
 	m_clearFilterButton->setSizePolicy(sizePolicy);
 
 	// Show automated only button
-	m_automatedOnlyButton = new QPushButton(tr(""), this);
+	m_automatedOnlyButton = new QPushButton(QString{}, this);
 	m_automatedOnlyButton->setIcon(embed::getIconPixmap("automation"));
 	m_automatedOnlyButton->setToolTip(
 				tr("Only show knobs with a connection."));
@@ -788,7 +788,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	// -- Input params
 	auto inputFrame = new QFrame(this);
 	auto inputLayout = new QVBoxLayout(inputFrame);
-	auto inputLabel = new QLabel("Input parameters", inputFrame);
+	auto inputLabel = new QLabel(tr("Input parameters"), inputFrame);
 
 	m_inputScrollArea = new QScrollArea(inputFrame);
 	m_inputScrollAreaWidgetContent = new QWidget();
@@ -814,7 +814,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	// -- Output params
 	auto outputFrame = new QFrame(this);
 	auto outputLayout = new QVBoxLayout(outputFrame);
-	auto outputLabel = new QLabel("Output parameters", outputFrame);
+	auto outputLabel = new QLabel(tr("Output parameters"), outputFrame);
 
 	m_outputScrollArea = new QScrollArea(outputFrame);
 	m_outputScrollAreaWidgetContent = new QWidget();

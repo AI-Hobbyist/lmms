@@ -6199,15 +6199,19 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Clear filter text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Only show knobs with a connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

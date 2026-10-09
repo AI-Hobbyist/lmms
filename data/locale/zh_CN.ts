@@ -6200,11 +6200,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Params</source>
-        <translation type="unfinished"></translation>
+        <translation>参数</translation>
     </message>
     <message>
         <source>Available from Carla version 2.1 and up.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要 Carla 2.1 或更高版本。</translation>
     </message>
 </context>
 <context>
@@ -6214,20 +6214,24 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>搜索......</translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Clear filter text</source>
-        <translation type="unfinished"></translation>
+        <translation>清除筛选文本</translation>
     </message>
     <message>
         <source>Only show knobs with a connection.</source>
-        <translation type="unfinished"></translation>
+        <translation>仅显示已连接的旋钮。</translation>
+    </message>
+    <message>
+        <source>Input parameters</source>
+        <translation>输入参数</translation>
+    </message>
+    <message>
+        <source>Output parameters</source>
+        <translation>输出参数</translation>
     </message>
     <message>
         <source> - Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation> - 参数</translation>
     </message>
 </context>
 <context>
@@ -9945,7 +9949,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Other inputs are treated as integer ratios and must be in the form of &apos;a/b&apos; or &apos;a&apos;.
 Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually.</source>
         <translation>请逐行输入音程。包含小数点的数字视为音分。
-其他输入视为整数比值，必须采用 'a/b' 或 'a' 格式。
+其他输入视为整数比值，必须采用 &apos;a/b&apos; 或 &apos;a&apos; 格式。
 同度（0.0 音分或比值 1/1）始终作为隐藏的首值存在，请勿手动输入。</translation>
     </message>
     <message>

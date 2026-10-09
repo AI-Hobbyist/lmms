@@ -130,3 +130,9 @@ M3 检查点 `249f129d5b6db7cb158429985f75507eda5c1805` 已推送并核对远端
 M4 质量检查 PASS，四语 QM 生成通过，前台 `lmms UiBaselineCapture` 编译通过。审计助记符识别区分 HTML 实体和文本中的独立 &，避免把自然语言连接符误认为快捷键。修复既有关于页中文换行/HTML 以及韩语步进录音方向键标记，未更改其他语言目录。生产可执行文件仍为 `build/Release/lmms.exe`，测试依赖的 amplifier/kicker/tripleoscillator DLL 均写入原有 `build/Release/plugins`。
 
 四语分别启动真实 Windows Qt 窗口，hostTranslations 各 3 PASS、0 FAIL；截图覆盖主窗口、常规设置、VST 设置及导出，100% 缩放，中日韩字形正常。VST 设置底部长说明需滚动查看，M7 验证滚动与完整文案的一致性，不以局部截图宣称完整可读性通过。测试日志中的 JACK/Carla 既有环境诊断不扩展当前修改范围。核心和插件诊断候选的调用方复核仍按计划留 M6。
+
+## M5 插件批次
+
+M4 检查点 `f036467a1584780e9f8b91b4d5ebc81300cfe9b2` 已推送并确认远端。M5-01 涵盖 Amplifier、AudioFileProcessor、BassBooster、BitInvader、Bitcrush 及 Carla 的关联 context，当前 103 键四语质量 PASS。新增 Carla 输入/输出参数两个标签入口，移除两个图标按钮共用的无效空 source（仍显示图标和原悬浮说明），全库 3578 键；剩余中/日/韩空译 840/961/53。Sinc 保留为标准插值算法名，通用操作与波形名补译。
+
+四语 QM 生成、UiBaselineCapture 和 Carla 目标编译成功，CarlaBase/Rack/Patchbay 及支持库使用 `build/Release/plugins`，开发程序为 `build/Release/lmms.exe`。测试支持指定本批插件，避免无关窗口与截图；预设保存/恢复检查沿用既有测试。四语 pluginPanels 各 3 PASS，真实 Windows 窗口截图覆盖五个可用原生插件，100% 缩放。Carla 依赖运行环境，窗口未验证，逐语言覆盖记录为 MANUAL/PENDING。日语 Bitcrush 的固定小面板标签拥挤，M7 核对已授权的省略与悬浮全文行为，本批不宣称该项视觉完整性通过。
