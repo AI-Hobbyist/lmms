@@ -685,8 +685,13 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		{
 			continue;
 		}
-		result.feedback["pitch"].push_back({{"noteId", note.id}, {"startSeconds", seconds},
-			{"durationSeconds", std::min(frameSeconds, note.start + note.duration - seconds)}, {"value", pitch[f]}});
+		const double noteEnd = note.start + note.duration;
+		const bool continues = noteIndex + 1 < ordered.size() && !ordered[noteIndex + 1].lyric.empty()
+			&& std::abs(ordered[noteIndex + 1].start - noteEnd) < 1e-6;
+		// A model frame can straddle adjacent sung notes; only clip it at a real rest.
+		const double duration = continues ? frameSeconds : std::min(frameSeconds, noteEnd - seconds);
+		result.feedback["pitch"].push_back(
+			{{"noteId", note.id}, {"startSeconds", seconds}, {"durationSeconds", duration}, {"value", pitch[f]}});
 	}
 	return result;
 }

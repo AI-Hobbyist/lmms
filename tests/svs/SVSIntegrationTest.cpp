@@ -4756,10 +4756,11 @@ private slots:
 		samples.append(
 			QJsonObject{{"noteId", "second"}, {"startSeconds", .20}, {"durationSeconds", .04}, {"value", 75.}});
 		const auto split = gui::feedbackPitchCurves(samples, mapping);
-		QCOMPARE(split.size(), 3);
+		QCOMPARE(split.size(), 2);
+		QVERIFY(split[0].valueAt(10)->toDouble() > 60.);
+		QVERIFY(split[0].valueAt(10)->toDouble() < 72.);
+		QCOMPARE(split[0].valueAt(12)->toDouble(), 72.);
 		QVERIFY(!split[1].valueAt(18));
-		QCOMPARE(split[0].valueAt(12)->toDouble(), 60.);
-		QCOMPARE(split[1].valueAt(12)->toDouble(), 72.);
 	}
 	void pitchDrawingAndPluginEvaluation()
 	{
@@ -6880,7 +6881,12 @@ private slots:
 		note.lyric = "la";
 		note.duration = 96;
 		note.pitch = 60;
-		clip->setNotes({note});
+		const bool continuityTest = qEnvironmentVariableIsSet("SVS_TEST_PITCH_CONTINUITY");
+		auto next = note;
+		next.id = "external-la-next";
+		next.tick = 96;
+		next.pitch = 64;
+		clip->setNotes(continuityTest ? QVector<svs::Note>{note, next} : QVector<svs::Note>{note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() || clip->status().startsWith("Failed"), 180000);
 		QVERIFY2(clip->audio(), qPrintable(clip->status()));
 		QCOMPARE(clip->status(), QString("Ready"));
@@ -6895,6 +6901,16 @@ private slots:
 		QVERIFY(energy > 1e-5);
 		QVERIFY(audio->feedback["pitch"].toArray().size() > 10);
 		QCOMPARE(audio->feedback["curves"].toObject().size(), track->capabilities().feedbackParameters.size());
+		if (continuityTest)
+		{
+			const auto curves = gui::feedbackPitchCurves(audio->feedback["pitch"].toArray(), audio->mapping);
+			bool connected = false;
+			for (const auto& curve : curves)
+			{
+				if (curve.valueAt(95) && curve.valueAt(97)) { connected = true; }
+			}
+			QVERIFY2(connected, "Real predicted pitch must remain continuous across adjacent la notes");
+		}
 		if (m_guiApplication)
 		{
 			QCOMPARE(QGuiApplication::platformName(), QString("windows"));
@@ -6909,7 +6925,8 @@ private slots:
 			QTest::qWait(700);
 			QVERIFY(editor.screen()
 					->grabWindow(editor.winId())
-					.save("doc/svs/validation/DiffSinger-deepseek-native-ready.png"));
+					.save(continuityTest ? "doc/svs/validation/DiffSinger-continuous-pitch-native.png"
+										 : "doc/svs/validation/DiffSinger-deepseek-native-ready.png"));
 			editor.close();
 		}
 	}

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <set>
 using namespace diffsinger;
 namespace {
 void require(bool value, const std::string& message)
@@ -270,6 +271,35 @@ int run(int argc, char** argv)
 			require(result.feedback.at("pitch").size() > 10, "Missing external pitch feedback");
 			const auto repeated = synthesis.render(plan, notes, input, tempo, 0, 48000, cancel);
 			require(digest(result.stereo) == digest(repeated.stereo), "External cached PCM changed");
+			if (voice->stages.count("pitch"))
+			{
+				const auto cacheRoot = fs::absolute(fs::u8path(argv[3]));
+				auto tensorFiles = [&] {
+					std::set<fs::path> files;
+					for (const auto& entry : fs::directory_iterator(cacheRoot))
+					{
+						if (entry.path().extension() == ".tensor") { files.insert(entry.path()); }
+					}
+					return files;
+				};
+				const auto before = tensorFiles();
+				auto repredict = input;
+				repredict["pitchPredictionRequests"]
+					= {{note.id, std::to_string(std::chrono::steady_clock::now().time_since_epoch().count())}};
+				const auto predicted = synthesis.render(plan, notes, repredict, tempo, 0, 48000, cancel);
+				require(digest(predicted.stereo) == digest(result.stereo), "Re-prediction changed deterministic seed");
+				const auto after = tensorFiles();
+				size_t fresh = 0;
+				for (const auto& path : after)
+				{
+					if (!before.count(path)) { ++fresh; }
+				}
+				require(fresh > 0, "Re-prediction reused all previous tensors instead of running pitch");
+				synthesis.render(plan, notes, repredict, tempo, 0, 48000, cancel);
+				require(tensorFiles() == after, "Repeating one prediction request did not reuse its tensors");
+				std::cout << "PASS fresh pitch request executed inference and wrote " << fresh
+						  << " new SHA256 tensors; repeated request reused them" << std::endl;
+			}
 			auto uncached = input;
 			uncached.erase("cacheDirectory");
 			require(digest(result.stereo)
