@@ -25,6 +25,7 @@
  */
 
 #include "PianoRoll.h"
+#include "NoteLabelDisplay.h"
 
 #include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
@@ -3574,7 +3575,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// draw key
 			p.drawRect(PIANO_X, yt, kw, kh);
 			// draw note name
-			if (static_cast<Key>(keyCode) == Key::C || (drawNoteNames && Piano::isWhiteKey(key)))
+			if (drawNoteNames)
+			{
+				const bool black = prKeyOrder[keyCode] == KeyType::Black;
+				p.setPen(black ? blackKeyTextColor() : m_whiteKeyInactiveTextColor);
+				noteLabels::draw(p, QRectF(0, yb - m_keyLineHeight, kw - 3, m_keyLineHeight), key, Qt::AlignRight);
+			}
+			else if (static_cast<Key>(keyCode) == Key::C)
 			{
 				// small font sizes have 1 pixel offset instead of 2
 				auto zoomOffset = m_zoomYLevels[m_zoomingYModel.value()] > 1.0f ? 2 : 1;
@@ -5310,6 +5317,11 @@ PianoRollWindow::PianoRollWindow() :
 	m_fileToolsButton->addAction(importAction);
 	m_fileToolsButton->addAction(exportAction);
 	fileActionsToolBar->addWidget(m_fileToolsButton);
+	fileActionsToolBar->addWidget(noteLabels::createControls(fileActionsToolBar));
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged, m_editor,
+		[editor = m_editor](const QString& group, const QString& key, const QString&) {
+			if (noteLabels::isSetting(group, key)) { editor->update(); }
+		});
 
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importMidiClip()));
 	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportMidiClip()));

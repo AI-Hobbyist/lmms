@@ -531,6 +531,8 @@ lmms--gui--PianoRoll {
 	qproperty-whiteKeyInactiveBackground: #E5EAF0;
 	qproperty-whiteKeyDisabledBackground: #A8B4C0;
 	qproperty-blackKeyWidth: 48;
+	/* All-note labels only; white-key color uses whiteKeyInactiveTextColor. */
+	qproperty-blackKeyTextColor: #ffffff;
 	qproperty-blackKeyActiveBackground: #42A065;
 	qproperty-blackKeyInactiveBackground: #20262D;
 	qproperty-blackKeyDisabledBackground: #35414D;
@@ -1593,6 +1595,7 @@ lmms--gui--SVSPianoRoll {
 	qproperty-whiteKeyInactiveBackground: #E5EAF0;
 	qproperty-blackKeyInactiveBackground: #20262D;
 	qproperty-whiteKeyInactiveTextColor: #000;
+	qproperty-blackKeyTextColor: #ffffff;
 	qproperty-backgroundColor: #14181D;
 	qproperty-gridLineColor: #29323B;
 	qproperty-beatLineColor: #35414D;

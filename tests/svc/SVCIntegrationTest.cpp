@@ -32,6 +32,7 @@
 #include "Knob.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
+#include "NoteLabelDisplay.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PianoRoll.h"
@@ -980,6 +981,168 @@ private slots:
 		QCOMPARE(ends.count(), 4);
 		delete track;
 		QTest::qWait(30);
+	}
+
+	void sharedNoteLabelModesNative()
+	{
+		auto* config = ConfigManager::inst();
+		const QStringList keys{"printnotelabels", "notelabelmode", "notelabeltonic", "notelabeloctave"};
+		QStringList saved;
+		for (const auto& key : keys)
+		{
+			saved.append(config->value("ui", key));
+		}
+		config->setValue("ui", "printnotelabels", "1");
+		config->setValue("ui", "notelabelmode", "numbered");
+		config->setValue("ui", "notelabeltonic", "0");
+		config->setValue("ui", "notelabeloctave", "5");
+		QCOMPARE(gui::noteLabels::text(60), QString("1"));
+		QCOMPARE(gui::noteLabels::text(61), QString("^1"));
+		QCOMPARE(gui::noteLabels::text(59), QString("7,"));
+		QCOMPARE(gui::noteLabels::text(72), QString("1'"));
+		QCOMPARE(gui::noteLabels::text(96), QString("1'''"));
+
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		QVector<svs::Note> notes;
+		for (int index = 0; index < 13; ++index)
+		{
+			svs::Note note;
+			note.id = QString::number(index);
+			note.tick = index * 60;
+			note.duration = 54;
+			note.pitch = 60 + index;
+			note.lyric = QString::fromUtf8("音");
+			notes.append(note);
+		}
+		clip->setNotes(notes);
+		auto* instrument = static_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::getSong()));
+		instrument->loadInstrument("tripleoscillator");
+		QTest::qWait(100);
+		auto* midi = static_cast<MidiClip*>(instrument->createClip(0));
+		for (const auto& note : notes)
+		{
+			midi->addNote(Note(54, int(note.tick), int(note.pitch)), false);
+		}
+		auto* piano = m_gui->pianoRoll();
+		piano->setCurrentMidiClip(midi);
+		piano->parentWidget()->show();
+		piano->show();
+		gui::SVSPianoRoll editor(clip);
+		editor.resize(1200, 740);
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		auto* canvas = editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");
+		QVERIFY(canvas);
+		canvas->setScroll(0, 75);
+		auto* svsButton = editor.findChild<QToolButton*>("noteLabelDisplayButton");
+		auto* midiButton = piano->parentWidget()->findChild<QToolButton*>("noteLabelDisplayButton");
+		QVERIFY(svsButton && midiButton);
+		QVERIFY(svsButton->isEnabled() && midiButton->isEnabled());
+		QCOMPARE(svsButton->text(), midiButton->text());
+		QCOMPARE(piano->findChild<gui::PianoRoll*>()->blackKeyTextColor(), QColor(Qt::white));
+		QCOMPARE(editor.blackKeyTextColor(), QColor(Qt::white));
+		QTest::qWait(200);
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-numbered-labels-native.png"));
+		// Change the tonic through the actual piano-window menu, not the settings dialog.
+		auto* tonicMenu = svsButton->menu()->actions().at(2)->menu();
+		QVERIFY(tonicMenu);
+		tonicMenu->actions().at(2)->trigger();
+		QCOMPARE(gui::noteLabels::text(62), QString("1"));
+		QCOMPARE(gui::noteLabels::text(61), QString("7,"));
+		QCOMPARE(svsButton->text(), QString::fromUtf8("123 · 1=D"));
+		QCOMPARE(svsButton->text(), midiButton->text());
+		QCOMPARE(svsButton->menu()->actions().size(), 3);
+		{
+			gui::SetupDialog settings;
+			auto* reference = settings.findChild<QComboBox*>("numberedNotationReference");
+			QVERIFY(reference && reference->isEnabled());
+			QCOMPARE(reference->currentText(), QString("C4"));
+			reference->setCurrentIndex(reference->findText("C3"));
+			settings.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&settings));
+			QTest::qWait(150);
+			QVERIFY(settings.screen()
+					->grabWindow(settings.winId())
+					.save("build/tests/svc/numbered-reference-settings-native.png"));
+			QVERIFY(QMetaObject::invokeMethod(&settings, "accept"));
+		}
+		QCOMPARE(gui::noteLabels::text(62), QString("1'"));
+		QCOMPARE(svsButton->text(), midiButton->text());
+		config->setValue("ui", "notelabeloctave", "5");
+		midiButton->menu()->actions().at(0)->trigger();
+		QVERIFY(!tonicMenu->menuAction()->isVisible());
+		{
+			gui::SetupDialog settings;
+			QVERIFY(!settings.findChild<QComboBox*>("numberedNotationReference")->isEnabled());
+		}
+		QCOMPARE(gui::noteLabels::text(61), QString::fromUtf8("C♯4"));
+		QCOMPARE(svsButton->text(), midiButton->text());
+		QTest::qWait(100);
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-pitch-labels-native.png"));
+		editor.hide();
+		piano->parentWidget()->raise();
+		QTest::qWait(150);
+		QVERIFY(m_gui->mainWindow()
+				->screen()
+				->grabWindow(m_gui->mainWindow()->winId())
+				.save("build/tests/svc/MIDI-pitch-labels-native.png"));
+		midiButton->menu()->actions().at(1)->trigger();
+		QTest::qWait(150);
+		QVERIFY(m_gui->mainWindow()
+				->screen()
+				->grabWindow(m_gui->mainWindow()->winId())
+				.save("build/tests/svc/MIDI-numbered-labels-native.png"));
+		QVERIFY(gui::noteLabels::numbered());
+		editor.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&editor));
+		config->setValue("ui", "printnotelabels", "0");
+		QVERIFY(!gui::noteLabels::numbered());
+		QVERIFY(!svsButton->isEnabled() && !midiButton->isEnabled());
+		QTest::qWait(100);
+		const auto originalKeyboard = canvas->grab(QRect(0, 24, 60, canvas->height() - 24)).toImage();
+		config->setValue("ui", "notelabelmode", "pitch");
+		config->setValue("ui", "notelabeltonic", "7");
+		config->setValue("ui", "notelabeloctave", "8");
+		QTest::qWait(100);
+		QCOMPARE(canvas->grab(QRect(0, 24, 60, canvas->height() - 24)).toImage(), originalKeyboard);
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-labels-disabled-native.png"));
+		QCOMPARE(clip->notes(), notes);
+		for (int index = 0; index < notes.size(); ++index)
+		{
+			QCOMPARE(midi->notes()[index]->key(), int(notes[index].pitch));
+		}
+		editor.show();
+		piano->setGhostMidiClip(midi);
+		auto* clearGhost = editor.findChild<QToolButton*>("svsClearGhostNotes");
+		QVERIFY(clearGhost && clearGhost->isEnabled());
+		QTest::mouseClick(clearGhost, Qt::LeftButton);
+		QVERIFY(piano->findChild<gui::PianoRoll*>()->ghostNotes().empty());
+		QVERIFY(!clearGhost->isEnabled());
+		auto* length = editor.findChild<QComboBox*>("svsNoteLength");
+		QVERIFY(length);
+		length->setCurrentIndex(length->findData(48.));
+		QVERIFY(QMetaObject::invokeMethod(length, "activated", Q_ARG(int, length->currentIndex())));
+		canvas->setQuantization(12);
+		const auto point = canvas->pointAt(96, 74).toPoint() + QPoint(1, 12);
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, point);
+		QCOMPARE(clip->notes().size(), notes.size() + 1);
+		QCOMPARE(clip->notes().last().duration, 48.);
+		QCOMPARE(clip->editorState()["noteLength"].toDouble(), 48.);
+		piano->setCurrentMidiClip(nullptr);
+		piano->parentWidget()->hide();
+		for (auto* candidate : m_gui->mainWindow()->findChildren<gui::TrackView*>())
+		{
+			if (candidate->getTrack() == instrument) { candidate->close(); }
+		}
+		QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+		delete instrument;
+		delete track;
+		QTest::qWait(30);
+		for (int index = 0; index < keys.size(); ++index)
+		{
+			config->setValue("ui", keys[index], saved[index]);
+		}
 	}
 
 	void svsGhostNotes()

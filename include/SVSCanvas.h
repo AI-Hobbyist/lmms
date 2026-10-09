@@ -46,6 +46,7 @@ public:
 	double scrollTick() const { return m_scrollTick; }
 	TimeLineWidget* timeLine() const { return m_timeLine; }
 	double topPitch() const { return m_topPitch; }
+	void setNoteLength(double ticks);
 	double horizontalZoom() const { return m_pixelsPerTick / 2; }
 	double verticalZoom() const { return m_rowHeight / 12; }
 	const QSet<QString>& selectedNotes() const { return m_selected; }
@@ -141,6 +142,8 @@ private:
 	Action m_action = Action::None;
 	QSet<QString> m_selected, m_initialSelection;
 	QMap<QString, QColor> m_colors;
+	double m_noteLength = 0;
+	double m_lastNoteLength = 12;
 	QLineEdit* m_lyric = nullptr;
 	QTimer* m_autoScroll = nullptr;
 	QString m_lyricId, m_hitId;

@@ -31,6 +31,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QScrollArea>
+#include <algorithm>
 #include "lmmsconfig.h"
 #ifdef WANT_AGENT_MCP
 #include <QSpinBox>
@@ -47,6 +48,7 @@
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
+#include "NoteLabelDisplay.h"
 #include "SVSSettingsPage.h"
 #include "SVCSettingsPage.h"
 #include "TabBar.h"
@@ -58,7 +60,6 @@
 #include "vsthost/VstCatalogSelection.h"
 #include <QTreeWidget>
 #include <QTimer>
-#include <algorithm>
 #endif
 
 
@@ -255,6 +256,30 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
 	addCheckBox(tr("Enable all note labels in piano roll"), guiGroupBox, guiGroupLayout,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
+	auto* referenceRow = new QHBoxLayout;
+	auto* referenceLabel = new QLabel(tr("简谱基准音（1=C）"), guiGroupBox);
+	m_numberedReference = new QComboBox(guiGroupBox);
+	m_numberedReference->setObjectName("numberedNotationReference");
+	m_numberedReference->setToolTip(tr("默认 C4；其他音高自动添加高音点或低音点，仅简谱显示模式生效"));
+	for (int index = 0; index <= 10; ++index)
+	{
+		m_numberedReference->addItem(QString("C%1").arg(index - 1), index);
+	}
+	m_numberedReference->setCurrentIndex(
+		std::clamp(ConfigManager::inst()->value("ui", "notelabeloctave", "5").toInt(), 0, 10));
+	m_numberedReference->setEnabled(m_printNoteLabels && noteLabels::numbered());
+	referenceLabel->setBuddy(m_numberedReference);
+	referenceRow->addWidget(referenceLabel);
+	referenceRow->addWidget(m_numberedReference);
+	guiGroupLayout->addLayout(referenceRow);
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged, m_numberedReference,
+		[this](const QString& group, const QString& key, const QString&) {
+			if (noteLabels::isSetting(group, key))
+			{
+				m_numberedReference->setEnabled(
+					m_printNoteLabels && ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered");
+			}
+		});
 	addCheckBox(tr("Show fader ticks"), guiGroupBox, guiGroupLayout,
 		m_showFaderTicks, SLOT(toggleShowFaderTicks(bool)), false);
 	addCheckBox(tr("Enable compact track buttons"), guiGroupBox, guiGroupLayout,
@@ -1214,6 +1239,7 @@ void SetupDialog::accept()
 					QString::number(m_displayWaveform));
 	ConfigManager::inst()->setValue("ui", "printnotelabels",
 					QString::number(m_printNoteLabels));
+	ConfigManager::inst()->setValue("ui", "notelabeloctave", m_numberedReference->currentData().toString());
 	ConfigManager::inst()->setValue("ui", "showfaderticks",
 					QString::number(m_showFaderTicks));
 	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",
@@ -1329,6 +1355,11 @@ void SetupDialog::toggleDisplayWaveform(bool enabled)
 void SetupDialog::toggleNoteLabels(bool enabled)
 {
 	m_printNoteLabels = enabled;
+	if (m_numberedReference)
+	{
+		m_numberedReference->setEnabled(
+			enabled && ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered");
+	}
 }
 
 void SetupDialog::toggleShowFaderTicks(bool enabled)

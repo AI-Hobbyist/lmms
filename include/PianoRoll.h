@@ -103,7 +103,18 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QBrush blackKeyInactiveBackground MEMBER m_blackKeyInactiveBackground)
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
 	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
+	Q_PROPERTY(QColor blackKeyTextColor READ blackKeyTextColor WRITE setBlackKeyTextColor)
 public:
+	QColor blackKeyTextColor() const
+	{
+		const auto value = property("_blackKeyTextColor");
+		return value.isValid() ? value.value<QColor>() : QColor(Qt::white);
+	}
+	void setBlackKeyTextColor(const QColor& color)
+	{
+		setProperty("_blackKeyTextColor", color);
+		update();
+	}
 	enum class EditMode
 	{
 		Draw,
@@ -126,6 +137,8 @@ public:
 	void setGhostMidiClip( MidiClip* newMidiClip );
 	void setGhostSVSClip(const SVSClip* clip);
 	void loadGhostNotes( const QDomElement & de );
+	const NoteVector& ghostNotes() const { return m_ghostNotes; }
+	Q_SLOT void clearGhostClip();
 	void loadMarkedSemiTones(const QDomElement & de);
 
 	inline void stopRecording()
@@ -243,7 +256,6 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
-	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void reverseNotes();
@@ -383,11 +395,6 @@ private:
 	MidiClip* m_midiClip;
 	qreal m_noteCornerRadius = 0;
 	NoteVector m_ghostNotes;
-
-	inline const NoteVector & ghostNotes() const
-	{
-		return m_ghostNotes;
-	}
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;

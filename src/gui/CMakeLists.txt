@@ -31,6 +31,7 @@ SET(LMMS_SRCS
 	gui/MixerChannelView.cpp
 	gui/MixerView.cpp
 	gui/ModelView.cpp
+	gui/NoteLabelDisplay.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PluginBrowser.cpp
 	gui/SVSBrowser.cpp

@@ -91,6 +91,8 @@ INCLUDE(GenQrc)
 ADD_GEN_QRC(LMMS_RCC_OUT lmms.qrc
 	"${CMAKE_SOURCE_DIR}/doc/AUTHORS"
 	"${CMAKE_SOURCE_DIR}/LICENSE.txt"
+	"${CMAKE_SOURCE_DIR}/data/fonts/JianpuASCII.ttf"
+	"${CMAKE_SOURCE_DIR}/data/fonts/JianpuASCII-OFL.txt"
 	"${CONTRIBUTORS}"
 )
 

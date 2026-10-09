@@ -1,4 +1,7 @@
 #include "SVSCanvas.h"
+#include "NoteLabelDisplay.h"
+#include "GuiApplication.h"
+#include "PianoRoll.h"
 #include "SVSTrack.h"
 #include "SVSPitchRanges.h"
 #include "SVSLyricEditor.h"
@@ -116,6 +119,8 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	m_pixelsPerTick = 2 * state["horizontalZoom"].toDouble(1);
 	m_rowHeight = 12 * state["verticalZoom"].toDouble(2);
 	m_quantization = state["quantization"].toDouble(12);
+	m_noteLength = state["noteLength"].toDouble();
+	m_lastNoteLength = std::max(1., state["lastNoteLength"].toDouble(m_quantization));
 	m_timelineBegin = TimePos(int(m_scrollTick));
 	m_timeLine = new TimeLineWidget(KeyboardWidth, 0, m_pixelsPerTick * TimePos::ticksPerBar(),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), m_timelineBegin, this);
@@ -171,8 +176,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	});
 	connect(ConfigManager::inst(), &ConfigManager::valueChanged, this,
 		[this](const QString& group, const QString& key, const QString&) {
-			if ((group == "ui" && key == "printnotelabels") || (group == "svs" && key == "showVoicePitchRanges"))
-				update();
+			if (noteLabels::isSetting(group, key) || (group == "svs" && key == "showVoicePitchRanges")) update();
 		});
 	connect(clip, &QObject::destroyed, this, [this] {
 		cancelOperation();
@@ -182,8 +186,23 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this,
 		qOverload<>(&SVSCanvas::update));
 	connect(Engine::getSong(), &Song::timeSignatureChanged, this, [this](int, int) { update(); });
+	if (auto* piano = getGUI()->pianoRoll()->findChild<PianoRoll*>())
+	{
+		connect(piano, &PianoRoll::ghostClipSet, this, [this](bool) { update(); });
+	}
 }
 SVSCanvas::~SVSCanvas() = default;
+
+void SVSCanvas::setNoteLength(double ticks)
+{
+	m_noteLength = std::max(0., ticks);
+	if (m_clip)
+	{
+		auto state = m_clip->editorState();
+		state["noteLength"] = m_noteLength;
+		m_clip->setEditorState(state);
+	}
+}
 const QVector<svs::Note>& SVSCanvas::displayedNotes() const
 {
 	static const QVector<svs::Note> empty;
@@ -707,6 +726,29 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 	}
 	if (m_clip && !m_parameter)
 	{
+		if (auto* piano = getGUI()->pianoRoll()->findChild<PianoRoll*>())
+		{
+			painter.save();
+			painter.setClipRect(grid);
+			auto ghostColor = piano->property("ghostNoteColor").value<QColor>();
+			ghostColor.setAlpha(piano->property("ghostNoteOpacity").toInt());
+			for (const auto* ghost : piano->ghostNotes())
+			{
+				svs::Note reference;
+				reference.tick = int(ghost->pos());
+				reference.duration = int(ghost->length());
+				reference.pitch = ghost->key();
+				const auto rectangle = noteRect(reference).adjusted(1, 1, -1, -1);
+				painter.fillRect(rectangle, ghostColor);
+				if (allNoteLabels)
+				{
+					painter.setPen(piano->property("ghostNoteTextColor").value<QColor>());
+					painter.drawText(rectangle.adjusted(3, 0, -3, 0), Qt::AlignVCenter | Qt::AlignLeft,
+						noteLabel(ghost->key()));
+				}
+			}
+			painter.restore();
+		}
 		const auto audio = m_clip->audio();
 		const auto readings = audio ? audio->feedback["pronunciations"].toObject() : QJsonObject{};
 		for (const auto& note : displayedNotes())
@@ -871,7 +913,14 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 				painter.setBrush(ranges.keyColor(isBlack ? black : white, pitch));
 				painter.drawRect(QRectF(0, y + m_rowHeight - 1 - correction,
 					isBlack ? KeyboardWidth * .75 - 1 : KeyboardWidth - 1, keyHeight));
-				if (!isBlack && (key == 0 || allNoteLabels))
+				if (allNoteLabels)
+				{
+					painter.setPen(isBlack ? m_colors.value("blackKeyTextColor", QColor(Qt::white)) : text);
+					noteLabels::draw(painter,
+						QRectF(0, y, (isBlack ? KeyboardWidth * .75 : KeyboardWidth) - 3, m_rowHeight), pitch,
+						Qt::AlignRight);
+				}
+				else if (!isBlack && key == 0)
 				{
 					painter.setPen(text);
 					painter.drawText(QRectF(0, y, KeyboardWidth - 3, m_rowHeight), Qt::AlignRight | Qt::AlignVCenter,
@@ -1196,7 +1245,10 @@ void SVSCanvas::updateOperation(const QPointF& point, Qt::KeyboardModifiers modi
 	{
 		auto note = m_createdNote;
 		const double minimum = modifiers.testFlag(Qt::AltModifier) ? 1. : std::max(1., m_quantization);
-		note.duration = std::max(minimum, snap(tickAt(point.x()), modifiers) - note.tick);
+		if (std::abs(point.x() - m_begin.x()) > 3)
+		{
+			note.duration = std::max(minimum, snap(tickAt(point.x()), modifiers) - note.tick);
+		}
 		m_transaction->notes.push_back(note);
 		update();
 		return;
@@ -1298,6 +1350,13 @@ void SVSCanvas::mouseMoveEvent(QMouseEvent* event)
 void SVSCanvas::commitOperation()
 {
 	m_finishing = true;
+	if (m_action == Action::CreateTail && !m_transaction->notes.isEmpty())
+	{
+		m_lastNoteLength = m_transaction->notes.last().duration;
+		auto state = m_clip->editorState();
+		state["lastNoteLength"] = m_lastNoteLength;
+		m_clip->setEditorState(state);
+	}
 	m_action = Action::None;
 	m_autoScroll->stop();
 	if (m_mouseCaptured)
@@ -1385,7 +1444,7 @@ void SVSCanvas::beginNote(const QPointF& point, Qt::KeyboardModifiers modifiers)
 	note.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	note.tick = std::max(0., snap(tickAt(point.x()), modifiers));
 	note.pitch = std::clamp(std::ceil(pitchAt(point.y())), 0., 127.);
-	note.duration = std::max(1., m_quantization);
+	note.duration = m_noteLength > 0 ? m_noteLength : m_lastNoteLength;
 	const auto* track = static_cast<SVSTrack*>(m_clip->getTrack());
 	if (!track->voice().defaultLyric.isEmpty())
 		note.lyric = track->voice().defaultLyric;

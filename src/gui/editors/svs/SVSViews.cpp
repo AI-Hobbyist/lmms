@@ -1,4 +1,5 @@
 #include "SVSViews.h"
+#include "NoteLabelDisplay.h"
 #include "SVSTrack.h"
 #include "SVSClip.h"
 #include "SVSParameterPanel.h"
@@ -678,6 +679,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto* toolbar = new QHBoxLayout(toolbarBody);
 	toolbar->setContentsMargins(0, 0, 0, 0);
 	toolbarScroll->setWidget(toolbarBody);
+	toolbar->addWidget(noteLabels::createControls(toolbarBody));
 	auto nativeIcon = [](const QString& name) {
 		QIcon icon("resources:" + name + ".png");
 		return icon.isNull() ? QIcon("data:/themes/default/" + name + ".png") : icon;
@@ -711,6 +713,18 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	iconButton(stop, "stop", tr("Stop"));
 	toolbar->addWidget(stop);
 	connect(stop, &QToolButton::clicked, Engine::getSong(), &Song::stop);
+	auto* referencePiano = getGUI()->pianoRoll()->findChild<PianoRoll*>();
+	auto* clearGhost = new QToolButton(this);
+	clearGhost->setObjectName("svsClearGhostNotes");
+	clearGhost->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	clearGhost->setToolTip(tr("Clear ghost notes"));
+	clearGhost->setEnabled(referencePiano && !referencePiano->ghostNotes().empty());
+	toolbar->addWidget(clearGhost);
+	if (referencePiano)
+	{
+		connect(clearGhost, &QToolButton::clicked, referencePiano, &PianoRoll::clearGhostClip);
+		connect(referencePiano, &PianoRoll::ghostClipSet, clearGhost, &QToolButton::setEnabled);
+	}
 	auto* render = new QPushButton(tr("Synthesize"), this);
 	toolbar->addWidget(render);
 	connect(render, &QPushButton::clicked, clip, &SVSClip::synthesize);
@@ -1030,6 +1044,26 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 		canvas->setQuantization(tick);
 		strip->setQuantization(tick);
 	});
+	auto* noteLengthIcon = new QLabel(this);
+	noteLengthIcon->setPixmap(nativeIcon("note").pixmap(16, 16));
+	noteLengthIcon->setToolTip(tr("Note length"));
+	toolbar->addWidget(noteLengthIcon);
+	auto* noteLength = new QComboBox(this);
+	noteLength->setObjectName("svsNoteLength");
+	noteLength->setToolTip(tr("Note length"));
+	noteLength->addItem(embed::getIconPixmap("edit_draw"), tr("Last note"), 0.);
+	const QStringList icons{"whole", "half", "quarter", "eighth", "sixteenth", "thirtysecond", "triplethalf",
+		"tripletquarter", "tripleteighth", "tripletsixteenth", "tripletthirtysecond"};
+	const QList<int> divisors{1, 2, 4, 8, 16, 32, 3, 6, 12, 24, 48};
+	for (int index = 0; index < divisors.size(); ++index)
+	{
+		noteLength->addItem(embed::getIconPixmap(("note_" + icons[index]).toStdString()),
+			QString("1/%1").arg(divisors[index]), double(DefaultTicksPerBar) / divisors[index]);
+	}
+	noteLength->setCurrentIndex(std::max(0, noteLength->findData(clip->editorState()["noteLength"].toDouble())));
+	toolbar->addWidget(noteLength);
+	connect(noteLength, qOverload<int>(&QComboBox::activated), canvas,
+		[canvas, noteLength](int index) { canvas->setNoteLength(noteLength->itemData(index).toDouble()); });
 	auto* zoomOut = new QToolButton(this);
 	zoomOut->setText(tr("−"));
 	toolbar->addWidget(zoomOut);
