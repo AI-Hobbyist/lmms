@@ -33,6 +33,7 @@ namespace lmms
 {
 
 class SampleClip;
+class SVCTrack;
 
 namespace gui
 {
@@ -64,6 +65,7 @@ protected:
 
 
 private:
+	void copyToSVCTrack(SVCTrack* track);
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;

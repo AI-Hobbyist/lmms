@@ -50,7 +50,7 @@ namespace lmms
 
 
 class MidiClip;
-
+class SVSClip;
 
 namespace gui
 {
@@ -124,6 +124,7 @@ public:
 
 	void setCurrentMidiClip( MidiClip* newMidiClip );
 	void setGhostMidiClip( MidiClip* newMidiClip );
+	void setGhostSVSClip(const SVSClip* clip);
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
 
@@ -570,6 +571,7 @@ public:
 	const MidiClip* currentMidiClip() const;
 	void setCurrentMidiClip( MidiClip* clip );
 	void setGhostMidiClip( MidiClip* clip );
+	void setGhostSVSClip(const SVSClip* clip);
 
 	int quantization() const;
 

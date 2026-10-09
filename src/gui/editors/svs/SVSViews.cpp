@@ -58,6 +58,11 @@
 #include <algorithm>
 #include <memory>
 #include <cmath>
+#include "FadeButton.h"
+#include "PianoRoll.h"
+#include "Mixer.h"
+#include "MixerView.h"
+
 namespace lmms::gui {
 namespace {
 // Global base values are declared by the selected engine/voice, never named here.
@@ -463,11 +468,25 @@ SVSTrackView::SVSTrackView(SVSTrack* track, TrackContainerView* container)
 	pan->setModel(track->panningModel());
 	auto* mix = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	mix->setModel(track->mixerChannelModel());
+
+	auto* activity = new FadeButton(getTrackSettingsWidget());
+	m_activityIndicator = activity;
+	activity->setMuted(track->isMuted());
+	activity->setObjectName("voiceTrackActivity");
+	activity->setFixedSize(8, 28);
+	connect(
+		track, &SVSTrack::playbackActivity, activity,
+		[activity] {
+			activity->activateOnce();
+			activity->noteEnd();
+		},
+		Qt::QueuedConnection);
 	auto* layout = new QHBoxLayout(getTrackSettingsWidget());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(1);
 	layout->addWidget(label);
 	layout->addWidget(mix);
+	layout->addWidget(activity);
 	layout->addWidget(volume);
 	layout->addWidget(pan);
 	auto* pluginSettings = createSVSPluginSettings(track, this);
@@ -478,6 +497,34 @@ SVSTrackView::SVSTrackView(SVSTrack* track, TrackContainerView* container)
 	});
 	setAcceptDrops(true);
 }
+QMenu* SVSTrackView::createMixerMenu(QString title, QString newMixerLabel)
+{
+	auto* track = static_cast<SVSTrack*>(getTrack());
+	const auto channelIndex = track->mixerChannelModel()->value();
+	const auto* channel = Engine::mixer()->mixerChannel(channelIndex);
+	if (title.contains("%2")) { title = title.arg(channelIndex).arg(channel->m_name); }
+	auto* menu = new QMenu(title, this);
+	auto assign = [this, track](int index) {
+		track->mixerChannelModel()->setValue(index);
+		getGUI()->mixerView()->setCurrentMixerChannel(index);
+	};
+	menu->addAction(newMixerLabel, this, [track, assign] {
+		const auto index = getGUI()->mixerView()->addNewChannel();
+		auto* channel = Engine::mixer()->mixerChannel(index);
+		channel->m_name = track->name();
+		channel->setColor(track->color());
+		assign(index);
+	});
+	menu->addSeparator();
+	for (int index = 0; index < Engine::mixer()->numChannels(); ++index)
+	{
+		if (index == channelIndex) { continue; }
+		const auto* candidate = Engine::mixer()->mixerChannel(index);
+		menu->addAction(tr("%1: %2").arg(index).arg(candidate->m_name), this, [assign, index] { assign(index); });
+	}
+	return menu;
+}
+
 void SVSTrackView::dragEnterEvent(QDragEnterEvent* event)
 {
 	if (!StringPairDrag::processDragEnterEvent(event, "svsvoice"))
@@ -511,6 +558,13 @@ SVSClipView::SVSClipView(SVSClip* clip, TrackView* view)
 }
 void SVSClipView::constructContextMenu(QMenu* menu)
 {
+	menu->addAction(embed::getIconPixmap("ghost_note"), tr("Set as ghost in piano-roll"), this, [this] {
+		auto* pianoRoll = getGUI()->pianoRoll();
+		pianoRoll->setGhostSVSClip(m_clip);
+		pianoRoll->parentWidget()->show();
+		pianoRoll->show();
+		pianoRoll->setFocus();
+	});
 	menu->addSeparator();
 	menu->addAction(embed::getIconPixmap("edit_rename"), tr("Change name"), this, [this] {
 		auto name = m_clip->name();

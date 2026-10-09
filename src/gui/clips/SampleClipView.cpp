@@ -40,6 +40,16 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+#include "ConfigManager.h"
+#include "SVCClip.h"
+#include "SVCTrack.h"
+#include <QDir>
+#include <QMessageBox>
+#include <QPointer>
+#include <QTemporaryFile>
+#include <array>
+#include <sndfile.h>
+
 namespace lmms::gui
 {
 
@@ -81,6 +91,20 @@ void SampleClipView::updateSample()
 
 void SampleClipView::constructContextMenu(QMenu* cm)
 {
+	auto* copyMenu = cm->addMenu(embed::getIconPixmap("svc_track.svg"), tr("Copy current clip to SVC track"));
+	copyMenu->setObjectName("sampleCopyToSVC");
+	for (auto* base : Engine::getSong()->tracks())
+	{
+		if (auto* track = dynamic_cast<SVCTrack*>(base))
+		{
+			QPointer<SVCTrack> target(track);
+			copyMenu->addAction(track->name(), this, [this, target] {
+				if (target) { copyToSVCTrack(target); }
+			});
+		}
+	}
+	copyMenu->setEnabled(!copyMenu->isEmpty() && m_clip->sample().sampleSize() > 0);
+
 	cm->addSeparator();
 
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
@@ -103,8 +127,71 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 }
 
-
-
+void SampleClipView::copyToSVCTrack(SVCTrack* track)
+{
+	const auto& sample = m_clip->sample();
+	if (sample.sampleSize() == 0) { return; }
+	const auto directory = ConfigManager::inst()->userSamplesDir() + "svc/";
+	QTemporaryFile file(directory + "copy-XXXXXX.wav");
+	auto fail = [this] {
+		QMessageBox::warning(this, tr("Copy to SVC track"), tr("Could not save the copied audio sample."));
+	};
+	if (!QDir().mkpath(directory) || !file.open())
+	{
+		fail();
+		return;
+	}
+	SF_INFO info{};
+	info.samplerate = sample.sampleRate();
+	info.channels = 2;
+	info.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT;
+	auto* writer = sf_open_fd(file.handle(), SFM_WRITE, &info, false);
+	if (!writer)
+	{
+		fail();
+		return;
+	}
+	// Persist the decoded source, including recorded/embedded audio and reversal.
+	// Clip offset and length below preserve the selected slice without other clips.
+	std::array<float, 4096 * 2> buffer{};
+	bool written = true;
+	for (size_t start = 0; start < sample.sampleSize() && written; start += 4096)
+	{
+		const auto count = std::min<size_t>(4096, sample.sampleSize() - start);
+		for (size_t frame = 0; frame < count; ++frame)
+		{
+			const auto source = sample.reversed() ? sample.sampleSize() - start - frame - 1 : start + frame;
+			for (size_t channel = 0; channel < 2; ++channel)
+			{
+				buffer[frame * 2 + channel] = sample.data()[source][channel] * sample.amplification();
+			}
+		}
+		written = sf_writef_float(writer, buffer.data(), count) == static_cast<sf_count_t>(count);
+	}
+	const auto closed = sf_close(writer);
+	file.close();
+	if (!written || closed != 0)
+	{
+		fail();
+		return;
+	}
+	track->addJournalCheckPoint();
+	auto* copy = static_cast<SVCClip*>(track->createClip(m_clip->startPosition()));
+	if (!copy->setSourceFile(file.fileName()))
+	{
+		delete copy;
+		fail();
+		return;
+	}
+	file.setAutoRemove(false);
+	copy->setAutoResize(m_clip->getAutoResize());
+	copy->setStartTimeOffset(m_clip->startTimeOffset());
+	copy->changeLength(m_clip->length());
+	copy->setName(m_clip->name());
+	copy->setMuted(m_clip->isMuted());
+	copy->setColor(m_clip->color());
+	Engine::getSong()->setModified();
+}
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {

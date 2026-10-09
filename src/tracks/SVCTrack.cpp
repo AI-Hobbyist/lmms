@@ -119,6 +119,7 @@ bool SVCTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 			|| played;
 	}
 	unlock();
+	if (played) { emit playbackActivity(); }
 	return played;
 }
 

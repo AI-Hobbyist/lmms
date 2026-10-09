@@ -20,10 +20,15 @@ class SVSTrackView : public TrackView
 	Q_OBJECT
 public:
 	SVSTrackView(SVSTrack*, TrackContainerView*);
+	QMenu* createMixerMenu(QString title, QString newMixerLabel) override;
+	FadeButton* getActivityIndicator() override { return m_activityIndicator; }
 
 protected:
 	void dragEnterEvent(QDragEnterEvent*) override;
 	void dropEvent(QDropEvent*) override;
+
+private:
+	FadeButton* m_activityIndicator = nullptr;
 };
 class SVSClipView : public ClipView
 {

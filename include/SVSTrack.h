@@ -50,6 +50,9 @@ public:
 	bool readOnly() const { return !m_migrationDiagnostic.isEmpty(); }
 	QString migrationDiagnostic() const { return m_migrationDiagnostic; }
 
+signals:
+	void playbackActivity();
+
 private:
 	std::shared_ptr<const QVector<svs::ExportAudioRegion>> m_exportRegions;
 	QString m_migrationDiagnostic;

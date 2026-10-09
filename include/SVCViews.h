@@ -15,10 +15,13 @@ class SVCTrackView : public TrackView
 	Q_OBJECT
 public:
 	SVCTrackView(SVCTrack* track, TrackContainerView* container);
+	QMenu* createMixerMenu(QString title, QString newMixerLabel) override;
+	FadeButton* getActivityIndicator() override { return m_activityIndicator; }
 	void openWindow(SVCClip* clip = nullptr);
 
 private:
 	QPointer<SVCWindow> m_window;
+	FadeButton* m_activityIndicator = nullptr;
 };
 
 class SVCClipView : public ClipView

@@ -31,6 +31,8 @@ public:
 	void invalidateClips();
 
 signals:
+	void playbackActivity();
+
 	void renderRequested();
 
 private:

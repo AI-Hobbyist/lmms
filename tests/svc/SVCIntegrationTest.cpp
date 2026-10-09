@@ -26,14 +26,19 @@
 #include "AudioDummy.h"
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "FadeButton.h"
+#include "InstrumentTrack.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MidiClip.h"
 #include "Mixer.h"
 #include "MixerView.h"
+#include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "ProjectJournal.h"
 #include "ProjectRenderer.h"
+#include "RenameDialog.h"
 #include "SVCBrowser.h"
 #include "SVCCache.h"
 #include "SVCCatalog.h"
@@ -45,11 +50,13 @@
 #include "SVCWindow.h"
 #include "SVSBrowser.h"
 #include "SVSClip.h"
+#include "SVSTrack.h"
 #include "SVSViews.h"
-#include "RenameDialog.h"
-#include "SetupDialog.h"
+#include "SampleBuffer.h"
 #include "SampleClip.h"
+#include "SampleClipView.h"
 #include "SampleTrack.h"
+#include "SetupDialog.h"
 #include "Song.h"
 #include "embed.h"
 
@@ -537,7 +544,8 @@ private slots:
 					action->trigger();
 					menu->close();
 				});
-				QContextMenuEvent event(QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)));
+				QContextMenuEvent event(
+					QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)), Qt::NoModifier);
 				QApplication::sendEvent(view, &event);
 				QVERIFY(invoked);
 			};
@@ -578,10 +586,12 @@ private slots:
 					}
 					menu->close();
 				});
-				QContextMenuEvent event(QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)));
+				QContextMenuEvent event(
+					QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)), Qt::NoModifier);
 				QApplication::sendEvent(view, &event);
 				QVERIFY(invoked);
-				QTRY_VERIFY_WITH_TIMEOUT(target->conversionComplete(), 10000);
+				QTRY_VERIFY_WITH_TIMEOUT(target->conversionComplete() || target->conversionFailed(), 10000);
+				QVERIFY2(target->conversionComplete(), qPrintable(target->status()));
 				QCOMPARE(wholeTrack.count(), 0);
 				QCOMPARE(untouched->playback()->generation(), generation);
 				QCOMPARE(untouched->status(), status);
@@ -595,6 +605,259 @@ private slots:
 			delete track;
 			QTest::qWait(30);
 		}
+	}
+
+	void copySampleSliceToSVC()
+	{
+		auto* song = Engine::getSong();
+		auto* sourceTrack = static_cast<SampleTrack*>(Track::create(Track::Type::Sample, song));
+		auto* source = static_cast<SampleClip*>(sourceTrack->createClip(96));
+		source->setSampleFile(m_source);
+		source->setName("Copied slice");
+		source->setAutoResize(false);
+		source->setStartTimeOffset(-24);
+		source->changeLength(48);
+		source->setColor(QColor("#be6699"));
+		auto* first = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, song));
+		auto* second = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, song));
+		first->setName(QString::fromUtf8("目标主唱"));
+		second->setName("Other SVC");
+		const auto selection = first->selection();
+		gui::SampleClipView* view = nullptr;
+		QTRY_VERIFY(([&] {
+			for (auto* candidate : m_gui->mainWindow()->findChildren<gui::SampleClipView*>())
+			{
+				if (candidate->getClip() == source) { view = candidate; }
+			}
+			return view != nullptr;
+		})());
+		auto copy = [&] {
+			bool invoked = false;
+			QTimer watchdog;
+			watchdog.setSingleShot(true);
+			connect(&watchdog, &QTimer::timeout, this, [] {
+				if (auto* menu = QApplication::activePopupWidget()) { menu->close(); }
+			});
+			watchdog.start(5000);
+			QTimer::singleShot(100, this, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu) { return; }
+				auto* submenu = menu->findChild<QMenu*>("sampleCopyToSVC");
+				if (submenu && submenu->isEnabled() && submenu->actions().size() == 2
+					&& submenu->actions().first()->text() == first->name())
+				{
+					submenu->popup(menu->mapToGlobal(QPoint(menu->width(), 0)));
+					QTest::qWait(100);
+					submenu->screen()->grabWindow(submenu->winId()).save("build/tests/svc/sample-copy-menu-native.png");
+					submenu->actions().first()->trigger();
+					invoked = true;
+					submenu->close();
+				}
+				menu->close();
+			});
+			QContextMenuEvent event(
+				QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)), Qt::NoModifier);
+			QApplication::sendEvent(view, &event);
+			QVERIFY(invoked);
+		};
+		copy();
+		QCOMPARE(first->getClips().size(), size_t(1));
+		QVERIFY(second->getClips().empty());
+		QCOMPARE(sourceTrack->getClips().size(), size_t(1));
+		auto* result = static_cast<SVCClip*>(first->getClips().front());
+		QCOMPARE(result->startPosition(), source->startPosition());
+		QCOMPARE(result->startTimeOffset(), source->startTimeOffset());
+		QCOMPARE(result->length(), source->length());
+		QCOMPARE(result->name(), source->name());
+		QCOMPARE(result->color(), source->color());
+		QCOMPARE(first->selection(), selection);
+		QCOMPARE(result->playback()->snapshot()->source->rate, uint32_t(source->sample().sampleRate()));
+		QCOMPARE(result->playback()->snapshot()->source->frames(), uint64_t(source->sample().sampleSize()));
+		QVERIFY(!result->conversionComplete());
+		QVERIFY(QFile::exists(result->sourceFile()));
+		// A fileless recording with reversal must copy its decoded samples as well.
+		std::vector<SampleFrame> frames(1024);
+		for (size_t n = 0; n < frames.size(); ++n)
+		{
+			frames[n][0] = float(n) / 2048;
+			frames[n][1] = -float(n) / 2048;
+		}
+		const auto encoded
+			= QByteArray(reinterpret_cast<const char*>(frames.data()), frames.size() * sizeof(SampleFrame)).toBase64();
+		source->setSampleBuffer(SampleBuffer::fromBase64(QString::fromLatin1(encoded), 44100));
+		source->setReversed(true);
+		copy();
+		QCOMPARE(first->getClips().size(), size_t(2));
+		auto* recorded = static_cast<SVCClip*>(first->getClips().back());
+		QCOMPARE(recorded->playback()->snapshot()->trackSample(0, 0), frames.back()[0]);
+		QCOMPARE(recorded->playback()->snapshot()->trackSample(1023, 1), frames.front()[1]);
+		QDomDocument document;
+		auto root = document.createElement("test");
+		recorded->saveState(document, root);
+		auto* restored = static_cast<SVCClip*>(second->createClip(0));
+		restored->restoreState(root.firstChildElement());
+		QCOMPARE(restored->playback()->snapshot()->trackSample(0, 0), frames.back()[0]);
+		QTest::qWait(100);
+		delete sourceTrack;
+		delete first;
+		delete second;
+		QTest::qWait(30);
+	}
+
+	void voiceTrackMixerAndActivity()
+	{
+		for (const auto type : {Track::Type::SVC, Track::Type::SVS})
+		{
+			auto* track = Track::create(type, Engine::getSong());
+			track->setName(QString::fromUtf8("人声混音通道"));
+			track->setColor(QColor("#42b8a5"));
+			gui::TrackView* view = nullptr;
+			QTRY_VERIFY(([&] {
+				for (auto* candidate : m_gui->mainWindow()->findChildren<gui::TrackView*>())
+				{
+					if (candidate->getTrack() == track) { view = candidate; }
+				}
+				return view != nullptr;
+			})());
+			auto* lamp = view->findChild<gui::FadeButton*>("voiceTrackActivity");
+			QVERIFY(lamp);
+			QCOMPARE(lamp->size(), QSize(8, 28));
+			track->setMuted(true);
+			QVERIFY(lamp->muted());
+			track->setMuted(false);
+			QVERIFY(!lamp->muted());
+			auto* model = type == Track::Type::SVC ? static_cast<SVCTrack*>(track)->mixerChannelModel()
+												   : static_cast<SVSTrack*>(track)->mixerChannelModel();
+			const auto count = Engine::mixer()->numChannels();
+			std::unique_ptr<QMenu> menu(view->createMixerMenu("Channel %1: %2", "New mixer channel"));
+			QVERIFY(menu && menu->title().startsWith("Channel 0:"));
+			menu->actions().first()->trigger();
+			QCOMPARE(Engine::mixer()->numChannels(), count + 1);
+			QCOMPARE(model->value(), count);
+			QCOMPARE(Engine::mixer()->mixerChannel(count)->m_name, track->name());
+			QCOMPARE(Engine::mixer()->mixerChannel(count)->color(), track->color());
+			menu.reset(view->createMixerMenu("Assign to", "New mixer channel"));
+			menu->actions().at(2)->trigger();
+			QCOMPARE(model->value(), 0);
+			const auto idle = lamp->grab().toImage();
+			if (type == Track::Type::SVC)
+			{
+				auto* clip = static_cast<SVCClip*>(track->createClip(0));
+				QVERIFY(clip->setSourceFile(m_source));
+				QSignalSpy activity(static_cast<SVCTrack*>(track), &SVCTrack::playbackActivity);
+				QVERIFY(static_cast<SVCTrack*>(track)->play(0, 64, 0));
+				QCOMPARE(activity.count(), 1);
+			}
+			else
+			{
+				emit static_cast<SVSTrack*>(track)->playbackActivity();
+			}
+			QTest::qWait(30);
+			QVERIFY(lamp->grab().toImage() != idle);
+			QVERIFY(m_gui->mainWindow()
+					->screen()
+					->grabWindow(m_gui->mainWindow()->winId())
+					.save(QString("build/tests/svc/%1-activity-native.png").arg(int(type))));
+			QTest::qWait(400);
+			QCOMPARE(lamp->grab().toImage(), idle);
+			menu.reset();
+			delete track;
+			QTest::qWait(30);
+		}
+	}
+
+	void svsGhostNotes()
+	{
+		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, Engine::getSong()));
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note first, second;
+		first.id = "one";
+		first.tick = 12;
+		first.duration = 48;
+		first.pitch = 60;
+		second.id = "two";
+		second.tick = 80;
+		second.duration = 48;
+		second.pitch = 67;
+		clip->setNotes({first, second});
+		clip->setStartTimeOffset(-24);
+		clip->changeLength(72);
+		auto* piano = m_gui->pianoRoll();
+
+		auto* instrument = static_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::getSong()));
+		instrument->loadInstrument("tripleoscillator");
+		QTest::qWait(100);
+		auto* midi = static_cast<MidiClip*>(instrument->createClip(0));
+		midi->addNote(Note(48, 0, 64), false);
+		piano->setCurrentMidiClip(midi);
+		piano->parentWidget()->show();
+		piano->show();
+		QTest::qWait(200);
+		gui::SVSClipView* view = nullptr;
+		QTRY_VERIFY(([&] {
+			for (auto* candidate : m_gui->mainWindow()->findChildren<gui::SVSClipView*>())
+			{
+				if (candidate->getClip() == clip) { view = candidate; }
+			}
+			return view != nullptr;
+		})());
+		bool invoked = false;
+		QTimer watchdog;
+		watchdog.setSingleShot(true);
+		connect(&watchdog, &QTimer::timeout, this, [] {
+			if (auto* menu = QApplication::activePopupWidget()) { menu->close(); }
+		});
+		watchdog.start(5000);
+		QTimer::singleShot(100, this, [&] {
+			auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+			if (!menu) { return; }
+			for (auto* action : menu->actions())
+			{
+				if (action->text() == "Set as ghost in piano-roll")
+				{
+					action->trigger();
+					invoked = true;
+					break;
+				}
+			}
+			menu->close();
+		});
+		QContextMenuEvent event(
+			QContextMenuEvent::Mouse, QPoint(5, 5), view->mapToGlobal(QPoint(5, 5)), Qt::NoModifier);
+		QApplication::sendEvent(view, &event);
+		QVERIFY(invoked);
+		QTest::qWait(200);
+		QVERIFY(piano->screen()->grabWindow(piano->winId()).save("build/tests/svc/SVS-ghost-notes-native.png"));
+		QDomDocument document;
+		auto root = document.createElement("pianoroll");
+		piano->saveSettings(document, root);
+		const auto notes = root.firstChildElement("ghostnotes").elementsByTagName("ghostnote");
+		QCOMPARE(notes.size(), 2);
+		QCOMPARE(notes.at(0).toElement().attribute("key").toInt(), 60);
+		QCOMPARE(notes.at(0).toElement().attribute("pos").toInt(), 0);
+		QCOMPARE(notes.at(0).toElement().attribute("len").toInt(), 36);
+		QCOMPARE(notes.at(1).toElement().attribute("pos").toInt(), 56);
+		QCOMPARE(notes.at(1).toElement().attribute("len").toInt(), 16);
+		// A second invocation replaces the snapshot rather than accumulating notes.
+		piano->setGhostSVSClip(clip);
+		QDomDocument repeated;
+		auto repeatRoot = repeated.createElement("pianoroll");
+		piano->saveSettings(repeated, repeatRoot);
+		QCOMPARE(repeatRoot.firstChildElement("ghostnotes").elementsByTagName("ghostnote").size(), 2);
+		piano->setGhostSVSClip(nullptr);
+		piano->setCurrentMidiClip(nullptr);
+		piano->parentWidget()->hide();
+		// Destroy fixture views before their model so periodic updates cannot hit
+		// a view still awaiting deferred deletion after instrument teardown.
+		for (auto* candidate : m_gui->mainWindow()->findChildren<gui::TrackView*>())
+		{
+			if (candidate->getTrack() == instrument) { candidate->close(); }
+		}
+		QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+		delete instrument;
+		QTest::qWait(30);
+		delete track;
+		QTest::qWait(30);
 	}
 
 	void referenceRerenderAndAudition()

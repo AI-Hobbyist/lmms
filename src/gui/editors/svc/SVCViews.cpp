@@ -10,8 +10,14 @@
 #include <QPainter>
 #include <algorithm>
 
+#include "Engine.h"
+#include "FadeButton.h"
+#include "GuiApplication.h"
 #include "Knob.h"
+#include "MainWindow.h"
+#include "Mixer.h"
 #include "MixerChannelLcdSpinBox.h"
+#include "MixerView.h"
 #include "RenameDialog.h"
 #include "SVCClip.h"
 #include "SVCConversion.h"
@@ -74,12 +80,54 @@ SVCTrackView::SVCTrackView(SVCTrack* track, TrackContainerView* container)
 	auto* pan = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(),
 		Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	pan->setModel(track->panningModel());
+
+	auto* activity = new FadeButton(getTrackSettingsWidget());
+	m_activityIndicator = activity;
+	activity->setMuted(track->isMuted());
+	activity->setObjectName("voiceTrackActivity");
+	activity->setFixedSize(8, 28);
+	connect(
+		track, &SVCTrack::playbackActivity, activity,
+		[activity] {
+			activity->activateOnce();
+			activity->noteEnd();
+		},
+		Qt::QueuedConnection);
 	auto* layout = new QHBoxLayout(getTrackSettingsWidget());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(label);
 	layout->addWidget(mix);
+	layout->addWidget(activity);
 	layout->addWidget(volume);
 	layout->addWidget(pan);
+}
+
+QMenu* SVCTrackView::createMixerMenu(QString title, QString newMixerLabel)
+{
+	auto* track = static_cast<SVCTrack*>(getTrack());
+	const auto channelIndex = track->mixerChannelModel()->value();
+	const auto* channel = Engine::mixer()->mixerChannel(channelIndex);
+	if (title.contains("%2")) { title = title.arg(channelIndex).arg(channel->m_name); }
+	auto* menu = new QMenu(title, this);
+	auto assign = [this, track](int index) {
+		track->mixerChannelModel()->setValue(index);
+		getGUI()->mixerView()->setCurrentMixerChannel(index);
+	};
+	menu->addAction(newMixerLabel, this, [track, assign] {
+		const auto index = getGUI()->mixerView()->addNewChannel();
+		auto* channel = Engine::mixer()->mixerChannel(index);
+		channel->m_name = track->name();
+		channel->setColor(track->color());
+		assign(index);
+	});
+	menu->addSeparator();
+	for (int index = 0; index < Engine::mixer()->numChannels(); ++index)
+	{
+		if (index == channelIndex) { continue; }
+		const auto* candidate = Engine::mixer()->mixerChannel(index);
+		menu->addAction(tr("%1: %2").arg(index).arg(candidate->m_name), this, [assign, index] { assign(index); });
+	}
+	return menu;
 }
 
 void SVCTrackView::openWindow(SVCClip* clip)

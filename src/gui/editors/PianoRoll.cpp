@@ -74,6 +74,7 @@
 #include "TimeLineWidget.h"
 #include "FileDialog.h"
 
+#include "SVSClip.h"
 
 namespace lmms
 {
@@ -631,6 +632,21 @@ void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 	}
 }
 
+void PianoRoll::setGhostSVSClip(const SVSClip* clip)
+{
+	clearGhostClip();
+	if (!clip) { return; }
+	for (const auto& note : clip->notes())
+	{
+		const auto start = std::max(0., note.tick + int(clip->startTimeOffset()));
+		const auto end
+			= std::min(double(int(clip->length())), note.tick + note.duration + int(clip->startTimeOffset()));
+		if (end <= start) { continue; }
+		m_ghostNotes.push_back(new Note(std::max(1, qRound(end) - qRound(start)), qRound(start), qRound(note.pitch)));
+	}
+	emit ghostClipSet(!m_ghostNotes.empty());
+	update();
+}
 
 void PianoRoll::loadGhostNotes( const QDomElement & de )
 {
@@ -5537,8 +5553,8 @@ const MidiClip* PianoRollWindow::currentMidiClip() const
 	return m_editor->currentMidiClip();
 }
 
-
-
+void PianoRollWindow::setGhostSVSClip(const SVSClip* clip)
+{ m_editor->setGhostSVSClip(clip); }
 
 void PianoRollWindow::setGhostMidiClip( MidiClip* clip )
 {
