@@ -925,7 +925,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>Speech speed</translation>
     </message>
     <message>
         <source>Expressiveness</source>

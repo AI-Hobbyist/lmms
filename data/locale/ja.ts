@@ -926,7 +926,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>Velocity</source>
-        <translation>ベロシティ</translation>
+        <translation>話速</translation>
     </message>
     <message>
         <source>Expressiveness</source>

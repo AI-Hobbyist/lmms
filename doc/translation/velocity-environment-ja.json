@@ -1,0 +1,12 @@
+{
+    "font": "Microsoft YaHei UI,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1",
+    "language": "ja",
+    "platform": "windows",
+    "qt": "6.10.3",
+    "scale": 1,
+    "simulatedScale": "1",
+    "systemLocale": "zh_CN",
+    "theme": "default",
+    "windowHeight": 800,
+    "windowWidth": 1280
+}

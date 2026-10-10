@@ -1,0 +1,22 @@
+[
+  {
+    "language": "zh_CN",
+    "sha256": "b2583b884b5be343f248cfa2a2c1b459053baa31aedffd3f9aeb65628bd91e7c",
+    "identical": true
+  },
+  {
+    "language": "ja",
+    "sha256": "fd8f2dbabd72225b8d61ffbbea18fefcb86b7dfb966778b8a8b62f79a59ba9e3",
+    "identical": true
+  },
+  {
+    "language": "en",
+    "sha256": "1d7efeb6deb52666c0297110b12186048989a745f730369d1fb0f27653ead807",
+    "identical": true
+  },
+  {
+    "language": "ko",
+    "sha256": "e594b1c32fcd5880b2458cb1a6989485f16c18f1fbab5986c1f96c4a9be1658c",
+    "identical": true
+  }
+]

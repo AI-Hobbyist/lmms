@@ -242,3 +242,10 @@ M6 检查点 `9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c` 推送确认后开始。
 四语各 3 PASS、0 FAIL（含初始化/清理）。在代码修改完成后，使用真实 Windows Qt 窗口、100% 缩放；生产 SVSParameterPanel 读取实际模型声明，SVS 钢琴窗在开启音名显示时仍只在音符块显示混合中日韩／英文歌词。真实窗口截图确认“实参”、主参数无偏移后缀、“音区偏移”完整显示及中日韩字形正常。测试窗口正常关闭。测试入口副本的计算内存策略路径告警沿用既有状况；此 GUI 测试不用于证明模型推理，模型验证由独立实际输入测试负责。
 
 四语源 QM 与原位部署 QM SHA-256 一致，见 svs-register-resources.json。全库 3886 键覆盖、占位符、复数、同源复核、HTML、换行及助记符质量 PASS；英文有 8 条显示用显式译文，其余 3878 条使用源文回退。证据前缀 svs-register-*；git diff --check PASS。
+
+
+## 用户补充：DiffSinger Velocity 显示名
+
+核对 refs/tlds_ref/DiffSingerDeclarations.cs 的 use_speed_embed → Speed，以及 Localization.cs 的 Speed → 语速。仅修正 NativeSVS/Velocity 译文：中文“语速”、日文“話速”、英文“Speech speed”、韩文“말하기 속도”。其他 MIDI velocity／力度词条、diffsinger.velocity 参数标识、speed 输入和数值逻辑不变。
+
+四语 QM 编译并原位部署 PASS；复用既有实窗测试程序，四语各 3 PASS、0 FAIL，Windows Qt、100% 缩放，生产参数面板截图确认名称及中日韩字形正常。截图保留为 velocity-<language>.png，历史 svs-register-* 证据未覆盖。全库 3886 键质量 PASS；本次没有 C++ 修改，无须重新编译未改动的二进制。

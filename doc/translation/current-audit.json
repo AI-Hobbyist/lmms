@@ -1,10 +1,10 @@
 {
-  "source_commit": "3fca86ccab53500708f885a18f3d28dacc2787a6",
-  "working_diff_sha256": "be0289450eba4f84f883beb36ce3b7309d551cc93462906f955910720976758c",
+  "source_commit": "75727e10a9c823ab17fc7e7d699fe2ddabdbe66c",
+  "working_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "extraction": "doc/translation/current.ts",
   "input_count": 1132,
   "key_count": 3886,
-  "summary": {"zh_CN": {"same-source": 150, "translated": 3736}, "ja": {"same-source": 159, "translated": 3727}, "en": {"source": 3878, "translated": 8}, "ko": {"same-source": 152, "translated": 3734}},
+  "summary": {"zh_CN": {"same-source": 150, "translated": 3736}, "ja": {"same-source": 159, "translated": 3727}, "en": {"source": 3877, "translated": 9}, "ko": {"same-source": 152, "translated": 3734}},
   "keys": [
     {"id": "7797fd8f5f1931ff", "key": ["AboutDialog", "<html><head/><body><p><a href=\"https://lmms.io\"><span style=\" text-decoration: underline; color:#33cc33;\">https://lmms.io</span></a></p></body></html>", "", "no"], "stage": "M4", "locations": [{"file": "src/gui/modals/about_dialog.ui", "line": "152"}], "status": {"zh_CN": "same-source", "ja": "same-source", "en": "source", "ko": "same-source"}},
     {"id": "1db7c78ff8f25de5", "key": ["AboutDialog", "About", "", "no"], "stage": "M4", "locations": [{"file": "src/gui/modals/about_dialog.ui", "line": "78"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
@@ -379,7 +379,7 @@
     {"id": "c241bdbac60ae19e", "key": ["NativeSVS", "Unsupported capability schema version", "", "no"], "stage": "M2", "locations": [{"file": "src/core/svs/SVSCapabilities.cpp", "line": "69"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
     {"id": "bbc52f2db1be7cc3", "key": ["NativeSVS", "Unsupported note language: %1", "", "no"], "stage": "M2", "locations": [{"file": "include/NativePluginTranslation.h", "line": "23"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
     {"id": "76d6b5a2a8ad9514", "key": ["NativeSVS", "Unsupported pitch mode/unit", "", "no"], "stage": "M2", "locations": [{"file": "src/core/svs/SVSCapabilities.cpp", "line": "230"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
-    {"id": "a7f39cc5b02597d3", "key": ["NativeSVS", "Velocity", "", "no"], "stage": "M2", "locations": [{"file": "include/NativePluginTranslation.h", "line": "104"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
+    {"id": "a7f39cc5b02597d3", "key": ["NativeSVS", "Velocity", "", "no"], "stage": "M2", "locations": [{"file": "include/NativePluginTranslation.h", "line": "104"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "translated", "ko": "translated"}},
     {"id": "042af2a473854401", "key": ["NativeSVS", "Voice", "", "no"], "stage": "M2", "locations": [{"file": "include/NativePluginTranslation.h", "line": "65"}, {"file": "include/NativePluginTranslation.h", "line": "86"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
     {"id": "c70d2a2d8e86e2fe", "key": ["NativeSVS", "Voice session unavailable", "", "no"], "stage": "M2", "locations": [{"file": "src/core/svs/SVSPlugin.cpp", "line": "465"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
     {"id": "e2bab29497440acd", "key": ["NativeSVS", "Voicebank directories", "", "no"], "stage": "M2", "locations": [{"file": "include/NativePluginTranslation.h", "line": "88"}], "status": {"zh_CN": "translated", "ja": "translated", "en": "source", "ko": "translated"}},
