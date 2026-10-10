@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "MidiClip.h"
 #include "NoteLabelDisplay.h"
+#include "ComboBox.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PianoRoll.h"
@@ -1037,24 +1038,62 @@ private slots:
 		auto* canvas = editor.findChild<gui::SVSCanvas*>("svsNoteCanvas");
 		QVERIFY(canvas);
 		canvas->setScroll(0, 75);
-		auto* svsButton = editor.findChild<QToolButton*>("noteLabelDisplayButton");
-		auto* midiButton = piano->parentWidget()->findChild<QToolButton*>("noteLabelDisplayButton");
+		auto* svsButton = editor.findChild<gui::ComboBox*>("noteLabelTonicComboBox");
+		auto* midiButton = piano->parentWidget()->findChild<gui::ComboBox*>("noteLabelTonicComboBox");
 		QVERIFY(svsButton && midiButton);
 		QVERIFY(svsButton->isEnabled() && midiButton->isEnabled());
-		QCOMPARE(svsButton->text(), midiButton->text());
+		QCOMPARE(svsButton->model()->currentText(), midiButton->model()->currentText());
 		QCOMPARE(piano->findChild<gui::PianoRoll*>()->blackKeyTextColor(), QColor(Qt::white));
 		QCOMPARE(editor.blackKeyTextColor(), QColor(Qt::white));
 		QTest::qWait(200);
 		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-numbered-labels-native.png"));
-		// Change the tonic through the actual piano-window menu, not the settings dialog.
-		auto* tonicMenu = svsButton->menu()->actions().at(2)->menu();
-		QVERIFY(tonicMenu);
-		tonicMenu->actions().at(2)->trigger();
+		// Change the tonic through the piano-window dropdown.
+		QTimer::singleShot(150, svsButton, [svsButton] {
+			auto* menu = svsButton->findChild<QMenu*>();
+			QVERIFY(menu && menu->actions().size() == 12);
+			QTest::mouseClick(menu, Qt::LeftButton, Qt::NoModifier, menu->actionGeometry(menu->actions().at(2)).center());
+		});
+		QTest::mouseClick(svsButton, Qt::LeftButton, Qt::NoModifier,
+			QPoint(svsButton->width() - 5, svsButton->height() / 2));
 		QCOMPARE(gui::noteLabels::text(62), QString("1"));
 		QCOMPARE(gui::noteLabels::text(61), QString("7,"));
-		QCOMPARE(svsButton->text(), QString::fromUtf8("123 · 1=D"));
-		QCOMPARE(svsButton->text(), midiButton->text());
-		QCOMPARE(svsButton->menu()->actions().size(), 3);
+		QCOMPARE(svsButton->model()->currentText(), QString("D"));
+		QCOMPARE(svsButton->model()->currentText(), midiButton->model()->currentText());
+		QCOMPARE(svsButton->model()->size(), 12);
+		auto* svsReference = editor.findChild<gui::ComboBox*>("noteLabelReferenceComboBox");
+		auto* midiReference = piano->findChild<gui::ComboBox*>("noteLabelReferenceComboBox");
+		auto* midiCanvas = piano->findChild<gui::PianoRoll*>();
+		QVERIFY(svsReference && midiReference && midiCanvas);
+		QCOMPARE(svsReference->model()->value(), 0);
+		QCOMPARE(midiReference->model()->value(), 0);
+		QCOMPARE(gui::noteLabels::referencePitch(canvas), 62);
+		QCOMPARE(gui::noteLabels::referencePitch(midiCanvas), 62);
+		QTimer::singleShot(150, svsReference, [svsReference] {
+			auto* menu = svsReference->findChild<QMenu*>();
+			QVERIFY(menu && menu->actions().size() == 12);
+			// C3, with index 0 reserved for Follow global.
+			QTest::mouseClick(menu, Qt::LeftButton, Qt::NoModifier, menu->actionGeometry(menu->actions().at(5)).center());
+		});
+		QTest::mouseClick(svsReference, Qt::LeftButton, Qt::NoModifier,
+			QPoint(svsReference->width() - 5, svsReference->height() / 2));
+		QCOMPARE(svsReference->model()->currentText(), QString("C3"));
+		QCOMPARE(midiReference->model()->value(), 0);
+		QCOMPARE(config->value("ui", "notelabeloctave"), QString("5"));
+		QCOMPARE(gui::noteLabels::text(62, canvas), QString("1'"));
+		QCOMPARE(gui::noteLabels::text(62, midiCanvas), QString("1"));
+		config->setValue("ui", "notelabeloctave", "6");
+		QCOMPARE(gui::noteLabels::text(62, canvas), QString("1'"));
+		QCOMPARE(gui::noteLabels::text(62, midiCanvas), QString("1,"));
+		{
+			gui::SVSPianoRoll anotherEditor(clip);
+			auto* anotherReference = anotherEditor.findChild<gui::ComboBox*>("noteLabelReferenceComboBox");
+			QVERIFY(anotherReference);
+			QCOMPARE(anotherReference->model()->value(), 0);
+			QCOMPARE(gui::noteLabels::referencePitch(&anotherEditor), 74);
+		}
+		svsReference->model()->setValue(0);
+		QCOMPARE(gui::noteLabels::referencePitch(canvas), 74);
+		config->setValue("ui", "notelabeloctave", "5");
 		{
 			gui::SetupDialog settings;
 			auto* reference = settings.findChild<QComboBox*>("numberedNotationReference");
@@ -1070,16 +1109,16 @@ private slots:
 			QVERIFY(QMetaObject::invokeMethod(&settings, "accept"));
 		}
 		QCOMPARE(gui::noteLabels::text(62), QString("1'"));
-		QCOMPARE(svsButton->text(), midiButton->text());
+		QCOMPARE(svsButton->model()->currentText(), midiButton->model()->currentText());
 		config->setValue("ui", "notelabeloctave", "5");
-		midiButton->menu()->actions().at(0)->trigger();
-		QVERIFY(!tonicMenu->menuAction()->isVisible());
+		config->setValue("ui", "notelabelmode", "pitch");
+		QVERIFY(svsButton->isVisible());
 		{
 			gui::SetupDialog settings;
 			QVERIFY(!settings.findChild<QComboBox*>("numberedNotationReference")->isEnabled());
 		}
 		QCOMPARE(gui::noteLabels::text(61), QString::fromUtf8("C♯4"));
-		QCOMPARE(svsButton->text(), midiButton->text());
+		QCOMPARE(svsButton->model()->currentText(), midiButton->model()->currentText());
 		QTest::qWait(100);
 		QVERIFY(editor.screen()->grabWindow(editor.winId()).save("build/tests/svc/SVS-pitch-labels-native.png"));
 		editor.hide();
@@ -1089,7 +1128,7 @@ private slots:
 				->screen()
 				->grabWindow(m_gui->mainWindow()->winId())
 				.save("build/tests/svc/MIDI-pitch-labels-native.png"));
-		midiButton->menu()->actions().at(1)->trigger();
+		config->setValue("ui", "notelabelmode", "numbered");
 		QTest::qWait(150);
 		QVERIFY(m_gui->mainWindow()
 				->screen()

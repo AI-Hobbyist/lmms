@@ -717,7 +717,11 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	toolbarScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	auto* toolbarRow = new QHBoxLayout;
 	toolbarRow->addWidget(toolbarScroll, 1);
-	toolbarRow->addWidget(noteLabels::createControls(this), 0, Qt::AlignTop | Qt::AlignRight);
+	auto* hoverControlsLayout = new QVBoxLayout;
+	hoverControlsLayout->setContentsMargins(0, 4, 0, 0);
+	hoverControlsLayout->addWidget(noteLabels::createControls(this, this), 0, Qt::AlignTop | Qt::AlignRight);
+	hoverControlsLayout->addStretch();
+	toolbarRow->addLayout(hoverControlsLayout);
 	layout->addLayout(toolbarRow);
 	auto* toolbarBody = new QWidget(toolbarScroll);
 	auto* toolbar = new QHBoxLayout(toolbarBody);

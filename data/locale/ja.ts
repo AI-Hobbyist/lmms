@@ -2016,6 +2016,18 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>数字譜の調</translation>
     </message>
     <message>
+        <source>Reference</source>
+        <translation>基準</translation>
+    </message>
+    <message>
+        <source>Follow global</source>
+        <translation>全体設定に従う</translation>
+    </message>
+    <message>
+        <source>Reference C pitch for this piano roll only; Follow global uses the global setting.</source>
+        <translation>このピアノロールの基準 C 音高だけを変更します。「全体設定に従う」を選ぶと全体設定を使用します。</translation>
+    </message>
+    <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
         <translation>数字譜の基準：%1%2。基準の C は全体設定で変更できます</translation>
     </message>

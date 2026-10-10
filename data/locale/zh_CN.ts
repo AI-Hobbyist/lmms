@@ -2016,6 +2016,18 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>简谱调号</translation>
     </message>
     <message>
+        <source>Reference</source>
+        <translation>基准</translation>
+    </message>
+    <message>
+        <source>Follow global</source>
+        <translation>跟随全局</translation>
+    </message>
+    <message>
+        <source>Reference C pitch for this piano roll only; Follow global uses the global setting.</source>
+        <translation>仅设置当前钢琴窗的参考 C 音高；选择“跟随全局”时使用全局设置。</translation>
+    </message>
+    <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
         <translation>简谱基准音：%1%2；基准 C 音可在全局设置修改</translation>
     </message>

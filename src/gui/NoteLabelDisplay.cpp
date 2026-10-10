@@ -1,15 +1,15 @@
 #include "NoteLabelDisplay.h"
 
 #include "ConfigManager.h"
-#include <QActionGroup>
+#include "ComboBox.h"
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QFontDatabase>
 #include <QFontMetricsF>
-#include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPalette>
 #include <QSignalBlocker>
-#include <QToolButton>
 #include <algorithm>
 #include <cmath>
 
@@ -20,12 +20,9 @@ const QStringList Names{"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯",
 int setting(const char* key, int fallback, int maximum)
 { return std::clamp(ConfigManager::inst()->value("ui", key, QString::number(fallback)).toInt(), 0, maximum); }
 
-int referencePitch()
-{ return 12 * setting("notelabeloctave", 5, 10) + setting("notelabeltonic", 0, 11); }
-
 // Digits and accidentals use Jianpu ASCII. Construct octave dots separately so
 // every MIDI octave is supported, including beyond the font's two-dot ligatures.
-QPainterPath numberedPath(int pitch)
+QPainterPath numberedPath(int pitch, int reference)
 {
 	static const QString family = [] {
 		const int id = QFontDatabase::addApplicationFont(":/JianpuASCII.ttf");
@@ -33,7 +30,7 @@ QPainterPath numberedPath(int pitch)
 	}();
 	QFont font(family);
 	font.setPixelSize(100);
-	const int relative = pitch - referencePitch();
+	const int relative = pitch - reference;
 	const int octave = int(std::floor(relative / 12.0));
 	static const QStringList Degrees{"1", "^1", "2", "^2", "3", "4", "^4", "5", "^5", "6", "^6", "7"};
 	QPainterPath path;
@@ -65,10 +62,25 @@ bool isSetting(const QString& group, const QString& key)
 			|| key == "pitchalignmentaxis" || key == "pitchalignmentlabelposition");
 }
 
-QString text(int pitch)
+int referencePitch(const QWidget* context)
+{
+	int octave = setting("notelabeloctave", 5, 10);
+	for (auto* widget = context; widget; widget = widget->parentWidget())
+	{
+		const auto local = widget->property("noteLabelReferenceOctave");
+		if (local.isValid())
+		{
+			if (local.toInt() >= 0) { octave = std::clamp(local.toInt(), 0, 10); }
+			break;
+		}
+	}
+	return 12 * octave + setting("notelabeltonic", 0, 11);
+}
+
+QString text(int pitch, const QWidget* context)
 {
 	if (!numbered()) { return Names[(pitch % 12 + 12) % 12] + QString::number(int(std::floor(pitch / 12.0)) - 1); }
-	const int relative = pitch - referencePitch();
+	const int relative = pitch - referencePitch(context);
 	static const QStringList Degrees{"1", "^1", "2", "^2", "3", "4", "^4", "5", "^5", "6", "^6", "7"};
 	const int octave = int(std::floor(relative / 12.0));
 	return Degrees[(relative % 12 + 12) % 12] + QString(std::abs(octave), octave > 0 ? '\'' : ',');
@@ -82,7 +94,7 @@ void draw(QPainter& painter, const QRectF& rectangle, int pitch, Qt::Alignment a
 		return;
 	}
 	if (rectangle.width() <= 0 || rectangle.height() <= 0) { return; }
-	const auto path = numberedPath(pitch);
+	const auto path = numberedPath(pitch, referencePitch());
 	const auto bounds = path.boundingRect();
 	const qreal textHeight = std::min(rectangle.height() * .8, QFontMetricsF(painter.font()).capHeight());
 	const qreal scale = std::min(textHeight / bounds.height(), rectangle.width() / bounds.width());
@@ -103,7 +115,7 @@ bool alignmentEnabled()
 
 void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer, int pitch,
 	double tick, double ticksPerBar, double ticksPerBeat, const QPalette& palette,
-	const QColor& pitchColor, const QColor& timeColor)
+	const QColor& pitchColor, const QColor& timeColor, const QWidget* context)
 {
 	if (!alignmentEnabled() || !area.contains(pointer) || pitch < 0 || pitch > 127 || tick < 0
 		|| ticksPerBar <= 0 || ticksPerBeat <= 0)
@@ -130,10 +142,11 @@ void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer
 	const QString time = QObject::tr("Bar %1 · Beat %2").arg(bar + 1)
 		.arg(1 + (tick - bar * ticksPerBar) / ticksPerBeat, 0, 'f', 2);
 	const qreal labelHeight = metrics.height() + 10;
-	const auto keyPath = showKey ? numberedPath(pitch) : QPainterPath{};
+	const int reference = referencePitch(context);
+	const auto keyPath = showKey ? numberedPath(pitch, reference) : QPainterPath{};
 	const auto keyBounds = keyPath.boundingRect();
 	// Keep the numeral large even when several octave dots extend the glyph.
-	const qreal keyScale = showKey ? 20.0 / numberedPath(referencePitch()).boundingRect().height() : 1.0;
+	const qreal keyScale = showKey ? 20.0 / numberedPath(reference, reference).boundingRect().height() : 1.0;
 	const qreal keyWidth = showKey ? keyBounds.width() * keyScale + 10 : 0;
 	const qreal pitchLabelHeight = std::max(labelHeight, keyBounds.height() * keyScale + 10);
 	auto panel = [&](const QString& label, QPointF position, bool keyLabel) {
@@ -177,75 +190,76 @@ void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer
 	painter.restore();
 }
 
-QToolButton* createControls(QWidget* parent)
+QWidget* createControls(QWidget* parent, QWidget* owner)
 {
-	// ConfigManager signals changes to existing values. Seed the shared options
-	// before connecting controls so the first user change also reaches both rolls.
+	// Seed shared settings before connecting the two piano-roll selectors.
 	const QList<QPair<QString, QString>> defaults{
-		{"printnotelabels", "0"}, {"notelabelmode", "pitch"}, {"notelabeltonic", "0"}, {"notelabeloctave", "5"},
+		{"printnotelabels", "0"}, {"notelabeltonic", "0"}, {"notelabeloctave", "5"},
 		{"pitchalignmentaxis", "0"}, {"pitchalignmentlabelposition", "axes"}};
 	for (const auto& option : defaults)
 	{
 		ConfigManager::inst()->setValue(
 			"ui", option.first, ConfigManager::inst()->value("ui", option.first, option.second));
 	}
-	auto* button = new QToolButton(parent);
-	button->setObjectName("noteLabelDisplayButton");
-	button->setPopupMode(QToolButton::InstantPopup);
-	auto* menu = new QMenu(button);
-	button->setMenu(menu);
-	auto addOptions = [button](QMenu* target, const QStringList& names, const QString& key, const QStringList& values) {
-		auto* group = new QActionGroup(target);
-		for (int index = 0; index < names.size(); ++index)
-		{
-			auto* action = target->addAction(names[index]);
-			action->setCheckable(true);
-			group->addAction(action);
-			action->setData(values[index]);
-			QObject::connect(action, &QAction::triggered, button, [key, value = values[index]] {
-				ConfigManager::inst()->setValue("ui", key, value);
-				ConfigManager::inst()->saveConfigFile();
-			});
-		}
-		return group;
-	};
-	auto* modes
-		= addOptions(menu, {QObject::tr("Standard pitch names CDEFGAB"), QObject::tr("Numbered notation 1234567")},
-			"notelabelmode", {"pitch", "numbered"});
-	auto* tonicMenu = menu->addMenu(QObject::tr("Numbered notation key"));
-	QStringList tonics, tonicValues;
-	for (int index = 0; index < 12; ++index)
+	ConfigManager::inst()->setValue("ui", "notelabelmode", "numbered");
+
+	auto* controls = new QWidget(parent);
+	controls->setObjectName("noteLabelDisplayControls");
+	controls->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	controls->setFixedHeight(32);
+	auto* layout = new QHBoxLayout(controls);
+	layout->setContentsMargins(0, 5, 0, 5);
+	layout->setSpacing(6);
+	auto* label = new QLabel("1=", controls);
+	auto* tonic = new ComboBox(controls);
+	tonic->setObjectName("noteLabelTonicComboBox");
+	tonic->setFixedSize(72, ComboBox::DEFAULT_HEIGHT);
+	label->setFont(tonic->font());
+	label->setBuddy(tonic);
+	for (const auto& name : Names)
 	{
-		tonics.append("1=" + Names[index]);
-		tonicValues.append(QString::number(index));
+		tonic->model()->addItem(name);
 	}
-	auto* tonicsGroup = addOptions(tonicMenu, tonics, "notelabeltonic", tonicValues);
-	auto refresh = [button, modes, tonicMenu, tonicsGroup] {
-		button->setVisible(alignmentEnabled());
-		button->setText(numbered() ? "123 · 1=" + Names[setting("notelabeltonic", 0, 11)] : "CDE / 123");
-		button->setToolTip(numbered()
-				? QObject::tr("Numbered notation reference: %1%2; change the reference C in global settings")
-					  .arg(Names[setting("notelabeltonic", 0, 11)])
-					  .arg(setting("notelabeloctave", 5, 10) - 1)
-				: QObject::tr("Hover pitch display: synchronized between SVS and instrument piano rolls"));
-		tonicMenu->menuAction()->setVisible(numbered());
-		const QList<QPair<QActionGroup*, QString>> choices{
-			{modes, ConfigManager::inst()->value("ui", "notelabelmode", "pitch")},
-			{tonicsGroup, QString::number(setting("notelabeltonic", 0, 11))}};
-		for (const auto& choice : choices)
-		{
-			for (auto* action : choice.first->actions())
-			{
-				QSignalBlocker blocker(action);
-				action->setChecked(action->data().toString() == choice.second);
-			}
-		}
+	layout->addWidget(label, 0, Qt::AlignVCenter);
+	layout->addWidget(tonic, 0, Qt::AlignVCenter);
+	auto* referenceLabel = new QLabel(QObject::tr("Reference"), controls);
+	auto* reference = new ComboBox(controls);
+	reference->setObjectName("noteLabelReferenceComboBox");
+	reference->model()->addItem(QObject::tr("Follow global"));
+	for (int octave = -1; octave <= 9; ++octave)
+	{
+		reference->model()->addItem("C" + QString::number(octave));
+	}
+	reference->setFixedSize(std::max(96, QFontMetrics(reference->font())
+		.horizontalAdvance(QObject::tr("Follow global")) + 30), ComboBox::DEFAULT_HEIGHT);
+	referenceLabel->setFont(reference->font());
+	referenceLabel->setBuddy(reference);
+	reference->setToolTip(QObject::tr("Reference C pitch for this piano roll only; Follow global uses the global setting."));
+	owner->setProperty("noteLabelReferenceOctave", -1);
+	QObject::connect(reference->model(), &Model::dataChanged, controls, [reference, owner] {
+		owner->setProperty("noteLabelReferenceOctave", reference->model()->value() - 1);
+		owner->update();
+		for (auto* child : owner->findChildren<QWidget*>()) { child->update(); }
+	});
+	layout->addWidget(referenceLabel, 0, Qt::AlignVCenter);
+	layout->addWidget(reference, 0, Qt::AlignVCenter);
+
+	auto refresh = [controls, tonic] {
+		controls->setVisible(alignmentEnabled());
+		QSignalBlocker blocker(tonic->model());
+		tonic->model()->setValue(setting("notelabeltonic", 0, 11));
+		tonic->update();
 	};
-	QObject::connect(ConfigManager::inst(), &ConfigManager::valueChanged, button,
+	QObject::connect(tonic->model(), &Model::dataChanged, controls, [tonic] {
+		ConfigManager::inst()->setValue("ui", "notelabeltonic", QString::number(tonic->model()->value()));
+		ConfigManager::inst()->setValue("ui", "notelabelmode", "numbered");
+		ConfigManager::inst()->saveConfigFile();
+	});
+	QObject::connect(ConfigManager::inst(), &ConfigManager::valueChanged, controls,
 		[refresh](const QString& group, const QString& key, const QString&) {
 			if (isSetting(group, key)) { refresh(); }
 		});
 	refresh();
-	return button;
+	return controls;
 }
 } // namespace lmms::gui::noteLabels

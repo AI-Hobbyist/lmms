@@ -957,7 +957,7 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 		noteLabels::drawAlignment(painter, grid, pointer, int(std::ceil(pitchAt(pointer.y()))),
 			tickAt(pointer.x()), TimePos::ticksPerBar(),
 			double(DefaultTicksPerBar) / Engine::getSong()->getTimeSigModel().getDenominator(), palette(),
-			m_colors.value("pitchAlignmentLineColor"), m_colors.value("timeAlignmentLineColor"));
+			m_colors.value("pitchAlignmentLineColor"), m_colors.value("timeAlignmentLineColor"), this);
 	}
 }
 void SVSCanvas::mousePressEvent(QMouseEvent* event)

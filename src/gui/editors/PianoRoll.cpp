@@ -4083,7 +4083,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			QRectF(m_whiteKeyWidth, keyAreaTop(), noteEditRight() - m_whiteKeyWidth, keyAreaBottom() - keyAreaTop()),
 			pointer, getKey(pointer.y()), tick, TimePos::ticksPerBar(),
 			double(DefaultTicksPerBar) / Engine::getSong()->getTimeSigModel().getDenominator(), palette(),
-			m_pitchAlignmentLineColor, m_timeAlignmentLineColor);
+			m_pitchAlignmentLineColor, m_timeAlignmentLineColor, this);
 	}
 }
 
@@ -5420,7 +5420,7 @@ PianoRollWindow::PianoRollWindow() :
 	auto* hoverSpacer = new QWidget(hoverTools);
 	hoverSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	hoverTools->addWidget(hoverSpacer);
-	auto* hoverControlsAction = hoverTools->addWidget(noteLabels::createControls(hoverTools));
+	auto* hoverControlsAction = hoverTools->addWidget(noteLabels::createControls(hoverTools, m_editor));
 	hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
 	connect(ConfigManager::inst(), &ConfigManager::valueChanged, hoverControlsAction,
 		[hoverControlsAction](const QString& group, const QString& key, const QString&) {

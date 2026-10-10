@@ -2011,6 +2011,18 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Reference</source>
+        <translation>Reference</translation>
+    </message>
+    <message>
+        <source>Follow global</source>
+        <translation>Follow global</translation>
+    </message>
+    <message>
+        <source>Reference C pitch for this piano roll only; Follow global uses the global setting.</source>
+        <translation>Reference C pitch for this piano roll only; Follow global uses the global setting.</translation>
+    </message>
+    <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
         <translation type="unfinished"></translation>
     </message>

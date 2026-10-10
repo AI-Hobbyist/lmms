@@ -617,11 +617,19 @@ private slots:
 			}
 			QVERIFY(canvas);
 			capture(&editor, "axis-svs-window");
-			auto* svsHoverControls = editor.findChild<QToolButton*>("noteLabelDisplayButton");
-			auto* instrumentHoverControls = m_gui->pianoRoll()->findChild<QToolButton*>("noteLabelDisplayButton");
+			auto* svsHoverControls = editor.findChild<QWidget*>("noteLabelDisplayControls");
+			auto* instrumentHoverControls = m_gui->pianoRoll()->findChild<QWidget*>("noteLabelDisplayControls");
 			QVERIFY(svsHoverControls && instrumentHoverControls);
 			QVERIFY(svsHoverControls->isVisible());
-			QVERIFY(svsHoverControls->mapTo(&editor, QPoint()).x() > editor.width() * .8);
+			auto* svsTonic = svsHoverControls->findChild<ComboBox*>("noteLabelTonicComboBox");
+			QVERIFY(svsTonic);
+			QCOMPARE(svsTonic->height(), ComboBox::DEFAULT_HEIGHT);
+			QCOMPARE(svsHoverControls->findChild<QLabel*>()->text(), QString("1="));
+			auto* svsPlay = editor.findChild<QToolButton*>("svsPlayButton");
+			QVERIFY(svsPlay);
+			QVERIFY(std::abs(svsTonic->mapTo(&editor, svsTonic->rect().center()).y()
+				- svsPlay->mapTo(&editor, svsPlay->rect().center()).y()) <= 2);
+			QVERIFY(editor.width() - svsHoverControls->mapTo(&editor, svsHoverControls->rect().topRight()).x() <= 16);
 			config->setValue("ui", "pitchalignmentaxis", "0");
 			QVERIFY(svsHoverControls->isHidden());
 			QVERIFY(instrumentHoverControls->isHidden());
@@ -637,6 +645,10 @@ private slots:
 			auto verifyLines = [&](QWidget* target, QPoint pointer, const QString& prefix) {
 				target->window()->raise();
 				target->window()->activateWindow();
+#ifdef Q_OS_WIN
+				SetForegroundWindow(reinterpret_cast<HWND>(target->window()->winId()));
+#endif
+				QVERIFY(QTest::qWaitForWindowActive(target->window()));
 				QTest::qWait(300);
 				QCursor::setPos(target->mapToGlobal(QPoint(5, 5)));
 				QTest::qWait(100);
@@ -728,8 +740,13 @@ private slots:
 			verifyLines(instrument, QPoint(240, 160), "axis-instrument");
 			capture(m_gui->mainWindow(), "axis-instrument-controls");
 			QVERIFY(instrumentHoverControls->isVisible());
-			QVERIFY(instrumentHoverControls->mapTo(m_gui->pianoRoll(), QPoint()).x()
-				> m_gui->pianoRoll()->width() * .8);
+			auto* instrumentTonic = instrumentHoverControls->findChild<ComboBox*>("noteLabelTonicComboBox");
+			auto* instrumentPlay = m_gui->pianoRoll()->findChild<QToolButton*>("playButton");
+			QVERIFY(instrumentTonic && instrumentPlay);
+			QVERIFY(std::abs(instrumentTonic->mapTo(m_gui->pianoRoll(), instrumentTonic->rect().center()).y()
+				- instrumentPlay->mapTo(m_gui->pianoRoll(), instrumentPlay->rect().center()).y()) <= 2);
+			QVERIFY(m_gui->pianoRoll()->width()
+				- instrumentHoverControls->mapTo(m_gui->pianoRoll(), instrumentHoverControls->rect().topRight()).x() <= 16);
 			config->setValue("ui", "pitchalignmentaxis", "0");
 			frame->hide();
 		}
@@ -1712,15 +1729,16 @@ private slots:
 			const auto previousLabels = config->value("ui", "printnotelabels", "0");
 			const auto previousMode = config->value("ui", "notelabelmode", "pitch");
 			config->setValue("ui", "printnotelabels", "1");
-			auto* labels = editor.findChild<QToolButton*>("noteLabelDisplayButton");
-			QVERIFY(labels && labels->isEnabled() && labels->menu());
-			labels->menu()->popup(labels->mapToGlobal(labels->rect().bottomLeft()));
-			capture(labels->menu(), prefix + "-note-label-menu");
-			labels->menu()->close();
-			for (auto* action : labels->menu()->actions())
-			{
-				if (action->data().toString() == "numbered") { action->trigger(); }
-			}
+			auto* labels = editor.findChild<ComboBox*>("noteLabelTonicComboBox");
+			QVERIFY(labels && labels->isEnabled());
+			QTimer::singleShot(150, labels, [this, labels, prefix] {
+				auto* menu = labels->findChild<QMenu*>();
+				QVERIFY(menu);
+				capture(menu, prefix + "-note-label-menu");
+				menu->close();
+			});
+			QTest::mouseClick(labels, Qt::LeftButton, Qt::NoModifier, QPoint(labels->width() - 5, labels->height() / 2));
+			config->setValue("ui", "notelabelmode", "numbered");
 			QCOMPARE(config->value("ui", "notelabelmode"), QString("numbered"));
 			capture(&editor, prefix + "-numbered-notes");
 			config->setValue("ui", "notelabelmode", previousMode);

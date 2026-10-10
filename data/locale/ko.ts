@@ -2016,6 +2016,18 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>숫자 악보 조성</translation>
     </message>
     <message>
+        <source>Reference</source>
+        <translation>기준</translation>
+    </message>
+    <message>
+        <source>Follow global</source>
+        <translation>전역 설정 따르기</translation>
+    </message>
+    <message>
+        <source>Reference C pitch for this piano roll only; Follow global uses the global setting.</source>
+        <translation>이 피아노 롤의 기준 C 음높이만 변경합니다. “전역 설정 따르기”를 선택하면 전역 설정을 사용합니다.</translation>
+    </message>
+    <message>
         <source>Numbered notation reference: %1%2; change the reference C in global settings</source>
         <translation>숫자 악보 기준: %1%2. 기준 C는 전역 설정에서 변경하세요</translation>
     </message>
