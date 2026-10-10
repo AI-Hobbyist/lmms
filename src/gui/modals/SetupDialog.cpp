@@ -264,6 +264,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	guiGroupLayout->addWidget(alignmentAxis);
 	connect(alignmentAxis, &QCheckBox::toggled, this, [this](bool enabled) {
 		m_pitchAlignmentAxis = enabled;
+		m_numberedReference->setEnabled(enabled && noteLabels::numbered());
 	});
 	auto* alignmentLabelRow = new QHBoxLayout;
 	auto* alignmentLabel = new QLabel(QObject::tr("Alignment hover information position"), guiGroupBox);
@@ -289,7 +290,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	}
 	m_numberedReference->setCurrentIndex(
 		std::clamp(ConfigManager::inst()->value("ui", "notelabeloctave", "5").toInt(), 0, 10));
-	m_numberedReference->setEnabled(m_printNoteLabels && noteLabels::numbered());
+	m_numberedReference->setEnabled(m_pitchAlignmentAxis && noteLabels::numbered());
 	referenceLabel->setBuddy(m_numberedReference);
 	referenceRow->addWidget(referenceLabel);
 	referenceRow->addWidget(m_numberedReference);
@@ -299,7 +300,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			if (noteLabels::isSetting(group, key))
 			{
 				m_numberedReference->setEnabled(
-					m_printNoteLabels && ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered");
+					m_pitchAlignmentAxis && noteLabels::numbered());
 			}
 		});
 	addCheckBox(tr("Show fader ticks"), guiGroupBox, guiGroupLayout,
@@ -1379,11 +1380,6 @@ void SetupDialog::toggleDisplayWaveform(bool enabled)
 void SetupDialog::toggleNoteLabels(bool enabled)
 {
 	m_printNoteLabels = enabled;
-	if (m_numberedReference)
-	{
-		m_numberedReference->setEnabled(
-			enabled && ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered");
-	}
 }
 
 void SetupDialog::toggleShowFaderTicks(bool enabled)

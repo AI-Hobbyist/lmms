@@ -617,6 +617,16 @@ private slots:
 			}
 			QVERIFY(canvas);
 			capture(&editor, "axis-svs-window");
+			auto* svsHoverControls = editor.findChild<QToolButton*>("noteLabelDisplayButton");
+			auto* instrumentHoverControls = m_gui->pianoRoll()->findChild<QToolButton*>("noteLabelDisplayButton");
+			QVERIFY(svsHoverControls && instrumentHoverControls);
+			QVERIFY(svsHoverControls->isVisible());
+			QVERIFY(svsHoverControls->mapTo(&editor, QPoint()).x() > editor.width() * .8);
+			config->setValue("ui", "pitchalignmentaxis", "0");
+			QVERIFY(svsHoverControls->isHidden());
+			QVERIFY(instrumentHoverControls->isHidden());
+			config->setValue("ui", "pitchalignmentaxis", "1");
+			QVERIFY(!svsHoverControls->isHidden() && !instrumentHoverControls->isHidden());
 			QCOMPARE(editor.property("pitchAlignmentLineColor").value<QColor>(), QColor("#8ec6e8"));
 			QCOMPARE(editor.property("timeAlignmentLineColor").value<QColor>(), QColor("#e8c68e"));
 			editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-pitchAlignmentLineColor: #ff8090; "
@@ -627,6 +637,7 @@ private slots:
 			auto verifyLines = [&](QWidget* target, QPoint pointer, const QString& prefix) {
 				target->window()->raise();
 				target->window()->activateWindow();
+				QTest::qWait(300);
 				QCursor::setPos(target->mapToGlobal(QPoint(5, 5)));
 				QTest::qWait(100);
 				QTest::mouseMove(target, pointer);
@@ -638,9 +649,13 @@ private slots:
 				};
 				config->setValue("ui", "pitchalignmentaxis", "0");
 				QTest::qWait(300);
+				QTest::mouseMove(target, pointer);
+				QTest::qWait(100);
 				const auto without = nativeImage();
 				config->setValue("ui", "pitchalignmentaxis", "1");
 				QTest::qWait(300);
+				QTest::mouseMove(target, pointer);
+				QTest::qWait(100);
 				const auto with = nativeImage();
 				QVERIFY(!with.isNull() && with.size() == without.size());
 				int horizontalChanges = 0, verticalChanges = 0;
@@ -669,9 +684,13 @@ private slots:
 				QVERIFY(timePixels > 10);
 				QVERIFY(with.save(m_output + '/' + prefix + "-standard.png"));
 				config->setValue("ui", "printnotelabels", "1");
+				config->setValue("ui", "notelabelmode", "pitch");
+				QTest::qWait(300);
+				const auto standardKeyboard = nativeImage().copy(0, 30, 60, target->height() - 160);
 				config->setValue("ui", "notelabelmode", "numbered");
 				QTest::mouseMove(target, pointer + QPoint(90, 35));
 				QTest::qWait(300);
+				QCOMPARE(nativeImage().copy(0, 30, 60, target->height() - 160), standardKeyboard);
 				QVERIFY(nativeImage().save(m_output + '/' + prefix + "-numbered.png"));
 				config->setValue("ui", "pitchalignmentlabelposition", "cursor");
 				QTest::qWait(300);
@@ -681,6 +700,7 @@ private slots:
 			verifyLines(canvas, canvas->pointAt(48, 69).toPoint() + QPoint(0, 12), "axis-svs");
 			config->setValue("ui", "notelabeltonic", "0");
 			config->setValue("ui", "notelabeloctave", "5");
+			config->setValue("ui", "printnotelabels", "0");
 			for (const auto pitch : {84, 36})
 			{
 				canvas->setScroll(0, pitch + 8);
@@ -706,6 +726,10 @@ private slots:
 			m_gui->mainWindow()->activateWindow();
 			QTest::qWait(600);
 			verifyLines(instrument, QPoint(240, 160), "axis-instrument");
+			capture(m_gui->mainWindow(), "axis-instrument-controls");
+			QVERIFY(instrumentHoverControls->isVisible());
+			QVERIFY(instrumentHoverControls->mapTo(m_gui->pianoRoll(), QPoint()).x()
+				> m_gui->pianoRoll()->width() * .8);
 			config->setValue("ui", "pitchalignmentaxis", "0");
 			frame->hide();
 		}

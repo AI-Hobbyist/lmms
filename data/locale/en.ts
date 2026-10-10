@@ -1995,8 +1995,8 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
-        <translation type="unfinished"></translation>
+        <source>Hover pitch display: synchronized between SVS and instrument piano rolls</source>
+        <translation>Hover pitch display: synchronized between SVS and instrument piano rolls</translation>
     </message>
     <message>
         <source>Standard pitch names CDEFGAB</source>

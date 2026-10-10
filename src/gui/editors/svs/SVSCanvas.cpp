@@ -913,9 +913,9 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 				if (allNoteLabels)
 				{
 					painter.setPen(isBlack ? m_colors.value("blackKeyTextColor", QColor(Qt::white)) : text);
-					noteLabels::draw(painter,
-						QRectF(0, y, (isBlack ? KeyboardWidth * .75 : KeyboardWidth) - 3, m_rowHeight), pitch,
-						Qt::AlignRight);
+					painter.drawText(
+						QRectF(0, y, (isBlack ? KeyboardWidth * .75 : KeyboardWidth) - 3, m_rowHeight),
+						Qt::AlignRight | Qt::AlignVCenter, noteLabel(pitch));
 				}
 				else if (!isBlack && key == 0)
 				{

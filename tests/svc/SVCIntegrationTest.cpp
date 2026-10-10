@@ -986,7 +986,8 @@ private slots:
 	void sharedNoteLabelModesNative()
 	{
 		auto* config = ConfigManager::inst();
-		const QStringList keys{"printnotelabels", "notelabelmode", "notelabeltonic", "notelabeloctave"};
+		const QStringList keys{
+			"printnotelabels", "notelabelmode", "notelabeltonic", "notelabeloctave", "pitchalignmentaxis"};
 		QStringList saved;
 		for (const auto& key : keys)
 		{
@@ -997,6 +998,7 @@ private slots:
 		config->setValue("ui", "notelabeltonic", "0");
 		config->setValue("ui", "notelabeloctave", "5");
 		QCOMPARE(gui::noteLabels::text(60), QString("1"));
+		config->setValue("ui", "pitchalignmentaxis", "1");
 		QCOMPARE(gui::noteLabels::text(61), QString("^1"));
 		QCOMPARE(gui::noteLabels::text(59), QString("7,"));
 		QCOMPARE(gui::noteLabels::text(72), QString("1'"));
@@ -1097,8 +1099,8 @@ private slots:
 		editor.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&editor));
 		config->setValue("ui", "printnotelabels", "0");
-		QVERIFY(!gui::noteLabels::numbered());
-		QVERIFY(!svsButton->isEnabled() && !midiButton->isEnabled());
+		QVERIFY(gui::noteLabels::numbered());
+		QVERIFY(svsButton->isEnabled() && midiButton->isEnabled());
 		QTest::qWait(100);
 		const auto originalKeyboard = canvas->grab(QRect(0, 24, 60, canvas->height() - 24)).toImage();
 		config->setValue("ui", "notelabelmode", "pitch");

@@ -3583,7 +3583,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				const bool black = prKeyOrder[keyCode] == KeyType::Black;
 				p.setPen(black ? blackKeyTextColor() : m_whiteKeyInactiveTextColor);
-				noteLabels::draw(p, QRectF(0, yb - m_keyLineHeight, kw - 3, m_keyLineHeight), key, Qt::AlignRight);
+				p.drawText(QRectF(0, yb - m_keyLineHeight, kw - 3, m_keyLineHeight),
+					Qt::AlignRight | Qt::AlignVCenter, getNoteString(key));
 			}
 			else if (static_cast<Key>(keyCode) == Key::C)
 			{
@@ -5332,7 +5333,6 @@ PianoRollWindow::PianoRollWindow() :
 	m_fileToolsButton->addAction(importAction);
 	m_fileToolsButton->addAction(exportAction);
 	fileActionsToolBar->addWidget(m_fileToolsButton);
-	fileActionsToolBar->addWidget(noteLabels::createControls(fileActionsToolBar));
 	connect(ConfigManager::inst(), &ConfigManager::valueChanged, m_editor,
 		[editor = m_editor](const QString& group, const QString& key, const QString&) {
 			if (noteLabels::isSetting(group, key)) { editor->update(); }
@@ -5412,6 +5412,24 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
+	auto* hoverTools = new QToolBar(this);
+	hoverTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	hoverTools->setMovable(false);
+	hoverTools->setFloatable(false);
+	hoverTools->setContextMenuPolicy(Qt::PreventContextMenu);
+	auto* hoverSpacer = new QWidget(hoverTools);
+	hoverSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	hoverTools->addWidget(hoverSpacer);
+	auto* hoverControlsAction = hoverTools->addWidget(noteLabels::createControls(hoverTools));
+	hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged, hoverControlsAction,
+		[hoverControlsAction](const QString& group, const QString& key, const QString&) {
+			if (group == "ui" && key == "pitchalignmentaxis")
+			{
+				hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
+			}
+		});
+	addToolBar(Qt::TopToolBarArea, hoverTools);
 
 	addToolBarBreak();
 

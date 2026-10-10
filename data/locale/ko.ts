@@ -2000,8 +2000,8 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>실패: %1. 부분 결과 유지</translation>
     </message>
     <message>
-        <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
-        <translation>음 이름 레이블: SVS / 악기 피아노 롤과 동기화합니다. 사용하려면 모든 음 이름 레이블을 활성화하세요</translation>
+        <source>Hover pitch display: synchronized between SVS and instrument piano rolls</source>
+        <translation>마우스 위치의 음높이 표시: SVS와 악기 피아노 롤 간 동기화</translation>
     </message>
     <message>
         <source>Standard pitch names CDEFGAB</source>

@@ -56,7 +56,7 @@ bool enabled()
 { return ConfigManager::inst()->value("ui", "printnotelabels").toInt() != 0; }
 
 bool numbered()
-{ return enabled() && ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered"; }
+{ return ConfigManager::inst()->value("ui", "notelabelmode", "pitch") == "numbered"; }
 
 bool isSetting(const QString& group, const QString& key)
 {
@@ -121,13 +121,15 @@ void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer
 	font.setPixelSize(13);
 	painter.setFont(font);
 	const QFontMetricsF metrics(font);
+	const bool showKey = numbered();
 	const QString standard = Names[pitch % 12] + QString::number(pitch / 12 - 1)
 		+ QString(" · %1 Hz").arg(440. * std::pow(2., (pitch - 69) / 12.), 0, 'f', 2);
+	const QString pitchInformation
+		= standard + (showKey ? " · 1=" + Names[setting("notelabeltonic", 0, 11)] : QString{});
 	const int bar = int(std::floor(tick / ticksPerBar));
 	const QString time = QObject::tr("Bar %1 · Beat %2").arg(bar + 1)
 		.arg(1 + (tick - bar * ticksPerBar) / ticksPerBeat, 0, 'f', 2);
 	const qreal labelHeight = metrics.height() + 10;
-	const bool showKey = numbered();
 	const auto keyPath = showKey ? numberedPath(pitch) : QPainterPath{};
 	const auto keyBounds = keyPath.boundingRect();
 	// Keep the numeral large even when several octave dots extend the glyph.
@@ -157,19 +159,19 @@ void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer
 	};
 	if (ConfigManager::inst()->value("ui", "pitchalignmentlabelposition", "axes") == "cursor")
 	{
-		const qreal labelWidth = std::max(metrics.horizontalAdvance(standard) + keyWidth,
+		const qreal labelWidth = std::max(metrics.horizontalAdvance(pitchInformation) + keyWidth,
 			metrics.horizontalAdvance(time)) + 12;
 		const qreal x = std::clamp(pointer.x() + 12, area.left(), std::max(area.left(), area.right() - labelWidth));
 		const qreal y = std::clamp(pointer.y() + 12, area.top(),
 			std::max(area.top(), area.bottom() - pitchLabelHeight - labelHeight - 4));
-		panel(standard, QPointF(x, y), showKey);
+		panel(pitchInformation, QPointF(x, y), showKey);
 		panel(time, QPointF(x, y + pitchLabelHeight + 4), false);
 	}
 	else
 	{
 		panel(time, QPointF(pointer.x() + 12, area.top() + 4), false);
 		const qreal pitchY = pointer.y() - pitchLabelHeight - 8;
-		panel(standard, QPointF(area.left() + 4,
+		panel(pitchInformation, QPointF(area.left() + 4,
 			pitchY < area.top() + labelHeight + 8 ? pointer.y() + 8 : pitchY), showKey);
 	}
 	painter.restore();
@@ -190,8 +192,6 @@ QToolButton* createControls(QWidget* parent)
 	auto* button = new QToolButton(parent);
 	button->setObjectName("noteLabelDisplayButton");
 	button->setPopupMode(QToolButton::InstantPopup);
-	button->setToolTip(
-		QObject::tr("Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this"));
 	auto* menu = new QMenu(button);
 	button->setMenu(menu);
 	auto addOptions = [button](QMenu* target, const QStringList& names, const QString& key, const QStringList& values) {
@@ -221,14 +221,13 @@ QToolButton* createControls(QWidget* parent)
 	}
 	auto* tonicsGroup = addOptions(tonicMenu, tonics, "notelabeltonic", tonicValues);
 	auto refresh = [button, modes, tonicMenu, tonicsGroup] {
-		button->setEnabled(enabled());
+		button->setVisible(alignmentEnabled());
 		button->setText(numbered() ? "123 · 1=" + Names[setting("notelabeltonic", 0, 11)] : "CDE / 123");
 		button->setToolTip(numbered()
 				? QObject::tr("Numbered notation reference: %1%2; change the reference C in global settings")
 					  .arg(Names[setting("notelabeltonic", 0, 11)])
 					  .arg(setting("notelabeloctave", 5, 10) - 1)
-				: QObject::tr("Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to "
-							  "use this"));
+				: QObject::tr("Hover pitch display: synchronized between SVS and instrument piano rolls"));
 		tonicMenu->menuAction()->setVisible(numbered());
 		const QList<QPair<QActionGroup*, QString>> choices{
 			{modes, ConfigManager::inst()->value("ui", "notelabelmode", "pitch")},

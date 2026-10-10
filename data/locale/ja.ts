@@ -2000,8 +2000,8 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>失敗：%1。部分的な結果を保持</translation>
     </message>
     <message>
-        <source>Note labels: synchronized with SVS / instrument piano rolls; enable all note labels to use this</source>
-        <translation>音名ラベル：SVS / 楽器のピアノロールと同期します。使用するには全音名ラベルを有効にしてください</translation>
+        <source>Hover pitch display: synchronized between SVS and instrument piano rolls</source>
+        <translation>ホバー時の音高表示：SVS と楽器のピアノロールで同期</translation>
     </message>
     <message>
         <source>Standard pitch names CDEFGAB</source>

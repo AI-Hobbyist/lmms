@@ -715,12 +715,14 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	toolbarScroll->setFrameShape(QFrame::NoFrame);
 	toolbarScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	toolbarScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	layout->addWidget(toolbarScroll);
+	auto* toolbarRow = new QHBoxLayout;
+	toolbarRow->addWidget(toolbarScroll, 1);
+	toolbarRow->addWidget(noteLabels::createControls(this), 0, Qt::AlignTop | Qt::AlignRight);
+	layout->addLayout(toolbarRow);
 	auto* toolbarBody = new QWidget(toolbarScroll);
 	auto* toolbar = new QHBoxLayout(toolbarBody);
 	toolbar->setContentsMargins(0, 0, 0, 0);
 	toolbarScroll->setWidget(toolbarBody);
-	toolbar->addWidget(noteLabels::createControls(toolbarBody));
 	auto nativeIcon = [](const QString& name) {
 		QIcon icon("resources:" + name + ".png");
 		return icon.isNull() ? QIcon("data:/themes/default/" + name + ".png") : icon;
