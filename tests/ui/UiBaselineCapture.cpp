@@ -679,6 +679,21 @@ private slots:
 				config->setValue("ui", "pitchalignmentlabelposition", "axes");
 			};
 			verifyLines(canvas, canvas->pointAt(48, 69).toPoint() + QPoint(0, 12), "axis-svs");
+			config->setValue("ui", "notelabeltonic", "0");
+			config->setValue("ui", "notelabeloctave", "5");
+			for (const auto pitch : {84, 36})
+			{
+				canvas->setScroll(0, pitch + 8);
+				QTest::qWait(100);
+				QTest::mouseMove(canvas, canvas->pointAt(48, pitch).toPoint() + QPoint(0, 12));
+				for (const auto& position : {QString("axes"), QString("cursor")})
+				{
+					config->setValue("ui", "pitchalignmentlabelposition", position);
+					QTest::qWait(300);
+					capture(&editor, QString("axis-octave-%1-%2").arg(pitch).arg(position));
+				}
+			}
+			config->setValue("ui", "pitchalignmentlabelposition", "axes");
 			editor.hide();
 			config->setValue("ui", "printnotelabels", "0");
 			m_gui->pianoRoll()->show();

@@ -127,36 +127,50 @@ void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer
 	const QString time = QObject::tr("Bar %1 · Beat %2").arg(bar + 1)
 		.arg(1 + (tick - bar * ticksPerBar) / ticksPerBeat, 0, 'f', 2);
 	const qreal labelHeight = metrics.height() + 10;
+	const bool showKey = numbered();
+	const auto keyPath = showKey ? numberedPath(pitch) : QPainterPath{};
+	const auto keyBounds = keyPath.boundingRect();
+	// Keep the numeral large even when several octave dots extend the glyph.
+	const qreal keyScale = showKey ? 20.0 / numberedPath(referencePitch()).boundingRect().height() : 1.0;
+	const qreal keyWidth = showKey ? keyBounds.width() * keyScale + 10 : 0;
+	const qreal pitchLabelHeight = std::max(labelHeight, keyBounds.height() * keyScale + 10);
 	auto panel = [&](const QString& label, QPointF position, bool keyLabel) {
-		const qreal keyWidth = keyLabel ? 32 : 0;
-		const qreal labelWidth = metrics.horizontalAdvance(label) + keyWidth + 12;
+		const qreal keySpace = keyLabel ? keyWidth : 0;
+		const qreal panelHeight = keyLabel ? pitchLabelHeight : labelHeight;
+		const qreal labelWidth = metrics.horizontalAdvance(label) + keySpace + 12;
 		position.setX(std::clamp(position.x(), area.left(), std::max(area.left(), area.right() - labelWidth)));
-		position.setY(std::clamp(position.y(), area.top(), std::max(area.top(), area.bottom() - labelHeight)));
-		const QRectF box(position, QSizeF(labelWidth, labelHeight));
+		position.setY(std::clamp(position.y(), area.top(), std::max(area.top(), area.bottom() - panelHeight)));
+		const QRectF box(position, QSizeF(labelWidth, panelHeight));
 		painter.fillRect(box, palette.color(QPalette::ToolTipBase));
 		painter.setPen(palette.color(QPalette::ToolTipText));
 		if (keyLabel)
 		{
-			draw(painter, box.adjusted(6, 3, -(labelWidth - keyWidth), -3), pitch, Qt::AlignLeft);
+			painter.save();
+			painter.setRenderHint(QPainter::Antialiasing);
+			painter.translate(box.left() + 6, box.center().y() - keyBounds.height() * keyScale / 2);
+			painter.scale(keyScale, keyScale);
+			painter.translate(-keyBounds.left(), -keyBounds.top());
+			painter.fillPath(keyPath, painter.pen().color());
+			painter.restore();
 		}
-		painter.drawText(box.adjusted(6 + keyWidth, 0, -6, 0), Qt::AlignVCenter | Qt::AlignLeft, label);
+		painter.drawText(box.adjusted(6 + keySpace, 0, -6, 0), Qt::AlignVCenter | Qt::AlignLeft, label);
 	};
 	if (ConfigManager::inst()->value("ui", "pitchalignmentlabelposition", "axes") == "cursor")
 	{
-		const qreal labelWidth = std::max(metrics.horizontalAdvance(standard) + (numbered() ? 32 : 0),
+		const qreal labelWidth = std::max(metrics.horizontalAdvance(standard) + keyWidth,
 			metrics.horizontalAdvance(time)) + 12;
 		const qreal x = std::clamp(pointer.x() + 12, area.left(), std::max(area.left(), area.right() - labelWidth));
 		const qreal y = std::clamp(pointer.y() + 12, area.top(),
-			std::max(area.top(), area.bottom() - 2 * labelHeight - 4));
-		panel(standard, QPointF(x, y), numbered());
-		panel(time, QPointF(x, y + labelHeight + 4), false);
+			std::max(area.top(), area.bottom() - pitchLabelHeight - labelHeight - 4));
+		panel(standard, QPointF(x, y), showKey);
+		panel(time, QPointF(x, y + pitchLabelHeight + 4), false);
 	}
 	else
 	{
 		panel(time, QPointF(pointer.x() + 12, area.top() + 4), false);
-		const qreal pitchY = pointer.y() - labelHeight - 8;
+		const qreal pitchY = pointer.y() - pitchLabelHeight - 8;
 		panel(standard, QPointF(area.left() + 4,
-			pitchY < area.top() + labelHeight + 8 ? pointer.y() + 8 : pitchY), numbered());
+			pitchY < area.top() + labelHeight + 8 ? pointer.y() + 8 : pitchY), showKey);
 	}
 	painter.restore();
 }
