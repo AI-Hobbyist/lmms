@@ -2524,6 +2524,10 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 {
+	if (noteLabels::alignmentEnabled())
+	{
+		update();
+	}
 	if( ! hasValidMidiClip() )
 	{
 		update();
@@ -4068,6 +4072,17 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		{
 			p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
 		}
+	}
+	if (underMouse())
+	{
+		const QPoint pointer = mapFromGlobal(QCursor::pos());
+		const double tick = int(m_currentPosition)
+			+ (pointer.x() - m_whiteKeyWidth) * double(TimePos::ticksPerBar()) / m_ppb;
+		noteLabels::drawAlignment(p,
+			QRectF(m_whiteKeyWidth, keyAreaTop(), noteEditRight() - m_whiteKeyWidth, keyAreaBottom() - keyAreaTop()),
+			pointer, getKey(pointer.y()), tick, TimePos::ticksPerBar(),
+			double(DefaultTicksPerBar) / Engine::getSong()->getTimeSigModel().getDenominator(), palette(),
+			m_pitchAlignmentLineColor, m_timeAlignmentLineColor);
 	}
 }
 

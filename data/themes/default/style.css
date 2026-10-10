@@ -503,6 +503,8 @@ lmms--gui--PositionLine {
 }
 
 lmms--gui--PianoRoll {
+	qproperty-pitchAlignmentLineColor: #8ec6e8;
+	qproperty-timeAlignmentLineColor: #e8c68e;
 	qproperty-noteCornerRadius: 2;
 	background-color: #14181D;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
@@ -1592,6 +1594,8 @@ lmms--gui--BarModelEditor {
 
 /* Native SVS editor follows this theme's piano and palette colors. */
 lmms--gui--SVSPianoRoll {
+	qproperty-pitchAlignmentLineColor: #8ec6e8;
+	qproperty-timeAlignmentLineColor: #e8c68e;
 	qproperty-whiteKeyInactiveBackground: #E5EAF0;
 	qproperty-blackKeyInactiveBackground: #20262D;
 	qproperty-whiteKeyInactiveTextColor: #000;

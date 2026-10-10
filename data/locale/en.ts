@@ -2078,6 +2078,30 @@ This chip was used in the Commodore 64 computer.</source>
         <source>Effects</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show piano roll alignment guides</source>
+        <translation>Show piano roll alignment guides</translation>
+    </message>
+    <message>
+        <source>Follow the mouse: horizontal pitch, vertical bar and beat</source>
+        <translation>Follow the mouse: horizontal pitch, vertical bar and beat</translation>
+    </message>
+    <message>
+        <source>Bar %1 · Beat %2</source>
+        <translation>Bar %1 · Beat %2</translation>
+    </message>
+    <message>
+        <source>Alignment hover information position</source>
+        <translation>Alignment hover information position</translation>
+    </message>
+    <message>
+        <source>At the alignment guide edges</source>
+        <translation>At the alignment guide edges</translation>
+    </message>
+    <message>
+        <source>Near the mouse pointer</source>
+        <translation>Near the mouse pointer</translation>
+    </message>
 </context>
 <context>
     <name>QWidget</name>

@@ -579,6 +579,135 @@ private slots:
 		capture(&dialog, "M4-export-" + language);
 		dialog.close();
 	}
+	void pitchAlignmentAxes()
+	{
+		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
+		auto* config = ConfigManager::inst();
+		config->setValue("ui", "pitchalignmentaxis", "0");
+		config->setValue("ui", "printnotelabels", "0");
+		auto* song = Engine::getSong();
+		auto* midiTrack = new InstrumentTrack(song);
+		auto* midi = static_cast<MidiClip*>(midiTrack->createClip(0));
+		midi->addNote(Note(TimePos(96), TimePos(0), 69));
+		m_gui->pianoRoll()->setCurrentMidiClip(midi);
+		auto* instrument = m_gui->pianoRoll()->findChild<PianoRoll*>();
+		QVERIFY(instrument);
+		{
+			SetupDialog settings(SetupDialog::ConfigTab::GeneralSettings);
+			auto* checkbox = settings.findChild<QCheckBox*>("pitchAlignmentAxisCheckBox");
+			QVERIFY(checkbox && !checkbox->isChecked());
+			auto* labelPosition = settings.findChild<QComboBox*>("alignmentLabelPosition");
+			QVERIFY(labelPosition);
+			QCOMPARE(labelPosition->currentData().toString(), QString("axes"));
+			capture(&settings, "axis-global-settings");
+			QTest::mouseClick(checkbox, Qt::LeftButton, Qt::NoModifier, QPoint(8, checkbox->height() / 2));
+			QVERIFY(checkbox->isChecked());
+			QVERIFY(QMetaObject::invokeMethod(&settings, "accept", Qt::DirectConnection));
+			QCOMPARE(config->value("ui", "pitchalignmentaxis"), QString("1"));
+		}
+		auto* svsTrack = new SVSTrack(song);
+		auto* clip = static_cast<SVSClip*>(svsTrack->createClip(0));
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			SVSCanvas* canvas = nullptr;
+			for (auto* candidate : editor.findChildren<SVSCanvas*>())
+			{
+				if (!candidate->isParameterLane()) { canvas = candidate; }
+			}
+			QVERIFY(canvas);
+			capture(&editor, "axis-svs-window");
+			QCOMPARE(editor.property("pitchAlignmentLineColor").value<QColor>(), QColor("#8ec6e8"));
+			QCOMPARE(editor.property("timeAlignmentLineColor").value<QColor>(), QColor("#e8c68e"));
+			editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-pitchAlignmentLineColor: #ff8090; "
+				"qproperty-timeAlignmentLineColor: #90ff80; }");
+			editor.ensurePolished();
+			QCOMPARE(editor.property("pitchAlignmentLineColor").value<QColor>(), QColor("#ff8090"));
+			QCOMPARE(editor.property("timeAlignmentLineColor").value<QColor>(), QColor("#90ff80"));
+			auto verifyLines = [&](QWidget* target, QPoint pointer, const QString& prefix) {
+				target->window()->raise();
+				target->window()->activateWindow();
+				QCursor::setPos(target->mapToGlobal(QPoint(5, 5)));
+				QTest::qWait(100);
+				QTest::mouseMove(target, pointer);
+				QTRY_VERIFY_WITH_TIMEOUT(target->underMouse(), 3000);
+				QTest::qWait(300);
+				const auto nativeImage = [&] {
+					const auto origin = target->mapToGlobal(QPoint());
+					return target->screen()->grabWindow(0, origin.x(), origin.y(), target->width(), target->height()).toImage();
+				};
+				config->setValue("ui", "pitchalignmentaxis", "0");
+				QTest::qWait(300);
+				const auto without = nativeImage();
+				config->setValue("ui", "pitchalignmentaxis", "1");
+				QTest::qWait(300);
+				const auto with = nativeImage();
+				QVERIFY(!with.isNull() && with.size() == without.size());
+				int horizontalChanges = 0, verticalChanges = 0;
+				for (int x = pointer.x() + 30; x < target->width() - 30; ++x)
+				{
+					if (with.pixel(x, pointer.y()) != without.pixel(x, pointer.y())) { ++horizontalChanges; }
+				}
+				for (int y = pointer.y() + 30; y < target->height() - 130; ++y)
+				{
+					if (with.pixel(pointer.x(), y) != without.pixel(pointer.x(), y)) { ++verticalChanges; }
+				}
+				QVERIFY(horizontalChanges > 20);
+				QVERIFY(verticalChanges > 10);
+				const QColor pitchColor(prefix == "axis-svs" ? "#ff8090" : "#8ec6e8");
+				const QColor timeColor(prefix == "axis-svs" ? "#90ff80" : "#e8c68e");
+				int pitchPixels = 0, timePixels = 0;
+				for (int x = pointer.x() + 30; x < target->width() - 30; ++x)
+				{
+					if (with.pixelColor(x, pointer.y()) == pitchColor) { ++pitchPixels; }
+				}
+				for (int y = pointer.y() + 30; y < target->height() - 130; ++y)
+				{
+					if (with.pixelColor(pointer.x(), y) == timeColor) { ++timePixels; }
+				}
+				QVERIFY(pitchPixels > 20);
+				QVERIFY(timePixels > 10);
+				QVERIFY(with.save(m_output + '/' + prefix + "-standard.png"));
+				config->setValue("ui", "printnotelabels", "1");
+				config->setValue("ui", "notelabelmode", "numbered");
+				QTest::mouseMove(target, pointer + QPoint(90, 35));
+				QTest::qWait(300);
+				QVERIFY(nativeImage().save(m_output + '/' + prefix + "-numbered.png"));
+				config->setValue("ui", "pitchalignmentlabelposition", "cursor");
+				QTest::qWait(300);
+				QVERIFY(nativeImage().save(m_output + '/' + prefix + "-cursor.png"));
+				config->setValue("ui", "pitchalignmentlabelposition", "axes");
+			};
+			verifyLines(canvas, canvas->pointAt(48, 69).toPoint() + QPoint(0, 12), "axis-svs");
+			editor.hide();
+			config->setValue("ui", "printnotelabels", "0");
+			m_gui->pianoRoll()->show();
+			auto* frame = qobject_cast<QMdiSubWindow*>(m_gui->pianoRoll()->parentWidget());
+			QVERIFY(frame);
+			frame->show();
+			frame->setGeometry(QRect(0, 0, 1000, 600));
+			frame->raise();
+			m_gui->mainWindow()->raise();
+			m_gui->mainWindow()->activateWindow();
+			QTest::qWait(600);
+			verifyLines(instrument, QPoint(240, 160), "axis-instrument");
+			config->setValue("ui", "pitchalignmentaxis", "0");
+			frame->hide();
+		}
+		m_gui->pianoRoll()->setCurrentMidiClip(nullptr);
+		// Song owns the tracks; let normal application teardown clean up their views.
+		config->setValue("ui", "printnotelabels", "0");
+		config->setValue("ui", "notelabelmode", "pitch");
+		{
+			SetupDialog settings(SetupDialog::ConfigTab::GeneralSettings);
+			auto* position = settings.findChild<QComboBox*>("alignmentLabelPosition");
+			QVERIFY(position);
+			position->setCurrentIndex(position->findData("cursor"));
+			QVERIFY(QMetaObject::invokeMethod(&settings, "accept", Qt::DirectConnection));
+			QCOMPARE(config->value("ui", "pitchalignmentlabelposition"), QString("cursor"));
+		}
+		config->setValue("ui", "pitchalignmentlabelposition", "axes");
+	}
 	void scenes()
 	{
 		auto* song = Engine::getSong();

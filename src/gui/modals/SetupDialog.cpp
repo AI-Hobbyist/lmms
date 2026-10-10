@@ -112,6 +112,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "displaywaveform").toInt()),
 	m_printNoteLabels(ConfigManager::inst()->value(
 			"ui", "printnotelabels").toInt()),
+	m_pitchAlignmentAxis(noteLabels::alignmentEnabled()),
 	m_showFaderTicks(ConfigManager::inst()->value(
 			"ui", "showfaderticks").toInt()),
 	m_compactTrackButtons(ConfigManager::inst()->value(
@@ -256,6 +257,26 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
 	addCheckBox(tr("Enable all note labels in piano roll"), guiGroupBox, guiGroupLayout,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
+	auto* alignmentAxis = new QCheckBox(QObject::tr("Show piano roll alignment guides"), guiGroupBox);
+	alignmentAxis->setObjectName("pitchAlignmentAxisCheckBox");
+	alignmentAxis->setToolTip(QObject::tr("Follow the mouse: horizontal pitch, vertical bar and beat"));
+	alignmentAxis->setChecked(m_pitchAlignmentAxis);
+	guiGroupLayout->addWidget(alignmentAxis);
+	connect(alignmentAxis, &QCheckBox::toggled, this, [this](bool enabled) {
+		m_pitchAlignmentAxis = enabled;
+	});
+	auto* alignmentLabelRow = new QHBoxLayout;
+	auto* alignmentLabel = new QLabel(QObject::tr("Alignment hover information position"), guiGroupBox);
+	m_alignmentLabelPosition = new QComboBox(guiGroupBox);
+	m_alignmentLabelPosition->setObjectName("alignmentLabelPosition");
+	m_alignmentLabelPosition->addItem(QObject::tr("At the alignment guide edges"), "axes");
+	m_alignmentLabelPosition->addItem(QObject::tr("Near the mouse pointer"), "cursor");
+	m_alignmentLabelPosition->setCurrentIndex(std::max(0, m_alignmentLabelPosition->findData(
+		ConfigManager::inst()->value("ui", "pitchalignmentlabelposition", "axes"))));
+	alignmentLabel->setBuddy(m_alignmentLabelPosition);
+	alignmentLabelRow->addWidget(alignmentLabel);
+	alignmentLabelRow->addWidget(m_alignmentLabelPosition);
+	guiGroupLayout->addLayout(alignmentLabelRow);
 	auto* referenceRow = new QHBoxLayout;
 	auto* referenceLabel = new QLabel(tr("Numbered notation reference (1=C)"), guiGroupBox);
 	m_numberedReference = new QComboBox(guiGroupBox);
@@ -1241,6 +1262,8 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("ui", "printnotelabels",
 					QString::number(m_printNoteLabels));
 	ConfigManager::inst()->setValue("ui", "notelabeloctave", m_numberedReference->currentData().toString());
+	ConfigManager::inst()->setValue("ui", "pitchalignmentaxis", QString::number(m_pitchAlignmentAxis));
+	ConfigManager::inst()->setValue("ui", "pitchalignmentlabelposition", m_alignmentLabelPosition->currentData().toString());
 	ConfigManager::inst()->setValue("ui", "showfaderticks",
 					QString::number(m_showFaderTicks));
 	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",

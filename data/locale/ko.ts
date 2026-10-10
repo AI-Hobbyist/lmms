@@ -2083,6 +2083,30 @@ This chip was used in the Commodore 64 computer.</source>
         <source>Effects</source>
         <translation>이펙트</translation>
     </message>
+    <message>
+        <source>Show piano roll alignment guides</source>
+        <translation>피아노 롤 음높이·시간 안내선 표시</translation>
+    </message>
+    <message>
+        <source>Follow the mouse: horizontal pitch, vertical bar and beat</source>
+        <translation>마우스 따라가기: 가로선은 음높이, 세로선은 마디와 박자</translation>
+    </message>
+    <message>
+        <source>Bar %1 · Beat %2</source>
+        <translation>마디 %1 · 박 %2</translation>
+    </message>
+    <message>
+        <source>Alignment hover information position</source>
+        <translation>안내선 정보 표시 위치</translation>
+    </message>
+    <message>
+        <source>At the alignment guide edges</source>
+        <translation>안내선 가장자리</translation>
+    </message>
+    <message>
+        <source>Near the mouse pointer</source>
+        <translation>마우스 포인터 근처</translation>
+    </message>
 </context>
 <context>
     <name>QWidget</name>

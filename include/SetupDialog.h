@@ -144,6 +144,8 @@ private:
 	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;
+	bool m_pitchAlignmentAxis;
+	QComboBox* m_alignmentLabelPosition = nullptr;
 	QComboBox* m_numberedReference = nullptr;
 	bool m_showFaderTicks;
 	bool m_compactTrackButtons;

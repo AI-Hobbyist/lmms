@@ -62,6 +62,8 @@ class SVSPianoRoll : public QWidget
 	Q_PROPERTY(QColor lyricColor READ lyricColor WRITE setlyricColor)
 	Q_PROPERTY(QColor pronunciationColor READ pronunciationColor WRITE setpronunciationColor)
 	Q_PROPERTY(QColor userPitchColor READ userPitchColor WRITE setuserPitchColor)
+	Q_PROPERTY(QColor pitchAlignmentLineColor READ pitchAlignmentLineColor WRITE setPitchAlignmentLineColor)
+	Q_PROPERTY(QColor timeAlignmentLineColor READ timeAlignmentLineColor WRITE setTimeAlignmentLineColor)
 	Q_PROPERTY(QColor synthesizedPitchColor READ synthesizedPitchColor WRITE setsynthesizedPitchColor)
 	Q_PROPERTY(QColor waveformColor READ waveformColor WRITE setwaveformColor)
 	Q_PROPERTY(QColor phonemeColor READ phonemeColor WRITE setphonemeColor)
@@ -96,6 +98,16 @@ public:
 	QColor pronunciationColor() const { return m_colors.value(QStringLiteral("pronunciationColor")); }
 	void setpronunciationColor(const QColor& value) { setThemeColor(QStringLiteral("pronunciationColor"), value); }
 	QColor userPitchColor() const { return m_colors.value(QStringLiteral("userPitchColor")); }
+	QColor pitchAlignmentLineColor() const { return m_colors.value("pitchAlignmentLineColor"); }
+	void setPitchAlignmentLineColor(const QColor& value)
+	{
+		setThemeColor("pitchAlignmentLineColor", value);
+	}
+	QColor timeAlignmentLineColor() const { return m_colors.value("timeAlignmentLineColor"); }
+	void setTimeAlignmentLineColor(const QColor& value)
+	{
+		setThemeColor("timeAlignmentLineColor", value);
+	}
 	void setuserPitchColor(const QColor& value) { setThemeColor(QStringLiteral("userPitchColor"), value); }
 	QColor synthesizedPitchColor() const { return m_colors.value(QStringLiteral("synthesizedPitchColor")); }
 	void setsynthesizedPitchColor(const QColor& value)

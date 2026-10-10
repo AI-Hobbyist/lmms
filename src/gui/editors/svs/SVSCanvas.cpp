@@ -17,6 +17,7 @@
 #include "operations/SVSFeedbackPitch.h"
 #include <QApplication>
 #include <QClipboard>
+#include <QCursor>
 #include <QMimeData>
 #include <QJsonDocument>
 #include <QPainter>
@@ -950,6 +951,14 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 			painter.drawLine(QPointF(x, 0), QPointF(x, height()));
 		}
 	}
+	if (m_clip && !m_parameter && underMouse())
+	{
+		const QPoint pointer = mapFromGlobal(QCursor::pos());
+		noteLabels::drawAlignment(painter, grid, pointer, int(std::ceil(pitchAt(pointer.y()))),
+			tickAt(pointer.x()), TimePos::ticksPerBar(),
+			double(DefaultTicksPerBar) / Engine::getSong()->getTimeSigModel().getDenominator(), palette(),
+			m_colors.value("pitchAlignmentLineColor"), m_colors.value("timeAlignmentLineColor"));
+	}
 }
 void SVSCanvas::mousePressEvent(QMouseEvent* event)
 {
@@ -1326,6 +1335,10 @@ void SVSCanvas::updateOperation(const QPointF& point, Qt::KeyboardModifiers modi
 }
 void SVSCanvas::mouseMoveEvent(QMouseEvent* event)
 {
+	if (!m_parameter && noteLabels::alignmentEnabled())
+	{
+		update();
+	}
 	m_pointer = event->position();
 	if (m_action != Action::None)
 		updateOperation(event->position(), event->modifiers());
@@ -1343,6 +1356,12 @@ void SVSCanvas::mouseMoveEvent(QMouseEvent* event)
 		setCursor(edge ? Qt::SizeHorCursor : m_tool == Tool::Pencil ? Qt::CrossCursor : Qt::ArrowCursor);
 	}
 }
+void SVSCanvas::leaveEvent(QEvent* event)
+{
+	QWidget::leaveEvent(event);
+	update();
+}
+
 void SVSCanvas::commitOperation()
 {
 	m_finishing = true;

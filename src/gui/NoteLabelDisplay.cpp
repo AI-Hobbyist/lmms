@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
 #include <QSignalBlocker>
 #include <QToolButton>
 #include <algorithm>
@@ -60,7 +61,8 @@ bool numbered()
 bool isSetting(const QString& group, const QString& key)
 {
 	return group == "ui"
-		&& (key == "printnotelabels" || key == "notelabelmode" || key == "notelabeltonic" || key == "notelabeloctave");
+		&& (key == "printnotelabels" || key == "notelabelmode" || key == "notelabeltonic" || key == "notelabeloctave"
+			|| key == "pitchalignmentaxis" || key == "pitchalignmentlabelposition");
 }
 
 QString text(int pitch)
@@ -94,12 +96,78 @@ void draw(QPainter& painter, const QRectF& rectangle, int pitch, Qt::Alignment a
 	painter.restore();
 }
 
+bool alignmentEnabled()
+{
+	return ConfigManager::inst()->value("ui", "pitchalignmentaxis", "0").toInt() != 0;
+}
+
+void drawAlignment(QPainter& painter, const QRectF& area, const QPointF& pointer, int pitch,
+	double tick, double ticksPerBar, double ticksPerBeat, const QPalette& palette,
+	const QColor& pitchColor, const QColor& timeColor)
+{
+	if (!alignmentEnabled() || !area.contains(pointer) || pitch < 0 || pitch > 127 || tick < 0
+		|| ticksPerBar <= 0 || ticksPerBeat <= 0)
+	{
+		return;
+	}
+	painter.save();
+	painter.setClipRect(area);
+	const auto fallback = palette.color(QPalette::Highlight).lighter(150);
+	painter.setPen(QPen(pitchColor.isValid() ? pitchColor : fallback, 1, Qt::DashLine));
+	painter.drawLine(QPointF(area.left(), pointer.y()), QPointF(area.right(), pointer.y()));
+	painter.setPen(QPen(timeColor.isValid() ? timeColor : fallback, 1, Qt::DashLine));
+	painter.drawLine(QPointF(pointer.x(), area.top()), QPointF(pointer.x(), area.bottom()));
+	QFont font = painter.font();
+	font.setPixelSize(13);
+	painter.setFont(font);
+	const QFontMetricsF metrics(font);
+	const QString standard = Names[pitch % 12] + QString::number(pitch / 12 - 1)
+		+ QString(" · %1 Hz").arg(440. * std::pow(2., (pitch - 69) / 12.), 0, 'f', 2);
+	const int bar = int(std::floor(tick / ticksPerBar));
+	const QString time = QObject::tr("Bar %1 · Beat %2").arg(bar + 1)
+		.arg(1 + (tick - bar * ticksPerBar) / ticksPerBeat, 0, 'f', 2);
+	const qreal labelHeight = metrics.height() + 10;
+	auto panel = [&](const QString& label, QPointF position, bool keyLabel) {
+		const qreal keyWidth = keyLabel ? 32 : 0;
+		const qreal labelWidth = metrics.horizontalAdvance(label) + keyWidth + 12;
+		position.setX(std::clamp(position.x(), area.left(), std::max(area.left(), area.right() - labelWidth)));
+		position.setY(std::clamp(position.y(), area.top(), std::max(area.top(), area.bottom() - labelHeight)));
+		const QRectF box(position, QSizeF(labelWidth, labelHeight));
+		painter.fillRect(box, palette.color(QPalette::ToolTipBase));
+		painter.setPen(palette.color(QPalette::ToolTipText));
+		if (keyLabel)
+		{
+			draw(painter, box.adjusted(6, 3, -(labelWidth - keyWidth), -3), pitch, Qt::AlignLeft);
+		}
+		painter.drawText(box.adjusted(6 + keyWidth, 0, -6, 0), Qt::AlignVCenter | Qt::AlignLeft, label);
+	};
+	if (ConfigManager::inst()->value("ui", "pitchalignmentlabelposition", "axes") == "cursor")
+	{
+		const qreal labelWidth = std::max(metrics.horizontalAdvance(standard) + (numbered() ? 32 : 0),
+			metrics.horizontalAdvance(time)) + 12;
+		const qreal x = std::clamp(pointer.x() + 12, area.left(), std::max(area.left(), area.right() - labelWidth));
+		const qreal y = std::clamp(pointer.y() + 12, area.top(),
+			std::max(area.top(), area.bottom() - 2 * labelHeight - 4));
+		panel(standard, QPointF(x, y), numbered());
+		panel(time, QPointF(x, y + labelHeight + 4), false);
+	}
+	else
+	{
+		panel(time, QPointF(pointer.x() + 12, area.top() + 4), false);
+		const qreal pitchY = pointer.y() - labelHeight - 8;
+		panel(standard, QPointF(area.left() + 4,
+			pitchY < area.top() + labelHeight + 8 ? pointer.y() + 8 : pitchY), numbered());
+	}
+	painter.restore();
+}
+
 QToolButton* createControls(QWidget* parent)
 {
 	// ConfigManager signals changes to existing values. Seed the shared options
 	// before connecting controls so the first user change also reaches both rolls.
 	const QList<QPair<QString, QString>> defaults{
-		{"printnotelabels", "0"}, {"notelabelmode", "pitch"}, {"notelabeltonic", "0"}, {"notelabeloctave", "5"}};
+		{"printnotelabels", "0"}, {"notelabelmode", "pitch"}, {"notelabeltonic", "0"}, {"notelabeloctave", "5"},
+		{"pitchalignmentaxis", "0"}, {"pitchalignmentlabelposition", "axes"}};
 	for (const auto& option : defaults)
 	{
 		ConfigManager::inst()->setValue(

@@ -82,6 +82,8 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
 	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
 	Q_PROPERTY(QColor knifeCutLine MEMBER m_knifeCutLineColor)
+	Q_PROPERTY(QColor pitchAlignmentLineColor MEMBER m_pitchAlignmentLineColor)
+	Q_PROPERTY(QColor timeAlignmentLineColor MEMBER m_timeAlignmentLineColor)
 	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
 	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
@@ -306,6 +308,8 @@ private:
 	};
 
 	PositionLine * m_positionLine;
+	QColor m_pitchAlignmentLineColor;
+	QColor m_timeAlignmentLineColor;
 
 	std::vector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
