@@ -163,7 +163,7 @@ int main(int argc, char** argv)
 	input.open(QIODevice::ReadOnly);
 	const QJsonObject snapshot{{"model_id", "identity"}, {"parameters", QJsonObject{{"gain", 0}}},
 		{"connection_identity", "http://127.0.0.1:8000"}, {"source_start", "0"}, {"source_end", "4"}};
-	auto pair = CachePair::create(working.path(), "Reference", input, snapshot);
+	auto pair = CachePair::create(working.filePath("cache"), "Reference", input, snapshot);
 	check(QFileInfo(pair->inputPath()).fileName() == QFileInfo(pair->outputPath()).fileName()
 			&& pair->hash().size() == 64 && pair->inputPath().contains("cache/svc/Reference/input/")
 			&& pair->outputPath().contains("cache/svc/Reference/output/"),
@@ -186,7 +186,7 @@ int main(int argc, char** argv)
 	QFile original(pair->inputPath());
 	check(original.open(QIODevice::ReadOnly) && original.readAll() == inputBytes, "source never modified");
 	input.seek(0);
-	auto failed = CachePair::create(working.path(), "Reference", input, snapshot);
+	auto failed = CachePair::create(working.filePath("cache"), "Reference", input, snapshot);
 	check(failed->hash() != pair->hash(), "same content has new identity");
 	check(failed->append(audio(pcm)), "failure fixture partial");
 	failed->fail();
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 			&& !QFile::exists(failed->outputPath()),
 		"failure never upgrades to full cache");
 	input.seek(0);
-	auto abandoned = CachePair::create(working.path(), "Reference", input, snapshot);
+	auto abandoned = CachePair::create(working.filePath("cache"), "Reference", input, snapshot);
 	const auto abandonedPath = abandoned->outputPath();
 	abandoned.reset();
 	QFile manifest(abandonedPath + ".json");
@@ -204,12 +204,12 @@ int main(int argc, char** argv)
 	for (const auto& engine : {"../escape", "CON", "RVC/name", "LPT1"})
 	{
 		input.seek(0);
-		invalid([&]() { CachePair::create(working.path(), engine, input, snapshot); }, "unsafe engine rejected");
+		invalid([&]() { CachePair::create(working.filePath("cache"), engine, input, snapshot); }, "unsafe engine rejected");
 	}
 	input.seek(0);
 	invalid(
 		[&]() {
-			CachePair::create(working.path(), "Reference", input, {{"parameters", QJsonObject{{"token", "secret"}}}});
+			CachePair::create(working.filePath("cache"), "Reference", input, {{"parameters", QJsonObject{{"token", "secret"}}}});
 		},
 		"credentials excluded from cache identity and metadata");
 	std::vector<std::future<QString>> tasks;
@@ -219,7 +219,7 @@ int main(int argc, char** argv)
 			QBuffer concurrent;
 			concurrent.setData(inputBytes);
 			concurrent.open(QIODevice::ReadOnly);
-			auto item = CachePair::create(working.path(), "Reference", concurrent, snapshot);
+			auto item = CachePair::create(working.filePath("cache"), "Reference", concurrent, snapshot);
 			return item->hash();
 		}));
 	}
@@ -232,12 +232,12 @@ int main(int argc, char** argv)
 	QTemporaryDir managed;
 	check(cacheLimit() == 2LL * 1024 * 1024 * 1024, "default global SVC cache limit is 2 GiB");
 	input.seek(0);
-	auto oldest = CachePair::create(managed.path(), "Reference", input, snapshot);
+	auto oldest = CachePair::create(managed.filePath("cache"), "Reference", input, snapshot);
 	check(oldest->append(audio(pcm)) && oldest->complete(SVC_COMPLETE), "old completed cache fixture");
 	const auto oldestInput = oldest->inputPath();
 	const auto oldestOutput = oldest->outputPath();
 	oldest.reset();
-	const auto oldestBytes = cacheBytes(managed.path());
+	const auto oldestBytes = cacheBytes(managed.filePath("cache"));
 	for (const auto& path : {oldestInput, oldestOutput, oldestOutput + ".json"})
 	{
 		QFile file(path);
@@ -246,32 +246,32 @@ int main(int argc, char** argv)
 			"deterministic oldest cache timestamp");
 	}
 	input.seek(0);
-	auto newest = CachePair::create(managed.path(), "Other", input, snapshot);
+	auto newest = CachePair::create(managed.filePath("cache"), "Other", input, snapshot);
 	check(newest->append(audio(pcm)) && newest->complete(SVC_COMPLETE), "new completed cache fixture");
 	const auto newestOutput = newest->outputPath();
 	newest.reset();
-	const auto newestBytes = cacheBytes(managed.path()) - oldestBytes;
-	setCacheLimit(managed.path(), newestBytes);
-	check(cacheBytes(managed.path()) == newestBytes && !QFile::exists(oldestInput)
+	const auto newestBytes = cacheBytes(managed.filePath("cache")) - oldestBytes;
+	setCacheLimit(managed.filePath("cache"), newestBytes);
+	check(cacheBytes(managed.filePath("cache")) == newestBytes && !QFile::exists(oldestInput)
 			&& !QFile::exists(oldestOutput) && QFile::exists(newestOutput),
 		"global capacity evicts oldest complete pair across engines");
 	input.seek(0);
-	auto active = CachePair::create(managed.path(), "Reference", input, snapshot);
+	auto active = CachePair::create(managed.filePath("cache"), "Reference", input, snapshot);
 	check(active->append(audio(pcm)), "active partial cache fixture");
 	const auto activePath = active->partialPath();
-	QFile unrelated(QDir(managed.path()).filePath("cache/svc/Reference/input/keep.txt"));
+	QFile unrelated(QDir(managed.filePath("cache")).filePath("svc/Reference/input/keep.txt"));
 	check(unrelated.open(QIODevice::WriteOnly) && unrelated.write("keep") == 4, "unowned fixture");
 	unrelated.close();
-	check(!clearCache(managed.path()) && QFile::exists(activePath) && !QFile::exists(newestOutput),
+	check(!clearCache(managed.filePath("cache")) && QFile::exists(activePath) && !QFile::exists(newestOutput),
 		"one-click clear protects active jobs and removes inactive pairs");
-	setCacheLimit(managed.path(), 0);
+	setCacheLimit(managed.filePath("cache"), 0);
 	active.reset();
-	check(cacheBytes(managed.path()) == 0 && !QFile::exists(activePath) && QFile::exists(unrelated.fileName()),
+	check(cacheBytes(managed.filePath("cache")) == 0 && !QFile::exists(activePath) && QFile::exists(unrelated.fileName()),
 		"job release enforces capacity without touching unowned files");
-	setCacheLimit(managed.path(), 2LL * 1024 * 1024 * 1024);
+	setCacheLimit(managed.filePath("cache"), 2LL * 1024 * 1024 * 1024);
 	QTemporaryDir shared;
 	input.seek(0);
-	auto oldSvc = CachePair::create(shared.path(), "Reference", input, snapshot);
+	auto oldSvc = CachePair::create(shared.filePath("cache"), "Reference", input, snapshot);
 	check(oldSvc->append(audio(pcm)) && oldSvc->complete(SVC_COMPLETE), "shared budget SVC fixture");
 	const auto oldSvcPath = oldSvc->outputPath();
 	const auto oldSvcInput = oldSvc->inputPath();
@@ -283,19 +283,19 @@ int main(int argc, char** argv)
 				&& file.setFileTime(QDateTime::currentDateTimeUtc().addDays(-1), QFileDevice::FileModificationTime),
 			"shared budget deterministic age");
 	}
-	const auto svsRoot = QDir(shared.path()).filePath("cache/SVS/DiffSinger");
+	const auto svsRoot = QDir(shared.filePath("cache")).filePath("SVS/DiffSinger");
 	check(QDir().mkpath(svsRoot), "shared budget SVS directory");
 	QFile tensor(QDir(svsRoot).filePath(QString(64, 'a') + ".tensor"));
 	check(tensor.open(QIODevice::WriteOnly) && tensor.write(QByteArray(4096, 'x')) == 4096, "new SVS tensor fixture");
 	tensor.close();
-	setCacheLimit(shared.path(), 4096);
+	setCacheLimit(shared.filePath("cache"), 4096);
 	check(!QFile::exists(oldSvcPath) && QFile::exists(tensor.fileName())
-			&& lmms::aiCache::bytes(shared.path(), lmms::aiCache::Scope::All) == 4096,
+			&& lmms::aiCache::bytes(shared.filePath("cache"), lmms::aiCache::Scope::All) == 4096,
 		"shared total evicts old SVC before new SVS instead of reserving separate quotas");
-	check(lmms::aiCache::clear(shared.path(), lmms::aiCache::Scope::All)
-			&& lmms::aiCache::bytes(shared.path(), lmms::aiCache::Scope::All) == 0,
+	check(lmms::aiCache::clear(shared.filePath("cache"), lmms::aiCache::Scope::All)
+			&& lmms::aiCache::bytes(shared.filePath("cache"), lmms::aiCache::Scope::All) == 0,
 		"global clear covers both cache types");
-	setCacheLimit(shared.path(), 2LL * 1024 * 1024 * 1024);
+	setCacheLimit(shared.filePath("cache"), 2LL * 1024 * 1024 * 1024);
 	std::puts("PASS SVC M1: defaults/custom, 30/35 boundaries, silence/stereo, tail padding, limits, random paired "
 			  "cache, partial failure, concurrency");
 	return 0;

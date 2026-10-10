@@ -9,7 +9,7 @@ class Cache
 public:
 	static Cache& instance();
 	Cache(QString directory, qint64 memoryLimit = 128 * 1024 * 1024, qint64 diskLimit = 2LL * 1024 * 1024 * 1024,
-		QString legacyDirectory = {}, QString sharedWorkingDirectory = {});
+		QString legacyDirectory = {}, QString sharedCacheDirectory = {});
 	QString engineDirectory(const QString& pluginId) const;
 	static QString key(const Input&, const QString& pluginIdentity);
 	// Content that can still be verified when a saved engine is unavailable.
@@ -35,7 +35,7 @@ private:
 	QString path(const QString&, const Input&) const;
 	QString m_directory;
 	QString m_legacyDirectory;
-	QString m_sharedWorkingDirectory;
+	QString m_sharedCacheDirectory;
 	qint64 m_memoryLimit, m_diskLimit, m_memoryBytes = 0;
 	quint64 m_access = 0;
 	mutable QMutex m_mutex;

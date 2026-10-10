@@ -14514,6 +14514,18 @@ Latency: %2 ms</source>
         <source>Choose your background picture</source>
         <translation>选择背景图片</translation>
     </message>
+    <message>
+        <source>AI cache directory</source>
+        <translation>AI 缓存目录</translation>
+    </message>
+    <message>
+        <source>Choose the AI cache directory</source>
+        <translation>选择 AI 缓存目录</translation>
+    </message>
+    <message>
+        <source>Changes take effect after restarting LMMS. Existing caches are not moved.</source>
+        <translation>重启 LMMS 后生效。已有缓存不会自动迁移。</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::Sf2InstrumentView</name>

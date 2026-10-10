@@ -39,6 +39,8 @@ Singing project format conversion uses [LibreSVIP](https://github.com/SoulMelody
 
 The synthesis strip colors can be customized in the theme's `lmms--gui--SVSPianoRoll` rule using `qproperty-synthesisRenderingColor`, `qproperty-synthesisReadyColor` and `qproperty-synthesisErrorColor`. The toolbar icon is configured by `qproperty-icon` in the `QToolBar QToolButton#qt_toolbar_ext_button` rule.
 
+The Paths page selects the AI cache directory, defaulting to `cache` beside the executable. Directory changes take effect after restarting and do not move existing files. Paths within the executable directory are shown and saved relative to it.
+
 The AI cache category icon is `data/themes/default/ai_cache.svg`. Themes can replace it through `qproperty-icon` in the `lmms--gui--SetupDialog QPushButton#aiCacheSettingsTab` rule in `style.css`. The stacked usage bar colors are configured by `qproperty-svcColor`, `qproperty-svsColor` and `qproperty-freeColor` in the `lmms--gui--AICacheUsageBar` rule.
 
 ## Original upstream README

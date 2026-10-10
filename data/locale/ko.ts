@@ -14514,6 +14514,18 @@ Latency: %2 ms</source>
         <source>Choose your background picture</source>
         <translation>사용자의 배경 사진 고르기</translation>
     </message>
+    <message>
+        <source>AI cache directory</source>
+        <translation>AI 캐시 디렉터리</translation>
+    </message>
+    <message>
+        <source>Choose the AI cache directory</source>
+        <translation>AI 캐시 디렉터리 선택</translation>
+    </message>
+    <message>
+        <source>Changes take effect after restarting LMMS. Existing caches are not moved.</source>
+        <translation>LMMS를 다시 시작하면 변경 사항이 적용됩니다. 기존 캐시는 이동되지 않습니다.</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::Sf2InstrumentView</name>

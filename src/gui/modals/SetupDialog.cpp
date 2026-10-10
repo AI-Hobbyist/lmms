@@ -30,6 +30,8 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QCoreApplication>
+#include <QFileInfo>
 #include <QScrollArea>
 #include <algorithm>
 #include "lmmsconfig.h"
@@ -106,6 +108,30 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 
+namespace {
+QString settingsAbsolutePath(const QString& path)
+{
+	const auto normalized = QDir::fromNativeSeparators(path);
+	if (normalized.isEmpty() || normalized.contains(':') || QDir::isAbsolutePath(normalized))
+	{
+		return normalized;
+	}
+	return QDir(QCoreApplication::applicationDirPath()).absoluteFilePath(normalized);
+}
+
+QString settingsDisplayPath(const QString& path)
+{
+	const auto normalized = QDir::fromNativeSeparators(path);
+	if (normalized.isEmpty() || !QDir::isAbsolutePath(normalized))
+	{
+		return QDir::toNativeSeparators(normalized);
+	}
+	const auto relative = QDir(QCoreApplication::applicationDirPath()).relativeFilePath(normalized);
+	return QDir::toNativeSeparators(relative == ".." || relative.startsWith("../")
+		|| QDir::isAbsolutePath(relative) ? normalized : relative);
+}
+} // namespace
+
 SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_tooltips(!ConfigManager::inst()->value(
 			"tooltips", "disabled").toInt()),
@@ -168,6 +194,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_midiAutoQuantize(ConfigManager::inst()->value(
 			"midi", "autoquantize", "0").toInt() != 0),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
+	m_aiCacheDir(QDir::toNativeSeparators(ConfigManager::inst()->value(
+		"paths", "aicache", ConfigManager::inst()->aiCacheDir()))),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
 	m_gigDir(QDir::toNativeSeparators(ConfigManager::inst()->gigDir())),
@@ -945,7 +973,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		auto pathEntryGroupBox = new QGroupBox(caption, pathSelectors);
 		QHBoxLayout * pathEntryLayout = new QHBoxLayout(pathEntryGroupBox);
 
-		lineEdit = new QLineEdit(content, pathEntryGroupBox);
+		const auto isPathList = qstrcmp(setSlot, SLOT(setLADSPADir(const QString&))) == 0;
+		auto displayed = content.split(',');
+		for (auto& path : displayed)
+		{
+			path = settingsDisplayPath(path);
+		}
+		lineEdit = new QLineEdit(isPathList ? displayed.join(',') : settingsDisplayPath(content), pathEntryGroupBox);
 		connect(lineEdit, SIGNAL(textChanged(const QString&)),
 			this, setSlot);
 
@@ -965,6 +999,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(setWorkingDir(const QString&)),
 		SLOT(openWorkingDir()),
 		m_workingDirLineEdit);
+	addPathEntry(tr("AI cache directory"), m_aiCacheDir,
+		SLOT(setAICacheDir(const QString&)), SLOT(openAICacheDir()), m_aiCacheDirLineEdit);
+	m_aiCacheDirLineEdit->setObjectName("aiCacheDirectory");
+	m_workingDirLineEdit->setObjectName("workingDirectory");
+	m_aiCacheDirLineEdit->setPlaceholderText(settingsDisplayPath(ConfigManager::inst()->aiCacheDir()));
+	m_aiCacheDirLineEdit->setToolTip(tr("Changes take effect after restarting LMMS. Existing caches are not moved."));
 	addPathEntry(tr("VST directory for older projects"), m_vstDir,
 		SLOT(setVSTDir(const QString&)),
 		SLOT(openVSTDir()),
@@ -1116,6 +1156,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(setThemeDir(const QString&)),
 		SLOT(openThemeDir()),
 		m_themeDirLineEdit);
+	m_themeDirLineEdit->setObjectName("themeDirectory");
+	const auto defaultTheme = QFileInfo(ConfigManager::inst()->defaultThemeDir()).canonicalFilePath();
+	if (!defaultTheme.isEmpty() && QFileInfo(m_themeDir).canonicalFilePath() == defaultTheme)
+	{
+		m_themeDirLineEdit->setText(QDir::toNativeSeparators("data/themes/default/"));
+	}
 	addPathEntry(tr("Background artwork"), m_backgroundPicFile,
 		SLOT(setBackgroundPicFile(const QString&)),
 		SLOT(openBackgroundPicFile()),
@@ -1329,16 +1375,21 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
 
-	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
-	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
-	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladspaDir));
-	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setWorkingDir(settingsAbsolutePath(m_workingDir));
+	ConfigManager::inst()->setVSTDir(settingsAbsolutePath(m_vstDir));
+	auto ladspaPaths = m_ladspaDir.split(',');
+	for (auto& path : ladspaPaths)
+	{
+		path = settingsAbsolutePath(path);
+	}
+	ConfigManager::inst()->setLADSPADir(ladspaPaths.join(','));
+	ConfigManager::inst()->setSF2Dir(settingsAbsolutePath(m_sf2Dir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	ConfigManager::inst()->setSF2File(m_sf2File);
+	ConfigManager::inst()->setSF2File(settingsAbsolutePath(m_sf2File));
 #endif
-	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
-	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
-	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
+	ConfigManager::inst()->setGIGDir(settingsAbsolutePath(m_gigDir));
+	ConfigManager::inst()->setThemeDir(settingsAbsolutePath(m_themeDir));
+	ConfigManager::inst()->setBackgroundPicFile(settingsAbsolutePath(m_backgroundPicFile));
 
 	// Tell all audio-settings-widgets to save their settings.
 	for(AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1359,6 +1410,8 @@ void SetupDialog::accept()
 		return;
 	}
 	static_cast<AICacheSettingsPage*>(m_aiCacheSettings)->save();
+	ConfigManager::inst()->setValue("paths", "aicache",
+		m_aiCacheDir.trimmed().isEmpty() ? QString{} : QDir::cleanPath(settingsAbsolutePath(m_aiCacheDir)));
 	ConfigManager::inst()->saveConfigFile();
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstScanRoots && m_vstScanRoots->changed())
@@ -1638,11 +1691,26 @@ void SetupDialog::toggleMidiAutoQuantization(bool enabled)
 void SetupDialog::openWorkingDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose the LMMS working directory"), m_workingDir);
+		tr("Choose the LMMS working directory"), settingsAbsolutePath(m_workingDir));
 	if (!new_dir.isEmpty())
 	{
-		m_workingDirLineEdit->setText(new_dir);
+		m_workingDirLineEdit->setText(settingsDisplayPath(new_dir));
 	}
+}
+
+void SetupDialog::openAICacheDir()
+{
+	const auto directory = FileDialog::getExistingDirectory(
+		this, tr("Choose the AI cache directory"), settingsAbsolutePath(m_aiCacheDir));
+	if (!directory.isEmpty())
+	{
+		m_aiCacheDirLineEdit->setText(settingsDisplayPath(directory));
+	}
+}
+
+void SetupDialog::setAICacheDir(const QString& directory)
+{
+	m_aiCacheDir = directory;
 }
 
 
@@ -1655,10 +1723,10 @@ void SetupDialog::setWorkingDir(const QString & workingDir)
 void SetupDialog::openVSTDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your VST plugins directory"), m_vstDir);
+		tr("Choose your VST plugins directory"), settingsAbsolutePath(m_vstDir));
 	if (!new_dir.isEmpty())
 	{
-		m_vstDirLineEdit->setText(new_dir);
+		m_vstDirLineEdit->setText(settingsDisplayPath(new_dir));
 	}
 }
 
@@ -1672,17 +1740,16 @@ void SetupDialog::setVSTDir(const QString & vstDir)
 void SetupDialog::openLADSPADir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your LADSPA plugins directory"), m_ladspaDir);
+		tr("Choose your LADSPA plugins directory"), settingsAbsolutePath(m_ladspaDir.section(',', 0, 0)));
 	if (!new_dir.isEmpty())
 	{
 		if(m_ladspaDirLineEdit->text() == "")
 		{
-			m_ladspaDirLineEdit->setText(new_dir);
+			m_ladspaDirLineEdit->setText(settingsDisplayPath(new_dir));
 		}
 		else
 		{
-			m_ladspaDirLineEdit->setText(m_ladspaDirLineEdit->text() + "," +
-								new_dir);
+			m_ladspaDirLineEdit->setText(m_ladspaDirLineEdit->text() + "," + settingsDisplayPath(new_dir));
 		}
 	}
 }
@@ -1697,10 +1764,10 @@ void SetupDialog::setLADSPADir(const QString & ladspaDir)
 void SetupDialog::openSF2Dir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your SF2 directory"), m_sf2Dir);
+		tr("Choose your SF2 directory"), settingsAbsolutePath(m_sf2Dir));
 	if (!new_dir.isEmpty())
 	{
-		m_sf2DirLineEdit->setText(new_dir);
+		m_sf2DirLineEdit->setText(settingsDisplayPath(new_dir));
 	}
 }
 
@@ -1715,11 +1782,11 @@ void SetupDialog::openSF2File()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
+		tr("Choose your default SF2"), settingsAbsolutePath(m_sf2File), "SoundFont 2 files (*.sf2)");
 
 	if (!new_file.isEmpty())
 	{
-		m_sf2FileLineEdit->setText(new_file);
+		m_sf2FileLineEdit->setText(settingsDisplayPath(new_file));
 	}
 #endif
 }
@@ -1736,10 +1803,10 @@ void SetupDialog::setSF2File(const QString & sf2File)
 void SetupDialog::openGIGDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your GIG directory"), m_gigDir);
+		tr("Choose your GIG directory"), settingsAbsolutePath(m_gigDir));
 	if(!new_dir.isEmpty())
 	{
-		m_gigDirLineEdit->setText(new_dir);
+		m_gigDirLineEdit->setText(settingsDisplayPath(new_dir));
 	}
 }
 
@@ -1753,10 +1820,10 @@ void SetupDialog::setGIGDir(const QString & gigDir)
 void SetupDialog::openThemeDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your theme directory"), m_themeDir);
+		tr("Choose your theme directory"), settingsAbsolutePath(m_themeDir));
 	if(!new_dir.isEmpty())
 	{
-		m_themeDirLineEdit->setText(new_dir);
+		m_themeDirLineEdit->setText(settingsDisplayPath(new_dir));
 	}
 }
 
@@ -1787,11 +1854,11 @@ void SetupDialog::openBackgroundPicFile()
 		m_themeDir :
 		m_backgroundPicFile;
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your background picture"), dir, "Picture files (" + fileTypes + ")");
+		tr("Choose your background picture"), settingsAbsolutePath(dir), "Picture files (" + fileTypes + ")");
 
 	if(!new_file.isEmpty())
 	{
-		m_backgroundPicFileLineEdit->setText(new_file);
+		m_backgroundPicFileLineEdit->setText(settingsDisplayPath(new_file));
 	}
 }
 

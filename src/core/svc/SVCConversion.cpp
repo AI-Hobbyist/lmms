@@ -26,7 +26,7 @@ struct ConversionService::Task
 	EngineProfile engine;
 	QJsonObject selection;
 	ChunkConfig config;
-	QString working;
+	QString cacheDirectory;
 	QString connectionIdentity;
 	uint64_t generation = 0;
 	std::atomic<unsigned> pending{0};
@@ -107,7 +107,7 @@ ConversionService& ConversionService::instance()
 	[[maybe_unused]] static const bool configured = [] {
 		auto* config = ConfigManager::inst();
 		const auto limit = config->value("aiCache", "limitMiB", "2048").toLongLong();
-		setCacheLimit(config->workingDir(), std::clamp(limit, 1LL, 1048576LL) * 1024 * 1024);
+		setCacheLimit(config->aiCacheDir(), std::clamp(limit, 1LL, 1048576LL) * 1024 * 1024);
 		return true;
 	}();
 	static ConversionService service;
@@ -147,7 +147,7 @@ void ConversionService::renderClip(SVCClip* clip)
 	task->connectionIdentity = Catalog::instance().connection(task->engine.id).address;
 	task->selection = selection;
 	task->config = track->chunkConfig();
-	task->working = ConfigManager::inst()->workingDir();
+	task->cacheDirectory = ConfigManager::inst()->aiCacheDir();
 	try
 	{
 		std::lock_guard lock(m_mutex);
@@ -260,7 +260,7 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 		try
 		{
 			const auto& range = task->segments[segment];
-			const auto directory = QDir(task->working).filePath("cache/svc/" + task->engine.id + "/input");
+			const auto directory = QDir(task->cacheDirectory).filePath("svc/" + task->engine.id + "/input");
 			if (!QDir().mkpath(directory))
 			{
 				throw std::runtime_error(
@@ -282,7 +282,7 @@ void ConversionService::run(const std::shared_ptr<Task>& task)
 				QJsonObject{{"silenceThresholdDbfs", task->config.silenceThresholdDbfs},
 					{"lengthThresholdSeconds", task->config.lengthThresholdSeconds},
 					{"forcedChunkSeconds", task->config.forcedChunkSeconds}});
-			cache = CachePair::create(task->working, task->engine.id, prepared, snapshot);
+			cache = CachePair::create(task->cacheDirectory, task->engine.id, prepared, snapshot);
 			QFile input(cache->inputPath());
 			if (!input.open(QIODevice::ReadOnly) || (task->engine.inputIsPcm && !input.seek(44)))
 			{

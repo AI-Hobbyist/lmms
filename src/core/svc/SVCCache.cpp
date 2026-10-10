@@ -43,10 +43,10 @@ struct CacheFiles
 	qint64 bytes = 0;
 };
 
-QList<CacheFiles> svcFiles(const QString& workingDirectory)
+QList<CacheFiles> svcFiles(const QString& cacheDirectory)
 {
 	QList<CacheFiles> result;
-	const auto root = QDir(workingDirectory).filePath("cache/svc");
+	const auto root = QDir(cacheDirectory).filePath("svc");
 	if (QFileInfo(root).isSymLink())
 	{
 		return result;
@@ -84,17 +84,17 @@ QList<CacheFiles> svcFiles(const QString& workingDirectory)
 	return result;
 }
 
-QList<CacheFiles> svsFiles(const QString& workingDirectory)
+QList<CacheFiles> svsFiles(const QString& cacheDirectory)
 {
 	QList<CacheFiles> result;
-	const auto root = QDir(workingDirectory).filePath("cache/SVS");
+	const auto root = QDir(cacheDirectory).filePath("SVS");
 	QFileInfoList directories;
 	if (!QFileInfo(root).isSymLink())
 	{
 		directories = QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 		directories.prepend(QFileInfo(root));
 	}
-	const auto legacy = legacyDirectories.value(QDir(workingDirectory).absolutePath());
+	const auto legacy = legacyDirectories.value(QDir(cacheDirectory).absolutePath());
 	if (!legacy.isEmpty() && !QFileInfo(legacy).isSymLink())
 	{
 		directories.append(QFileInfo(legacy));
@@ -140,12 +140,12 @@ QList<CacheFiles> svsFiles(const QString& workingDirectory)
 	return result;
 }
 
-QList<CacheFiles> cacheFiles(const QString& workingDirectory, Scope scope)
+QList<CacheFiles> cacheFiles(const QString& cacheDirectory, Scope scope)
 {
-	auto result = scope == Scope::SVS ? QList<CacheFiles>{} : svcFiles(workingDirectory);
+	auto result = scope == Scope::SVS ? QList<CacheFiles>{} : svcFiles(cacheDirectory);
 	if (scope != Scope::SVC)
 	{
-		result.append(svsFiles(workingDirectory));
+		result.append(svsFiles(cacheDirectory));
 	}
 	return result;
 }
@@ -166,9 +166,9 @@ bool protectedFiles(const CacheFiles& entry)
 	return activeInputs.contains(entry.input);
 }
 
-qint64 trimCache(const QString& workingDirectory, qint64 limit, Scope scope)
+qint64 trimCache(const QString& cacheDirectory, qint64 limit, Scope scope)
 {
-	auto pairs = cacheFiles(workingDirectory, scope);
+	auto pairs = cacheFiles(cacheDirectory, scope);
 	qint64 bytes = 0;
 	for (const auto& pair : pairs)
 	{
@@ -202,11 +202,11 @@ qint64 limit()
 	return maximumCacheBytes.load();
 }
 
-qint64 bytes(const QString& workingDirectory, Scope scope)
+qint64 bytes(const QString& cacheDirectory, Scope scope)
 {
 	QMutexLocker lock(&cacheMutex);
 	qint64 result = 0;
-	for (const auto& entry : cacheFiles(workingDirectory, scope))
+	for (const auto& entry : cacheFiles(cacheDirectory, scope))
 	{
 		result += entry.bytes;
 	}
@@ -218,22 +218,22 @@ void setLimit(qint64 bytes)
 	maximumCacheBytes = std::max(qint64(0), bytes);
 }
 
-void setLegacyDirectory(const QString& workingDirectory, const QString& directory)
+void setLegacyDirectory(const QString& cacheDirectory, const QString& directory)
 {
 	QMutexLocker lock(&cacheMutex);
-	legacyDirectories[QDir(workingDirectory).absolutePath()] = directory;
+	legacyDirectories[QDir(cacheDirectory).absolutePath()] = directory;
 }
 
-void trim(const QString& workingDirectory)
+void trim(const QString& cacheDirectory)
 {
 	QMutexLocker lock(&cacheMutex);
-	trimCache(workingDirectory, maximumCacheBytes, Scope::All);
+	trimCache(cacheDirectory, maximumCacheBytes, Scope::All);
 }
 
-bool clear(const QString& workingDirectory, Scope scope)
+bool clear(const QString& cacheDirectory, Scope scope)
 {
 	QMutexLocker lock(&cacheMutex);
-	return trimCache(workingDirectory, 0, scope) == 0;
+	return trimCache(cacheDirectory, 0, scope) == 0;
 }
 
 void protectPath(const QString& path)
@@ -258,9 +258,9 @@ void releasePath(const QString& path)
 	}
 }
 
-Use::Use(QString path, QString workingDirectory)
+Use::Use(QString path, QString cacheDirectory)
 	: m_path(std::move(path))
-	, m_workingDirectory(std::move(workingDirectory))
+	, m_cacheDirectory(std::move(cacheDirectory))
 {
 	protectPath(m_path);
 }
@@ -268,9 +268,9 @@ Use::Use(QString path, QString workingDirectory)
 Use::~Use()
 {
 	releasePath(m_path);
-	if (!m_workingDirectory.isEmpty())
+	if (!m_cacheDirectory.isEmpty())
 	{
-		trim(m_workingDirectory);
+		trim(m_cacheDirectory);
 	}
 }
 } // namespace lmms::aiCache
@@ -322,9 +322,9 @@ QByteArray nonce()
 }
 } // namespace
 
-qint64 cacheBytes(const QString& workingDirectory)
+qint64 cacheBytes(const QString& cacheDirectory)
 {
-	return aiCache::bytes(workingDirectory, aiCache::Scope::SVC);
+	return aiCache::bytes(cacheDirectory, aiCache::Scope::SVC);
 }
 
 qint64 cacheLimit()
@@ -332,19 +332,19 @@ qint64 cacheLimit()
 	return aiCache::limit();
 }
 
-void setCacheLimit(const QString& workingDirectory, qint64 bytes)
+void setCacheLimit(const QString& cacheDirectory, qint64 bytes)
 {
 	aiCache::setLimit(bytes);
-	aiCache::trim(workingDirectory);
+	aiCache::trim(cacheDirectory);
 }
 
-bool clearCache(const QString& workingDirectory)
+bool clearCache(const QString& cacheDirectory)
 {
-	return aiCache::clear(workingDirectory, aiCache::Scope::SVC);
+	return aiCache::clear(cacheDirectory, aiCache::Scope::SVC);
 }
 
 std::unique_ptr<CachePair> CachePair::create(
-	const QString& workingDirectory, const QString& engine, QIODevice& source, const QJsonObject& snapshot)
+	const QString& cacheDirectory, const QString& engine, QIODevice& source, const QJsonObject& snapshot)
 {
 	if (!QRegularExpression("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$").match(engine).hasMatch()
 		|| engine.compare("CON", Qt::CaseInsensitive) == 0 || engine.compare("NUL", Qt::CaseInsensitive) == 0
@@ -372,7 +372,7 @@ std::unique_ptr<CachePair> CachePair::create(
 	{
 		throw std::runtime_error(QCoreApplication::translate("NativeRVC", "Input cannot rewind").toStdString());
 	}
-	const auto root = QDir(workingDirectory).absoluteFilePath("cache/svc/" + engine);
+	const auto root = QDir(cacheDirectory).absoluteFilePath("svc/" + engine);
 	if (!QDir().mkpath(root + "/input") || !QDir().mkpath(root + "/output"))
 	{
 		throw std::runtime_error(
@@ -391,10 +391,10 @@ std::unique_ptr<CachePair> CachePair::create(
 				.toHex());
 		pair->m_input.setFileName(root + "/input/" + pair->m_hash + ".wav");
 		pair->m_output.setFileName(root + "/output/" + pair->m_hash + ".wav.partial");
-		pair->m_workingDirectory = workingDirectory;
+		pair->m_cacheDirectory = cacheDirectory;
 		aiCache::protectPath(pair->inputPath());
 		pair->m_registered = true;
-		aiCache::trim(workingDirectory);
+		aiCache::trim(cacheDirectory);
 		// NewOnly never truncates another task's files, even on a hash collision.
 		if (!pair->m_input.open(QIODevice::WriteOnly | QIODevice::NewOnly))
 		{
@@ -443,7 +443,7 @@ CachePair::~CachePair()
 	if (m_registered)
 	{
 		aiCache::releasePath(inputPath());
-		aiCache::trim(m_workingDirectory);
+		aiCache::trim(m_cacheDirectory);
 	}
 }
 

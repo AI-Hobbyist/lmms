@@ -10,12 +10,12 @@ enum class Scope
 	SVC,
 	SVS
 };
-qint64 bytes(const QString& workingDirectory, Scope scope);
+qint64 bytes(const QString& cacheDirectory, Scope scope);
 qint64 limit();
 void setLimit(qint64 bytes);
-void setLegacyDirectory(const QString& workingDirectory, const QString& directory);
-void trim(const QString& workingDirectory);
-bool clear(const QString& workingDirectory, Scope scope);
+void setLegacyDirectory(const QString& cacheDirectory, const QString& directory);
+void trim(const QString& cacheDirectory);
+bool clear(const QString& cacheDirectory, Scope scope);
 void protectPath(const QString& path);
 void releasePath(const QString& path);
 
@@ -23,14 +23,14 @@ void releasePath(const QString& path);
 class Use
 {
 public:
-	Use(QString path, QString workingDirectory);
+	Use(QString path, QString cacheDirectory);
 	~Use();
 	Use(const Use&) = delete;
 	Use& operator=(const Use&) = delete;
 
 private:
 	QString m_path;
-	QString m_workingDirectory;
+	QString m_cacheDirectory;
 };
 } // namespace lmms::aiCache
 

@@ -276,7 +276,7 @@ bool SVCClip::restoreCaches()
 			continue;
 		}
 		const auto path
-			= QDir(ConfigManager::inst()->workingDir()).filePath("cache/svc/" + engine + "/output/" + hash + ".wav");
+			= QDir(ConfigManager::inst()->aiCacheDir()).filePath("svc/" + engine + "/output/" + hash + ".wav");
 		QFile manifest(path + ".json");
 		if (!manifest.open(QIODevice::ReadOnly))
 		{

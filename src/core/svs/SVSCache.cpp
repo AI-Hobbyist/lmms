@@ -193,26 +193,26 @@ DiskFiles diskFiles(const QString& root, const QString& legacy = {})
 } // namespace
 Cache& Cache::instance()
 {
-	static Cache cache(ConfigManager::inst()->workingDir() + "cache/SVS", 128 * 1024 * 1024,
+	static Cache cache(QDir(ConfigManager::inst()->aiCacheDir()).filePath("SVS"), 128 * 1024 * 1024,
 		std::clamp(ConfigManager::inst()->value("aiCache", "limitMiB", "2048").toLongLong(), 1LL, 1048576LL)
 			* 1024 * 1024,
 		QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/svs-v1",
-		ConfigManager::inst()->workingDir());
+		ConfigManager::inst()->aiCacheDir());
 	return cache;
 }
 Cache::Cache(QString directory, qint64 memoryLimit, qint64 diskLimit, QString legacyDirectory,
-	QString sharedWorkingDirectory)
+	QString sharedCacheDirectory)
 	: m_directory(QDir(directory).absolutePath())
 	, m_legacyDirectory(std::move(legacyDirectory))
-	, m_sharedWorkingDirectory(std::move(sharedWorkingDirectory))
+	, m_sharedCacheDirectory(std::move(sharedCacheDirectory))
 	, m_memoryLimit(std::max(qint64(0), memoryLimit))
 	, m_diskLimit(std::max(qint64(0), diskLimit))
 {
 	QDir().mkpath(m_directory);
-	if (!m_sharedWorkingDirectory.isEmpty())
+	if (!m_sharedCacheDirectory.isEmpty())
 	{
 		aiCache::setLimit(m_diskLimit);
-		aiCache::setLegacyDirectory(m_sharedWorkingDirectory, m_legacyDirectory);
+		aiCache::setLegacyDirectory(m_sharedCacheDirectory, m_legacyDirectory);
 	}
 	trimDisk();
 }
@@ -444,9 +444,9 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 		return;
 	QMutexLocker lock(&m_mutex);
 	auto audio = std::make_shared<Audio>(*source);
-	aiCache::Use use(m_sharedWorkingDirectory.isEmpty()
+	aiCache::Use use(m_sharedCacheDirectory.isEmpty()
 			? QString{} : engineDirectory(input.document["pluginId"].toString()),
-		m_sharedWorkingDirectory);
+		m_sharedCacheDirectory);
 	audio->revision = 0;
 	audio->feedback = feedbackIds(audio->feedback, noteIds(input, false)).toObject();
 	audio->cacheInputHash = editableKey(input);
@@ -466,7 +466,7 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 													{"startTick", audio->startTick},
 													{"feedback", audio->feedback}})
 							  .toJson(QJsonDocument::Compact);
-	const auto limit = m_sharedWorkingDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
+	const auto limit = m_sharedCacheDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
 	if (metadata.size() > MaximumMetadata || bytes.size() + metadata.size() > std::min(limit, MaximumFile))
 	{
 		trimDisk();
@@ -494,9 +494,9 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 }
 void Cache::trimDisk()
 {
-	if (!m_sharedWorkingDirectory.isEmpty())
+	if (!m_sharedCacheDirectory.isEmpty())
 	{
-		aiCache::trim(m_sharedWorkingDirectory);
+		aiCache::trim(m_sharedCacheDirectory);
 		return;
 	}
 	auto files = diskFiles(m_directory, m_legacyDirectory);
@@ -532,13 +532,13 @@ qint64 Cache::diskBytes() const
 qint64 Cache::diskLimit() const
 {
 	QMutexLocker lock(&m_mutex);
-	return m_sharedWorkingDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
+	return m_sharedCacheDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
 }
 void Cache::setDiskLimit(qint64 bytes)
 {
 	QMutexLocker lock(&m_mutex);
 	m_diskLimit = std::max(qint64(0), bytes);
-	if (!m_sharedWorkingDirectory.isEmpty())
+	if (!m_sharedCacheDirectory.isEmpty())
 	{
 		aiCache::setLimit(m_diskLimit);
 	}
@@ -549,9 +549,9 @@ bool Cache::clear()
 	QMutexLocker lock(&m_mutex);
 	m_entries.clear();
 	m_memoryBytes = 0;
-	if (!m_sharedWorkingDirectory.isEmpty())
+	if (!m_sharedCacheDirectory.isEmpty())
 	{
-		return aiCache::clear(m_sharedWorkingDirectory, aiCache::Scope::SVS);
+		return aiCache::clear(m_sharedCacheDirectory, aiCache::Scope::SVS);
 	}
 	const auto limit = m_diskLimit;
 	m_diskLimit = 0;

@@ -110,6 +110,16 @@ private slots:
 	{
 		QCOMPARE(QGuiApplication::platformName(), QString("windows"));
 		QVERIFY(m_working.isValid());
+		QFile isolatedConfig(m_working.filePath("svc-test-config.xml"));
+		QVERIFY(isolatedConfig.open(QIODevice::WriteOnly));
+		QDomDocument configDocument;
+		auto configRoot = configDocument.createElement("lmms");
+		configDocument.appendChild(configRoot);
+		auto paths = configDocument.createElement("paths");
+		paths.setAttribute("aicache", m_working.filePath("custom-cache"));
+		configRoot.appendChild(paths);
+		isolatedConfig.write(configDocument.toByteArray());
+		isolatedConfig.close();
 		ConfigManager::inst()->loadConfigFile(m_working.filePath("svc-test-config.xml"));
 		ConfigManager::inst()->setWorkingDir(m_working.path() + "/");
 		ConfigManager::inst()->setValue("app", "configured", "1");
@@ -228,7 +238,7 @@ private slots:
 		QCOMPARE(track->mixerChannelModel()->value(), 0);
 		QFile input(m_source);
 		QVERIFY(input.open(QIODevice::ReadOnly));
-		auto pair = svc::CachePair::create(m_working.path(), "Reference", input, track->selection());
+		auto pair = svc::CachePair::create(ConfigManager::inst()->aiCacheDir(), "Reference", input, track->selection());
 		QVERIFY(pair->append(event));
 		event.chunk_index = 2;
 		event.sample_offset = event.sample_count;

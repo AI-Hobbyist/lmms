@@ -349,7 +349,19 @@ private slots:
 			}
 		}
 		auto* config = ConfigManager::inst();
-		config->loadConfigFile(m_config.filePath("ui-config.xml"));
+		QCOMPARE(config->aiCacheDir(), QDir(QCoreApplication::applicationDirPath()).filePath("cache") + '/');
+		QFile isolatedConfig(m_config.filePath("ui-config.xml"));
+		QVERIFY(isolatedConfig.open(QIODevice::WriteOnly));
+		QDomDocument cacheConfig;
+		auto cacheRoot = cacheConfig.createElement("lmms");
+		cacheConfig.appendChild(cacheRoot);
+		auto cachePaths = cacheConfig.createElement("paths");
+		cachePaths.setAttribute("aicache", m_config.filePath("custom-ai-cache"));
+		cacheRoot.appendChild(cachePaths);
+		isolatedConfig.write(cacheConfig.toByteArray());
+		isolatedConfig.close();
+		config->loadConfigFile(isolatedConfig.fileName());
+		QCOMPARE(config->aiCacheDir(), m_config.filePath("custom-ai-cache") + '/');
 		config->setWorkingDir(m_config.path() + '/');
 		const auto stkDir = qEnvironmentVariable("LMMS_UI_STK_DIR");
 		if (!stkDir.isEmpty())
@@ -386,8 +398,37 @@ private slots:
 			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
 			QCoreApplication::installTranslator(&translator);
 			config->setValue("aiCache", "limitMiB", "2048");
+			{
+				const auto activeWorkingDirectory = config->workingDir();
+				const auto cacheSetting = config->value("paths", "aicache");
+				config->setWorkingDir(QCoreApplication::applicationDirPath() + "/lmms-workspace/");
+				config->setValue("paths", "aicache", QCoreApplication::applicationDirPath() + "/cache");
+				SetupDialog paths(SetupDialog::ConfigTab::PathsSettings);
+				auto* editor = paths.findChild<QLineEdit*>("aiCacheDirectory");
+				QVERIFY(editor);
+				QCOMPARE(QDir::fromNativeSeparators(editor->text()), QString("cache"));
+				QCOMPARE(QDir::cleanPath(QDir::fromNativeSeparators(
+					paths.findChild<QLineEdit*>("workingDirectory")->text())), QString("lmms-workspace"));
+				QCOMPARE(QDir::fromNativeSeparators(paths.findChild<QLineEdit*>("themeDirectory")->text()),
+					QString("data/themes/default/"));
+				if (language != "en")
+				{
+					QVERIFY(QCoreApplication::translate("lmms::gui::SetupDialog", "AI cache directory")
+						!= "AI cache directory");
+				}
+				capture(&paths, "ai-cache-path-" + language);
+				if (language == "zh_CN")
+				{
+					auto* scroll = paths.findChild<QWidget*>("pathsSettingsPage")->findChild<QScrollArea*>();
+					scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+					capture(&paths, "ai-cache-path-theme-zh_CN");
+				}
+				paths.close();
+				config->setWorkingDir(activeWorkingDirectory);
+				config->setValue("paths", "aicache", cacheSetting);
+			}
 			svs::Cache::instance().setDiskLimit(2LL * 1024 * 1024 * 1024);
-			const auto svcRoot = QDir(config->workingDir()).filePath("cache/svc/Reference/input");
+			const auto svcRoot = QDir(config->aiCacheDir()).filePath("svc/Reference/input");
 			const auto svsRoot = svs::Cache::instance().engineDirectory("org.lmms.svs.diffsinger");
 			QVERIFY(QDir().mkpath(svcRoot) && QDir().mkpath(svsRoot));
 			for (const auto& path : {QDir(svcRoot).filePath(QString(64, 'a') + ".wav"),
@@ -429,8 +470,9 @@ private slots:
 			auto* bar = page->findChild<AICacheUsageBar*>("aiCacheUsageBar");
 			QVERIFY(bar);
 			const auto barImage = [bar] {
-				const auto point = bar->mapToGlobal(QPoint());
-				return bar->screen()->grabWindow(0, point.x(), point.y(), bar->width(), bar->height()).toImage();
+				const auto point = bar->mapTo(bar->window(), QPoint());
+				return bar->screen()->grabWindow(bar->window()->winId(),
+					point.x(), point.y(), bar->width(), bar->height()).toImage();
 			};
 			const auto verifyColors = [&] {
 				const auto pixels = barImage();
@@ -450,7 +492,7 @@ private slots:
 				verifyColors();
 			}
 			QTest::mouseClick(page->findChild<QPushButton*>("svcCacheClear"), Qt::LeftButton);
-			QCOMPARE(svc::cacheBytes(config->workingDir()), qint64(0));
+			QCOMPARE(svc::cacheBytes(config->aiCacheDir()), qint64(0));
 			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(4 * 1024 * 1024));
 			QTest::mouseClick(page->findChild<QPushButton*>("svsCacheClear"), Qt::LeftButton);
 			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(0));
@@ -462,7 +504,7 @@ private slots:
 				QCOMPARE(file.write(QByteArray(1024, 'x')), qint64(1024));
 			}
 			QTest::mouseClick(page->findChild<QPushButton*>("aiCacheClearAll"), Qt::LeftButton);
-			QCOMPARE(svc::cacheBytes(config->workingDir()), qint64(0));
+			QCOMPARE(svc::cacheBytes(config->aiCacheDir()), qint64(0));
 			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(0));
 			QCOMPARE(page->findChild<QLabel*>("aiCacheStatus")->text(),
 				QCoreApplication::translate("lmms::gui::AICacheSettingsPage", "Cache cleared."));
@@ -477,6 +519,36 @@ private slots:
 			settings.close();
 			QCoreApplication::removeTranslator(&translator);
 		}
+	}
+	void aiCachePathPersistence()
+	{
+		auto* config = ConfigManager::inst();
+		const auto activeCacheDirectory = config->aiCacheDir();
+		const auto oldTheme = config->themeDir();
+		const auto oldCacheSetting = config->value("paths", "aicache");
+		{
+			SetupDialog paths(SetupDialog::ConfigTab::PathsSettings);
+			paths.findChild<QLineEdit*>("aiCacheDirectory")->setText("cache/custom");
+			QVERIFY(QMetaObject::invokeMethod(&paths, "accept", Qt::DirectConnection));
+			QCOMPARE(config->aiCacheDir(), activeCacheDirectory);
+			QFile saved(m_config.filePath("ui-config.xml"));
+			QVERIFY(saved.open(QIODevice::ReadOnly));
+			QDomDocument document;
+			QVERIFY(document.setContent(saved.readAll()));
+			const auto pathValues = document.documentElement().firstChildElement("paths");
+			QCOMPARE(pathValues.attribute("aicache"), QString("cache/custom"));
+			QCOMPARE(pathValues.attribute("theme"), QString("data/themes/default/"));
+			paths.close();
+		}
+		{
+			SetupDialog reopened(SetupDialog::ConfigTab::PathsSettings);
+			QCOMPARE(QDir::fromNativeSeparators(reopened.findChild<QLineEdit*>("aiCacheDirectory")->text()),
+				QString("cache/custom"));
+			reopened.close();
+		}
+		config->setThemeDir(oldTheme);
+		config->setValue("paths", "aicache", oldCacheSetting);
+		config->saveConfigFile();
 	}
 	void svsCacheManagement()
 	{

@@ -79,6 +79,7 @@ public:
 	}
 
 	void initPortableWorkingDir();
+	const QString& aiCacheDir() const;
 
 	void initInstalledWorkingDir();
 

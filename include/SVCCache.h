@@ -9,17 +9,17 @@
 
 namespace lmms::svc {
 // SVC input/output pairs share the total AI cache budget with SVS.
-qint64 cacheBytes(const QString& workingDirectory);
+qint64 cacheBytes(const QString& cacheDirectory);
 qint64 cacheLimit();
-void setCacheLimit(const QString& workingDirectory, qint64 bytes);
-bool clearCache(const QString& workingDirectory);
+void setCacheLimit(const QString& cacheDirectory, qint64 bytes);
+bool clearCache(const QString& cacheDirectory);
 
 class CachePair
 {
 public:
 	// Source must be a seekable WAV stream. Snapshot must never contain credentials.
 	static std::unique_ptr<CachePair> create(
-		const QString& workingDirectory, const QString& engine, QIODevice& source, const QJsonObject& snapshot);
+		const QString& cacheDirectory, const QString& engine, QIODevice& source, const QJsonObject& snapshot);
 	~CachePair();
 	CachePair(const CachePair&) = delete;
 	CachePair& operator=(const CachePair&) = delete;
@@ -37,7 +37,7 @@ private:
 	bool saveMetadata();
 	QByteArray waveHeader() const;
 	QString m_hash;
-	QString m_workingDirectory;
+	QString m_cacheDirectory;
 	bool m_registered = false;
 	QFile m_input;
 	QFile m_output;

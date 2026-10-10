@@ -128,7 +128,7 @@ AICacheSettingsPage::AICacheSettingsPage(QWidget* parent)
 	aiCache::setLimit(limit * MiB);
 	// Initialize the SVS legacy cache registration before enforcing the shared limit.
 	svs::Cache::instance();
-	aiCache::trim(config->workingDir());
+	aiCache::trim(config->aiCacheDir());
 	auto* limitForm = new QFormLayout;
 	m_limit = new QDoubleSpinBox(this);
 	m_limit->setObjectName("aiCacheLimit");
@@ -187,7 +187,7 @@ AICacheSettingsPage::AICacheSettingsPage(QWidget* parent)
 
 void AICacheSettingsPage::refreshUsage()
 {
-	const auto svcBytes = svc::cacheBytes(ConfigManager::inst()->workingDir());
+	const auto svcBytes = svc::cacheBytes(ConfigManager::inst()->aiCacheDir());
 	const auto svsBytes = svs::Cache::instance().diskBytes();
 	const auto capacity = qRound64(m_limit->value() * 1024) * MiB;
 	const QLocale locale;
@@ -215,7 +215,7 @@ void AICacheSettingsPage::clearCaches(bool svcCache, bool svsCache)
 	bool cleared = true;
 	if (svcCache)
 	{
-		cleared &= svc::clearCache(ConfigManager::inst()->workingDir());
+		cleared &= svc::clearCache(ConfigManager::inst()->aiCacheDir());
 	}
 	if (svsCache)
 	{
@@ -233,7 +233,7 @@ void AICacheSettingsPage::save()
 	const auto limit = qRound64(m_limit->value() * 1024);
 	config->setValue("aiCache", "limitMiB", QString::number(limit));
 	aiCache::setLimit(limit * MiB);
-	aiCache::trim(config->workingDir());
+	aiCache::trim(config->aiCacheDir());
 	refreshUsage();
 }
 } // namespace lmms::gui

@@ -59,6 +59,7 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 namespace {
+QString activeAICacheDirectory;
 QString resolveConfigPath(const QString& path)
 {
 	if (path.isEmpty() || path.contains(':') || QDir::isAbsolutePath(path)) { return path; }
@@ -67,6 +68,11 @@ QString resolveConfigPath(const QString& path)
 
 QString portableConfigPath(const QString& path)
 {
+	const auto defaultTheme = QFileInfo(ConfigManager::inst()->defaultThemeDir()).canonicalFilePath();
+	if (!defaultTheme.isEmpty() && QFileInfo(path).canonicalFilePath() == defaultTheme)
+	{
+		return "data/themes/default/";
+	}
 	if (path.isEmpty() || !QDir::isAbsolutePath(path)) { return path; }
 	const auto relative = QDir(qApp->applicationDirPath()).relativeFilePath(path);
 	if (relative == ".." || relative.startsWith("../") || QDir::isAbsolutePath(relative)) { return path; }
@@ -75,6 +81,11 @@ QString portableConfigPath(const QString& path)
 } // namespace
 
 ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
+
+const QString& ConfigManager::aiCacheDir() const
+{
+	return activeAICacheDirectory;
+}
 
 
 ConfigManager::ConfigManager() :
@@ -90,6 +101,7 @@ ConfigManager::ConfigManager() :
 		initInstalledWorkingDir();
 	}
 	m_dataDir = "data:/";
+	activeAICacheDirectory = ensureTrailingSlash(qApp->applicationDirPath() + "/cache");
 	m_vstDir = m_workingDir + "vst/";
 	m_sf2Dir = m_workingDir + SF2_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
@@ -480,6 +492,7 @@ void ConfigManager::deleteValue(const QString & cls, const QString & attribute)
 
 void ConfigManager::loadConfigFile(const QString & configFile)
 {
+	activeAICacheDirectory = ensureTrailingSlash(qApp->applicationDirPath() + "/cache");
 	// read the XML file and create DOM tree
 	// Allow configuration file override through --config commandline option
 	if (!configFile.isEmpty())
@@ -570,9 +583,21 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			}
 
 			for (const auto* name : {"theme", "workingdir", "vstdir", "gigdir", "sf2dir", "ladspadir", "stkdir",
-					 "defaultsf2", "backgroundtheme"})
+					 "defaultsf2", "backgroundtheme", "aicache"})
 			{
-				setValue("paths", name, resolveConfigPath(value("paths", name)));
+				if (QString::fromLatin1(name) == "ladspadir")
+				{
+					auto directories = value("paths", name).split(',');
+					for (auto& directory : directories)
+					{
+						directory = resolveConfigPath(directory);
+					}
+					setValue("paths", name, directories.join(','));
+				}
+				else
+				{
+					setValue("paths", name, resolveConfigPath(value("paths", name)));
+				}
 			}
 
 			if(value("paths", "theme") != "")
@@ -594,6 +619,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 				m_themeDir = ensureTrailingSlash(m_themeDir);
 			}
 			setWorkingDir(value("paths", "workingdir"));
+			if (!value("paths", "aicache").trimmed().isEmpty())
+			{
+				activeAICacheDirectory = ensureTrailingSlash(QDir::cleanPath(value("paths", "aicache")));
+			}
 
 			setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
 			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
@@ -706,9 +735,21 @@ void ConfigManager::saveConfigFile()
 #endif
 	setValue("paths", "backgroundtheme", m_backgroundPicFile);
 	for (const auto* name : {"theme", "workingdir", "vstdir", "gigdir", "sf2dir", "ladspadir", "stkdir",
-			 "defaultsf2", "backgroundtheme"})
+			 "defaultsf2", "backgroundtheme", "aicache"})
 	{
-		setValue("paths", name, portableConfigPath(value("paths", name)));
+		if (QString::fromLatin1(name) == "ladspadir")
+		{
+			auto directories = value("paths", name).split(',');
+			for (auto& directory : directories)
+			{
+				directory = portableConfigPath(directory);
+			}
+			setValue("paths", name, directories.join(','));
+		}
+		else
+		{
+			setValue("paths", name, portableConfigPath(value("paths", name)));
+		}
 	}
 
 	QDomDocument doc("lmms-config-file");
