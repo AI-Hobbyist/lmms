@@ -586,11 +586,19 @@ private slots:
 		auto* clip = static_cast<SVSClip*>(track->createClip(0));
 		SVSPianoRoll editor(clip);
 		editor.resize(1100, 660);
-		capture(&editor, "synthesis-strip-pending");
+		capture(&editor, "synthesis-strip-empty");
 		auto* canvas = editor.findChild<SVSCanvas*>("svsNoteCanvas");
 		QVERIFY(canvas && !editor.findChild<QLabel*>("svsSynthesisStatus"));
 		auto* strip = canvas->findChild<QWidget*>("svsSynthesisProgressStrip");
-		QVERIFY(strip && strip->isVisible());
+		QVERIFY(strip && !strip->isVisible());
+		svs::Note initialNote;
+		initialNote.id = QUuid::createUuid().toString();
+		initialNote.duration = 96;
+		initialNote.pitch = 60;
+		initialNote.lyric = "a";
+		clip->setNotes({initialNote});
+		QVERIFY(strip->isVisible());
+		capture(&editor, "synthesis-strip-pending");
 		QCOMPARE(strip->height(), 4);
 		auto stripImage = [&] {
 			const auto origin = strip->mapToGlobal(QPoint());
@@ -626,6 +634,12 @@ private slots:
 		const auto completed = stripImage();
 		QTest::qWait(160);
 		QCOMPARE(stripImage(), completed);
+		clip->setNotes({});
+		QVERIFY(!strip->isVisible());
+		capture(&editor, "synthesis-strip-deleted");
+		clip->setNotes(notes);
+		QVERIFY(strip->isVisible());
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 30000);
 		canvas->setScroll(700, canvas->topPitch());
 		QTest::qWait(100);
 		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#69c78f"));

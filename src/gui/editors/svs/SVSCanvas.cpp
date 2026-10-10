@@ -178,7 +178,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	m_timeLine->setFixedHeight(TimelineHeight);
 	m_timeLine->setSnapSize(m_quantization / TimePos::ticksPerBar());
 	auto running = [this] {
-		if (!m_clip || m_parameter)
+		if (!m_clip || m_parameter || m_clip->notes().isEmpty())
 		{
 			return false;
 		}
@@ -186,7 +186,7 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 		return m_clip->status() == "Rendering" || m_clip->status().startsWith(prefix);
 	};
 	auto* strip = new SynthesisStrip(m_timeLine, [this, running](QPainter& painter) {
-		if (!m_clip || m_parameter)
+		if (!m_clip || m_parameter || m_clip->notes().isEmpty())
 		{
 			return;
 		}
@@ -252,9 +252,11 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	}, running);
 	m_synthesisStrip = strip;
 	m_synthesisStrip->setGeometry(0, 0, width(), 4);
+	strip->setVisible(!clip->notes().isEmpty());
 	m_timeLine->setToolTip(nativeTranslation::svsStatus(clip->status()));
 	connect(clip, &Clip::dataChanged, strip, [this, strip] {
 		m_timeLine->setToolTip(nativeTranslation::svsStatus(m_clip->status()));
+		strip->setVisible(!m_clip->notes().isEmpty());
 		strip->refresh();
 	});
 	connect(this, &SVSCanvas::viewportChanged, this, [this] {
