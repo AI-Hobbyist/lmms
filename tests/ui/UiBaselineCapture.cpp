@@ -1417,6 +1417,41 @@ private slots:
 		capture(&dialog, prefix + "-svs-project-export");
 		dialog.close();
 	}
+	void hostVolumeCurve()
+	{
+		const auto prefix = "host-volume-" + qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			capture(&editor, prefix + "-unselected");
+			QCOMPARE(editor.devicePixelRatioF(), 1.0);
+			auto* tab = editor.findChild<QToolButton*>("svsParameterTab.input:svs.volume");
+			QVERIFY(tab && tab->isVisible() && tab->isEnabled());
+			QCOMPARE(tab->text(), QCoreApplication::translate("NativeSVS", "Volume"));
+			QCOMPARE(clip->editorState()["selectedParameter"].toString(), QString("input:svs.volume"));
+			const auto voices = svs::Registry::instance().voices();
+			auto voice = std::find_if(voices.cbegin(), voices.cend(),
+				[](const auto& item) { return item.pluginId == "org.lmms.svs.example"; });
+			QVERIFY(voice != voices.cend());
+			track->bindVoice(voice->pluginId, "full");
+			QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+			svs::Curve curve;
+			curve.id = svs::VolumeId;
+			curve.unit = "dB";
+			curve.insert(0, -12.);
+			curve.insert(48, 6.);
+			curve.insert(96, 0.);
+			clip->setEditorData(clip->notes(), {{svs::VolumeId, curve}});
+			QTest::mouseClick(tab, Qt::LeftButton);
+			capture(&editor, prefix + "-engine");
+			QCOMPARE(tab->text(), QCoreApplication::translate("NativeSVS", "Volume"));
+			QVERIFY(tab->isVisible() && tab->isEnabled());
+			editor.close();
+		}
+		delete track;
+	}
 	void svsRegisterFollowup()
 	{
 		const auto prefix = "svs-register-" + qEnvironmentVariable("LMMS_UI_TRANSLATION");

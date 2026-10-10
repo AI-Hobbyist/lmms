@@ -19,6 +19,7 @@ public:
 		double position = 0, length = 0, contentOffset = 0;
 		std::shared_ptr<Plugin> plugin;
 		std::shared_ptr<const Audio> audio;
+		std::shared_ptr<const VolumeAutomation> volume;
 		bool declarationPending = false;
 		bool catalogPending = false;
 		QString voicePackage;

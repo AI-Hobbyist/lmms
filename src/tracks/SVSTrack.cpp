@@ -27,11 +27,12 @@ namespace {
 class SVSPlaybackHandle : public PlayHandle
 {
 public:
-	SVSPlaybackHandle(
-		SVSTrack* track, std::shared_ptr<const svs::Audio> audio, double start, f_cnt_t frames, f_cnt_t offset)
+	SVSPlaybackHandle(SVSTrack* track, std::shared_ptr<const svs::Audio> audio,
+		std::shared_ptr<const svs::VolumeAutomation> volume, double start, f_cnt_t frames, f_cnt_t offset)
 		: PlayHandle(Type::SVSPlayHandle, offset)
 		, m_track(track)
 		, m_audio(std::move(audio))
+		, m_volume(std::move(volume))
 		, m_start(start)
 		, m_frames(frames)
 	{
@@ -51,9 +52,13 @@ public:
 				continue;
 			auto index = static_cast<size_t>(position);
 			const float fraction = position - index;
+			const double tick = m_audio->mapping.tickAtLocalSeconds(
+				m_audio->mapping.localSeconds(m_audio->startTick) + position / m_audio->rate);
+			const double gain = m_volume ? m_volume->gainAt(tick) : 1.;
 			for (int channel = 0; channel < 2; ++channel)
-				buffer[f + offset()][channel] = m_audio->samples[index * 2 + channel] * (1 - fraction)
-					+ m_audio->samples[(index + 1) * 2 + channel] * fraction;
+				buffer[f + offset()][channel] = gain
+					* (m_audio->samples[index * 2 + channel] * (1 - fraction)
+						+ m_audio->samples[(index + 1) * 2 + channel] * fraction);
 		}
 		m_start += count * ratio;
 		m_frames -= count;
@@ -63,6 +68,7 @@ public:
 private:
 	SVSTrack* m_track;
 	std::shared_ptr<const svs::Audio> m_audio;
+	std::shared_ptr<const svs::VolumeAutomation> m_volume;
 	double m_start;
 	f_cnt_t m_frames;
 };
@@ -74,6 +80,7 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 	, m_mix(0, 0, Engine::mixer()->numChannels() - 1, this, "Mixer channel")
 	, m_bus("SVS", true, &m_volume, &m_pan, &m_mutedModel)
 {
+	svs::addHostVolume(m_capabilities);
 	Track::setName("SVS");
 	connect(Engine::getSong(), &Song::playbackStateChanged, this, [this] {
 		if (!Engine::getSong()->isPlaying()) { clearNoteActivity(); }
@@ -109,6 +116,7 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 			++m_capabilityRequest;
 			m_capabilitiesReady = false;
 			m_capabilities = {};
+			svs::addHostVolume(m_capabilities);
 			m_dictionaries.clear();
 			m_capabilityDiagnostics = next.id.isEmpty() ? QStringList{QCoreApplication::translate("NativeSVS",
 															  "Voicebank is missing; project data is retained")}
@@ -170,6 +178,7 @@ void SVSTrack::bindVoice(const QString& plugin, const QString& voice)
 		}
 	++m_capabilityRequest;
 	m_capabilities = {};
+	svs::addHostVolume(m_capabilities);
 	m_capabilitiesReady = false;
 	m_dictionaries.clear();
 	m_capabilityDiagnostics.clear();
@@ -248,6 +257,9 @@ void SVSTrack::refreshCapabilities(const QJsonObject& editorContext)
 	auto context = m_parameters;
 	for (auto i = editorContext.begin(); i != editorContext.end(); ++i)
 		context[i.key()] = i.value();
+	auto clipParameters = context["clipParameters"].toObject();
+	clipParameters.remove(svs::VolumeId);
+	if (context.contains("clipParameters")) { context["clipParameters"] = clipParameters; }
 	context["language"] = m_language;
 	QPointer<SVSTrack> target(this);
 	svs::SynthesisScheduler::instance().declarationPool().start(QRunnable::create([plugin, target, voice, package,
@@ -295,6 +307,7 @@ void SVSTrack::refreshCapabilities(const QJsonObject& editorContext)
 				}
 				const bool changed = !target->m_capabilitiesReady || target->m_capabilities.original != parsed.original;
 				target->m_capabilities = parsed;
+				svs::addHostVolume(target->m_capabilities);
 				target->m_capabilitiesReady = true;
 				target->m_dictionaries = dictionaries;
 				target->m_capabilityDiagnostics = diagnostics;
@@ -355,7 +368,8 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 		m_activeNotes.clear();
 	}
 	m_lastActivityTick = int(start);
-	auto playRegion = [&](std::shared_ptr<const svs::Audio> audio, double position, double end, double contentOffset) {
+	auto playRegion = [&](std::shared_ptr<const svs::Audio> audio, std::shared_ptr<const svs::VolumeAutomation> volume,
+						  double position, double end, double contentOffset) {
 		if (!audio || playTick >= end) return false;
 		const auto& mapping = audio->mapping;
 		const double begin = contentOffset == 0 ? std::min(position, mapping.projectTick(audio->startTick)) : position;
@@ -367,13 +381,14 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 		auto bounded = f_cnt_t(std::ceil(std::max(
 			0., std::min(double(Engine::framesPerTick()), (end - playTick) * Engine::framesPerTick()) - remainder)));
 		return Engine::audioEngine()->addPlayHandle(
-			new SVSPlaybackHandle(this, std::move(audio), sampleStart, bounded, offset));
+			new SVSPlaybackHandle(this, std::move(audio), std::move(volume), sampleStart, bounded, offset));
 	};
 	const auto frozen = Engine::getSong()->isExporting() ? std::atomic_load(&m_exportRegions) : nullptr;
 	if (frozen)
 	{
 		for (const auto& region : *frozen)
-			played = playRegion(region.audio, region.position, region.end, region.contentOffset) || played;
+			played
+				= playRegion(region.audio, region.volume, region.position, region.end, region.contentOffset) || played;
 	}
 	else
 	{
@@ -399,8 +414,8 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 				}
 			}
 			if (!clip->isMuted())
-				played = playRegion(clip->audio(), int(clip->startPosition()), int(clip->endPosition()),
-							 -int(clip->startTimeOffset()))
+				played = playRegion(clip->audio(), clip->volumeAutomation(), int(clip->startPosition()),
+							 int(clip->endPosition()), -int(clip->startTimeOffset()))
 					|| played;
 		}
 	}
@@ -476,6 +491,7 @@ void SVSTrack::loadTrackSpecificSettings(const QDomElement& node)
 		m_voiceId = node.attribute("voiceId");
 		m_voice = {};
 		m_capabilities = {};
+		svs::addHostVolume(m_capabilities);
 		m_capabilitiesReady = false;
 		m_dictionaries.clear();
 		m_capabilityDiagnostics = {m_migrationDiagnostic};

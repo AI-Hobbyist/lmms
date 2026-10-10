@@ -18,6 +18,7 @@
 #include "SVSTimeMapping.h"
 namespace lmms::svs {
 struct TempoSnapshot;
+struct VolumeAutomation;
 struct Note
 {
 	QString id, lyric = "la", language, pronunciation;
@@ -53,6 +54,7 @@ struct ExportAudioRegion
 {
 	double position = 0, end = 0, contentOffset = 0;
 	std::shared_ptr<const Audio> audio;
+	std::shared_ptr<const VolumeAutomation> volume;
 };
 struct Input
 {

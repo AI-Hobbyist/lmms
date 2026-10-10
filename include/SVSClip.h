@@ -9,6 +9,7 @@
 #include "SVSCurve.h"
 #include "SVSModel.h"
 #include "SVSSegmentedSynthesis.h"
+#include "SVSVolume.h"
 namespace lmms {
 class SVSClip : public Clip
 {
@@ -42,6 +43,8 @@ public:
 	void invalidate();
 	void cancelSynthesis();
 	std::shared_ptr<const svs::Audio> audio() const;
+	std::shared_ptr<const svs::VolumeAutomation> volumeAutomation() const
+	{ return std::atomic_load(&m_volumeAutomation); }
 	QString status() const { return m_status; }
 	QString id() const { return m_id; }
 	const QJsonObject& parameters() const { return m_parameters; }
@@ -54,6 +57,7 @@ public:
 	const QJsonArray& projectDictionaryData() const { return m_projectDictionaryData; }
 
 private:
+	void refreshVolumeAutomation();
 	void scheduleSynthesis();
 	bool m_synthesisScheduled = false;
 	bool m_loading = false;
@@ -73,6 +77,7 @@ private:
 	std::atomic<uint64_t> m_revision{1};
 	uint64_t m_generation = 1, m_request = 0;
 	std::shared_ptr<const svs::Audio> m_audio;
+	std::shared_ptr<const svs::VolumeAutomation> m_volumeAutomation;
 	std::shared_ptr<svs::RenderControl> m_renderControl;
 	QVector<svs::SynthesisSegment> m_segments;
 };

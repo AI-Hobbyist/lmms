@@ -249,3 +249,16 @@ M6 检查点 `9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c` 推送确认后开始。
 核对 refs/tlds_ref/DiffSingerDeclarations.cs 的 use_speed_embed → Speed，以及 Localization.cs 的 Speed → 语速。仅修正 NativeSVS/Velocity 译文：中文“语速”、日文“話速”、英文“Speech speed”、韩文“말하기 속도”。其他 MIDI velocity／力度词条、diffsinger.velocity 参数标识、speed 输入和数值逻辑不变。
 
 四语 QM 编译并原位部署 PASS；复用既有实窗测试程序，四语各 3 PASS、0 FAIL，Windows Qt、100% 缩放，生产参数面板截图确认名称及中日韩字形正常。截图保留为 velocity-<language>.png，历史 svs-register-* 证据未覆盖。全库 3886 键质量 PASS；本次没有 C++ 修改，无须重新编译未改动的二进制。
+
+
+## 用户补充：SVS 宿主公用音量曲线
+
+参考 refs/tl_ref/TuneLab/ConstantDefine.cs 的 Volume 配置及 Data/MidiPart.cs 的 Volume2Level。新增宿主管理的 svs.volume 曲线：范围 −12～+12，默认 0，−12 完全静音、0 为单位增益，正值按分贝增益处理，低值使用 TuneLab 的平滑静音尾段。中日英韩名称为音量／音量／Volume／음량。
+
+音量在未选择声库、引擎缺失和切换引擎时均常驻，首次打开默认选中。参数及曲线沿用片段保存／克隆数据路径；播放线程读取不可变快照并按内容时间及速度映射逐采样应用增益。混音和分轨导出使用冻结的音量快照。仅编辑音量不会重新合成，也不会改变合成缓存键；宿主参数不进入引擎声明上下文和合成输入。没有增加其他公用参数或修改引擎 SDK。
+
+lmms、UiBaselineCapture、SVSIntegrationTest、SVSDiffSinger 前台编译 PASS。开发程序 build/Release/lmms.exe；所需 amplifier、kicker、tripleoscillator 原位部署到 build/Release/plugins，SVSExample 和 SVSDiffSinger 在原 build/Release/svs 目录验证。所有测试均使用 Windows Qt 平台，代码修改完成后才进行 GUI 验证，只测试 100% 缩放。
+
+SVS 音频集成 6 PASS、0 FAIL：范围与默认值、实时静音／增益／曲线、无需重合成及缓存复用、保存克隆恢复、跨引擎常驻、混音与分轨导出一致、导出中编辑时冻结曲线不变、变速工程曲线播放与导出一致。首次运行旧导出测试因默认取首个声库而误选 DiffSinger；本次相关测试改为显式绑定已部署的示例引擎，重跑通过。测试启动仍有既存 JACK／Carla 插件告警，未扩张到无关修复。
+
+四语真实 Windows 窗口各 3 PASS、0 FAIL。截图检查未选声库／绑定引擎两种状态的音量标签、曲线、−12～+12 范围及中日韩字形均正常；所有测试窗口已关闭。证据为 host-volume-*。四语 QM 源文件与原位部署文件 SHA-256 一致，见 host-volume-resources.json。全库 3887 键四语质量 PASS；git diff --check PASS。

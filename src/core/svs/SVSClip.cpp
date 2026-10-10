@@ -157,6 +157,13 @@ std::shared_ptr<const svs::Audio> SVSClip::audio() const
 	auto result = std::atomic_load(&m_audio);
 	return result && result->revision == m_revision.load() ? result : nullptr;
 }
+void SVSClip::refreshVolumeAutomation()
+{
+	auto volume = std::make_shared<svs::VolumeAutomation>();
+	volume->base = m_parameters.value(svs::VolumeId).toDouble();
+	volume->curve = m_curves.value(svs::VolumeId);
+	std::atomic_store(&m_volumeAutomation, std::shared_ptr<const svs::VolumeAutomation>(std::move(volume)));
+}
 void SVSClip::setNotes(const QVector<svs::Note>& notes)
 {
 	setEditorData(notes, m_curves);
@@ -165,9 +172,21 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 {
 	if (readOnly() || (notes == m_notes && curves == m_curves))
 		return;
+	auto synthesisCurves = [](svs::Curves value) {
+		value.remove(svs::VolumeId);
+		return value;
+	};
+	const bool volumeOnly = notes == m_notes && synthesisCurves(curves) == synthesisCurves(m_curves);
 	addJournalCheckPoint();
 	m_notes = notes;
 	m_curves = curves;
+	refreshVolumeAutomation();
+	if (volumeOnly)
+	{
+		emit dataChanged();
+		Engine::getSong()->setModified();
+		return;
+	}
 	if (getAutoResize())
 	{
 		double end = TimePos::ticksPerBar();
@@ -281,6 +300,13 @@ bool SVSClip::setParameter(const QString& id, const QJsonValue& value)
 		return true;
 	addJournalCheckPoint();
 	m_parameters[id] = value;
+	if (id == svs::VolumeId)
+	{
+		refreshVolumeAutomation();
+		emit dataChanged();
+		Engine::getSong()->setModified();
+		return true;
+	}
 	static_cast<SVSTrack*>(getTrack())->refreshCapabilities({{"clipParameters", m_parameters}});
 	invalidate();
 	synthesize();
@@ -535,7 +561,9 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 	if (!m_globalParameters.isEmpty())
 		input.document["globalParameters"] = m_globalParameters;
 	input.document["trackParameters"] = track->parameters();
-	input.document["clipParameters"] = m_parameters;
+	auto engineParameters = m_parameters;
+	engineParameters.remove(svs::VolumeId);
+	input.document["clipParameters"] = engineParameters;
 	input.document["engineSettings"]
 		= QJsonDocument::fromJson(
 			  ConfigManager::inst()
@@ -552,7 +580,9 @@ svs::Input SVSClip::captureInput(uint32_t rate) const
 	input.document["computeBackend"] = compute["effectiveBackend"].toString("cpu");
 	input.document["computeDevice"] = compute["effectiveDevice"].toString("cpu");
 	input.document["cacheDirectory"] = svs::Cache::instance().engineDirectory(track->pluginId());
-	input.document["curves"] = svs::curvesToJson(m_curves);
+	auto engineCurves = m_curves;
+	engineCurves.remove(svs::VolumeId);
+	input.document["curves"] = svs::curvesToJson(engineCurves);
 	input.document["secondsPerTick"] = input.secondsPerTick;
 	input.document["language"] = track->language();
 	input.document["capabilities"] = track->capabilities().original;
@@ -843,6 +873,7 @@ void SVSClip::loadSettings(const QDomElement& node)
 			}
 		}
 	}
+	refreshVolumeAutomation();
 	++m_generation;
 	invalidate();
 	scheduleSynthesis();

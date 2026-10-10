@@ -1594,6 +1594,10 @@ Original file backups remain at: %2</source>
         <source>Tone shift</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volume</translation>
+    </message>
 </context>
 <context>
     <name>PatchesDialog</name>

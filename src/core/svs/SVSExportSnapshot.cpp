@@ -52,6 +52,7 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song, uint32_t rat
 				region.length = int(clip->length());
 				region.contentOffset = -int(clip->startTimeOffset());
 				region.input = clip->captureInput(rate);
+				region.volume = clip->volumeAutomation();
 				region.plugin = Registry::instance().plugin(track->pluginId());
 				region.mixContext = mixContext(*track);
 				region.catalogPending
@@ -212,8 +213,8 @@ void ExportSnapshot::freezeTimeline(Song& song)
 			auto clips = std::make_shared<QVector<ExportAudioRegion>>();
 			for (const auto& region : m_regions)
 				if (region.track == track)
-					clips->push_back(
-						{region.position, region.position + region.length, region.contentOffset, region.audio});
+					clips->push_back({region.position, region.position + region.length, region.contentOffset,
+						region.audio, region.volume});
 			track->setExportRegions(std::move(clips));
 			m_activeTracks.push_back(track);
 		}

@@ -206,6 +206,101 @@ private slots:
 		else
 			Engine::destroy();
 	}
+	void hostVolumeAutomation()
+	{
+		auto* song = Engine::getSong();
+		auto* track = new SVSTrack(song);
+		const auto cleanup = qScopeGuard([&] {
+			song->stop();
+			delete track;
+		});
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		const auto* descriptor = track->capabilities().parameter(svs::VolumeId, "clip");
+		QVERIFY(descriptor);
+		QCOMPARE(descriptor->minimum, -12.);
+		QCOMPARE(descriptor->maximum, 12.);
+		QCOMPARE(descriptor->defaultValue.toDouble(), 0.);
+		QVERIFY(descriptor->curve && descriptor->writable);
+		QVERIFY(!clip->setGlobalParameter(svs::VolumeId, 12.1));
+		svs::VolumeAutomation volume;
+		QCOMPARE(volume.gainAt(0), 1.);
+		volume.base = -12.;
+		QCOMPARE(volume.gainAt(0), 0.);
+		volume.base = 12.;
+		QVERIFY(std::abs(volume.gainAt(0) - std::pow(10., .6)) < 1e-12);
+		const auto voices = svs::Registry::instance().voices();
+		auto voice = std::find_if(
+			voices.cbegin(), voices.cend(), [](const auto& item) { return item.pluginId == "org.lmms.svs.example"; });
+		QVERIFY(voice != voices.cend());
+		track->bindVoice(voice->pluginId, "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVERIFY(track->capabilities().parameter(svs::VolumeId, "clip"));
+		svs::Note note;
+		note.id = "host-volume";
+		note.duration = 192;
+		clip->setNotes({note});
+		QTRY_VERIFY_WITH_TIMEOUT(clip->audio(), 10000);
+		const auto audio = clip->audio();
+		const auto input = clip->captureInput(audio->rate);
+		auto energy = [&] {
+			song->stop();
+			song->getTimeline(Song::PlayMode::Song).setTicks(0);
+			song->playSong();
+			double result = 0;
+			for (int period = 0; period < 60; ++period)
+			{
+				for (const auto& frame : Engine::audioEngine()->renderNextPeriod())
+				{
+					if (period >= 16) { result += frame[0] * frame[0] + frame[1] * frame[1]; }
+				}
+			}
+			song->stop();
+			return result;
+		};
+		const double unity = energy();
+		QVERIFY(unity > .01);
+		QVERIFY(clip->setGlobalParameter(svs::VolumeId, -12.));
+		QVERIFY(energy() < 1e-10);
+		QVERIFY(clip->setGlobalParameter(svs::VolumeId, 6.));
+		const double boosted = energy();
+		QVERIFY(std::abs(boosted / unity - std::pow(10., .6)) < .01);
+		QVERIFY(clip->setGlobalParameter(svs::VolumeId, 0.));
+		svs::Curve curve;
+		curve.id = svs::VolumeId;
+		curve.unit = "dB";
+		curve.insert(0, -12.);
+		curve.insert(192, -12.);
+		clip->setEditorData(clip->notes(), {{svs::VolumeId, curve}});
+		QVERIFY(energy() < 1e-10);
+		QTest::qWait(100);
+		QCOMPARE(clip->audio(), audio);
+		const auto edited = clip->captureInput(audio->rate);
+		QCOMPARE(edited.revision, input.revision);
+		QCOMPARE(edited.request, input.request);
+		QCOMPARE(svs::Cache::editableKey(edited), svs::Cache::editableKey(input));
+		QVERIFY(!edited.document["curves"].toObject().contains(svs::VolumeId));
+		QVERIFY(!edited.document["clipParameters"].toObject().contains(svs::VolumeId));
+		auto regions = svs::ExportSnapshot::capture(*song, audio->rate);
+		auto region = std::find_if(
+			regions.begin(), regions.end(), [clip](const auto& item) { return item.input.clipId == clip->id(); });
+		QVERIFY(region != regions.end() && region->volume);
+		QCOMPARE(region->volume->gainAt(48), 0.);
+		clip->setEditorData(clip->notes(), {});
+		QCOMPARE(region->volume->gainAt(48), 0.);
+		QCOMPARE(clip->volumeAutomation()->gainAt(48), 1.);
+		QVERIFY(clip->setGlobalParameter(svs::VolumeId, -6.));
+		clip->setEditorData(clip->notes(), {{svs::VolumeId, curve}});
+		auto* copy = static_cast<SVSClip*>(clip->clone());
+		QCOMPARE(copy->parameters().value(svs::VolumeId).toDouble(), -6.);
+		QCOMPARE(copy->curves().value(svs::VolumeId), curve);
+		QCOMPARE(copy->volumeAutomation()->gainAt(48), 0.);
+		delete copy;
+		track->bindVoice(voice->pluginId, "minimal");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVERIFY(track->capabilities().parameter(svs::VolumeId, "clip"));
+		track->bindVoice("missing-engine", "missing-voice");
+		QVERIFY(track->capabilities().parameter(svs::VolumeId, "clip"));
+	}
 	void voiceReadmeNative()
 	{
 		QVERIFY(m_guiApplication);
@@ -2874,7 +2969,7 @@ private slots:
 		song->setExportLoop(false);
 		song->setRenderBetweenMarkers(false);
 		song->setLoopRenderCount(1);
-		const auto voice = svs::Registry::instance().voices().first();
+		const QString pluginId = "org.lmms.svs.example";
 		auto* left = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
 		auto* right = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
 		auto cleanup = qScopeGuard([&] {
@@ -2889,8 +2984,8 @@ private slots:
 		});
 		left->setName("Left");
 		right->setName("Right");
-		left->bindVoice(voice.pluginId, "full");
-		right->bindVoice(voice.pluginId, "minimal");
+		left->bindVoice(pluginId, "full");
+		right->bindVoice(pluginId, "minimal");
 		QTRY_VERIFY_WITH_TIMEOUT(left->capabilitiesReady() && right->capabilitiesReady(), 10000);
 		left->panningModel()->setValue(-100);
 		right->panningModel()->setValue(100);
@@ -2905,6 +3000,8 @@ private slots:
 		note.pitch = 67;
 		b->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(a->audio() && b->audio(), 10000);
+		QVERIFY(a->setGlobalParameter(svs::VolumeId, -6.));
+		QVERIFY(b->setGlobalParameter(svs::VolumeId, 3.));
 		const auto first = a->audio(), second = b->audio();
 		// Settle LMMS' existing per-model panning ramps for both tracks, so the
 		// comparison starts from the same mixer state as the subsequent export.
@@ -3021,7 +3118,7 @@ private slots:
 		auto* song = Engine::getSong();
 		const auto previousTempo = song->getTempo();
 		song->tempoModel().setValue(120);
-		const auto voice = svs::Registry::instance().voices().first();
+		const QString pluginId = "org.lmms.svs.example";
 		auto* left = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
 		auto* right = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
 		auto cleanup = qScopeGuard([&] {
@@ -3032,8 +3129,8 @@ private slots:
 		});
 		left->setName("FrozenLeft");
 		right->setName("FrozenRight");
-		left->bindVoice(voice.pluginId, "full");
-		right->bindVoice(voice.pluginId, "minimal");
+		left->bindVoice(pluginId, "full");
+		right->bindVoice(pluginId, "minimal");
 		QTRY_VERIFY_WITH_TIMEOUT(left->capabilitiesReady() && right->capabilitiesReady(), 10000);
 		auto* a = static_cast<SVSClip*>(left->createClip(0));
 		auto* b = static_cast<SVSClip*>(right->createClip(192));
@@ -3046,6 +3143,14 @@ private slots:
 		note.pitch = 67;
 		b->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(a->audio() && b->audio(), 10000);
+		svs::Curve volume;
+		volume.id = svs::VolumeId;
+		volume.unit = "dB";
+		volume.insert(0, -6.);
+		volume.insert(96, 3.);
+		volume.insert(192, 0.);
+		a->setEditorData(a->notes(), {{svs::VolumeId, volume}});
+		QVERIFY(b->setGlobalParameter(svs::VolumeId, -3.));
 		QTemporaryDir baseline, frozen;
 		QVERIFY(baseline.isValid() && frozen.isValid());
 		const OutputSettings settings(32000, 192, OutputSettings::BitDepth::Depth32Bit,
@@ -3061,6 +3166,8 @@ private slots:
 			QSignalSpy done(&manager, &RenderManager::finished);
 			QSignalSpy failed(&manager, &RenderManager::svsExportFailed);
 			manager.renderTracks();
+			QVERIFY(a->setGlobalParameter(svs::VolumeId, -12.));
+			a->setEditorData(a->notes(), {});
 			auto changed = a->notes();
 			changed[0].pitch = 84;
 			changed[0].lyric = "changed after batch capture";
@@ -3168,7 +3275,7 @@ private slots:
 		tempo->changeLength(384);
 		tempo->putValue(0, 120, false);
 		tempo->putValue(192, 240, false);
-		const auto voice = svs::Registry::instance().voices().first();
+		const QString pluginId = "org.lmms.svs.example";
 		auto* track = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
 		auto cleanup = qScopeGuard([&] {
 			song->stopExport();
@@ -3179,7 +3286,7 @@ private slots:
 			song->setExportLoop(previousExportLoop);
 			song->setRenderBetweenMarkers(previousMarkers);
 		});
-		track->bindVoice(voice.pluginId, "full");
+		track->bindVoice(pluginId, "full");
 		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
 		auto* clip = static_cast<SVSClip*>(track->createClip(0));
 		clip->setAutoResize(false);
@@ -3189,6 +3296,13 @@ private slots:
 		note.duration = 384;
 		clip->setNotes({note});
 		QTRY_VERIFY_WITH_TIMEOUT(clip->audio() != nullptr, 10000);
+		svs::Curve volume;
+		volume.id = svs::VolumeId;
+		volume.unit = "dB";
+		volume.insert(0, -6.);
+		volume.insert(192, 3.);
+		volume.insert(384, 0.);
+		clip->setEditorData(clip->notes(), {{svs::VolumeId, volume}});
 		const auto audio = clip->audio();
 		QVERIFY(std::abs(audio->mapping.localSeconds(384) - 3.) < 1e-9);
 		QCOMPARE(Engine::framesPerTick(), Engine::framesPerTick(Engine::audioEngine()->outputSampleRate()));
