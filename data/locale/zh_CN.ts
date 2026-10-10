@@ -14037,6 +14037,10 @@ Seed: %3</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
+        <source>AI cache</source>
+        <translation>AI 缓存</translation>
+    </message>
+    <message>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -16498,6 +16502,57 @@ Latency: %2 ms</source>
     <message>
         <source>Track deleted before preparing SVS export</source>
         <translation>准备 SVS 导出前轨道被删除</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AICacheSettingsPage</name>
+    <message>
+        <source>Limit: %1</source>
+        <translation>上限：%1</translation>
+    </message>
+    <message>
+        <source>Available: %1</source>
+        <translation>可用：%1</translation>
+    </message>
+    <message>
+        <source>AI cache</source>
+        <translation>AI 缓存</translation>
+    </message>
+    <message>
+        <source>Clear all caches</source>
+        <translation>清除全部缓存</translation>
+    </message>
+    <message>
+        <source>Maximum total cache size</source>
+        <translation>总缓存上限</translation>
+    </message>
+    <message>
+        <source>Current cache size</source>
+        <translation>当前缓存大小</translation>
+    </message>
+    <message>
+        <source>Clear SVC cache</source>
+        <translation>清除 SVC 缓存</translation>
+    </message>
+    <message>
+        <source>Clear SVS cache</source>
+        <translation>清除 SVS 缓存</translation>
+    </message>
+    <message>
+        <source>Total cache size: %1</source>
+        <translation>总缓存大小：%1</translation>
+    </message>
+    <message>
+        <source>Cache cleared.</source>
+        <translation>缓存已清除。</translation>
+    </message>
+    <message>
+        <source>Some cache files are in use or could not be removed. Remaining usage is shown above.</source>
+        <translation>部分缓存正在使用或无法删除，剩余占用显示在上方。</translation>
+    </message>
+    <message>
+        <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
+        <translation>SVC 和 SVS 共用一个总缓存上限，默认为 2 GiB。超出时优先删除两类缓存中最旧的文件。SVS 占用包含合成音频和 AI 中间缓存。正在执行的 SVC 任务所用文件会保留。清除或自动删除缓存后，重新打开已保存的工程时可能需要再次渲染。</translation>
     </message>
 </context>
 </TS>

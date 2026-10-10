@@ -14037,6 +14037,10 @@ Seed: %3</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
+        <source>AI cache</source>
+        <translation>AI キャッシュ</translation>
+    </message>
+    <message>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
@@ -16498,6 +16502,57 @@ Latency: %2 ms</source>
     <message>
         <source>Track deleted before preparing SVS export</source>
         <translation>SVS エクスポートの準備前にトラックが削除されました</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AICacheSettingsPage</name>
+    <message>
+        <source>Limit: %1</source>
+        <translation>上限：%1</translation>
+    </message>
+    <message>
+        <source>Available: %1</source>
+        <translation>利用可能：%1</translation>
+    </message>
+    <message>
+        <source>AI cache</source>
+        <translation>AI キャッシュ</translation>
+    </message>
+    <message>
+        <source>Clear all caches</source>
+        <translation>すべてのキャッシュを削除</translation>
+    </message>
+    <message>
+        <source>Maximum total cache size</source>
+        <translation>キャッシュの合計容量上限</translation>
+    </message>
+    <message>
+        <source>Current cache size</source>
+        <translation>現在のキャッシュ容量</translation>
+    </message>
+    <message>
+        <source>Clear SVC cache</source>
+        <translation>SVC キャッシュを削除</translation>
+    </message>
+    <message>
+        <source>Clear SVS cache</source>
+        <translation>SVS キャッシュを削除</translation>
+    </message>
+    <message>
+        <source>Total cache size: %1</source>
+        <translation>キャッシュの合計容量：%1</translation>
+    </message>
+    <message>
+        <source>Cache cleared.</source>
+        <translation>キャッシュを削除しました。</translation>
+    </message>
+    <message>
+        <source>Some cache files are in use or could not be removed. Remaining usage is shown above.</source>
+        <translation>使用中または削除できないキャッシュが残っています。残りの容量は上に表示されています。</translation>
+    </message>
+    <message>
+        <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
+        <translation>SVC と SVS は共通のキャッシュ容量上限を使用します。既定値は合計 2 GiB です。上限を超えると、両方のキャッシュから古いファイルを先に削除します。SVS の容量には合成音声と AI の中間キャッシュが含まれます。実行中の SVC 処理で使用しているファイルは保持します。削除した結果は、保存済みプロジェクトを再度開くときに再レンダリングが必要になる場合があります。</translation>
     </message>
 </context>
 </TS>

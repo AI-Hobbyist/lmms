@@ -14037,6 +14037,10 @@ Seed: %3</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
+        <source>AI cache</source>
+        <translation>AI 캐시</translation>
+    </message>
+    <message>
         <source>Settings</source>
         <translation>설정</translation>
     </message>
@@ -16498,6 +16502,57 @@ Latency: %2 ms</source>
     <message>
         <source>Track deleted before preparing SVS export</source>
         <translation>SVS 내보내기 준비 전에 트랙이 삭제되었습니다</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AICacheSettingsPage</name>
+    <message>
+        <source>Limit: %1</source>
+        <translation>한도: %1</translation>
+    </message>
+    <message>
+        <source>Available: %1</source>
+        <translation>사용 가능: %1</translation>
+    </message>
+    <message>
+        <source>AI cache</source>
+        <translation>AI 캐시</translation>
+    </message>
+    <message>
+        <source>Clear all caches</source>
+        <translation>모든 캐시 삭제</translation>
+    </message>
+    <message>
+        <source>Maximum total cache size</source>
+        <translation>전체 캐시 크기 한도</translation>
+    </message>
+    <message>
+        <source>Current cache size</source>
+        <translation>현재 캐시 크기</translation>
+    </message>
+    <message>
+        <source>Clear SVC cache</source>
+        <translation>SVC 캐시 삭제</translation>
+    </message>
+    <message>
+        <source>Clear SVS cache</source>
+        <translation>SVS 캐시 삭제</translation>
+    </message>
+    <message>
+        <source>Total cache size: %1</source>
+        <translation>전체 캐시 크기: %1</translation>
+    </message>
+    <message>
+        <source>Cache cleared.</source>
+        <translation>캐시를 삭제했습니다.</translation>
+    </message>
+    <message>
+        <source>Some cache files are in use or could not be removed. Remaining usage is shown above.</source>
+        <translation>사용 중이거나 삭제할 수 없는 캐시가 남아 있습니다. 남은 크기는 위에 표시됩니다.</translation>
+    </message>
+    <message>
+        <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
+        <translation>SVC와 SVS는 기본 2 GiB의 전체 캐시 한도를 공유합니다. 한도를 초과하면 두 캐시에서 가장 오래된 파일부터 삭제합니다. SVS 크기에는 합성 오디오와 AI 중간 캐시가 포함됩니다. 실행 중인 SVC 작업에서 사용하는 파일은 유지됩니다. 캐시를 삭제하면 저장된 프로젝트를 다시 열 때 재렌더링이 필요할 수 있습니다.</translation>
     </message>
 </context>
 </TS>

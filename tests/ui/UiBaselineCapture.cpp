@@ -23,6 +23,7 @@
 #include <QScrollBar>
 #include <QSlider>
 #include <QSpinBox>
+#include <QStandardPaths>
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTemporaryDir>
@@ -35,6 +36,10 @@
 #include <QtTest>
 
 #include "AudioDummy.h"
+#include "AICacheSettingsPage.h"
+#include "AICacheBudget.h"
+#include "SVCCache.h"
+#include "SVSCache.h"
 #include "AutomationClip.h"
 #include "AutomationEditor.h"
 #include "AutomationTrack.h"
@@ -369,6 +374,152 @@ private slots:
 		QFile metadata(m_output + "/environment.json");
 		QVERIFY(metadata.open(QIODevice::WriteOnly));
 		metadata.write(QJsonDocument(environment).toJson());
+	}
+	void aiCacheManagement()
+	{
+		QStandardPaths::setTestModeEnabled(true);
+		auto* config = ConfigManager::inst();
+		QCOMPARE(svs::Cache::instance().diskLimit(), 2LL * 1024 * 1024 * 1024);
+		for (const auto& language : QStringList{"zh_CN", "ja", "en", "ko"})
+		{
+			QTranslator translator;
+			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
+			QCoreApplication::installTranslator(&translator);
+			config->setValue("aiCache", "limitMiB", "2048");
+			svs::Cache::instance().setDiskLimit(2LL * 1024 * 1024 * 1024);
+			const auto svcRoot = QDir(config->workingDir()).filePath("cache/svc/Reference/input");
+			const auto svsRoot = svs::Cache::instance().engineDirectory("org.lmms.svs.diffsinger");
+			QVERIFY(QDir().mkpath(svcRoot) && QDir().mkpath(svsRoot));
+			for (const auto& path : {QDir(svcRoot).filePath(QString(64, 'a') + ".wav"),
+					 QDir(svsRoot).filePath(QString(64, 'b') + ".tensor")})
+			{
+				QFile file(path);
+				QVERIFY(file.open(QIODevice::WriteOnly));
+				const qint64 size = path.endsWith(".wav") ? 6 * 1024 * 1024 : 4 * 1024 * 1024;
+				QCOMPARE(file.write(QByteArray(size, 'x')), size);
+			}
+			SetupDialog settings(SetupDialog::ConfigTab::AiCacheSettings);
+			auto* page = static_cast<AICacheSettingsPage*>(settings.findChild<QWidget*>("aiCacheSettingsPage"));
+			QVERIFY(page && page->isVisible());
+			auto* icon = settings.findChild<QPushButton*>("aiCacheSettingsTab");
+			QVERIFY(icon && !icon->icon().isNull());
+			QCOMPARE(icon->toolTip(), QCoreApplication::translate("lmms::gui::SetupDialog", "AI cache"));
+			if (language != "en")
+			{
+				QVERIFY(icon->toolTip() != "AI cache");
+				for (const auto* source : {"Clear all caches", "Maximum total cache size", "Current cache size",
+						 "Clear SVC cache", "Clear SVS cache", "Total cache size: %1", "Cache cleared.",
+						 "Some cache files are in use or could not be removed. Remaining usage is shown above."})
+				{
+					QVERIFY(QCoreApplication::translate("lmms::gui::AICacheSettingsPage", source) != source);
+				}
+			}
+			auto* limit = page->findChild<QDoubleSpinBox*>("aiCacheLimit");
+			QVERIFY(limit);
+			QCOMPARE(limit->value(), 2.0);
+			QVERIFY(!page->findChild<QDoubleSpinBox*>("svcCacheLimit"));
+			QVERIFY(!page->findChild<QDoubleSpinBox*>("svsCacheLimit"));
+			QCOMPARE(page->findChild<QLabel*>("aiCacheTotalUsage")->text(),
+				QLocale().formattedDataSize(10 * 1024 * 1024, 2));
+			QCOMPARE(page->findChild<QLabel*>("aiCacheTotalCapacity")->text(),
+				QCoreApplication::translate("lmms::gui::AICacheSettingsPage", "Limit: %1")
+					.arg(QLocale().formattedDataSize(2LL * 1024 * 1024 * 1024, 2)));
+			limit->setValue(0.02);
+			capture(&settings, "ai-cache-" + language);
+			auto* bar = page->findChild<AICacheUsageBar*>("aiCacheUsageBar");
+			QVERIFY(bar);
+			const auto barImage = [bar] {
+				const auto point = bar->mapToGlobal(QPoint());
+				return bar->screen()->grabWindow(0, point.x(), point.y(), bar->width(), bar->height()).toImage();
+			};
+			const auto verifyColors = [&] {
+				const auto pixels = barImage();
+				QCOMPARE(pixels.pixelColor(bar->width() / 6, 6), bar->svcColor());
+				QCOMPARE(pixels.pixelColor(bar->width() * 2 / 5, 6), bar->svsColor());
+				QCOMPARE(pixels.pixelColor(bar->width() * 4 / 5, 6), bar->freeColor());
+			};
+			verifyColors();
+			if (language == "zh_CN")
+			{
+				bar->setStyleSheet("lmms--gui--AICacheUsageBar { qproperty-svcColor: #ff7040; "
+					"qproperty-svsColor: #7050e0; qproperty-freeColor: #52606c; }");
+				capture(&settings, "ai-cache-custom-colors");
+				QCOMPARE(bar->svcColor(), QColor("#ff7040"));
+				QCOMPARE(bar->svsColor(), QColor("#7050e0"));
+				QCOMPARE(bar->freeColor(), QColor("#52606c"));
+				verifyColors();
+			}
+			QTest::mouseClick(page->findChild<QPushButton*>("svcCacheClear"), Qt::LeftButton);
+			QCOMPARE(svc::cacheBytes(config->workingDir()), qint64(0));
+			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(4 * 1024 * 1024));
+			QTest::mouseClick(page->findChild<QPushButton*>("svsCacheClear"), Qt::LeftButton);
+			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(0));
+			for (const auto& path : {QDir(svcRoot).filePath(QString(64, 'a') + ".wav"),
+					 QDir(svsRoot).filePath(QString(64, 'b') + ".tensor")})
+			{
+				QFile file(path);
+				QVERIFY(file.open(QIODevice::WriteOnly));
+				QCOMPARE(file.write(QByteArray(1024, 'x')), qint64(1024));
+			}
+			QTest::mouseClick(page->findChild<QPushButton*>("aiCacheClearAll"), Qt::LeftButton);
+			QCOMPARE(svc::cacheBytes(config->workingDir()), qint64(0));
+			QCOMPARE(svs::Cache::instance().diskBytes(), qint64(0));
+			QCOMPARE(page->findChild<QLabel*>("aiCacheStatus")->text(),
+				QCoreApplication::translate("lmms::gui::AICacheSettingsPage", "Cache cleared."));
+			limit->setValue(1.25);
+			page->save();
+			QCOMPARE(svc::cacheLimit(), qint64(1280) * 1024 * 1024);
+			QCOMPARE(svs::Cache::instance().diskLimit(), qint64(1280) * 1024 * 1024);
+			{
+				AICacheSettingsPage reopened;
+				QCOMPARE(reopened.findChild<QDoubleSpinBox*>("aiCacheLimit")->value(), 1.25);
+			}
+			settings.close();
+			QCoreApplication::removeTranslator(&translator);
+		}
+	}
+	void svsCacheManagement()
+	{
+		QTemporaryDir directory;
+		svs::Cache cache(directory.path());
+		svs::Input input;
+		input.rate = 48000;
+		input.secondsPerTick = .01;
+		input.duration = .2;
+		auto audio = std::make_shared<svs::Audio>();
+		audio->samples.resize(2000, .25f);
+		const auto oldKey = QString(64, 'a');
+		cache.put(oldKey, input, audio);
+		const auto oldBytes = cache.diskBytes();
+		QVERIFY(oldBytes > 0);
+		const auto root = cache.engineDirectory({});
+		for (const auto& file : QDir(root).entryInfoList(QDir::Files))
+		{
+			QFile old(file.absoluteFilePath());
+			QVERIFY(old.open(QIODevice::ReadWrite));
+			QVERIFY(old.setFileTime(QDateTime::currentDateTimeUtc().addDays(-1), QFileDevice::FileModificationTime));
+		}
+		audio->samples.assign(2000, .5f);
+		const auto newKey = QString(64, 'b');
+		cache.put(newKey, input, audio);
+		const auto newBytes = cache.diskBytes() - oldBytes;
+		cache.setDiskLimit(newBytes);
+		QVERIFY(!QFile::exists(QDir(root).filePath(oldKey + ".svsmeta")));
+		QVERIFY(QFile::exists(QDir(root).filePath(newKey + ".svsmeta")));
+		QCOMPARE(cache.diskBytes(), newBytes);
+		for (const auto& name : {QString(64, 'c') + ".tensor", QString(64, 'd') + ".wav", QString("keep.txt")})
+		{
+			QFile file(QDir(root).filePath(name));
+			QVERIFY(file.open(QIODevice::WriteOnly));
+			QCOMPARE(file.write(QByteArray(1024, 'x')), qint64(1024));
+		}
+		QCOMPARE(cache.diskBytes(), newBytes + 2048);
+		cache.setDiskLimit(1024);
+		QVERIFY(cache.diskBytes() <= 1024);
+		QVERIFY(cache.clear());
+		QCOMPARE(cache.diskBytes(), qint64(0));
+		QCOMPARE(cache.memoryBytes(), qint64(0));
+		QVERIFY(QFile::exists(QDir(root).filePath("keep.txt")));
 	}
 	void translationEntryPoints()
 	{

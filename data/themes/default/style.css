@@ -1639,6 +1639,15 @@ lmms--gui--SetupDialog QPushButton#svsSettingsTab {
 	qproperty-icon: url("resources:svs_track.svg");
 	qproperty-iconSize: 48px 48px;
 }
+lmms--gui--SetupDialog QPushButton#aiCacheSettingsTab {
+	qproperty-icon: url("resources:ai_cache.svg");
+	qproperty-iconSize: 48px 48px;
+}
+lmms--gui--AICacheUsageBar {
+	qproperty-svcColor: #409b87;
+	qproperty-svsColor: #6e91c3;
+	qproperty-freeColor: #39434c;
+}
 
 /* White SVG tools; the track's missing-avatar fallback uses svs_track.svg. */
 lmms--gui--SVSPianoRoll QToolButton#svsPlayButton {

@@ -1,6 +1,8 @@
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QDateTime>
+#include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSet>
@@ -13,6 +15,7 @@
 #include <limits>
 
 #include "SVCCache.h"
+#include "AICacheBudget.h"
 #include "SVCChunking.h"
 
 using namespace lmms::svc;
@@ -226,6 +229,73 @@ int main(int argc, char** argv)
 		names.insert(task.get());
 	}
 	check(names.size() == 16 && !names.contains(pair->hash()), "parallel unique exclusive allocation");
+	QTemporaryDir managed;
+	check(cacheLimit() == 2LL * 1024 * 1024 * 1024, "default global SVC cache limit is 2 GiB");
+	input.seek(0);
+	auto oldest = CachePair::create(managed.path(), "Reference", input, snapshot);
+	check(oldest->append(audio(pcm)) && oldest->complete(SVC_COMPLETE), "old completed cache fixture");
+	const auto oldestInput = oldest->inputPath();
+	const auto oldestOutput = oldest->outputPath();
+	oldest.reset();
+	const auto oldestBytes = cacheBytes(managed.path());
+	for (const auto& path : {oldestInput, oldestOutput, oldestOutput + ".json"})
+	{
+		QFile file(path);
+		check(file.open(QIODevice::ReadWrite)
+				&& file.setFileTime(QDateTime::currentDateTimeUtc().addDays(-1), QFileDevice::FileModificationTime),
+			"deterministic oldest cache timestamp");
+	}
+	input.seek(0);
+	auto newest = CachePair::create(managed.path(), "Other", input, snapshot);
+	check(newest->append(audio(pcm)) && newest->complete(SVC_COMPLETE), "new completed cache fixture");
+	const auto newestOutput = newest->outputPath();
+	newest.reset();
+	const auto newestBytes = cacheBytes(managed.path()) - oldestBytes;
+	setCacheLimit(managed.path(), newestBytes);
+	check(cacheBytes(managed.path()) == newestBytes && !QFile::exists(oldestInput)
+			&& !QFile::exists(oldestOutput) && QFile::exists(newestOutput),
+		"global capacity evicts oldest complete pair across engines");
+	input.seek(0);
+	auto active = CachePair::create(managed.path(), "Reference", input, snapshot);
+	check(active->append(audio(pcm)), "active partial cache fixture");
+	const auto activePath = active->partialPath();
+	QFile unrelated(QDir(managed.path()).filePath("cache/svc/Reference/input/keep.txt"));
+	check(unrelated.open(QIODevice::WriteOnly) && unrelated.write("keep") == 4, "unowned fixture");
+	unrelated.close();
+	check(!clearCache(managed.path()) && QFile::exists(activePath) && !QFile::exists(newestOutput),
+		"one-click clear protects active jobs and removes inactive pairs");
+	setCacheLimit(managed.path(), 0);
+	active.reset();
+	check(cacheBytes(managed.path()) == 0 && !QFile::exists(activePath) && QFile::exists(unrelated.fileName()),
+		"job release enforces capacity without touching unowned files");
+	setCacheLimit(managed.path(), 2LL * 1024 * 1024 * 1024);
+	QTemporaryDir shared;
+	input.seek(0);
+	auto oldSvc = CachePair::create(shared.path(), "Reference", input, snapshot);
+	check(oldSvc->append(audio(pcm)) && oldSvc->complete(SVC_COMPLETE), "shared budget SVC fixture");
+	const auto oldSvcPath = oldSvc->outputPath();
+	const auto oldSvcInput = oldSvc->inputPath();
+	oldSvc.reset();
+	for (const auto& path : {oldSvcInput, oldSvcPath, oldSvcPath + ".json"})
+	{
+		QFile file(path);
+		check(file.open(QIODevice::ReadWrite)
+				&& file.setFileTime(QDateTime::currentDateTimeUtc().addDays(-1), QFileDevice::FileModificationTime),
+			"shared budget deterministic age");
+	}
+	const auto svsRoot = QDir(shared.path()).filePath("cache/SVS/DiffSinger");
+	check(QDir().mkpath(svsRoot), "shared budget SVS directory");
+	QFile tensor(QDir(svsRoot).filePath(QString(64, 'a') + ".tensor"));
+	check(tensor.open(QIODevice::WriteOnly) && tensor.write(QByteArray(4096, 'x')) == 4096, "new SVS tensor fixture");
+	tensor.close();
+	setCacheLimit(shared.path(), 4096);
+	check(!QFile::exists(oldSvcPath) && QFile::exists(tensor.fileName())
+			&& lmms::aiCache::bytes(shared.path(), lmms::aiCache::Scope::All) == 4096,
+		"shared total evicts old SVC before new SVS instead of reserving separate quotas");
+	check(lmms::aiCache::clear(shared.path(), lmms::aiCache::Scope::All)
+			&& lmms::aiCache::bytes(shared.path(), lmms::aiCache::Scope::All) == 0,
+		"global clear covers both cache types");
+	setCacheLimit(shared.path(), 2LL * 1024 * 1024 * 1024);
 	std::puts("PASS SVC M1: defaults/custom, 30/35 boundaries, silence/stereo, tail padding, limits, random paired "
 			  "cache, partial failure, concurrency");
 	return 0;

@@ -51,6 +51,7 @@
 #include "NoteLabelDisplay.h"
 #include "SVSSettingsPage.h"
 #include "SVCSettingsPage.h"
+#include "AICacheSettingsPage.h"
 #include "TabBar.h"
 #include "TabButton.h"
 #include "TimeLineWidget.h"
@@ -1149,6 +1150,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	svcScroll->setFrameShape(QFrame::NoFrame);
 	svcScroll->setWidget(svc_w);
 	settingsLayout->addWidget(svcScroll);
+	auto* aiCache = new AICacheSettingsPage(settings_w);
+	m_aiCacheSettings = aiCache;
+	settingsLayout->addWidget(aiCache);
 	vstControlsLayout->addStretch();
 
 	// Major tabs ordering.
@@ -1176,6 +1180,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* svcTab = m_tabBar->addTab(svcScroll, tr("SVC"), 7, true, true, false);
 	svcTab->setObjectName("svcSettingsTab");
 	svcTab->setIcon(embed::getIconPixmap("svc_track.svg", 48, 48));
+	auto* aiCacheTab = m_tabBar->addTab(aiCache, tr("AI cache"), 8, true, true, false);
+	aiCacheTab->setObjectName("aiCacheSettingsTab");
+	aiCacheTab->setIcon(embed::getIconPixmap("ai_cache.svg", 48, 48));
 
 	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
@@ -1351,6 +1358,7 @@ void SetupDialog::accept()
 		m_tabBar->setActiveTab(static_cast<int>(ConfigTab::SvcSettings));
 		return;
 	}
+	static_cast<AICacheSettingsPage*>(m_aiCacheSettings)->save();
 	ConfigManager::inst()->saveConfigFile();
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstScanRoots && m_vstScanRoots->changed())

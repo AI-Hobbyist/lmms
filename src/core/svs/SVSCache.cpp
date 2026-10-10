@@ -15,6 +15,7 @@
 
 #include "ConfigManager.h"
 #include "SVSComputePolicy.h"
+#include "AICacheBudget.h"
 namespace lmms::svs {
 namespace {
 QJsonValue feedbackIds(const QJsonValue& value, const QMap<QString, QString>& ids)
@@ -138,10 +139,20 @@ struct DiskFiles
 	QMap<QString, int> references;
 	qint64 bytes = 0;
 };
-DiskFiles diskFiles(const QString& root)
+DiskFiles diskFiles(const QString& root, const QString& legacy = {})
 {
 	DiskFiles result;
-	for (const auto& directory : QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
+	QFileInfoList directories;
+	if (!QFileInfo(root).isSymLink())
+	{
+		directories = QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+		directories.prepend(QFileInfo(root));
+	}
+	if (!legacy.isEmpty() && !QFileInfo(legacy).isSymLink())
+	{
+		directories.append(QFileInfo(legacy));
+	}
+	for (const auto& directory : directories)
 	{
 		for (const auto& file : QDir(directory.absoluteFilePath())
 									.entryInfoList({"*.svsmeta", "*.svscache"}, QDir::Files | QDir::NoSymLinks))
@@ -166,23 +177,43 @@ DiskFiles diskFiles(const QString& root)
 			if (result.references[audio]++ == 0)
 				result.bytes += info.size();
 		}
+		// Include tensor intermediates and orphaned audio in the same global budget.
+		for (const auto& file : QDir(directory.absoluteFilePath())
+				.entryInfoList({"*.tensor", "*.wav"}, QDir::Files | QDir::NoSymLinks))
+		{
+			if (validKey(file.completeBaseName()) && !result.references.contains(file.absoluteFilePath()))
+			{
+				result.indices.append(file);
+				result.bytes += file.size();
+			}
+		}
 	}
 	return result;
 }
 } // namespace
 Cache& Cache::instance()
 {
-	static Cache cache(ConfigManager::inst()->workingDir() + "cache/SVS", 128 * 1024 * 1024, 512 * 1024 * 1024,
-					   QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/svs-v1");
+	static Cache cache(ConfigManager::inst()->workingDir() + "cache/SVS", 128 * 1024 * 1024,
+		std::clamp(ConfigManager::inst()->value("aiCache", "limitMiB", "2048").toLongLong(), 1LL, 1048576LL)
+			* 1024 * 1024,
+		QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/svs-v1",
+		ConfigManager::inst()->workingDir());
 	return cache;
 }
-Cache::Cache(QString directory, qint64 memoryLimit, qint64 diskLimit, QString legacyDirectory)
+Cache::Cache(QString directory, qint64 memoryLimit, qint64 diskLimit, QString legacyDirectory,
+	QString sharedWorkingDirectory)
 	: m_directory(QDir(directory).absolutePath())
 	, m_legacyDirectory(std::move(legacyDirectory))
+	, m_sharedWorkingDirectory(std::move(sharedWorkingDirectory))
 	, m_memoryLimit(std::max(qint64(0), memoryLimit))
 	, m_diskLimit(std::max(qint64(0), diskLimit))
 {
 	QDir().mkpath(m_directory);
+	if (!m_sharedWorkingDirectory.isEmpty())
+	{
+		aiCache::setLimit(m_diskLimit);
+		aiCache::setLegacyDirectory(m_sharedWorkingDirectory, m_legacyDirectory);
+	}
 	trimDisk();
 }
 QString Cache::engineDirectory(const QString& pluginId) const
@@ -413,13 +444,19 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 		return;
 	QMutexLocker lock(&m_mutex);
 	auto audio = std::make_shared<Audio>(*source);
+	aiCache::Use use(m_sharedWorkingDirectory.isEmpty()
+			? QString{} : engineDirectory(input.document["pluginId"].toString()),
+		m_sharedWorkingDirectory);
 	audio->revision = 0;
 	audio->feedback = feedbackIds(audio->feedback, noteIds(input, false)).toObject();
 	audio->cacheInputHash = editableKey(input);
 	remember(key, audio);
 	const auto bytes = waveBytes(*audio);
 	if (bytes.isEmpty())
+	{
+		trimDisk();
 		return;
+	}
 	const auto sha = QString::fromLatin1(QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex());
 	const auto metadata = QJsonDocument(QJsonObject{{"key", key},
 													{"audioSHA256", sha},
@@ -429,8 +466,12 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 													{"startTick", audio->startTick},
 													{"feedback", audio->feedback}})
 							  .toJson(QJsonDocument::Compact);
-	if (metadata.size() > MaximumMetadata || bytes.size() + metadata.size() > std::min(m_diskLimit, MaximumFile))
+	const auto limit = m_sharedWorkingDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
+	if (metadata.size() > MaximumMetadata || bytes.size() + metadata.size() > std::min(limit, MaximumFile))
+	{
+		trimDisk();
 		return;
+	}
 	const auto directory = engineDirectory(input.document["pluginId"].toString());
 	if (!QDir().mkpath(directory))
 		return;
@@ -453,7 +494,12 @@ void Cache::put(const QString& key, const Input& input, const std::shared_ptr<co
 }
 void Cache::trimDisk()
 {
-	auto files = diskFiles(m_directory);
+	if (!m_sharedWorkingDirectory.isEmpty())
+	{
+		aiCache::trim(m_sharedWorkingDirectory);
+		return;
+	}
+	auto files = diskFiles(m_directory, m_legacyDirectory);
 	std::sort(files.indices.begin(), files.indices.end(),
 			  [](const auto& a, const auto& b) { return a.lastModified() < b.lastModified(); });
 	for (const auto& file : files.indices)
@@ -481,7 +527,37 @@ qint64 Cache::memoryBytes() const
 qint64 Cache::diskBytes() const
 {
 	QMutexLocker lock(&m_mutex);
-	return diskFiles(m_directory).bytes;
+	return diskFiles(m_directory, m_legacyDirectory).bytes;
+}
+qint64 Cache::diskLimit() const
+{
+	QMutexLocker lock(&m_mutex);
+	return m_sharedWorkingDirectory.isEmpty() ? m_diskLimit : aiCache::limit();
+}
+void Cache::setDiskLimit(qint64 bytes)
+{
+	QMutexLocker lock(&m_mutex);
+	m_diskLimit = std::max(qint64(0), bytes);
+	if (!m_sharedWorkingDirectory.isEmpty())
+	{
+		aiCache::setLimit(m_diskLimit);
+	}
+	trimDisk();
+}
+bool Cache::clear()
+{
+	QMutexLocker lock(&m_mutex);
+	m_entries.clear();
+	m_memoryBytes = 0;
+	if (!m_sharedWorkingDirectory.isEmpty())
+	{
+		return aiCache::clear(m_sharedWorkingDirectory, aiCache::Scope::SVS);
+	}
+	const auto limit = m_diskLimit;
+	m_diskLimit = 0;
+	trimDisk();
+	m_diskLimit = limit;
+	return diskFiles(m_directory, m_legacyDirectory).bytes == 0;
 }
 void Cache::clearMemory()
 {

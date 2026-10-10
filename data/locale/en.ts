@@ -13995,6 +13995,10 @@ Seed: %3</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
+        <source>AI cache</source>
+        <translation>AI cache</translation>
+    </message>
+    <message>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16454,6 +16458,57 @@ Latency: %2 ms</source>
     <message>
         <source>Track deleted before preparing SVS export</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AICacheSettingsPage</name>
+    <message>
+        <source>Limit: %1</source>
+        <translation>Limit: %1</translation>
+    </message>
+    <message>
+        <source>Available: %1</source>
+        <translation>Available: %1</translation>
+    </message>
+    <message>
+        <source>AI cache</source>
+        <translation>AI cache</translation>
+    </message>
+    <message>
+        <source>Clear all caches</source>
+        <translation>Clear all caches</translation>
+    </message>
+    <message>
+        <source>Maximum total cache size</source>
+        <translation>Maximum total cache size</translation>
+    </message>
+    <message>
+        <source>Current cache size</source>
+        <translation>Current cache size</translation>
+    </message>
+    <message>
+        <source>Clear SVC cache</source>
+        <translation>Clear SVC cache</translation>
+    </message>
+    <message>
+        <source>Clear SVS cache</source>
+        <translation>Clear SVS cache</translation>
+    </message>
+    <message>
+        <source>Total cache size: %1</source>
+        <translation>Total cache size: %1</translation>
+    </message>
+    <message>
+        <source>Cache cleared.</source>
+        <translation>Cache cleared.</translation>
+    </message>
+    <message>
+        <source>Some cache files are in use or could not be removed. Remaining usage is shown above.</source>
+        <translation>Some cache files are in use or could not be removed. Remaining usage is shown above.</translation>
+    </message>
+    <message>
+        <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
+        <translation>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</translation>
     </message>
 </context>
 </TS>

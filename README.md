@@ -27,6 +27,7 @@ The comparison uses this fork's inherited upstream baseline (`a2f57e70c`), rathe
 | Singing voice conversion | No branch-specific SVC tracks or ABI | Independent progressive SVC audio tracks, segmentation and paired caches, a versioned streaming SDK, an RVC API backend, capability-driven controls and A/B audition. Audio clips can be renamed, copied as slices and converted individually. [SVC SDK](sdk/svc/README.md) |
 | Language coverage | Inherited upstream translation catalogs | Completed Chinese, Japanese, English and Korean coverage for branch features, host panels and native plugin interfaces, using shared translation catalogs and native-window checks. Voicebank README viewing is available from the SVS sidebar. |
 | Clip transport | Existing song and clip playback | MIDI/SVS clip previews share transport behavior and follow the Song Editor timeline within clip boundaries; muted singing tracks suspend synthesis. |
+| AI cache management | No dedicated SVC/SVS cache settings | A separate AI cache category shows total and per-system disk usage, clears all caches or SVC/SVS independently, and sets one shared total limit (2 GiB by default). A stacked usage bar shows SVC, SVS and available capacity. Oldest cached results across both systems are evicted first; active SVC jobs are protected. SVS usage includes audio, tensor intermediates and legacy caches. Saved results removed from disk may need rendering again when reopening a project. |
 
 Current release validation targets Windows x64, with x86/x64 VST helpers. SVS AI engines can share native CPU/DirectML workers with global backend/device and model memory settings. Idle release defaults to 60 seconds; immediate release and persistent models are also available. Actual per-stage routes, CPU constraints and fallback are reported. Six DiffSinger voicebanks and both available GPUs have passed inference comparisons. [GPU validation](doc/svs/DiffSinger-B3-validation.md). The linked records distinguish automated results from pending listening, external-runtime and visual checks.
 
@@ -37,6 +38,8 @@ Some SVS editor interaction and presentation logic was informed by [TuneLab](htt
 Singing project format conversion uses [LibreSVIP](https://github.com/SoulMelody/LibreSVIP), while the original LMMS codebase remains the foundation for arrangement, MIDI, instruments and mixing. These references describe the sources of specific behaviors and integrations, rather than claiming full feature parity with the referenced projects.
 
 The synthesis strip colors can be customized in the theme's `lmms--gui--SVSPianoRoll` rule using `qproperty-synthesisRenderingColor`, `qproperty-synthesisReadyColor` and `qproperty-synthesisErrorColor`. The toolbar icon is configured by `qproperty-icon` in the `QToolBar QToolButton#qt_toolbar_ext_button` rule.
+
+The AI cache category icon is `data/themes/default/ai_cache.svg`. Themes can replace it through `qproperty-icon` in the `lmms--gui--SetupDialog QPushButton#aiCacheSettingsTab` rule in `style.css`. The stacked usage bar colors are configured by `qproperty-svcColor`, `qproperty-svsColor` and `qproperty-freeColor` in the `lmms--gui--AICacheUsageBar` rule.
 
 ## Original upstream README
 

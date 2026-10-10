@@ -83,6 +83,8 @@ SET(LMMS_SRCS
 	gui/menus/TemplatesMenu.cpp
 
 	gui/modals/AboutDialog.cpp
+	gui/modals/AICacheSettingsPage.cpp
+	"${CMAKE_SOURCE_DIR}/include/AICacheSettingsPage.h"
 	gui/modals/ColorChooser.cpp
 	gui/modals/ControllerConnectionDialog.cpp
 	gui/modals/EffectSelectDialog.cpp

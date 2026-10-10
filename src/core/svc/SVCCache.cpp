@@ -1,4 +1,5 @@
 #include "SVCCache.h"
+#include "AICacheBudget.h"
 
 #include <QCoreApplication>
 
@@ -11,14 +12,268 @@
 #endif
 
 #include <QCryptographicHash>
+#include <QDateTime>
 #include <QDir>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QMap>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QRegularExpression>
 #include <QSaveFile>
 #include <QtEndian>
+#include <algorithm>
+#include <atomic>
 #include <limits>
 #include <stdexcept>
+
+namespace lmms::aiCache {
+namespace {
+QMutex cacheMutex;
+QMap<QString, int> activeInputs;
+QMap<QString, QString> legacyDirectories;
+std::atomic<qint64> maximumCacheBytes{2LL * 1024 * 1024 * 1024};
+
+struct CacheFiles
+{
+	QString input;
+	QFileInfoList files;
+	QDateTime modified;
+	qint64 bytes = 0;
+};
+
+QList<CacheFiles> svcFiles(const QString& workingDirectory)
+{
+	QList<CacheFiles> result;
+	const auto root = QDir(workingDirectory).filePath("cache/svc");
+	if (QFileInfo(root).isSymLink())
+	{
+		return result;
+	}
+	for (const auto& engine : QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
+	{
+		QMap<QString, CacheFiles> pairs;
+		for (const auto& folder : {QString("input"), QString("output")})
+		{
+			const auto directory = QDir(engine.absoluteFilePath()).filePath(folder);
+			if (QFileInfo(directory).isSymLink())
+			{
+				continue;
+			}
+			for (const auto& file : QDir(directory).entryInfoList(QDir::Files | QDir::NoSymLinks))
+			{
+				const auto match = QRegularExpression("^([a-f0-9]{64})\\.wav(?:\\.partial|\\.json)?$")
+					.match(file.fileName());
+				if (!match.hasMatch())
+				{
+					continue;
+				}
+				auto& pair = pairs[match.captured(1)];
+				pair.input = QDir(engine.absoluteFilePath()).filePath("input/" + match.captured(1) + ".wav");
+				pair.files.append(file);
+				pair.bytes += file.size();
+				pair.modified = std::max(pair.modified, file.lastModified());
+			}
+		}
+		for (const auto& pair : pairs)
+		{
+			result.append(pair);
+		}
+	}
+	return result;
+}
+
+QList<CacheFiles> svsFiles(const QString& workingDirectory)
+{
+	QList<CacheFiles> result;
+	const auto root = QDir(workingDirectory).filePath("cache/SVS");
+	QFileInfoList directories;
+	if (!QFileInfo(root).isSymLink())
+	{
+		directories = QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+		directories.prepend(QFileInfo(root));
+	}
+	const auto legacy = legacyDirectories.value(QDir(workingDirectory).absolutePath());
+	if (!legacy.isEmpty() && !QFileInfo(legacy).isSymLink())
+	{
+		directories.append(QFileInfo(legacy));
+	}
+	const QRegularExpression hash("^[a-f0-9]{64}$");
+	for (const auto& directory : directories)
+	{
+		QMap<QString, CacheFiles> groups;
+		const auto addFile = [&groups](const QString& key, const QFileInfo& file) {
+			auto& group = groups[key];
+			group.files.append(file);
+			group.bytes += file.size();
+			group.modified = std::max(group.modified, file.lastModified());
+		};
+		const QDir folder(directory.absoluteFilePath());
+		for (const auto& file : folder.entryInfoList({"*.svsmeta"}, QDir::Files | QDir::NoSymLinks))
+		{
+			if (!hash.match(file.completeBaseName()).hasMatch())
+			{
+				continue;
+			}
+			QString audio;
+			QFile metadata(file.absoluteFilePath());
+			if (file.size() <= 4 * 1024 * 1024 && metadata.open(QIODevice::ReadOnly))
+			{
+				audio = QJsonDocument::fromJson(metadata.readAll()).object()["audioSHA256"].toString();
+			}
+			const auto key = hash.match(audio).hasMatch() ? folder.filePath(audio + ".wav") : file.absoluteFilePath();
+			addFile(key, file);
+		}
+		for (const auto& file : folder.entryInfoList({"*.wav", "*.tensor", "*.svscache"}, QDir::Files | QDir::NoSymLinks))
+		{
+			if (hash.match(file.completeBaseName()).hasMatch())
+			{
+				addFile(file.absoluteFilePath(), file);
+			}
+		}
+		for (const auto& group : groups)
+		{
+			result.append(group);
+		}
+	}
+	return result;
+}
+
+QList<CacheFiles> cacheFiles(const QString& workingDirectory, Scope scope)
+{
+	auto result = scope == Scope::SVS ? QList<CacheFiles>{} : svcFiles(workingDirectory);
+	if (scope != Scope::SVC)
+	{
+		result.append(svsFiles(workingDirectory));
+	}
+	return result;
+}
+
+bool protectedFiles(const CacheFiles& entry)
+{
+	for (const auto& file : entry.files)
+	{
+		const auto path = QDir::cleanPath(file.absoluteFilePath());
+		for (auto it = activeInputs.cbegin(); it != activeInputs.cend(); ++it)
+		{
+			if (path == it.key() || path.startsWith(it.key() + '/'))
+			{
+				return true;
+			}
+		}
+	}
+	return activeInputs.contains(entry.input);
+}
+
+qint64 trimCache(const QString& workingDirectory, qint64 limit, Scope scope)
+{
+	auto pairs = cacheFiles(workingDirectory, scope);
+	qint64 bytes = 0;
+	for (const auto& pair : pairs)
+	{
+		bytes += pair.bytes;
+	}
+	std::sort(pairs.begin(), pairs.end(), [](const auto& a, const auto& b) { return a.modified < b.modified; });
+	for (const auto& pair : pairs)
+	{
+		if (bytes <= limit)
+		{
+			break;
+		}
+		if (protectedFiles(pair))
+		{
+			continue;
+		}
+		for (const auto& file : pair.files)
+		{
+			if (QFile::remove(file.absoluteFilePath()))
+			{
+				bytes -= file.size();
+			}
+		}
+	}
+	return bytes;
+}
+} // namespace
+
+qint64 limit()
+{
+	return maximumCacheBytes.load();
+}
+
+qint64 bytes(const QString& workingDirectory, Scope scope)
+{
+	QMutexLocker lock(&cacheMutex);
+	qint64 result = 0;
+	for (const auto& entry : cacheFiles(workingDirectory, scope))
+	{
+		result += entry.bytes;
+	}
+	return result;
+}
+
+void setLimit(qint64 bytes)
+{
+	maximumCacheBytes = std::max(qint64(0), bytes);
+}
+
+void setLegacyDirectory(const QString& workingDirectory, const QString& directory)
+{
+	QMutexLocker lock(&cacheMutex);
+	legacyDirectories[QDir(workingDirectory).absolutePath()] = directory;
+}
+
+void trim(const QString& workingDirectory)
+{
+	QMutexLocker lock(&cacheMutex);
+	trimCache(workingDirectory, maximumCacheBytes, Scope::All);
+}
+
+bool clear(const QString& workingDirectory, Scope scope)
+{
+	QMutexLocker lock(&cacheMutex);
+	return trimCache(workingDirectory, 0, scope) == 0;
+}
+
+void protectPath(const QString& path)
+{
+	if (!path.isEmpty())
+	{
+		QMutexLocker lock(&cacheMutex);
+		++activeInputs[QDir::cleanPath(path)];
+	}
+}
+
+void releasePath(const QString& path)
+{
+	if (!path.isEmpty())
+	{
+		QMutexLocker lock(&cacheMutex);
+		const auto key = QDir::cleanPath(path);
+		if (--activeInputs[key] == 0)
+		{
+			activeInputs.remove(key);
+		}
+	}
+}
+
+Use::Use(QString path, QString workingDirectory)
+	: m_path(std::move(path))
+	, m_workingDirectory(std::move(workingDirectory))
+{
+	protectPath(m_path);
+}
+
+Use::~Use()
+{
+	releasePath(m_path);
+	if (!m_workingDirectory.isEmpty())
+	{
+		trim(m_workingDirectory);
+	}
+}
+} // namespace lmms::aiCache
 
 namespace lmms::svc {
 namespace {
@@ -67,6 +322,27 @@ QByteArray nonce()
 }
 } // namespace
 
+qint64 cacheBytes(const QString& workingDirectory)
+{
+	return aiCache::bytes(workingDirectory, aiCache::Scope::SVC);
+}
+
+qint64 cacheLimit()
+{
+	return aiCache::limit();
+}
+
+void setCacheLimit(const QString& workingDirectory, qint64 bytes)
+{
+	aiCache::setLimit(bytes);
+	aiCache::trim(workingDirectory);
+}
+
+bool clearCache(const QString& workingDirectory)
+{
+	return aiCache::clear(workingDirectory, aiCache::Scope::SVC);
+}
+
 std::unique_ptr<CachePair> CachePair::create(
 	const QString& workingDirectory, const QString& engine, QIODevice& source, const QJsonObject& snapshot)
 {
@@ -96,7 +372,7 @@ std::unique_ptr<CachePair> CachePair::create(
 	{
 		throw std::runtime_error(QCoreApplication::translate("NativeRVC", "Input cannot rewind").toStdString());
 	}
-	const auto root = QDir(workingDirectory).filePath("cache/svc/" + engine);
+	const auto root = QDir(workingDirectory).absoluteFilePath("cache/svc/" + engine);
 	if (!QDir().mkpath(root + "/input") || !QDir().mkpath(root + "/output"))
 	{
 		throw std::runtime_error(
@@ -115,6 +391,10 @@ std::unique_ptr<CachePair> CachePair::create(
 				.toHex());
 		pair->m_input.setFileName(root + "/input/" + pair->m_hash + ".wav");
 		pair->m_output.setFileName(root + "/output/" + pair->m_hash + ".wav.partial");
+		pair->m_workingDirectory = workingDirectory;
+		aiCache::protectPath(pair->inputPath());
+		pair->m_registered = true;
+		aiCache::trim(workingDirectory);
 		// NewOnly never truncates another task's files, even on a hash collision.
 		if (!pair->m_input.open(QIODevice::WriteOnly | QIODevice::NewOnly))
 		{
@@ -160,6 +440,11 @@ std::unique_ptr<CachePair> CachePair::create(
 CachePair::~CachePair()
 {
 	if (!m_terminal) { fail("cancelled-partial"); }
+	if (m_registered)
+	{
+		aiCache::releasePath(inputPath());
+		aiCache::trim(m_workingDirectory);
+	}
 }
 
 QString CachePair::outputPath() const

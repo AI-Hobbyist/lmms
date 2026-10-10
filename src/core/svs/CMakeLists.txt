@@ -41,6 +41,7 @@ target_include_directories(lmmssvs PUBLIC "${CMAKE_SOURCE_DIR}/include" "${CMAKE
 										  "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/src")
 target_link_libraries(lmmssvs PUBLIC ${QT_LIBRARIES})
 target_link_libraries(lmmssvs PRIVATE ${CMAKE_DL_LIBS})
+target_link_libraries(lmmssvs PRIVATE svc-host)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/sdk/svs/include/" DESTINATION include/svs)
 if(WIN32)
 	# Runtime assembly is explicit and uses the foreground SDK/logging pipeline.

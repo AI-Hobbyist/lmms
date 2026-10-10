@@ -104,6 +104,12 @@ QJsonObject mapping(const Segment& segment)
 
 ConversionService& ConversionService::instance()
 {
+	[[maybe_unused]] static const bool configured = [] {
+		auto* config = ConfigManager::inst();
+		const auto limit = config->value("aiCache", "limitMiB", "2048").toLongLong();
+		setCacheLimit(config->workingDir(), std::clamp(limit, 1LL, 1048576LL) * 1024 * 1024);
+		return true;
+	}();
 	static ConversionService service;
 	return service;
 }

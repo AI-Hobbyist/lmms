@@ -62,7 +62,8 @@ public:
 			PathsSettings,
 		VstSettings,
 		SvsSettings,
-		SvcSettings
+		SvcSettings,
+		AiCacheSettings
 	};
 
 	SetupDialog(ConfigTab tab_to_open = ConfigTab::GeneralSettings);
@@ -139,6 +140,7 @@ private:
 	TabBar * m_tabBar;
 	QWidget* m_svsSettings = nullptr;
 	QWidget* m_svcSettings = nullptr;
+	QWidget* m_aiCacheSettings = nullptr;
 
 	// General settings widgets.
 	bool m_tooltips;

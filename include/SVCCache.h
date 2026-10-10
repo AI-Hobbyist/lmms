@@ -8,6 +8,12 @@
 #include "svc.h"
 
 namespace lmms::svc {
+// SVC input/output pairs share the total AI cache budget with SVS.
+qint64 cacheBytes(const QString& workingDirectory);
+qint64 cacheLimit();
+void setCacheLimit(const QString& workingDirectory, qint64 bytes);
+bool clearCache(const QString& workingDirectory);
+
 class CachePair
 {
 public:
@@ -31,6 +37,8 @@ private:
 	bool saveMetadata();
 	QByteArray waveHeader() const;
 	QString m_hash;
+	QString m_workingDirectory;
+	bool m_registered = false;
 	QFile m_input;
 	QFile m_output;
 	QJsonObject m_metadata;
