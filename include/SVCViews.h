@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QPointer>
+#include <memory>
+#include <vector>
 
 #include "ClipView.h"
 #include "TrackView.h"
@@ -8,6 +10,9 @@
 namespace lmms {
 class SVCTrack;
 class SVCClip;
+namespace svc {
+struct PlaybackSnapshot;
+}
 namespace gui {
 class SVCWindow;
 class SVCTrackView : public TrackView
@@ -48,6 +53,14 @@ protected:
 
 private:
 	void importAudio();
+	struct WaveformPeak
+	{
+		float minimum = 0;
+		float maximum = 0;
+		bool rendered = false;
+	};
+	std::shared_ptr<const svc::PlaybackSnapshot> m_waveformSnapshot;
+	std::vector<WaveformPeak> m_waveformPeaks;
 	SVCClip* m_clip;
 	QColor m_trackColor{"#8064B5"};
 	QColor m_sourceColor{"#788A9B"};

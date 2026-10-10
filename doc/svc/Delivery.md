@@ -49,3 +49,5 @@ USVC is deployed as `plugins/svcusvc.dll`, with default address `http://127.0.0.
 USVC sends raw WAV to `/infer`, validates the returned mono PCM16 WAV and publishes bounded audio events through the unchanged SVC ABI. Untouched backend defaults are omitted; nullable numeric values use Default, and inactive conditional values are omitted. The Python API is unchanged. Server test-fixture voices verify transport and speaker selection, not trained voice quality.
 
 Before replacing track audio, USVC aligns small backend frame-quantization differences at the tail and converts output to the DAW global sample rate using libsamplerate. Matching rates bypass resampling. Differences above 20 ms still fail validation; no interior audio is stretched. This also prevents a successful HTTP response with a slightly short waveform from leaving the track in Failed/partial-result state.
+
+SVC track waveforms retain each pixel interval's positive/negative peaks from both channels. Playback handles continue across audio periods until the next tick or clip end, preventing periodic silent gaps when Song Editor playback uses ticks longer than an audio buffer.

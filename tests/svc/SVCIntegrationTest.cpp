@@ -62,6 +62,9 @@
 #include "SVSTrack.h"
 #include "SVSViews.h"
 #include "SampleBuffer.h"
+#include "Sample.h"
+#include "SampleThumbnail.h"
+#include <QPainter>
 #include "SampleClip.h"
 #include "SampleClipView.h"
 #include "SampleTrack.h"
@@ -300,6 +303,176 @@ private slots:
 		QVERIFY(dynamic_cast<SampleClip*>(sample->createClip(0)));
 		QTest::qWait(30);
 		delete sample;
+	}
+
+	void waveformPeaksNative()
+	{
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		QTest::qWait(30);
+		auto* clip = static_cast<SVCClip*>(track->createClip(0));
+		QVERIFY(clip->setSourceFile(m_source));
+		clip->setName(QString::fromUtf8("SVC 波形对比"));
+		auto* trackView = m_gui->mainWindow()->findChild<gui::SVCTrackView*>();
+		QVERIFY(trackView);
+		{
+			gui::SVCClipView view(clip, trackView);
+			view.setParent(nullptr);
+			view.setFixedSize(640, 80);
+			view.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&view));
+			const auto source = clip->playback()->snapshot()->source;
+			auto pcm = wave(source->rate, source->frames(), 0).mid(44);
+			// Peaks fall inside each pixel interval, away from the single sampled frame.
+			for (int x = 0; x < view.width(); ++x)
+			{
+				const auto begin = uint64_t(x) * source->frames() / view.width();
+				const auto end = uint64_t(x + 1) * source->frames() / view.width();
+				qToLittleEndian<int16_t>(24576, pcm.data() + (begin + (end - begin) / 2) * 2);
+				qToLittleEndian<int16_t>(-24576, pcm.data() + (begin + (end - begin) / 2 + 1) * 2);
+			}
+			const svc::Segment segment{0, source->frames(), 0, source->frames(), 0, source->rate};
+			const auto generation = clip->beginConversion({segment});
+			svc_event event{};
+			event.size = sizeof(event);
+			event.type = SVC_AUDIO;
+			event.generation_id = generation;
+			event.request_id = "waveform-peaks";
+			event.sample_rate = source->rate;
+			event.channels = 1;
+			event.chunk_index = 1;
+			event.total_chunks = 1;
+			event.sample_count = source->frames();
+			event.bytes = reinterpret_cast<const uint8_t*>(pcm.constData());
+			event.byte_count = pcm.size();
+			QVERIFY(clip->publish(event));
+			QVERIFY(clip->finishSegment(generation, 0, SVC_COMPLETE, {}));
+			auto output = wave(source->rate, source->frames(), 0);
+			output.replace(44, pcm.size(), pcm);
+			const auto outputPath = m_working.filePath("waveform-output.wav");
+			QFile file(outputPath);
+			QVERIFY(file.open(QIODevice::WriteOnly));
+			QCOMPARE(file.write(output), output.size());
+			file.close();
+			Sample sample(SampleBuffer::fromFile(outputPath));
+			QCOMPARE(uint64_t(sample.sampleSize()), source->frames());
+			const auto snapshot = clip->playback()->snapshot();
+			for (uint64_t frame = 0; frame < source->frames(); ++frame)
+			{
+				QCOMPARE(snapshot->trackSample(frame, 0), sample.data()[frame][0]);
+				QCOMPARE(snapshot->trackSample(frame, 1), sample.data()[frame][1]);
+			}
+			QImage reference(view.size(), QImage::Format_RGB32);
+			reference.fill(Qt::black);
+			QPainter painter(&reference);
+			painter.setPen(Qt::white);
+			gui::SampleThumbnail(sample).visualize({.sampleRect = reference.rect()}, painter);
+			painter.end();
+			view.update();
+			QTest::qWait(300);
+			const auto screenshot = view.screen()->grabWindow(view.winId());
+			QVERIFY(!screenshot.isNull());
+			QVERIFY(screenshot.save(
+				qEnvironmentVariable("LMMS_SVC_WAVEFORM_EVIDENCE", m_working.filePath("waveform-native.png"))));
+			const auto image = screenshot.toImage().scaled(view.size());
+			const auto color = view.property("svcRenderedColor").value<QColor>();
+			const auto peakY = view.height() * 3 / 4;
+			int referencePeaks = 0;
+			int svcPeaks = 0;
+			for (int x = 10; x < view.width() - 10; ++x)
+			{
+				if (reference.pixelColor(x, peakY) != QColor(Qt::black)) { ++referencePeaks; }
+				if (image.pixelColor(x, peakY) == color) { ++svcPeaks; }
+			}
+			qInfo() << "Same PCM: sample waveform peak columns" << referencePeaks << "SVC" << svcPeaks;
+			QVERIFY(referencePeaks > 600);
+			QVERIFY2(svcPeaks > 600, "SVC waveform discarded peaks between pixel samples");
+		}
+		delete track;
+		QTest::qWait(30);
+	}
+
+	void continuousTrackAudioNative()
+	{
+		auto* song = Engine::getSong();
+		auto* engine = Engine::audioEngine();
+		const auto oldTempo = song->getTempo();
+		song->setTempo(137);
+		auto* svcTrack = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, song));
+		auto* svcClip = static_cast<SVCClip*>(svcTrack->createClip(0));
+		QVERIFY(svcClip->setSourceFile(m_source));
+		const auto source = svcClip->playback()->snapshot()->source;
+		const svc::Segment segment{0, source->frames(), 0, source->frames(), 0, source->rate};
+		const auto generation = svcClip->beginConversion({segment});
+		const auto output = wave(source->rate, source->frames(), 16384);
+		const auto pcm = output.mid(44);
+		svc_event event{};
+		event.size = sizeof(event);
+		event.type = SVC_AUDIO;
+		event.generation_id = generation;
+		event.request_id = "continuous-audio";
+		event.sample_rate = source->rate;
+		event.channels = 1;
+		event.chunk_index = 1;
+		event.total_chunks = 1;
+		event.sample_count = source->frames();
+		event.bytes = reinterpret_cast<const uint8_t*>(pcm.constData());
+		event.byte_count = pcm.size();
+		QVERIFY(svcClip->publish(event));
+		QVERIFY(svcClip->finishSegment(generation, 0, SVC_COMPLETE, {}));
+		const auto outputPath = m_working.filePath("continuous-output.wav");
+		QFile file(outputPath);
+		QVERIFY(file.open(QIODevice::WriteOnly));
+		QCOMPARE(file.write(output), output.size());
+		file.close();
+		auto* sampleTrack = static_cast<SampleTrack*>(Track::create(Track::Type::Sample, song));
+		auto* sampleClip = static_cast<SampleClip*>(sampleTrack->createClip(0));
+		sampleClip->setSampleFile(outputPath);
+		QTest::qWait(30);
+		const auto capture = [&](bool svc) {
+			song->stop();
+			for (int period = 0; period < 8; ++period)
+			{
+				engine->renderNextPeriod();
+			}
+			svcTrack->setMuted(!svc);
+			sampleTrack->setMuted(svc);
+			sampleClip->setIsPlaying(false);
+			song->getTimeline().setTicks(0);
+			song->getTimeline().setFrameOffset(0);
+			song->playSong();
+			std::vector<SampleFrame> result;
+			for (int period = 0; period < 40; ++period)
+			{
+				const auto& buffer = engine->renderNextPeriod();
+				result.insert(result.end(), buffer.begin(), buffer.end());
+			}
+			song->stop();
+			for (int period = 0; period < 8; ++period)
+			{
+				engine->renderNextPeriod();
+			}
+			return result;
+		};
+		const auto sample = capture(false);
+		const auto svc = capture(true);
+		QCOMPARE(svc.size(), sample.size());
+		int missing = 0;
+		float maximumDifference = 0;
+		for (size_t frame = 0; frame < sample.size(); ++frame)
+		{
+			if (std::abs(sample[frame][0]) > .01f && std::abs(svc[frame][0]) < .001f) { ++missing; }
+			for (unsigned channel = 0; channel < 2; ++channel)
+			{
+				maximumDifference = std::max(maximumDifference, std::abs(svc[frame][channel] - sample[frame][channel]));
+			}
+		}
+		qInfo() << "Mixer comparison: SVC missing frames" << missing << "maximum difference" << maximumDifference;
+		delete sampleTrack;
+		delete svcTrack;
+		song->setTempo(oldTempo);
+		QTest::qWait(30);
+		QVERIFY2(missing == 0, "SVC track has silent gaps absent from sample track playing the same WAV");
+		QVERIFY(maximumDifference < .0001f);
 	}
 
 	void capabilityControlsAndBrowser()

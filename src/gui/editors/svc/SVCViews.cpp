@@ -202,15 +202,39 @@ void SVCClipView::paintEvent(QPaintEvent*)
 									 double(region.end - region.start) * width() / frames, height()),
 					m_renderedColor.darker(200));
 			}
-			painter.setPen(m_sourceColor);
+			if (m_waveformSnapshot != snapshot || m_waveformPeaks.size() != static_cast<size_t>(width()))
+			{
+				m_waveformPeaks.assign(width(), {});
+				for (int x = 0; x < width(); ++x)
+				{
+					auto& peak = m_waveformPeaks[x];
+					const auto begin = uint64_t(x) * frames / width();
+					const auto end = std::min(frames, std::max(begin + 1, uint64_t(x + 1) * frames / width()));
+					// Preserve both channels' extrema across the entire pixel interval.
+					// Sampling just one frame aliases the waveform when zoomed out.
+					for (auto frame = begin; frame < end; ++frame)
+					{
+						bool available = false;
+						const auto rendered = snapshot->renderedSample(frame, available);
+						peak.rendered |= available;
+						for (unsigned channel = 0; channel < 2; ++channel)
+						{
+							const auto value = available ? rendered : snapshot->sourceSample(frame, channel);
+							peak.minimum = std::min(peak.minimum, value);
+							peak.maximum = std::max(peak.maximum, value);
+						}
+					}
+				}
+				m_waveformSnapshot = snapshot;
+			}
+			const auto center = height() * .5;
+			const auto scale = (height() - 4) * .5;
 			for (int x = 0; x < width(); ++x)
 			{
-				const auto frame = std::min<uint64_t>(frames - 1, uint64_t(x) * frames / width());
-				bool available = false;
-				snapshot->renderedSample(frame, available);
-				painter.setPen(available ? m_renderedColor : m_sourceColor);
-				const auto value = std::clamp(snapshot->trackSample(frame, 0), -1.0f, 1.0f);
-				painter.drawLine(QPointF(x, height() * .5), QPointF(x, height() * .5 - value * (height() - 4) * .5));
+				const auto& peak = m_waveformPeaks[x];
+				painter.setPen(peak.rendered ? m_renderedColor : m_sourceColor);
+				painter.drawLine(QPointF(x, center - std::clamp(peak.maximum, -1.f, 1.f) * scale),
+					QPointF(x, center - std::clamp(peak.minimum, -1.f, 1.f) * scale));
 			}
 		}
 	}

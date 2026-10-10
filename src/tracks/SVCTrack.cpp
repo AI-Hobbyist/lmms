@@ -95,7 +95,7 @@ void SVCTrack::setName(const QString& name)
 	m_bus.setName(name);
 }
 
-bool SVCTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int clipNumber)
+bool SVCTrack::play(const TimePos& start, f_cnt_t, f_cnt_t offset, int clipNumber)
 {
 	if (clipNumber >= 0 || isMuted() || !tryLock()) { return false; }
 	bool played = false;
@@ -112,8 +112,11 @@ bool SVCTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 		const double ticks = int(start) - int(clip->startPosition()) - int(clip->startTimeOffset());
 		const auto position = ticks * Engine::framesPerTick(snapshot->source->rate)
 			+ remainder * snapshot->source->rate / Engine::audioEngine()->outputSampleRate();
+		// Song schedules tracks once per tick, even when that tick spans several
+		// audio periods. Keep the handle alive until the next tick (or clip end),
+		// rather than stopping at the end of the current period's fragment.
 		const auto bounded = static_cast<f_cnt_t>(std::ceil(std::max(0.0,
-			std::min(double(frames),
+			std::min(double(Engine::framesPerTick()) - remainder,
 				(int(clip->endPosition()) - int(start)) * double(Engine::framesPerTick()) - remainder))));
 		played = Engine::audioEngine()->addPlayHandle(new SVCPlaybackHandle(this, snapshot, position, bounded, offset))
 			|| played;
