@@ -1,0 +1,6 @@
+PASS OpenUtau word boundaries / grouped frames / padding / gaps / AP / no-vowel / zero-frame / mismatch
+PASS tone shift requested=0 effective=0; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback
+PASS tone shift requested=6 effective=6; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback
+PASS tone shift requested=99 effective=12; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback
+PASS tone shift requested=-99 effective=-12; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback
+PASS tone shift requested=6 effective=0; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback

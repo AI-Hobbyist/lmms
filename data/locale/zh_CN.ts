@@ -878,11 +878,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation>能量（绝对值）</translation>
+        <translation>能量（实参）</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation>能量偏移</translation>
+        <translation>能量</translation>
     </message>
     <message>
         <source>energy</source>
@@ -890,11 +890,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation>气声（绝对值）</translation>
+        <translation>气声（实参）</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation>气声偏移</translation>
+        <translation>气声</translation>
     </message>
     <message>
         <source>breathiness</source>
@@ -902,11 +902,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation>发声（绝对值）</translation>
+        <translation>发声（实参）</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation>发声偏移</translation>
+        <translation>发声</translation>
     </message>
     <message>
         <source>voicing</source>
@@ -914,11 +914,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation>张力（绝对值）</translation>
+        <translation>张力（实参）</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation>张力偏移</translation>
+        <translation>张力</translation>
     </message>
     <message>
         <source>tension</source>
@@ -1593,6 +1593,10 @@ Original file backups remain at: %2</source>
     <message>
         <source>%1: incompatible dictionary language/phoneme set</source>
         <translation>%1：词典语言或音素集不兼容</translation>
+    </message>
+    <message>
+        <source>Tone shift</source>
+        <translation>音区偏移</translation>
     </message>
 </context>
 <context>

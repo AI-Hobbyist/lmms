@@ -1417,6 +1417,72 @@ private slots:
 		capture(&dialog, prefix + "-svs-project-export");
 		dialog.close();
 	}
+	void svsRegisterFollowup()
+	{
+		const auto prefix = "svs-register-" + qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		QFile schemaFile(qEnvironmentVariable("LMMS_UI_DIFFSINGER_SCHEMA"));
+		QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+		svs::Capabilities capabilities;
+		QString error;
+		QVERIFY2(svs::Capabilities::parse(QJsonDocument::fromJson(schemaFile.readAll()).object(), capabilities, error),
+			qPrintable(error));
+		const auto* shift = capabilities.parameter("diffsinger.tone_shift", "clip");
+		QVERIFY(shift);
+		QCOMPARE(shift->minimum, -12.);
+		QCOMPARE(shift->maximum, 12.);
+		QScrollArea window;
+		auto* panel = new SVSParameterPanel;
+		window.setWidget(panel);
+		window.setWidgetResizable(true);
+		const auto display = nativeTranslation::svsParameters("org.lmms.svs.diffsinger", capabilities.parameters);
+		panel->refresh(display, "clip", {QJsonObject{}}, {}, {});
+		for (const auto& parameter : display)
+		{
+			if (parameter.id.endsWith(".offset"))
+			{
+				const auto source = parameter.id.mid(QString("diffsinger.").size()).chopped(QString(".offset").size());
+				QCOMPARE(parameter.name, nativeTranslation::svsText("org.lmms.svs.diffsinger", source));
+			}
+		}
+		if (qEnvironmentVariable("LMMS_UI_TRANSLATION") == "zh_CN")
+		{
+			QCOMPARE(nativeTranslation::svsText("org.lmms.svs.diffsinger", "breathiness (absolute)"),
+				QString("气声（实参）"));
+			QCOMPARE(nativeTranslation::svsText("org.lmms.svs.diffsinger", "Tone shift"), QString("音区偏移"));
+		}
+		window.resize(500, 760);
+		capture(&window, prefix + "-parameters-top");
+		QCOMPARE(window.devicePixelRatioF(), 1.0);
+		window.verticalScrollBar()->setValue(window.verticalScrollBar()->maximum());
+		capture(&window, prefix + "-parameters-bottom");
+		window.close();
+		const auto voices = svs::Registry::instance().voices();
+		const auto voice = std::find_if(voices.cbegin(), voices.cend(),
+			[](const auto& candidate) { return candidate.pluginId == "org.lmms.svs.example"; });
+		QVERIFY(voice != voices.cend());
+		auto* track = new SVSTrack(Engine::getSong());
+		track->bindVoice(voice->pluginId, voice->id);
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note note;
+		note.id = "lyric-only-note";
+		note.duration = 96;
+		note.pitch = 60;
+		note.lyric = "你 あ 한 a";
+		note.language = "zh";
+		clip->setNotes({note});
+		auto* config = ConfigManager::inst();
+		const auto previous = config->value("ui", "printnotelabels", "0");
+		config->setValue("ui", "printnotelabels", "1");
+		{
+			SVSPianoRoll editor(clip);
+			editor.resize(1100, 660);
+			capture(&editor, prefix + "-lyric-only");
+			editor.close();
+		}
+		QCOMPARE(clip->notes().first().pitch, 60.);
+		config->setValue("ui", "printnotelabels", previous);
+		delete track;
+	}
 	void finalVoiceScenes()
 	{
 		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");

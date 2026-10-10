@@ -103,6 +103,7 @@ inline QString svsText(const QString& plugin, const QString& source)
 		QT_TRANSLATE_NOOP("NativeSVS", "Gender"),
 		QT_TRANSLATE_NOOP("NativeSVS", "Velocity"),
 		QT_TRANSLATE_NOOP("NativeSVS", "Expressiveness"),
+		QT_TRANSLATE_NOOP("NativeSVS", "Tone shift"),
 	};
 	auto translateKnown = [&](const auto& texts) {
 		for (const auto* text : texts)

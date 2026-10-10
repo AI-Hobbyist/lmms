@@ -1,0 +1,29 @@
+warning: in the working copy of 'include/NativePluginTranslation.h', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'plugins/SVSDiffSinger/DiffSingerSynthesisTest.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'plugins/SVSDiffSinger/Synthesis.cpp', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/gui/editors/svs/SVSCanvas.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "3fca86ccab53500708f885a18f3d28dacc2787a6",
+  "working_diff_sha256": "be0289450eba4f84f883beb36ce3b7309d551cc93462906f955910720976758c",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1132,
+  "key_count": 3886,
+  "summary": {
+    "zh_CN": {
+      "same-source": 150,
+      "translated": 3736
+    },
+    "ja": {
+      "same-source": 159,
+      "translated": 3727
+    },
+    "en": {
+      "source": 3878,
+      "translated": 8
+    },
+    "ko": {
+      "same-source": 152,
+      "translated": 3734
+    }
+  }
+}

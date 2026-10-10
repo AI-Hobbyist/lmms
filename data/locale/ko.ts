@@ -878,11 +878,11 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation>에너지 (절댓값)</translation>
+        <translation>에너지 (실제값)</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation>에너지 오프셋</translation>
+        <translation>에너지</translation>
     </message>
     <message>
         <source>energy</source>
@@ -890,11 +890,11 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation>기식 (절댓값)</translation>
+        <translation>기식 (실제값)</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation>기식 오프셋</translation>
+        <translation>기식</translation>
     </message>
     <message>
         <source>breathiness</source>
@@ -902,11 +902,11 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation>발성 (절댓값)</translation>
+        <translation>발성 (실제값)</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation>발성 오프셋</translation>
+        <translation>발성</translation>
     </message>
     <message>
         <source>voicing</source>
@@ -914,11 +914,11 @@ LMMS를 다른 언어로 번역하거나 기존 번역을 개선하고 싶다면
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation>긴장도 (절댓값)</translation>
+        <translation>긴장도 (실제값)</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation>긴장도 오프셋</translation>
+        <translation>긴장도</translation>
     </message>
     <message>
         <source>tension</source>
@@ -1593,6 +1593,10 @@ Original file backups remain at: %2</source>
     <message>
         <source>%1: incompatible dictionary language/phoneme set</source>
         <translation>%1: 호환되지 않는 사전 언어 또는 음소 집합</translation>
+    </message>
+    <message>
+        <source>Tone shift</source>
+        <translation>음역 이동</translation>
     </message>
 </context>
 <context>

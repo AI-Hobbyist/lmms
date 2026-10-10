@@ -226,6 +226,10 @@ void Synthesis::declareParameters(const VoicePackage& voice, Json& schema)
 	{
 		parameter("diffsinger.gender", "Gender", "ratio", -1, 1, 0, false);
 	}
+	if (voice.stages.at("vocoder").values.value("pitch_controllable", false))
+	{
+		parameter("diffsinger.tone_shift", "Tone shift", "semitone", -12, 12, 0, false);
+	}
 	if (config.value("use_speed_embed", false))
 	{
 		parameter("diffsinger.velocity", "Velocity", "ratio", .2, 3, 1, false);
@@ -637,6 +641,20 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		pitch[f] = std::clamp(pitch[f], 0.f, 127.f);
 		f0[f] = 440.f * std::pow(2.f, (pitch[f] - 69.f) / 12.f);
 	}
+	// Shift the acoustic register, while the vocoder and pitch feedback retain
+	// the original F0. The variance predictor follows the acoustic register.
+	auto variancePitch = pitch;
+	auto acousticF0 = f0;
+	if (m_voice->stages.at("vocoder").values.value("pitch_controllable", false))
+	{
+		for (size_t f = 0; f < pitch.size(); ++f)
+		{
+			const auto sampled = curves.value("diffsinger.tone_shift", ticks[f], 0);
+			const auto shift = float(std::clamp(std::isnan(sampled) ? 0. : sampled, -12., 12.));
+			variancePitch[f] += shift;
+			acousticF0[f] *= std::pow(2.f, shift / 12.f);
+		}
+	}
 	std::set<std::string> predicted;
 	std::map<std::string, std::vector<float>> variance;
 	for (const std::string name : {"energy", "breathiness", "voicing", "tension"})
@@ -653,7 +671,8 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 		const auto& config = m_voice->stages.at("variance");
 		const auto encoded = linguistic("variance");
 		auto& target = model("variance", "variance");
-		Tensors in{{"encoder_out", encoded.at("encoder_out")}, {"ph_dur", longs(durations)}, {"pitch", floats(pitch)}};
+		Tensors in{
+			{"encoder_out", encoded.at("encoder_out")}, {"ph_dur", longs(durations)}, {"pitch", floats(variancePitch)}};
 		int64_t channels = 0;
 		for (auto& item : variance)
 		{
@@ -680,7 +699,7 @@ SynthesisResult Synthesis::render(const DurationPlan& plan, const std::vector<No
 			}
 		}
 	}
-	Tensors in{{"tokens", longs(tokens("acoustic"))}, {"durations", longs(durations)}, {"f0", floats(f0)}};
+	Tensors in{{"tokens", longs(tokens("acoustic"))}, {"durations", longs(durations)}, {"f0", floats(acousticF0)}};
 	result.feedback["curves"] = Json::object();
 	for (auto& item : variance)
 	{

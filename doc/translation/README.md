@@ -229,3 +229,16 @@ M6 检查点 `9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c` 推送确认后开始。
 在既有提交 607b75ab5 上修正三个未接入翻译的侧栏标题：SVC、SVS、My Favorites。中文显示歌声转换、歌声合成、我的收藏；日文与韩文同步补齐，英文保留标准缩写。SVS/SVC 轨道的 VOL/PAN 原来按缩写保留，现复用普通 InstrumentTrackView 同键译文，并修正 12 条逐语言复核结论；参数、单位和轨道数据不变。
 
 开发程序 build/Release/lmms.exe 和 UiBaselineCapture 编译 PASS，相关插件依赖原位链接至 build/Release/plugins。四语各 3 PASS、0 FAIL，真实 Windows Qt 窗口、100% 缩放，验证实际侧栏标题/按钮、SVS/SVC 轨道旋钮，并保留四语截图；中日韩字形正常。四份 QM 与部署文件一致，见 sidebar-followup-resources.json。全库当前 3885 键质量 PASS；本修正新增 3 个标题键，另 5 个新增提取键来自开始前已有的声库说明提交，不属于本次实现。未修改其他语言。
+
+
+## 用户截图补充：SVS 歌词与 DiffSinger 音区偏移
+
+在侧栏／旋钮检查点 3fca86cca 推送成功后实施。SVS 音符块仅绘制歌词，保留键盘音名、参考 MIDI 音名及音高数据。DiffSinger 参数显示改为“气声（实参）／气声”等；offset 内部标识、曲线语义和绝对值协议不变。中、日、英、韩同步更新；“音区偏移”保留完整名称，新增 NativeSVS/Tone shift 词条。没有改动其他语言或加入无关功能。
+
+音区偏移依据 refs/tlds_ref/DiffSingerDeclarations.cs 与 DiffSingerSynthesisSession.cs：仅当已解析的声码器配置 pitch_controllable 为 true 时声明 diffsinger.tone_shift，默认 0、范围 ±12 半音。每帧采样曲线（未覆盖时使用片段参数），NaN 归零并钳位；声学 F0 乘 2^(shift/12)，variance pitch 加 shift，声码器仍使用原始 F0，pitch 预测和回显不受影响。配置加载沿用现有 bundled/shared 声码器解析链，无须修改用户配置或模型。
+
+开发程序 build/Release/lmms.exe、UiBaselineCapture、SVSDiffSinger 和 DiffSingerSynthesisTest 前台 Release 编译 PASS；DiffSinger DLL 原位写入 build/Release/svs/SVSDiffSinger，依赖插件仍在 build/Release/plugins。实际芙宁娜模型通过五组输入观测：0、+6 曲线覆盖片段值、+99→+12、−99→−12，以及配置 false 时忽略 +6。逐帧检查 acoustic F0、variance pitch、原始 vocoder F0 与不变 pitch 回显；没有修改参考声库文件。初次独立测试程序按自身路径寻找 SVSCompute 失败，显式使用既有 SVS_COMPUTE_RUNTIME_DIR=build/Release/svs/compute 后通过，未改生产路径。
+
+四语各 3 PASS、0 FAIL（含初始化/清理）。在代码修改完成后，使用真实 Windows Qt 窗口、100% 缩放；生产 SVSParameterPanel 读取实际模型声明，SVS 钢琴窗在开启音名显示时仍只在音符块显示混合中日韩／英文歌词。真实窗口截图确认“实参”、主参数无偏移后缀、“音区偏移”完整显示及中日韩字形正常。测试窗口正常关闭。测试入口副本的计算内存策略路径告警沿用既有状况；此 GUI 测试不用于证明模型推理，模型验证由独立实际输入测试负责。
+
+四语源 QM 与原位部署 QM SHA-256 一致，见 svs-register-resources.json。全库 3886 键覆盖、占位符、复数、同源复核、HTML、换行及助记符质量 PASS；英文有 8 条显示用显式译文，其余 3878 条使用源文回退。证据前缀 svs-register-*；git diff --check PASS。

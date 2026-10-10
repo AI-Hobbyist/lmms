@@ -878,11 +878,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation>エネルギー（絶対値）</translation>
+        <translation>エネルギー（実値）</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation>エネルギーのオフセット</translation>
+        <translation>エネルギー</translation>
     </message>
     <message>
         <source>energy</source>
@@ -890,11 +890,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation>ブレス（絶対値）</translation>
+        <translation>ブレス（実値）</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation>ブレスのオフセット</translation>
+        <translation>ブレス</translation>
     </message>
     <message>
         <source>breathiness</source>
@@ -902,11 +902,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation>発声（絶対値）</translation>
+        <translation>発声（実値）</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation>発声のオフセット</translation>
+        <translation>発声</translation>
     </message>
     <message>
         <source>voicing</source>
@@ -914,11 +914,11 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation>テンション（絶対値）</translation>
+        <translation>テンション（実値）</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation>テンションのオフセット</translation>
+        <translation>テンション</translation>
     </message>
     <message>
         <source>tension</source>
@@ -1593,6 +1593,10 @@ Original file backups remain at: %2</source>
     <message>
         <source>%1: incompatible dictionary language/phoneme set</source>
         <translation>%1：辞書の言語または音素セットに互換性がありません</translation>
+    </message>
+    <message>
+        <source>Tone shift</source>
+        <translation>音域シフト</translation>
     </message>
 </context>
 <context>

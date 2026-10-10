@@ -877,11 +877,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>energy (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>energy (actual)</translation>
     </message>
     <message>
         <source>energy offset</source>
-        <translation type="unfinished"></translation>
+        <translation>energy</translation>
     </message>
     <message>
         <source>energy</source>
@@ -889,11 +889,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>breathiness (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>breathiness (actual)</translation>
     </message>
     <message>
         <source>breathiness offset</source>
-        <translation type="unfinished"></translation>
+        <translation>breathiness</translation>
     </message>
     <message>
         <source>breathiness</source>
@@ -901,11 +901,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>voicing (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>voicing (actual)</translation>
     </message>
     <message>
         <source>voicing offset</source>
-        <translation type="unfinished"></translation>
+        <translation>voicing</translation>
     </message>
     <message>
         <source>voicing</source>
@@ -913,11 +913,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>tension (absolute)</source>
-        <translation type="unfinished"></translation>
+        <translation>tension (actual)</translation>
     </message>
     <message>
         <source>tension offset</source>
-        <translation type="unfinished"></translation>
+        <translation>tension</translation>
     </message>
     <message>
         <source>tension</source>
@@ -1589,6 +1589,10 @@ Original file backups remain at: %2</source>
     <message>
         <source>%1: incompatible dictionary language/phoneme set</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone shift</source>
+        <translation></translation>
     </message>
 </context>
 <context>

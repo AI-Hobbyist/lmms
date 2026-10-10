@@ -813,13 +813,9 @@ void SVSCanvas::paintEvent(QPaintEvent*)
 			{
 				painter.fillRect(body, noteColor);
 			}
-			const auto namedLyric = noteLabel(int(std::floor(note.pitch))) + " · " + note.lyric;
-			const auto label = allNoteLabels && fontMetrics().horizontalAdvance(namedLyric) <= rectangle.width() - 6
-				? namedLyric
-				: note.lyric;
 			painter.setPen(color("lyricColor", QPalette::HighlightedText));
 			painter.drawText(rectangle.adjusted(3, 0, -3, 0), Qt::AlignVCenter | Qt::AlignLeft,
-				fontMetrics().elidedText(label, Qt::ElideRight, int(rectangle.width() - 6)));
+				fontMetrics().elidedText(note.lyric, Qt::ElideRight, int(rectangle.width() - 6)));
 			const auto reading
 				= note.pronunciation.isEmpty() ? readings[note.id].toObject()["text"].toString() : note.pronunciation;
 			const auto recording = m_clip->editorState()["pitchPredictionRequests"].toObject()[note.id].toObject();

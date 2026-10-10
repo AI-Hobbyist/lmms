@@ -1,0 +1,62 @@
+{
+  "languages": [
+    {
+      "language": "zh_CN",
+      "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\zh_CN.qm",
+      "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\zh_CN.qm",
+      "sha256": "ee0cf234ddad580ac4d6153eec7bd4565d1f63c45e3da682212652c29be5e90c",
+      "identical": true
+    },
+    {
+      "language": "ja",
+      "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\ja.qm",
+      "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\ja.qm",
+      "sha256": "889fee20c38bc2c0a9540ef18c617ea708ce4ed2d18bcb9dc4e1406b97e01e23",
+      "identical": true
+    },
+    {
+      "language": "en",
+      "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\en.qm",
+      "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\en.qm",
+      "sha256": "5ff4f6781526a5e2ff37653c179f1ac3ace8514157c48bde66d761b890ce0b54",
+      "identical": true
+    },
+    {
+      "language": "ko",
+      "source": "D:\\UserData\\Desktop\\Project\\lmms\\data\\locale\\ko.qm",
+      "deployed": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\data\\locale\\ko.qm",
+      "sha256": "be72025c2ec121f2687fea2c4b1183b7f736cafbe53e5e00b4e5affc3f285cc4",
+      "identical": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\lmms.exe",
+      "sha256": "c132cb696879346912f6444273bfd6b9d15d845999e4f7ad4d3598c4370330ea"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\svs\\SVSDiffSinger\\SVSDiffSinger.dll",
+      "sha256": "76d51b8de35db601234a882a8a0a6d78a20bc2c6bc25c4cccd4d09e85e81c4b6"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\SVSCompute.dll",
+      "sha256": "44425bbbe9a06b8c06f933a92c1fbc3a8449b4f4f302174f8ef3300a714e7b2b"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\tripleoscillator.dll",
+      "sha256": "0abc1f83e0a559cc4da448a84b5943a1b2d6b0e2ed95ea5f86733d72f6132539"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\amplifier.dll",
+      "sha256": "a54cf66e898a3d627932a7c8aef97dae8f8bec03a10fc2ee5f69eedbff5174a8"
+    },
+    {
+      "path": "D:\\UserData\\Desktop\\Project\\lmms\\build\\Release\\plugins\\kicker.dll",
+      "sha256": "5fa97fa7250534fd83dfd62235e19e892f3163d8e3d6d3f03b1f2e63e5192489"
+    }
+  ],
+  "gui_platform": "windows",
+  "scale": 1,
+  "reference": "refs/tlds_ref",
+  "model_cases": 5
+}

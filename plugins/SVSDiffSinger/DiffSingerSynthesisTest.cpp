@@ -377,6 +377,99 @@ void tensorCacheFixture()
 	std::cout << "PASS tensor codec / identity / corruption / bounded LRU / audition preservation" << std::endl;
 }
 } // namespace
+void toneShiftFixture(Ort::Env& env, const std::shared_ptr<const VoicePackage>& voice, const DurationPlan& plan,
+	const std::vector<NoteInput>& notes, const svs_sdk::TempoMap& tempo, const fs::path& schemaPath)
+{
+	require(voice->stages.at("vocoder").values.value("pitch_controllable", false),
+		"Tone-shift fixture requires a pitch-controllable vocoder");
+	Json schema = voice->declaration();
+	schema["schemaVersion"] = 1;
+	schema["parameters"] = Json::array();
+	schema["feedbackParameters"] = Json::array();
+	Synthesis::declareParameters(*voice, schema);
+	std::ofstream(schemaPath) << schema.dump(2);
+	auto hasShift = [](const VoicePackage& package) {
+		Json declaration;
+		Synthesis::declareParameters(package, declaration);
+		for (const auto& parameter : declaration["parameters"])
+		{
+			if (parameter["id"] == "diffsinger.tone_shift")
+			{
+				require(parameter["min"] == -12 && parameter["max"] == 12 && parameter["default"] == 0,
+					"Tone-shift declaration range differs");
+				return true;
+			}
+		}
+		return false;
+	};
+	require(hasShift(*voice), "Controllable vocoder omitted tone shift");
+	std::map<std::string, std::vector<float>> baseline;
+	Json baselineFeedback;
+	std::atomic<bool> cancel{false};
+	for (int test = 0; test < 5; ++test)
+	{
+		const double requested[] = {0, 6, 99, -99, 6};
+		auto fixture = std::make_shared<VoicePackage>(*voice);
+		if (test == 4) { fixture->stages.at("vocoder").values["pitch_controllable"] = false; }
+		require(hasShift(*fixture) == (test != 4), "Vocoder capability gate differs");
+		Json input{{"seed", 1234}, {"engineSettings", {{"diffsinger.renderSteps", 5}}},
+			{"clipParameters", {{"diffsinger.tone_shift", requested[test]}}}};
+		if (test == 1)
+		{
+			input["clipParameters"]["diffsinger.tone_shift"] = -3;
+			input["curves"]["diffsinger.tone_shift"] = {{"interpolation", "linear"},
+				{"points", Json::array({{{"tick", -1000}, {"value", 6}}, {{"tick", 1000}, {"value", 6}}})}};
+		}
+		std::map<std::string, std::vector<float>> observed;
+		const auto previous = exchangeInferenceObserver([&](const fs::path& path, const std::string&, uint32_t,
+															const Tensors& inputs, const Tensors&, const Json&) {
+			for (const auto& stage : {"acoustic", "vocoder", "variance"})
+			{
+				const auto& config = fixture->stages.at(stage);
+				const auto role = std::string(stage) == "vocoder" ? "model" : stage;
+				if (path == config.models.at(role))
+				{
+					observed[stage] = inputs.at(std::string(stage) == "variance" ? "pitch" : "f0").values<float>();
+				}
+			}
+		});
+		SynthesisResult result;
+		try
+		{
+			Synthesis synthesis(env, fixture);
+			result = synthesis.render(plan, notes, input, tempo, 0, 48000, cancel);
+		}
+		catch (...)
+		{
+			exchangeInferenceObserver(previous);
+			throw;
+		}
+		exchangeInferenceObserver(previous);
+		require(observed.size() == 3, "Missing acoustic/vocoder/variance model inputs");
+		if (test == 0)
+		{
+			baseline = observed;
+			baselineFeedback = result.feedback.at("pitch");
+		}
+		const auto shift = test == 4 ? 0. : std::clamp(requested[test], -12., 12.);
+		require(result.feedback.at("pitch") == baselineFeedback, "Tone shift changed pitch feedback");
+		for (const auto& item : observed)
+		{
+			require(item.second.size() == baseline.at(item.first).size(), "Shift changed input frame count");
+			for (size_t f = 0; f < item.second.size(); ++f)
+			{
+				const auto original = baseline.at(item.first)[f];
+				const auto expected = item.first == "acoustic" ? original * std::pow(2., shift / 12.)
+					: item.first == "variance"				   ? original + shift
+															   : original;
+				require(std::abs(item.second[f] - expected) <= 0.0001 * std::max(1., std::abs(expected)),
+					"Tone shift input mismatch: " + item.first);
+			}
+		}
+		std::cout << "PASS tone shift requested=" << requested[test] << " effective=" << shift
+				  << "; acoustic F0 / variance pitch / original vocoder F0 / unchanged feedback" << std::endl;
+	}
+}
 int run(int argc, char** argv)
 {
 	try
@@ -397,8 +490,9 @@ int run(int argc, char** argv)
 			argv += 2;
 		}
 		wordTimingFixture();
+		const bool testToneShift = argc == 5 && std::string(argv[1]) == "--tone-shift";
 		const bool testWords = argc == 5 && std::string(argv[1]) == "--word-models";
-		if (argc == 5 && (std::string(argv[1]) == "--voice" || testWords))
+		if (argc == 5 && (std::string(argv[1]) == "--voice" || testWords || testToneShift))
 		{
 			initializeRuntime();
 			Ort::Env env{ORT_LOGGING_LEVEL_WARNING, "DiffSingerExternalVoiceTest"};
@@ -442,6 +536,11 @@ int run(int argc, char** argv)
 			const auto plan = duration.predict(notes, tempo, 0, Json::object(), cancel);
 			const Json input{{"cacheDirectory", fs::absolute(fs::u8path(argv[3])).u8string()},
 							 {"engineSettings", {{"diffsinger.renderSteps", 5}}}};
+			if (testToneShift)
+			{
+				toneShiftFixture(env, voice, plan, notes, tempo, fs::u8path(argv[3]));
+				return 0;
+			}
 			const auto result = synthesis.render(plan, notes, input, tempo, 0, 48000, cancel);
 			require(result.stereo.size() > 48000, "External PCM too short");
 			double energy = 0;
