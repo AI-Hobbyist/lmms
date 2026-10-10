@@ -1000,6 +1000,12 @@ QToolBar {
 	spacing: 0;
 }
 
+QToolBar QToolButton#qt_toolbar_ext_button {
+	padding: 0;
+	qproperty-icon: url("resources:ui-toolbar-overflow.svg");
+	qproperty-iconSize: 12px 12px;
+}
+
 QToolBar::separator {
 	border: none;
 	width: 5px;
@@ -1593,6 +1599,10 @@ lmms--gui--BarModelEditor {
 /* palette information  */
 
 /* Native SVS editor follows this theme's piano and palette colors. */
+QToolBar#svsEditorToolbar {
+	border: none;
+}
+
 lmms--gui--SVSPianoRoll {
 	qproperty-pitchAlignmentLineColor: #8ec6e8;
 	qproperty-timeAlignmentLineColor: #e8c68e;

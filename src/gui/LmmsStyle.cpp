@@ -371,6 +371,9 @@ int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 		case QStyle::PM_ToolBarItemSpacing:
 			return 2;
 
+		case QStyle::PM_ToolBarExtensionExtent:
+			return 24;
+
 		case QStyle::PM_TitleBarHeight:
 			return 24;
 

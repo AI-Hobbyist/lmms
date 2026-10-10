@@ -2,7 +2,7 @@
 #define LMMS_SVS_VIEWS_H
 #include "TrackView.h"
 #include "ClipView.h"
-#include <QWidget>
+#include <QMainWindow>
 #include <QPointer>
 #include <QColor>
 #include <QMap>
@@ -46,7 +46,7 @@ private:
 	QPointer<SVSPianoRoll> m_editor;
 };
 class SVSCanvas;
-class SVSPianoRoll : public QWidget
+class SVSPianoRoll : public QMainWindow
 {
 	Q_OBJECT
 	Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setbackgroundColor)

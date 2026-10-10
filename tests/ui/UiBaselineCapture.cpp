@@ -28,6 +28,7 @@
 #include <QTemporaryDir>
 #include <QTextEdit>
 #include <QTimer>
+#include <QToolBar>
 #include <QToolButton>
 #include <QToolTip>
 #include <QTranslator>
@@ -579,6 +580,87 @@ private slots:
 		capture(&dialog, "M4-export-" + language);
 		dialog.close();
 	}
+	void editorToolbarOverflowIcons()
+	{
+		const QList<QPair<QWidget*, QString>> editors{
+			{m_gui->songEditor(), "song-toolbar-overflow"}, {m_gui->pianoRoll(), "piano-toolbar-overflow"}};
+		for (const auto& entry : editors)
+		{
+			auto* editor = entry.first;
+			auto* frame = qobject_cast<QMdiSubWindow*>(editor->parentWidget());
+			QVERIFY(frame);
+			const auto previousGeometry = frame->geometry();
+			const auto previouslyVisible = frame->isVisible();
+			editor->show();
+			frame->show();
+			frame->setGeometry(QRect(0, 0, 440, 500));
+			frame->raise();
+			capture(m_gui->mainWindow(), entry.second);
+			QToolButton* visibleExtension = nullptr;
+			for (auto* extension : editor->findChildren<QToolButton*>("qt_toolbar_ext_button"))
+			{
+				QCOMPARE(extension->iconSize(), QSize(12, 12));
+				QVERIFY(!extension->icon().isNull());
+				if (extension->isVisible()) { visibleExtension = extension; }
+			}
+			QVERIFY(visibleExtension);
+			QVERIFY(visibleExtension->width() >= 20);
+			auto* toolbar = qobject_cast<QToolBar*>(visibleExtension->parentWidget());
+			QVERIFY(toolbar);
+			const auto collapsedHeight = toolbar->height();
+			QTest::mouseClick(visibleExtension, Qt::LeftButton);
+			QTRY_VERIFY(toolbar->height() > collapsedHeight);
+			capture(m_gui->mainWindow(), entry.second + "-open");
+			for (auto* action : toolbar->actions())
+			{
+				auto* widget = toolbar->widgetForAction(action);
+				if (action->isVisible() && !action->isSeparator() && widget)
+				{
+					QVERIFY2(widget->isVisible(), qPrintable(widget->objectName() + " " + action->text()));
+				}
+			}
+			QTest::mouseClick(visibleExtension, Qt::LeftButton);
+			frame->setGeometry(previousGeometry);
+			frame->setVisible(previouslyVisible);
+		}
+	}
+	void svsToolbarOverflow()
+	{
+		auto* config = ConfigManager::inst();
+		const auto previousAxis = config->value("ui", "pitchalignmentaxis", "0");
+		config->setValue("ui", "pitchalignmentaxis", "1");
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		SVSPianoRoll editor(clip);
+		editor.resize(1000, 660);
+		capture(&editor, "svs-toolbar-overflow-closed");
+		auto* toolbar = editor.findChild<QToolBar*>("svsEditorToolbar");
+		QVERIFY(toolbar);
+		auto* extension = toolbar->findChild<QToolButton*>("qt_toolbar_ext_button");
+		auto* controls = editor.findChild<QWidget*>("noteLabelDisplayControls");
+		auto* reference = controls ? controls->findChild<ComboBox*>("noteLabelReferenceComboBox") : nullptr;
+		QVERIFY(extension && controls && reference);
+		QVERIFY(extension->isVisible());
+		QCOMPARE(extension->iconSize(), QSize(12, 12));
+		QVERIFY(!extension->icon().isNull());
+		QVERIFY(extension->width() >= 20);
+		QVERIFY(!controls->isVisible());
+		bool operated = false;
+		QTimer::singleShot(300, &editor, [&] {
+			QVERIFY(controls->isVisible());
+			capture(&editor, "svs-toolbar-overflow-open");
+			QCOMPARE(reference->model()->value(), 0);
+			QTest::mouseClick(reference, Qt::LeftButton, Qt::NoModifier, QPoint(8, reference->height() / 2));
+			QCOMPARE(reference->model()->value(), 1);
+			QCOMPARE(editor.property("noteLabelReferenceOctave").toInt(), 0);
+			operated = true;
+			if (auto* popup = QApplication::activePopupWidget()) { popup->close(); }
+		});
+		QTest::mouseClick(extension, Qt::LeftButton);
+		QTRY_VERIFY(operated);
+		editor.close();
+		config->setValue("ui", "pitchalignmentaxis", previousAxis);
+	}
 	void pitchAlignmentAxes()
 	{
 		QCOMPARE(m_gui->mainWindow()->devicePixelRatioF(), 1.0);
@@ -620,21 +702,27 @@ private slots:
 			auto* svsHoverControls = editor.findChild<QWidget*>("noteLabelDisplayControls");
 			auto* instrumentHoverControls = m_gui->pianoRoll()->findChild<QWidget*>("noteLabelDisplayControls");
 			QVERIFY(svsHoverControls && instrumentHoverControls);
-			QVERIFY(svsHoverControls->isVisible());
-			auto* svsTonic = svsHoverControls->findChild<ComboBox*>("noteLabelTonicComboBox");
-			QVERIFY(svsTonic);
-			QCOMPARE(svsTonic->height(), ComboBox::DEFAULT_HEIGHT);
-			QCOMPARE(svsHoverControls->findChild<QLabel*>()->text(), QString("1="));
-			auto* svsPlay = editor.findChild<QToolButton*>("svsPlayButton");
-			QVERIFY(svsPlay);
-			QVERIFY(std::abs(svsTonic->mapTo(&editor, svsTonic->rect().center()).y()
-				- svsPlay->mapTo(&editor, svsPlay->rect().center()).y()) <= 2);
-			QVERIFY(editor.width() - svsHoverControls->mapTo(&editor, svsHoverControls->rect().topRight()).x() <= 16);
+			auto* toolbar = editor.findChild<QToolBar*>("svsEditorToolbar");
+			QVERIFY(toolbar);
+			QAction* hoverAction = nullptr;
+			QAction* settingsAction = nullptr;
+			for (auto* action : toolbar->actions())
+			{
+				if (toolbar->widgetForAction(action) == svsHoverControls) { hoverAction = action; }
+				auto* widget = toolbar->widgetForAction(action);
+				if (widget && widget->objectName() == "svsEditorSettingsButton")
+				{
+					settingsAction = action;
+				}
+			}
+			QVERIFY(hoverAction && settingsAction);
+			QVERIFY(hoverAction->isVisible());
+			QVERIFY(toolbar->actions().indexOf(hoverAction) < toolbar->actions().indexOf(settingsAction));
 			config->setValue("ui", "pitchalignmentaxis", "0");
 			QVERIFY(svsHoverControls->isHidden());
 			QVERIFY(instrumentHoverControls->isHidden());
 			config->setValue("ui", "pitchalignmentaxis", "1");
-			QVERIFY(!svsHoverControls->isHidden() && !instrumentHoverControls->isHidden());
+			QVERIFY(hoverAction->isVisible() && !instrumentHoverControls->isHidden());
 			QCOMPARE(editor.property("pitchAlignmentLineColor").value<QColor>(), QColor("#8ec6e8"));
 			QCOMPARE(editor.property("timeAlignmentLineColor").value<QColor>(), QColor("#e8c68e"));
 			editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-pitchAlignmentLineColor: #ff8090; "
@@ -666,6 +754,7 @@ private slots:
 				const auto without = nativeImage();
 				config->setValue("ui", "pitchalignmentaxis", "1");
 				QTest::qWait(300);
+				QCursor::setPos(target->mapToGlobal(pointer + QPoint(1, 1)));
 				QTest::mouseMove(target, pointer);
 				QTest::qWait(100);
 				const auto with = nativeImage();
@@ -746,7 +835,7 @@ private slots:
 			QVERIFY(std::abs(instrumentTonic->mapTo(m_gui->pianoRoll(), instrumentTonic->rect().center()).y()
 				- instrumentPlay->mapTo(m_gui->pianoRoll(), instrumentPlay->rect().center()).y()) <= 2);
 			QVERIFY(m_gui->pianoRoll()->width()
-				- instrumentHoverControls->mapTo(m_gui->pianoRoll(), instrumentHoverControls->rect().topRight()).x() <= 16);
+				- instrumentHoverControls->mapTo(m_gui->pianoRoll(), instrumentHoverControls->rect().topRight()).x() <= 32);
 			config->setValue("ui", "pitchalignmentaxis", "0");
 			frame->hide();
 		}

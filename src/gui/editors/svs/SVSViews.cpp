@@ -696,7 +696,7 @@ void SVSPianoRoll::openIn(MainWindow* mainWindow)
 		m_subWindow->raise();
 }
 SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
-	: QWidget(parent)
+	: QMainWindow(parent)
 {
 	auto* song = Engine::getSong();
 	if (!song->isPlaying())
@@ -708,25 +708,15 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	setWindowIcon(embed::getIconPixmap("piano"));
 	setWindowTitle(tr("SVS Piano Roll — LMMS"));
 	resize(1100, 740);
-	auto* layout = new QVBoxLayout(this);
-	auto* toolbarScroll = new QScrollArea(this);
-	toolbarScroll->setObjectName("svsToolbarScroll");
-	toolbarScroll->setWidgetResizable(true);
-	toolbarScroll->setFrameShape(QFrame::NoFrame);
-	toolbarScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	toolbarScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	auto* toolbarRow = new QHBoxLayout;
-	toolbarRow->addWidget(toolbarScroll, 1);
-	auto* hoverControlsLayout = new QVBoxLayout;
-	hoverControlsLayout->setContentsMargins(0, 4, 0, 0);
-	hoverControlsLayout->addWidget(noteLabels::createControls(this, this), 0, Qt::AlignTop | Qt::AlignRight);
-	hoverControlsLayout->addStretch();
-	toolbarRow->addLayout(hoverControlsLayout);
-	layout->addLayout(toolbarRow);
-	auto* toolbarBody = new QWidget(toolbarScroll);
-	auto* toolbar = new QHBoxLayout(toolbarBody);
-	toolbar->setContentsMargins(0, 0, 0, 0);
-	toolbarScroll->setWidget(toolbarBody);
+	auto* editorBody = new QWidget(this);
+	setCentralWidget(editorBody);
+	auto* layout = new QVBoxLayout(editorBody);
+	auto* toolbar = new QToolBar(this);
+	toolbar->setObjectName("svsEditorToolbar");
+	toolbar->setMovable(false);
+	toolbar->setFloatable(false);
+	toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
+	addToolBar(Qt::TopToolBarArea, toolbar);
 	auto nativeIcon = [](const QString& name) {
 		QIcon icon("resources:" + name + ".png");
 		return icon.isNull() ? QIcon("data:/themes/default/" + name + ".png") : icon;
@@ -933,7 +923,7 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	iconButton(followTimeline, "autoscroll_stepped_on", tr("Follow Song Editor scrolling"));
 	followTimeline->setToolTip(
 		tr("Scroll automatically with the Song Editor timeline using its scrolling mode; stop at the clip boundary"));
-	toolbar->insertWidget(2, followTimeline);
+	toolbar->insertWidget(toolbar->actions().at(2), followTimeline);
 	connect(followTimeline, &QToolButton::toggled, this, [clip](bool enabled) {
 		auto state = clip->editorState();
 		state["followSongTimeline"] = enabled;
@@ -1149,7 +1139,9 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 				index = i;
 		barZoom->setCurrentIndex(index);
 	});
-	toolbar->addStretch();
+	auto* toolbarSpacer = new QWidget(toolbar);
+	toolbarSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	toolbar->addWidget(toolbarSpacer);
 	auto* track = static_cast<SVSTrack*>(clip->getTrack());
 	auto* sidebarScroll = new QScrollArea(this);
 	sidebarScroll->setObjectName("svsVoicePanel");
@@ -1360,6 +1352,15 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	auto* settings = new QToolButton(this);
 	settings->setText(tr("Settings"));
 	settings->setObjectName("svsEditorSettingsButton");
+	auto* hoverControlsAction = toolbar->addWidget(noteLabels::createControls(toolbar, this));
+	hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged, hoverControlsAction,
+		[hoverControlsAction](const QString& group, const QString& key, const QString&) {
+			if (group == "ui" && key == "pitchalignmentaxis")
+			{
+				hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
+			}
+		});
 	toolbar->addWidget(settings);
 	connect(settings, &QToolButton::clicked, side, [side] {
 		side->show();
@@ -1372,8 +1373,6 @@ SVSPianoRoll::SVSPianoRoll(SVSClip* clip, QWidget* parent)
 	properties->setChecked(true);
 	toolbar->addWidget(properties);
 	connect(properties, &QToolButton::toggled, sidebarScroll, &QWidget::setVisible);
-	toolbarBody->ensurePolished();
-	toolbarScroll->setFixedHeight(toolbarBody->sizeHint().height() + style()->pixelMetric(QStyle::PM_ScrollBarExtent));
 	auto* portrait = new SVSImageLoader(canvas);
 	portrait->setObjectName("svsPortraitLoader");
 	auto* portraitVisible = new QCheckBox(tr("Show portrait"), side);
@@ -1696,7 +1695,7 @@ bool SVSPianoRoll::eventFilter(QObject* target, QEvent* event)
 		event->ignore();
 		return true;
 	}
-	return QWidget::eventFilter(target, event);
+	return QMainWindow::eventFilter(target, event);
 }
 void SVSPianoRoll::setThemeColor(const QString& name, const QColor& value)
 {
@@ -1711,7 +1710,7 @@ void SVSPianoRoll::setThemeColor(const QString& name, const QColor& value)
 }
 void SVSPianoRoll::changeEvent(QEvent* event)
 {
-	QWidget::changeEvent(event);
+	QMainWindow::changeEvent(event);
 	if (event->type() == QEvent::StyleChange && !m_polishingTheme)
 	{
 		m_polishingTheme = true;

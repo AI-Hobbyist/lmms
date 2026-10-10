@@ -936,7 +936,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 
 	// Track actions
-	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
+	auto* trackActionsToolBar = m_toolBar;
 
 	m_addPatternTrackAction = new QAction(embed::getIconPixmap("add_pattern_track"),
 									 tr("Add pattern-track"), this);
@@ -957,7 +957,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 
 	// Edit actions
-	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
+	auto* editActionsToolBar = m_toolBar;
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
@@ -973,10 +973,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	editActionsToolBar->addAction( m_knifeModeAction );
 	editActionsToolBar->addAction( m_selectModeAction );
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	auto* timeLineToolBar = m_toolBar;
 	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
-	DropToolBar *insertActionsToolBar = addDropToolBarToTop(tr("Bar insert controls"));
+	auto* insertActionsToolBar = m_toolBar;
 	m_insertBarAction = new QAction(embed::getIconPixmap("insert_bar"), tr("Insert bar"), this);
 	m_removeBarAction = new QAction(embed::getIconPixmap("remove_bar"), tr("Remove bar"), this);
 	insertActionsToolBar->addAction( m_insertBarAction );
@@ -984,7 +984,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_insertBarAction, SIGNAL(triggered()), song, SLOT(insertBar()));
 	connect(m_removeBarAction, SIGNAL(triggered()), song, SLOT(removeBar()));
 
-	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
+	auto* zoomToolBar = m_toolBar;
 
 	auto zoom_lbl = new QLabel(m_toolBar);
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -1003,7 +1003,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget(m_zoomingSlider);
 
-	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
+	auto* snapToolBar = m_toolBar;
 	auto snap_lbl = new QLabel(m_toolBar);
 	snap_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 

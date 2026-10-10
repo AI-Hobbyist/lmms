@@ -5274,7 +5274,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_toggleStepRecordingAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano, one step at the time" ) );
 	m_stopAction->setToolTip( tr( "Stop playing of current clip (Space)" ) );
 
-	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
+	auto* notesActionsToolBar = m_toolBar;
 
 	// init edit-buttons at the top
 	auto editModeGroup = new ActionGroup(this);
@@ -5318,7 +5318,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addWidget(quantizeButton);
 
 	// -- File actions
-	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
+	auto* fileActionsToolBar = m_toolBar;
 
 	// -- File ToolButton
 	m_fileToolsButton = new QToolButton(m_toolBar);
@@ -5343,7 +5343,7 @@ PianoRollWindow::PianoRollWindow() :
 	// -- End File actions
 
 	// Copy + paste actions
-	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
+	auto* copyPasteActionsToolBar = m_toolBar;
 
 	auto cutAction = new QAction(embed::getIconPixmap("edit_cut"), tr("Cut (%1+X)").arg(UI_CTRL_KEY), this);
 
@@ -5364,7 +5364,7 @@ PianoRollWindow::PianoRollWindow() :
 	copyPasteActionsToolBar->addAction( pasteAction );
 
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
+	auto* timeLineToolBar = m_toolBar;
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
@@ -5412,7 +5412,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
-	auto* hoverTools = new QToolBar(this);
+	auto* hoverTools = m_toolBar;
 	hoverTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	hoverTools->setMovable(false);
 	hoverTools->setFloatable(false);
@@ -5429,7 +5429,6 @@ PianoRollWindow::PianoRollWindow() :
 				hoverControlsAction->setVisible(noteLabels::alignmentEnabled());
 			}
 		});
-	addToolBar(Qt::TopToolBarArea, hoverTools);
 
 	addToolBarBreak();
 
