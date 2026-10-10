@@ -37,7 +37,7 @@ void attach(QTreeWidgetItem* item, const QJsonObject& selection, const QJsonObje
 }
 } // namespace
 SVCBrowser::SVCBrowser(QWidget* parent)
-	: SideBarWidget("SVC", embed::getIconPixmap("svc_track.svg").transformed(QTransform().rotate(90)), parent)
+	: SideBarWidget(tr("SVC"), embed::getIconPixmap("svc_track.svg").transformed(QTransform().rotate(90)), parent)
 	, m_tree(new SVCTree(contentParent()))
 	, m_search(new QLineEdit(contentParent()))
 {

@@ -10714,6 +10714,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <source>All file types</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>My Favorites</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -12530,6 +12534,10 @@ Shift-click to open the note in Automation Editor</source>
         <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SVC</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
@@ -12806,6 +12814,10 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <source>Search</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SVS</source>
+        <translation></translation>
     </message>
 </context>
 <context>

@@ -222,3 +222,10 @@ M6 检查点 `9667fb5b2b5fcc36d4286fd39869d00a3c9ff82c` 推送确认后开始。
 最终静态统计仍为 3877 键，中/日/韩译文 3723/3714/3721，同原文保留 154/163/156，英文 3877 源文回退；四语缺键、空译、unfinished、占位符、复数、HTML、换行及助记符质量 PASS。1306 候选、25 声明、779 条逐语言同原文复核全部 CLOSED。日志见 `M7-extraction.log`、`M7-audit.log`、`M7-quality.log`、`M7-selfcheck.log`；没有修改其他语言目录。
 
 人工验收尚未完成，明确为非阻塞 `MANUAL/PENDING`：DiffSinger 实际模型合成/音高重录/DirectML 运算、实时 RVC 参数与 A/B 过载、外部项目格式完整转换与损失弹窗、Carla 运行依赖、外部 LV2 样本，以及禁用的 SID/GigPlayer。矩阵逐项记录原因和恢复方法。测试入口副本的 SVSCompute 路径告警不代表生产 DLL 缺失，也不作为实际 AI 运算通过的证据；生产 DLL 原位存在。根据计划“自动检查通过且非阻塞人工项待执行时，可完成阶段提交推送检查点”，M0～M7 实施检查点完成；未将人工项记为 PASS。
+
+
+## 用户截图补充：侧栏标题与轨道旋钮
+
+在既有提交 607b75ab5 上修正三个未接入翻译的侧栏标题：SVC、SVS、My Favorites。中文显示歌声转换、歌声合成、我的收藏；日文与韩文同步补齐，英文保留标准缩写。SVS/SVC 轨道的 VOL/PAN 原来按缩写保留，现复用普通 InstrumentTrackView 同键译文，并修正 12 条逐语言复核结论；参数、单位和轨道数据不变。
+
+开发程序 build/Release/lmms.exe 和 UiBaselineCapture 编译 PASS，相关插件依赖原位链接至 build/Release/plugins。四语各 3 PASS、0 FAIL，真实 Windows Qt 窗口、100% 缩放，验证实际侧栏标题/按钮、SVS/SVC 轨道旋钮，并保留四语截图；中日韩字形正常。四份 QM 与部署文件一致，见 sidebar-followup-resources.json。全库当前 3885 键质量 PASS；本修正新增 3 个标题键，另 5 个新增提取键来自开始前已有的声库说明提交，不属于本次实现。未修改其他语言。

@@ -10737,6 +10737,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <source>All file types</source>
         <translation>所有类型</translation>
     </message>
+    <message>
+        <source>My Favorites</source>
+        <translation>我的收藏</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -12564,6 +12568,10 @@ Shift-click to open the note in Automation Editor</source>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
+    <message>
+        <source>SVC</source>
+        <translation>歌声转换</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
@@ -12670,7 +12678,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -12678,7 +12686,7 @@ Shift-click to open the note in Automation Editor</source>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>声相</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -12840,6 +12848,10 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <source>Search</source>
         <translation>搜索</translation>
+    </message>
+    <message>
+        <source>SVS</source>
+        <translation>歌声合成</translation>
     </message>
 </context>
 <context>
@@ -13545,7 +13557,7 @@ Seed: %3</source>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -13553,7 +13565,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>声相</translation>
     </message>
     <message>
         <source>Panning</source>

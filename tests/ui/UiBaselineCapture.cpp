@@ -67,6 +67,7 @@
 #include "PluginView.h"
 #include "SVCSettingsPage.h"
 #include "SVCTrack.h"
+#include "SVCViews.h"
 #include "SVCWindow.h"
 #include "SVSCanvas.h"
 #include "SVSClip.h"
@@ -79,6 +80,7 @@
 #include "SampleClip.h"
 #include "SampleTrack.h"
 #include "SetupDialog.h"
+#include "SideBarWidget.h"
 #include "SimpleTextFloat.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -1194,6 +1196,56 @@ private slots:
 			settings.close();
 		}
 		song->setModified(false);
+	}
+	void sidebarTranslationFollowup()
+	{
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		const QMap<QString, QStringList> titles{{"zh_CN", {"歌声转换", "歌声合成", "我的收藏"}},
+			{"ja", {"歌声変換", "歌声合成", "お気に入り"}}, {"en", {"SVC", "SVS", "My Favorites"}},
+			{"ko", {"가창 변환", "가창 합성", "즐겨찾기"}}};
+		QVERIFY(titles.contains(language));
+		auto* main = m_gui->mainWindow();
+		QCOMPARE(main->devicePixelRatioF(), 1.0);
+		int index = 0;
+		for (const auto& title : titles.value(language))
+		{
+			SideBarWidget* panel = nullptr;
+			for (auto* candidate : main->findChildren<SideBarWidget*>())
+			{
+				if (candidate->title() == title) { panel = candidate; }
+			}
+			QVERIFY2(panel, qPrintable(title));
+			QToolButton* button = nullptr;
+			for (auto* candidate : main->findChildren<QToolButton*>())
+			{
+				if (candidate->toolTip() == title) { button = candidate; }
+			}
+			QVERIFY(button);
+			QTest::mouseClick(button, Qt::LeftButton);
+			QVERIFY(panel->isVisible());
+			capture(main, "sidebar-followup-" + language + '-' + QString::number(++index));
+			QTest::mouseClick(button, Qt::LeftButton);
+		}
+		auto* svsTrack = new SVSTrack(Engine::getSong());
+		auto* svcTrack = new SVCTrack(Engine::getSong());
+		QCoreApplication::processEvents();
+		int checked = 0;
+		for (auto* view : main->findChildren<TrackView*>())
+		{
+			if (view->getTrack() != svsTrack && view->getTrack() != svcTrack) { continue; }
+			QStringList labels;
+			for (auto* knob : view->findChildren<Knob*>())
+			{
+				labels.append(knob->getLabel());
+			}
+			QVERIFY(labels.contains(QCoreApplication::translate("lmms::gui::InstrumentTrackView", "VOL")));
+			QVERIFY(labels.contains(QCoreApplication::translate("lmms::gui::InstrumentTrackView", "PAN")));
+			++checked;
+		}
+		QCOMPARE(checked, 2);
+		capture(main, "sidebar-followup-" + language + "-track-knobs");
+		delete svcTrack;
+		delete svsTrack;
 	}
 	void finalTranslations()
 	{

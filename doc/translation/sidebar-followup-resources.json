@@ -1,0 +1,22 @@
+[
+  {
+    "language": "zh_CN",
+    "sha256": "c19198ccb432e62da37ca0fbc976a35dfe07732abce1cf93127702f4808fe408",
+    "deployed": "build\\Release\\data\\locale\\zh_CN.qm"
+  },
+  {
+    "language": "ja",
+    "sha256": "915655167b2581b022a5d86de36978811117131bcc83509ef58ce4c691699ace",
+    "deployed": "build\\Release\\data\\locale\\ja.qm"
+  },
+  {
+    "language": "en",
+    "sha256": "c95bd52ee1ce80237a7e27e14847d48df2fdad97f6c132d3fc293acff631112c",
+    "deployed": "build\\Release\\data\\locale\\en.qm"
+  },
+  {
+    "language": "ko",
+    "sha256": "5a0737be70466225a085b5a43e79f07276b0473e25634b55309a57b80e2128d0",
+    "deployed": "build\\Release\\data\\locale\\ko.qm"
+  }
+]

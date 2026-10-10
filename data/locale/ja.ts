@@ -10737,6 +10737,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <source>All file types</source>
         <translation>すべてのファイル</translation>
     </message>
+    <message>
+        <source>My Favorites</source>
+        <translation>お気に入り</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -12564,6 +12568,10 @@ Shift を押しながらクリックするとオートメーションエディ�
         <source>Search</source>
         <translation>検索</translation>
     </message>
+    <message>
+        <source>SVC</source>
+        <translation>歌声変換</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
@@ -12670,7 +12678,7 @@ Shift を押しながらクリックするとオートメーションエディ�
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -12678,7 +12686,7 @@ Shift を押しながらクリックするとオートメーションエディ�
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>パン</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -12840,6 +12848,10 @@ Shift を押しながらクリックするとオートメーションエディ�
     <message>
         <source>Search</source>
         <translation>検索</translation>
+    </message>
+    <message>
+        <source>SVS</source>
+        <translation>歌声合成</translation>
     </message>
 </context>
 <context>
@@ -13545,7 +13557,7 @@ Seed: %3</source>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>音量</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -13553,7 +13565,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>パン</translation>
     </message>
     <message>
         <source>Panning</source>

@@ -10737,6 +10737,10 @@ LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translatio
         <source>All file types</source>
         <translation>모든 파일 유형</translation>
     </message>
+    <message>
+        <source>My Favorites</source>
+        <translation>즐겨찾기</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -12564,6 +12568,10 @@ Shift 키를 누른 채 클릭하면 자동화 편집기에서 음표를 엽니�
         <source>Search</source>
         <translation>검색</translation>
     </message>
+    <message>
+        <source>SVC</source>
+        <translation>가창 변환</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::SVCClipView</name>
@@ -12670,7 +12678,7 @@ Shift 키를 누른 채 클릭하면 자동화 편집기에서 음표를 엽니�
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>볼륨</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -12678,7 +12686,7 @@ Shift 키를 누른 채 클릭하면 자동화 편집기에서 음표를 엽니�
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>패닝</translation>
     </message>
     <message>
         <source>Panning</source>
@@ -12840,6 +12848,10 @@ Shift 키를 누른 채 클릭하면 자동화 편집기에서 음표를 엽니�
     <message>
         <source>Search</source>
         <translation>검색</translation>
+    </message>
+    <message>
+        <source>SVS</source>
+        <translation>가창 합성</translation>
     </message>
 </context>
 <context>
@@ -13545,7 +13557,7 @@ Seed: %3</source>
     <name>lmms::gui::SVSTrackView</name>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>볼륨</translation>
     </message>
     <message>
         <source>Track volume</source>
@@ -13553,7 +13565,7 @@ Seed: %3</source>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation>패닝</translation>
     </message>
     <message>
         <source>Panning</source>

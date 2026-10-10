@@ -13,7 +13,7 @@
 
 namespace lmms::gui {
 SVSBrowser::SVSBrowser(QWidget* parent)
-	: SideBarWidget("SVS", embed::getIconPixmap("svs_track.svg").transformed(QTransform().rotate(90)), parent)
+	: SideBarWidget(tr("SVS"), embed::getIconPixmap("svs_track.svg").transformed(QTransform().rotate(90)), parent)
 	, m_search(new QLineEdit(contentParent()))
 	, m_tree(new QTreeWidget(contentParent()))
 {

@@ -1,0 +1,25 @@
+warning: in the working copy of 'src/gui/SVSBrowser.cpp', CRLF will be replaced by LF the next time Git touches it
+{
+  "source_commit": "607b75ab559240d42e108517d487c7deb8688e82",
+  "working_diff_sha256": "c5bf18625533b592a1ef481b9195fec8bf8bda9f2b3b003efda762c1742d011d",
+  "extraction": "doc/translation/current.ts",
+  "input_count": 1132,
+  "key_count": 3885,
+  "summary": {
+    "zh_CN": {
+      "same-source": 150,
+      "translated": 3735
+    },
+    "ja": {
+      "same-source": 159,
+      "translated": 3726
+    },
+    "en": {
+      "source": 3885
+    },
+    "ko": {
+      "same-source": 152,
+      "translated": 3733
+    }
+  }
+}
