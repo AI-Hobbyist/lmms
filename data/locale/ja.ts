@@ -13095,8 +13095,8 @@ Phonemes: %4
         <translation> — 手動設定を保持</translation>
     </message>
     <message>
-        <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation>%1 個のトークンを割り当て、%2 個は未使用です。手動の読みと音素は保持されます。変更は確認時にまとめて適用されます。</translation>
+        <source>%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
+        <translation>%1 個のトークンを割り当て、%2 個の音符は未使用です。手動の読みと音素は保持されます。変更は確認時にまとめて適用されます。</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>

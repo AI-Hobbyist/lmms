@@ -13095,8 +13095,8 @@ Phonemes: %4
         <translation> — 수동 설정 유지</translation>
     </message>
     <message>
-        <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation>토큰 %1개를 할당했고 %2개는 사용하지 않았습니다. 수동 독음과 음소는 유지됩니다. 확인 시 변경 사항이 함께 적용됩니다.</translation>
+        <source>%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
+        <translation>토큰 %1개를 할당했고 음표 %2개는 사용하지 않았습니다. 수동 독음과 음소는 유지됩니다. 확인 시 변경 사항이 함께 적용됩니다.</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>

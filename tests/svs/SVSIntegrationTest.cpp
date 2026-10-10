@@ -5301,6 +5301,7 @@ private slots:
 			QStringList({"hello", QString::fromUtf8("世"), QString::fromUtf8("界"), QString::fromUtf8("きゃ"), "-"}));
 		{
 			gui::SVSLyricEditor dialog(clip, {"a", "b", "c"});
+			dialog.findChild<QCheckBox*>("svsBatchSkipContinuation")->setChecked(true);
 			auto* text = dialog.findChild<QPlainTextEdit*>("svsBatchLyricText");
 			QVERIFY(text);
 			text->setPlainText(QString::fromUtf8("你 好"));
@@ -5316,6 +5317,7 @@ private slots:
 		clip->setJournalling(true);
 		{
 			gui::SVSLyricEditor dialog(clip, {"a", "b", "c"});
+			dialog.findChild<QCheckBox*>("svsBatchSkipContinuation")->setChecked(true);
 			auto* text = dialog.findChild<QPlainTextEdit*>();
 			text->setPlainText("one two");
 			QInputMethodEvent composing(QString::fromUtf8("未"), {});

@@ -13057,8 +13057,8 @@ Phonemes: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation type="unfinished"></translation>
+        <source>%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
+        <translation>%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>

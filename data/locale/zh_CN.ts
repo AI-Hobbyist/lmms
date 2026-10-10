@@ -13095,8 +13095,8 @@ Phonemes: %4
         <translation> — 保留手动覆盖</translation>
     </message>
     <message>
-        <source>%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
-        <translation>已分配 %1 个词元；%2 个未使用。保留手动读音和音素。确认时统一应用更改。</translation>
+        <source>%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on confirmation.</source>
+        <translation>已分配 %1 个词元；%2 个音符未使用。保留手动读音和音素。确认时统一应用更改。</translation>
     </message>
     <message>
         <source>Notes changed while this preview was open. Reopen batch lyrics to review the current notes.</source>

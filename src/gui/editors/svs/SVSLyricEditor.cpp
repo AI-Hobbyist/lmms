@@ -79,7 +79,7 @@ SVSLyricEditor::SVSLyricEditor(SVSClip* clip, const QSet<QString>& selection, QW
 	m_skip = new QCheckBox(
 		QCoreApplication::translate("lmms::gui::SVSLyricEditor", "Skip voice continuation notes and tokens"), this);
 	m_skip->setObjectName("svsBatchSkipContinuation");
-	m_skip->setChecked(true);
+	m_skip->setChecked(false);
 	layout->addWidget(m_skip);
 	m_table = new QTableWidget(this);
 	m_table->setObjectName("svsBatchLyricPreview");
@@ -153,10 +153,10 @@ void SVSLyricEditor::preview()
 		++row;
 	}
 	m_diagnostic->setText(QCoreApplication::translate("lmms::gui::SVSLyricEditor",
-		"%1 tokens assigned; %2 unused. Manual readings and phonemes are preserved. Changes apply together on "
+		"%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on "
 		"confirmation.")
 			.arg(token)
-			.arg(tokens.size() - token));
+			.arg(indices.size() - token));
 }
 void SVSLyricEditor::accept()
 {

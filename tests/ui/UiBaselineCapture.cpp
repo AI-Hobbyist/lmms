@@ -14,6 +14,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProcess>
+#include <QPlainTextEdit>
 #include <QProcessEnvironment>
 #include <QProgressBar>
 #include <QPushButton>
@@ -519,6 +520,62 @@ private slots:
 			settings.close();
 			QCoreApplication::removeTranslator(&translator);
 		}
+	}
+	void batchLyricCounts()
+	{
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		QVector<svs::Note> notes;
+		QSet<QString> selection;
+		for (int index = 0; index < 4; ++index)
+		{
+			svs::Note note;
+			note.id = QString::number(index);
+			note.tick = index * 48;
+			note.duration = 48;
+			note.pitch = 60;
+			note.lyric = "la";
+			notes.append(note);
+			selection.insert(note.id);
+		}
+		clip->setNotes(notes);
+		QCOMPARE(SVSLyricEditor::splitLyrics(QString::fromUtf8("你-好")),
+			QStringList({QString::fromUtf8("你"), "-", QString::fromUtf8("好")}));
+		for (const auto& language : QStringList{"zh_CN", "ja", "en", "ko"})
+		{
+			QTranslator translator;
+			QVERIFY(translator.load(QString("%1/locale/%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), language)));
+			QCoreApplication::installTranslator(&translator);
+			SVSLyricEditor dialog(clip, selection);
+			auto* text = dialog.findChild<QPlainTextEdit*>("svsBatchLyricText");
+			auto* skip = dialog.findChild<QCheckBox*>("svsBatchSkipContinuation");
+			auto* table = dialog.findChild<QTableWidget*>("svsBatchLyricPreview");
+			auto* diagnostic = dialog.findChild<QLabel*>();
+			QVERIFY(text && skip && table && diagnostic);
+			QVERIFY(!skip->isChecked());
+			const auto verifyCounts = [&](int assigned, int unused) {
+				QCOMPARE(diagnostic->text(), QCoreApplication::translate("lmms::gui::SVSLyricEditor",
+					"%1 tokens assigned; %2 notes unused. Manual readings and phonemes are preserved. Changes apply together on "
+					"confirmation.").arg(assigned).arg(unused));
+			};
+			text->clear();
+			verifyCounts(0, 4);
+			text->setPlainText(QString::fromUtf8("你"));
+			verifyCounts(1, 3);
+			capture(&dialog, "batch-lyric-unused-" + language);
+			text->setPlainText(QString::fromUtf8("你好世界"));
+			verifyCounts(4, 0);
+			text->setPlainText(QString::fromUtf8("你好世界呀"));
+			verifyCounts(4, 0);
+			text->setPlainText(QString::fromUtf8("你-好"));
+			verifyCounts(3, 1);
+			QCOMPARE(table->item(1, 2)->text(), QString("-"));
+			dialog.accept();
+			QCOMPARE(clip->notes()[1].lyric, QString("-"));
+			clip->setNotes(notes);
+			QCoreApplication::removeTranslator(&translator);
+		}
+		delete track;
 	}
 	void aiCachePathPersistence()
 	{
