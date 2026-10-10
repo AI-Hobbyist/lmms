@@ -122,6 +122,28 @@ int main()
 	check(contextSnapshot->trackSample(999, 0) == .25f && contextSnapshot->trackSample(4000, 0) == .25f
 			&& contextSnapshot->trackSample(1000, 0) != .25f && context.progress() == 1,
 		"context cropped while effective source interval stays aligned");
+	for (const auto rate : {32000u, 44100u, 48000u, 96000u})
+	{
+		PlaybackState native(source);
+		const auto nativeGeneration = native.begin({segment});
+		const auto nativeFirst = pcm(0, rate / 2, rate / 3, 24576);
+		const auto nativeSecond = pcm(rate / 2, rate - rate / 2, rate / 3, 24576);
+		check(native.publish(event(nativeFirst, nativeGeneration, 0, 1, 0, rate)), "native first chunk accepted");
+		const auto retained = native.snapshot()->rendered.front().audio;
+		check(retained->rate == rate && retained->frames == rate / 2, "output rate and native frame count preserved");
+		check(native.publish(event(nativeSecond, nativeGeneration, 0, 2, rate / 2, rate)),
+			"native second chunk accepted");
+		check(native.complete(nativeGeneration, 0, SVC_COMPLETE), "native rate duration completed");
+		const auto audio = native.snapshot()->rendered.front().audio;
+		check(audio->rate == rate && audio->frames == rate && audio->chunks.size() == 2,
+			"no source-rate intermediate PCM or chunk merge");
+		check(audio->chunks[0].samples == retained->chunks[0].samples && retained->frames == rate / 2,
+			"native PCM chunks shared while snapshots remain immutable");
+		for (uint64_t frame = 0; frame < rate; ++frame)
+		{
+			check(audio->sample(frame) == (frame == rate / 3 ? .75f : 0.f), "native PCM bit-exact after publication");
+		}
+	}
 	std::puts("PASS SVC M2 playback: provisional replacement, immutable blocks, stale rejection, absolute-phase "
 			  "impulses, context cropping and re-render");
 	return 0;

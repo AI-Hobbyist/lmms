@@ -16,13 +16,28 @@ struct SourceAudio
 	uint64_t frames() const { return stereo.size() / 2; }
 };
 
+struct RenderedAudio
+{
+	struct Chunk
+	{
+		uint64_t offset;
+		std::shared_ptr<const std::vector<float>> samples;
+	};
+	uint32_t rate = 0;
+	uint64_t inputStart = 0; // Origin in source frames; PCM stays at the backend rate.
+	uint64_t generation = 0;
+	uint64_t segment = 0;
+	uint64_t frames = 0;
+	std::vector<Chunk> chunks;
+	float sample(uint64_t frame) const;
+};
+
 struct PlaybackRegion
 {
 	uint64_t start = 0;
 	uint64_t end = 0;
-	uint64_t storageStart = 0;
 	uint64_t generation = 0;
-	std::shared_ptr<const std::vector<float>> mono;
+	std::shared_ptr<const RenderedAudio> audio;
 };
 
 struct PlaybackSnapshot
@@ -30,7 +45,8 @@ struct PlaybackSnapshot
 	std::shared_ptr<const SourceAudio> source;
 	std::vector<PlaybackRegion> rendered;
 	float sourceSample(uint64_t frame, unsigned channel) const;
-	float renderedSample(uint64_t frame, bool& available) const;
+	const PlaybackRegion* renderedRegion(double frame) const;
+	float renderedSample(double frame, bool& available) const;
 	float trackSample(uint64_t frame, unsigned channel) const;
 };
 
@@ -57,14 +73,13 @@ private:
 		QString request;
 		uint64_t chunks = 0;
 		uint64_t received = 0;
-		uint64_t cursor = 0;
 		uint64_t published = 0;
 		uint32_t rate = 0;
-		float last = 0;
+		std::shared_ptr<const RenderedAudio> audio;
 		svc_status terminal = SVC_OK;
 	};
-	void install(uint64_t start, std::shared_ptr<const std::vector<float>> data);
-	void resample(RequestState& request, const std::vector<float>& data, uint64_t dataOffset, bool final);
+	void install(uint64_t start, uint64_t end, std::shared_ptr<const RenderedAudio> audio);
+	void publishCoverage(RequestState& request, bool final);
 	mutable std::mutex m_mutex;
 	std::atomic<uint64_t> m_generation{1};
 	std::shared_ptr<const PlaybackSnapshot> m_snapshot;

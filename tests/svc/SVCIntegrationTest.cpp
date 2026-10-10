@@ -77,6 +77,7 @@ class SVCManualAudioDevice final : public AudioDummy
 {
 public:
 	using AudioDummy::AudioDummy;
+	void useSampleRate(sample_rate_t rate) { setSampleRate(rate); }
 
 private:
 	void startProcessingImpl() override {}
@@ -305,8 +306,16 @@ private slots:
 		delete sample;
 	}
 
+	void waveformPeaksNative_data()
+	{
+		QTest::addColumn<int>("nativeRate");
+		QTest::newRow("44100") << 44100;
+		QTest::newRow("88200") << 88200;
+	}
+
 	void waveformPeaksNative()
 	{
+		QFETCH(int, nativeRate);
 		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
 		QTest::qWait(30);
 		auto* clip = static_cast<SVCClip*>(track->createClip(0));
@@ -321,12 +330,13 @@ private slots:
 			view.show();
 			QVERIFY(QTest::qWaitForWindowExposed(&view));
 			const auto source = clip->playback()->snapshot()->source;
-			auto pcm = wave(source->rate, source->frames(), 0).mid(44);
+			const auto nativeFrames = uint64_t(nativeRate) * source->frames() / source->rate;
+			auto pcm = wave(nativeRate, nativeFrames, 0).mid(44);
 			// Peaks fall inside each pixel interval, away from the single sampled frame.
 			for (int x = 0; x < view.width(); ++x)
 			{
-				const auto begin = uint64_t(x) * source->frames() / view.width();
-				const auto end = uint64_t(x + 1) * source->frames() / view.width();
+				const auto begin = uint64_t(x) * nativeFrames / view.width();
+				const auto end = uint64_t(x + 1) * nativeFrames / view.width();
 				qToLittleEndian<int16_t>(24576, pcm.data() + (begin + (end - begin) / 2) * 2);
 				qToLittleEndian<int16_t>(-24576, pcm.data() + (begin + (end - begin) / 2 + 1) * 2);
 			}
@@ -337,16 +347,16 @@ private slots:
 			event.type = SVC_AUDIO;
 			event.generation_id = generation;
 			event.request_id = "waveform-peaks";
-			event.sample_rate = source->rate;
+			event.sample_rate = nativeRate;
 			event.channels = 1;
 			event.chunk_index = 1;
 			event.total_chunks = 1;
-			event.sample_count = source->frames();
+			event.sample_count = nativeFrames;
 			event.bytes = reinterpret_cast<const uint8_t*>(pcm.constData());
 			event.byte_count = pcm.size();
 			QVERIFY(clip->publish(event));
 			QVERIFY(clip->finishSegment(generation, 0, SVC_COMPLETE, {}));
-			auto output = wave(source->rate, source->frames(), 0);
+			auto output = wave(nativeRate, nativeFrames, 0);
 			output.replace(44, pcm.size(), pcm);
 			const auto outputPath = m_working.filePath("waveform-output.wav");
 			QFile file(outputPath);
@@ -354,12 +364,12 @@ private slots:
 			QCOMPARE(file.write(output), output.size());
 			file.close();
 			Sample sample(SampleBuffer::fromFile(outputPath));
-			QCOMPARE(uint64_t(sample.sampleSize()), source->frames());
+			QCOMPARE(uint64_t(sample.sampleSize()), nativeFrames);
 			const auto snapshot = clip->playback()->snapshot();
-			for (uint64_t frame = 0; frame < source->frames(); ++frame)
+			for (uint64_t frame = 0; frame < nativeFrames; ++frame)
 			{
-				QCOMPARE(snapshot->trackSample(frame, 0), sample.data()[frame][0]);
-				QCOMPARE(snapshot->trackSample(frame, 1), sample.data()[frame][1]);
+				QCOMPARE(snapshot->rendered.front().audio->sample(frame), sample.data()[frame][0]);
+				QCOMPARE(snapshot->rendered.front().audio->sample(frame), sample.data()[frame][1]);
 			}
 			QImage reference(view.size(), QImage::Format_RGB32);
 			reference.fill(Qt::black);
@@ -391,30 +401,66 @@ private slots:
 		QTest::qWait(30);
 	}
 
+	void continuousTrackAudioNative_data()
+	{
+		QTest::addColumn<int>("sourceRate");
+		QTest::addColumn<int>("nativeRate");
+		QTest::addColumn<int>("globalRate");
+		QTest::newRow("original") << 44100 << 44100 << 44100;
+		QTest::newRow("direct-44100") << 32000 << 44100 << 44100;
+		QTest::newRow("direct-48000") << 44100 << 48000 << 48000;
+		QTest::newRow("direct-96000") << 48000 << 96000 << 96000;
+		QTest::newRow("upsample-32000") << 48000 << 32000 << 44100;
+		QTest::newRow("upsample-44100") << 32000 << 44100 << 48000;
+		QTest::newRow("downsample-48000") << 32000 << 48000 << 44100;
+		QTest::newRow("downsample-96000") << 44100 << 96000 << 48000;
+	}
+
 	void continuousTrackAudioNative()
 	{
+		QFETCH(int, sourceRate);
+		QFETCH(int, nativeRate);
+		QFETCH(int, globalRate);
 		auto* song = Engine::getSong();
 		auto* engine = Engine::audioEngine();
+		const auto oldRate = engine->outputSampleRate();
+		bool available = false;
+		auto* device = new SVCManualAudioDevice(available, engine);
+		device->useSampleRate(globalRate);
+		engine->setAudioDevice(device, false);
+		Engine::updateFramesPerTick();
 		const auto oldTempo = song->getTempo();
 		song->setTempo(137);
 		auto* svcTrack = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, song));
 		auto* svcClip = static_cast<SVCClip*>(svcTrack->createClip(0));
-		QVERIFY(svcClip->setSourceFile(m_source));
+		const auto sourcePath = m_working.filePath("different-rate-source.wav");
+		QFile sourceFile(sourcePath);
+		QVERIFY(sourceFile.open(QIODevice::WriteOnly));
+		const auto sourceBytes = wave(sourceRate, sourceRate * 2, 4096);
+		QCOMPARE(sourceFile.write(sourceBytes), sourceBytes.size());
+		sourceFile.close();
+		QVERIFY(svcClip->setSourceFile(sourcePath));
 		const auto source = svcClip->playback()->snapshot()->source;
 		const svc::Segment segment{0, source->frames(), 0, source->frames(), 0, source->rate};
 		const auto generation = svcClip->beginConversion({segment});
-		const auto output = wave(source->rate, source->frames(), 16384);
+		auto output = wave(nativeRate, nativeRate * 2, 16384);
+		for (int frame = 0; frame < nativeRate * 2 && QByteArray(QTest::currentDataTag()) != "original"; ++frame)
+		{
+			const auto value = int16_t(10000 * std::sin(frame * 2 * 3.141592653589793 * 440 / nativeRate)
+				+ 6000 * std::sin(frame * 2 * 3.141592653589793 * 6000 / nativeRate));
+			qToLittleEndian<int16_t>(value, output.data() + 44 + frame * 2);
+		}
 		const auto pcm = output.mid(44);
 		svc_event event{};
 		event.size = sizeof(event);
 		event.type = SVC_AUDIO;
 		event.generation_id = generation;
 		event.request_id = "continuous-audio";
-		event.sample_rate = source->rate;
+		event.sample_rate = nativeRate;
 		event.channels = 1;
 		event.chunk_index = 1;
 		event.total_chunks = 1;
-		event.sample_count = source->frames();
+		event.sample_count = nativeRate * 2;
 		event.bytes = reinterpret_cast<const uint8_t*>(pcm.constData());
 		event.byte_count = pcm.size();
 		QVERIFY(svcClip->publish(event));
@@ -453,8 +499,20 @@ private slots:
 			}
 			return result;
 		};
-		const auto sample = capture(false);
+		auto sample = capture(false);
 		const auto svc = capture(true);
+		if (nativeRate == globalRate && QByteArray(QTest::currentDataTag()) != "original")
+		{
+			// The same-rate SVC path must preserve the PCM itself, without even
+			// libsamplerate Linear's startup delay. AudioEngine has one period of output latency.
+			for (size_t frame = 0; frame < sample.size(); ++frame)
+			{
+				const auto value = frame < engine->framesPerPeriod()
+					? 0.f
+					: qFromLittleEndian<int16_t>(pcm.constData() + (frame - engine->framesPerPeriod()) * 2) / 32768.f;
+				sample[frame][0] = sample[frame][1] = value;
+			}
+		}
 		QCOMPARE(svc.size(), sample.size());
 		int missing = 0;
 		float maximumDifference = 0;
@@ -470,6 +528,10 @@ private slots:
 		delete sampleTrack;
 		delete svcTrack;
 		song->setTempo(oldTempo);
+		auto* restoredDevice = new SVCManualAudioDevice(available, engine);
+		restoredDevice->useSampleRate(oldRate);
+		engine->setAudioDevice(restoredDevice, false);
+		Engine::updateFramesPerTick();
 		QTest::qWait(30);
 		QVERIFY2(missing == 0, "SVC track has silent gaps absent from sample track playing the same WAV");
 		QVERIFY(maximumDifference < .0001f);

@@ -1,12 +1,19 @@
 #pragma once
 
 #include <QJsonObject>
+#include <atomic>
+#include <memory>
+#include <unordered_map>
 
 #include "AudioBusHandle.h"
 #include "SVCChunking.h"
 #include "Track.h"
 
 namespace lmms {
+class SVCClip;
+namespace svc {
+class PlaybackState;
+}
 class SVCTrack : public Track
 {
 	Q_OBJECT
@@ -36,6 +43,15 @@ signals:
 	void renderRequested();
 
 private:
+	struct ActivePlayback
+	{
+		std::weak_ptr<std::atomic<bool>> active;
+		std::weak_ptr<svc::PlaybackState> state;
+		int nextTick = 0;
+		int origin = 0;
+		int end = 0;
+	};
+	std::unordered_map<SVCClip*, ActivePlayback> m_activePlayback;
 	FloatModel m_volume;
 	FloatModel m_pan;
 	IntModel m_mix;

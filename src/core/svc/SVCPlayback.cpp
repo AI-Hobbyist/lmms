@@ -10,21 +10,40 @@ namespace lmms::svc {
 float PlaybackSnapshot::sourceSample(uint64_t frame, unsigned channel) const
 { return source && frame < source->frames() && channel < 2 ? source->stereo[frame * 2 + channel] : 0; }
 
-float PlaybackSnapshot::renderedSample(uint64_t frame, bool& available) const
+float RenderedAudio::sample(uint64_t frame) const
+{
+	if (chunks.empty() || !frames) { return 0; }
+	frame = std::min(frame, frames - 1);
+	const auto next = std::upper_bound(chunks.begin(), chunks.end(), frame,
+		[](uint64_t position, const Chunk& chunk) { return position < chunk.offset; });
+	const auto& chunk = *std::prev(next);
+	return (*chunk.samples)[frame - chunk.offset];
+}
+
+const PlaybackRegion* PlaybackSnapshot::renderedRegion(double frame) const
 {
 	const auto next = std::upper_bound(rendered.begin(), rendered.end(), frame,
-		[](uint64_t position, const PlaybackRegion& region) { return position < region.start; });
+		[](double position, const PlaybackRegion& region) { return position < region.start; });
 	if (next != rendered.begin())
 	{
 		const auto& region = *std::prev(next);
-		if (frame < region.end)
-		{
-			available = true;
-			return (*region.mono)[frame - region.storageStart];
-		}
+		if (frame < region.end) { return &region; }
 	}
-	available = false;
-	return 0;
+	return nullptr;
+}
+
+float PlaybackSnapshot::renderedSample(double frame, bool& available) const
+{
+	const auto* region = renderedRegion(frame);
+	available = region != nullptr;
+	if (!region) { return 0; }
+	const auto& audio = *region->audio;
+	const auto position = (frame - audio.inputStart) * audio.rate / source->rate;
+	const auto index = static_cast<uint64_t>(std::max(0.0, position));
+	const auto fraction = position - index;
+	// A display/audition lookup projects time into native PCM without storing
+	// a source-rate copy. Track playback consumes the native PCM directly.
+	return audio.sample(index) * (1 - fraction) + audio.sample(index + 1) * fraction;
 }
 
 float PlaybackSnapshot::trackSample(uint64_t frame, unsigned channel) const
@@ -79,12 +98,11 @@ uint64_t PlaybackState::begin(const std::vector<Segment>& segments)
 	return m_generation;
 }
 
-void PlaybackState::install(uint64_t start, std::shared_ptr<const std::vector<float>> data)
+void PlaybackState::install(uint64_t start, uint64_t end, std::shared_ptr<const RenderedAudio> audio)
 {
-	if (data->empty()) { return; }
+	if (start >= end) { return; }
 	auto next = std::make_shared<PlaybackSnapshot>();
 	next->source = m_snapshot->source;
-	const auto end = start + data->size();
 	for (const auto& region : m_snapshot->rendered)
 	{
 		if (region.end <= start || region.start >= end) { next->rendered.push_back(region); }
@@ -104,38 +122,21 @@ void PlaybackState::install(uint64_t start, std::shared_ptr<const std::vector<fl
 			}
 		}
 	}
-	next->rendered.push_back({start, end, start, m_generation, std::move(data)});
+	next->rendered.push_back({start, end, m_generation, std::move(audio)});
 	std::sort(next->rendered.begin(), next->rendered.end(),
 		[](const auto& first, const auto& second) { return first.start < second.start; });
 	std::atomic_store(&m_snapshot, std::shared_ptr<const PlaybackSnapshot>(next));
 }
 
-void PlaybackState::resample(RequestState& request, const std::vector<float>& data, uint64_t dataOffset, bool final)
+void PlaybackState::publishCoverage(RequestState& request, bool final)
 {
-	// Keep absolute phase across incoming chunks; only the last neighbor sample
-	// waits for the next chunk. Context/padding never enters an effective region.
-	auto samples = std::make_shared<std::vector<float>>();
 	const auto& segment = request.segment;
-	const uint64_t first = std::max(segment.start, segment.inputStart + request.cursor);
-	while (request.cursor < segment.transmittedFrames())
-	{
-		const double position = double(request.cursor) * request.rate / segment.sampleRate;
-		const auto index = static_cast<uint64_t>(std::floor(position));
-		const auto fraction = position - index;
-		if (!final && (index >= request.received || (fraction > 1e-12 && index + 1 >= request.received))) { break; }
-		const auto effectiveFrame = segment.inputStart + request.cursor;
-		if (effectiveFrame >= segment.start && effectiveFrame < segment.end)
-		{
-			const auto at = [&](uint64_t point) {
-				if (point < dataOffset || point - dataOffset >= data.size()) { return request.last; }
-				return data[point - dataOffset];
-			};
-			samples->push_back(at(index) * (1 - fraction) + at(index + 1) * fraction);
-		}
-		++request.cursor;
-	}
-	request.published += samples->size();
-	install(first, samples);
+	const auto covered = final
+		? segment.inputEnd
+		: segment.inputStart + static_cast<uint64_t>(double(request.received) * segment.sampleRate / request.rate);
+	const auto end = std::min(segment.end, covered);
+	request.published = end > segment.start ? end - segment.start : 0;
+	install(segment.start, end, request.audio);
 }
 
 bool PlaybackState::publish(const svc_event& event)
@@ -158,17 +159,23 @@ bool PlaybackState::publish(const svc_event& event)
 	if (projected > request.segment.transmittedFrames() + tolerance) { return false; }
 	request.request = QString::fromUtf8(event.request_id);
 	request.rate = event.sample_rate;
-	std::vector<float> decoded;
-	const auto offset = request.received ? request.received - 1 : 0;
-	if (request.received) { decoded.push_back(request.last); }
+	auto decoded = std::make_shared<std::vector<float>>();
+	decoded->reserve(event.sample_count);
 	for (uint64_t index = 0; index < event.sample_count; ++index)
 	{
-		decoded.push_back(qFromLittleEndian<int16_t>(event.bytes + index * 2) / 32768.0f);
+		decoded->push_back(qFromLittleEndian<int16_t>(event.bytes + index * 2) / 32768.0f);
 	}
+	auto audio = request.audio ? std::make_shared<RenderedAudio>(*request.audio) : std::make_shared<RenderedAudio>();
+	audio->rate = request.rate;
+	audio->inputStart = request.segment.inputStart;
+	audio->generation = event.generation_id;
+	audio->segment = event.segment_id;
+	audio->chunks.push_back({request.received, std::move(decoded)});
 	request.received += event.sample_count;
+	audio->frames = request.received;
+	request.audio = std::move(audio);
 	++request.chunks;
-	resample(request, decoded, offset, false);
-	request.last = decoded.back();
+	publishCoverage(request, false);
 	return true;
 }
 
@@ -192,7 +199,7 @@ bool PlaybackState::complete(uint64_t generation, uint64_t segment, svc_status t
 		request.terminal = SVC_FAILED;
 		return false;
 	}
-	resample(request, {request.last}, request.received - 1, true);
+	publishCoverage(request, true);
 	request.terminal = SVC_COMPLETE;
 	return true;
 }

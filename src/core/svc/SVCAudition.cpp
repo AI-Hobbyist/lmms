@@ -24,9 +24,7 @@ std::array<float, 2> auditionSampleLinear(
 	const auto next = std::min(frame + 1, snapshot.source->frames() - 1);
 	const auto fraction = position - frame;
 	bool available;
-	const auto bFirst = snapshot.renderedSample(frame, available);
-	const auto bNext = snapshot.renderedSample(next, available);
-	const auto b = bFirst * (1 - fraction) + bNext * fraction;
+	const auto b = snapshot.renderedSample(position, available);
 	for (unsigned channel = 0; channel < 2; ++channel)
 	{
 		const auto a

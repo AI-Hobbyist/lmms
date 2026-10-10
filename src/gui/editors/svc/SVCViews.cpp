@@ -214,12 +214,28 @@ void SVCClipView::paintEvent(QPaintEvent*)
 					// Sampling just one frame aliases the waveform when zoomed out.
 					for (auto frame = begin; frame < end; ++frame)
 					{
-						bool available = false;
-						const auto rendered = snapshot->renderedSample(frame, available);
-						peak.rendered |= available;
+						if (snapshot->renderedRegion(frame)) { continue; }
 						for (unsigned channel = 0; channel < 2; ++channel)
 						{
-							const auto value = available ? rendered : snapshot->sourceSample(frame, channel);
+							const auto value = snapshot->sourceSample(frame, channel);
+							peak.minimum = std::min(peak.minimum, value);
+							peak.maximum = std::max(peak.maximum, value);
+						}
+					}
+					for (const auto& region : snapshot->rendered)
+					{
+						const auto first = std::max(begin, region.start);
+						const auto last = std::min(end, region.end);
+						if (first >= last) { continue; }
+						peak.rendered = true;
+						const auto& audio = *region.audio;
+						const auto nativeFirst
+							= uint64_t(double(first - audio.inputStart) * audio.rate / snapshot->source->rate);
+						const auto nativeLast = std::min(audio.frames,
+							uint64_t(std::ceil(double(last - audio.inputStart) * audio.rate / snapshot->source->rate)));
+						for (auto frame = nativeFirst; frame < nativeLast; ++frame)
+						{
+							const auto value = audio.sample(frame);
 							peak.minimum = std::min(peak.minimum, value);
 							peak.maximum = std::max(peak.maximum, value);
 						}
