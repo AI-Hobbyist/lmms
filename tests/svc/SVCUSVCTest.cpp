@@ -10,6 +10,7 @@
 #include <QTcpSocket>
 #include <QUrlQuery>
 #include <QtEndian>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <future>
@@ -257,7 +258,8 @@ int main(int argc, char** argv)
 	QCoreApplication app(argc, argv);
 	check(argc >= 2, "module argument");
 	QLibrary module(QString::fromLocal8Bit(argv[1]));
-	check(module.load(), qPrintable(module.errorString()));
+	const auto loaded = module.load();
+	check(loaded, qPrintable(module.errorString()));
 	const auto entry = reinterpret_cast<svc_plugin_entry>(module.resolve("svc_plugin_entry_v1"));
 	check(entry && !entry(0), "ABI negotiation");
 	const auto* plugin = entry(SVC_ABI_VERSION);
@@ -340,6 +342,39 @@ int main(int argc, char** argv)
 		{
 			check(observer.error.contains("invalid_parameter") && observer.error.contains("trans"),
 				"structured API error");
+		}
+		plugin->destroy_context(context);
+	}
+	for (const auto test : {std::pair{-160, 48000}, std::pair{160, 48000}, std::pair{-1600, 48000}, std::pair{0, 32000},
+			 std::pair{0, 16000}, std::pair{0, 96000}})
+	{
+		const auto [delta, targetRate] = test;
+		const auto returned = QByteArray(32000 * 2, '\x20');
+		Server server(wave(32000, returned));
+		void* context = plugin->create_context(server.address().constData(), "test-secret");
+		const auto* json = plugin->engine->capabilities(context);
+		check(json, plugin->error(context));
+		const auto model = QJsonDocument::fromJson(json).object().value("models").toArray().first().toObject();
+		Observer observer;
+		const auto inputFrames = 32000 - delta;
+		observer.source = wave(32000, QByteArray(inputFrames * 2, '\x10'));
+		auto chosen = selection(model);
+		chosen.insert("output_sample_rate", targetRate);
+		const auto status = run(plugin, context, observer, chosen);
+		if (delta == -1600)
+		{
+			check(
+				status == SVC_FAILED && observer.pcm.isEmpty(), "large duration mismatch rejected before publication");
+		}
+		else
+		{
+			check(status == SVC_COMPLETE && observer.rate == uint32_t(targetRate)
+					&& observer.samples == uint64_t(std::llround(double(inputFrames) * targetRate / 32000)),
+				"frame-quantized output aligned and resampled to DAW rate");
+			if (!delta && targetRate == 32000)
+			{
+				check(observer.pcm == returned, "matching rates preserve PCM exactly");
+			}
 		}
 		plugin->destroy_context(context);
 	}

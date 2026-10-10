@@ -12,6 +12,8 @@
 #include <cmath>
 
 #include "ConfigManager.h"
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "SVCCache.h"
 #include "SVCCatalog.h"
 #include "SVCClip.h"
@@ -146,6 +148,10 @@ void ConversionService::renderClip(SVCClip* clip)
 	task->engine = Catalog::instance().engine(selection.value("engine_id").toString());
 	task->connectionIdentity = Catalog::instance().connection(task->engine.id).address;
 	task->selection = selection;
+	if (task->engine.id == "USVC")
+	{
+		task->selection.insert("output_sample_rate", int(Engine::audioEngine()->outputSampleRate()));
+	}
 	task->config = track->chunkConfig();
 	task->cacheDirectory = ConfigManager::inst()->aiCacheDir();
 	try

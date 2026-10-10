@@ -1593,21 +1593,38 @@ private slots:
 		auto& catalog = svc::Catalog::instance();
 		QVERIFY(catalog.setConnection("USVC", {"http://127.0.0.1:8001", "", false}).isEmpty());
 		QTRY_VERIFY_WITH_TIMEOUT(catalog.engine("USVC").api != nullptr, 120000);
+		const auto model = qEnvironmentVariable("LMMS_USVC_MODEL", "ddsp6/__test_ddsp65_multi");
+		const auto speaker = qEnvironmentVariable("LMMS_USVC_SPEAKER", "1");
 		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
-		QVERIFY(track->setSelection(
-			{{"engine_id", "USVC"}, {"model_id", "ddsp6/__test_ddsp65_multi"}, {"speaker_id", "1"}}));
+		QVERIFY(track->setSelection({{"engine_id", "USVC"}, {"model_id", model}, {"speaker_id", speaker}}));
 		auto* clip = static_cast<SVCClip*>(track->createClip(0));
 		QVERIFY(clip->setSourceFile(qEnvironmentVariable("LMMS_USVC_INPUT")));
 		{
 			gui::SVCWindow window(track, m_gui->mainWindow());
 			window.show();
 			QVERIFY(QTest::qWaitForWindowExposed(&window));
-			QCOMPARE(window.findChild<QComboBox*>("svcSpeaker")->currentData().toString(), QString("1"));
+			QCOMPARE(window.findChild<QComboBox*>("svcSpeaker")->currentData().toString(), speaker);
 			QVERIFY(window.findChild<QCheckBox*>("svcDefault_resample_sr")->isChecked());
 			QTest::mouseClick(window.findChild<QPushButton*>("svcReRender"), Qt::LeftButton);
 			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete() || clip->conversionFailed(), 600000);
 			QVERIFY2(clip->conversionComplete(), qPrintable(clip->status()));
 			QVERIFY(!clip->playback()->snapshot()->rendered.empty());
+			QCOMPARE(clip->playback()->snapshot()->rendered.back().end, clip->playback()->snapshot()->source->frames());
+			QDomDocument saved;
+			auto root = saved.createElement("clip");
+			clip->saveState(saved, root);
+			const auto references
+				= QJsonDocument::fromJson(root.firstChildElement().attribute("cacheReferences").toUtf8()).array();
+			QVERIFY(!references.isEmpty());
+			for (const auto& entry : references)
+			{
+				const auto reference = entry.toObject();
+				QFile metadata(QDir(ConfigManager::inst()->aiCacheDir())
+						.filePath("svc/USVC/output/" + reference.value("hash").toString() + ".wav.json"));
+				QVERIFY(metadata.open(QIODevice::ReadOnly));
+				const auto object = QJsonDocument::fromJson(metadata.readAll()).object();
+				QCOMPARE(object.value("sample_rate").toInt(), int(Engine::audioEngine()->outputSampleRate()));
+			}
 			QTest::qWait(300);
 			QVERIFY(window.screen()->grabWindow(window.winId()).save("build/tests/svc/USVC-live-native.png"));
 			window.close();

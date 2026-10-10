@@ -143,6 +143,7 @@ foreach ($required in @('data/themes/default/svs_track.svg')) {
 $requiredSvcFiles = @(
     'plugins/svcrvc.dll'
     'plugins/svcusvc.dll'
+    'plugins/samplerate.dll'
     'Qt6Network.dll'
     'data/themes/default/svc_track.svg'
     'data/themes/default/svc_render.svg'

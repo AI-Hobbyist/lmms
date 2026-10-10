@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <samplerate.h>
 #include <stdexcept>
+#include <vector>
 
 #include "../SVCRVC/Http.h"
 #include "svc_plugin.h"
@@ -232,12 +234,129 @@ struct Job
 	svc_request request{};
 	std::unique_ptr<svc_rvc::Http> http;
 	QTemporaryFile wave;
-	QByteArray token, errorBody;
+	QTemporaryFile normalized;
+	QFile* audio = &wave;
+	QByteArray token, errorBody, inputHeader;
+	uint64_t inputBytes = 0;
+	uint32_t outputRate = 0;
 	svc_status terminal = SVC_OK;
 	uint32_t rate = 0;
 	uint64_t samples = 0, offset = 0, chunk = 0, dataStart = 0;
 	uint64_t reportedBytes = UINT64_MAX;
 	bool decoded = false;
+
+	double inputDuration() const
+	{
+		if (inputHeader.size() < 12 || inputHeader.left(4) != "RIFF" || inputHeader.mid(8, 4) != "WAVE"
+			|| uint64_t(qFromLittleEndian<uint32_t>(inputHeader.constData() + 4)) + 8 != inputBytes)
+		{
+			throw std::runtime_error("Invalid USVC input WAV length");
+		}
+		uint32_t inputRate = 0, alignment = 0;
+		for (uint64_t at = 12; at + 8 <= uint64_t(inputHeader.size());)
+		{
+			const auto* header = inputHeader.constData() + at;
+			const auto length = qFromLittleEndian<uint32_t>(header + 4);
+			if (QByteArray(header, 4) == "fmt " && length >= 16 && at + 24 <= uint64_t(inputHeader.size()))
+			{
+				inputRate = qFromLittleEndian<uint32_t>(header + 12);
+				alignment = qFromLittleEndian<uint16_t>(header + 20);
+			}
+			if (QByteArray(header, 4) == "data" && inputRate && alignment && length && length % alignment == 0
+				&& at + 8 + length <= inputBytes)
+			{
+				return double(length / alignment) / inputRate;
+			}
+			at += 8ULL + length + (length & 1);
+		}
+		throw std::runtime_error("Missing USVC input WAV duration");
+	}
+
+	void normalize()
+	{
+		const auto duration = inputDuration();
+		const auto expected = uint64_t(std::llround(duration * rate));
+		// Feature/vocoder frames quantize the endpoint. Correct only a bounded tail;
+		// keep the start and all interior samples in place, and reject larger mismatches.
+		if (!expected || std::abs(double(samples) - expected) > std::ceil(rate * .020) + 1)
+		{
+			throw std::runtime_error("USVC output duration differs from input by more than 20 ms");
+		}
+		const auto targetRate = outputRate ? outputRate : rate;
+		if (samples == expected && targetRate == rate) { return; }
+		if (!normalized.open()) { throw std::runtime_error("Cannot prepare normalized USVC audio"); }
+		int error = 0;
+		std::unique_ptr<SRC_STATE, decltype(&src_delete)> converter(
+			targetRate == rate ? nullptr : src_new(SRC_SINC_FASTEST, 1, &error), src_delete);
+		if (targetRate != rate && !converter) { throw std::runtime_error(src_strerror(error)); }
+		const auto targetSamples = uint64_t(std::llround(duration * targetRate));
+		uint64_t inputOffset = 0, written = 0;
+		std::vector<float> output(SVC_MAX_FEED / 2);
+		const auto write = [&](const float* values, uint64_t count) {
+			count = std::min(count, targetSamples - written);
+			QByteArray pcm(count * 2, 0);
+			for (uint64_t index = 0; index < count; ++index)
+			{
+				qToLittleEndian<int16_t>(int16_t(std::clamp(std::llround(values[index] * 32768.), -32768LL, 32767LL)),
+					pcm.data() + index * 2);
+			}
+			if (normalized.write(pcm) != pcm.size()) { throw std::runtime_error("Cannot write normalized USVC audio"); }
+			written += count;
+		};
+		while (inputOffset < expected)
+		{
+			const auto count = std::min<uint64_t>(SVC_MAX_FEED / 2, expected - inputOffset);
+			const auto available = inputOffset < samples ? std::min(count, samples - inputOffset) : 0;
+			const auto bytes = wave.read(available * 2);
+			if (uint64_t(bytes.size()) != available * 2) { throw std::runtime_error("Cannot read USVC audio tail"); }
+			std::vector<float> input(count, 0);
+			for (uint64_t index = 0; index < available; ++index)
+			{
+				input[index] = qFromLittleEndian<int16_t>(bytes.constData() + index * 2) / 32768.f;
+			}
+			inputOffset += count;
+			if (!converter)
+			{
+				write(input.data(), count);
+				continue;
+			}
+			long consumed = 0;
+			for (;;)
+			{
+				SRC_DATA data{};
+				data.data_in = input.data() + consumed;
+				data.input_frames = long(count) - consumed;
+				data.data_out = output.data();
+				data.output_frames = long(output.size());
+				data.src_ratio = double(targetRate) / rate;
+				data.end_of_input = inputOffset == expected;
+				if (const auto result = src_process(converter.get(), &data))
+				{
+					throw std::runtime_error(src_strerror(result));
+				}
+				consumed += data.input_frames_used;
+				write(output.data(), data.output_frames_gen);
+				if (consumed == long(count) && (!data.end_of_input || !data.output_frames_gen)) { break; }
+				if (!data.input_frames_used && !data.output_frames_gen)
+				{
+					throw std::runtime_error("USVC resampler stalled");
+				}
+			}
+		}
+		if (written < targetSamples)
+		{
+			if (targetSamples - written > 1) { throw std::runtime_error("USVC resampler length mismatch"); }
+			const float zero = 0;
+			write(&zero, 1);
+		}
+		if (!normalized.flush() || !normalized.seek(0))
+		{
+			throw std::runtime_error("Cannot rewind normalized USVC audio");
+		}
+		rate = targetRate;
+		samples = targetSamples;
+		audio = &normalized;
+	}
 
 	bool deliver(svc_event_type type, const QByteArray& bytes = {}, uint64_t count = 0)
 	{
@@ -323,6 +442,7 @@ struct Job
 		{
 			throw std::runtime_error("USVC WAV metadata mismatch");
 		}
+		normalize();
 		decoded = true;
 		deliver(SVC_START,
 			QJsonDocument(QJsonObject{{"codec", "pcm_s16le"}, {"sample_rate", int(rate)}, {"channels", 1},
@@ -422,6 +542,16 @@ void* start(void* opaque, const svc_request* request)
 		job->request = *request;
 		job->request.selection_json = nullptr;
 		job->token = context.token;
+		if (selection.contains("output_sample_rate"))
+		{
+			const auto value = selection.value("output_sample_rate");
+			if (!value.isDouble() || value.toDouble() != value.toInt() || value.toInt() < 8000
+				|| value.toInt() > 192000)
+			{
+				return nullptr;
+			}
+			job->outputRate = value.toInt();
+		}
 		if (!job->wave.open()) { return nullptr; }
 		job->http = std::make_unique<svc_rvc::Http>(url, context.token, true, 600000);
 		return job.release();
@@ -444,6 +574,12 @@ svc_status pump(void* opaque)
 			job.http->pump(
 				[&](uint8_t* data, size_t count) {
 					const auto read = job.request.read(job.request.input_user, data, count);
+					if (read > 0 && uint64_t(read) <= count)
+					{
+						job.inputBytes += read;
+						job.inputHeader.append(reinterpret_cast<const char*>(data),
+							std::min<qint64>(read, SVC_MAX_HEADER - job.inputHeader.size()));
+					}
 					return read > 0 && job.http->sent() + read > 67108864 ? int64_t(-1) : read;
 				},
 				[&](const uint8_t* data, size_t count) {
@@ -485,7 +621,7 @@ svc_status pump(void* opaque)
 		if (job.offset < job.samples)
 		{
 			const auto count = std::min<uint64_t>(SVC_MAX_FEED / 2, job.samples - job.offset);
-			const auto bytes = job.wave.read(count * 2);
+			const auto bytes = job.audio->read(count * 2);
 			if (uint64_t(bytes.size()) != count * 2) { throw std::runtime_error("Cannot read USVC audio"); }
 			++job.chunk;
 			if (job.deliver(SVC_AUDIO, bytes, count)) { job.offset += count; }
