@@ -61,8 +61,10 @@ extern "C" svc_status svc_validate_capabilities(const char* json, size_t count, 
 			if (type == "number" || type == "integer")
 			{
 				const auto value = parameter.value("default");
-				if (!value.isDouble() || !std::isfinite(value.toDouble())
-					|| (type == "integer" && std::floor(value.toDouble()) != value.toDouble()))
+				const bool nullDefault = value.isNull() && parameter.value("nullable").toBool();
+				if (!nullDefault
+					&& (!value.isDouble() || !std::isfinite(value.toDouble())
+						|| (type == "integer" && std::floor(value.toDouble()) != value.toDouble())))
 				{
 					reason = "Invalid numeric default";
 				}
@@ -74,8 +76,10 @@ extern "C" svc_status svc_validate_capabilities(const char* json, size_t count, 
 					}
 				}
 				if ((parameter.contains("step") && parameter.value("step").toDouble() <= 0)
-					|| (parameter.contains("minimum") && value.toDouble() < parameter.value("minimum").toDouble())
-					|| (parameter.contains("maximum") && value.toDouble() > parameter.value("maximum").toDouble()))
+					|| (!nullDefault && parameter.contains("minimum")
+						&& value.toDouble() < parameter.value("minimum").toDouble())
+					|| (!nullDefault && parameter.contains("maximum")
+						&& value.toDouble() > parameter.value("maximum").toDouble()))
 				{
 					reason = "Default outside bounds or nonpositive step";
 				}

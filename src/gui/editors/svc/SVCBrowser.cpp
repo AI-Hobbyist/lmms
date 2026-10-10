@@ -77,7 +77,29 @@ void SVCBrowser::refresh()
 		for (const auto& value : engine.capabilities.value("models").toArray())
 		{
 			const auto model = value.toObject();
-			auto* leaf = new QTreeWidgetItem(branch, {model.value("name").toString(model.value("id").toString())});
+			auto* parent = branch;
+			for (const auto& category : model.value("category_path").toArray())
+			{
+				const auto name = category.toString();
+				if (name.isEmpty()) { continue; }
+				QTreeWidgetItem* group = nullptr;
+				for (int index = 0; index < parent->childCount(); ++index)
+				{
+					auto* child = parent->child(index);
+					if (child->data(0, Qt::UserRole + 1).toString() == name)
+					{
+						group = child;
+						break;
+					}
+				}
+				if (!group)
+				{
+					group = new QTreeWidgetItem(parent, {name});
+					group->setData(0, Qt::UserRole + 1, name);
+				}
+				parent = group;
+			}
+			auto* leaf = new QTreeWidgetItem(parent, {model.value("name").toString(model.value("id").toString())});
 			leaf->setIcon(0, embed::getIconPixmap("svc_track.svg"));
 			QJsonObject selection{{"engine_id", engine.id}, {"model_id", model.value("id")}};
 			const auto weights = model.value("weights").toArray();
@@ -86,7 +108,7 @@ void SVCBrowser::refresh()
 				selection.insert("weight_id", weights.first().toObject().value("id"));
 			}
 			const auto speakers = model.value("speakers").toArray();
-			if (speakers.size() <= 1)
+			if (!model.value("multi_speaker").toBool(speakers.size() > 1))
 			{
 				if (!speakers.isEmpty()) { selection.insert("speaker_id", speakers.first().toObject().value("id")); }
 				attach(leaf, selection, model);

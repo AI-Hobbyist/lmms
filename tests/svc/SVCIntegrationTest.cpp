@@ -1,13 +1,16 @@
 #include <QAction>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QContextMenuEvent>
 #include <QDomDocument>
 #include <QDoubleSpinBox>
+#include <QDragEnterEvent>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMimeData>
 #include <QPointer>
 #include <QPushButton>
 #include <QScreen>
@@ -24,6 +27,7 @@
 #include <cmath>
 
 #include "AudioDummy.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
@@ -1487,6 +1491,125 @@ private slots:
 			delete copy;
 			QTest::qWait(300);
 			QVERIFY(window.screen()->grabWindow(window.winId()).save("build/tests/svc/SVC-M4-RVC-native.png"));
+			window.close();
+		}
+		delete track;
+		QTest::qWait(50);
+	}
+
+	void usvcMetadataNative()
+	{
+		auto profile = svc::Catalog::instance().engine("reference");
+		profile.id = "usvc-metadata";
+		profile.name = "USVC metadata";
+		profile.capabilities.insert("engine_id", profile.id);
+		QJsonArray parameters{QJsonObject{{"id", "target_loudness"}, {"name", "target_loudness"}, {"type", "number"},
+								  {"unit", "LUFS"}, {"scope", "convert"}, {"default", QJsonValue::Null},
+								  {"nullable", true}, {"minimum", -70}, {"maximum", 0}},
+			QJsonObject{{"id", "resample_sr"}, {"name", "resample_sr"}, {"type", "integer"}, {"unit", "Hz"},
+				{"scope", "convert"}, {"default", QJsonValue::Null}, {"nullable", true}, {"minimum", 8000},
+				{"maximum", 192000}},
+			QJsonObject{{"id", "restore_loudness"}, {"name", "restore_loudness"}, {"type", "enum"}, {"unit", ""},
+				{"scope", "convert"}, {"default", "true"},
+				{"options", QJsonArray{QJsonObject{{"id", "true"}, {"name", "True"}, {"available", true}}}},
+				{"enabled_when", QJsonObject{{"target_loudness", QJsonObject{{"not", QJsonValue::Null}}}}}}};
+		QJsonObject model{{"id", "metadata/model"}, {"name", QString::fromUtf8("节点返回模型")},
+			{"category_path", QJsonArray{"backend-from-node"}}, {"parameters", parameters},
+			{"speakers",
+				QJsonArray{QJsonObject{{"id", "0"}, {"name", QString::fromUtf8("测试甲")}},
+					QJsonObject{{"id", "1"}, {"name", QString::fromUtf8("测试乙")}}}}};
+		profile.capabilities.insert("parameters", parameters);
+		profile.capabilities.insert("models", QJsonArray{model});
+		QVERIFY(svc::Catalog::instance().install(profile).isEmpty());
+		gui::SVCBrowser browser(nullptr);
+		browser.resize(340, 480);
+		browser.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&browser));
+		auto* tree = browser.findChild<QTreeWidget*>("svcBrowserTree");
+		QVERIFY(tree);
+		const auto branches = tree->findItems(profile.name, Qt::MatchExactly);
+		QCOMPARE(branches.size(), 1);
+		auto* group = branches.first()->child(0);
+		QCOMPARE(group->text(0), QString("backend-from-node"));
+		QCOMPARE(group->child(0)->text(0), model.value("name").toString());
+		QCOMPARE(group->child(0)->childCount(), 2);
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		QTest::qWait(50);
+		gui::SVCTrackView* view = nullptr;
+		for (auto* candidate : m_gui->mainWindow()->findChildren<gui::SVCTrackView*>())
+		{
+			if (candidate->getTrack() == track) { view = candidate; }
+		}
+		QVERIFY(view);
+		const auto payload = group->child(0)->child(1)->data(0, Qt::UserRole).toString().toUtf8();
+		QMimeData mime;
+		mime.setData(Clipboard::mimeType(Clipboard::MimeType::StringPair), "svcselection:" + payload);
+		QDragEnterEvent enter(QPoint(20, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+		QCoreApplication::sendEvent(view, &enter);
+		QVERIFY(enter.isAccepted());
+		QDropEvent drop(QPointF(20, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+		QCoreApplication::sendEvent(view, &drop);
+		QVERIFY(drop.isAccepted());
+		QCOMPARE(track->selection().value("engine_id").toString(), profile.id);
+		QCOMPARE(track->selection().value("model_id"), model.value("id"));
+		QCOMPARE(track->selection().value("speaker_id").toString(), QString("1"));
+		{
+			gui::SVCWindow window(track, m_gui->mainWindow());
+			window.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&window));
+			auto* automatic = window.findChild<QCheckBox*>("svcDefault_target_loudness");
+			auto* value = window.findChild<QDoubleSpinBox*>("svcValue_target_loudness");
+			auto* dependent = window.findChild<QWidget*>("svcParameter_restore_loudness");
+			QVERIFY(automatic && value && dependent);
+			QVERIFY(automatic->isChecked() && !value->isEnabled() && !dependent->isEnabled());
+			QString error;
+			auto frozen = svc::Catalog::instance().requestSelection(track->selection(), error);
+			QVERIFY2(error.isEmpty(), qPrintable(error));
+			QVERIFY(frozen.value("parameters").toObject().value("resample_sr").isNull());
+			QVERIFY(!frozen.value("parameters").toObject().contains("restore_loudness"));
+			QTest::mouseClick(automatic, Qt::LeftButton, Qt::NoModifier, QPoint(8, automatic->height() / 2));
+			value->setValue(-18);
+			QVERIFY(value->isEnabled() && dependent->isEnabled());
+			QCOMPARE(track->selection().value("parameters").toObject().value("target_loudness").toDouble(), -18.);
+			QTest::mouseClick(automatic, Qt::LeftButton, Qt::NoModifier, QPoint(8, automatic->height() / 2));
+			QVERIFY(!dependent->isEnabled());
+			QVERIFY(track->selection().value("parameters").toObject().value("target_loudness").isNull());
+			QTest::qWait(300);
+			QVERIFY(window.screen()->grabWindow(window.winId()).save("build/tests/svc/USVC-nullable-native.png"));
+			window.close();
+		}
+		QTest::qWait(300);
+		QVERIFY(browser.screen()->grabWindow(browser.winId()).save("build/tests/svc/USVC-category-native.png"));
+		browser.close();
+		delete track;
+		profile.api = nullptr;
+		QVERIFY(svc::Catalog::instance().install(profile).isEmpty());
+		QTest::qWait(50);
+	}
+
+	void usvcLiveNative()
+	{
+		if (!qEnvironmentVariableIsSet("LMMS_USVC_LIVE")) { QSKIP("Optional USVC live service validation"); }
+		auto& catalog = svc::Catalog::instance();
+		QVERIFY(catalog.setConnection("USVC", {"http://127.0.0.1:8001", "", false}).isEmpty());
+		QTRY_VERIFY_WITH_TIMEOUT(catalog.engine("USVC").api != nullptr, 120000);
+		auto* track = static_cast<SVCTrack*>(Track::create(Track::Type::SVC, Engine::getSong()));
+		QVERIFY(track->setSelection(
+			{{"engine_id", "USVC"}, {"model_id", "ddsp6/__test_ddsp65_multi"}, {"speaker_id", "1"}}));
+		auto* clip = static_cast<SVCClip*>(track->createClip(0));
+		QVERIFY(clip->setSourceFile(qEnvironmentVariable("LMMS_USVC_INPUT")));
+		{
+			gui::SVCWindow window(track, m_gui->mainWindow());
+			window.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&window));
+			QCOMPARE(window.findChild<QComboBox*>("svcSpeaker")->currentData().toString(), QString("1"));
+			QVERIFY(window.findChild<QCheckBox*>("svcDefault_resample_sr")->isChecked());
+			QTest::mouseClick(window.findChild<QPushButton*>("svcReRender"), Qt::LeftButton);
+			QTRY_VERIFY_WITH_TIMEOUT(clip->conversionComplete() || clip->conversionFailed(), 600000);
+			QVERIFY2(clip->conversionComplete(), qPrintable(clip->status()));
+			QVERIFY(!clip->playback()->snapshot()->rendered.empty());
+			QTest::qWait(300);
+			QVERIFY(window.screen()->grabWindow(window.winId()).save("build/tests/svc/USVC-live-native.png"));
 			window.close();
 		}
 		delete track;

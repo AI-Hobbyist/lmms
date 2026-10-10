@@ -513,6 +513,13 @@ void SVCWindow::selectClip(SVCClip* clip)
 	m_clips->setCurrentIndex(index);
 	m_updating = false;
 }
+void SVCWindow::refreshSelection()
+{
+	// A sidebar drop supplies a new selection, so old controls must not overwrite it.
+	m_parameters = {};
+	refreshEngines();
+}
+
 void SVCWindow::refreshEngines()
 {
 	if (!m_track) { return; }
@@ -622,6 +629,32 @@ void SVCWindow::refreshParameters()
 				saveSelection();
 				refreshParameterAvailability();
 			});
+		}
+		else if (parameter.value("nullable").toBool())
+		{
+			auto* automatic = new QCheckBox(tr("Default"), row);
+			automatic->setObjectName("svcDefault_" + id);
+			automatic->setChecked(m_parameters.value(id).isNull());
+			auto* edit = new QDoubleSpinBox(row);
+			edit->setObjectName("svcValue_" + id);
+			edit->setDecimals(parameter.value("type") == "integer" ? 0 : 4);
+			edit->setRange(parameter.value("minimum").toDouble(-1e12), parameter.value("maximum").toDouble(1e12));
+			edit->setSingleStep(parameter.value("step").toDouble(1));
+			edit->setKeyboardTracking(false);
+			edit->setValue(m_parameters.value(id).toDouble(parameter.value("minimum").toDouble()));
+			edit->setEnabled(!automatic->isChecked());
+			body->addWidget(automatic);
+			body->addWidget(edit);
+			body->addWidget(new QLabel(displayUnit, row));
+			const auto update = [this, automatic, edit, id] {
+				edit->setEnabled(!automatic->isChecked());
+				m_parameters.insert(
+					id, automatic->isChecked() ? QJsonValue(QJsonValue::Null) : QJsonValue(edit->value()));
+				saveSelection();
+				refreshParameterAvailability();
+			};
+			connect(automatic, &QCheckBox::toggled, this, update);
+			connect(edit, &QDoubleSpinBox::valueChanged, this, update);
 		}
 		else if (parameter.value("control") == "slider")
 		{

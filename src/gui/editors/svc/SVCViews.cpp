@@ -5,6 +5,7 @@
 #include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QJsonDocument>
 #include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
@@ -24,6 +25,7 @@
 #include "SVCConversion.h"
 #include "SVCTrack.h"
 #include "SVCWindow.h"
+#include "StringPairDrag.h"
 #include "TrackLabelButton.h"
 #include "embed.h"
 
@@ -131,6 +133,37 @@ QMenu* SVCTrackView::createMixerMenu(QString title, QString newMixerLabel)
 		menu->addAction(tr("%1: %2").arg(index).arg(candidate->m_name), this, [assign, index] { assign(index); });
 	}
 	return menu;
+}
+
+void SVCTrackView::dragEnterEvent(QDragEnterEvent* event)
+{
+	if (StringPairDrag::decodeKey(event) == "svcselection") { event->acceptProposedAction(); }
+	else
+	{
+		TrackView::dragEnterEvent(event);
+	}
+}
+
+void SVCTrackView::dropEvent(QDropEvent* event)
+{
+	if (StringPairDrag::decodeKey(event) == "svcselection")
+	{
+		const auto selection = QJsonDocument::fromJson(StringPairDrag::decodeValue(event).toUtf8()).object();
+		if (!selection.value("engine_id").toString().isEmpty() && !selection.value("model_id").toString().isEmpty()
+			&& static_cast<SVCTrack*>(getTrack())->setSelection(selection))
+		{
+			if (m_window) { m_window->refreshSelection(); }
+			event->acceptProposedAction();
+		}
+		else
+		{
+			event->ignore();
+		}
+	}
+	else
+	{
+		TrackView::dropEvent(event);
+	}
 }
 
 void SVCTrackView::openWindow(SVCClip* clip)

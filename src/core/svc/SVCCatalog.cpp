@@ -42,6 +42,16 @@ bool conditionsMatch(const QJsonObject& conditions, const QJsonObject& values)
 {
 	for (auto it = conditions.begin(); it != conditions.end(); ++it)
 	{
+		if (it.value().isObject() && it.value().toObject().contains("not"))
+		{
+			const auto excluded = it.value().toObject().value("not");
+			const auto actual = values.value(it.key());
+			if (actual.isUndefined() || (excluded.isArray() ? excluded.toArray().contains(actual) : actual == excluded))
+			{
+				return false;
+			}
+			continue;
+		}
 		if (it.value().isArray() ? !it.value().toArray().contains(values.value(it.key()))
 								 : values.value(it.key()) != it.value())
 		{
@@ -492,10 +502,11 @@ QJsonObject Catalog::requestSelection(const QJsonObject& saved, QString& error) 
 				return {};
 			}
 		}
-		else if (!value.isDouble() || !std::isfinite(value.toDouble())
-			|| (parameter.value("type") == "integer" && value.toDouble() != std::floor(value.toDouble()))
-			|| (parameter.contains("minimum") && value.toDouble() < parameter.value("minimum").toDouble())
-			|| (parameter.contains("maximum") && value.toDouble() > parameter.value("maximum").toDouble()))
+		else if (!(value.isNull() && parameter.value("nullable").toBool())
+			&& (!value.isDouble() || !std::isfinite(value.toDouble())
+				|| (parameter.value("type") == "integer" && value.toDouble() != std::floor(value.toDouble()))
+				|| (parameter.contains("minimum") && value.toDouble() < parameter.value("minimum").toDouble())
+				|| (parameter.contains("maximum") && value.toDouble() > parameter.value("maximum").toDouble())))
 		{
 			error = tr("SVC parameter is outside the backend range: %1").arg(parameter.value("name").toString());
 			return {};

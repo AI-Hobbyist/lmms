@@ -62,6 +62,7 @@ public:
 	explicit SVCWindow(SVCTrack* track, QWidget* parent = nullptr);
 	~SVCWindow() override;
 	void selectClip(SVCClip* clip);
+	void refreshSelection();
 	std::shared_ptr<svc::AuditionState> audition() const { return m_audition; }
 
 private:

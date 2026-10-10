@@ -19,6 +19,10 @@ public:
 	FadeButton* getActivityIndicator() override { return m_activityIndicator; }
 	void openWindow(SVCClip* clip = nullptr);
 
+protected:
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
+
 private:
 	QPointer<SVCWindow> m_window;
 	FadeButton* m_activityIndicator = nullptr;

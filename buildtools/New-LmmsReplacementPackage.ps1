@@ -142,6 +142,7 @@ foreach ($required in @('data/themes/default/svs_track.svg')) {
 }
 $requiredSvcFiles = @(
     'plugins/svcrvc.dll'
+    'plugins/svcusvc.dll'
     'Qt6Network.dll'
     'data/themes/default/svc_track.svg'
     'data/themes/default/svc_render.svg'
@@ -174,7 +175,7 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
         [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
     })
 $manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records; RemoveFiles = $removedSvs }
-$manifest.EnabledSvcPluginCount = 1
+$manifest.EnabledSvcPluginCount = 2
 if ($BaseManifest) {
     $base = Get-Content -LiteralPath $BaseManifest -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($base.Format -ne 1 -or $base.PackageKind -eq 'Incremental' -or -not $base.Files.Count) {
