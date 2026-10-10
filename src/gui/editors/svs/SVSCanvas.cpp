@@ -1,5 +1,6 @@
 #include "SVSCanvas.h"
 #include "NoteLabelDisplay.h"
+#include "NativePluginTranslation.h"
 #include "GuiApplication.h"
 #include "PianoRoll.h"
 #include "SVSTrack.h"
@@ -34,6 +35,8 @@
 #include <QHelpEvent>
 #include <QLineEdit>
 #include <QTimer>
+#include <QElapsedTimer>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QInputDialog>
 #include <QUuid>
@@ -43,6 +46,52 @@
 namespace lmms::gui {
 namespace {
 constexpr int KeyboardWidth = 60, TimelineHeight = 24;
+class SynthesisStrip final : public QWidget
+{
+public:
+	SynthesisStrip(QWidget* parent, std::function<void(QPainter&)> paint, std::function<bool()> active)
+		: QWidget(parent)
+		, m_paint(std::move(paint))
+		, m_active(std::move(active))
+	{
+		setObjectName("svsSynthesisProgressStrip");
+		setAttribute(Qt::WA_TransparentForMouseEvents);
+		m_timer.setInterval(16);
+		connect(&m_timer, &QTimer::timeout, this, qOverload<>(&QWidget::update));
+	}
+	void refresh()
+	{
+		if (isVisible() && m_active())
+		{
+			if (!m_timer.isActive())
+			{
+				m_clock.start();
+				m_timer.start();
+			}
+		}
+		else
+		{
+			m_timer.stop();
+		}
+		update();
+	}
+	double phase() const { return m_timer.isActive() ? (m_clock.elapsed() % 1250) / 1250. : -1.; }
+
+protected:
+	void showEvent(QShowEvent*) override { refresh(); }
+	void hideEvent(QHideEvent*) override { m_timer.stop(); }
+	void paintEvent(QPaintEvent*) override
+	{
+		QPainter painter(this);
+		m_paint(painter);
+	}
+
+private:
+	std::function<void(QPainter&)> m_paint;
+	std::function<bool()> m_active;
+	QTimer m_timer;
+	QElapsedTimer m_clock;
+};
 void fillReferenceCurve(QPainter& painter, const QPainterPath& path, QColor color, double baseline)
 {
 	QPainterPath area;
@@ -128,10 +177,92 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 	m_timeLine->setObjectName("svsClipTimeline");
 	m_timeLine->setFixedHeight(TimelineHeight);
 	m_timeLine->setSnapSize(m_quantization / TimePos::ticksPerBar());
+	auto running = [this] {
+		if (!m_clip || m_parameter)
+		{
+			return false;
+		}
+		const auto prefix = QCoreApplication::translate("NativeSVS", "Rendering %1/%2").section("%1", 0, 0);
+		return m_clip->status() == "Rendering" || m_clip->status().startsWith(prefix);
+	};
+	auto* strip = new SynthesisStrip(m_timeLine, [this, running](QPainter& painter) {
+		if (!m_clip || m_parameter)
+		{
+			return;
+		}
+		const auto status = m_clip->status();
+		const bool failed = m_clip->readOnly() || status.startsWith("Failed")
+			|| status.startsWith("Missing voice/plugin") || status.startsWith("Unsupported");
+		const auto rendering = m_colors.value("synthesisRenderingColor", QColor("#e5c35b"));
+		const auto ready = m_colors.value("synthesisReadyColor", QColor("#69c78f"));
+		const auto error = m_colors.value("synthesisErrorColor", QColor("#e77474"));
+		painter.setClipRect(QRect(KeyboardWidth, 0, width() - KeyboardWidth, 4));
+		const double clipStart = -int(m_clip->startTimeOffset());
+		const double clipEnd = clipStart + int(m_clip->length());
+		auto drawRange = [&](double start, double end, bool completed) {
+			start = std::max(start, clipStart);
+			end = std::min(end, clipEnd);
+			if (end <= start)
+			{
+				return;
+			}
+			completed = completed && !m_clip->readOnly();
+			const auto color = completed ? ready : failed ? error : rendering;
+			const QRectF range(pointAt(start, 0).x(), 0, (end - start) * m_pixelsPerTick, 4);
+			painter.fillRect(range, color);
+			const auto phase = static_cast<SynthesisStrip*>(m_synthesisStrip)->phase();
+			if (!completed && !failed && running() && phase >= 0)
+			{
+				const auto bandWidth = std::max(16., range.width() * .4);
+				const auto left = range.left() - bandWidth + phase * (range.width() + bandWidth);
+				QLinearGradient gradient(left, 0, left + bandWidth, 0);
+				gradient.setColorAt(0, QColor(255, 255, 255, 0));
+				gradient.setColorAt(.5, QColor(255, 255, 255, 128));
+				gradient.setColorAt(1, QColor(255, 255, 255, 0));
+				painter.save();
+				painter.setClipRect(range, Qt::IntersectClip);
+				painter.fillRect(QRectF(left, 0, bandWidth, 4), gradient);
+				painter.restore();
+			}
+		};
+		const auto& segments = m_clip->synthesisSegments();
+		if (segments.isEmpty())
+		{
+			const bool completed = m_clip->audio()
+				&& (status == "Ready" || status == "Missing voice/plugin: cached audio");
+			drawRange(clipStart, clipEnd, completed);
+		}
+		else
+		{
+			for (const auto& segment : segments)
+			{
+				if (segment.input.notes.isEmpty())
+				{
+					continue;
+				}
+				double start = segment.input.notes.front().tick, end = start;
+				for (const auto& note : segment.input.notes)
+				{
+					start = std::min(start, note.tick);
+					end = std::max(end, note.tick + note.duration);
+				}
+				drawRange(start, end, bool(segment.audio));
+			}
+		}
+	}, running);
+	m_synthesisStrip = strip;
+	m_synthesisStrip->setGeometry(0, 0, width(), 4);
+	m_timeLine->setToolTip(nativeTranslation::svsStatus(clip->status()));
+	connect(clip, &Clip::dataChanged, strip, [this, strip] {
+		m_timeLine->setToolTip(nativeTranslation::svsStatus(m_clip->status()));
+		strip->refresh();
+	});
 	connect(this, &SVSCanvas::viewportChanged, this, [this] {
 		m_timelineBegin = TimePos(int(m_scrollTick));
 		m_timeLine->setPixelsPerBar(m_pixelsPerTick * TimePos::ticksPerBar());
 		m_timeLine->setFixedWidth(width());
+		m_synthesisStrip->setGeometry(0, 0, width(), 4);
+		m_synthesisStrip->update();
 	});
 	connect(&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionChanged, this,
 		qOverload<>(&SVSCanvas::update));

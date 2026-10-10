@@ -69,6 +69,7 @@ public:
 	{
 		m_colors = colors;
 		update();
+		if (m_synthesisStrip) { m_synthesisStrip->update(); }
 	}
 	void setPortrait(const QImage& image, bool visible, int transparency, QPointF position = {1, 1});
 	QSize portraitTargetSize() const;
@@ -116,6 +117,7 @@ protected:
 private:
 	TimePos m_timelineBegin;
 	TimeLineWidget* m_timeLine = nullptr;
+	QWidget* m_synthesisStrip = nullptr;
 	double playbackTick() const;
 	enum class Action
 	{

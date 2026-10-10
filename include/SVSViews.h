@@ -70,6 +70,9 @@ class SVSPianoRoll : public QMainWindow
 	Q_PROPERTY(QColor invalidColor READ invalidColor WRITE setinvalidColor)
 	Q_PROPERTY(QColor renderingColor READ renderingColor WRITE setrenderingColor)
 	Q_PROPERTY(QColor errorColor READ errorColor WRITE seterrorColor)
+	Q_PROPERTY(QColor synthesisRenderingColor READ synthesisRenderingColor WRITE setSynthesisRenderingColor)
+	Q_PROPERTY(QColor synthesisReadyColor READ synthesisReadyColor WRITE setSynthesisReadyColor)
+	Q_PROPERTY(QColor synthesisErrorColor READ synthesisErrorColor WRITE setSynthesisErrorColor)
 public:
 	explicit SVSPianoRoll(SVSClip*, QWidget* parent = nullptr);
 	void openIn(MainWindow*);
@@ -124,6 +127,12 @@ public:
 	void setrenderingColor(const QColor& value) { setThemeColor(QStringLiteral("renderingColor"), value); }
 	QColor errorColor() const { return m_colors.value(QStringLiteral("errorColor")); }
 	void seterrorColor(const QColor& value) { setThemeColor(QStringLiteral("errorColor"), value); }
+	QColor synthesisRenderingColor() const { return m_colors.value("synthesisRenderingColor"); }
+	void setSynthesisRenderingColor(const QColor& value) { setThemeColor("synthesisRenderingColor", value); }
+	QColor synthesisReadyColor() const { return m_colors.value("synthesisReadyColor"); }
+	void setSynthesisReadyColor(const QColor& value) { setThemeColor("synthesisReadyColor", value); }
+	QColor synthesisErrorColor() const { return m_colors.value("synthesisErrorColor"); }
+	void setSynthesisErrorColor(const QColor& value) { setThemeColor("synthesisErrorColor", value); }
 
 protected:
 	void changeEvent(QEvent*) override;

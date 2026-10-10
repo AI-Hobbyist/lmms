@@ -46,6 +46,7 @@ public:
 	std::shared_ptr<const svs::VolumeAutomation> volumeAutomation() const
 	{ return std::atomic_load(&m_volumeAutomation); }
 	QString status() const { return m_status; }
+	const QVector<svs::SynthesisSegment>& synthesisSegments() const { return m_segments; }
 	QString id() const { return m_id; }
 	const QJsonObject& parameters() const { return m_parameters; }
 	bool setParameter(const QString&, const QJsonValue&);

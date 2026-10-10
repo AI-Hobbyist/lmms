@@ -580,6 +580,69 @@ private slots:
 		capture(&dialog, "M4-export-" + language);
 		dialog.close();
 	}
+	void synthesisStatusStrip()
+	{
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		SVSPianoRoll editor(clip);
+		editor.resize(1100, 660);
+		capture(&editor, "synthesis-strip-pending");
+		auto* canvas = editor.findChild<SVSCanvas*>("svsNoteCanvas");
+		QVERIFY(canvas && !editor.findChild<QLabel*>("svsSynthesisStatus"));
+		auto* strip = canvas->findChild<QWidget*>("svsSynthesisProgressStrip");
+		QVERIFY(strip && strip->isVisible());
+		QCOMPARE(strip->height(), 4);
+		auto stripImage = [&] {
+			const auto origin = strip->mapToGlobal(QPoint());
+			return strip->screen()->grabWindow(0, origin.x(), origin.y(), strip->width(), strip->height()).toImage();
+		};
+		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#e5c35b"));
+		track->bindVoice("org.lmms.svs.example", "full");
+		QTRY_VERIFY_WITH_TIMEOUT(track->capabilitiesReady(), 10000);
+		QVector<svs::Note> notes;
+		for (int index = 0; index < 64; ++index)
+		{
+			svs::Note note;
+			note.id = QUuid::createUuid().toString();
+			note.duration = 768;
+			note.pitch = 60;
+			note.lyric = "a";
+			notes.append(note);
+		}
+		clip->setNotes(notes);
+		clip->synthesize();
+		const auto renderingPrefix = QCoreApplication::translate("NativeSVS", "Rendering %1/%2").section("%1", 0, 0);
+		QTRY_VERIFY_WITH_TIMEOUT(clip->status() == "Rendering" || clip->status().startsWith(renderingPrefix), 10000);
+		QTest::qWait(80);
+		const auto first = stripImage();
+		QTest::qWait(160);
+		QVERIFY(clip->status() == "Rendering" || clip->status().startsWith(renderingPrefix));
+		QVERIFY(stripImage() != first);
+		QVERIFY(editor.screen()->grabWindow(editor.winId()).save(m_output + "/synthesis-strip-rendering.png"));
+		QTRY_COMPARE_WITH_TIMEOUT(clip->status(), QString("Ready"), 30000);
+		QTest::qWait(100);
+		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#69c78f"));
+		capture(&editor, "synthesis-strip-ready");
+		const auto completed = stripImage();
+		QTest::qWait(160);
+		QCOMPARE(stripImage(), completed);
+		canvas->setScroll(700, canvas->topPitch());
+		QTest::qWait(100);
+		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#69c78f"));
+		QVERIFY(stripImage().pixelColor(250, 2) != QColor("#69c78f"));
+		canvas->setScroll(0, canvas->topPitch());
+		QDomDocument document;
+		auto node = document.createElement("svsclip");
+		clip->saveSettings(document, node);
+		node.setAttribute("seed", "invalid");
+		clip->loadSettings(node);
+		capture(&editor, "synthesis-strip-error");
+		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#e77474"));
+		editor.setStyleSheet("lmms--gui--SVSPianoRoll { qproperty-synthesisErrorColor: #c04080; }");
+		QTest::qWait(100);
+		QCOMPARE(stripImage().pixelColor(100, 2), QColor("#c04080"));
+		editor.close();
+	}
 	void editorToolbarOverflowIcons()
 	{
 		const QList<QPair<QWidget*, QString>> editors{
@@ -1656,23 +1719,15 @@ private slots:
 			SVSPianoRoll editor(clip);
 			editor.resize(1100, 660);
 			capture(&editor, prefix + "-svs-wide");
-			auto* status = editor.findChild<QLabel*>("svsSynthesisStatus");
-			QVERIFY(status);
+			QVERIFY(!editor.findChild<QLabel*>("svsSynthesisStatus"));
+			auto* ruler = editor.findChild<QWidget*>("svsClipTimeline");
+			QVERIFY(ruler);
 			const auto fullText = nativeTranslation::svsStatus(clip->status());
-			QCOMPARE(status->toolTip(), fullText);
-			auto* toolbar = editor.findChild<QScrollArea*>("svsToolbarScroll");
-			QVERIFY(toolbar);
-			toolbar->ensureWidgetVisible(status);
-			QTest::qWait(600);
-			QVERIFY(status->width() >= status->fontMetrics().horizontalAdvance(QString(QChar(0x2026))));
-			QVERIFY(!status->visibleRegion().isEmpty());
-			capture(&editor, prefix + "-svs-toolbar-end");
-			hoverCapture(status, fullText, prefix + "-svs-status-tooltip");
+			QCOMPARE(ruler->toolTip(), fullText);
+			hoverCapture(ruler, fullText, prefix + "-svs-status-tooltip");
 			editor.resize(900, 600);
-			QCoreApplication::processEvents();
-			toolbar->ensureWidgetVisible(status);
 			capture(&editor, prefix + "-svs-narrow");
-			QCOMPARE(status->toolTip(), fullText);
+			QCOMPARE(ruler->toolTip(), fullText);
 			editor.close();
 		}
 		delete track;

@@ -1604,6 +1604,10 @@ QToolBar#svsEditorToolbar {
 }
 
 lmms--gui--SVSPianoRoll {
+	/* Top synthesis strip: rendering / completed / failed. */
+	qproperty-synthesisRenderingColor: #e5c35b;
+	qproperty-synthesisReadyColor: #69c78f;
+	qproperty-synthesisErrorColor: #e77474;
 	qproperty-pitchAlignmentLineColor: #8ec6e8;
 	qproperty-timeAlignmentLineColor: #e8c68e;
 	qproperty-whiteKeyInactiveBackground: #E5EAF0;
