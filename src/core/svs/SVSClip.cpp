@@ -1,5 +1,7 @@
 #include "SVSClip.h"
 
+#include <algorithm>
+
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QJsonArray>
@@ -24,6 +26,27 @@
 #include "SVSXml.h"
 #include "Song.h"
 namespace lmms {
+namespace {
+QString lyricName(QVector<svs::Note> notes)
+{
+	std::stable_sort(
+		notes.begin(), notes.end(), [](const auto& left, const auto& right) { return left.tick < right.tick; });
+	QString result;
+	for (const auto& note : notes)
+	{
+		const auto lyric = note.lyric.trimmed();
+		if (lyric.isEmpty() || lyric == "-" || lyric == "+") { continue; }
+		if (!result.isEmpty() && result.back().script() == QChar::Script_Latin
+			&& lyric.front().script() == QChar::Script_Latin)
+		{
+			result += ' ';
+		}
+		result += lyric;
+	}
+	return result.isEmpty() ? QString("SVS") : result;
+}
+} // namespace
+
 bool SVSClip::readOnly() const
 {
 	return !m_migrationDiagnostic.isEmpty() || static_cast<SVSTrack*>(getTrack())->readOnly();
@@ -178,8 +201,10 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 	};
 	const bool volumeOnly = notes == m_notes && synthesisCurves(curves) == synthesisCurves(m_curves);
 	addJournalCheckPoint();
+	const bool followsLyrics = name() == "SVS" || name() == lyricName(m_notes);
 	m_notes = notes;
 	m_curves = curves;
+	if (followsLyrics) { setName(lyricName(m_notes)); }
 	refreshVolumeAutomation();
 	if (volumeOnly)
 	{
@@ -873,6 +898,7 @@ void SVSClip::loadSettings(const QDomElement& node)
 			}
 		}
 	}
+	if (m_migrationDiagnostic.isEmpty() && name() == "SVS") { setName(lyricName(m_notes)); }
 	refreshVolumeAutomation();
 	++m_generation;
 	invalidate();

@@ -1,4 +1,5 @@
 #include "SVSCanvas.h"
+#include "SVSPianoPreview.h"
 #include "NoteLabelDisplay.h"
 #include "NativePluginTranslation.h"
 #include "GuiApplication.h"
@@ -325,7 +326,61 @@ SVSCanvas::SVSCanvas(SVSClip* clip, QWidget* parent)
 		connect(piano, &PianoRoll::ghostClipSet, this, [this](bool) { update(); });
 	}
 }
-SVSCanvas::~SVSCanvas() = default;
+SVSCanvas::~SVSCanvas()
+{ stopPianoPreview(); }
+
+int SVSCanvas::pianoPitchAt(const QPointF& point) const
+{
+	// Match the painted key shapes: black keys take precedence over overlapping white keys.
+	for (bool blackKeys : {true, false})
+	{
+		for (int pitch = 0; pitch <= 127; ++pitch)
+		{
+			const int key = pitch % 12;
+			const bool black = key == 1 || key == 3 || key == 6 || key == 8 || key == 10;
+			if (black != blackKeys) { continue; }
+			const bool big = key == 2 || key == 7 || key == 9;
+			const auto smallHeight = std::floor(m_rowHeight * 1.5);
+			const auto correction = black ? m_rowHeight : (big || key == 0 || key == 5) ? smallHeight : m_rowHeight;
+			const auto keyHeight = black ? m_rowHeight : big ? 2 * m_rowHeight : smallHeight;
+			const auto y = pointAt(0, pitch).y() + m_rowHeight - 1 - correction;
+			const QRectF keyRect(0, y, black ? KeyboardWidth * .75 - 1 : KeyboardWidth - 1, keyHeight);
+			if (keyRect.contains(point)) { return pitch; }
+		}
+	}
+	return -1;
+}
+
+void SVSCanvas::previewPianoKey(int pitch)
+{
+	if (pitch < 0 || pitch > 127)
+	{
+		stopPianoPreview();
+		return;
+	}
+	if (m_pianoPitch == pitch || !m_clip || Engine::getSong()->isExporting()) { return; }
+	stopPianoPreview();
+	if (!m_pianoSample)
+	{
+		m_pianoSample = SampleBuffer::fromFile(ConfigManager::inst()->factorySamplesDir() + "instruments/piano01.ogg");
+	}
+	if (!m_pianoSample || m_pianoSample->empty()) { return; }
+	m_pianoReleased = std::make_shared<std::atomic_bool>(false);
+	auto* handle = new SVSPianoPreview(m_clip->getTrack(), m_pianoSample, pitch, m_pianoReleased);
+	if (Engine::audioEngine()->addPlayHandle(handle)) { m_pianoPitch = pitch; }
+	update();
+}
+
+void SVSCanvas::stopPianoPreview()
+{
+	if (m_pianoReleased)
+	{
+		m_pianoReleased->store(true, std::memory_order_relaxed);
+		m_pianoReleased.reset();
+	}
+	m_pianoPitch = -1;
+	update();
+}
 
 void SVSCanvas::setNoteLength(double ticks)
 {
@@ -1143,7 +1198,15 @@ void SVSCanvas::mousePressEvent(QMouseEvent* event)
 		return;
 	}
 	if (event->position().x() < KeyboardWidth)
+	{
+		if (!m_parameter && event->position().y() >= TimelineHeight)
+		{
+			m_pianoPressed = true;
+			previewPianoKey(pianoPitchAt(event->position()));
+			grabMouse();
+		}
 		return;
+	}
 	if (m_parameter || !noteTool())
 	{
 		if (!curveEditable())
@@ -1468,6 +1531,19 @@ void SVSCanvas::updateOperation(const QPointF& point, Qt::KeyboardModifiers modi
 }
 void SVSCanvas::mouseMoveEvent(QMouseEvent* event)
 {
+	if (m_pianoPressed)
+	{
+		if (rect().contains(event->position().toPoint()) && event->position().x() < KeyboardWidth
+			&& event->position().y() >= TimelineHeight)
+		{
+			previewPianoKey(pianoPitchAt(event->position()));
+		}
+		else
+		{
+			stopPianoPreview();
+		}
+		return;
+	}
 	if (!m_parameter && noteLabels::alignmentEnabled())
 	{
 		update();
@@ -1545,6 +1621,13 @@ void SVSCanvas::cancelOperation()
 }
 void SVSCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
+	if (m_pianoPressed && event->button() == Qt::LeftButton)
+	{
+		m_pianoPressed = false;
+		stopPianoPreview();
+		releaseMouse();
+		return;
+	}
 	const bool release = m_action == Action::CurveReset ? event->button() == Qt::RightButton
 		: m_action == Action::Pan						? event->button() == Qt::MiddleButton
 														: event->button() == Qt::LeftButton;
@@ -1724,6 +1807,13 @@ bool SVSCanvas::eventFilter(QObject* object, QEvent* event)
 }
 bool SVSCanvas::event(QEvent* event)
 {
+	if (event->type() == QEvent::UngrabMouse || event->type() == QEvent::WindowDeactivate
+		|| event->type() == QEvent::Hide || event->type() == QEvent::FocusOut)
+	{
+		m_pianoPressed = false;
+		stopPianoPreview();
+		if (QWidget::mouseGrabber() == this) { releaseMouse(); }
+	}
 	if ((event->type() == QEvent::UngrabMouse || event->type() == QEvent::WindowDeactivate) && !m_finishing)
 		cancelOperation();
 	if (event->type() == QEvent::ToolTip && !m_parameter)

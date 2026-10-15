@@ -12,6 +12,9 @@
 class QLineEdit;
 class QTimer;
 class QMenu;
+namespace lmms {
+class SampleBuffer;
+}
 namespace lmms::gui {
 class TimeLineWidget;
 class SVSEditTransaction;
@@ -115,6 +118,13 @@ protected:
 	bool eventFilter(QObject*, QEvent*) override;
 
 private:
+	int pianoPitchAt(const QPointF& point) const;
+	void previewPianoKey(int pitch);
+	void stopPianoPreview();
+	std::shared_ptr<const SampleBuffer> m_pianoSample;
+	std::shared_ptr<std::atomic_bool> m_pianoReleased;
+	int m_pianoPitch = -1;
+	bool m_pianoPressed = false;
 	TimePos m_timelineBegin;
 	TimeLineWidget* m_timeLine = nullptr;
 	QWidget* m_synthesisStrip = nullptr;

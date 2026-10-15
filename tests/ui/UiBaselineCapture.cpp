@@ -20,6 +20,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScreen>
+#include <QScopeGuard>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSlider>
@@ -100,6 +101,17 @@
 
 using namespace lmms;
 using namespace lmms::gui;
+
+// Advance audio explicitly while checking the real GUI, without a concurrent dummy-device thread.
+class UiManualAudioDevice final : public AudioDummy
+{
+public:
+	using AudioDummy::AudioDummy;
+
+private:
+	void startProcessingImpl() override {}
+	void stopProcessingImpl() override {}
+};
 
 // Capture production widgets through the native desktop, never QWidget::render.
 class UiBaselineCapture : public QObject
@@ -520,6 +532,121 @@ private slots:
 			settings.close();
 			QCoreApplication::removeTranslator(&translator);
 		}
+	}
+	void svsLyricNameAndPianoAudition()
+	{
+		auto* track = new SVSTrack(Engine::getSong());
+		auto* clip = static_cast<SVSClip*>(track->createClip(0));
+		svs::Note first;
+		first.id = "first";
+		first.tick = 0;
+		first.duration = 48;
+		first.pitch = 60;
+		first.lyric = QString::fromUtf8("你");
+		auto second = first;
+		second.id = "second";
+		second.tick = 48;
+		second.lyric = QString::fromUtf8("好");
+		clip->setNotes({second, first});
+		QCOMPARE(clip->name(), QString::fromUtf8("你好"));
+		first.lyric = QString::fromUtf8("真");
+		clip->setNotes({first, second});
+		QCOMPARE(clip->name(), QString::fromUtf8("真好"));
+		QDomDocument document;
+		auto saved = document.createElement("svsclip");
+		clip->saveSettings(document, saved);
+		clip->loadSettings(saved);
+		second.lyric = QString::fromUtf8("美");
+		clip->setNotes({first, second});
+		QCOMPARE(clip->name(), QString::fromUtf8("真美"));
+		clip->setName("My phrase");
+		first.lyric = "hello";
+		second.lyric = "world";
+		clip->setNotes({first, second});
+		QCOMPARE(clip->name(), QString("My phrase"));
+		clip->setName("SVS");
+		clip->setNotes({first});
+		clip->setNotes({first, second});
+		QCOMPARE(clip->name(), QString("hello world"));
+
+		{
+			SVSCanvas canvas(clip);
+			canvas.resize(800, 450);
+			canvas.setScroll(0, 65);
+			canvas.show();
+			QVERIFY(QTest::qWaitForWindowExposed(&canvas));
+			canvas.beginLyric("first");
+			auto* lyric = canvas.findChild<QLineEdit*>("svsInlineLyric");
+			QVERIFY(lyric && lyric->isVisible());
+			lyric->setText(QString::fromUtf8("你好"));
+			QTest::keyClick(lyric, Qt::Key_Return);
+			QCOMPARE(clip->name(), QString::fromUtf8("你好world"));
+			capture(&canvas, "svs-lyric-name-piano");
+			auto* engine = Engine::audioEngine();
+			bool available = false;
+			engine->storeAudioDevice();
+			engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+			const auto restoreAudio = qScopeGuard([engine] { engine->restoreAudioDevice(); });
+			QVERIFY(available);
+			const auto render = [engine](int periods) {
+				std::vector<float> result;
+				for (int period = 0; period < periods; ++period)
+				{
+					for (const auto& frame : engine->renderNextPeriod())
+					{
+						result.push_back(frame[0]);
+					}
+				}
+				return result;
+			};
+			const auto peak = [](const std::vector<float>& samples) {
+				float value = 0;
+				for (float sample : samples)
+				{
+					value = std::max(value, std::abs(sample));
+				}
+				return value;
+			};
+			render(8);
+			const auto key = [&](int pitch) { return QPoint(20, int(canvas.pointAt(0, pitch).y() + 8)); };
+			QTest::mousePress(&canvas, Qt::LeftButton, Qt::NoModifier, key(60));
+			const auto c4 = render(24);
+			QVERIFY(peak(c4) > .01f);
+			const auto fundamental = [engine](const std::vector<float>& samples) {
+				const auto rate = engine->outputSampleRate();
+				double best = -1;
+				int bestLag = 0;
+				for (int lag = int(rate / 300); lag < int(rate / 230); ++lag)
+				{
+					double correlation = 0;
+					for (size_t index = 1024; index + lag < samples.size(); ++index)
+					{
+						correlation += double(samples[index]) * samples[index + lag];
+					}
+					if (correlation > best)
+					{
+						best = correlation;
+						bestLag = lag;
+					}
+				}
+				return double(rate) / bestLag;
+			};
+			QVERIFY(std::abs(fundamental(c4) - 261.63) < 4);
+			QTest::mouseMove(&canvas, key(61));
+			const auto cSharp4 = render(24);
+			QVERIFY(peak(cSharp4) > .01f);
+			QVERIFY(std::abs(fundamental(cSharp4) - 277.18) < 4);
+			qInfo() << "Native piano audition C4/C#4:" << fundamental(c4) << fundamental(cSharp4);
+			QTest::mouseRelease(&canvas, Qt::LeftButton, Qt::NoModifier, key(61));
+			render(24);
+			QVERIFY(peak(render(8)) < .0001f);
+			QTest::mousePress(&canvas, Qt::LeftButton, Qt::NoModifier, key(60));
+			QVERIFY(peak(render(12)) > .01f);
+			canvas.hide();
+			render(24);
+			QVERIFY(peak(render(8)) < .0001f);
+		}
+		delete track;
 	}
 	void batchLyricCounts()
 	{
