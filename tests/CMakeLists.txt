@@ -51,6 +51,7 @@ if(WANT_AGENT)
 		src/agent/A3CommandsTest.cpp
 		src/agent/A4CommandsTest.cpp
 		src/agent/DiscoveryCommandsTest.cpp
+		src/agent/SvsCommandsTest.cpp
 	)
 endif()
 
@@ -92,6 +93,11 @@ set_tests_properties(SVCIntegrationTest PROPERTIES TIMEOUT 90 RUN_SERIAL TRUE LA
 add_dependencies(SVSIntegrationTest SVSExample)
 if(LMMS_BUILD_DIFFSINGER)
  add_dependencies(SVSIntegrationTest SVSDiffSinger)
+endif()
+if(TARGET SvsCommandsTest)
+	add_dependencies(SvsCommandsTest SVSExample)
+	set_tests_properties(SvsCommandsTest PROPERTIES TIMEOUT 120 RUN_SERIAL TRUE
+		ENVIRONMENT "LMMS_DATA_DIR=${CMAKE_SOURCE_DIR}/data;LMMS_SVS_PLUGIN_DIR=$<TARGET_FILE_DIR:SVSExample>/..")
 endif()
 add_dependencies(UiBaselineCapture tripleoscillator kicker amplifier SVSExample)
 add_dependencies(ThemeWidgetTest tripleoscillator kicker amplifier SVSExample)

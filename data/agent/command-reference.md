@@ -6540,6 +6540,531 @@ List SVC engines, models, weights and speakers for selection; read-only.
 }
 ```
 
+## svs.addNotes
+
+Append notes with lyrics to an SVS clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "notes": {
+            "description": "The notes argument for this command.",
+            "items": {
+                "additionalProperties": false,
+                "properties": {
+                    "duration": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "lyric": {
+                        "type": "string"
+                    },
+                    "parameters": {
+                        "type": "object"
+                    },
+                    "phonemes": {
+                        "type": "object"
+                    },
+                    "pitch": {
+                        "maximum": 127,
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "pronunciation": {
+                        "type": "string"
+                    },
+                    "tick": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "xmlExtras": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "tick",
+                    "duration",
+                    "pitch"
+                ],
+                "type": "object"
+            },
+            "maxItems": 4096,
+            "minItems": 1,
+            "type": "array"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "notes"
+    ],
+    "type": "object"
+}
+```
+
+## svs.cancelSynthesis
+
+Cancel asynchronous SVS synthesis.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.createClip
+
+Create an SVS clip on an SVS track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "length": {
+            "description": "The length argument for this command.",
+            "type": "integer"
+        },
+        "name": {
+            "description": "The name argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "position": {
+            "description": "The position argument for this command.",
+            "type": "integer"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.createTrack
+
+Create an SVS track, optionally binding a voicebank.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "index": {
+            "description": "The index argument for this command.",
+            "type": "integer"
+        },
+        "name": {
+            "description": "The name argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "pluginId": {
+            "description": "The pluginId argument for this command.",
+            "type": "string"
+        },
+        "voiceId": {
+            "description": "The voiceId argument for this command.",
+            "type": "string"
+        }
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
+## svs.getCapabilities
+
+Return SVS parameter, language, phoneme and dictionary capabilities.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.getNotes
+
+List SVS notes with stable ids and optional pronunciation.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "includePronunciation": {
+            "description": "The includePronunciation argument for this command.",
+            "type": "boolean"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "range": {
+            "additionalProperties": false,
+            "description": "Clip-local tick range; start inclusive, end exclusive.",
+            "properties": {
+                "end": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "start": {
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": [
+                "start",
+                "end"
+            ],
+            "type": "object"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
+## svs.getPronunciation
+
+Resolve lyrics to phonemes and candidates without changing the clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "afterNoteId": {
+            "description": "The afterNoteId argument for this command.",
+            "type": "string"
+        },
+        "candidates": {
+            "description": "The candidates argument for this command.",
+            "type": "boolean"
+        },
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "language": {
+            "description": "The language argument for this command.",
+            "type": "string"
+        },
+        "lyric": {
+            "description": "The lyric argument for this command.",
+            "type": "string"
+        },
+        "noteId": {
+            "description": "The noteId argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
+## svs.getStatus
+
+Return SVS clip or track synthesis status.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.getTrack
+
+Return SVS track, voice, parameters and clip status.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.importDictionary
+
+Import a project dictionary into an SVS clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "path": {
+            "description": "The path argument for this command.",
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "path"
+    ],
+    "type": "object"
+}
+```
+
 ## svs.listVoices
 
 List SVS engines and voicebanks; scanning is asynchronous, retry while scanning is true.
@@ -6577,6 +7102,465 @@ List SVS engines and voicebanks; scanning is asynchronous, retry while scanning 
         }
     },
     "required": [
+    ],
+    "type": "object"
+}
+```
+
+## svs.removeNotes
+
+Remove SVS notes by id or clip-local tick range.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "ids": {
+            "description": "The ids argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "range": {
+            "additionalProperties": false,
+            "description": "Clip-local tick range; start inclusive, end exclusive.",
+            "properties": {
+                "end": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "start": {
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": [
+                "start",
+                "end"
+            ],
+            "type": "object"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
+## svs.setLyrics
+
+Assign lyrics to selected SVS notes in tick order.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "noteIds": {
+            "description": "The noteIds argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "range": {
+            "additionalProperties": false,
+            "description": "Clip-local tick range; start inclusive, end exclusive.",
+            "properties": {
+                "end": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "start": {
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": [
+                "start",
+                "end"
+            ],
+            "type": "object"
+        },
+        "skipContinuation": {
+            "description": "The skipContinuation argument for this command.",
+            "type": "boolean"
+        },
+        "text": {
+            "description": "The text argument for this command.",
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "text"
+    ],
+    "type": "object"
+}
+```
+
+## svs.setNoteParameter
+
+Set a declared note or phoneme parameter on selected SVS notes.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "noteIds": {
+            "description": "The noteIds argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "parameter": {
+            "description": "The parameter argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "phoneme": {
+            "description": "The phoneme argument for this command.",
+            "type": "boolean"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        },
+        "value": {
+            "description": "The value argument for this command."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "noteIds",
+        "parameter",
+        "value"
+    ],
+    "type": "object"
+}
+```
+
+## svs.setParameters
+
+Set declared track, clip or global SVS parameters.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parameters": {
+            "description": "The parameters argument for this command.",
+            "type": "object"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "scope": {
+            "description": "The scope argument for this command.",
+            "enum": [
+                "track",
+                "clip",
+                "global"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "scope",
+        "parameters"
+    ],
+    "type": "object"
+}
+```
+
+## svs.setVoice
+
+Bind an installed SVS voicebank to an SVS track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "pluginId": {
+            "description": "The pluginId argument for this command.",
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        },
+        "voiceId": {
+            "description": "The voiceId argument for this command.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "track",
+        "pluginId",
+        "voiceId"
+    ],
+    "type": "object"
+}
+```
+
+## svs.synthesize
+
+Start asynchronous SVS synthesis for a clip or track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svs.updateNote
+
+Update SVS note fields by stable id.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "fields": {
+            "additionalProperties": false,
+            "description": "The fields argument for this command.",
+            "properties": {
+                "duration": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "lyric": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "object"
+                },
+                "phonemes": {
+                    "type": "object"
+                },
+                "pitch": {
+                    "maximum": 127,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "pronunciation": {
+                    "type": "string"
+                },
+                "tick": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "xmlExtras": {
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "id": {
+            "description": "The id argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "id",
+        "fields"
     ],
     "type": "object"
 }

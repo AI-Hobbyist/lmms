@@ -66,6 +66,19 @@ existing load commands:
 voicebank and model lists may be empty on the first call. List tools are read-only,
 do not change the project, and are outside undo.
 
+## SVS editing tools
+
+`svs.createTrack` (optionally with `pluginId`/`voiceId`) and `svs.createClip` create
+SVS project data. After `svs.setVoice`, poll `svs.getTrack` until
+`capabilitiesReady` is true before using lyrics, phoneme or parameter commands.
+`svs.getNotes` returns stable note ids; update and remove notes by id. `svs.setLyrics`
+uses the same word/ideograph tokenization as the piano-roll batch-lyrics dialog and
+preserves manual pronunciation and phoneme overrides. `svs.getPronunciation` is a
+read-only preview. `svs.synthesize` and `svs.cancelSynthesis` start or cancel
+asynchronous work and are rejected inside a project transaction; poll
+`svs.getStatus` for `status`, `audioAvailable` and cache/segment information.
+Project edits from SVS commands are part of project undo; synthesis results are not.
+
 One local MCP session is supported: initialization replaces the previous session.
 The client sends the returned `MCP-Session-Id`, the negotiated protocol header and
 the initialized notification before using tools. Stopping invalidates the session
