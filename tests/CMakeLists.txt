@@ -50,6 +50,7 @@ if(WANT_AGENT)
 		src/agent/MixAutomationCommandsTest.cpp
 		src/agent/A3CommandsTest.cpp
 		src/agent/A4CommandsTest.cpp
+		src/agent/DiscoveryCommandsTest.cpp
 	)
 endif()
 

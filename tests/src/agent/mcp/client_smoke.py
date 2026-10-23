@@ -33,9 +33,19 @@ async def discover(endpoint, execute=False, render=False):
                 result["capabilities"].get(key) is None for key in ("resources", "prompts", "tasks")
             )
             tools = (await session.list_tools()).tools
-            assert len(tools) == 159, len(tools)
-            assert "agent.runScript" in {tool.name for tool in tools}
-            assert not {tool.name for tool in tools} & {
+            assert len(tools) == 166, len(tools)
+            names = {tool.name for tool in tools}
+            assert "agent.runScript" in names
+            assert {
+                "instrument.listPlugins",
+                "preset.list",
+                "sample.list",
+                "svs.listVoices",
+                "svc.listModels",
+                "fs.listRoots",
+                "fs.listDirectory",
+            } <= names
+            assert not names & {
                 "agent.listCommands",
                 "agent.getContext",
                 "agent.diffPreview",
@@ -62,6 +72,14 @@ async def execution(session):
         return value["data"]
 
     before = await call("track.list")
+    roots = await call("fs.listRoots")
+    assert roots["roots"], roots
+    discovered = await call("instrument.listPlugins", {"pageSize": 1})
+    assert "plugins" in discovered and "vstCatalog" in discovered, discovered
+    samples = await call("sample.list", {"source": "factory", "pageSize": 1})
+    assert samples["total"] > 0, samples
+    models = await call("svc.listModels", {"pageSize": 1})
+    assert any(engine["id"] == "reference" for engine in models["engines"]), models
     script = {
         "steps": [
             {

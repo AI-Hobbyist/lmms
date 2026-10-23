@@ -1,4 +1,5 @@
 #include "agent/CommandBus.h"
+#include "DiscoveryCommands.h"
 #include "agent/ExportCommands.h"
 #include "agent/ToolRegistry.h"
 #include "agent/ScriptRunner.h"
@@ -178,6 +179,7 @@ CommandBus::CommandBus()
 	registerMetadataCommands(*this);
 	registerScriptCommands(*this);
 	registerHighLevelCommands(*this);
+	registerDiscoveryCommands(*this);
 }
 
 bool CommandBus::registerCommand(const CommandDescriptor& descriptor)

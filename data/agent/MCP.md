@@ -45,6 +45,27 @@ with `dryRun:true` to preview an atomic multi-command edit. `export.audio` and
 `export.cancel` for cancellation. Finished/cancelled tasks remain queryable, up to
 64 recent tasks. Mutating commands are rejected while rendering, except cancellation.
 
+## Discovery tools
+
+The read-only discovery tools return stable handles and absolute local paths for
+existing load commands:
+
+- `instrument.listPlugins` → `instrument.load` (`plugin`, optional `subKey`, `path`,
+  `classid`, `architecture`); `effect.listAvailable(kind=instrument)` remains available
+  and unchanged.
+- `preset.list` → `instrument.loadPreset` (`path`). Entries with
+  `loadableBy:["pluginPreset"]` (for example `.xiz`) belong to a plugin's own preset
+  browser and are not accepted by `instrument.loadPreset`.
+- `sample.list` → `sample.setFile` / `import.sampleToTrack` (`path`).
+- `fs.listRoots` returns drives, home and known LMMS directories. `fs.listDirectory`
+  lists direct children of an explicitly supplied absolute path; it is non-recursive,
+  never writes, and does not follow directory symlinks while scanning.
+
+`svs.listVoices` and `svc.listModels` report asynchronous catalog state. Retry while
+`catalog.scanning` is true or an engine `status` says discovery is still running;
+voicebank and model lists may be empty on the first call. List tools are read-only,
+do not change the project, and are outside undo.
+
 One local MCP session is supported: initialization replaces the previous session.
 The client sends the returned `MCP-Session-Id`, the negotiated protocol header and
 the initialized notification before using tools. Stopping invalidates the session

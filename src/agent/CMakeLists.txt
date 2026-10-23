@@ -7,6 +7,7 @@ set(LMMS_SRCS
 	agent/CommandBus.cpp
 	agent/CommandSchema.cpp
 	agent/CoreCommands.cpp
+	agent/DiscoveryCommands.cpp
 	agent/ExportCommands.cpp
 	agent/ToolRegistry.cpp
 	agent/ScriptExpression.cpp

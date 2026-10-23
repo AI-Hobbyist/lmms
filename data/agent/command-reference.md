@@ -2975,6 +2975,68 @@ Query an audio export task, or list up to 64 recent tasks when task is omitted.
 }
 ```
 
+## fs.listDirectory
+
+List direct children of an explicit absolute directory path; read-only, non-recursive.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "directoriesOnly": {
+            "description": "The directoriesOnly argument for this command.",
+            "type": "boolean"
+        },
+        "extensions": {
+            "description": "The extensions argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        },
+        "path": {
+            "description": "The path argument for this command.",
+            "type": "string"
+        },
+        "showHidden": {
+            "description": "The showHidden argument for this command.",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "path"
+    ],
+    "type": "object"
+}
+```
+
+## fs.listRoots
+
+List drive roots, home and known LMMS directories; read-only.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
 ## history.redo
 
 Redo the most recently undone project change.
@@ -3196,6 +3258,50 @@ List native parameter metadata with serialized-state fallback.
 }
 ```
 
+## instrument.listPlugins
+
+List instrument plugins and sub-plugin keys for instrument.load; read-only and paginated.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "includeSubKeys": {
+            "description": "The includeSubKeys argument for this command.",
+            "type": "boolean"
+        },
+        "keyword": {
+            "description": "The keyword argument for this command.",
+            "type": "string"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        },
+        "source": {
+            "description": "The source argument for this command.",
+            "enum": [
+                "all",
+                "builtin",
+                "vst",
+                "lv2"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
 ## instrument.load
 
 Load an instrument plugin onto an instrument track.
@@ -3204,6 +3310,14 @@ Load an instrument plugin onto an instrument track.
 {
     "additionalProperties": false,
     "properties": {
+        "architecture": {
+            "description": "The architecture argument for this command.",
+            "type": "string"
+        },
+        "classid": {
+            "description": "The classid argument for this command.",
+            "type": "string"
+        },
         "dryRun": {
             "description": "Validate and preview the change without committing project or history changes.",
             "type": "boolean"
@@ -5476,6 +5590,53 @@ Pattern operation: setLength.
 }
 ```
 
+## preset.list
+
+List user and factory presets with absolute paths for instrument.loadPreset; read-only.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "extensions": {
+            "description": "The extensions argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "keyword": {
+            "description": "The keyword argument for this command.",
+            "type": "string"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        },
+        "source": {
+            "description": "The source argument for this command.",
+            "enum": [
+                "all",
+                "user",
+                "factory"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
 ## query.clipDetail
 
 Return a clip detail object.
@@ -5755,6 +5916,53 @@ Return metadata and peak information for a sample clip.
     "required": [
         "track",
         "clip"
+    ],
+    "type": "object"
+}
+```
+
+## sample.list
+
+List user and factory audio samples with absolute paths for sample.setFile; read-only.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "extensions": {
+            "description": "The extensions argument for this command.",
+            "items": {
+                "type": "string"
+            },
+            "maxItems": 128,
+            "type": "array"
+        },
+        "keyword": {
+            "description": "The keyword argument for this command.",
+            "type": "string"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        },
+        "source": {
+            "description": "The source argument for this command.",
+            "enum": [
+                "all",
+                "user",
+                "factory"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
     ],
     "type": "object"
 }
@@ -6285,6 +6493,90 @@ Set the song time signature.
     "required": [
         "numerator",
         "denominator"
+    ],
+    "type": "object"
+}
+```
+
+## svc.listModels
+
+List SVC engines, models, weights and speakers for selection; read-only.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "category": {
+            "description": "The category argument for this command.",
+            "type": "string"
+        },
+        "engine": {
+            "description": "The engine argument for this command.",
+            "type": "string"
+        },
+        "includeParameters": {
+            "description": "The includeParameters argument for this command.",
+            "type": "boolean"
+        },
+        "keyword": {
+            "description": "The keyword argument for this command.",
+            "type": "string"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        }
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
+## svs.listVoices
+
+List SVS engines and voicebanks; scanning is asynchronous, retry while scanning is true.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "engine": {
+            "description": "The engine argument for this command.",
+            "type": "string"
+        },
+        "includeMetadata": {
+            "description": "The includeMetadata argument for this command.",
+            "type": "boolean"
+        },
+        "keyword": {
+            "description": "The keyword argument for this command.",
+            "type": "string"
+        },
+        "language": {
+            "description": "The language argument for this command.",
+            "type": "string"
+        },
+        "page": {
+            "description": "The page argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "pageSize": {
+            "description": "The pageSize argument for this command.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+        }
+    },
+    "required": [
     ],
     "type": "object"
 }
