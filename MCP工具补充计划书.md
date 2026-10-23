@@ -1,6 +1,6 @@
 # LMMS MCP 工具补充计划书（列表发现 · SVS/SVC 选取与输入）
 
-> **文档状态**：v0.4（M1、M2、M3 已实施并通过自动化验证）
+> **文档状态**：v0.5（M1～M4 已实施；M4 文档/SDK/回归记录完成，曲线与真实后端待后续）
 > **编写日期**：2026-10-23（Asia/Seoul）
 > **源码基线**：`44ccf432e4ba0e0a818e7a22a42a8624732c0141`，分支 `master`
 > **勘察依据**：CodeGraph 符号检索 + 源码核对；现有实现结论见 [MCP 实现分析](MCP_IMPLEMENTATION_ANALYSIS.md)，接续约束见 [Agent 交接手册](AGENT_HANDOFF.md)
@@ -1157,7 +1157,7 @@ registerSvcCommands(*this);       // M3
 | M1 列表发现 | **已实施** | 7 个只读工具注册；`--tools` 导出 **166** 个工具；`--manual` 生成 **171** 个命令；`DiscoveryCommandsTest` 通过（CTest 1/1）；`client_smoke.py` 数量断言更新为 166 并增加发现调用 |
 | M2 SVS 输入 | **已实施** | 17 个 `svs.*` 命令（曲线延后）；`--tools` 导出 **183** 个工具；`--manual` 生成 **188** 个命令；`SvsCommandsTest` 8 项通过（建轨/片段/声库/音符/填词/参数/撤销/合成）；`client_smoke.py` 更新为 183 |
 | M3 SVC 输入 | **已实施** | 9 个 `svc.*` 命令；`--tools` 导出 **192** 个工具；`--manual` 生成 **197** 个命令；`SvcCommandsTest` 7 项通过（建轨/选型/源音频/分块/转换/撤销/类型校验）；`client_smoke.py` 更新为 192 |
-| M4 收尾 | 待实施 | — |
+| M4 收尾 | **已实施（文档/SDK）** | `MCP_IMPLEMENTATION_ANALYSIS.md`、`AGENT_HANDOFF.md` 更新到 192/197 与 M1～M3 提交；官方 SDK 2.2.0 发现 192 工具、ping、JSON 传输与示例通过；全量 CTest **76/80 passed**，4 个 GUI/既有集成测试超时或异常退出，记录为 `MANUAL/PENDING` |
 
 M1 构建记录：`cmake --build build --config Release --target AgentHarness` 与 `DiscoveryCommandsTest` 均 `EXITCODE=0`；日志为 `build-m1.log`、`build-m1-test.log`、`test-m1.log`（本地未跟踪产物）。
 
@@ -1165,19 +1165,23 @@ M2 构建记录：`AgentHarness`、`SvsCommandsTest`、`SVSExample` 构建均 `E
 
 M3 构建记录：`AgentHarness`、`SvcCommandsTest` 构建均 `EXITCODE=0`；`SvcCommandsTest` 7 passed / 0 failed / 0 skipped（reference 引擎转换完成）；日志为 `build-m3.log`、`build-m3-test.log`、`test-m3.log`。真实 RVC/USVC 后端未接入本机自动化，标为 `MANUAL/PENDING`。
 
+M4 记录：`build/sdk-venv` 安装 `mcp==2.2.0`、`httpx2==2.16.0`；`client_smoke.py` 对 `AgentHarness` 发现 **192** 个工具，ping、JSON 传输与 `mcp_client.py` 示例通过（日志 `sdk-smoke-m4.log`）。`--execute --render` 未执行，原因是当前没有同时具备 Harness 与原生插件 DLL 的合规部署，按项目规则未新建替代目录。全量 CTest **76/80 passed**；失败/超时为 `SVSIntegrationTest`（60s）、`SVCIntegrationTest`（0xcfffffff）、`UiBaselineCapture`（120s）、`ThemeWidgetTest`（0xcfffffff），均记录为 `MANUAL/PENDING`，不能据此声称全量全绿。`svs.getCurves/setCurve` 仍待 M2b。
+
 ---
 
-## 11. 待用户决策
+## 11. 已确认决策与遗留项
 
-| # | 决策 | 推荐 |
-|---|------|------|
-| D1 | 工具命名是否采用 `instrument.listPlugins` / `preset.list` / `sample.list` / `svs.listVoices` / `svc.listModels` / `fs.listRoots` / `fs.listDirectory` | 采用 |
-| D2 | 是否授权 §7.2 的最小旧文件改动（注册/CMake/测试/文档） | 授权；否则无法接入 |
-| D3 | `fs.listDirectory` 是否允许任意绝对路径只读浏览 | 允许（只读、只列直接子项）；如只允许已知根，需要额外白名单设计 |
-| D4 | SVS/SVC 创建轨道/片段：独立命令 vs 扩展 `track.create`/`clip.create` | 独立命令（零改动 `CoreCommands.cpp`） |
-| D5 | 是否同时修正 `trackTypeName`/`clipTypeName` 的 SVS/SVC 显示 | 可延后；新域命令已返回正确类型 |
-| D6 | M2 是否包含曲线 `getCurves/setCurve` | 建议包含；若范围收紧可延后 |
-| D7 | 本阶段只做 M1，还是 M1–M3 一起实施 | 建议先 M1 验收，再按需启动 M2/M3 |
+| # | 决策 | 最终状态 |
+|---|------|----------|
+| D1 | 工具命名采用 `instrument.listPlugins` / `preset.list` / `sample.list` / `svs.listVoices` / `svc.listModels` / `fs.listRoots` / `fs.listDirectory` | 已采用 |
+| D2 | 授权 §7.2 的最小旧文件改动（注册/CMake/测试/文档） | 用户已授权；M1～M3 已实施 |
+| D3 | `fs.listDirectory` 允许任意绝对路径只读浏览 | 已采用；只列直接子项、不递归、不写 |
+| D4 | SVS/SVC 建轨/建片段使用独立命令 | 已采用；未改 `CoreCommands.cpp` 的 `track.create/clip.create` |
+| D5 | `trackTypeName`/`clipTypeName` 的 SVS/SVC 显示修正 | 仍未修正；新域 `getTrack` 返回正确类型，后续需授权 |
+| D6 | M2 曲线 `getCurves/setCurve` | 未纳入；留作 M2b |
+| D7 | 是否一次性完成 M1～M3 | 已按 M1→M2→M3 顺序完成并逐阶段提交推送 |
+
+遗留项：`svs.getCurves/setCurve`、真实 RVC/USVC 与真实声库人工验收、`client_smoke.py --execute --render`、全量 GUI/VST CTest 的 `MANUAL/PENDING` 项。
 
 ---
 
