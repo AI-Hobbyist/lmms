@@ -74,9 +74,11 @@ and can be named in the same call. Route a track to it with `track.setMixerChann
 `mixer.removeChannel` protects channel 0 (master) and refuses channels that a track
 still uses; pass `force:true` to reroute those tracks to the master channel first.
 `mixer.moveChannel` reorders one channel a single slot left or right; the master stays
-at index 0 and cannot be moved. All three commands are project-undoable and support
-`dryRun`. Send, volume, mute, solo, name and color changes continue to use the existing
-`mixer.set*` commands.
+at index 0 and cannot be moved. These three commands change the mixer structure, so when
+the GUI is running they rebuild the mixer view and refresh the per-track channel ranges
+before returning; without a GUI they only touch the model. All three are project-undoable
+and support `dryRun`. Send, volume, mute, solo, name and color changes continue to use
+the existing `mixer.set*` commands.
 
 SVS and SVC tracks have no effect chain of their own. Route such a track to a mixer
 channel with `track.setMixerChannel` (instrument, sample, SVS and SVC tracks are all

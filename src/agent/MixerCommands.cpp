@@ -9,7 +9,9 @@
 #include <cmath>
 
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
+#include "MixerView.h"
 
 namespace lmms::agent {
 namespace {
@@ -27,6 +29,23 @@ CommandResult mixerUnavailable()
 QString mixerChannelPath(int channelIndex)
 {
 	return QStringLiteral("song/channel:%1").arg(channelIndex);
+}
+
+// MixerView keeps its own vector of channel views indexed by channel number. A model-only
+// structural change leaves that vector out of sync, and the next in-app "add channel"
+// indexes past the end and crashes. Rebuild the views after every structural change, and
+// let the view refresh the per-track channel ranges for us.
+void refreshMixerViews()
+{
+	auto* application = gui::getGUI();
+	if (application == nullptr)
+	{
+		return;
+	}
+	if (auto* mixerView = application->mixerView())
+	{
+		mixerView->refreshDisplay();
+	}
 }
 
 // Mirrors the shape returned by the existing mixer.get*/mixer.set* commands so
@@ -192,6 +211,8 @@ CommandResult executeMixerAddChannel(const QJsonObject& arguments)
 		channel->m_name = name;
 	}
 
+	refreshMixerViews();
+
 	auto detail = mixerChannelDetail(channel);
 	detail.insert("numChannels", currentCount);
 	return CommandResult::success(detail);
@@ -236,6 +257,7 @@ CommandResult executeMixerRemoveChannel(const QJsonObject& arguments)
 	}
 
 	mixer->deleteChannel(channelIndex);
+	refreshMixerViews();
 	return CommandResult::success(
 		QJsonObject{{"removed", channelIndex}, {"numChannels", static_cast<int>(mixer->numChannels())}});
 }
@@ -283,6 +305,7 @@ CommandResult executeMixerMoveChannel(const QJsonObject& arguments)
 				"Channel 1 cannot move in front of the master channel.");
 		}
 		mixer->moveChannelLeft(channelIndex);
+		refreshMixerViews();
 		auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex - 1));
 		detail.insert("numChannels", channelCount);
 		return CommandResult::success(detail);
@@ -295,6 +318,7 @@ CommandResult executeMixerMoveChannel(const QJsonObject& arguments)
 			"Only channels between the master channel and the last channel can move right.");
 	}
 	mixer->moveChannelRight(channelIndex);
+	refreshMixerViews();
 	auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex + 1));
 	detail.insert("numChannels", channelCount);
 	return CommandResult::success(detail);
