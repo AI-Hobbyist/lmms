@@ -1,0 +1,113 @@
+name: windows-full-package
+
+'on':
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: CMake build type
+        required: false
+        default: Release
+        type: choice
+        options:
+          - Release
+          - RelWithDebInfo
+      build_diffsinger:
+        description: Build the native DiffSinger SVS engine
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-full-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: windows-x64-full-package
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 120
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      CMAKE_BUILD_TYPE: ${{ inputs.build_type }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v6
+        with:
+          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-msvc-x86_64-
+          path: build-package\vcpkg_installed
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@bcb88e3bed2e992f5f9e24c0f9e364a231d278eb
+        with:
+          version: '6.10.*'
+          arch: 'win64_msvc2022_64'
+          archives: qtbase qtsvg qttools
+          cache: true
+
+      - name: Set up build environment
+        uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f9035a9
+        with:
+          arch: x64
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S . `
+            -B build-package `
+            -G Ninja `
+            --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+            -Werror=dev `
+            -DCMAKE_BUILD_TYPE="$env:CMAKE_BUILD_TYPE" `
+            -DTARGET_UARCH=official `
+            -DWANT_QT6=ON `
+            -DWANT_AGENT=ON `
+            -DWANT_AGENT_MCP=ON `
+            -DLMMS_BUILD_DIFFSINGER=${{ inputs.build_diffsinger }} `
+            -DWANT_SWH=OFF `
+            -DWANT_GIG=OFF `
+            -DWANT_SID=OFF `
+            -DWANT_SUIL=OFF `
+            -DBUNDLE_QT_TRANSLATIONS=OFF `
+            -DVCPKG_TARGET_TRIPLET="x64-windows" `
+            -DVCPKG_HOST_TRIPLET="x64-windows" `
+            -DVCPKG_MANIFEST_INSTALL="${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}"
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build build-package
+
+      - name: Run agent and MCP smoke tests
+        shell: pwsh
+        run: |
+          ctest --test-dir build-package --output-on-failure `
+            -R "^(DiscoveryCommandsTest|SvsCommandsTest|SvcCommandsTest)$"
+
+      - name: Build full replacement package
+        shell: pwsh
+        run: |
+          ./buildtools/package-windows.ps1 `
+            -SourceDir build-package `
+            -OutputDir build-packages `
+            -PythonExe python
+
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: lmms-windows-full-package
+          archive: false
+          path: |
+            build-packages/*.zip
+            build-packages/*.sha256
+          retention-days: 14
