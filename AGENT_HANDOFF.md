@@ -35,6 +35,7 @@
 - **M5 调音台通道（2，2026-10-24）**：`mixer.addChannel`、`mixer.removeChannel`，补齐“调音台相关轨道添加”缺口（此前 MCP 只能改 master，无法新建通道，因此 `track.setMixerChannel` 只能指向 0）。新文件 `src/agent/MixerCommands.h/.cpp`、`tests/src/agent/MixerCommandsTest.cpp`；旧文件仅追加注册/构建/测试/文档。master 受保护、在用通道需 `force:true` 才能连带改线后删除；两者均支持 `dryRun` 与 undo。
 - **M5b 通道重排与类型名（2026-10-24）**：新增 `mixer.moveChannel`（左右各一格，master 固定 0 位）；`trackTypeName`/`clipTypeName` 补 `SVC` 与 SVS/SVC 片段分支，`track.get`/`clip.get` 不再返回 `type:"unknown"`。新测试 `tests/src/agent/TrackClipTypeTest.cpp`。
 - **M5c 轨道路由覆盖 SVS/SVC（2026-10-24）**：`track.setMixerChannel` 由“仅 instrument/sample”扩展为同时接受 SVS/SVC 轨道（复用各自 `mixerChannelModel()`），`track.get` 对这四类轨道都返回 `mixerChannel`；错误提示同步更新。按要求不再新增并行命令 `mixer.setTrackChannel`。这是 SVS/SVC 加效果的唯一可行路径（它们没有轨道级 EffectChain）。
+- **M5d 寻址诊断与时间单位（2026-10-24）**：`resolveTrack` 按名字查找失败时不再返回 `Track -1 does not exist`，改为 `Track "<name>" was not found by name.` 并附索引/名字/路径提示（`CoreCommands.cpp` 与 `CommandTargets.cpp` 两处一致）；`data/agent/MCP.md` 新增「Time and tick units」，写明 `DefaultTicksPerBar = 192`（4/4 下 1 小节 192 tick、1 拍 48 tick、1 个 16 分步 12 tick）。
 - 当前运行时目录：**197 个 MCP 工具 / 202 个注册命令**；`data/agent/command-reference.md` 已由 `AgentHarness --manual` 重新生成，`data/agent/MCP.md` 已补发现/Mixer/SVS/SVC 说明。
 - 新增测试：`DiscoveryCommandsTest`、`SvsCommandsTest`、`SvcCommandsTest`。Agent + MCP 回归 **13/13 passed**。
 - 官方 Python MCP SDK 2.2.0 对 `AgentHarness` 实际连接：发现 **194** 个工具/schema、ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过。

@@ -87,6 +87,15 @@ that channel (`effect.add` with `owner: "song/channel:N"`).
 clips as `type: "svs"` / `"svc"` instead of `"unknown"`; the dedicated
 `svs.getTrack` / `svc.getTrack` payloads remain the richer view.
 
+## Time and tick units
+
+Positions and lengths are song ticks, not beats or milliseconds. `DefaultTicksPerBar`
+is 192, so in 4/4 one bar is **192 ticks**, one quarter-note beat is 48 ticks and one
+16th step is 12 ticks. Commands that take `bar`/`bars` convert with that value, while
+`clip.create`/`midi.*`/`svs.*` positions and lengths are raw ticks. A 10-second phrase
+at 120 BPM is 5 bars, i.e. 960 ticks; `getSongInfo`/`agent.runScript` report the same
+`ticksPerBar` so scripts can compute from it instead of assuming a value.
+
 ## SVS editing tools
 
 `svs.createTrack` (optionally with `pluginId`/`voiceId`) and `svs.createClip` create

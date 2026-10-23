@@ -464,6 +464,13 @@ bool resolveTrack(Song* song, const QJsonObject& arguments, Track*& track, int& 
 		return false;
 	}
 	const auto& tracks = container->tracks();
+	if (trackIndex < 0 && selector.isString())
+	{
+		failure = CommandResult::failure("track_not_found",
+			QStringLiteral("Track \"%1\" was not found by name.").arg(selector.toString()),
+			"Pass an integer index, an exact track name, or a song/track:N path.");
+		return false;
+	}
 	if (trackIndex < 0 || trackIndex >= static_cast<int>(tracks.size()))
 	{
 		failure = CommandResult::failure("track_not_found", QStringLiteral("Track %1 does not exist.").arg(trackIndex));

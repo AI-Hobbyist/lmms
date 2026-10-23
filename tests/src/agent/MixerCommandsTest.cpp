@@ -243,6 +243,25 @@ private slots:
 		QVERIFY(!routed.ok);
 		QCOMPARE(routed.errorCode, QStringLiteral("invalid_arguments"));
 	}
+
+	void setMixerChannelAcceptsTrackName()
+	{
+		QVERIFY(CommandBus::instance().execute("mixer.addChannel", {}).ok);
+		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "instrument"}, {"name", "Keys"}}).ok);
+
+		const auto routed = CommandBus::instance().execute("track.setMixerChannel", {{"track", "Keys"}, {"channel", 1}});
+		QVERIFY2(routed.ok, qPrintable(routed.errorMessage));
+		QCOMPARE(routed.data.value("mixerChannel").toInt(), 1);
+	}
+
+	void reportsUnknownTrackNameClearly()
+	{
+		const auto routed = CommandBus::instance().execute("track.setMixerChannel", {{"track", "0"}, {"channel", 0}});
+		QVERIFY(!routed.ok);
+		QCOMPARE(routed.errorCode, QStringLiteral("track_not_found"));
+		QCOMPARE(routed.errorMessage, QStringLiteral("Track \"0\" was not found by name."));
+		QVERIFY(!routed.errorHint.isEmpty());
+	}
 };
 
 QTEST_GUILESS_MAIN(MixerCommandsTest)
