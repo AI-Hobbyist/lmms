@@ -181,6 +181,68 @@ private slots:
 		QVERIFY(!result.ok);
 		QCOMPARE(result.errorCode, QStringLiteral("invalid_arguments"));
 	}
+
+	void setMixerChannelRoutesSvsTrack()
+	{
+		const auto add = CommandBus::instance().execute("mixer.addChannel", {{"name", "Vocal FX"}});
+		QVERIFY2(add.ok, qPrintable(add.errorMessage));
+		const int channelIndex = add.data.value("channel").toInt();
+
+		const auto track = CommandBus::instance().execute("svs.createTrack", {{"name", "Vocal"}});
+		QVERIFY2(track.ok, qPrintable(track.errorMessage));
+		const int trackIndex = track.data.value("index").toInt();
+
+		const auto routed = CommandBus::instance().execute(
+			"track.setMixerChannel", {{"track", trackIndex}, {"channel", channelIndex}});
+		QVERIFY2(routed.ok, qPrintable(routed.errorMessage));
+		QCOMPARE(routed.data.value("mixerChannel").toInt(), channelIndex);
+		QCOMPARE(routed.data.value("type").toString(), QStringLiteral("svs"));
+
+		const auto detail = CommandBus::instance().execute("svs.getTrack", {{"track", trackIndex}});
+		QVERIFY2(detail.ok, qPrintable(detail.errorMessage));
+		QCOMPARE(detail.data.value("mixerChannel").toInt(), channelIndex);
+
+		const auto undo = CommandBus::instance().execute("history.undo", {});
+		QVERIFY2(undo.ok, qPrintable(undo.errorMessage));
+		const auto restored = CommandBus::instance().execute("track.get", {{"track", trackIndex}});
+		QVERIFY2(restored.ok, qPrintable(restored.errorMessage));
+		QCOMPARE(restored.data.value("mixerChannel").toInt(), 0);
+	}
+
+	void setMixerChannelRoutesSvcTrack()
+	{
+		const auto add = CommandBus::instance().execute("mixer.addChannel", {});
+		QVERIFY2(add.ok, qPrintable(add.errorMessage));
+		const int channelIndex = add.data.value("channel").toInt();
+
+		const auto track = CommandBus::instance().execute("svc.createTrack", {{"name", "Conversion"}});
+		QVERIFY2(track.ok, qPrintable(track.errorMessage));
+		const int trackIndex = track.data.value("index").toInt();
+
+		const auto routed = CommandBus::instance().execute(
+			"track.setMixerChannel", {{"track", trackIndex}, {"channel", channelIndex}});
+		QVERIFY2(routed.ok, qPrintable(routed.errorMessage));
+		QCOMPARE(routed.data.value("mixerChannel").toInt(), channelIndex);
+		QCOMPARE(routed.data.value("type").toString(), QStringLiteral("svc"));
+	}
+
+	void setMixerChannelRejectsUnroutableTrack()
+	{
+		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "automation"}, {"name", "Auto"}}).ok);
+
+		const auto routed = CommandBus::instance().execute("track.setMixerChannel", {{"track", 0}, {"channel", 0}});
+		QVERIFY(!routed.ok);
+		QCOMPARE(routed.errorCode, QStringLiteral("wrong_track_type"));
+	}
+
+	void setMixerChannelRejectsUnknownChannel()
+	{
+		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "instrument"}}).ok);
+
+		const auto routed = CommandBus::instance().execute("track.setMixerChannel", {{"track", 0}, {"channel", 4}});
+		QVERIFY(!routed.ok);
+		QCOMPARE(routed.errorCode, QStringLiteral("invalid_arguments"));
+	}
 };
 
 QTEST_GUILESS_MAIN(MixerCommandsTest)

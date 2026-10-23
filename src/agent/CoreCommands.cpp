@@ -61,6 +61,8 @@
 #include "Scale.h"
 #include "Keymap.h"
 #include "Song.h"
+#include "SVCTrack.h"
+#include "SVSTrack.h"
 #include "TimePos.h"
 #include "Timeline.h"
 #include "Track.h"
@@ -602,6 +604,14 @@ QJsonObject trackDetail(Song* song, Track* track, int trackIndex)
 	if (auto* sampleTrack = dynamic_cast<SampleTrack*>(track))
 	{
 		detail.insert("mixerChannel", sampleTrack->mixerChannelModel()->value());
+	}
+	if (auto* svsTrack = dynamic_cast<SVSTrack*>(track))
+	{
+		detail.insert("mixerChannel", svsTrack->mixerChannelModel()->value());
+	}
+	if (auto* svcTrack = dynamic_cast<SVCTrack*>(track))
+	{
+		detail.insert("mixerChannel", svcTrack->mixerChannelModel()->value());
 	}
 
 	QJsonArray clips;
@@ -3422,9 +3432,18 @@ CommandResult executeTrackProperty(const QJsonObject& arguments, const QString& 
 		{
 			model = sample->mixerChannelModel();
 		}
+		if (auto* svsTrack = dynamic_cast<SVSTrack*>(track))
+		{
+			model = svsTrack->mixerChannelModel();
+		}
+		if (auto* svcTrack = dynamic_cast<SVCTrack*>(track))
+		{
+			model = svcTrack->mixerChannelModel();
+		}
 		if (!model)
 		{
-			return CommandResult::failure("wrong_track_type", "Only instrument and sample tracks have mixer channels.");
+			return CommandResult::failure("wrong_track_type",
+				"Only instrument, sample, SVS and SVC tracks have mixer channels.");
 		}
 		model->setRange(0, Engine::mixer()->numChannels() - 1, 1);
 		model->setValue(channel);

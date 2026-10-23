@@ -79,8 +79,9 @@ at index 0 and cannot be moved. All three commands are project-undoable and supp
 `mixer.set*` commands.
 
 SVS and SVC tracks have no effect chain of their own. Route such a track to a mixer
-channel with `track.setMixerChannel` and add effects on that channel
-(`effect.add` with `owner: "song/channel:N"`).
+channel with `track.setMixerChannel` (instrument, sample, SVS and SVC tracks are all
+accepted, and `track.get` reports `mixerChannel` for each of them) and add effects on
+that channel (`effect.add` with `owner: "song/channel:N"`).
 
 `track.get` / `track.list` and `clip.get` / `clip.list` report SVS and SVC tracks and
 clips as `type: "svs"` / `"svc"` instead of `"unknown"`; the dedicated
