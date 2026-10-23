@@ -33,7 +33,7 @@ async def discover(endpoint, execute=False, render=False):
                 result["capabilities"].get(key) is None for key in ("resources", "prompts", "tasks")
             )
             tools = (await session.list_tools()).tools
-            assert len(tools) == 198, len(tools)
+            assert len(tools) == 199, len(tools)
             names = {tool.name for tool in tools}
             assert "agent.runScript" in names
             assert {

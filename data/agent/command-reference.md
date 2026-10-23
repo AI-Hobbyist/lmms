@@ -8013,6 +8013,81 @@ Set declared track, clip or global SVS parameters.
 }
 ```
 
+## svs.setPitchCurve
+
+Write or clear the piano-roll pitch line (svs.pitch) of an SVS clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clear": {
+            "description": "The clear argument for this command.",
+            "type": "boolean"
+        },
+        "clip": {
+            "description": "The clip argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "interpolation": {
+            "description": "The interpolation argument for this command.",
+            "enum": [
+                "linear",
+                "hermite",
+                "step"
+            ],
+            "type": "string"
+        },
+        "points": {
+            "description": "The points argument for this command.",
+            "items": {
+                "properties": {
+                    "tick": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "value": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "tick",
+                    "value"
+                ],
+                "type": "object"
+            },
+            "maxItems": 4096,
+            "type": "array"
+        },
+        "relative": {
+            "description": "The relative argument for this command.",
+            "type": "boolean"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "The track argument for this command."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
 ## svs.setVoice
 
 Bind an installed SVS voicebank to an SVS track.

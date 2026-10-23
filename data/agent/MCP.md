@@ -113,6 +113,11 @@ uses the same word/ideograph tokenization as the piano-roll batch-lyrics dialog 
 preserves manual pronunciation and phoneme overrides. `svs.getPronunciation` is a
 read-only preview. `svs.getCurves` lists editable parameter curves; `svs.setCurve`
 replaces a declared curve object or removes it with `curve:null` and an `id`.
+The piano-roll pitch line is an editor curve (`svs.pitch`, absolute semitones) rather
+than a voicebank parameter, so it has its own command: `svs.setPitchCurve` writes
+`points:[{tick,value}]` (values are offsets from the sustaining note by default, or
+absolute pitches with `relative:false`), supports `linear`/`hermite`/`step`
+interpolation, and clears the curve with `clear:true`.
 `svs.synthesize` and `svs.cancelSynthesis` start or cancel asynchronous work and are
 rejected inside a project transaction; poll `svs.getStatus` for `status`,
 `audioAvailable` and cache/segment information.

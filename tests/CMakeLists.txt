@@ -54,6 +54,7 @@ if(WANT_AGENT)
 		src/agent/MixerCommandsTest.cpp
 		src/agent/TrackClipTypeTest.cpp
 		src/agent/SvsCommandsTest.cpp
+		src/agent/SvsPitchCommandsTest.cpp
 		src/agent/SvcCommandsTest.cpp
 	)
 endif()

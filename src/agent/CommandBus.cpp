@@ -2,6 +2,7 @@
 #include "DiscoveryCommands.h"
 #include "MixerCommands.h"
 #include "SvsCommands.h"
+#include "SvsPitchCommands.h"
 #include "SvcCommands.h"
 #include "agent/ExportCommands.h"
 #include "agent/ToolRegistry.h"
@@ -185,6 +186,7 @@ CommandBus::CommandBus()
 	registerDiscoveryCommands(*this);
 	registerMixerCommands(*this);
 	registerSvsCommands(*this);
+	registerSvsPitchCommands(*this);
 	registerSvcCommands(*this);
 }
 

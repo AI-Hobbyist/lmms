@@ -11,6 +11,7 @@ set(LMMS_SRCS
 	agent/DiscoveryCommands.cpp
 	agent/MixerCommands.cpp
 	agent/SvsCommands.cpp
+	agent/SvsPitchCommands.cpp
 	agent/SvcCommands.cpp
 	agent/ExportCommands.cpp
 	agent/ToolRegistry.cpp
