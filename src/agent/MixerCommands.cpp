@@ -191,6 +191,66 @@ CommandResult executeMixerRemoveChannel(const QJsonObject& arguments)
 		QJsonObject{{"removed", channelIndex}, {"numChannels", static_cast<int>(mixer->numChannels())}});
 }
 
+CommandResult executeMixerMoveChannel(const QJsonObject& arguments)
+{
+	auto* mixer = Engine::mixer();
+	if (mixer == nullptr)
+	{
+		return mixerUnavailable();
+	}
+
+	int channelIndex = -1;
+	QString error;
+	if (!readChannelIndex(arguments, channelIndex, error))
+	{
+		return invalidArguments(error);
+	}
+
+	const auto directionValue = arguments.value("direction");
+	if (!directionValue.isString())
+	{
+		return invalidArguments("'direction' is required and must be 'left' or 'right'.");
+	}
+	const QString direction = directionValue.toString().trimmed().toLower();
+	if (direction != "left" && direction != "right")
+	{
+		return invalidArguments("'direction' must be 'left' or 'right'.");
+	}
+
+	const int channelCount = static_cast<int>(mixer->numChannels());
+	if (channelIndex >= channelCount)
+	{
+		return CommandResult::failure(
+			"mixer_channel_not_found", QStringLiteral("Mixer channel %1 does not exist.").arg(channelIndex));
+	}
+
+	// The master channel is fixed at index 0, so channel 1 has no room to move left.
+	if (direction == "left")
+	{
+		if (channelIndex <= 1)
+		{
+			return CommandResult::failure("mixer_channel_at_edge",
+				QStringLiteral("Mixer channel %1 cannot move left.").arg(channelIndex),
+				"Channel 1 cannot move in front of the master channel.");
+		}
+		mixer->moveChannelLeft(channelIndex);
+		auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex - 1));
+		detail.insert("numChannels", channelCount);
+		return CommandResult::success(detail);
+	}
+
+	if (channelIndex == 0 || channelIndex == channelCount - 1)
+	{
+		return CommandResult::failure("mixer_channel_at_edge",
+			QStringLiteral("Mixer channel %1 cannot move right.").arg(channelIndex),
+			"Only channels between the master channel and the last channel can move right.");
+	}
+	mixer->moveChannelRight(channelIndex);
+	auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex + 1));
+	detail.insert("numChannels", channelCount);
+	return CommandResult::success(detail);
+}
+
 void addCommand(CommandBus& commandBus, const QString& name, const QString& summary, const QJsonObject& properties,
 	const QJsonArray& required, Mutability mutability, TxScope scope, CommandHandler handler)
 {
@@ -225,6 +285,13 @@ void registerMixerCommands(CommandBus& commandBus)
 		"Remove a mixer channel after rerouting its tracks; the master channel is protected.",
 		removeChannelProperties, QJsonArray{"channel"}, Mutability::Destructive, TxScope::Single,
 		executeMixerRemoveChannel);
+
+	QJsonObject moveChannelProperties{{"channel", QJsonObject{{"type", "integer"}, {"minimum", 0}}},
+		{"direction", QJsonObject{{"type", "string"}, {"enum", QJsonArray{"left", "right"}}}}};
+	addCommand(commandBus, "mixer.moveChannel",
+		"Move a mixer channel one position left or right; the master channel stays at index 0.",
+		moveChannelProperties, QJsonArray{"channel", "direction"}, Mutability::Mutating, TxScope::Single,
+		executeMixerMoveChannel);
 }
 
 } // namespace lmms::agent

@@ -4951,6 +4951,40 @@ List all mixer channels.
 }
 ```
 
+## mixer.moveChannel
+
+Move a mixer channel one position left or right; the master channel stays at index 0.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "channel": {
+            "description": "The channel argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "direction": {
+            "description": "The direction argument for this command.",
+            "enum": [
+                "left",
+                "right"
+            ],
+            "type": "string"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "channel",
+        "direction"
+    ],
+    "type": "object"
+}
+```
+
 ## mixer.removeChannel
 
 Remove a mixer channel after rerouting its tracks; the master channel is protected.

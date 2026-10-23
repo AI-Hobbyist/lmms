@@ -144,6 +144,43 @@ private slots:
 		QVERIFY2(undo.ok, qPrintable(undo.errorMessage));
 		QCOMPARE(static_cast<int>(Engine::mixer()->numChannels()), 2);
 	}
+
+	void moveChannelSwapsWithNeighbour()
+	{
+		QVERIFY(CommandBus::instance().execute("mixer.addChannel", {{"name", "First"}}).ok);
+		QVERIFY(CommandBus::instance().execute("mixer.addChannel", {{"name", "Second"}}).ok);
+
+		const auto moved = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 2}, {"direction", "left"}});
+		QVERIFY2(moved.ok, qPrintable(moved.errorMessage));
+		QCOMPARE(moved.data.value("channel").toInt(), 1);
+		QCOMPARE(moved.data.value("name").toString(), QStringLiteral("Second"));
+		QCOMPARE(Engine::mixer()->mixerChannel(1)->m_name, QStringLiteral("Second"));
+		QCOMPARE(Engine::mixer()->mixerChannel(2)->m_name, QStringLiteral("First"));
+
+		const auto back = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 1}, {"direction", "right"}});
+		QVERIFY2(back.ok, qPrintable(back.errorMessage));
+		QCOMPARE(back.data.value("channel").toInt(), 2);
+		QCOMPARE(Engine::mixer()->mixerChannel(1)->m_name, QStringLiteral("First"));
+	}
+
+	void moveChannelRejectsEdges()
+	{
+		const auto master = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 0}, {"direction", "right"}});
+		QVERIFY(!master.ok);
+		QCOMPARE(master.errorCode, QStringLiteral("mixer_channel_at_edge"));
+
+		QVERIFY(CommandBus::instance().execute("mixer.addChannel", {}).ok);
+		const auto first = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 1}, {"direction", "left"}});
+		QVERIFY(!first.ok);
+		QCOMPARE(first.errorCode, QStringLiteral("mixer_channel_at_edge"));
+	}
+
+	void moveChannelRejectsInvalidDirection()
+	{
+		const auto result = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 1}, {"direction", "up"}});
+		QVERIFY(!result.ok);
+		QCOMPARE(result.errorCode, QStringLiteral("invalid_arguments"));
+	}
 };
 
 QTEST_GUILESS_MAIN(MixerCommandsTest)

@@ -73,8 +73,18 @@ as `mixer.getChannel`; the new channel is routed to the master channel automatic
 and can be named in the same call. Route a track to it with `track.setMixerChannel`.
 `mixer.removeChannel` protects channel 0 (master) and refuses channels that a track
 still uses; pass `force:true` to reroute those tracks to the master channel first.
-Both commands are project-undoable and support `dryRun`. Send, volume, mute, solo,
-name and color changes continue to use the existing `mixer.set*` commands.
+`mixer.moveChannel` reorders one channel a single slot left or right; the master stays
+at index 0 and cannot be moved. All three commands are project-undoable and support
+`dryRun`. Send, volume, mute, solo, name and color changes continue to use the existing
+`mixer.set*` commands.
+
+SVS and SVC tracks have no effect chain of their own. Route such a track to a mixer
+channel with `track.setMixerChannel` and add effects on that channel
+(`effect.add` with `owner: "song/channel:N"`).
+
+`track.get` / `track.list` and `clip.get` / `clip.list` report SVS and SVC tracks and
+clips as `type: "svs"` / `"svc"` instead of `"unknown"`; the dedicated
+`svs.getTrack` / `svc.getTrack` payloads remain the richer view.
 
 ## SVS editing tools
 

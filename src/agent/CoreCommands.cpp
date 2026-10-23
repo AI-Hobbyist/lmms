@@ -305,6 +305,8 @@ QString trackTypeName(Track::Type type)
 		return "hiddenAutomation";
 	case Track::Type::SVS:
 		return "svs";
+	case Track::Type::SVC:
+		return "svc";
 	case Track::Type::Count:
 		return "unknown";
 	}
@@ -324,6 +326,10 @@ QString clipTypeName(const Clip* clip)
 		return "sample";
 	case Track::Type::Automation:
 		return "automation";
+	case Track::Type::SVS:
+		return "svs";
+	case Track::Type::SVC:
+		return "svc";
 	default:
 		return "unknown";
 	}

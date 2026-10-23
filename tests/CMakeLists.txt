@@ -52,6 +52,7 @@ if(WANT_AGENT)
 		src/agent/A4CommandsTest.cpp
 		src/agent/DiscoveryCommandsTest.cpp
 		src/agent/MixerCommandsTest.cpp
+		src/agent/TrackClipTypeTest.cpp
 		src/agent/SvsCommandsTest.cpp
 		src/agent/SvcCommandsTest.cpp
 	)
