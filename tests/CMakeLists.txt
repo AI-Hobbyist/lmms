@@ -51,6 +51,7 @@ if(WANT_AGENT)
 		src/agent/A3CommandsTest.cpp
 		src/agent/A4CommandsTest.cpp
 		src/agent/DiscoveryCommandsTest.cpp
+		src/agent/MixerCommandsTest.cpp
 		src/agent/SvsCommandsTest.cpp
 		src/agent/SvcCommandsTest.cpp
 	)

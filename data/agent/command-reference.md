@@ -4827,6 +4827,27 @@ Adjust selected mixer gains from caller-provided measured peakDb to targetDb min
 }
 ```
 
+## mixer.addChannel
+
+Create a new mixer channel and return its detail object; optional name and dryRun.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "name": {
+            "description": "The name argument for this command.",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}
+```
+
 ## mixer.addSend
 
 Create a mixer send.
@@ -4926,6 +4947,35 @@ List all mixer channels.
     "additionalProperties": false,
     "properties": {
     },
+    "type": "object"
+}
+```
+
+## mixer.removeChannel
+
+Remove a mixer channel after rerouting its tracks; the master channel is protected.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "channel": {
+            "description": "The channel argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "force": {
+            "description": "The force argument for this command.",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "channel"
+    ],
     "type": "object"
 }
 ```

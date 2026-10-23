@@ -9,6 +9,7 @@ set(LMMS_SRCS
 	agent/CommandTargets.cpp
 	agent/CoreCommands.cpp
 	agent/DiscoveryCommands.cpp
+	agent/MixerCommands.cpp
 	agent/SvsCommands.cpp
 	agent/SvcCommands.cpp
 	agent/ExportCommands.cpp

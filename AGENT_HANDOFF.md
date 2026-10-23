@@ -32,7 +32,8 @@
 - **M2 SVS（17）**：建轨/建片段、声库绑定、音符 CRUD、批量填词（复用 `SVSLyricEditor::splitLyrics`）、发音解析、音素/参数、词典、合成/取消/状态。
 - **M2b SVS 曲线（2）**：`svs.getCurves`、`svs.setCurve`，复用 `svs::Curve::fromJson/toJson`，支持替换与 `curve:null` 删除。
 - **M3 SVC（9）**：建轨/建片段、`requestSelection` 规范化选型、源音频、分块配置、转换/取消/状态。
-- 当前运行时目录：**194 个 MCP 工具 / 199 个注册命令**；`data/agent/command-reference.md` 已由 `AgentHarness --manual` 重新生成，`data/agent/MCP.md` 已补发现/SVS/SVC 说明。
+- **M5 调音台通道（2，2026-10-24）**：`mixer.addChannel`、`mixer.removeChannel`，补齐“调音台相关轨道添加”缺口（此前 MCP 只能改 master，无法新建通道，因此 `track.setMixerChannel` 只能指向 0）。新文件 `src/agent/MixerCommands.h/.cpp`、`tests/src/agent/MixerCommandsTest.cpp`；旧文件仅追加注册/构建/测试/文档。master 受保护、在用通道需 `force:true` 才能连带改线后删除；两者均支持 `dryRun` 与 undo。
+- 当前运行时目录：**196 个 MCP 工具 / 201 个注册命令**；`data/agent/command-reference.md` 已由 `AgentHarness --manual` 重新生成，`data/agent/MCP.md` 已补发现/Mixer/SVS/SVC 说明。
 - 新增测试：`DiscoveryCommandsTest`、`SvsCommandsTest`、`SvcCommandsTest`。Agent + MCP 回归 **13/13 passed**。
 - 官方 Python MCP SDK 2.2.0 对 `AgentHarness` 实际连接：发现 **194** 个工具/schema、ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过。
 

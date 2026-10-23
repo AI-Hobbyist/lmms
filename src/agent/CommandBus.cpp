@@ -1,5 +1,6 @@
 #include "agent/CommandBus.h"
 #include "DiscoveryCommands.h"
+#include "MixerCommands.h"
 #include "SvsCommands.h"
 #include "SvcCommands.h"
 #include "agent/ExportCommands.h"
@@ -182,6 +183,7 @@ CommandBus::CommandBus()
 	registerScriptCommands(*this);
 	registerHighLevelCommands(*this);
 	registerDiscoveryCommands(*this);
+	registerMixerCommands(*this);
 	registerSvsCommands(*this);
 	registerSvcCommands(*this);
 }

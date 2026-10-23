@@ -66,6 +66,16 @@ existing load commands:
 voicebank and model lists may be empty on the first call. List tools are read-only,
 do not change the project, and are outside undo.
 
+## Mixer channel tools
+
+`mixer.addChannel` appends a mixer channel and returns the same channel detail object
+as `mixer.getChannel`; the new channel is routed to the master channel automatically
+and can be named in the same call. Route a track to it with `track.setMixerChannel`.
+`mixer.removeChannel` protects channel 0 (master) and refuses channels that a track
+still uses; pass `force:true` to reroute those tracks to the master channel first.
+Both commands are project-undoable and support `dryRun`. Send, volume, mute, solo,
+name and color changes continue to use the existing `mixer.set*` commands.
+
 ## SVS editing tools
 
 `svs.createTrack` (optionally with `pluginId`/`voiceId`) and `svs.createClip` create
