@@ -33,7 +33,7 @@ async def discover(endpoint, execute=False, render=False):
                 result["capabilities"].get(key) is None for key in ("resources", "prompts", "tasks")
             )
             tools = (await session.list_tools()).tools
-            assert len(tools) == 183, len(tools)
+            assert len(tools) == 192, len(tools)
             names = {tool.name for tool in tools}
             assert "agent.runScript" in names
             assert {
@@ -48,6 +48,10 @@ async def discover(endpoint, execute=False, render=False):
                 "svs.addNotes",
                 "svs.setLyrics",
                 "svs.synthesize",
+                "svc.createTrack",
+                "svc.setModel",
+                "svc.setSourceFile",
+                "svc.convert",
             } <= names
             assert not names & {
                 "agent.listCommands",

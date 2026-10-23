@@ -1,6 +1,7 @@
 #include "agent/CommandBus.h"
 #include "DiscoveryCommands.h"
 #include "SvsCommands.h"
+#include "SvcCommands.h"
 #include "agent/ExportCommands.h"
 #include "agent/ToolRegistry.h"
 #include "agent/ScriptRunner.h"
@@ -182,6 +183,7 @@ CommandBus::CommandBus()
 	registerHighLevelCommands(*this);
 	registerDiscoveryCommands(*this);
 	registerSvsCommands(*this);
+	registerSvcCommands(*this);
 }
 
 bool CommandBus::registerCommand(const CommandDescriptor& descriptor)

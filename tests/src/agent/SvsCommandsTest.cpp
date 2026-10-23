@@ -257,6 +257,24 @@ private slots:
 		QCOMPARE(Engine::getSong()->tracks().size(), before + 1);
 		QVERIFY(CommandBus::instance().execute("history.undo").ok);
 		QCOMPARE(Engine::getSong()->tracks().size(), before);
+
+		const int noteTrack = createTrack();
+		QVERIFY(noteTrack >= 0);
+		const int clipIndex = createClip(noteTrack);
+		QVERIFY(clipIndex >= 0);
+		const auto added = CommandBus::instance().execute(
+			"svs.addNotes", {{"track", noteTrack}, {"clip", clipIndex}, {"notes", exampleNotes()}});
+		QVERIFY2(added.ok, qPrintable(added.errorMessage));
+		QVERIFY(CommandBus::instance().execute("history.undo").ok);
+		QCOMPARE(CommandBus::instance().execute("svs.getNotes", {{"track", noteTrack}, {"clip", clipIndex}})
+					 .data.value("total")
+					 .toInt(),
+			0);
+		QVERIFY(CommandBus::instance().execute("history.redo").ok);
+		QCOMPARE(CommandBus::instance().execute("svs.getNotes", {{"track", noteTrack}, {"clip", clipIndex}})
+					 .data.value("total")
+					 .toInt(),
+			3);
 	}
 
 	void wrongTrackType()

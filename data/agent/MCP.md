@@ -79,6 +79,21 @@ asynchronous work and are rejected inside a project transaction; poll
 `svs.getStatus` for `status`, `audioAvailable` and cache/segment information.
 Project edits from SVS commands are part of project undo; synthesis results are not.
 
+## SVC tools
+
+`svc.createTrack` optionally takes a `selection` object (`engine_id`, `model_id`,
+optional `weight_id`/`speaker_id`/`parameters`). `svc.setModel` normalizes the
+selection through the engine capability contract: it validates the model, weight and
+speaker, fills parameter defaults and rejects unavailable or out-of-range values.
+Selection never contains connection tokens. `svc.setSourceFile` decodes a local
+audio file into the clip and is a blocking, project-undoable operation.
+`svc.setChunkConfig` updates the silence/length/forced thresholds and invalidates
+affected clips. `svc.convert` and `svc.cancel` are asynchronous and rejected inside a
+project transaction; poll `svc.getStatus` for `status`, `progress`,
+`conversionComplete`, `conversionFailed` and `cacheReferences`. `svc.getTrack`
+returns the normalized selection, engine status, model parameters, chunk config and
+clip summaries.
+
 One local MCP session is supported: initialization replaces the previous session.
 The client sends the returned `MCP-Session-Id`, the negotiated protocol header and
 the initialized notification before using tools. Stopping invalidates the session

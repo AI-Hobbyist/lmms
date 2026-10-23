@@ -1,6 +1,6 @@
 # LMMS MCP 工具补充计划书（列表发现 · SVS/SVC 选取与输入）
 
-> **文档状态**：v0.3（M1、M2 已实施并通过自动化验证；M3 待实施）
+> **文档状态**：v0.4（M1、M2、M3 已实施并通过自动化验证）
 > **编写日期**：2026-10-23（Asia/Seoul）
 > **源码基线**：`44ccf432e4ba0e0a818e7a22a42a8624732c0141`，分支 `master`
 > **勘察依据**：CodeGraph 符号检索 + 源码核对；现有实现结论见 [MCP 实现分析](MCP_IMPLEMENTATION_ANALYSIS.md)，接续约束见 [Agent 交接手册](AGENT_HANDOFF.md)
@@ -1156,12 +1156,14 @@ registerSvcCommands(*this);       // M3
 |--------|------|------|
 | M1 列表发现 | **已实施** | 7 个只读工具注册；`--tools` 导出 **166** 个工具；`--manual` 生成 **171** 个命令；`DiscoveryCommandsTest` 通过（CTest 1/1）；`client_smoke.py` 数量断言更新为 166 并增加发现调用 |
 | M2 SVS 输入 | **已实施** | 17 个 `svs.*` 命令（曲线延后）；`--tools` 导出 **183** 个工具；`--manual` 生成 **188** 个命令；`SvsCommandsTest` 8 项通过（建轨/片段/声库/音符/填词/参数/撤销/合成）；`client_smoke.py` 更新为 183 |
-| M3 SVC 输入 | 待实施 | — |
+| M3 SVC 输入 | **已实施** | 9 个 `svc.*` 命令；`--tools` 导出 **192** 个工具；`--manual` 生成 **197** 个命令；`SvcCommandsTest` 7 项通过（建轨/选型/源音频/分块/转换/撤销/类型校验）；`client_smoke.py` 更新为 192 |
 | M4 收尾 | 待实施 | — |
 
 M1 构建记录：`cmake --build build --config Release --target AgentHarness` 与 `DiscoveryCommandsTest` 均 `EXITCODE=0`；日志为 `build-m1.log`、`build-m1-test.log`、`test-m1.log`（本地未跟踪产物）。
 
 M2 构建记录：`AgentHarness`、`SvsCommandsTest`、`SVSExample` 构建均 `EXITCODE=0`；`SvsCommandsTest` 8 passed / 0 failed / 0 skipped（含 `SVSExample` 合成到音频可用）；日志为 `build-m2.log`、`build-m2-test.log`、`test-m2.log`。`svs.getCurves/setCurve` 未在本阶段实施，留待后续。
+
+M3 构建记录：`AgentHarness`、`SvcCommandsTest` 构建均 `EXITCODE=0`；`SvcCommandsTest` 7 passed / 0 failed / 0 skipped（reference 引擎转换完成）；日志为 `build-m3.log`、`build-m3-test.log`、`test-m3.log`。真实 RVC/USVC 后端未接入本机自动化，标为 `MANUAL/PENDING`。
 
 ---
 

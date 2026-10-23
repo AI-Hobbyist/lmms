@@ -6498,6 +6498,270 @@ Set the song time signature.
 }
 ```
 
+## svc.cancel
+
+Cancel SVC conversion for a track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svc.convert
+
+Start asynchronous SVC conversion for a clip or track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svc.createClip
+
+Create an SVC clip on an SVC track.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "length": {
+            "description": "The length argument for this command.",
+            "type": "integer"
+        },
+        "name": {
+            "description": "The name argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "position": {
+            "description": "The position argument for this command.",
+            "type": "integer"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svc.createTrack
+
+Create an SVC track, optionally selecting an engine and model.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "index": {
+            "description": "The index argument for this command.",
+            "type": "integer"
+        },
+        "name": {
+            "description": "The name argument for this command.",
+            "type": "string"
+        },
+        "selection": {
+            "additionalProperties": false,
+            "description": "The selection argument for this command.",
+            "properties": {
+                "engine_id": {
+                    "type": "string"
+                },
+                "model_id": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "object"
+                },
+                "speaker_id": {
+                    "type": "string"
+                },
+                "weight_id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "engine_id",
+                "model_id"
+            ],
+            "type": "object"
+        }
+    },
+    "required": [
+    ],
+    "type": "object"
+}
+```
+
+## svc.getStatus
+
+Return SVC clip or track conversion status.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svc.getTrack
+
+Return SVC selection, chunk config and clip status.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
 ## svc.listModels
 
 List SVC engines, models, weights and speakers for selection; read-only.
@@ -6535,6 +6799,171 @@ List SVC engines, models, weights and speakers for selection; read-only.
         }
     },
     "required": [
+    ],
+    "type": "object"
+}
+```
+
+## svc.setChunkConfig
+
+Set SVC silence, length and forced chunk thresholds.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "forcedChunkSeconds": {
+            "description": "The forcedChunkSeconds argument for this command.",
+            "minimum": 0,
+            "type": "number"
+        },
+        "lengthThresholdSeconds": {
+            "description": "The lengthThresholdSeconds argument for this command.",
+            "minimum": 0,
+            "type": "number"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "silenceThresholdDbfs": {
+            "description": "The silenceThresholdDbfs argument for this command.",
+            "maximum": 0,
+            "minimum": -120,
+            "type": "number"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track"
+    ],
+    "type": "object"
+}
+```
+
+## svc.setModel
+
+Select and normalize an SVC model, weight, speaker and parameters.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "engine_id": {
+            "description": "The engine_id argument for this command.",
+            "type": "string"
+        },
+        "model_id": {
+            "description": "The model_id argument for this command.",
+            "type": "string"
+        },
+        "parameters": {
+            "description": "The parameters argument for this command.",
+            "type": "object"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "speaker_id": {
+            "description": "The speaker_id argument for this command.",
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        },
+        "weight_id": {
+            "description": "The weight_id argument for this command.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "track",
+        "engine_id",
+        "model_id"
+    ],
+    "type": "object"
+}
+```
+
+## svc.setSourceFile
+
+Decode and attach a source audio file to an SVC clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "path": {
+            "description": "The path argument for this command.",
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip",
+        "path"
     ],
     "type": "object"
 }

@@ -10,6 +10,7 @@ set(LMMS_SRCS
 	agent/CoreCommands.cpp
 	agent/DiscoveryCommands.cpp
 	agent/SvsCommands.cpp
+	agent/SvcCommands.cpp
 	agent/ExportCommands.cpp
 	agent/ToolRegistry.cpp
 	agent/ScriptExpression.cpp
