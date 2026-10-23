@@ -7237,6 +7237,46 @@ Return SVS parameter, language, phoneme and dictionary capabilities.
 }
 ```
 
+## svs.getCurves
+
+List editable SVS parameter curves for a clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
 ## svs.getNotes
 
 List SVS notes with stable ids and optional pronunciation.
@@ -7586,6 +7626,65 @@ Remove SVS notes by id or clip-local tick range.
                 "end"
             ],
             "type": "object"
+        },
+        "track": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "Track index, unique name, or song/track:N path."
+        }
+    },
+    "required": [
+        "track",
+        "clip"
+    ],
+    "type": "object"
+}
+```
+
+## svs.setCurve
+
+Replace or remove one declared SVS parameter curve on a clip.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "clip": {
+            "description": "The clip argument for this command.",
+            "type": "integer"
+        },
+        "curve": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "The curve argument for this command."
+        },
+        "dryRun": {
+            "description": "Validate and preview the change without committing project or history changes.",
+            "type": "boolean"
+        },
+        "id": {
+            "description": "The id argument for this command.",
+            "type": "string"
+        },
+        "parent": {
+            "description": "The parent argument for this command.",
+            "enum": [
+                "song",
+                "pattern"
+            ],
+            "type": "string"
         },
         "track": {
             "anyOf": [

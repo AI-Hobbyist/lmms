@@ -74,9 +74,11 @@ SVS project data. After `svs.setVoice`, poll `svs.getTrack` until
 `svs.getNotes` returns stable note ids; update and remove notes by id. `svs.setLyrics`
 uses the same word/ideograph tokenization as the piano-roll batch-lyrics dialog and
 preserves manual pronunciation and phoneme overrides. `svs.getPronunciation` is a
-read-only preview. `svs.synthesize` and `svs.cancelSynthesis` start or cancel
-asynchronous work and are rejected inside a project transaction; poll
-`svs.getStatus` for `status`, `audioAvailable` and cache/segment information.
+read-only preview. `svs.getCurves` lists editable parameter curves; `svs.setCurve`
+replaces a declared curve object or removes it with `curve:null` and an `id`.
+`svs.synthesize` and `svs.cancelSynthesis` start or cancel asynchronous work and are
+rejected inside a project transaction; poll `svs.getStatus` for `status`,
+`audioAvailable` and cache/segment information.
 Project edits from SVS commands are part of project undo; synthesis results are not.
 
 ## SVC tools

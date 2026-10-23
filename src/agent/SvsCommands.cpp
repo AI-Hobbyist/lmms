@@ -1127,6 +1127,120 @@ CommandResult executeSetParameters(const QJsonObject& arguments)
 		{"parameters", parameters}});
 }
 
+CommandResult executeGetCurves(const QJsonObject& arguments)
+{
+	SVSTrack* track = nullptr;
+	SVSClip* clip = nullptr;
+	int trackIndex = -1;
+	int clipIndex = -1;
+	CommandResult failure;
+	if (!resolveSvsClip(arguments, track, clip, trackIndex, clipIndex, failure))
+	{
+		return failure;
+	}
+	return CommandResult::success(QJsonObject{{"path", clipPath(trackIndex, clipIndex, track)},
+		{"ready", track->capabilitiesReady()}, {"curves", svs::curvesToJson(clip->curves())}});
+}
+
+CommandResult executeSetCurve(const QJsonObject& arguments)
+{
+	SVSTrack* track = nullptr;
+	SVSClip* clip = nullptr;
+	int trackIndex = -1;
+	int clipIndex = -1;
+	CommandResult failure;
+	if (!resolveSvsClip(arguments, track, clip, trackIndex, clipIndex, failure))
+	{
+		return failure;
+	}
+	if (clip->readOnly())
+	{
+		return CommandResult::failure("svs_clip_read_only", "The SVS clip is read-only.");
+	}
+	QString id;
+	QString error;
+	if (!readString(arguments, "id", id, error, false))
+	{
+		return invalidArguments(error);
+	}
+	auto curves = clip->curves();
+	if (arguments.contains("curve") && !arguments.value("curve").isNull())
+	{
+		if (!track->capabilitiesReady())
+		{
+			return capabilitiesPending();
+		}
+		const auto value = arguments.value("curve");
+		if (!value.isObject())
+		{
+			return invalidArguments("'curve' must be an object or null.");
+		}
+		const auto object = value.toObject();
+		const auto curveId = object.value("id").toString();
+		if (curveId.isEmpty())
+		{
+			return invalidArguments("The curve object requires a non-empty 'id'.");
+		}
+		if (!id.isEmpty() && id != curveId)
+		{
+			return invalidArguments("'id' and curve.id must identify the same curve.");
+		}
+		const auto& capabilities = track->capabilities();
+		const auto requestedScope = object.value("scope").toString();
+		const svs::Parameter* descriptor = nullptr;
+		if (!requestedScope.isEmpty())
+		{
+			descriptor = capabilities.parameter(curveId, requestedScope);
+		}
+		for (const auto& scope : {QString("clip"), QString("track"), QString("global")})
+		{
+			if (descriptor == nullptr)
+			{
+				descriptor = capabilities.parameter(curveId, scope);
+			}
+		}
+		if (descriptor == nullptr)
+		{
+			return CommandResult::failure(
+				"svs_parameter_not_found", "The SVS curve parameter is not declared: " + curveId);
+		}
+		if (!descriptor->curve || !descriptor->writable)
+		{
+			return CommandResult::failure(
+				"svs_curve_not_supported", "The SVS parameter does not expose an editable curve: " + curveId);
+		}
+		svs::Curve curve;
+		if (!svs::Curve::fromJson(object, curve, error, descriptor))
+		{
+			return CommandResult::failure("svs_curve_invalid", error);
+		}
+		if (curve.id != curveId)
+		{
+			return CommandResult::failure("svs_curve_invalid", "The parsed curve id does not match the request.");
+		}
+		if (curve.scope.isEmpty())
+		{
+			curve.scope = descriptor->scope;
+		}
+		curves[curveId] = curve;
+	}
+	else
+	{
+		if (id.isEmpty())
+		{
+			return invalidArguments("Provide 'id' when removing a curve with 'curve: null'.");
+		}
+		if (!curves.contains(id))
+		{
+			return CommandResult::failure("svs_curve_not_found", "The SVS curve does not exist: " + id);
+		}
+		curves.remove(id);
+	}
+	clip->setEditorData(clip->notes(), curves);
+	return CommandResult::success(QJsonObject{{"path", clipPath(trackIndex, clipIndex, track)},
+		{"curves", svs::curvesToJson(clip->curves())}});
+}
+
 CommandResult executeImportDictionary(const QJsonObject& arguments)
 {
 	SVSTrack* track = nullptr;
@@ -1538,6 +1652,20 @@ void registerSvsCommands(CommandBus& commandBus)
 	registerCommand(commandBus, "svs.setParameters", "Set declared track, clip or global SVS parameters.",
 		discovery::objectSchema(parametersProperties, QJsonArray{"track", "clip", "scope", "parameters"}),
 		Mutability::Mutating, TxScope::Single, executeSetParameters);
+
+	registerCommand(commandBus, "svs.getCurves", "List editable SVS parameter curves for a clip.",
+		discovery::objectSchema(clipSchema(), QJsonArray{"track", "clip"}), Mutability::ReadOnly, TxScope::None,
+		executeGetCurves);
+
+	QJsonObject curveProperties = clipSchema();
+	curveProperties.insert("id", discovery::stringSchema());
+	curveProperties.insert("curve",
+		QJsonObject{{"anyOf",
+			QJsonArray{QJsonObject{{"type", "object"}}, QJsonObject{{"type", "null"}}}}});
+	registerCommand(commandBus, "svs.setCurve",
+		"Replace or remove one declared SVS parameter curve on a clip.",
+		discovery::objectSchema(curveProperties, QJsonArray{"track", "clip"}), Mutability::Mutating,
+		TxScope::Single, executeSetCurve);
 
 	QJsonObject dictionaryProperties = clipSchema();
 	dictionaryProperties.insert("path", discovery::stringSchema());

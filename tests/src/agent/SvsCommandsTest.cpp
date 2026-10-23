@@ -6,6 +6,8 @@
 #include <QJsonObject>
 #include <QThread>
 
+#include <cmath>
+
 #include "agent/CommandBus.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
@@ -242,6 +244,107 @@ private slots:
 				{"parameter", noteParameter.value("id")}, {"value", value}});
 		QVERIFY2(applied.ok, qPrintable(applied.errorMessage));
 		QCOMPARE(applied.data.value("updated").toInt(), 1);
+	}
+
+	void curves()
+	{
+		const int trackIndex = createTrack();
+		QVERIFY(trackIndex >= 0);
+		QVERIFY(waitForCapabilities(trackIndex));
+		const int clipIndex = createClip(trackIndex);
+		QVERIFY(clipIndex >= 0);
+
+		const auto capabilities = CommandBus::instance().execute(
+			"svs.getCapabilities", {{"track", trackIndex}});
+		QVERIFY2(capabilities.ok, qPrintable(capabilities.errorMessage));
+		QJsonObject parameter;
+		for (const auto& entry : capabilities.data.value("parameters").toArray())
+		{
+			const auto candidate = entry.toObject();
+			if (candidate.value("curve").toBool() && candidate.value("writable").toBool()
+				&& !candidate.value("feedback").toBool())
+			{
+				parameter = candidate;
+				break;
+			}
+		}
+		if (parameter.isEmpty())
+		{
+			QSKIP("SVSExample does not declare an editable curve parameter");
+		}
+		QJsonValue value;
+		const auto type = parameter.value("type").toString();
+		if (type == "bool")
+		{
+			value = true;
+		}
+		else if (type == "enum")
+		{
+			const auto choices = parameter.value("choices").toArray();
+			if (choices.isEmpty())
+			{
+				QSKIP("SVSExample enum curve has no options");
+			}
+			value = choices.first().toObject().value("id");
+		}
+		else if (parameter.contains("default") && !parameter.value("default").isNull())
+		{
+			value = parameter.value("default");
+		}
+		else if (parameter.contains("minimum"))
+		{
+			value = parameter.value("minimum");
+		}
+		else
+		{
+			value = 0.5;
+		}
+		if (type == "int")
+		{
+			value = std::round(value.toDouble());
+		}
+		const auto id = parameter.value("id").toString();
+		QJsonObject point{{"tick", 0}, {"value", value}};
+		QJsonObject curve{{"id", id}, {"scope", parameter.value("scope")}, {"type", type},
+			{"interpolation", type == "float" ? "linear" : "step"}, {"points", QJsonArray{point}}};
+		const auto applied = CommandBus::instance().execute(
+			"svs.setCurve", {{"track", trackIndex}, {"clip", clipIndex}, {"curve", curve}});
+		QVERIFY2(applied.ok, qPrintable(applied.errorMessage));
+		QVERIFY(applied.data.value("curves").toObject().contains(id));
+
+		const auto read = CommandBus::instance().execute(
+			"svs.getCurves", {{"track", trackIndex}, {"clip", clipIndex}});
+		QVERIFY2(read.ok, qPrintable(read.errorMessage));
+		QVERIFY(read.data.value("curves").toObject().contains(id));
+
+		QVERIFY(CommandBus::instance().execute("history.undo").ok);
+		QVERIFY(!CommandBus::instance().execute("svs.getCurves", {{"track", trackIndex}, {"clip", clipIndex}})
+					 .data.value("curves")
+					 .toObject()
+					 .contains(id));
+		QVERIFY(CommandBus::instance().execute("history.redo").ok);
+		QVERIFY(CommandBus::instance().execute("svs.getCurves", {{"track", trackIndex}, {"clip", clipIndex}})
+					.data.value("curves")
+					.toObject()
+					.contains(id));
+
+		const auto removed = CommandBus::instance().execute("svs.setCurve",
+			{{"track", trackIndex}, {"clip", clipIndex}, {"id", id}, {"curve", QJsonValue()}});
+		QVERIFY2(removed.ok, qPrintable(removed.errorMessage));
+		QVERIFY(!removed.data.value("curves").toObject().contains(id));
+	}
+
+	void importDictionaryRejectsMissingFile()
+	{
+		const int trackIndex = createTrack();
+		QVERIFY(trackIndex >= 0);
+		QVERIFY(waitForCapabilities(trackIndex));
+		const int clipIndex = createClip(trackIndex);
+		QVERIFY(clipIndex >= 0);
+		const auto result = CommandBus::instance().execute("svs.importDictionary",
+			{{"track", trackIndex}, {"clip", clipIndex}, {"path", "missing-dictionary.json"}});
+		QVERIFY(!result.ok);
+		QCOMPARE(result.errorCode, QString("file_not_found"));
 	}
 
 	void undoAndDryRun()

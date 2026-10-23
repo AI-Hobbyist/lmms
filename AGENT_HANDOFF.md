@@ -1,6 +1,6 @@
 # Agent 交接手册：LMMS MCP 补充工作
 
-更新：2026-10-23（Asia/Seoul）。本次任务：在 `MCP工具补充计划书.md` 授权下完成 M1～M3，并整理 M4 文档与验证记录。M1～M3 已实现、提交并推送；M4 只更新文档与验证状态，不改产品代码。
+更新：2026-10-23（Asia/Seoul）。本次任务：在 `MCP工具补充计划书.md` 授权下完成 M1～M3 与 M2b，并整理 M4 文档与验证记录。M1～M3/M2b 已实现、提交并推送；M4 更新文档与验证状态。
 
 ## 1. 首要约束：已有实现冻结
 
@@ -29,15 +29,15 @@
 ### 已完成（2026-10-23）
 
 - **M1 发现工具（7）**：`instrument.listPlugins`、`preset.list`、`sample.list`、`svs.listVoices`、`svc.listModels`、`fs.listRoots`、`fs.listDirectory`。全部只读、分页，返回绝对路径或稳定选择 id。
-- **M2 SVS（17）**：建轨/建片段、声库绑定、音符 CRUD、批量填词（复用 `SVSLyricEditor::splitLyrics`）、发音解析、音素/参数、词典、合成/取消/状态。`svs.getCurves/setCurve` 未实施。
+- **M2 SVS（17）**：建轨/建片段、声库绑定、音符 CRUD、批量填词（复用 `SVSLyricEditor::splitLyrics`）、发音解析、音素/参数、词典、合成/取消/状态。
+- **M2b SVS 曲线（2）**：`svs.getCurves`、`svs.setCurve`，复用 `svs::Curve::fromJson/toJson`，支持替换与 `curve:null` 删除。
 - **M3 SVC（9）**：建轨/建片段、`requestSelection` 规范化选型、源音频、分块配置、转换/取消/状态。
-- 当前运行时目录：**192 个 MCP 工具 / 197 个注册命令**；`data/agent/command-reference.md` 已由 `AgentHarness --manual` 重新生成，`data/agent/MCP.md` 已补发现/SVS/SVC 说明。
+- 当前运行时目录：**194 个 MCP 工具 / 199 个注册命令**；`data/agent/command-reference.md` 已由 `AgentHarness --manual` 重新生成，`data/agent/MCP.md` 已补发现/SVS/SVC 说明。
 - 新增测试：`DiscoveryCommandsTest`、`SvsCommandsTest`、`SvcCommandsTest`。Agent + MCP 回归 **13/13 passed**。
-- 官方 Python MCP SDK 2.2.0 对 `AgentHarness` 实际连接：发现 **192** 个工具/schema、ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过。
+- 官方 Python MCP SDK 2.2.0 对 `AgentHarness` 实际连接：发现 **194** 个工具/schema、ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过。
 
 ### 未完成 / 验证缺口
 
-- `svs.getCurves/setCurve`（计划中的可选 M2b）未实施。
 - 真实 RVC/USVC 后端、真实声库人工试听、真实 LMMS 设置页/MCP 连接人工验收：`MANUAL/PENDING`，本次按用户要求注明并跳过。
 - `client_smoke.py --execute --render` 未执行：当前没有同时具备 `AgentHarness` 与原生插件 DLL 的合规部署；按项目规则未复制一个新的 Harness 部署目录。
 - 全量 CTest 已尝试：**76/80 passed**，失败/超时为 `SVSIntegrationTest`（60 秒超时）、`SVCIntegrationTest`（退出码 `0xcfffffff`）、`UiBaselineCapture`（120 秒超时）、`ThemeWidgetTest`（退出码 `0xcfffffff`）。所有 agent/MCP 测试通过。本次未改 GUI/SVC 设置页，相关失败记录为 `MANUAL/PENDING`，不能据此声称全量全绿。
@@ -53,6 +53,8 @@
   - `386b62c7a` agent: add M1 read-only discovery tools
   - `307764ee5` agent: add M2 SVS editing tools
   - `2e1749e52` agent: add M3 SVC selection and conversion tools
+  - `49dbbdaf1` docs: complete M4 MCP handoff and validation records
+  - M2b（`svs.getCurves/setCurve` 与本次文档更新）：本手册随该提交更新，哈希见 `git log`。
 - 工作区仍有大量他人未跟踪日志、截图、SDK/参考代码和其它产物；不得清理或归入本任务提交。
 - 本手册与 `MCP_IMPLEMENTATION_ANALYSIS.md` 在 M4 一并纳入提交；此前它们保持未跟踪状态。
 
@@ -66,7 +68,7 @@
 | 校验、事务、dryRun、回滚、history | `src/agent/CommandBus.cpp`、`CommandSchema.cpp`、`ProjectSnapshot.cpp` |
 | 业务命令和参数 schema | `src/agent/CoreCommands.cpp` |
 | 只读发现（M1） | `src/agent/DiscoveryCommands.cpp`、`DiscoverySupport.h` |
-| SVS 命令（M2） | `src/agent/SvsCommands.cpp`、`CommandTargets.cpp` |
+| SVS 命令（M2/M2b） | `src/agent/SvsCommands.cpp`、`CommandTargets.cpp` |
 | SVC 命令（M3） | `src/agent/SvcCommands.cpp`、`CommandTargets.cpp` |
 | 导出任务 | `src/agent/ExportCommands.cpp` |
 | 脚本/高层组合 | `ScriptRunner.cpp`、`ScriptExpression.cpp`、`HighLevelCommands.cpp` |
@@ -87,11 +89,10 @@
 
 按依赖顺序，等待用户选择/授权后执行：
 
-1. **M2b SVS 曲线**：新增 `svs.getCurves/setCurve`，复用 `svs::Curve::fromJson/toJson`，并补测试。它属于新增能力，不改 M2 既有命令。
-2. **真实后端验证**：配置本机 RVC/USVC 服务，验证 `svc.listModels/setModel/convert` 的真实选择、转换、取消与试听；再验证真实 DiffSinger 声库的合成与填词。
-3. **合规的 SDK 执行/渲染冒烟**：在具有当前插件集的真实 `build/Release/lmms.exe` 上启动 MCP 服务，或在用户批准的合规 Harness 部署上运行 `client_smoke.py --execute --render`。不要新建替代部署目录。
-4. **全量 GUI/VST 复验**：单独重跑 `SVSIntegrationTest`、`UiBaselineCapture`、`SVCIntegrationTest`、`VstEntryPointsRealtime`，判断超时/布局断言是否既有环境问题。GUI 必须真实 Windows 窗口，禁止 offscreen。
-5. **通用类型显示小修（需授权）**：`trackTypeName` 补 `Track::Type::SVC`，`clipTypeName` 补 SVS/SVC，使 `track.get/clip.get` 不再返回 `unknown`。
+1. **真实后端验证**：配置本机 RVC/USVC 服务，验证 `svc.listModels/setModel/convert` 的真实选择、转换、取消与试听；再验证真实 DiffSinger 声库的合成与填词。
+2. **合规的 SDK 执行/渲染冒烟**：在具有当前插件集的真实 `build/Release/lmms.exe` 上启动 MCP 服务，或在用户批准的合规 Harness 部署上运行 `client_smoke.py --execute --render`。不要新建替代部署目录。
+3. **全量 GUI/VST 复验**：单独重跑 `SVSIntegrationTest`、`UiBaselineCapture`、`SVCIntegrationTest`、`VstEntryPointsRealtime`，判断超时/布局断言是否既有环境问题。GUI 必须真实 Windows 窗口，禁止 offscreen。
+4. **通用类型显示小修（需授权）**：`trackTypeName` 补 `Track::Type::SVC`，`clipTypeName` 补 SVS/SVC，使 `track.get/clip.get` 不再返回 `unknown`。
 
 以上是接续建议，不是待执行命令列表，也不授予实现范围。已有 B 阶段默认不新增聊天、LLM 客户端、OAuth、多用户隔离、审批/审计子系统、媒体推送或全插件反射。
 
@@ -100,9 +101,9 @@
 2026-10-23 实际执行：
 
 - `cmake --build build --config Release --target AgentHarness/lmms/SvsCommandsTest/SvcCommandsTest`：`EXITCODE=0`。
-- `AgentHarness --tools`：192；`--manual`：197（生成 `data/agent/command-reference.md`）。
-- `ctest -R "CommandBus|Core|MixAutomation|A3|A4|Discovery|SvsCommands|SvcCommands|Mcp"`：13/13 passed。
-- 官方 SDK 2.2.0（venv `build/sdk-venv`）：192 schemas、ping、JSON 传输、`mcp_client.py` 通过。
+- `AgentHarness --tools`：194；`--manual`：199（生成 `data/agent/command-reference.md`）。
+- `ctest -R "CommandBus|Core|MixAutomation|A3|A4|Discovery|SvsCommands|SvcCommands|Mcp"`：13/13 passed；`SvsCommandsTest` 另计 10 passed（含 M2b 曲线）。
+- 官方 SDK 2.2.0（venv `build/sdk-venv`）：194 schemas、ping、JSON 传输、`mcp_client.py` 通过。
 - 全量 CTest：**76/80 passed**；失败/超时为 `SVSIntegrationTest`（60s 超时）、`SVCIntegrationTest`（0xcfffffff）、`UiBaselineCapture`（120s 超时）、`ThemeWidgetTest`（0xcfffffff）。失败集中在 GUI/既有集成测试；未使用 Qt offscreen。
 
 后续验证时：
@@ -117,11 +118,11 @@
 
 ## 8. 已知风险、差异与失败状态
 
-- **冻结基线已扩展**：M1～M3 的 33 个工具是新的既有实现；后续不得改其名称、参数或语义。
-- **曲线缺口**：SVS 可编辑曲线（pitch/tension 等）仍只能通过工程/GUI 编辑，MCP 未暴露。
+- **冻结基线已扩展**：M1～M3/M2b 的 35 个工具是新的既有实现；后续不得改其名称、参数或语义。
+- **曲线已实现**：`svs.getCurves/setCurve` 支持声明参数的曲线替换与删除；未知/只读/不可曲线化参数返回结构化错误。
 - **异步目录**：`svs.listVoices`/`svc.listModels` 首次调用可能返回空或提示扫描中；必须轮询，不应把它当成“无资源”。
 - **真实后端缺口**：reference SVC 引擎和 SVSExample 已通过自动化；RVC/USVC/DiffSinger 真实后端与人工试听未验证。
-- **全量 CTest 失败**：`SVSIntegrationTest`/`UiBaselineCapture` 超时、`SVCIntegrationTest` 设置页尺寸与异常退出；本次未改相关 GUI，记录为 `MANUAL/PENDING`，不声称全绿。
+- **全量 CTest 失败**：`SVSIntegrationTest`/`UiBaselineCapture`/`ThemeWidgetTest` 超时或异常退出、`SVCIntegrationTest` 设置页断言与异常退出；本次未改相关 GUI，记录为 `MANUAL/PENDING`，不声称全绿。
 - **通用类型显示**：`track.get/clip.get` 对 SVC/SVS 仍可能返回 `unknown`；使用新域 `svs.getTrack`/`svc.getTrack` 获取正确类型。
 - **SDK 执行/渲染未跑**：缺少合规 Harness 原生插件部署；不要通过新建目录或覆盖开发 exe 绕过。
 - **文档差异**：`instrument.load` 源码 schema 的 `classid/architecture` 已包含在重新生成的手册中；若未来文档漂移，以运行时 `tools/list` 为准。

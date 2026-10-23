@@ -8,7 +8,7 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 
 本次只进行源码与文档静态分析，没有启动服务、编译、执行测试或检查真实窗口。下文的“已实现”指找到代码路径；“历史通过”来自计划书 2026-10-04 的记录，不代表当前 HEAD 已重新验收。未发现需要在本次文档任务中修复的阻塞；本次不修改实现。
 
-> **2026-10-23 更新（M4）**：M1（7 个只读发现工具）、M2（17 个 SVS 命令）、M3（9 个 SVC 命令）已实施并推送，当前运行时目录为 **192 个 MCP 工具 / 197 个注册命令**。M1～M3 的自动化测试与官方 Python SDK 发现回归已通过；SVS/SVC 曲线、真实 RVC/USVC 后端与真实窗口人工验收仍为后续项。原始静态分析内容保留在下方，数量与“尚无 svs/svc 工具”等结论以本节和 §4/§5/§6 的更新为准。
+> **2026-10-23 更新（M4/M2b）**：M1（7 个只读发现工具）、M2（17 个 SVS 命令）、M2b（`svs.getCurves/setCurve`）、M3（9 个 SVC 命令）已实施并推送，当前运行时目录为 **194 个 MCP 工具 / 199 个注册命令**。M1～M3/M2b 的自动化测试与官方 Python SDK 发现回归已通过；真实 RVC/USVC 后端与真实窗口人工验收仍为后续项。原始静态分析内容保留在下方，数量与“尚无 svs/svc 工具”等结论以本节和 §4/§5/§6 的更新为准。
 
 **用户约束：接手 Agent 不得修改已有实现。** 本报告列出的差异和后续方向仅供分析、验证与提出补充方案，不构成修改源码、既有测试、构建配置或产品行为的授权。执行规则见 [交接手册](AGENT_HANDOFF.md)。M1～M3 是用户明确授权后新增的实现；它们已成为新的既有实现基线，后续不得改写其工具名、参数或语义。
 
@@ -46,7 +46,7 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 
 ## 4. 目前开放的业务能力
 
-命令手册 `data/agent/command-reference.md` 现有 **197 个命令标题**。ToolRegistry 过滤掉除 runScript 外的全部 `agent.*`，运行时 `tools/list` 为 **192 个 MCP 工具**（M1 后 166，M2 后 183，M3 后 192）。该数量由 `AgentHarness --tools/--manual` 于 2026-10-23 实际导出核对；`client_smoke.py` 的断言已同步为 192。
+命令手册 `data/agent/command-reference.md` 现有 **199 个命令标题**。ToolRegistry 过滤掉除 runScript 外的全部 `agent.*`，运行时 `tools/list` 为 **194 个 MCP 工具**（M1 后 166，M2 后 183，M2b 后 185，M3 后 194）。该数量由 `AgentHarness --tools/--manual` 于 2026-10-23 实际导出核对；`client_smoke.py` 的断言已同步为 194。
 
 | 能力 | 范围与限制 |
 |---|---|
@@ -59,7 +59,7 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 | 高层创作 | 和弦、鼓、低音、琶音、变奏、段落增删/复制、编辑封装、增益处理和预览 |
 | 查询/脚本/历史 | 工程/轨道/Clip/混音摘要，脚本批次、dryRun、undo/redo；索引随当前工程顺序变化 |
 | 发现（M1） | `instrument.listPlugins`、`preset.list`、`sample.list`、`svs.listVoices`、`svc.listModels`、`fs.listRoots/listDirectory`；只读、分页，返回绝对路径/稳定选择 id |
-| SVS（M2） | 建轨/建片段、声库绑定、音符 CRUD、批量填词、发音/音素、参数、词典、合成/取消/状态；曲线工具未实施 |
+| SVS（M2/M2b） | 建轨/建片段、声库绑定、音符 CRUD、批量填词、发音/音素、参数、词典、曲线、合成/取消/状态 |
 | SVC（M3） | 建轨/建片段、模型/权重/说话人选择规范化、源音频、分块配置、转换/取消/状态 |
 
 九个内置脚本：four_on_floor_drums、pop_chord_progression、arpeggio_16th、bassline_root_octave、humanize_groove、scale_snap、arrange_verse_to_chorus、mix_gain_staging、render_preview。
@@ -72,10 +72,10 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 |---|---|---|
 | 本次源码/配置检查 | 已完成，静态 | 服务、协议、工具派发、设置与测试入口存在 |
 | 2026-10-04 计划书 B4 | 历史记录：Windows MSVC/Qt 6.10.3，CTest 13/13，五组 MCP 测试共 25 项 QtTest | 当时环境下的自动化验收；未在当前 HEAD 重跑 |
-| 官方 Python SDK 2.2.0 | 2026-10-23：对 `AgentHarness` 实际连接，发现 **192** 个工具/schema，ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过；未执行 `--execute --render`（当前无合规 Harness 原生插件部署） | 当前 HEAD 的协议互操作与工具目录；不代表真实主程序界面或音频渲染 |
+| 官方 Python SDK 2.2.0 | 2026-10-23：对 `AgentHarness` 实际连接，发现 **194** 个工具/schema，ping、JSON 传输与 `data/agent/mcp_client.py` 示例通过；未执行 `--execute --render`（当前无合规 Harness 原生插件部署） | 当前 HEAD 的协议互操作与工具目录；不代表真实主程序界面或音频渲染 |
 | 构建开关矩阵 | 历史记录通过；本次 build/CMakeCache.txt 为 Agent ON/MCP ON | 历史开关验证与本地配置值 |
 | M1 发现工具 | `DiscoveryCommandsTest` 通过；工厂预设 1129、工厂采样 1004、reference SVC 模型可列出 | 列表/分页/过滤/只读/错误路径 |
-| M2 SVS 工具 | `SvsCommandsTest` 8 passed / 0 failed / 0 skipped；`SVSExample` 合成到音频可用 | 建轨/片段/声库/音符/填词/参数/撤销/合成 |
+| M2 SVS 工具 | `SvsCommandsTest` 10 passed / 0 failed / 0 skipped（含 M2b 曲线）；`SVSExample` 合成到音频可用 | 建轨/片段/声库/音符/填词/参数/曲线/撤销/合成/词典错误 |
 | M3 SVC 工具 | `SvcCommandsTest` 7 passed / 0 failed / 0 skipped；reference 引擎转换完成 | 建轨/选型/源音频/分块/转换/撤销 |
 | Agent + MCP 回归 | 2026-10-23：13/13 passed（CommandBus、Core、A3、A4、MixAutomation、三个新测试、五组 Mcp 测试） | 新工具未破坏既有命令与协议路径 |
 | 全量 CTest | 2026-10-23：**76/80 passed**；失败/超时为 `SVSIntegrationTest`（60s 超时）、`SVCIntegrationTest`（0xcfffffff）、`UiBaselineCapture`（120s 超时）、`ThemeWidgetTest`（0xcfffffff）。Agent/MCP 子集全部通过。 | 不能声称全量全绿；失败集中在 GUI/既有集成测试，需单独复验，标 `MANUAL/PENDING` |
@@ -91,7 +91,7 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 1. **生成手册有参数差异**：CoreCommands.cpp 的 instrument.load schema 包含 `classid/architecture`，并在 vestige 加载 .vst3 时校验扫描目录中的 class/架构/路径和加载状态；当前 command-reference.md 未列出这两个字段。说明文档快照可能滞后，不证明运行时 schema 缺少字段。接手者先只读核对 tools/list；更新已有手册也先取得明确文件范围授权。
 2. **计划中的示意命名不完全等于代码**：架构图仍有 McpAdapter、src/gui/agent 等规划名；实际协议类为 McpProtocol，设置直接在 SetupDialog.cpp。不要为对齐计划命名重构已有代码。
 3. **早期阶段记录有历史语境**：B0 的“POST 返回 501”是当时未接协议的记录；当前 service() 已创建 McpProtocol，正常应用路径不能据早期文字判为只完成骨架。
-4. **SVS/SVC 专用能力已从“未暴露”变为专用工具域（M2/M3）**：当前有 18 个 `svs.*` 和 10 个 `svc.*` 工具（含 M1 的发现命令），覆盖声库/模型选择、音符/歌词/音素/参数、词典、合成/转换与状态。仍未覆盖 SVS 可编辑曲线（`getCurves/setCurve` 未实施），也未验证真实 RVC/USVC 后端与人工试听；不能把工具存在等同于全后端可用。`track.get`/`clip.get` 对 SVC/SVS 的类型显示缺口仍保留（新域 `getTrack` 返回正确类型），修正通用显示需要另行授权。
+4. **SVS/SVC 专用能力已从“未暴露”变为专用工具域（M2/M2b/M3）**：当前有 20 个 `svs.*` 和 10 个 `svc.*` 工具（含 M1 的发现命令），覆盖声库/模型选择、音符/歌词/音素/参数/曲线、词典、合成/转换与状态。仍未验证真实 RVC/USVC 后端与人工试听；不能把工具存在等同于全后端可用。`track.get`/`clip.get` 对 SVC/SVS 的类型显示缺口仍保留（新域 `getTrack` 返回正确类型），修正通用显示需要另行授权。
 5. **其他平台、更多客户端与全面参数反射**属于候选后续事项，尚未授权实现；不能自行扩大已经完成的 B 阶段 Definition of Done。
 
 ## 7. 静态工具清单
@@ -126,8 +126,8 @@ LMMS 已有一套随应用进程运行的本机 HTTP MCP 服务器，并非仅�
 | scale | 3 | `scale.get`、`scale.set`、`scale.snapNotes` |
 | song | 9 | `song.clearProject`、`song.getInfo`、`song.load`、`song.save`、`song.setMasterPitch`、`song.setMasterVolume`、`song.setPlayMode`、`song.setTempo`、`song.setTimeSignature` |
 | svc | 10 | `svc.cancel`、`svc.convert`、`svc.createClip`、`svc.createTrack`、`svc.getStatus`、`svc.getTrack`、`svc.listModels`、`svc.setChunkConfig`、`svc.setModel`、`svc.setSourceFile` |
-| svs | 18 | `svs.addNotes`、`svs.cancelSynthesis`、`svs.createClip`、`svs.createTrack`、`svs.getCapabilities`、`svs.getNotes`、`svs.getPronunciation`、`svs.getStatus`、`svs.getTrack`、`svs.importDictionary`、`svs.listVoices`、`svs.removeNotes`、`svs.setLyrics`、`svs.setNoteParameter`、`svs.setParameters`、`svs.setVoice`、`svs.synthesize`、`svs.updateNote` |
+| svs | 20 | `svs.addNotes`、`svs.cancelSynthesis`、`svs.createClip`、`svs.createTrack`、`svs.getCapabilities`、`svs.getCurves`、`svs.getNotes`、`svs.getPronunciation`、`svs.getStatus`、`svs.getTrack`、`svs.importDictionary`、`svs.listVoices`、`svs.removeNotes`、`svs.setCurve`、`svs.setLyrics`、`svs.setNoteParameter`、`svs.setParameters`、`svs.setVoice`、`svs.synthesize`、`svs.updateNote` |
 | track | 14 | `track.clone`、`track.create`、`track.delete`、`track.get`、`track.list`、`track.move`、`track.remove`、`track.setColor`、`track.setHeight`、`track.setMixerChannel`、`track.setMute`、`track.setMuted`、`track.setName`、`track.setSolo` |
 | transport | 9 | `transport.getPosition`、`transport.play`、`transport.playSong`、`transport.previewClip`、`transport.seek`、`transport.setLoopRange`、`transport.setPosition`、`transport.stop`、`transport.togglePause` |
 
-合计：192 个静态工具条目。五个仅本地接口为 agent.commandHelp、agent.diffPreview、agent.getContext、agent.listCommands、agent.searchCommands。
+合计：194 个静态工具条目。五个仅本地接口为 agent.commandHelp、agent.diffPreview、agent.getContext、agent.listCommands、agent.searchCommands。
