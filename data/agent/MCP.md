@@ -83,6 +83,11 @@ channel with `track.setMixerChannel` (instrument, sample, SVS and SVC tracks are
 accepted, and `track.get` reports `mixerChannel` for each of them) and add effects on
 that channel (`effect.add` with `owner: "song/channel:N"`).
 
+`mixer.getLevels` reports the current peak level of one channel (`channel`) or every
+channel as linear values plus `peakDb` (dBFS, floored at −120). Peaks come from the
+audio engine, so they read 0 while the transport is stopped and update during playback
+and export; use them to drive `mix.gainStaging` instead of guessing levels.
+
 `track.get` / `track.list` and `clip.get` / `clip.list` report SVS and SVC tracks and
 clips as `type: "svs"` / `"svc"` instead of `"unknown"`; the dedicated
 `svs.getTrack` / `svc.getTrack` payloads remain the richer view.

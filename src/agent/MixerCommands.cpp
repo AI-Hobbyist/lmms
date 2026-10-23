@@ -5,6 +5,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include <algorithm>
+#include <cmath>
+
 #include "Engine.h"
 #include "Mixer.h"
 
@@ -111,6 +114,52 @@ bool readOptionalForce(const QJsonObject& arguments, bool& force, QString& error
 	}
 	force = value.toBool();
 	return true;
+}
+
+QJsonObject mixerChannelLevels(MixerChannel* channel)
+{
+	const float peakLeft = channel->m_peakLeft;
+	const float peakRight = channel->m_peakRight;
+	const float peak = std::max(peakLeft, peakRight);
+	const auto toDb = [](float value) {
+		return value > 0.0f ? static_cast<double>(20.0f * std::log10(value)) : -120.0;
+	};
+
+	return {{"channel", channel->index()}, {"name", channel->m_name}, {"master", channel->isMaster()},
+		{"peakLeft", peakLeft}, {"peakRight", peakRight}, {"peak", peak}, {"peakDb", toDb(peak)},
+		{"muted", channel->m_muteModel.value()}, {"solo", channel->m_soloModel.value()}};
+}
+
+CommandResult executeMixerGetLevels(const QJsonObject& arguments)
+{
+	auto* mixer = Engine::mixer();
+	if (mixer == nullptr)
+	{
+		return mixerUnavailable();
+	}
+
+	if (arguments.contains("channel"))
+	{
+		int channelIndex = -1;
+		QString error;
+		if (!readChannelIndex(arguments, channelIndex, error))
+		{
+			return invalidArguments(error);
+		}
+		if (channelIndex >= static_cast<int>(mixer->numChannels()))
+		{
+			return CommandResult::failure(
+				"mixer_channel_not_found", QStringLiteral("Mixer channel %1 does not exist.").arg(channelIndex));
+		}
+		return CommandResult::success(mixerChannelLevels(mixer->mixerChannel(channelIndex)));
+	}
+
+	QJsonArray channels;
+	for (int channelIndex = 0; channelIndex < static_cast<int>(mixer->numChannels()); ++channelIndex)
+	{
+		channels.append(mixerChannelLevels(mixer->mixerChannel(channelIndex)));
+	}
+	return CommandResult::success(QJsonObject{{"channels", channels}});
 }
 
 CommandResult executeMixerAddChannel(const QJsonObject& arguments)
@@ -292,6 +341,11 @@ void registerMixerCommands(CommandBus& commandBus)
 		"Move a mixer channel one position left or right; the master channel stays at index 0.",
 		moveChannelProperties, QJsonArray{"channel", "direction"}, Mutability::Mutating, TxScope::Single,
 		executeMixerMoveChannel);
+
+	QJsonObject levelsProperties{{"channel", QJsonObject{{"type", "integer"}, {"minimum", 0}}}};
+	addCommand(commandBus, "mixer.getLevels",
+		"Read current mixer peak levels (linear and dBFS) for one channel or every channel.",
+		levelsProperties, QJsonArray{}, Mutability::ReadOnly, TxScope::None, executeMixerGetLevels);
 }
 
 } // namespace lmms::agent

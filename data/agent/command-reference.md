@@ -4925,6 +4925,24 @@ Return a mixer channel detail object.
 }
 ```
 
+## mixer.getLevels
+
+Read current mixer peak levels (linear and dBFS) for one channel or every channel.
+
+```json
+{
+    "additionalProperties": false,
+    "properties": {
+        "channel": {
+            "description": "The channel argument for this command.",
+            "minimum": 0,
+            "type": "integer"
+        }
+    },
+    "type": "object"
+}
+```
+
 ## mixer.getMaster
 
 Return the master mixer channel detail object.

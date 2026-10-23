@@ -262,6 +262,43 @@ private slots:
 		QCOMPARE(routed.errorMessage, QStringLiteral("Track \"0\" was not found by name."));
 		QVERIFY(!routed.errorHint.isEmpty());
 	}
+
+	void getLevelsReportsEveryChannel()
+	{
+		QVERIFY(CommandBus::instance().execute("mixer.addChannel", {{"name", "Bus"}}).ok);
+
+		const auto levels = CommandBus::instance().execute("mixer.getLevels", {});
+		QVERIFY2(levels.ok, qPrintable(levels.errorMessage));
+
+		const auto channels = levels.data.value("channels").toArray();
+		QCOMPARE(channels.size(), static_cast<int>(Engine::mixer()->numChannels()));
+
+		const auto master = channels.first().toObject();
+		QCOMPARE(master.value("master").toBool(), true);
+		QCOMPARE(master.value("channel").toInt(), 0);
+
+		const auto bus = channels.last().toObject();
+		QCOMPARE(bus.value("name").toString(), QStringLiteral("Bus"));
+		QCOMPARE(bus.value("peak").toDouble(), 0.0);
+		QCOMPARE(bus.value("peakDb").toDouble(), -120.0);
+		QVERIFY(bus.contains("peakLeft"));
+		QVERIFY(bus.contains("peakRight"));
+	}
+
+	void getLevelsAcceptsSingleChannel()
+	{
+		const auto levels = CommandBus::instance().execute("mixer.getLevels", {{"channel", 0}});
+		QVERIFY2(levels.ok, qPrintable(levels.errorMessage));
+		QCOMPARE(levels.data.value("channel").toInt(), 0);
+		QCOMPARE(levels.data.value("master").toBool(), true);
+	}
+
+	void getLevelsRejectsUnknownChannel()
+	{
+		const auto levels = CommandBus::instance().execute("mixer.getLevels", {{"channel", 3}});
+		QVERIFY(!levels.ok);
+		QCOMPARE(levels.errorCode, QStringLiteral("mixer_channel_not_found"));
+	}
 };
 
 QTEST_GUILESS_MAIN(MixerCommandsTest)
