@@ -64,7 +64,13 @@ MSBuild logger 报告项目阶段状态；测试进度来自 CTest 实际完成�
   总耗时 2.61 秒；日志 `build/final-agent-tests.log`，单项 QtTest 结果见 `build/tests/*-results.txt`。
 - 上述 QtTest 合计 43 passed、0 failed、1 skipped；跳过项为 CoreCommandsTest 的原生插件
   DLL 集成用例（未设置 `LMMS_AGENT_PLUGIN_TEST_PATH`），不计为通过。
-- 主程序编译、插件导入符号兼容核对、增量包验证：PENDING。
+- 主程序 Release 编译：通过；实际路径 `build/Release/lmms.exe`，7098368 字节。
+  `--version` 实际执行成功，版本 `1.3.0-alpha.1.1244+59b7d93`，Qt 6.10.3、Windows x64。
+  版本标签来自当前仓库 Git 标签，不是安装目录中的旧版本字符串。
+- 新旧主程序各 3120 个导出符号，删除数 0；生产目录中 59 个依赖主程序的 DLL
+  缺失导入数 0；实际 `LMMS_HAVE_*` 构建能力宏差异为 0。
+  核对记录 `build/production-abi-check.json`，这是静态兼容核对，不冒充真实 GUI 验收。
+- 本次未重建或替换原生插件 DLL；生产既有插件、引擎、运行库均保留。
 - 原生 GUI / 人工操作验收：`MANUAL/PENDING`，不作为交付阻塞条件，不记为 PASS。
 - 用户取消过第一轮编译；该轮退出码 `0xC000013A`，不计为验证通过。
 
@@ -81,4 +87,23 @@ pwsh -NoProfile -File buildtools/New-McpReloadPackage.ps1 -BaseDirectory 'D:\Pro
 复用已有 `Install-Replace.ps1` 的包内哈希、基线校验及路径检查。
 生产目录不由本任务自动覆盖；安装前关闭 LMMS 并备份原 EXE，便于回滚。
 
-包文件、大小、SHA256、兼容核对和安装器 VerifyOnly 结果：PENDING。
+实际交付：
+
+| 项目 | 值 |
+| --- | --- |
+| ZIP | `build/packages/lmms-mcp-reload-20261115-213416-win64.zip` |
+| 大小 | 2800234 字节 |
+| ZIP SHA256 | `3ED61182B81FCA98EBD21087887E49EEAA5D25C06D2DC426EBB916C6FF143A18` |
+| EXE SHA256 | `C37F7CAE9BA47850DBF2BC2645A0F6F5C5815914A5B52394B2D08DDD70ADB2B1` |
+| 产品源码提交 | `59b7d93c4` |
+| 编译脚本提交 | `d7984eaf8` |
+| 基线 | 实际安装的 367 个二进制 SHA256 |
+| 安装器只读校验 | PASS：1 个替换文件、0 个移除文件，未修改生产目录 |
+
+包内包含新 EXE、现有安装器、安装入口、基线/替换清单与说明；只有 `lmms.exe` 属于替换载荷。
+日志 `build/incremental-package.log`、`build/incremental-verify.log`。
+
+后续事项仅为 `MANUAL/PENDING` 的实际界面/用户操作验收，没有剩余实施任务。
+另记既有路径差异：主程序依赖 RemoteCatalogIo 的旧 CMake 产物仍为
+`build/plugins/RemoteCatalogIo.exe`；本包不替换该辅助程序，生产目录中的现有版本保持原位。
+本次没有扩展到辅助程序部署路径整改。

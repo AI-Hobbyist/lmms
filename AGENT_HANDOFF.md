@@ -1,21 +1,48 @@
-# 当前任务进度：MCP 工程重载修复与增量包（2026-11-15）
+# 当前交接：MCP 工程重载修复与增量包已交付
 
-目标持续有效。用户已授权恢复编译；后续按需编译测试，聊天不替代或中断当前目标。
+更新：2026-11-15（Asia/Seoul）。目标已完成，没有剩余实施任务。
 
-- 分支 master；本轮起始 HEAD 1e4e33a11。生产目录 D:\Program Files\LMMS 未修改。
-- 已实施但未完成功能验证：src/core/Song.cpp 的非 track 节点遍历、清理/恢复的加载状态范围、加载失败状态复位；src/agent/CommandBus.cpp 的加载期间 project_busy 拒绝。测试新增于 tests/src/agent/CommandBusTest.cpp。
-- 已完成首次核心库全量编译。新增测试曾误用不存在的 Song::tempo()，已修正为 tempoModel().value()；随后 CommandBusTest 增量编译成功，退出码 0。随后最终 CommandBusTest、CoreCommandsTest、McpProtocolTest、McpQueueTest 4/4 passed（2.61 秒），最终 CommandBus 用例 25 passed。
-- 用户要求优先单独提交推送编译脚本。脚本：buildtools/build.py、build_progress.py、Build-Lmms.ps1、BuildProgressLogger.cs、README-build.md。支持 Debug/Release 参数、按实际源文件/对象文件计数、当前 CPP 说明、独立窗口、前台完整 build.log、完成或失败 5 秒后自动退出。
-- 编译脚本验证：实际 CommandBusTest 增量 0/1→1/1 成功；随后真实项目待编译源码数为 0；完成/错误状态窗口约 5.5 秒自动退出。记录 build/source-progress-build.log、build/progress-script-check.log。
-- 当前用户要求仅提交推送上述脚本及其说明；生产修复、回归用例和打包脚本仍留工作区，后续验证完成再提交。脚本已提交并推送 master：d7984eaf8。
-- build 初始不存在，已在约定原目录恢复；依赖来自本机 vcpkg 二进制缓存，多项音频 Release DLL 与生产哈希一致。临时配置 build/configure.ps1、原生 Windows x64、Qt 6.10.3。编译使用受授权前台执行，早期受限执行停在 Checking Build System；恢复后的原生构建已通过该检查。
-- 生产主程序为 1.3.0-alpha.2.207+8223da3，源码比它多 svs.setPitchCurve 一次提交。57 个生产插件按名称导入 lmms.exe，无 ordinal 导入；尚待与新 EXE 核对。
-- 打包准备：buildtools/New-McpReloadPackage.ps1（未验证），计划仅替换 lmms.exe，基线来自实际安装的二进制 SHA256，复用现有安装器，不自动覆盖生产。
-- 下一步：提交推送已通过 RED/GREEN 的修复与打包脚本；在原目录重新配置并构建 Release lmms，核对生产插件导入兼容，生成并 VerifyOnly 验证增量包，完成最终记录和提交推送。
-- 受控 RED 已执行：旧源码非轨道子节点加载超过 8 秒不返回；加载失败残留 loading；回滚中未知命令重入导致 0xC0000005。build/baseline-red-test.log 保留真实输出；finally 已恢复修复源码，随后格式化改动范围并完成 GREEN。
-- GUI/人工验收 MANUAL/PENDING，不作为阻塞条件；没有使用 offscreen，没有启动生产 LMMS。dryRun/回滚/快照撤销语义保留，普通成功编辑不重载。
-- 保留未跟踪 .codegraph/ 和构建日志，不清理他人文件。git status 使用 --ignore-submodules，diff 使用 -c diff.ignoreSubmodules=all，避免 doc/wiki 子模块权限错误。
-- 项目约束：禁止 WSL、只构建 Windows、原 build/Release/plugins 部署、前台 PowerShell Tee-Object 日志、编译前检查同工程任务、最小范围。后续功能验收和包尚未完成。
+## 提交与生产状态
+
+- 分支 master；编译脚本提交 d7984eaf8、修复提交 59b7d93c4 均已成功推送 origin/master。
+- 本次收尾仅更新本手册和 doc/agent/MCP-reload-fix.md；最终记录提交哈希以 Git 为准。
+- 生产目录 D:\Program Files\LMMS 未修改。用户自行关闭应用、备份旧 EXE 后安装。
+- 保留未跟踪 .codegraph/（原有索引）、build.log 和 build-driver.log；未清理他人内容。
+
+## 已完成和已验证
+
+- 修复非 track 子节点加载死循环；清理/恢复期间加载状态保护；命令总线在校验及事务处理前返回 project_busy；加载失败恢复 loading/journalling；正常刷新工程长度。
+- 新增 6 个针对性测试场景，含普通成功编辑保留对象、回滚期间未知命令重入和长度恢复。
+- 受控 RED：旧源码的非轨道节点加载超过 8 秒不返回，加载失败残留状态，回滚重入以 0xC0000005 崩溃。finally 恢复修复源码后 GREEN。
+- 最终 CommandBusTest、CoreCommandsTest、McpProtocolTest、McpQueueTest 4/4 passed（2.61 秒）；QtTest 合计 43 passed、0 failed、1 skipped。跳过项为未设置 LMMS_AGENT_PLUGIN_TEST_PATH 的原生插件 DLL 集成用例，未记为通过。
+- Release 主程序 build/Release/lmms.exe 编译及 --version 实际执行成功；版本 1.3.0-alpha.1.1244+59b7d93，Qt 6.10.3 / Windows x64，7098368 字节。
+- 新旧主程序各 3120 个导出，移除 0；生产中 59 个依赖主程序 DLL 的导入均满足；实际 LMMS_HAVE_* 能力差异 0。没有改公开类数据布局，没有重建或替换原生插件 DLL。
+- 编译脚本支持 Debug/Release、目标和并发命令行参数、按本轮源码/对象文件更新计数、CPP 说明、独立窗口、前台 PowerShell 完整 build.log、完成或失败后 5 秒自动退出。实际 1/1、2/2、8/8、14/14 编译计数通过；未变化文件增量计划为 0；完成/失败窗口自动退出约 5.5/5.3 秒。
+- 仅 Release 实际编译验证；未额外全量编译 Debug。先前用户取消的一轮不计为通过。
+
+## ZIP 交付
+
+- 路径：D:\UserData\Desktop\Project\lmms\build\packages\lmms-mcp-reload-20261115-213416-win64.zip
+- 大小：2800234 字节。
+- ZIP SHA256：3ED61182B81FCA98EBD21087887E49EEAA5D25C06D2DC426EBB916C6FF143A18。
+- 新 EXE SHA256：C37F7CAE9BA47850DBF2BC2645A0F6F5C5815914A5B52394B2D08DDD70ADB2B1。
+- 产品源码 59b7d93c4，打包时跟踪工作区无改动。基线来自实际安装的 367 个二进制 SHA256，未采用旧 manifest。
+- 包仅替换 lmms.exe，移除文件数 0；插件、引擎、运行库、配置和工程保持原位。
+- 现有安装器 VerifyOnly 通过，未写生产目录。安装说明在 ZIP 内；需要管理员权限覆盖 Program Files，安装前备份原 EXE 便于回滚。
+
+## 未验证和实际后续
+
+- 原生 GUI/用户实际操作验收：MANUAL/PENDING，不作为阻塞条件，不记为 PASS。没有使用 offscreen，没有启动生产 LMMS。
+- 普通成功编辑直接操作当前模型；dryRun、失败回滚和快照撤销保留原有整工程恢复语义，没有擅自重写所有工具。
+- 记录既有路径差异：RemoteCatalogIo 依赖产物在 build/plugins/RemoteCatalogIo.exe；本增量包不替换它，生产已有 helper 保留。其部署路径整改是独立后续，不属于本修复。
+- 没有剩余实施；只需用户按包内说明安装并按需做人工验收，不编造下一阶段。
+
+## 证据与约束
+
+- 正式记录 doc/agent/MCP-reload-fix.md；脚本说明 buildtools/README-build.md；打包入口 buildtools/New-McpReloadPackage.ps1。
+- build/final-agent-tests.log、build/baseline-red-test.log、build/release-build.log、build/release-version.log、build/production-abi-check.json、build/incremental-package.log、build/incremental-verify.log。
+- 继续遵守 AGENTS.md：原生 Windows、禁止 WSL/offscreen、同工程任务检查、原部署路径、按需测试、前台 PowerShell Tee-Object 日志、范围控制。
+- git status 使用 --ignore-submodules，diff 使用 -c diff.ignoreSubmodules=all，避免 doc/wiki 子模块权限错误。
 
 ---
 以下保留此前任务交接记录：
