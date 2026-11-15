@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
+#include <QScopedValueRollback>
 
 #include <algorithm>
 #include <cmath>
@@ -988,6 +989,8 @@ AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 void Song::clearProject()
 {
 	using gui::getGUI;
+	const bool wasLoading = m_loadingProject;
+	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -1060,6 +1063,8 @@ void Song::clearProject()
 	Engine::projectJournal()->clearJournal();
 
 	Engine::projectJournal()->setJournalling( true );
+	m_loadingProject = wasLoading;
+	updateLength();
 }
 
 
@@ -1206,6 +1211,8 @@ void Song::saveProjectState(DataFile& dataFile)
 void Song::restoreProjectState(DataFile& dataFile)
 {
 	using gui::getGUI;
+	const bool wasLoading = m_loadingProject;
+	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
 
 	QDomNode node;
 	clearProject();
@@ -1373,6 +1380,7 @@ void Song::restoreProjectState(DataFile& dataFile)
 		emit playbackStateChanged();
 	}
 	Engine::audioEngine()->doneChangeInModel();
+	m_loadingProject = wasLoading;
 	updateLength();
 }
 
@@ -1383,7 +1391,8 @@ void Song::loadProject( const QString & fileName )
 
 	QDomNode node;
 
-	m_loadingProject = true;
+	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
+	const bool wasJournalling = Engine::projectJournal()->isJournalling();
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -1429,6 +1438,7 @@ void Song::loadProject( const QString & fileName )
 			createNewProject();
 		}
 		setProjectFileName(m_oldFileName);
+		Engine::projectJournal()->setJournalling(wasJournalling);
 		return;
 	}
 
@@ -1480,8 +1490,8 @@ void Song::loadProject( const QString & fileName )
 					n += nd.toElement().elementsByTagName("patterntrack").at(0)
 						.toElement().firstChildElement().childNodes().count();
 				}
-				nd=nd.nextSibling();
 			}
+			nd = nd.nextSibling();
 		}
 	}
 

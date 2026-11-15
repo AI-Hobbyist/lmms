@@ -1,11 +1,15 @@
 #include <QtTest>
 
 #include <QJsonArray>
+#include <QPointer>
+#include <QTemporaryDir>
 #include <memory>
 #include <thread>
 
 #include "agent/CommandBus.h"
 #include "AudioEngine.h"
+#include "Clip.h"
+#include "DataFile.h"
 #include "Engine.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -69,6 +73,122 @@ private slots:
 		lmms::Engine::getSong()->tempoModel().setValue(InitialTempo);
 		journal->setJournalling(journalling);
 		journal->clearJournal();
+	}
+
+	void rejectsCommandsWhileClearingOrRestoringTheProject()
+	{
+		auto* song = lmms::Engine::getSong();
+		auto& bus = lmms::agent::CommandBus::instance();
+		lmms::DataFile snapshot(lmms::DataFile::Type::SongProject);
+		song->saveProjectState(snapshot);
+
+		for (const bool restore : {false, true})
+		{
+			bool dispatched = false;
+			QMetaObject::invokeMethod(
+				song,
+				[&] {
+					dispatched = true;
+					QVERIFY(song->isLoadingProject());
+					for (const auto& name : {"song.getInfo", "test.setTempo", "test.missing"})
+					{
+						const auto arguments
+							= QString(name) == "test.setTempo" ? QJsonObject{{"bpm", 150}} : QJsonObject{};
+						const auto result = bus.execute(name, arguments);
+						QVERIFY(!result.ok);
+						QCOMPARE(result.errorCode, QString("project_busy"));
+					}
+				},
+				Qt::QueuedConnection);
+			if (restore) { song->restoreProjectState(snapshot); }
+			else
+			{
+				song->clearProject();
+			}
+			QVERIFY(dispatched);
+			QVERIFY(!song->isLoadingProject());
+			QVERIFY(bus.execute("test.setTempo", {{"bpm", InitialTempo}}).ok);
+		}
+	}
+
+	void loadsProjectsWithNonTrackChildren()
+	{
+		auto* song = lmms::Engine::getSong();
+		QTemporaryDir directory;
+		QVERIFY(directory.isValid());
+		lmms::DataFile project(lmms::DataFile::Type::SongProject);
+		auto container = project.createElement("trackcontainer");
+		container.appendChild(project.createComment("Not a track"));
+		container.appendChild(project.createElement("metadata"));
+		project.content().appendChild(container);
+		const auto path = directory.filePath("non-track-children.mmp");
+		QVERIFY(project.writeFile(path));
+		song->loadProject(path);
+		QVERIFY(!song->isLoadingProject());
+		song->clearProject();
+	}
+
+	void rejectsNestedCommandsDuringTransactionRollback()
+	{
+		auto* song = lmms::Engine::getSong();
+		auto& bus = lmms::agent::CommandBus::instance();
+		bool dispatched = false;
+		QMetaObject::invokeMethod(
+			song,
+			[&] {
+				dispatched = true;
+				QCOMPARE(bus.batchDepth(), 1);
+				const auto result = bus.execute("test.missing");
+				QVERIFY(!result.ok);
+				QCOMPARE(result.errorCode, QString("project_busy"));
+				QCOMPARE(bus.batchDepth(), 1);
+			},
+			Qt::QueuedConnection);
+		const auto result = bus.execute("test.setTempoThenFail", {{"bpm", 144}});
+		QVERIFY(dispatched);
+		QVERIFY(!result.ok);
+		QCOMPARE(result.errorCode, QString("test_failure"));
+		QCOMPARE(song->tempoModel().value(), InitialTempo);
+		QVERIFY(!bus.isBatchActive());
+	}
+
+	void resetsLoadingOnFailedLoad()
+	{
+		auto* song = lmms::Engine::getSong();
+		QTemporaryDir directory;
+		QVERIFY(directory.isValid());
+		song->setLoadOnLaunch(false);
+		const bool journalling = lmms::Engine::projectJournal()->isJournalling();
+		song->loadProject(directory.filePath("missing.mmp"));
+		QVERIFY(!song->isLoadingProject());
+		QCOMPARE(lmms::Engine::projectJournal()->isJournalling(), journalling);
+	}
+
+	void successfulEditsKeepExistingTrackObjects()
+	{
+		auto* song = lmms::Engine::getSong();
+		QPointer<lmms::Track> track = lmms::Track::create(lmms::Track::Type::Instrument, song);
+		QVERIFY(lmms::agent::CommandBus::instance().execute("test.setTempo", {{"bpm", 133}}).ok);
+		QVERIFY(!track.isNull());
+		QCOMPARE(song->tracks().front(), track.data());
+		song->clearProject();
+	}
+
+	void restoringProjectRecalculatesItsLength()
+	{
+		auto* song = lmms::Engine::getSong();
+		auto* track = lmms::Track::create(lmms::Track::Type::Instrument, song);
+		track->createClip(lmms::TimePos(0))->changeLength(lmms::TimePos(384));
+		song->updateLength();
+		const auto length = song->length();
+		QVERIFY(length > 0);
+		lmms::DataFile snapshot(lmms::DataFile::Type::SongProject);
+		song->saveProjectState(snapshot);
+		song->clearProject();
+		QCOMPARE(song->length(), 0);
+		song->restoreProjectState(snapshot);
+		QCOMPARE(song->length(), length);
+		song->clearProject();
 	}
 
 	void registersDescriptorsAndReportsUnknownCommands()

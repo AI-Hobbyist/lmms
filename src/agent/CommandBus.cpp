@@ -210,6 +210,12 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 	{
 		return CommandResult::failure("wrong_thread", "Commands must execute on the main thread.");
 	}
+	// Project loading dispatches Qt events while the model tree is incomplete.
+	// Reject before validation, which can otherwise roll back an active batch.
+	if (Engine::getSong() && Engine::getSong()->isLoadingProject())
+	{
+		return CommandResult::failure("project_busy", "Wait for the project to finish loading or restoring.");
+	}
 
 	const auto command = m_commands.constFind(name);
 	if (command == m_commands.cend())
