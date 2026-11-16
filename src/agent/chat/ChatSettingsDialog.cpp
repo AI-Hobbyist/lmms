@@ -3,6 +3,7 @@
 #include <QAbstractButton>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QDir>
 #include <QFileDialog>
 #include <QFrame>
 #include <QLabel>
@@ -14,10 +15,13 @@
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QStackedWidget>
+#include <QStandardPaths>
 #include <QUrl>
 
 #include "ConfigManager.h"
 #include "ToolButton.h"
+#include "agent/chat/ChatApiSettingsPage.h"
+#include "agent/chat/ChatGenerationPage.h"
 #include "agent/chat/ChatStore.h"
 #include "embed.h"
 
@@ -120,6 +124,7 @@ void makeCardTextTransparent(QAbstractButton* button)
 
 ChatSettingsDialog::ChatSettingsDialog(QWidget* parent)
 	: QDialog(parent)
+	, m_connectionStore(QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"))
 {
 	setObjectName("agentSettingsDialog");
 	setWindowTitle(QStringLiteral("Agent 设置"));
@@ -135,6 +140,11 @@ ChatSettingsDialog::ChatSettingsDialog(QWidget* parent)
 	m_scroll->setWidget(m_pages);
 	buildGlobalPage();
 	buildApprovalPage();
+	m_apiPage
+		= new ChatApiSettingsPage(m_connectionStore, nullptr, ConfigManager::inst()->value("agentchat", "connection"));
+	m_pages->addWidget(m_apiPage);
+	m_generationPage = new ChatGenerationPage;
+	m_pages->addWidget(m_generationPage);
 	buildChrome();
 	selectPage(0);
 	updateApprovalLabels();
@@ -169,9 +179,11 @@ void ChatSettingsDialog::buildChrome()
 		button->setCheckable(true);
 		button->setAutoExclusive(true);
 		button->setObjectName(QStringLiteral("agentSettingsTab%1").arg(index));
-		if (index == 2 || index == 3)
+		if (index < 4)
 		{
-			connect(button, &QToolButton::clicked, this, [this, index] { selectPage(index - 2); });
+			connect(button, &QToolButton::clicked, this, [this, index] {
+				selectPage(index == 0 ? 2 : index == 1 ? 3 : index - 2);
+			});
 		}
 		else
 		{
@@ -341,8 +353,21 @@ void ChatSettingsDialog::buildApprovalPage()
 
 void ChatSettingsDialog::selectPage(int page)
 {
+	if (m_pages->currentWidget() == m_generationPage)
+	{
+		m_apiPage->setGenerationDraft(m_generationPage->connection());
+	}
+	if (page == 3)
+	{
+		m_generationPage->setConnection(m_apiPage->connectionDraft(), m_requestApproval->isChecked());
+	}
 	m_pages->setCurrentIndex(page);
-	m_navigation->findChild<QAbstractButton*>(QStringLiteral("agentSettingsTab%1").arg(page + 2))->setChecked(true);
+	m_navigation
+		->findChild<QAbstractButton*>(QStringLiteral("agentSettingsTab%1")
+										  .arg(page == 2	   ? 0
+												   : page == 3 ? 1
+															   : page + 2))
+		->setChecked(true);
 }
 
 void ChatSettingsDialog::updateApprovalLabels()
@@ -368,6 +393,10 @@ void ChatSettingsDialog::reloadPrompt()
 
 void ChatSettingsDialog::accept()
 {
+	if (m_pages->currentWidget() == m_generationPage)
+	{
+		m_apiPage->setGenerationDraft(m_generationPage->connection());
+	}
 	QString error;
 	ChatStore::readPrompt(m_promptPath->text(), error);
 	if (!error.isEmpty())
@@ -375,7 +404,13 @@ void ChatSettingsDialog::accept()
 		QMessageBox::warning(this, QStringLiteral("System Prompt"), error);
 		return;
 	}
+	if (!m_apiPage->save(error))
+	{
+		QMessageBox::warning(this, QStringLiteral("API"), error);
+		return;
+	}
 	auto* config = ConfigManager::inst();
+	config->setValue("agentchat", "connection", m_apiPage->selectedConnectionId());
 	config->setValue("agentchat", "promptPath", m_promptPath->text());
 	config->setValue("agentchat", "approval", m_noApproval->isChecked() ? "none" : "request");
 	config->saveConfigFile();

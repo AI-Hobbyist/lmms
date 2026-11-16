@@ -16567,4 +16567,936 @@ Latency: %2 ms</source>
         <translation>SVC 和 SVS 共用一个总缓存上限，默认为 2 GiB。超出时优先删除两类缓存中最旧的文件。SVS 占用包含合成音频和 AI 中间缓存。正在执行的 SVC 任务所用文件会保留。清除或自动删除缓存后，重新打开已保存的工程时可能需要再次渲染。</translation>
     </message>
 </context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>New connection</source>
+        <translation>新连接</translation>
+    </message>
+    <message>
+        <source>Windows Credential Manager error %1.</source>
+        <translation>Windows 凭据管理器错误 %1。</translation>
+    </message>
+    <message>
+        <source>Invalid connection identifier, name or protocol.</source>
+        <translation>连接标识、名称或请求格式无效。</translation>
+    </message>
+    <message>
+        <source>API base URL must be HTTP(S), without credentials, query or fragment.</source>
+        <translation>API 基础地址须使用 HTTP(S)，且不能包含凭据、查询参数或片段。</translation>
+    </message>
+    <message>
+        <source>Temperature must be between 0 and 2.</source>
+        <translation>温度须介于 0 和 2 之间。</translation>
+    </message>
+    <message>
+        <source>Invalid API key header configuration.</source>
+        <translation>API Key 请求头配置无效。</translation>
+    </message>
+    <message>
+        <source>Invalid connection settings JSON or unsupported version.</source>
+        <translation>连接设置 JSON 无效或版本不受支持。</translation>
+    </message>
+    <message>
+        <source>Duplicate connection identifier.</source>
+        <translation>连接标识重复。</translation>
+    </message>
+    <message>
+        <source>Cannot create connection settings directory.</source>
+        <translation>无法创建连接设置目录。</translation>
+    </message>
+    <message>
+        <source>Connection not found.</source>
+        <translation>未找到连接。</translation>
+    </message>
+    <message>
+        <source>A valid connection and non-empty API key are required.</source>
+        <translation>需要有效连接和非空的 API Key。</translation>
+    </message>
+    <message>
+        <source>API key exceeds the Windows credential size limit.</source>
+        <translation>API Key 超过 Windows 凭据大小限制。</translation>
+    </message>
+    <message>
+        <source>Native API key storage is available on Windows only.</source>
+        <translation>原生 API Key 存储仅支持 Windows。</translation>
+    </message>
+    <message>
+        <source>Invalid connection identifier.</source>
+        <translation>连接标识无效。</translation>
+    </message>
+    <message>
+        <source>Selected attachments exceed the 64 MiB request limit.</source>
+        <translation>所选附件总大小超过 64 MiB 请求限制。</translation>
+    </message>
+    <message>
+        <source>Previous attachment: %1 (content unavailable; select it again to send).</source>
+        <translation>先前附件：%1（内容不可用；请重新选择后发送）。</translation>
+    </message>
+    <message>
+        <source>The model response contained invalid JSON.</source>
+        <translation>模型响应包含无效 JSON。</translation>
+    </message>
+    <message>
+        <source>The configured response text path did not contain a string.</source>
+        <translation>配置的响应文本路径未包含字符串。</translation>
+    </message>
+    <message>
+        <source>The model response did not contain the expected message fields.</source>
+        <translation>模型响应未包含预期的消息字段。</translation>
+    </message>
+    <message>
+        <source>Invalid, incomplete or unsupported tool history for this protocol.</source>
+        <translation>工具历史无效、不完整，或当前协议不支持该格式。</translation>
+    </message>
+    <message>
+        <source>Tool result</source>
+        <translation>工具结果</translation>
+    </message>
+    <message>
+        <source>Thought · Summary</source>
+        <translation>已思考 · 摘要</translation>
+    </message>
+    <message>
+        <source>Start a new music conversation.</source>
+        <translation>开始新的音乐创作会话。</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>请求失败：%1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>已停止</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatApiSettingsPage</name>
+    <message>
+        <source>Bailian</source>
+        <translation>阿里云百炼</translation>
+    </message>
+    <message>
+        <source>SiliconFlow</source>
+        <translation>硅基流动</translation>
+    </message>
+    <message>
+        <source>ZhiPu AI</source>
+        <translation>智谱 AI</translation>
+    </message>
+    <message>
+        <source>Moonshot</source>
+        <translation>月之暗面</translation>
+    </message>
+    <message>
+        <source>StepFun</source>
+        <translation>阶跃星辰</translation>
+    </message>
+    <message>
+        <source>Volcengine</source>
+        <translation>火山方舟</translation>
+    </message>
+    <message>
+        <source>Tencent Hunyuan</source>
+        <translation>腾讯混元</translation>
+    </message>
+    <message>
+        <source>Model connections</source>
+        <translation>模型连接</translation>
+    </message>
+    <message>
+        <source>Add provider preset</source>
+        <translation>添加厂商预设</translation>
+    </message>
+    <message>
+        <source>Search connections</source>
+        <translation>搜索连接</translation>
+    </message>
+    <message>
+        <source>Presets can be edited, duplicated and deleted</source>
+        <translation>预设可编辑、复制和删除</translation>
+    </message>
+    <message>
+        <source>Model connection</source>
+        <translation>模型连接</translation>
+    </message>
+    <message>
+        <source>Connect with an API address and Key. No provider account login is needed.</source>
+        <translation>使用 API 地址和 Key 连接，不需要登录厂商账号。</translation>
+    </message>
+    <message>
+        <source>Connection name</source>
+        <translation>连接名称</translation>
+    </message>
+    <message>
+        <source>Request format</source>
+        <translation>请求格式</translation>
+    </message>
+    <message>
+        <source>OpenAI compatible</source>
+        <translation>通用 OpenAI 兼容</translation>
+    </message>
+    <message>
+        <source>Custom HTTP JSON</source>
+        <translation>自定义 HTTP JSON</translation>
+    </message>
+    <message>
+        <source>Choose the format supported by the provider and model.</source>
+        <translation>根据厂商与模型选择支持的请求格式。</translation>
+    </message>
+    <message>
+        <source>API address</source>
+        <translation>API 地址</translation>
+    </message>
+    <message>
+        <source>API Key</source>
+        <translation>API Key</translation>
+    </message>
+    <message>
+        <source>Model ID</source>
+        <translation>模型 ID</translation>
+    </message>
+    <message>
+        <source>Get models</source>
+        <translation>获取模型</translation>
+    </message>
+    <message>
+        <source>You can also enter a model ID manually.</source>
+        <translation>也可手动输入模型 ID。</translation>
+    </message>
+    <message>
+        <source>Advanced connection parameters</source>
+        <translation>高级连接参数</translation>
+    </message>
+    <message>
+        <source>Advanced mapping is being implemented in M2.</source>
+        <translation>高级映射正在 M2 阶段实现。</translation>
+    </message>
+    <message>
+        <source>Connection overview</source>
+        <translation>连接概览</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>认证</translation>
+    </message>
+    <message>
+        <source>Streaming output</source>
+        <translation>流式输出</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>开启</translation>
+    </message>
+    <message>
+        <source>Project tools</source>
+        <translation>工程工具</translation>
+    </message>
+    <message>
+        <source>Internal interfaces</source>
+        <translation>内部接口</translation>
+    </message>
+    <message>
+        <source>Request preview</source>
+        <translation>请求预览</translation>
+    </message>
+    <message>
+        <source>Test connection</source>
+        <translation>测试连接</translation>
+    </message>
+    <message>
+        <source>Not tested</source>
+        <translation>尚未测试</translation>
+    </message>
+    <message>
+        <source>Provider presets</source>
+        <translation>厂商预设</translation>
+    </message>
+    <message>
+        <source>Select a preset, then enter the API address and Key. Formats and models remain editable.</source>
+        <translation>选择预设后填写 API 地址和 Key；请求格式与模型可在连接详情中调整。</translation>
+    </message>
+    <message>
+        <source>Search providers, for example DeepSeek</source>
+        <translation>搜索厂商，例如 DeepSeek</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>全部</translation>
+    </message>
+    <message>
+        <source>China</source>
+        <translation>国内</translation>
+    </message>
+    <message>
+        <source>International</source>
+        <translation>国际</translation>
+    </message>
+    <message>
+        <source>Compatible / gateways</source>
+        <translation>兼容与聚合</translation>
+    </message>
+    <message>
+        <source>Custom compatible service</source>
+        <translation>自定义兼容服务</translation>
+    </message>
+    <message>
+        <source>Enter an address, API Key and request format to create your own connection.</source>
+        <translation>输入服务地址、API Key 和请求格式，保存为自己的连接。</translation>
+    </message>
+    <message>
+        <source>Add custom connection</source>
+        <translation>添加自定义连接</translation>
+    </message>
+    <message>
+        <source>Custom connection</source>
+        <translation>自定义连接</translation>
+    </message>
+    <message>
+        <source>Authentication: API Key, Bearer or native provider Key headers.</source>
+        <translation>认证范围：API Key、Bearer 或厂商原生 Key 请求头。</translation>
+    </message>
+    <message>
+        <source>Enter a Key to replace it; leave unchanged to keep the stored Key.</source>
+        <translation>输入 Key 可替换；保持不变则保留已保存的 Key。</translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source> (copy)</source>
+        <translation>（副本）</translation>
+    </message>
+    <message>
+        <source>This format has no configured model-list endpoint. Enter a model ID manually.</source>
+        <translation>此格式未配置模型列表接口，请手动输入模型 ID。</translation>
+    </message>
+    <message>
+        <source>Enter an API Key before testing.</source>
+        <translation>请先输入 API Key 再测试。</translation>
+    </message>
+    <message>
+        <source>Requesting model list…</source>
+        <translation>正在获取模型列表…</translation>
+    </message>
+    <message>
+        <source>HTTP %1: %2</source>
+        <translation>HTTP %1：%2</translation>
+    </message>
+    <message>
+        <source>The endpoint did not return a valid model list. You can enter an ID manually.</source>
+        <translation>接口未返回有效模型列表，可手动输入模型 ID。</translation>
+    </message>
+    <message>
+        <source>The model-list endpoint repeated a pagination cursor.</source>
+        <translation>模型列表接口返回了重复的分页标记。</translation>
+    </message>
+    <message>
+        <source>Connection succeeded; %1 models returned.</source>
+        <translation>连接成功，返回 %1 个模型。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatAdvancedDialog</name>
+    <message>
+        <source>Request format</source>
+        <translation>请求格式</translation>
+    </message>
+    <message>
+        <source>Provider presets are recommendations. Request formats remain editable; authentication uses API Keys.</source>
+        <translation>厂商预设仅供参考。请求格式仍可修改，使用 API Key 认证。</translation>
+    </message>
+    <message>
+        <source>OpenAI compatible</source>
+        <translation>OpenAI 兼容格式</translation>
+    </message>
+    <message>
+        <source>Custom HTTP JSON</source>
+        <translation>自定义 HTTP JSON</translation>
+    </message>
+    <message>
+        <source>Chat messages and tool calls</source>
+        <translation>聊天消息与工具调用</translation>
+    </message>
+    <message>
+        <source>Responses messages and tool calls</source>
+        <translation>Responses 消息与工具调用</translation>
+    </message>
+    <message>
+        <source>Native Messages with an API Key header</source>
+        <translation>原生 Messages，使用 API Key 请求头</translation>
+    </message>
+    <message>
+        <source>Native GenerateContent with an API Key</source>
+        <translation>原生 GenerateContent，使用 API Key</translation>
+    </message>
+    <message>
+        <source>Resource URL, deployment and API version</source>
+        <translation>资源地址、部署名称与 API 版本</translation>
+    </message>
+    <message>
+        <source>Azure Responses with an API Key</source>
+        <translation>Azure Responses，使用 API Key</translation>
+    </message>
+    <message>
+        <source>Gateways and self-hosted compatible services</source>
+        <translation>网关与自部署兼容服务</translation>
+    </message>
+    <message>
+        <source>Custom paths, authentication and JSON mapping</source>
+        <translation>自定义路径、认证与 JSON 映射</translation>
+    </message>
+    <message>
+        <source>Custom request configuration</source>
+        <translation>自定义请求配置</translation>
+    </message>
+    <message>
+        <source>Use advanced configuration only when needed. Standard presets need only an address and Key.</source>
+        <translation>仅在需要时使用高级配置。标准预设只需填写地址和 Key。</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>认证方式</translation>
+    </message>
+    <message>
+        <source>API Key / request header</source>
+        <translation>API Key / 请求头</translation>
+    </message>
+    <message>
+        <source>API Key / query parameter</source>
+        <translation>API Key / 查询参数</translation>
+    </message>
+    <message>
+        <source>API Key / JSON body</source>
+        <translation>API Key / JSON 请求体</translation>
+    </message>
+    <message>
+        <source>Key header or field name</source>
+        <translation>Key 请求头或字段名称</translation>
+    </message>
+    <message>
+        <source>Key prefix</source>
+        <translation>Key 前缀</translation>
+    </message>
+    <message>
+        <source>Request path</source>
+        <translation>请求路径</translation>
+    </message>
+    <message>
+        <source>Leave empty to use the native protocol path</source>
+        <translation>留空以使用协议默认路径</translation>
+    </message>
+    <message>
+        <source>Request / response mapping and model capabilities</source>
+        <translation>请求 / 响应映射与模型能力</translation>
+    </message>
+    <message>
+        <source>Project tools always use LMMS internal interfaces</source>
+        <translation>工程工具始终调用 LMMS 内部接口</translation>
+    </message>
+    <message>
+        <source>Configure model requests here, not MCP services. Do not put API Keys in mapping JSON.</source>
+        <translation>此处配置模型请求。请勿填写 MCP 服务或将 API Key 写入映射 JSON。</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Apply to draft</source>
+        <translation>应用到草稿</translation>
+    </message>
+    <message>
+        <source>Invalid JSON</source>
+        <translation>JSON 无效</translation>
+    </message>
+    <message>
+        <source>Invalid connection</source>
+        <translation>连接配置无效</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatApiSettingsPage</name>
+    <message>
+        <source>JSON body authentication cannot be used for GET model lists. Enter a model ID manually.</source>
+        <translation>GET 模型列表不支持 JSON 请求体认证，请手动输入模型 ID。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatAdvancedDialog</name>
+    <message>
+        <source>%1 must be a JSON object.</source>
+        <translation>%1 必须是 JSON 对象。</translation>
+    </message>
+    <message>
+        <source>%1 must be a string.</source>
+        <translation>%1 必须是字符串。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatGenerationPage</name>
+    <message>
+        <source>Generation parameters</source>
+        <translation>生成参数</translation>
+    </message>
+    <message>
+        <source>Set default reasoning and temperature for the selected connection.</source>
+        <translation>设置当前连接的默认思考等级和温度。</translation>
+    </message>
+    <message>
+        <source>Reasoning level</source>
+        <translation>思考等级</translation>
+    </message>
+    <message>
+        <source>Model capability</source>
+        <translation>按模型能力</translation>
+    </message>
+    <message>
+        <source>Higher levels can help complex arrangement analysis and usually take longer.</source>
+        <translation>更高等级适用于复杂编配分析，通常需要更长响应时间。</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
+    <message>
+        <source>Extra high</source>
+        <translation>更高</translation>
+    </message>
+    <message>
+        <source>Unsupported levels are disabled. Budget-based models use their configured budgets.</source>
+        <translation>不支持的档位置灰；预算型思考模型使用配置的预算。</translation>
+    </message>
+    <message>
+        <source>Temperature</source>
+        <translation>温度</translation>
+    </message>
+    <message>
+        <source>Lower values are steadier; higher values add variation.</source>
+        <translation>较低更稳定，较高更有变化。</translation>
+    </message>
+    <message>
+        <source>Temperature is unavailable when the model does not support it.</source>
+        <translation>模型不支持温度时，此项不可用。</translation>
+    </message>
+    <message>
+        <source>Requests include only parameters supported by the model and protocol.</source>
+        <translation>请求只携带当前模型和协议支持的参数。</translation>
+    </message>
+    <message>
+        <source>Current connection preview</source>
+        <translation>当前连接预览</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>模型</translation>
+    </message>
+    <message>
+        <source>Approval mode</source>
+        <translation>批准模式</translation>
+    </message>
+    <message>
+        <source>Capability adaptation</source>
+        <translation>能力适配</translation>
+    </message>
+    <message>
+        <source>Reasoning levels, attachment types and temperature depend on the model. Only compatible settings are retained.</source>
+        <translation>思考档位、附件类型和温度并非所有模型都支持。只保留兼容的设置。</translation>
+    </message>
+    <message>
+        <source>Reset defaults</source>
+        <translation>恢复默认</translation>
+    </message>
+    <message>
+        <source>No connection selected</source>
+        <translation>未选择连接</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>请求批准</translation>
+    </message>
+    <message>
+        <source>No approval</source>
+        <translation>无需批准</translation>
+    </message>
+    <message>
+        <source>Unavailable</source>
+        <translation>不可用</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>An API Key, model ID and conversation are required.</source>
+        <translation>需要填写有效的 API Key、模型 ID 和会话内容。</translation>
+    </message>
+    <message>
+        <source>This request encoder requires user or assistant text messages.</source>
+        <translation>此请求编码器仅接受用户或助手文本消息。</translation>
+    </message>
+    <message>
+        <source>Maximum output tokens must be positive.</source>
+        <translation>最大输出 token 数必须为正数。</translation>
+    </message>
+    <message>
+        <source>Versioned Azure Chat requests require a valid deployment name.</source>
+        <translation>指定 API 版本的 Azure Chat 请求需要有效的部署名称。</translation>
+    </message>
+    <message>
+        <source>Configure a request path for custom HTTP JSON.</source>
+        <translation>请为自定义 HTTP JSON 配置请求路径。</translation>
+    </message>
+    <message>
+        <source>Request path must be relative to the configured API address.</source>
+        <translation>请求路径必须相对于已配置的 API 地址。</translation>
+    </message>
+    <message>
+        <source>The selected reasoning level has no model parameter mapping.</source>
+        <translation>所选思考等级没有对应的模型参数映射。</translation>
+    </message>
+    <message>
+        <source>Reasoning mappings may contain only reasoning parameters.</source>
+        <translation>思考映射只能包含思考参数。</translation>
+    </message>
+    <message>
+        <source>Reasoning parameters conflict with required request fields.</source>
+        <translation>思考参数与必要的请求字段冲突。</translation>
+    </message>
+    <message>
+        <source>Custom request fields must be nonempty and distinct.</source>
+        <translation>自定义请求字段不能为空或重复。</translation>
+    </message>
+    <message>
+        <source>Invalid or conflicting API Key location.</source>
+        <translation>API Key 位置无效或存在字段冲突。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Generation did not finish normally: %1.</source>
+        <translation>生成未正常结束：%1。</translation>
+    </message>
+    <message>
+        <source>The model returned an incomplete or invalid tool call.</source>
+        <translation>模型返回了不完整或无效的工具调用。</translation>
+    </message>
+    <message>
+        <source>The model stream contained invalid JSON.</source>
+        <translation>模型输出流包含无效的 JSON。</translation>
+    </message>
+    <message>
+        <source>Model protocol error: %1</source>
+        <translation>模型协议错误：%1</translation>
+    </message>
+    <message>
+        <source>The model stream ended before its completion marker.</source>
+        <translation>模型输出流在结束标记前中断。</translation>
+    </message>
+    <message>
+        <source>Configure text and completion paths for custom JSON responses.</source>
+        <translation>请为自定义 JSON 响应配置文本路径和结束标记路径。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>A model request is already running.</source>
+        <translation>已有模型请求正在运行。</translation>
+    </message>
+    <message>
+        <source>Model request failed: HTTP %1, network error %2.</source>
+        <translation>模型请求失败：HTTP %1，网络错误 %2。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Select a valid session and enter a message.</source>
+        <translation>请选择有效会话并输入消息。</translation>
+    </message>
+    <message>
+        <source>The request's original session or message no longer exists.</source>
+        <translation>请求原属的会话或消息已不存在。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>You</source>
+        <translation>你</translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>Agent</translation>
+    </message>
+    <message>
+        <source>Configure a model</source>
+        <translation>配置模型</translation>
+    </message>
+    <message>
+        <source>API and model settings</source>
+        <translation>API 与模型设置</translation>
+    </message>
+    <message>
+        <source>Stop current request</source>
+        <translation>停止当前请求</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>发送</translation>
+    </message>
+    <message>
+        <source>Model reasoning</source>
+        <translation>模型思考</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>请求失败：%1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>已停止</translation>
+    </message>
+    <message>
+        <source>Add attachments</source>
+        <translation>添加附件</translation>
+    </message>
+    <message>
+        <source> +%1</source>
+        <translation> +%1</translation>
+    </message>
+    <message>
+        <source>Enter to send · Shift+Enter for a new line</source>
+        <translation>Enter 发送 · Shift+Enter 换行</translation>
+    </message>
+    <message>
+        <source>Reading and encoding selected attachments…</source>
+        <translation>正在读取并编码所选附件…</translation>
+    </message>
+    <message>
+        <source>Request upload: %1 / %2 bytes</source>
+        <translation>请求上传：%1 / %2 字节</translation>
+    </message>
+    <message>
+        <source>Attachment: %1 (%2)</source>
+        <translation>附件：%1（%2）</translation>
+    </message>
+    <message>
+        <source>Export session (includes sent attachment content)</source>
+        <translation>导出会话（包含已发送的附件内容）</translation>
+    </message>
+    <message>
+        <source>Export JSON (includes sent attachment content)</source>
+        <translation>导出 JSON（包含已发送的附件内容）</translation>
+    </message>
+    <message>
+        <source>Remove attachment: %1</source>
+        <translation>移除附件：%1</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Auto</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
+    <message>
+        <source>Extra high</source>
+        <translation>更高</translation>
+    </message>
+    <message>
+        <source>Reasoning · %1</source>
+        <translation>思考 · %1</translation>
+    </message>
+    <message>
+        <source>Reasoning level</source>
+        <translation>思考等级</translation>
+    </message>
+    <message>
+        <source>Not supported</source>
+        <translation>模型不支持</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Attachment is not a readable file: %1</source>
+        <translation>附件不是可读取的文件：%1</translation>
+    </message>
+    <message>
+        <source>Attachment is empty or exceeds the %1 byte inline limit: %2</source>
+        <translation>附件为空或超过 %1 字节的内联限制：%2</translation>
+    </message>
+    <message>
+        <source>This model and protocol do not support %1 attachments: %2</source>
+        <translation>当前模型和协议不支持 %1 附件：%2</translation>
+    </message>
+    <message>
+        <source>Attachment changed after selection; select it again: %1</source>
+        <translation>附件在选择后已更改，请重新选择：%1</translation>
+    </message>
+    <message>
+        <source>Local MIDI reference (not uploaded or parsed): %1 (%2 bytes).</source>
+        <translation>本地 MIDI 引用（未上传或解析）：%1（%2 字节）。</translation>
+    </message>
+    <message>
+        <source>Cannot read the complete attachment: %1</source>
+        <translation>无法完整读取附件：%1</translation>
+    </message>
+    <message>
+        <source>Text attachments must be UTF-8: %1</source>
+        <translation>文本附件必须使用 UTF-8 编码：%1</translation>
+    </message>
+    <message>
+        <source>Attachment data: %1
+%2</source>
+        <translation>附件数据：%1
+%2</translation>
+    </message>
+    <message>
+        <source>Unsupported or invalid attachment content for this protocol.</source>
+        <translation>当前协议不支持该附件内容，或内容无效。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatAttachmentsDialog</name>
+    <message>
+        <source>Add attachments</source>
+        <translation>添加附件</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Drop files or choose files</source>
+        <translation>拖入文件或选择文件</translation>
+    </message>
+    <message>
+        <source>Choose files…</source>
+        <translation>选择文件…</translation>
+    </message>
+    <message>
+        <source>Choose attachments</source>
+        <translation>选择附件</translation>
+    </message>
+    <message>
+        <source>All files (*)</source>
+        <translation>所有文件 (*)</translation>
+    </message>
+    <message>
+        <source>Attachment name</source>
+        <translation>附件名称</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>状态</translation>
+    </message>
+    <message>
+        <source>Selected files are sent only when you send a message; unsupported types are reported.</source>
+        <translation>仅在发送消息时发送所选文件；不支持的类型会明确提示。</translation>
+    </message>
+    <message>
+        <source>Local reference</source>
+        <translation>本地引用</translation>
+    </message>
+    <message>
+        <source>Ready to send</source>
+        <translation>准备发送</translation>
+    </message>
+    <message>
+        <source>Not supported by this model</source>
+        <translation>当前模型不支持</translation>
+    </message>
+    <message>
+        <source>Remove attachment</source>
+        <translation>移除附件</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSessionsDialog</name>
+    <message>
+        <source>Export folder (includes sent attachment content)</source>
+        <translation>选择导出目录（包含已发送的附件内容）</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Request template placeholders must name an available request field and occupy the entire value.</source>
+        <translation>请求模板占位符必须引用可用请求字段，并占据整个值。</translation>
+    </message>
+    <message>
+        <source>The custom request template must be a JSON object containing the messages placeholder.</source>
+        <translation>自定义请求模板必须是包含 messages 占位符的 JSON 对象。</translation>
+    </message>
+    <message>
+        <source>Configure an error path for custom JSON responses.</source>
+        <translation>请为自定义 JSON 响应配置错误路径。</translation>
+    </message>
+    <message>
+        <source>The configured response error path did not contain an error string or message object.</source>
+        <translation>配置的响应错误路径不包含错误字符串或 message 对象。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>There is no failed request to retry in this session.</source>
+        <translation>当前会话没有可重试的失败请求。</translation>
+    </message>
+    <message>
+        <source>Attachment content is unavailable. Select the files again to send a new request.</source>
+        <translation>附件内容不可用。请重新选择文件后发送新请求。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Retry last failed request</source>
+        <translation>重试上次失败的请求</translation>
+    </message>
+    <message>
+        <source>Request failed · Click Send to retry</source>
+        <translation>请求失败 · 点击发送按钮重试</translation>
+    </message>
+</context>
 </TS>

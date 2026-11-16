@@ -66,7 +66,9 @@ if(WANT_AGENT_MCP)
 endif()
 
 if(WANT_AGENT_CHAT)
-	list(APPEND LMMS_TESTS src/agent/ChatStoreTest.cpp src/agent/ChatDockTest.cpp)
+	list(APPEND LMMS_TESTS src/agent/ChatStoreTest.cpp src/agent/ChatDockTest.cpp src/agent/ChatConnectionTest.cpp
+		src/agent/ChatEventStreamTest.cpp src/agent/ChatRequestTest.cpp src/agent/ChatResponseTest.cpp
+		src/agent/ChatProviderClientTest.cpp src/agent/ChatAttachmentTest.cpp)
 endif()
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)

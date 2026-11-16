@@ -4,7 +4,12 @@ endif()
 
 if(WANT_AGENT_CHAT)
 	list(APPEND LMMS_SRCS agent/chat/ChatStore.cpp agent/chat/ChatDock.cpp agent/chat/ChatDockLayout.cpp
-		agent/chat/ChatSettingsDialog.cpp agent/chat/ChatSessionsDialog.cpp)
+		agent/chat/ChatSettingsDialog.cpp agent/chat/ChatSessionsDialog.cpp agent/chat/ChatConnection.cpp
+		agent/chat/ChatEventStream.cpp agent/chat/ChatApiSettingsPage.cpp agent/chat/ChatAdvancedDialog.cpp
+		agent/chat/ChatGenerationPage.cpp agent/chat/ChatRequest.cpp agent/chat/ChatResponse.cpp
+		agent/chat/ChatProviderClient.cpp agent/chat/ChatController.cpp agent/chat/ChatDockRequest.cpp
+		agent/chat/ChatAttachment.cpp agent/chat/ChatContent.cpp agent/chat/ChatAttachmentsDialog.cpp
+		agent/chat/ChatTranscript.cpp)
 endif()
 
 set(LMMS_SRCS

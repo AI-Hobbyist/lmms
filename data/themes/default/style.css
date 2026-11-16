@@ -1779,8 +1779,23 @@ QWidget#agentSettingsNavigation, QFrame[agentSettingsCard="true"] {
 QWidget#agentSettingsHeader, QWidget#agentSettingsFooter {
     background: palette(base);
 }
-QScrollArea#agentSettingsScroll, QScrollArea#agentManagerScroll, QScrollArea#agentManagerRows {
+QScrollArea#agentSettingsScroll, QScrollArea#agentManagerScroll, QScrollArea#agentManagerRows,
+QScrollArea#agentAdvancedScroll, QScrollArea#agentAttachmentRows {
     border: none;
+}
+QSlider#agentTemperatureSlider::groove:horizontal {
+    height: 5px;
+    margin: 0 12px;
+    background: #3a4650;
+}
+QSlider#agentTemperatureSlider::sub-page:horizontal {
+    background: #50ac70;
+}
+QSlider#agentTemperatureSlider::handle:horizontal {
+    width: 17px;
+    margin: -8px 0;
+    border-radius: 4px;
+    background: #70cd8d;
 }
 QLineEdit#agentPromptPath {
     font-size: 14px;
@@ -1797,6 +1812,15 @@ QToolButton[agentApprovalCard="true"] {
     border: 1px solid palette(mid);
     border-radius: 10px;
 }
+QToolButton[agentPresetCard="true"] {
+    background: palette(button);
+    border: 1px solid palette(mid);
+    border-radius: 8px;
+}
+QLineEdit[agentApiInput="true"] {
+    font-size: 14px;
+    padding-left: 12px;
+}
 QToolButton[agentApprovalCard="true"]:checked {
     background: palette(alternate-base);
     border-color: palette(highlight);
@@ -1807,7 +1831,18 @@ QLabel[agentSettingsBadge="true"] {
     border-radius: 4px;
     padding-left: 10px;
 }
-QTextBrowser#agentMessages, QPlainTextEdit#agentInput {
+QScrollArea#agentMessages, QWidget#agentTranscriptContents, QPlainTextEdit#agentInput {
+    background: transparent;
+    border: none;
+}
+
+QFrame[agentUserBubble="true"] {
+    background: #293442;
+    border: none;
+    border-radius: 8px;
+}
+
+QToolButton#agentAttachmentRemove {
     background: transparent;
     border: none;
 }

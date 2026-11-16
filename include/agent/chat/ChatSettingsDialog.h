@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "agent/chat/ChatConnection.h"
+
 class QAbstractButton;
 class QDialogButtonBox;
 class QLabel;
@@ -11,6 +13,9 @@ class QScrollArea;
 class QStackedWidget;
 
 namespace lmms::agent::chat {
+
+class ChatApiSettingsPage;
+class ChatGenerationPage;
 
 class ChatSettingsDialog : public QDialog
 {
@@ -29,6 +34,9 @@ private:
 	void selectPage(int page);
 	void updateApprovalLabels();
 	void reloadPrompt();
+	ChatConnectionStore m_connectionStore;
+	ChatApiSettingsPage* m_apiPage = nullptr;
+	ChatGenerationPage* m_generationPage = nullptr;
 
 	QWidget* m_header = nullptr;
 	QWidget* m_navigation = nullptr;

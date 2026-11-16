@@ -325,7 +325,8 @@ void ChatSessionsDialog::deleteSelected()
 
 void ChatSessionsDialog::exportSelected()
 {
-	const auto directory = QFileDialog::getExistingDirectory(this, QStringLiteral("选择会话导出目录"));
+	const auto directory
+		= QFileDialog::getExistingDirectory(this, tr("Export folder (includes sent attachment content)"));
 	if (directory.isEmpty())
 	{
 		return;

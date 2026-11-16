@@ -236,6 +236,9 @@ target_link_libraries(lmmsobjs
 target_static_libraries(lmmsobjs lmmssvs)
 if(LMMS_BUILD_WIN32)
 	target_link_libraries(lmmsobjs bcrypt)
+	if(WANT_AGENT_CHAT)
+		target_link_libraries(lmmsobjs advapi32)
+	endif()
 endif()
 target_static_libraries(lmmsobjs ringbuffer)
 

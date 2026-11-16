@@ -6,12 +6,12 @@
 #include <QListWidget>
 #include <QMenu>
 #include <QPlainTextEdit>
-#include <QTextBrowser>
 #include <QToolButton>
 
 #include "ConfigManager.h"
 #include "ToolButton.h"
 #include "agent/chat/ChatDock.h"
+#include "agent/chat/ChatTranscript.h"
 #include "embed.h"
 
 namespace lmms::agent::chat {
@@ -140,10 +140,9 @@ void ChatDock::buildWorkspace()
 	connect(m_more, &QToolButton::clicked, this, [this] { showSessionMenu(QPoint(0, 0)); });
 	m_context = new QLabel(QStringLiteral("  当前工程"), m_chatPanel);
 	m_context->setObjectName("agentProjectContext");
-	m_messages = new QTextBrowser(m_chatPanel);
+	m_messages = new ChatTranscript(m_chatPanel);
 	m_messages->setObjectName("agentMessages");
 	m_messages->setFrameShape(QFrame::NoFrame);
-	m_messages->setOpenExternalLinks(false);
 	m_model = iconButton(m_chatPanel, QStringLiteral("未配置模型"), "agent_chat_settings", true);
 	m_model->setObjectName("agentModel");
 	m_model->setEnabled(false);
@@ -154,8 +153,30 @@ void ChatDock::buildWorkspace()
 	m_input->setFrameShape(QFrame::NoFrame);
 	m_input->setPlaceholderText(QStringLiteral("继续描述你想要的编配…"));
 	m_attach = iconButton(m_composer, QStringLiteral("添加附件（M2 接入）"), "agent_chat_attach");
-	m_attach->setEnabled(false);
+	m_attach->setObjectName("agentAttach");
+	m_attachmentChip = iconButton(m_composer, {}, "agent_chat_attach", true);
+	m_attachmentChip->setIcon({});
+	m_attachmentChip->setObjectName("agentAttachmentChip");
+	auto* attachmentIcon = new QLabel(m_attachmentChip);
+	attachmentIcon->setObjectName("agentAttachmentChipIcon");
+	attachmentIcon->setPixmap(embed::getIconPixmap("agent_chat_attach", 15, 15));
+	attachmentIcon->setGeometry(9, 6, 15, 15);
+	attachmentIcon->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_attachmentCaption = new QLabel(m_attachmentChip);
+	m_attachmentCaption->setObjectName("agentAttachmentChipCaption");
+	m_attachmentCaption->setTextFormat(Qt::PlainText);
+	m_attachmentCaption->setGeometry(32, 5, 105, 16);
+	m_attachmentCaption->setAttribute(Qt::WA_TransparentForMouseEvents);
+	auto attachmentFont = m_attachmentCaption->font();
+	attachmentFont.setPixelSize(11);
+	m_attachmentCaption->setFont(attachmentFont);
+	m_attachmentRemove = iconButton(m_attachmentChip, {}, "agent_chat_close");
+	m_attachmentRemove->setObjectName("agentAttachmentRemove");
+	m_attachmentRemove->setGeometry(141, 8, 12, 12);
+	m_attachmentRemove->setIconSize({12, 12});
+	m_attachmentChip->hide();
 	m_reasoning = iconButton(m_composer, QStringLiteral("思考 · 自动"), "agent_chat_brain", true);
+	m_reasoning->setObjectName("agentReasoning");
 	m_reasoning->setEnabled(false);
 	const auto approvalMode = ConfigManager::inst()->value("agentchat", "approval", "request");
 	m_approval
@@ -224,7 +245,10 @@ void ChatDock::arrangeWorkspace()
 	m_messages->setGeometry(20, 108, innerWidth, qMax(0, bodyHeight - 360));
 	m_model->setGeometry(20, bodyHeight - 228, qMin(240, innerWidth), 22);
 	m_composer->setGeometry(20, bodyHeight - 197, innerWidth, 155);
-	m_input->setGeometry(14, 10, innerWidth - 28, 84);
+	const bool attachments = !m_current.value("draftAttachments").toArray().isEmpty();
+	m_input->setGeometry(14, 10, innerWidth - 28, attachments ? 40 : 84);
+	m_attachmentChip->setGeometry(12, 57, qMin(174, innerWidth - 24), 28);
+	m_attachmentChip->setVisible(attachments);
 	m_attach->setGeometry(6, 106, 34, 34);
 	m_reasoning->setGeometry(45, 106, 112, 34);
 	m_approval->setGeometry(165, 106, 112, 34);

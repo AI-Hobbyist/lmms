@@ -1,4 +1,176 @@
-# 当前接续：内置 Agent 聊天 M1 DONE（2026-11-16）
+## M2 阶段验收及检查点收尾（2026-11-16）
+
+- M2计划范围实施及自动验收完成。新增失败重试复用Penpot01既有发送位置与底部状态文字，无新增几何；实时读11/13及页面错误相关节点，未发现专用重试按钮。ChatController重试保留原用户消息/失败尝试，以retryOf追加assistant；复用附件快照，缺内容要求重选，保留草稿且不会自动重放。
+- Release8/8源文件通过，QM4131 finished/0 unfinished。重试专项CTest2/2通过12.89秒；全部8个Chat目标更新/重链接通过（0待编译CPP），最终CTest8/8通过13.24秒、QtTest71 passed/0 failed/skip。真实Qt窗口鼠标重试、原发送几何不变、本机503连续失败/恢复/销毁恢复/原文件删除后快照字节/重复用户不追加/草稿保留均通过。
+- 日志build/agent-chat-m2-retry-{build,tests}.log及build/agent-chat-m2-checkpoint-{build,tests}.log。已查看本次真实build/agent-chat-send-native.png，中文/默认主题正常。逐协议和附件支持边界见doc/agent/chat-m2-validation.md，真实厂商/完整DAW人工项MANUAL/PENDING，不作阻塞、不记PASS。
+- 当前master，M1 c39002397已推送；M2阶段提交和推送正在收尾，尚未开始M3。提交前需检查status/diff和cached diff --check，明确排除.codegraph、build.log、build-driver.log。无活动构建/测试，无ZIP，生产安装未改。未读到可靠额度接口，不猜额度。
+- 下一最小任务：完成M2提交/推送并验证远端，再更新本手册确认状态；之后实时确认Penpot连接并按计划开始M3内部工具与批准。禁止无关重构、扩大范围、offscreen、WSL；Windows原目录、前台Python进度条构建、同工程任务检查等约束继续有效。
+
+---
+
+## M2 自定义请求模板与错误字段映射（2026-11-16）
+
+- 已实时连接Penpot13（正确file/page/board），并读取11状态板；本轮没有改变任何界面几何。仅补计划§6已有自定义HTTP JSON要求，无无关重构。
+- ChatRequest支持mapping.requestTemplate完整JSON对象，递归替换整个字符串值的${字段}占位符，保留JSON类型；必须引用messages，未知/内嵌占位符及非对象模板明确报错。messages已含system及历史/工具结果，替入后不再解释消息内容。原有无模板字段重命名保留；认证在模板之后处理，不暴露Key变量。实际启用的温度/思考字段可显式引用；使用说明及完整示例写入doc/agent/chat-provider-sources.md。
+- ChatResponse支持responseErrorPath，默认error；对象/数组点路径、字符串及message对象，JSON与SSE都先检查错误再读正文，错误不暴露工具调用。空路径或错误值类型明确报映射错误。仍使用ProviderClient的Key脱敏。
+- 首次编译因QJsonValueRef不能绑定QJsonValue&失败；读build.log定位后改为显式QJsonValue副本，保留build/agent-chat-m2-custom-template-compile-red.log。最终Release4/4成功，输出build/Release/lmms.exe；QM4127 finished/0 unfinished。未重建插件，未改变插件部署目录。
+- CTest ChatRequestTest/ChatResponseTest/ChatProviderClientTest 3/3通过，4.87秒；QtTest分别9/12/16 passed，0 failed/skip。新增模板嵌套数组/对象/布尔/null与system内容、未知占位符/缺messages拒绝、消息含占位符不解释；本机HTTP同时验证JSON/SSE两种出站模板正文、成功响应、自定义错误与Key脱敏。另测数组索引错误路径及空路径拒绝。日志build/agent-chat-m2-custom-template-{build,tests}.log。没有真实厂商API调用，也没有新增GUI验收结论。
+- 格式化限定本轮5个新增M2源/测试文件，检查新增实现可读性及git diff --check通过。当前master，M1 c39002397已推送；M2仍IN PROGRESS、全部未提交，无活动构建/测试，无ZIP，生产未动。人工真实厂商/完整DAW验收MANUAL/PENDING。
+- 下一最小任务：按实时Penpot确认失败重试入口（本轮11按名称/characters搜索无匹配，不能据此认定设计没有该状态；需读取实际节点/文本API或相关板），补计划内可用重试，再核对附件能力声明与支持类型、完整M2验收及所有8项Chat回归。完成阶段后更新记录/提交/推送确认，再进入M3；M3～M5未开始。禁止扩大计划范围、无关重构、WSL/offscreen。
+
+---
+
+
+## M2 输入附件标记与阶段核对（2026-11-16）
+
+- Penpot01已实时读取：chip相对composer(12,57,174,28)，内部图标(9,6,15,15)、文件名(32,5,105,16)、独立移除(141,8,12,12)。已复用LMMS ToolButton与主题SVG实现；文件名中间省略、tooltip/无障碍保留全文，多附件显示首项与其余数量，移除当前首项，其他项继续保留。
+- removeFirstAttachment同步draftAttachments并保存会话，重新排输入区；最后一项移除后隐藏chip、恢复输入高度，空输入禁用发送；原始文件不删。在途请求期间由父按钮禁用阻止改动。新增中文1条，QM4123 finished/0 unfinished。
+- Release6/6成功；真实ChatDockTest CTest1/1通过6.88秒，QtTest11 passed/0 failed/skip。nativeTextConversation扩展真实鼠标点移除、关键几何、两项逐个移除、磁盘草稿与原文件保留、重新加图发送，HTTP抓包不含已移除文本且实际PNG字节仍匹配。截图doc/agent/chat-attachment-chip-native.png已查看，中文/图标/独立移除正常。日志build/agent-chat-m2-attachment-chip-{build,tests}.log。
+- 按计划§6原文核对，M2尚有明确缺项，不能仅凭已过夹具提前标DONE：custom HTTP目前只有字段重命名，没有请求模板；配置的自定义错误路径尚未解析（当前只有通用顶层error）；失败信息已显示但还没有明确重试入口。以上是原计划已有要求，不新增范围。附件MIME按当前实现存在明确支持表，最终核对需确认与能力声明一致，不能将全部文件格式记为已支持。
+- 下一最小任务：先完成custom请求模板及错误字段映射（不执行JS/Python），再按实时Penpot核对可用失败重试入口；复核M2完整验收、整体回归后更新记录/提交推送确认，再进入M3。不要继续把“只剩最后布局”当成完成依据。已有连接、协议/SSE/JSON、原生签名/工具历史、附件/消息界面均保留，不重复实现。
+- 当前master，M1 c39002397已推送，M2未完成未提交。无活动构建/测试，无ZIP，生产未改。git diff --check通过，人工完整DAW/真实厂商缺Key项MANUAL/PENDING，不作为受阻条件。M3～M5仍未开始，禁止计划外扩展、无关重构、WSL/offscreen。
+
+---
+
+## M2 原生消息区域布局（2026-11-16）
+
+- 实时读取Penpot01用户气泡420×113、圆角8、文字(14,13)/宽392、附件行(14,74)、Agent相隔27、图标22、标题(32,0)、摘要(100,1)、正文(0,37)；另实时读取10分离窗口对应宽840与同一相对间距。本轮仅实现M2消息展示，未伪造M3批准/工具操作卡。
+- 新增ChatTranscript.h/.cpp，使用QScrollArea/QFrame/QLabel和默认主题SVG；替换旧无气泡QTextBrowser。用户气泡背景/圆角接默认主题style.css，字体复用LMMS系统字体、13px正文；附件名称/MIME/大小实际元数据，摘要有实际内容时显示并通过tooltip提供，原生签名不显示。文本按PlainText呈现，错误/已停止及结构化工具结果（含数组）真实显示。空会话不再显示M3实施细节。
+- 流式只更新当前ChatMessage，已存在的消息行保持对象；保留上滚位置。会话切换/请求完成通过既有renderSession回读，仍保留草稿/模型/思考和请求归属。新组件toPlainText供统一文本读取。导出菜单旧“不包含附件文件”与快照行为不符，已同步为明确包含已发送内容。
+- 首次编译RED为残留clear()和缺QJsonObject头，保留build/agent-chat-m2-transcript-compile-red.log；最小修复后Release6/6成功、QM4122 finished/0 unfinished。真实ChatDockTest CTest1/1通过7.36秒；再补数组/错误显示和正常父窗口背景后Release2/2成功，最终CTest1/1通过6.55秒，QtTest11 passed/0 failed/skip。日志build/agent-chat-m2-transcript-{build,tests,final-build,final-tests}.log。
+- 已查看真实窗口doc/agent/chat-transcript-native.png及更新的chat-send-native.png：主题背景正常、中文无方框、用户气泡/附件/Agent关键坐标断言通过。最初独立透明根窗口的黑背景截图已由正常主题父窗口截图替代；没有使用offscreen或Computer Use。既有发送、停止、滚动、会话切换、销毁取消等本机HTTP/原生窗口回归仍通过。
+- 当前master、M2尚未完成未提交阶段检查点，M1 c39002397已推送。无活动编译/测试，无ZIP，生产未改。git diff --check通过，已检查改动范围与可读性。真实厂商与完整DAW人工验收仍MANUAL/PENDING。
+- 下一最小任务：实时Penpot核对并补齐输入区已选附件标记（目前整体按钮，原型有独立移除图标）等M2剩余布局；核对M2验收清单后整体回归/记录/提交推送，确认后才开始M3。消息区域不再是无气泡QTextBrowser，禁止重复重做；M3实际工具/批准卡、M4搜索下载、M5交付仍未开始。仅计划范围内，禁止无关重构、WSL和offscreen。
+
+---
+
+## M2 工具历史协议传输（2026-11-16）
+
+- 实时Penpot13连接成功，本轮无界面几何改动。ChatContent支持normalized assistant.tool_calls（id/name/arguments object）及role:tool结果（tool_call_id/name/content/is_error）；Chat/兼容/Azure、Responses、Claude、Gemini分别编码各自原生调用/结果，不把工具结果当system或普通用户指令。Controller恢复已记录的工具消息和调用；发送前检查调用/结果配对，孤立、重复或未解决的结果/调用明确失败，原历史不追加伪成功记录。
+- Claude/Gemini的并行结果合并同一user消息，后续用户文本排在全部结果后；Responses多调用和function_call_output按flat input排列。对象/数组结果编码为JSON字符串（Gemini保留response object）；Claude is_error与Gemini error字段按协议处理，其他族通过结果正文传达错误数据。
+- Gemini区分内部归属id与服务端providerId：服务端未返回id时，后续functionCall/functionResponse不伪造id；有id时原样匹配。该点已按官方FunctionCall/FunctionResponse schema核对。
+- custom HTTP通过mapping.toolHistoryFormat=openai-chat明确工具历史格式；responseToolCallsPath读取完整normalized调用数组快照，支持JSON和SSE，参数必须object，结束前不暴露调用。未配置格式则明确拒绝，不猜服务端格式。高级映射能力只用于协议传输，没有工具执行。
+- Release首次10/10成功（QM4116 finished/0 unfinished），新增代码可读性整理与后续文本分组后最终Release3/3成功。ChatDockTest+ChatRequestTest+ChatResponseTest+ChatProviderClientTest+ChatAttachmentTest CTest5/5通过11.52秒，QtTest计数见归档日志。本机HTTP toolProtocolRoundTrip覆盖8格式两轮：接收2并行调用、回传预设成功/失败结果、读取最终Done；同时验证原生签名仍在请求、Gemini缺省/指定ID、Controller存储恢复和未解决调用不发请求。结果为fixture数据，未执行LMMS内部工具，也不冒称真实厂商实测。日志build/agent-chat-m2-tool-history-{build,final-build,tests}.log。
+- 已检查新增/改动代码可读性、限定格式整理及git diff --check。当前master，M2未完成未提交阶段检查点，M1 c39002397已推送；无活动构建/测试，无ZIP，生产安装未改。真实厂商连接/附件/工具API验收MANUAL/PENDING，不阻塞可自主推进工作。
+- 下一最小任务：实时读取Penpot01/11完成M2消息区域排版（现QTextBrowser仍不是最终气泡布局），补阶段所需核对，然后M2整体验证、更新记录、提交并推送确认，再开始M3。M3工具schema接线、批准/实际执行循环尚未开始；M4/M5也未开始。只实施计划范围，禁止无关重构、offscreen、WSL。
+
+---
+
+## M2 原生响应块和签名回传（2026-11-16）
+
+- Penpot11实时连接成功，本轮无界面几何修改。ChatResponse新增nativeContent；只在协议完整结束且工具参数验证成功后发布。失败、HTTP错误或取消清空原生内容，未完成块不会作为后续历史回传。
+- Claude按block index保留原始content，拼接text/thinking/signature_delta，保留redacted_thinking.data，tool_use.input使用验证后的完整参数；Gemini逐part保留thoughtSignature及其他原生字段；Responses保留output_item及最终output（包括reasoning.encrypted_content、message.phase），function_call.arguments使用完整参数。Chat族保留assistant文本/返回的reasoning_content及原生工具调用结构。
+- Controller完成后以native envelope落盘，origin绑定connection UUID、protocol、model、baseUrl、deployment。相同来源下一轮用原生块；改变来源则沿用普通文本，不发送旧签名。底层encoder直接接收不匹配origin时拒绝。Responses的多output item在请求中展开到input，Claude为assistant.content，Gemini为model.parts。未调用任何内部工具，M3批准/执行未开始。
+- Release12/12成功；ChatDockTest+ChatRequestTest+ChatResponseTest+ChatProviderClientTest CTest4/4通过10.05秒，QtTest具体计数见LastTest及归档日志。新增三族nativeHistoryRoundTrip使用同一本机HTTP端点：第一轮接收原生块、Controller销毁后恢复第二轮抓包逐JSON值比对、第三轮切换model无旧opaque-state；另验证Claude分片signature拼接/redacted数据、Responses最终encrypted输出、原生来源隔离。日志build/agent-chat-m2-native-history-{build,tests}.log。
+- 已检查代码格式与git diff --check。本轮没有新词条，QM仍4115。当前master，M1提交c39002397已推送，M2未完成未提交检查点；无活动构建/测试，无ZIP，生产未改。真实厂商验收仍MANUAL/PENDING。
+- 下一最小任务：M2工具结果历史的各协议编码和完整请求/响应夹具，再按实时Penpot完成消息区域排版。原生签名保留及常规下一轮回传已完成本机验证，但不能冒充完整工具执行回合已实现；M3～M5仍未开始。禁止计划外扩展、无关重构、offscreen、WSL。
+
+---
+
+## M2 普通 JSON 响应与非流式请求（2026-11-16）
+
+- 实时Penpot13连接成功；本轮没有新增或改变界面几何。ChatProviderClient按真实响应Content-Type区分application/json（含charset）及+json和SSE，JSON等网络结束后解析，不再误判缺SSE结束标记。取消清理未完成JSON缓冲；协议错误仍经过API Key脱敏。
+- ChatResponseDecoder新增完整JSON解析，覆盖Chat/Azure/兼容的message、Responses output、Claude content、Gemini candidates及custom文本路径；保留文本/思考摘要/usage/完成原因，完整校验并行工具ID和参数object，失败不暴露可执行调用。该层只解析、不执行工具。原生签名/内容回传仍未完成，不能据此宣称完整工具回合通过。
+- 高级映射支持stream:false（默认仍true）；Chat/Responses/Claude/custom发送false字段，Gemini改generateContent且无alt=sse；Accept为application/json。服务端在流式请求下返回JSON也按响应格式解析。自定义普通JSON允许只设responseTextPath；若配置responseDonePath则仍必须匹配responseDoneValue（默认true），SSE仍要求结束路径。
+- RED：新增本机HTTP JSON用例先失败，openai-chat报“The model stream ended before its completion marker.”，日志build/agent-chat-m2-json-red.log。修复后Release7/7成功、QM4115 finished/0 unfinished；ChatDockTest+ChatRequestTest+ChatResponseTest+ChatProviderClientTest CTest4/4通过9.83秒。新增八格式HTTP抓包验证非流式字段/URL/Accept和文本，JSON替代SSE、+json错误/脱敏、取消；四原生族JSON并行工具和摘要、非法JSON/错误字段/参数非object/异常完成原因/custom路径回归。日志build/agent-chat-m2-json-{build,tests}.log。
+- 已检查新增代码格式及git diff --check。当前master，M2尚未完成未提交阶段检查点，无活动构建/测试；生产安装未改、无ZIP。下一最小任务：原生签名和工具历史回传，再按实时Penpot完成消息区域；随后M2整体回归、文档、提交推送。真实厂商连接缺Key仍MANUAL/PENDING，夹具不冒充厂商实测。M3～M5未开始，仅计划范围内实施。
+
+---
+
+## M2 历史附件快照及补充协议验证（2026-11-16）
+
+- 已连接实时Penpot11；本轮不改变附件几何。ChatController在第一次附件读取成功后、发HTTP前，把canonical content实际字节快照写入原会话的user消息；以会话/轮次/消息ID核对，原user或assistant占位被删时不发请求。读取当前会话后合并，保留期间草稿及标题变化。
+- 后续轮次复用快照，不重新读取原始文件。旧/导入记录只有附件元数据时明确提供“内容不可用，请重新选择”的文本，不按path自动读取本地文件。导出/导入保留已发送快照；两个导出入口的原生文件窗口标题明确包含已发送附件内容。新增中文3条，QM4112 finished/0 unfinished。
+- Release7/7成功；ChatStoreTest+ChatDockTest+ChatProviderClientTest CTest3/3通过9.99秒。新增attachmentHistorySnapshot实际本机HTTP两轮：第一轮PNG发送，删除原文件，导出/导入并新建Controller后续发原PNG字节；导入记录含private.txt路径但不读取其独特内容，原文件仍存在。日志build/agent-chat-m2-attachment-history-{build,tests}.log。
+- 增补PDF七种原生协议及Gemini音频请求字节断言：PDF document/source、inlineData、file_data对应MIME/名称/base64还原一致，custom结构附件明确拒绝；Gemini WAV inlineData字节一致。Release测试增量1/1成功，ChatAttachmentTest CTest1/1通过0.14秒、QtTest7 passed/0 failed/skip。PDF是请求编码夹具，不冒充真实厂商PDF理解测试。日志build/agent-chat-m2-attachment-formats-{build,tests}.log。
+- 已复查代码与git diff --check，末尾仅对导出标题调用换行，不改变已测试行为。当前无活动构建/测试；master M2尚未完成未提交，生产未改，无ZIP。保留所有既有工作区及日志。
+- 下一最小任务：继续M2普通JSON响应与custom映射、原生签名/工具历史回传和消息区域实时Penpot排版；再完成M2整体协议验证/阶段提交推送。历史附件不再是待实现项，真实厂商Key验收仍MANUAL/PENDING。M3～M5未开始。只做计划内实现，不进行无关重构。
+
+---
+
+## M2 附件界面与发送接线（2026-11-16，已验证的增量）
+
+- 已实时连接 Penpot 11/01；新增原生 ChatAttachmentsDialog（848×471），文件选择/拖入/移除、名称/MIME/大小、准备发送/本地引用/不支持状态；Dock 输入区显示所选附件标记，保存当前会话 draftAttachments，发送后清空。中文词条本轮增加20条，QM4109 finished/0 unfinished。
+- ChatController 发送时后台读取编码，取消令牌隔离旧轮次；本地准备状态与 QNetworkReply 整个请求 uploadProgress 分开显示。选择时仅检查元数据，不联网；会话记录保留附件元数据。总附件64MiB上限，协议/模型不支持发送前拒绝。
+- 抓包 RED 证明 QJsonArray::last() 赋值只修改临时副本，导致附件未进入请求；已改索引赋值。最终本机 HTTP 真实请求验证 image_url 的 PNG data URI 解码与原始文件逐字节一致。
+- 首轮 Release11/11成功；回归3/4通过、Dock抓包失败已保留 attachments-ui-red.log。最小修复及新增准备取消/文件消失用例后，Release2/2成功，CTest4/4通过13.06秒；QtTest Dock10、Request5、Provider8、Attachment5均0失败/跳过。准备阶段立即停止不发HTTP、取消回调不重启、发送前文件删除落盘error均已验证。日志 build/agent-chat-m2-attachments-ui-{build,final-build,tests}.log。
+- 真实Windows附件窗口截图 doc/agent/chat-attachments-native.png 已查看，中文正常、关键坐标断言通过；chat-send-native.png同步抓包通过后的窗口。未用offscreen或Computer Use。当前截图是组件测试，不是完整DAW/真实厂商验收。
+- M2仍 IN PROGRESS、未提交阶段检查点。历史附件目前只有元数据，后续轮次尚未回传内容，必须继续完成；还需PDF/Gemini音频、原生签名与工具历史、普通JSON响应和剩余消息区域Penpot排版。不提前开始M3/M4。真实厂商无Key验收 MANUAL/PENDING。
+- 当前master，M1检查点c39002397已推送；M2改动保留未提交，git diff --check通过。无活动编译测试，无ZIP、生产安装未改。下一最小任务：历史附件的明确引用/发送快照与回传，先核对计划和实时Penpot，防止从导入会话自动读取任意本地路径。
+
+---
+# 当前接续：内置 Agent 聊天 M2 IN PROGRESS（2026-11-16）
+
+- 最新附件核心：新增ChatAttachment.h/.cpp（inspect元数据、supports能力、prepare实际读取）和ChatContent.h/.cpp（canonical parts→各协议消息）。ChatRequest已调用encodeChatMessage，支持user文本/图像/音频/PDF等parts，Gemini不再把parts降成字符串。仍拒绝tool_calls历史；Controller/Dock尚未传附件，附件按钮仍禁用，不宣称已上传附件。
+- 能力字段inputTypes（image/audio/file）、可选inputMimeTypes与maxAttachmentBytes；进程单附件内联上限64MiB（16GB本机，模型可设更小），空/超限/不支持/读取失败明确报错。文本UTF-8，图像png/jpeg/webp/gif，Chat音频wav/mp3、Gemini音频，文件暂PDF；Custom结构附件明确不支持，text仍可用。只选文件时看元数据，prepare才读字节；未来须放发送处理阶段，不能在选中时联网。
+- MIDI选择计划允许的本地引用分支：现有MidiImport::readSMF会创建工程轨道/自动化，未拿来做预览，没引入/重构portsmf。MIDI part明确“未上传或解析”的路径/大小文本引用，不把路径伪装成远端内容；无MIDI解析或工程修改。UI需区分“本地引用”与上传状态。
+- 实时Penpot11已读附件面板848×471、拖入区800×121、三行名称/状态/移除与底部提示坐标，本轮尚未实施该UI。原型为静态展示，接入实际状态时继续实时读节点；后续需选择/拖入/移除、类型大小、输入区已选标记、发送时准备/网络uploadProgress及取消。还需处理历史附件引用/快照、会话切换，不能默默丢弃。
+- Release首次附件核心8/8成功，QM4089 finished/0 unfinished。测试发现Qt WAV MIME为audio/vnd.wave，原支持表遗漏；保存attachment-core-red.log与attachment-mime-red.log。最小规范为audio/wav后Release增量2/2成功，ChatAttachmentTest+ChatRequestTest CTest2/2通过0.21秒，QtTest5+5通过。日志build/agent-chat-m2-attachment-core-build.log、attachment-core-final-build.log、attachment-core-tests.log。实际验证UTF-8/非法编码、MIDI明确引用、七种native协议图像字节、WAV读/Chat音频正文字节、未知能力/小上限/文件变化和删除；PDF、Gemini音频、真实网络附件仍待回归，不冒称全厂商PASS。
+- 当前无编译/测试，master M2未提交，无ZIP、生产未改。下一最小任务：复用本轮核心实现ChatAttachmentsDialog及Dock/Controller发送接线，读Penpot11/01并做真实窗口+本机HTTP附件字节验证；补PDF/Gemini音频及请求限额。后续M2工具/签名/JSON响应/消息排版仍未完成，M3～M5未开始。禁止计划外扩展或无关重构。
+
+- 最新快捷选择已完成（取代下方“模型按钮暂打开设置/思考禁用”记录）：模型按钮弹原生QMenu列真实已保存连接，另保留设置入口；选择写当前会话connectionId。思考按钮弹316×384原生Popup，按实时Penpot11的标题(22,21)、六行(11,66+45*i,294,38)、caption(19,7)、check(264,10)、不支持提示(108,7)布置。auto始终可用，其他档需reasoningLevels且reasoningParameters[level]非空；写会话reasoning，切换连接不兼容时显示/使用auto。运行中禁用模型/思考修改，停止按钮仍可用。
+- ChatDock::renderSession重新读取会话连接/思考，返回旧会话保留选择；未指定时用全局默认。ChatApiSettingsPage新增可选selectedId构造参数，ChatSettingsDialog传已保存全局连接UUID，解决重开设置总选第一连接的问题，不改旧调用默认行为。生成参数页现有能力界面仍按reasoningLevels启用，缺参数映射时请求层明确报错；后续M2能力/附件完整回合时须统一实际能力资料，不猜模型名。
+- Release增量8/8成功（lmms、ChatDockTest、zh_CN.qm），QM4080 finished/0 unfinished；真实ChatDockTest CTest1/1通过6.38秒，QtTest9 passed/0 failed/skip。扩展nativeTextConversation：实际选择Alternate连接、Popup高档/更高禁用与关键几何、发送抓包验证model=alternate-model及reasoning_effort=high、返回原会话仍保留模型/高档；nativeGenerationDraftPersistence新增设置恢复第二连接断言。继续验证旧发送/停止/滚动/销毁路径。
+- 已查看doc/agent/chat-reasoning-native.png，中文/禁用项正常；chat-send-native.png同步最新截图。日志build/agent-chat-m2-quick-build.log、quick-tests.log。当前无构建，M2仍未完成未提交；无ZIP、生产未改。下一最小任务转向附件：实时Penpot11附件面板+主输入区标记，按计划实际读取/编码/上传、能力不支持明确拒绝，MIDI复用已有解析；同时后续补签名/工具回合/JSON响应。不要重复做快捷菜单。
+
+- 最新Dock文本发送已接通（取代下方“发送按钮禁用/未接Controller”记录）：ChatDock持有ChatController，新增ChatDockRequest.cpp实现连接读取、原生Key/prompt读取、发送/停止、文本/思考/错误显示。Enter发送、Shift+Enter换行；运行中按钮为Stop，可从其他会话停止原请求。模型按钮暂打开设置，快捷连接/思考切换、附件按钮尚未完成。
+- 流式只替换最后助手消息的文本区，不clear重建全历史；上滚保留当前位置，会话切换保存/恢复滚动位置，返回在途会话用Controller当前消息补显示。完成回读原会话。Dock析构体先stop，保证注入Store尚存活。新SVG data/themes/default/agent_chat_stop.svg参照实时Penpot11 stop的18×18/内部10.5矩形，仍走默认主题embed，无独立加载器；主布局几何未改变。
+- 实时Penpot01与11已连接并读取相关节点。初次Release增量7/7通过（lmms、ChatDockTest、zh_CN.qm），QM4071 finished/0 unfinished。真实ChatDockTest CTest1/1通过6.37秒、QtTest9通过。随后仅补销毁在途Dock用例/明确测试请求批准，测试增量1/1成功，最终CTest1/1通过6.67秒，QtTest9通过，未用offscreen或Computer Use。
+- nativeTextConversation用唯一临时应用配置及测试WinCred Key、本机HTTP夹具，验证ShiftEnter不发送、Enter发送、流式中文、上滚不跳底、新建其他会话不混入旧回复/草稿、返回原会话、按钮取消保存、流式期间delete Dock取消保存。测试Key已清理。已查看真实截图doc/agent/chat-send-native.png（640×878，中文正常、请求批准），日志build/agent-chat-m2-send-{build,tests}.log及send-lifecycle-{build,tests}.log。是组件窗口，不冒充完整DAW或真实厂商端到端。
+- M2仍未完成：消息气泡/附件状态仍需按Penpot最终精对，当前文本浏览器不宣称整个消息区域一比一完成；快捷模型/思考选择、selected UUID恢复、附件/工具历史出站编码、JSON响应、签名原生内容回传与完整协议回合仍待实施。下一最小任务为快捷连接/思考与附件（实时读取Penpot11及计划§附件要求），不要重复接文本发送。M3～M5未开始；当前无构建、master M2未提交，无ZIP，生产未改。禁止无关重构。
+
+- 最新控制器：新增ChatController.h/.cpp并接入src/agent/CMakeLists.txt。注入ChatStore，send绑定session UUID/新turn UUID/消息UUID；user与streaming助手占位先落盘，客户端增量通过messageUpdated信号交出，完成或stop才合并最终助手消息。合并重新读取原会话，保留期间draft/title/archive变更；原消息/会话删除则报错，不重建。stop取消客户端后保存部分文本为canceled；输入/协议启动失败保存error尝试，不执行工具。
+- 控制器当前只转发文本历史，不是完整工具/附件回合；ChatRequest仍拒绝结构内容，ChatDock尚未持有/连接控制器，发送按钮仍禁用。不要重复创建Controller；下一步在真实Penpot门槛后接ChatDock发送/停止和增量消息显示，保持滚动、不每块重建全部消息，加载真实连接/Key/prompt，处理Dock析构时controller/store生命周期（QObject子对象销毁晚于C++成员，需Dock析构体先stop）。
+- Release增量4/4成功（lmms、ChatProviderClientTest、zh_CN.qm），QM4062 finished/0 unfinished。ChatProviderClientTest CTest1/1通过0.92秒，QtTest7 passed/0 failed/skip；新增controllerSessionBinding及controllerCancellationAndDeletion：两个会话分离、拒绝并发、原会话新draft/title保留、正常文本落盘、取消保存部分输出、删除不重建。日志build/agent-chat-m2-controller-build.log、controller-tests.log。均本机HTTP+临时会话目录，不冒充真实厂商/DAW集成。
+- 本轮实际Penpot01已连接并读模型/思考/Enter相关文字节点；界面源码未改，没新增截图。当前无活动构建，master M2未提交、无ZIP、生产未改，M3～M5未开始。继续计划内M2，不因模块通过就提前记阶段完成或扩大范围。
+
+- 最新流式层：新增ChatResponse.h/.cpp与ChatResponseTest.cpp，结合既有ChatEventStream处理Chat/兼容/Azure Chat、Responses/Azure Responses、Anthropic、Gemini和Custom点路径的SSE事件。保留文本、厂商提供的思考内容、usage和finishReason；正常结束才交出完整JSON对象工具调用，不执行工具。Chat须finish_reason+[DONE]，Responses须completed，Anthropic须stop_reason+message_stop，Gemini须finishReason。中断/错误/无效参数清空可执行工具调用并保留文本。初次解析目标Release4/4及CTest1/1通过；后续严格参数校验后再次回归通过。
+- 新增ChatProviderClient.h/.cpp与ChatProviderClientTest.cpp，QNetworkAccessManager异步POST接ChatRequest+SSE解析；一实例一次请求、禁止自动重放、拒绝重定向，取消先断开旧reply再abort，旧回调不会完成新请求；错误隐藏已知Key，HTTP错误用状态/网络错误码，不输出含Key的请求URL。当前仅SSE，不支持普通JSON响应；没有接Controller/Dock，不宣称聊天已可用。
+- 最新构建中主lmms.exe与ChatProviderClientTest已编译，ChatResponseTest新增用例括号缺失导致该批整体失败，日志build/agent-chat-m2-provider-build-red.log。改为独立choice对象后按需重编ChatResponseTest+zh_CN.qm，增量1/1退出0，QM4060 finished/0 unfinished。随后CTest ChatResponseTest+ChatProviderClientTest 2/2通过0.61秒；日志build/agent-chat-m2-provider-build.log、provider-tests.log。没有把失败批记为全量PASS。
+- 解析用例覆盖所有网络分块大小的UTF-8+两个交错工具、Responses/Claude/Gemini文本与思考、Responses/Claude工具、空/残缺/数组参数拒绝、Custom结束路径、中断及错误。网络夹具覆盖OpenAI格式真实本机POST/认证/正文、并发拒绝、SSE分段、HTTP200缺结束/401/302、取消及复用；未验证真实厂商、所有协议网络、TLS/超时和真实工具回合，不把夹具冒充正式端到端。
+- M2待完成：Controller会话/轮次绑定与Dock发送/停止、附件与工具历史的出站编码、普通JSON响应、自定义工具映射、Gemini thoughtSignature及Claude签名/原生内容回传、各协议完整回合验证；当前出站仍只接受user/assistant文本。此前selected UUID恢复与API高级入口回归也仍待做。M3～M5未开始，master M2未提交、无ZIP、生产未改，当前无活动构建。继续真实Penpot门槛、原目录Windows构建与计划范围；禁止无关重构。
+
+- 最新草稿完整路径验证：新增ChatDockTest::nativeGenerationDraftPersistence，真实设置窗口切换两个连接，分别设置low/1.2与high/0.4，离开页面保留各自草稿，Save写盘，重新打开修改后Cancel不改盘。使用唯一测试应用名/临时prompt/配置与清理，未用生产配置或Key。Release测试目标增量1/1成功；ChatDockTest CTest1/1通过4.93秒，QtTest8 passed、0 failed/skip。日志build/agent-chat-m2-drafts-build.log与drafts-tests.log。
+- 新增ChatRequest.h/.cpp与ChatRequestTest.cpp，CMake已接入。这是M2文本请求构造层，不是完整ProviderClient：输入只接受user/assistant字符串content，显式拒绝结构附件/tool_calls/system历史，附件与工具编码尚待本阶段后续扩展，不能以此缩小最终范围。所有8个协议标识已有基本出站文本结构；Chat/Responses/Anthropic/Gemini独立结构，Azure v1与明确版本路由、deployment，Custom顶层modelField/messagesField/streamField映射，relative path校验。无网络发送、无凭据存储读取、无工具执行。
+- 模型参数不猜名称：temperature:true才携带温度；非auto思考需reasoningLevels与reasoningParameters[level]显式对象，限定思考参数字段，缺映射报错。支持Key header/query/body位置，拒绝覆盖已有请求体字段；请求禁止自动重定向。默认无tools/联网字段。还需后续正式网络、完整响应/流事件、工具/附件编解码和Controller/Dock发送；当前聊天发送仍未启用，M3～M5未开始。
+- 请求层Release增量4/4成功（lmms/ChatRequestTest/zh_CN.qm）；QM4052 finished、0 unfinished。ChatRequestTest CTest1/1通过0.16秒，包含protocolFormats/authenticationAndCapabilities/azureAndInvalidInputs三组（QtTest5通过），仅内存请求对象验证，不冒充厂商端到端。日志build/agent-chat-m2-request-build.log、request-tests.log。当前无活动编译/测试；master上的M2修改仍未提交，阶段未完成，无ZIP、生产未改。下一最小任务为ChatProtocol流事件解码+ProviderClient网络层，结合既有ChatEventStream分帧；随后工具/附件与Controller，禁止提前做M3/M4。
+- 已知M2待补：ChatApiSettingsPage构造默认取第一连接，父设置虽保存selected UUID但尚未恢复选择；后续正式Dock模型接入时须按已保存UUID恢复，缺失才选有效连接。高级配置API入口及查询认证实际网络夹具尚待补；不要把请求对象测试当已覆盖网络。
+
+- 最新生成参数页：新增ChatGenerationPage.h/.cpp，实时读取Penpot04后实现原生6档思考、温度数值/滑条、连接及批准预览、恢复默认。ChatSettingsDialog导航已启用生成参数；离开页面或保存时只把reasoning/temperature回写对应UUID连接草稿，取消不落盘。capabilities.reasoningLevels显式允许档位，temperature:true启用温度；未知能力禁用，不猜模型名。协议参数映射/发送仍未实施，不把此页当请求层通过。
+- Release增量7/7成功（lmms、ChatDockTest、zh_CN.qm）；QM4041 finished、0 unfinished。真实Windows ChatDockTest CTest1/1通过5.11秒，QtTest7 passed、0 failed/skip。新增用例验证04关键坐标、中文、未知能力禁用、支持档位、温度同步及恢复默认；尚未覆盖父设置保存/取消与跨连接切换完整GUI路径。
+- 已查看doc/agent/chat-generation-native.png，中文正常；截图为1368×874实际页面区域，非完整DAW。日志build/agent-chat-m2-generation-build.log、agent-chat-m2-generation-tests.log。当前无活动编译/测试；生产未改、无ZIP，M2阶段未完成未提交。下一最小任务仍属M2：补父设置草稿路径验证，然后实现ProviderClient/控制器/附件与01输入区接入，按实时Penpot核对。
+- 用户再次明确：不得无关重构，只完成计划书范围。保持现有工作区，计划外问题只记录，不实施。所有新增行为必须对照根目录实施计划书；不因当前方便而扩大M2或提前做M3/M4。
+
+- 最新高级配置接入已取代下方“未接入/未编译”状态：ChatAdvancedDialog加入src/agent/CMakeLists.txt，API页高级按钮打开原生对话框；接受只更新连接草稿，父设置保存才落盘。提取refreshCurrentFields避免重新载入时覆盖刚接受的协议。模型列表支持查询参数认证；JSON请求体认证明确提示手工模型ID，不发送GET请求体。JSON映射只解析数据，校验capabilities/mapping对象及apiVersion/deployment字符串。
+- 实时Penpot13连接与坐标读取成功。高级配置保留13主体矩形，在原型空白底边使用已确认设置页的取消/应用按钮位置，这是静态展示转为可保存窗口所需的操作入口；并非所有细节均已一比一验证，选项前图标等仍待最终精对。
+- Release增量6/6成功（lmms、ChatDockTest、zh_CN.qm），QM4015 finished、0 unfinished；原生ChatDockTest CTest1/1通过4.28秒，QtTest6 passed、0 failed、0 skipped。新增nativeAdvancedSettings覆盖关键坐标、中文标题、Gemini认证头切换、路径/能力/认证位置应用和取消。测试没覆盖API入口端到端、查询认证网络夹具及错误JSON弹窗，后续按需补。
+- 已查看真实截图doc/agent/chat-advanced-native.png，中文正常。日志build/agent-chat-m2-advanced-build.log、agent-chat-m2-advanced-tests.log。首轮编译曾早于配置完成导致build.log锁失败；配置退出0后重试成功。当前无活动编译/测试。生产未改，无新ZIP。M2未完成，不提交阶段检查点；下一最小任务为实时读取04生成参数页并接入，随后协议客户端/控制器/附件。
+
+- 最新翻译补充：ChatAdvancedDialog 的29条中文已加入zh_CN.ts，使用现有完整命名空间上下文。原生Release目标zh_CN.qm生成成功，4012 finished、0 unfinished，退出0；仅重建翻译，未重建或验证高级配置GUI。当前无编译在运行。
+- ChatAdvancedDialog.h/.cpp已在磁盘创建，尚未接入CMake/API入口、尚未编译验证；不得记为高级配置功能完成。下一最小任务为接入并按实时Penpot核对，然后继续04生成参数。M2仍未完成，所有本阶段修改未提交，没有新ZIP。
+
+- 最新API界面进展：新增ChatApiSettingsPage.h/.cpp，按实时02/03画板接入ChatSettingsDialog API导航；16个厂商卡片、搜索/分类、自定义连接、8种格式选择、名称/地址/密码Key/手工模型、列表复制/删除草稿。Save才写配置和原生凭据，取消不保存；复制仅复制基础字段、不复制Key（静态核对，尚无专门复制GUI用例）。高级参数按钮仍禁用，04生成参数未实施，不记M2完成。
+- 实际模型列表请求使用QNetworkAccessManager GET，返回真实ID，保留手工输入；Anthropic/Gemini分页，手工模型ID及自定义格式无端点提示，30秒超时、拒绝自动重定向。获取与测试按钮不调用生成或工程工具。只用本机HTTP夹具验证OpenAI格式GET/认证/响应；未执行真实厂商调用，其他认证/分页尚待针对性测试，不能计为全厂商PASS。
+- Release最后增量2/2成功（lmms、ChatDockTest、zh_CN.qm目标）；ChatDockTest+ChatConnectionTest CTest 2/2通过（4.09秒），QtTest11 passed、0 failed、0 skipped。实际窗口断言preset(280,264,302,98)、名称(530,231)、地址(530,442)、Key(530,539)、模型(530,636)、标题(574,100)；本机GET模型列表、密码字段、原生Key保存、取消草稿通过。修正QByteArray三元类型歧义及预览仍显示旧地址问题。
+- 本轮界面词条新增57条（含7个国内厂商名称），加连接层14条共71条；均在data/locale/zh_CN.ts，QM已重新生成并实际加载。预设通用Key SVG沿用默认主题，不使用厂商品牌位图。真实组件截图doc/agent/chat-api-native.png、chat-presets-native.png，来自1368×874页面区域，外部主设置框架沿用M1；中文正常。布局档案doc/agent/chat-api-layout-baseline.json；归档不能替代后续实时请求Penpot。
+- 本轮日志build/agent-chat-m2-api-build.log与agent-chat-m2-api-tests.log，首次类型歧义失败日志agent-chat-m2-api-build-red.log已保存；当前无活动编译/测试。开发lmms.exe现已重链包含基础API页（取代下方早期“尚未重链”记录）；生产安装和插件DLL未替换，无新ZIP。
+- 下一最小任务：实时Penpot确认后，继续13高级参数与04生成参数、ProviderClient各协议生成/流事件及附件，接ChatController和Dock模型选择/发送。不要重复创建API基础页、连接存储或SSE分帧。02侧栏卡片行内布局、厂商徽章/概览和请求预览完整内容仍待随M2最终状态精对；当前只有关键几何通过，不宣称所有页面一比一完成。预设卡片的协议说明现为内部格式标识，需改为用户可读名称。
+- 最新接续补充：实际Penpot连接正常，已重新读取02 API页各标签/输入区坐标；界面源码本轮未改。新增未提交ChatEventStream.h/.cpp及ChatEventStreamTest.cpp，做SSE分帧，不包含厂商事件语义或网络请求。支持UTF-8跨块、BOM、CR/LF/CRLF、多行data、注释和空data；无终止空行的事件不派发，不自动重连生成请求。
+- SSE目标Release实际4/4成功；ChatConnectionTest+ChatEventStreamTest CTest 2/2通过（0.36秒），日志build/agent-chat-m2-stream-build.log、agent-chat-m2-stream-tests.log。前者含中文目录实际加载，后者遍历每种分块大小、单CR结尾及未结束事件。没有将SSE分帧测试冒充厂商协议或模型对话通过。
+- 下一最小任务仍是M2 API设置页和ProviderClient：02几何已经实时复读，但实施调整前继续按需请求Penpot。将现有ChatConnectionStore接入保存/取消和真实模型获取；实现各协议编解码后接入ChatEventStream，区分结束事件与中途断流，再处理会话绑定、取消、附件。SSE分帧已实现，不重复造轮子。
+- 最新接续：M1检查点fd978a60d及记录c39002397均已推送origin/master；目标仍active，M2实施中，M3～M5未开始。下方M1记录为已完成基线，不重复实现。
+- 本轮已实时连接Penpot并读取02/03/04/13画板文本与02输入区矩形，目标文件/页面正确。继续界面构建前仍需实读各节点，不能凭归档脑补。
+- 新增未提交include/agent/chat/ChatConnection.h、src/agent/chat/ChatConnection.cpp、tests/src/agent/ChatConnectionTest.cpp。连接配置版本化JSON原子写入，支持8个请求格式标识、模型/能力/映射字段；JSON无API Key。Key使用Windows CredWriteW/CredReadW/CredDeleteW，按配置路径哈希和连接UUID隔离，失败明确报错，不回退明文。
+- 已在原build目录配置并链接advapi32；ChatConnectionTest实际Release构建12/12通过，真实Windows凭据写/读/隔离/删除、配置往返、损坏设置不覆盖及非法地址检查通过。测试只用临时目录和测试凭据，已清理，不触碰生产Key。
+- 用户新增要求补中文词条：data/locale/zh_CN.ts新增AgentChat上下文14条，连接层调用QCoreApplication::translate。ChatConnectionTest和现有zh_CN.qm构建2/2通过；实际加载QM后验证中文名称/错误及%1占位符，CTest 1/1通过（0.19秒）。本轮尚未重链主lmms.exe，新增连接层也尚未接入UI；不能报告聊天可用。
+- 日志build/agent-chat-m2-connection-build.log、agent-chat-m2-connection-tests.log、agent-chat-m2-translation-build.log、agent-chat-m2-translation-tests.log。源码已按clang-format处理，git diff --check通过。
+- 参考来源doc/agent/chat-provider-sources.md；Cherry registry固定版本c53a5e02941bc2f35d3270dc73a33b13da82df15，核对AGPL，不复制适配器代码。DeepSeek官方当前模型示例deepseek-flash，别盲用Penpot旧示例。厂商精简预设文件尚未写，协议与模型实际能力后续按官方文档验证。
+- 下一最小任务：实时探测Penpot；继续M2的API/预设/参数页面、ProviderClient各协议与SSE分片、ChatController会话归属/取消、真实附件。不要只实现单协议后标M2完成；不提前接M3/M4。不因缺厂商Key阻塞，真实厂商缺凭据项记MANUAL/PENDING，夹具不冒充实测。
+- 当前master，M2修改未提交（阶段未完成）；保留.codegraph/、build.log、build-driver.log。无活动构建/测试，无新ZIP，生产安装未改。编译继续使用SDK环境、原build、Windows原生工具链、jobs2、前台PTY/Tee及Python进度脚本；禁止WSL和Qt offscreen；必要的任务冲突查询只输出数量。
+
+---
+
+# M1 已完成基线
 
 - 目标active，完整范围仍为根目录《内置Agent聊天框实施计划书.md》M1～M5。M1自动验证、原生布局核对及提交/推送检查点完成；M2～M5未开始。
 - Penpot已恢复，实际读取文件509f8c9c-0e43-811a-8008-f310b05ce9db、页面509f8c9c-0e43-811a-8008-f310b05ce9dc，08/09/10画板核对成功。后续每次开始/恢复实施及新界面调整仍必须实时读取对应画板；不可连接停止实施。

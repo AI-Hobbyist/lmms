@@ -2,8 +2,11 @@
 #define LMMS_AGENT_CHAT_DOCK_H
 
 #include <QDockWidget>
+#include <QHash>
 #include <QJsonObject>
 
+#include "agent/chat/ChatAttachment.h"
+#include "agent/chat/ChatConnection.h"
 #include "agent/chat/ChatStore.h"
 
 class QCheckBox;
@@ -14,16 +17,19 @@ class QListWidget;
 class QMainWindow;
 class QMenu;
 class QPlainTextEdit;
-class QTextBrowser;
 class QToolButton;
 
 namespace lmms::agent::chat {
+
+class ChatController;
+class ChatTranscript;
 
 class ChatDock : public QDockWidget
 {
 	Q_OBJECT
 public:
 	explicit ChatDock(QMainWindow* window);
+	~ChatDock() override;
 	void setCollapsed(bool collapsed);
 
 protected:
@@ -42,8 +48,24 @@ private:
 	bool persistCurrent();
 	void showError(const QString& error);
 	void saveLayout();
+	void refreshConnection();
+	void showModelMenu();
+	void showReasoningMenu();
+	void showAttachments();
+	void removeFirstAttachment();
+	QVector<ChatAttachment> selectedAttachments() const;
+	void updateRequestControls();
+	void sendOrStop();
+	bool retryAvailable() const;
+	void updateStreamingMessage(const QString& sessionId, const QJsonObject& message);
 
 	ChatStore m_store;
+	ChatConnectionStore m_connectionStore;
+	ChatConnection m_connection;
+	ChatController* m_controller = nullptr;
+	QHash<QString, int> m_scrollPositions;
+	QString m_renderedSession;
+	QString m_streamMessageId;
 	QJsonObject m_current;
 	QWidget* m_content = nullptr;
 	QWidget* m_headerActions = nullptr;
@@ -62,6 +84,9 @@ private:
 	QToolButton* m_settings = nullptr;
 	QToolButton* m_model = nullptr;
 	QToolButton* m_attach = nullptr;
+	QToolButton* m_attachmentChip = nullptr;
+	QToolButton* m_attachmentRemove = nullptr;
+	QLabel* m_attachmentCaption = nullptr;
 	QToolButton* m_reasoning = nullptr;
 	QToolButton* m_approval = nullptr;
 	QToolButton* m_send = nullptr;
@@ -69,7 +94,7 @@ private:
 	QListWidget* m_sessions = nullptr;
 	QLineEdit* m_search = nullptr;
 	QCheckBox* m_archived = nullptr;
-	QTextBrowser* m_messages = nullptr;
+	ChatTranscript* m_messages = nullptr;
 	QPlainTextEdit* m_input = nullptr;
 	QToolButton* m_expand = nullptr;
 	bool m_collapsed = false;

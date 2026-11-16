@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
@@ -20,18 +21,20 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QScreen>
+#include <QScrollBar>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QStandardPaths>
-#include <QTextBrowser>
 #include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
 
 #include "ConfigManager.h"
 #include "ToolButton.h"
+#include "agent/chat/ChatController.h"
 #include "agent/chat/ChatSessionsDialog.h"
 #include "agent/chat/ChatSettingsDialog.h"
+#include "agent/chat/ChatTranscript.h"
 #include "embed.h"
 
 namespace lmms::agent::chat {
@@ -48,11 +51,43 @@ void saveSetting(const QString& key, const QString& value)
 ChatDock::ChatDock(QMainWindow* window)
 	: QDockWidget(QStringLiteral("Agent"), window)
 	, m_store(QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent/sessions"))
+	, m_connectionStore(QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"))
 {
 	setObjectName("agentChatDock");
 	setAllowedAreas(Qt::RightDockWidgetArea);
 	setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 	buildWorkspace();
+	m_controller = new ChatController(m_store, this);
+	connect(m_controller, &ChatController::messageUpdated, this, &ChatDock::updateStreamingMessage);
+	connect(m_controller, &ChatController::stateChanged, this, &ChatDock::updateRequestControls);
+	connect(m_controller, &ChatController::sessionChanged, this, [this](const QString& id) {
+		if (m_current.value("id").toString() == id)
+		{
+			const auto session = m_store.session(id);
+			if (!session.isEmpty())
+			{
+				m_current = session;
+				renderSession();
+			}
+		}
+		refreshSessions();
+	});
+	connect(m_send, &QToolButton::clicked, this, &ChatDock::sendOrStop);
+	connect(m_model, &QToolButton::clicked, this, &ChatDock::showModelMenu);
+	connect(m_reasoning, &QToolButton::clicked, this, &ChatDock::showReasoningMenu);
+	connect(m_attach, &QToolButton::clicked, this, &ChatDock::showAttachments);
+	connect(m_attachmentChip, &QToolButton::clicked, this, &ChatDock::showAttachments);
+	connect(m_attachmentRemove, &QToolButton::clicked, this, &ChatDock::removeFirstAttachment);
+	connect(m_controller, &ChatController::attachmentStatus, this,
+			[this](const QString& id, const QString& status, qint64 sent, qint64 total) {
+				if (m_current.value("id").toString() != id)
+				{
+					return;
+				}
+				m_footer->setText(status == "preparing" ? tr("Reading and encoding selected attachments…")
+														: tr("Request upload: %1 / %2 bytes").arg(sent).arg(total));
+			});
+	m_input->installEventFilter(this);
 	connect(m_search, &QLineEdit::textChanged, this, &ChatDock::refreshSessions);
 	connect(m_archived, &QCheckBox::toggled, this, &ChatDock::refreshSessions);
 	connect(m_sessions, &QListWidget::currentItemChanged, this, [this] { selectSession(); });
@@ -60,6 +95,7 @@ ChatDock::ChatDock(QMainWindow* window)
 	connect(m_input, &QPlainTextEdit::textChanged, this, [this] {
 		m_current.insert("draft", m_input->toPlainText());
 		persistCurrent();
+		updateRequestControls();
 	});
 	window->installEventFilter(this);
 	m_current = m_store.session(setting("session"));
@@ -90,6 +126,15 @@ ChatDock::ChatDock(QMainWindow* window)
 		}
 	}
 	setCollapsed(setting("collapsed") == "1");
+	refreshConnection();
+	arrangeWorkspace();
+}
+
+ChatDock::~ChatDock()
+{
+	// QObject children are destroyed after C++ members; persist cancellation
+	// while the injected store and the view are still alive.
+	m_controller->stop();
 }
 
 void ChatDock::setCollapsed(bool collapsed)
@@ -132,6 +177,19 @@ void ChatDock::saveLayout()
 
 bool ChatDock::eventFilter(QObject* watched, QEvent* event)
 {
+	if (watched == m_input && (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress))
+	{
+		auto* key = static_cast<QKeyEvent*>(event);
+		if ((key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter) && key->modifiers() == Qt::NoModifier)
+		{
+			event->accept();
+			if (event->type() == QEvent::KeyPress && !m_controller->active() && m_send->isEnabled())
+			{
+				sendOrStop();
+			}
+			return true;
+		}
+	}
 	if ((watched == m_content || watched == m_header) && event->type() == QEvent::Resize)
 	{
 		arrangeWorkspace();
@@ -206,22 +264,35 @@ void ChatDock::selectSession()
 
 void ChatDock::renderSession()
 {
+	auto* scroll = m_messages->verticalScrollBar();
+	const bool follow = scroll->value() >= scroll->maximum() - 2;
+	if (!m_renderedSession.isEmpty())
+	{
+		m_scrollPositions.insert(m_renderedSession, scroll->value());
+	}
+	const auto id = m_current.value("id").toString();
+	const bool sameSession = id == m_renderedSession;
 	saveSetting("session", m_current.value("id").toString());
 	m_title->setText(m_current.value("title").toString());
 	const QSignalBlocker blocker(m_input);
 	m_input->setPlainText(m_current.value("draft").toString());
-	m_messages->clear();
+	m_streamMessageId.clear();
+	QJsonArray messages;
 	for (const auto& message : m_current.value("messages").toArray())
 	{
-		const auto object = message.toObject();
-		m_messages->append(
-			QStringLiteral("<b>%1</b><p>%2</p>")
-				.arg(object.value("role").toString().toHtmlEscaped(), object.value("text").toString().toHtmlEscaped()));
+		auto object = message.toObject();
+		if (m_controller->activeSessionId() == id && object.value("id") == m_controller->currentMessage().value("id"))
+		{
+			object = m_controller->currentMessage();
+			m_streamMessageId = object.value("id").toString();
+		}
+		messages.append(object);
 	}
-	if (m_current.value("messages").toArray().isEmpty())
-	{
-		m_messages->setPlainText(QStringLiteral("开始新的音乐创作会话。\n\n默认请求批准；工程工具将在 M3 接入。"));
-	}
+	m_messages->setMessages(messages);
+	m_renderedSession = id;
+	scroll->setValue(sameSession && follow ? scroll->maximum() : m_scrollPositions.value(id, scroll->maximum()));
+	refreshConnection();
+	arrangeWorkspace();
 }
 
 void ChatDock::showSessionMenu(const QPoint& position)
@@ -236,7 +307,7 @@ void ChatDock::showSessionMenu(const QPoint& position)
 	rename->setEnabled(selected.size() == 1);
 	auto* pin = menu.addAction(QStringLiteral("切换置顶"));
 	auto* archive = menu.addAction(m_archived->isChecked() ? QStringLiteral("取消归档") : QStringLiteral("归档"));
-	auto* exportAction = menu.addAction(QStringLiteral("导出 JSON（不包含附件文件）"));
+	auto* exportAction = menu.addAction(tr("Export JSON (includes sent attachment content)"));
 	exportAction->setEnabled(selected.size() == 1);
 	menu.addSeparator();
 	auto* remove = menu.addAction(QStringLiteral("删除"));
@@ -272,8 +343,8 @@ void ChatDock::showSessionMenu(const QPoint& position)
 		}
 		if (action == exportAction)
 		{
-			const auto path
-				= QFileDialog::getSaveFileName(this, QStringLiteral("导出会话"), "session.json", "JSON (*.json)");
+			const auto path = QFileDialog::getSaveFileName(
+				this, tr("Export session (includes sent attachment content)"), "session.json", "JSON (*.json)");
 			if (!path.isEmpty() && !m_store.exportSession(id, path, error))
 			{
 				showError(error);
@@ -343,6 +414,7 @@ void ChatDock::showSettings()
 	{
 		m_approval->setText(setting("approval", "request") == "none" ? QStringLiteral("无需批准")
 																	 : QStringLiteral("请求批准"));
+		refreshConnection();
 	}
 }
 
