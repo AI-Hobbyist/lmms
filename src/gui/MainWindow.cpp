@@ -78,6 +78,10 @@
 
 #include "lmmsversion.h"
 
+#ifdef WANT_AGENT_CHAT
+#include "agent/chat/ChatDock.h"
+#endif
+
 
 namespace lmms::gui
 {
@@ -364,6 +368,10 @@ void MainWindow::finalize()
 	connect( m_viewMenu, SIGNAL(triggered(QAction*)), this,
 		SLOT(updateConfig(QAction*)));
 	updateViewMenu();
+
+#ifdef WANT_AGENT_CHAT
+	agent::chat::attachChatDock(this, m_viewMenu);
+#endif
 
 
 	m_toolsMenu = new QMenu( this );

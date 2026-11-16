@@ -219,6 +219,7 @@ def main():
 
     def consume_output():
         for line in process.stdout:
+            tqdm.write(line.rstrip())
             if len(startup_output) < 20:
                 startup_output.append(line.rstrip())
             match = re.search(r"(\d+)/(\d+) Test\s+#\d+:\s+(\S+)", line)

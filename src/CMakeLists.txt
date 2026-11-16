@@ -152,6 +152,14 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
 
+if(WANT_AGENT_CHAT)
+	add_custom_command(TARGET lmms POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:lmms>/data"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+			"${CMAKE_SOURCE_DIR}/data/system_prompt.txt" "$<TARGET_FILE_DIR:lmms>/data/system_prompt.txt"
+		VERBATIM)
+endif()
+
 # Enable updated C++ language standards
 IF(MSVC)
 	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")

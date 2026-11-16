@@ -83,8 +83,8 @@ def compile_items(projects, configuration):
                     timestamps[dependency] = modification_time(Path(dependency))
                 if not timestamps[dependency] or timestamps[dependency] > before:
                     required = True
-            if modification_time(project) > before:
-                required = True
+            # CMake may rewrite a project without changing its compile commands.
+            # MSBuild then keeps existing objects; project mtime is not an input.
             units.append(
                 {
                     "source": str(source),

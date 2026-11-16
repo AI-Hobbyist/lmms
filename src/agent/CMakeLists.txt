@@ -2,6 +2,11 @@ if(WANT_AGENT_MCP)
 	list(APPEND LMMS_SRCS agent/mcp/HttpMcpServer.cpp agent/mcp/McpProtocol.cpp)
 endif()
 
+if(WANT_AGENT_CHAT)
+	list(APPEND LMMS_SRCS agent/chat/ChatStore.cpp agent/chat/ChatDock.cpp agent/chat/ChatDockLayout.cpp
+		agent/chat/ChatSettingsDialog.cpp agent/chat/ChatSessionsDialog.cpp)
+endif()
+
 set(LMMS_SRCS
 	${LMMS_SRCS}
 	agent/CommandBus.cpp

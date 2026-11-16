@@ -113,6 +113,7 @@ OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_AGENT	"Include Agent command API" ON)
 include(CMakeDependentOption)
 cmake_dependent_option(WANT_AGENT_MCP "Include local HTTP MCP server" ON "WANT_AGENT" OFF)
+cmake_dependent_option(WANT_AGENT_CHAT "Include native Agent chat" ON "WANT_AGENT" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
@@ -289,7 +290,7 @@ endif()
 
 find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
-if(WANT_AGENT_MCP)
+if(WANT_AGENT_MCP OR WANT_AGENT_CHAT)
 	find_package(
 		Qt${QT_VERSION_MAJOR}
 		COMPONENTS Network
@@ -312,7 +313,7 @@ set(QT_LIBRARIES
 	Qt${QT_VERSION_MAJOR}::Xml
 	Qt${QT_VERSION_MAJOR}::Svg
 )
-if(WANT_AGENT_MCP)
+if(WANT_AGENT_MCP OR WANT_AGENT_CHAT)
 	list(APPEND QT_LIBRARIES Qt${QT_VERSION_MAJOR}::Network)
 endif()
 
@@ -752,6 +753,9 @@ IF(WANT_AGENT)
 	FILE(GLOB_RECURSE LMMS_AGENT_INCLUDES "${CMAKE_SOURCE_DIR}/include/agent/*.h")
 	IF(NOT WANT_AGENT_MCP)
 		LIST(FILTER LMMS_AGENT_INCLUDES EXCLUDE REGEX "/agent/mcp/")
+	ENDIF()
+	IF(NOT WANT_AGENT_CHAT)
+		LIST(FILTER LMMS_AGENT_INCLUDES EXCLUDE REGEX "/agent/chat/")
 	ENDIF()
 	LIST(APPEND LMMS_INCLUDES ${LMMS_AGENT_INCLUDES})
 ENDIF()

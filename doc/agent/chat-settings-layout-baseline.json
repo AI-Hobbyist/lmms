@@ -1,0 +1,1291 @@
+{
+  "fileId": "509f8c9c-0e43-811a-8008-f310b05ce9db",
+  "pageId": "509f8c9c-0e43-811a-8008-f310b05ce9dc",
+  "boards": [
+    {
+      "id": "f437380c-ddd4-80ad-8008-f318e954b9da",
+      "name": "05 / 全局设置 · 提示词路径与联网能力",
+      "size": [
+        1600,
+        1000
+      ],
+      "nodes": [
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9622d4a",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            0,
+            1600,
+            66
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e96bd952",
+          "name": "SVG / agent",
+          "type": "group",
+          "rect": [
+            24,
+            23,
+            23,
+            23
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e97db08e",
+          "name": "Agent 设置",
+          "type": "text",
+          "rect": [
+            60,
+            17,
+            106,
+            33
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9892885",
+          "name": "当前工程：Night Drive",
+          "type": "text",
+          "rect": [
+            1360,
+            25,
+            113,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9948ba6",
+          "name": "SVG / close",
+          "type": "group",
+          "rect": [
+            1558,
+            23,
+            20,
+            20
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9a057cb",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            66,
+            232,
+            874
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9a9d049",
+          "name": "工作区",
+          "type": "text",
+          "rect": [
+            24,
+            94,
+            30,
+            16
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9b5b8b5",
+          "name": "SVG / key",
+          "type": "group",
+          "rect": [
+            28,
+            144,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9c28de2",
+          "name": "API 与模型",
+          "type": "text",
+          "rect": [
+            60,
+            142,
+            67,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9cdf913",
+          "name": "SVG / sliders",
+          "type": "group",
+          "rect": [
+            28,
+            198,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9d98c94",
+          "name": "生成参数",
+          "type": "text",
+          "rect": [
+            60,
+            196,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9e47a4f",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            12,
+            240,
+            208,
+            44
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9ee4e34",
+          "name": "SVG / file",
+          "type": "group",
+          "rect": [
+            28,
+            252,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318e9fb9f5a",
+          "name": "全局设置",
+          "type": "text",
+          "rect": [
+            60,
+            250,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea06b2db",
+          "name": "SVG / shield",
+          "type": "group",
+          "rect": [
+            28,
+            306,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea13af39",
+          "name": "批准模式",
+          "type": "text",
+          "rect": [
+            60,
+            304,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea1dcc68",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            940,
+            1600,
+            60
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea25e316",
+          "name": "按钮 / 返回聊天",
+          "type": "board",
+          "rect": [
+            20,
+            952,
+            126,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea4795f3",
+          "name": "仅保存本地设置；不会发送测试请求",
+          "type": "text",
+          "rect": [
+            264,
+            954,
+            176,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea520f34",
+          "name": "按钮 / 取消",
+          "type": "board",
+          "rect": [
+            1328,
+            952,
+            104,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea6be042",
+          "name": "按钮 / 保存设置",
+          "type": "board",
+          "rect": [
+            1446,
+            952,
+            130,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea8870e5",
+          "name": "全局设置",
+          "type": "text",
+          "rect": [
+            280,
+            101,
+            100,
+            39
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ea939a94",
+          "name": "从外置文件读取 System Prompt；管理联网搜索与素材下载能力。",
+          "type": "text",
+          "rect": [
+            280,
+            145,
+            1190,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eaa38fdc",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            280,
+            208,
+            850,
+            624
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eaadc6bd",
+          "name": "SVG / file",
+          "type": "group",
+          "rect": [
+            305,
+            233,
+            24,
+            24
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eab781a9",
+          "name": "System Prompt 文件",
+          "type": "text",
+          "rect": [
+            344,
+            230,
+            174,
+            28
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eac47764",
+          "name": "内容保存在文本文件中，设置页只指定路径。",
+          "type": "text",
+          "rect": [
+            306,
+            278,
+            260,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ead0db42",
+          "name": "文件路径",
+          "type": "text",
+          "rect": [
+            306,
+            326,
+            48,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eade2d28",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            306,
+            352,
+            610,
+            43
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eaea4ffd",
+          "name": "data / system_prompt.txt",
+          "type": "text",
+          "rect": [
+            319,
+            363,
+            584,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eaf9d71d",
+          "name": "按钮 / 选择文件…",
+          "type": "board",
+          "rect": [
+            934,
+            352,
+            168,
+            43
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb1f1be4",
+          "name": "相对路径以 LMMS 程序目录为基准，支持选择其他 .txt 文件。",
+          "type": "text",
+          "rect": [
+            307,
+            410,
+            790,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb316159",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            306,
+            464,
+            86,
+            26
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb3bd2cd",
+          "name": "默认来源",
+          "type": "text",
+          "rect": [
+            316,
+            468,
+            44,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb493536",
+          "name": "UTF-8 文本  ·  外部维护",
+          "type": "text",
+          "rect": [
+            410,
+            468,
+            131,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb57d6a9",
+          "name": "按钮 / 打开文件",
+          "type": "board",
+          "rect": [
+            306,
+            518,
+            136,
+            36
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eb7e5984",
+          "name": "按钮 / 重新读取",
+          "type": "board",
+          "rect": [
+            454,
+            518,
+            136,
+            36
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eba32d59",
+          "name": "按钮 / 恢复默认路径",
+          "type": "board",
+          "rect": [
+            602,
+            518,
+            162,
+            36
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ebc6f5d1",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            306,
+            586,
+            794,
+            1
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ebd4422a",
+          "name": "默认提示词职责",
+          "type": "text",
+          "rect": [
+            306,
+            615,
+            98,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ebe31e00",
+          "name": "音乐创作与编辑；调用已有内部工具；遵守当前批准模式；\n核对工具结果；按请求搜索与下载",
+          "type": "text",
+          "rect": [
+            306,
+            655,
+            770,
+            41
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ebf560bf",
+          "name": "修改文件后重新读取，后续消息使用更新后的提示词。",
+          "type": "text",
+          "rect": [
+            306,
+            752,
+            780,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec09bd3e",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1162,
+            208,
+            414,
+            624
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec15ec31",
+          "name": "SVG / globe",
+          "type": "group",
+          "rect": [
+            1186,
+            234,
+            25,
+            25
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec274edd",
+          "name": "联网与外部素材",
+          "type": "text",
+          "rect": [
+            1227,
+            231,
+            119,
+            27
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec3bafd0",
+          "name": "允许联网搜索",
+          "type": "text",
+          "rect": [
+            1186,
+            294,
+            84,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec5ac33f",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1514,
+            297,
+            38,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec694032",
+          "name": "Ellipse",
+          "type": "ellipse",
+          "rect": [
+            1533,
+            300,
+            16,
+            16
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec74c316",
+          "name": "查找资料、读取网页和搜索素材来源。",
+          "type": "text",
+          "rect": [
+            1186,
+            331,
+            356,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec8a77b1",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1186,
+            391,
+            366,
+            1
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ec957711",
+          "name": "允许下载素材",
+          "type": "text",
+          "rect": [
+            1186,
+            428,
+            84,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eca2a931",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1514,
+            431,
+            38,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ecae8013",
+          "name": "Ellipse",
+          "type": "ellipse",
+          "rect": [
+            1533,
+            434,
+            16,
+            16
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ecb8df82",
+          "name": "按请求保存音频、MIDI 等素材到指定位置。",
+          "type": "text",
+          "rect": [
+            1186,
+            466,
+            356,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ecca73e7",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1186,
+            530,
+            366,
+            1
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ecd5d91a",
+          "name": "SVG / shield",
+          "type": "group",
+          "rect": [
+            1186,
+            566,
+            22,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ece4eaf8",
+          "name": "沿用批准模式",
+          "type": "text",
+          "rect": [
+            1220,
+            564,
+            84,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ecf25277",
+          "name": "请求批准：搜索和下载前先确认。\n无需批准：直接执行并显示记录。",
+          "type": "text",
+          "rect": [
+            1186,
+            609,
+            350,
+            41
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed074aea",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1186,
+            725,
+            160,
+            26
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed129c1d",
+          "name": "当前：请求批准",
+          "type": "text",
+          "rect": [
+            1196,
+            729,
+            77,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f31ac3da91d4",
+          "name": "SVG / download",
+          "type": "group",
+          "rect": [
+            28,
+            360,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f31ac3ebf327",
+          "name": "素材下载",
+          "type": "text",
+          "rect": [
+            60,
+            358,
+            56,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f318ed2192af",
+      "name": "06 / 批准模式 · 默认请求批准",
+      "size": [
+        1600,
+        1000
+      ],
+      "nodes": [
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed2b87d6",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            0,
+            1600,
+            66
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed35e6c7",
+          "name": "SVG / agent",
+          "type": "group",
+          "rect": [
+            24,
+            23,
+            23,
+            23
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed44e3ec",
+          "name": "Agent 设置",
+          "type": "text",
+          "rect": [
+            60,
+            17,
+            106,
+            33
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed547d02",
+          "name": "当前工程：Night Drive",
+          "type": "text",
+          "rect": [
+            1360,
+            25,
+            113,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed633908",
+          "name": "SVG / close",
+          "type": "group",
+          "rect": [
+            1558,
+            23,
+            20,
+            20
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed71342e",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            66,
+            231.99999999999997,
+            874
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed7afe0c",
+          "name": "工作区",
+          "type": "text",
+          "rect": [
+            24,
+            94,
+            30,
+            16
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed88013a",
+          "name": "SVG / key",
+          "type": "group",
+          "rect": [
+            28,
+            144,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ed964b3b",
+          "name": "API 与模型",
+          "type": "text",
+          "rect": [
+            60,
+            142,
+            67,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eda4e7aa",
+          "name": "SVG / sliders",
+          "type": "group",
+          "rect": [
+            28,
+            198,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318edb28db6",
+          "name": "生成参数",
+          "type": "text",
+          "rect": [
+            60,
+            196,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318edc105df",
+          "name": "SVG / file",
+          "type": "group",
+          "rect": [
+            28,
+            252,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318edcfb3eb",
+          "name": "全局设置",
+          "type": "text",
+          "rect": [
+            60,
+            250,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eddce326",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            12,
+            294,
+            208,
+            44
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ede9cf11",
+          "name": "SVG / shield",
+          "type": "group",
+          "rect": [
+            28,
+            306,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318edf93e50",
+          "name": "批准模式",
+          "type": "text",
+          "rect": [
+            60,
+            304,
+            56,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee06b889",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            0,
+            940,
+            1600,
+            60
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee0f96a3",
+          "name": "按钮 / 返回聊天",
+          "type": "board",
+          "rect": [
+            20,
+            952,
+            126,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee3f7ae9",
+          "name": "仅保存本地设置；不会发送测试请求",
+          "type": "text",
+          "rect": [
+            264,
+            954,
+            176,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee4e4a7d",
+          "name": "按钮 / 取消",
+          "type": "board",
+          "rect": [
+            1328,
+            952,
+            104,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee73739f",
+          "name": "按钮 / 保存设置",
+          "type": "board",
+          "rect": [
+            1446,
+            952,
+            130,
+            35
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ee9f161d",
+          "name": "批准模式",
+          "type": "text",
+          "rect": [
+            280,
+            101,
+            100,
+            39
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eeb080f9",
+          "name": "控制工程操作、联网搜索和素材下载在执行前是否需要你确认。",
+          "type": "text",
+          "rect": [
+            280,
+            145,
+            1190,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eecc138f",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            280,
+            208,
+            850,
+            222
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eedac55a",
+          "name": "SVG / shield",
+          "type": "group",
+          "rect": [
+            306,
+            234,
+            28,
+            28
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eeeae263",
+          "name": "请求批准",
+          "type": "text",
+          "rect": [
+            352,
+            233,
+            80,
+            31
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eefc3317",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            493,
+            238,
+            60,
+            26
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef09ae59",
+          "name": "默认",
+          "type": "text",
+          "rect": [
+            503,
+            242,
+            22,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef1b67e7",
+          "name": "SVG / check",
+          "type": "group",
+          "rect": [
+            1078,
+            239,
+            23,
+            23
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef29b9bc",
+          "name": "工具执行前，先展示目的和影响范围，等待你批准。",
+          "type": "text",
+          "rect": [
+            307,
+            295,
+            760,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef405333",
+          "name": "工程编辑：显示将改动的轨道、片段和音符。\n联网搜索：显示查询内容。素材下载：显示来源",
+          "type": "text",
+          "rect": [
+            307,
+            342,
+            768,
+            41
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef5a3f27",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            280,
+            454,
+            850,
+            191
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef690dbc",
+          "name": "SVG / play",
+          "type": "group",
+          "rect": [
+            306,
+            480,
+            28,
+            28
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef7887c4",
+          "name": "无需批准",
+          "type": "text",
+          "rect": [
+            352,
+            479,
+            80,
+            31
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318ef8ff8e5",
+          "name": "模型请求的工具直接执行，不再弹出批准请求。",
+          "type": "text",
+          "rect": [
+            307,
+            539,
+            760,
+            22
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318efa7350a",
+          "name": "执行记录持续显示，可随时停止。修改可能立即写入当前工程。",
+          "type": "text",
+          "rect": [
+            307,
+            581,
+            760,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318efc3055e",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1162,
+            208,
+            414,
+            437
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318efd21518",
+          "name": "当前模式",
+          "type": "text",
+          "rect": [
+            1186,
+            232,
+            64,
+            25
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318efe6a233",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            1186,
+            281,
+            110,
+            26
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318eff65eb2",
+          "name": "请求批准",
+          "type": "text",
+          "rect": [
+            1196,
+            285,
+            44,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f00a6a8d",
+          "name": "适用于",
+          "type": "text",
+          "rect": [
+            1186,
+            337,
+            36,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f01d3d0b",
+          "name": "SVG / midi",
+          "type": "group",
+          "rect": [
+            1188,
+            379,
+            20,
+            20
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f02d9895",
+          "name": "工程内部工具",
+          "type": "text",
+          "rect": [
+            1222,
+            377,
+            78,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f04104e8",
+          "name": "SVG / globe",
+          "type": "group",
+          "rect": [
+            1188,
+            438,
+            20,
+            20
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f057504c",
+          "name": "联网搜索",
+          "type": "text",
+          "rect": [
+            1222,
+            436,
+            52,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f06e3b4a",
+          "name": "SVG / download",
+          "type": "group",
+          "rect": [
+            1188,
+            497,
+            20,
+            20
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f07fd666",
+          "name": "外部素材下载",
+          "type": "text",
+          "rect": [
+            1222,
+            495,
+            78,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f094e69c",
+          "name": "Rectangle",
+          "type": "rectangle",
+          "rect": [
+            280,
+            681,
+            1296,
+            151
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f0a669da",
+          "name": "批准会出现在聊天记录中",
+          "type": "text",
+          "rect": [
+            306,
+            707,
+            176,
+            25
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f0b99afb",
+          "name": "可以批准本次、查看变更或拒绝。批准之前保持当前工程和下载目标不变。",
+          "type": "text",
+          "rect": [
+            306,
+            750,
+            1200,
+            21
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f318f0d31f85",
+          "name": "聊天输入区始终显示当前模式，方便随时识别。",
+          "type": "text",
+          "rect": [
+            306,
+            791,
+            231,
+            18
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f31ac40ed933",
+          "name": "SVG / download",
+          "type": "group",
+          "rect": [
+            28,
+            360,
+            19,
+            19
+          ]
+        },
+        {
+          "id": "f437380c-ddd4-80ad-8008-f31ac41c336b",
+          "name": "素材下载",
+          "type": "text",
+          "rect": [
+            60,
+            358,
+            56,
+            22
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,819 @@
+{
+  "fileId": "509f8c9c-0e43-811a-8008-f310b05ce9db",
+  "pageId": "509f8c9c-0e43-811a-8008-f310b05ce9dc",
+  "boardId": "f437380c-ddd4-80ad-8008-f3157cd3a933",
+  "groupId": "f437380c-ddd4-80ad-8008-f32bcbb5d246",
+  "origin": [
+    960,
+    98
+  ],
+  "reference": [
+    640,
+    878
+  ],
+  "nodes": [
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7965c82",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        0,
+        0,
+        640,
+        877.9999999999999
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c79c10de",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        0,
+        0,
+        1,
+        877.9999999999999
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7a1a2a6",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        0,
+        0,
+        640,
+        54
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7a7883c",
+      "name": "SVG / agent",
+      "type": "group",
+      "rect": [
+        18,
+        17,
+        22,
+        22
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7b055a2",
+      "name": "Agent",
+      "type": "text",
+      "rect": [
+        49,
+        14,
+        47,
+        27
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7ba0439",
+      "name": "SVG / chat",
+      "type": "group",
+      "rect": [
+        127,
+        18,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7c98c61",
+      "name": "SVG / expand",
+      "type": "group",
+      "rect": [
+        531,
+        18,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7da09da",
+      "name": "SVG / right",
+      "type": "group",
+      "rect": [
+        602,
+        18,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7e1df8e",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        0,
+        54,
+        180,
+        824
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c7e7b12a",
+      "name": "按钮 / 新建会话",
+      "type": "board",
+      "rect": [
+        14,
+        70,
+        152,
+        36
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8089061",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        14,
+        118,
+        152,
+        32
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c80fc00e",
+      "name": "SVG / search",
+      "type": "group",
+      "rect": [
+        24,
+        126,
+        15,
+        15
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c818f73e",
+      "name": "搜索会话",
+      "type": "text",
+      "rect": [
+        48,
+        123,
+        44,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c822e838",
+      "name": "已置顶",
+      "type": "text",
+      "rect": [
+        16,
+        172,
+        30,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c82d3eed",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        8,
+        198,
+        164,
+        76
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c834340e",
+      "name": "SVG / pin",
+      "type": "group",
+      "rect": [
+        18,
+        210,
+        13,
+        13
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c83c0dcd",
+      "name": "和弦与 Pad 编配",
+      "type": "text",
+      "rect": [
+        38,
+        208,
+        130,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c84f6d9a",
+      "name": "等待批准",
+      "type": "text",
+      "rect": [
+        18,
+        242,
+        40,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c85a070b",
+      "name": "今天",
+      "type": "text",
+      "rect": [
+        16,
+        301,
+        20,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c86487c2",
+      "name": "整理鼓组力度",
+      "type": "text",
+      "rect": [
+        18,
+        336,
+        152,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c871dacc",
+      "name": "Night Drive · 10:24",
+      "type": "text",
+      "rect": [
+        18,
+        360,
+        71,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c87ee93e",
+      "name": "主旋律音色建议",
+      "type": "text",
+      "rect": [
+        18,
+        402,
+        152,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c891b002",
+      "name": "当前工程 · 已完成",
+      "type": "text",
+      "rect": [
+        18,
+        426,
+        77,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c89c4d4d",
+      "name": "混音电平检查",
+      "type": "text",
+      "rect": [
+        18,
+        468,
+        152,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8aa16db",
+      "name": "当前工程 · 已完成",
+      "type": "text",
+      "rect": [
+        18,
+        492,
+        77,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8b5d181",
+      "name": "昨天",
+      "type": "text",
+      "rect": [
+        16,
+        582,
+        20,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8c017f0",
+      "name": "试做 Lo-fi 鼓组",
+      "type": "text",
+      "rect": [
+        18,
+        619,
+        152,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8cd888c",
+      "name": "草稿工程 · 已归档",
+      "type": "text",
+      "rect": [
+        18,
+        644,
+        77,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8d9d211",
+      "name": "按钮 / 会话管理",
+      "type": "board",
+      "rect": [
+        12,
+        780,
+        156,
+        36
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c8f61ac2",
+      "name": "按钮 / Agent 设置",
+      "type": "board",
+      "rect": [
+        12,
+        830,
+        156,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9147235",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        180,
+        54,
+        1,
+        824
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c91b0ce7",
+      "name": "和弦与 Pad 编配",
+      "type": "text",
+      "rect": [
+        200,
+        73,
+        378,
+        27
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c92a3fc7",
+      "name": "SVG / more",
+      "type": "group",
+      "rect": [
+        601,
+        77,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9340213",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        200,
+        111,
+        420,
+        29
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c93c525f",
+      "name": "SVG / folder",
+      "type": "group",
+      "rect": [
+        209,
+        118,
+        14,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c94498f0",
+      "name": "当前工程 · 第9–16小节 · 2轨选中",
+      "type": "text",
+      "rect": [
+        231,
+        117,
+        157,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9504f93",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        200,
+        162,
+        420,
+        113
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9580192",
+      "name": "参考这个 MIDI，在第9–16小节加一条柔和的 Pad，先让我确认。",
+      "type": "text",
+      "rect": [
+        214,
+        175,
+        392,
+        21
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c96791c2",
+      "name": "SVG / midi",
+      "type": "group",
+      "rect": [
+        214,
+        239,
+        16,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c970f800",
+      "name": "chords.mid",
+      "type": "text",
+      "rect": [
+        238,
+        236,
+        53,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c97c95d6",
+      "name": "4.2 KB",
+      "type": "text",
+      "rect": [
+        343,
+        237,
+        29,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c98a35dd",
+      "name": "SVG / agent",
+      "type": "group",
+      "rect": [
+        200,
+        302,
+        22,
+        22
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c99450f3",
+      "name": "Agent",
+      "type": "text",
+      "rect": [
+        232,
+        302,
+        33,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c99fed5b",
+      "name": "已思考 · 摘要",
+      "type": "text",
+      "rect": [
+        300,
+        303,
+        65,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9abe9a1",
+      "name": "我会新建 Pad 轨道并沿用参考和弦，只处理选中的8小节。",
+      "type": "text",
+      "rect": [
+        200,
+        339,
+        420,
+        21
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9bc3082",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        200,
+        403,
+        420,
+        50
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9c40869",
+      "name": "SVG / check",
+      "type": "group",
+      "rect": [
+        212,
+        419,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9cdf33c",
+      "name": "已批准 · 读取当前工程",
+      "type": "text",
+      "rect": [
+        240,
+        409,
+        115,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9da20bb",
+      "name": "12条轨道，未改动工程",
+      "type": "text",
+      "rect": [
+        240,
+        430,
+        102,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9e59afa",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        200,
+        469,
+        420,
+        157
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9eee10c",
+      "name": "SVG / shield",
+      "type": "group",
+      "rect": [
+        212,
+        484,
+        19,
+        19
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316c9f846a6",
+      "name": "待批准：添加 Pad",
+      "type": "text",
+      "rect": [
+        239,
+        482,
+        105,
+        21
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca045453",
+      "name": "1条轨道 · 1个片段 · 16个音符",
+      "type": "text",
+      "rect": [
+        214,
+        517,
+        392,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca150fd2",
+      "name": "批准后调用工程内部工具执行",
+      "type": "text",
+      "rect": [
+        214,
+        542,
+        130,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca21c4b9",
+      "name": "按钮 / 批准本次",
+      "type": "board",
+      "rect": [
+        212,
+        578,
+        98,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca3de8e7",
+      "name": "按钮 / 查看变更",
+      "type": "board",
+      "rect": [
+        320,
+        578,
+        100,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca5d44f9",
+      "name": "按钮 / 拒绝",
+      "type": "board",
+      "rect": [
+        430,
+        578,
+        65,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca7b7d69",
+      "name": "DeepSeek / deepseek-chat",
+      "type": "text",
+      "rect": [
+        200,
+        650,
+        135,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca88b062",
+      "name": "SVG / down",
+      "type": "group",
+      "rect": [
+        410,
+        652,
+        14,
+        14
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca921b5c",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        200,
+        681,
+        420,
+        155
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ca9bff77",
+      "name": "继续描述你想要的编配…",
+      "type": "text",
+      "rect": [
+        214,
+        696,
+        392,
+        21
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316caaeb055",
+      "name": "Rectangle",
+      "type": "rectangle",
+      "rect": [
+        212,
+        738,
+        174,
+        28
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316cabd0f81",
+      "name": "SVG / wave",
+      "type": "group",
+      "rect": [
+        221,
+        744,
+        15,
+        15
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316cacdee87",
+      "name": "参考音频.wav",
+      "type": "text",
+      "rect": [
+        244,
+        743,
+        62,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316cadc3db7",
+      "name": "SVG / close",
+      "type": "group",
+      "rect": [
+        353,
+        746,
+        12,
+        12
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316caec73c4",
+      "name": "SVG / attach",
+      "type": "group",
+      "rect": [
+        214,
+        796,
+        20,
+        20
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316caf6d6fa",
+      "name": "按钮 / 思考 · 自动",
+      "type": "board",
+      "rect": [
+        245,
+        787,
+        112,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316cb1c269b",
+      "name": "按钮 / 请求批准",
+      "type": "board",
+      "rect": [
+        365,
+        787,
+        112,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316cb3fc6d0",
+      "name": "按钮",
+      "type": "board",
+      "rect": [
+        580,
+        787,
+        34,
+        34
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ed7cff7a",
+      "name": "SVG / send",
+      "type": "group",
+      "rect": [
+        588,
+        796,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f316ed86f1a5",
+      "name": "Enter 发送  ·  Shift+Enter 换行",
+      "type": "text",
+      "rect": [
+        200,
+        847,
+        141,
+        16
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f31c29526725",
+      "name": "SVG / detach",
+      "type": "group",
+      "rect": [
+        566,
+        18,
+        18,
+        18
+      ]
+    },
+    {
+      "id": "f437380c-ddd4-80ad-8008-f31c296d1204",
+      "name": "会话",
+      "type": "text",
+      "rect": [
+        154,
+        17,
+        22,
+        18
+      ]
+    }
+  ]
+}

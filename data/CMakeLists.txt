@@ -5,3 +5,7 @@ ADD_SUBDIRECTORY(projects)
 ADD_SUBDIRECTORY(samples)
 ADD_SUBDIRECTORY(themes)
 ADD_SUBDIRECTORY(wavetables)
+
+if(WANT_AGENT_CHAT)
+	install(FILES system_prompt.txt DESTINATION "${DATA_DIR}")
+endif()

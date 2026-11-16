@@ -1726,3 +1726,99 @@ lmms--gui--SVCWaveform {
     qproperty-svcErrorColor: #D66A72;
     qproperty-svcComparePlayheadColor: #F2ECFF;
 }
+
+/* Agent icon buttons inherit the normal LMMS button states and palette. */
+QToolButton[agentChatIcon="true"] {
+    padding: 4px;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+/* Geometry follows the measured Penpot chat workspace; colors follow LMMS. */
+QToolButton[agentChatControl="true"] {
+    font-size: 13px;
+    min-width: 0px;
+    min-height: 0px;
+    padding: 0px;
+}
+QToolButton#agentModel {
+    font-size: 11px;
+}
+QWidget#agentHeader {
+    border-bottom: 1px solid palette(mid);
+}
+QDockWidget#agentChatDock {
+    border: none;
+}
+QLabel#agentHeaderTitle, QLabel#agentConversationTitle {
+    font-size: 17px;
+    font-weight: bold;
+}
+QLineEdit#agentSessionSearch {
+    font-size: 11px;
+}
+QLabel#agentComposerHint {
+    font-size: 10px;
+}
+QWidget#agentSessionPanel {
+    border-right: 1px solid palette(mid);
+}
+QFrame#agentComposer, QLabel#agentProjectContext {
+    border: 1px solid palette(mid);
+    border-radius: 6px;
+    background: palette(base);
+}
+QDialog#agentSettingsDialog {
+    background: palette(window);
+}
+QWidget#agentSettingsNavigation, QFrame[agentSettingsCard="true"] {
+    background: palette(button);
+    border: none;
+    border-radius: 8px;
+}
+QWidget#agentSettingsHeader, QWidget#agentSettingsFooter {
+    background: palette(base);
+}
+QScrollArea#agentSettingsScroll, QScrollArea#agentManagerScroll, QScrollArea#agentManagerRows {
+    border: none;
+}
+QLineEdit#agentPromptPath {
+    font-size: 14px;
+    padding-left: 12px;
+    border-radius: 6px;
+}
+QToolButton[agentSettingsButton="true"], QToolButton[agentApprovalCard="true"] {
+    min-width: 0px;
+    min-height: 0px;
+    padding: 0px;
+}
+QToolButton[agentApprovalCard="true"] {
+    background: palette(button);
+    border: 1px solid palette(mid);
+    border-radius: 10px;
+}
+QToolButton[agentApprovalCard="true"]:checked {
+    background: palette(alternate-base);
+    border-color: palette(highlight);
+}
+QLabel[agentSettingsBadge="true"] {
+    background: palette(alternate-base);
+    border: 1px solid palette(mid);
+    border-radius: 4px;
+    padding-left: 10px;
+}
+QTextBrowser#agentMessages, QPlainTextEdit#agentInput {
+    background: transparent;
+    border: none;
+}
+
+QToolButton[agentSessionTitle="true"] {
+    text-align: left;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+}
+QLineEdit#agentManagerSearch {
+    font-size: 13px;
+    padding-left: 10px;
+}

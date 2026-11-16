@@ -23,12 +23,14 @@ python buildtools/build.py --config Release --test '^CommandBusTest$' --window
 每个非空 `.obj` 成功更新后增加计数，预编译且未变化的文件不计入最大值。
 同一源文件为不同目标生成不同对象文件时，各算一个编译单元。
 生成代码或编译命令在构建中引入额外工作时，计数会按实际对象更新补齐。
+CMake 重写 `.vcxproj` 本身不计为源码重编条件；以源码、实际头文件依赖及对象更新为准。
 
 进度条旁显示当前 `.cpp` / `.c` 文件名。编译计数完成后的链接、复制等步骤单独显示为
 `Linking / finishing build`；编译 100% 不表示链接已成功。
 测试进度来自 CTest 实际完成记录。
 
 所有输出经前台 PowerShell `Tee-Object` 写入根目录 `build.log`。
+当前会话同时回传完整 stdout/stderr；`--window` 的独立窗口仅展示简洁进度条与当前源码。
 成功或失败均显示退出码，失败时显示日志尾部；结果显示 5 秒后，脚本及进度窗口自动退出。
 GUI 测试使用原生 Windows Qt 后端，禁止 offscreen。
 本脚本当前支持 Windows x64 Visual Studio 生成器；不会创建其他构建或部署目录。
