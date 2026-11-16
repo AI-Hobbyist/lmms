@@ -1,10 +1,10 @@
-## M2 阶段验收及检查点收尾（2026-11-16）
+## M2 DONE：阶段检查点已推送（2026-11-16）
 
 - M2计划范围实施及自动验收完成。新增失败重试复用Penpot01既有发送位置与底部状态文字，无新增几何；实时读11/13及页面错误相关节点，未发现专用重试按钮。ChatController重试保留原用户消息/失败尝试，以retryOf追加assistant；复用附件快照，缺内容要求重选，保留草稿且不会自动重放。
 - Release8/8源文件通过，QM4131 finished/0 unfinished。重试专项CTest2/2通过12.89秒；全部8个Chat目标更新/重链接通过（0待编译CPP），最终CTest8/8通过13.24秒、QtTest71 passed/0 failed/skip。真实Qt窗口鼠标重试、原发送几何不变、本机503连续失败/恢复/销毁恢复/原文件删除后快照字节/重复用户不追加/草稿保留均通过。
 - 日志build/agent-chat-m2-retry-{build,tests}.log及build/agent-chat-m2-checkpoint-{build,tests}.log。已查看本次真实build/agent-chat-send-native.png，中文/默认主题正常。逐协议和附件支持边界见doc/agent/chat-m2-validation.md，真实厂商/完整DAW人工项MANUAL/PENDING，不作阻塞、不记PASS。
-- 当前master，M1 c39002397已推送；M2阶段提交和推送正在收尾，尚未开始M3。提交前需检查status/diff和cached diff --check，明确排除.codegraph、build.log、build-driver.log。无活动构建/测试，无ZIP，生产安装未改。未读到可靠额度接口，不猜额度。
-- 下一最小任务：完成M2提交/推送并验证远端，再更新本手册确认状态；之后实时确认Penpot连接并按计划开始M3内部工具与批准。禁止无关重构、扩大范围、offscreen、WSL；Windows原目录、前台Python进度条构建、同工程任务检查等约束继续有效。
+- 当前master；M2实现提交ad36183547f480882acd5db81cdf59d28c9cf1a3已推送origin/master，git ls-remote哈希与本地HEAD一致，阶段检查点完成。已检查status/diff及cached diff --check；仅保留未跟踪.codegraph/、build.log、build-driver.log，没有清理用户文件。当前仅同步检查点文档，无活动构建/测试，无ZIP，生产安装未改。未读到可靠额度接口，不猜额度。
+- 下一最小任务：实时确认Penpot连接，读取计划M3及既有ToolRegistry/CommandBus/ScriptRunner，开始M3内部工具与批准。M2没有剩余实施，不重复实现或扩大其验收条件；整体持续目标仍未完成。禁止无关重构、扩大范围、offscreen、WSL；Windows原目录、前台Python进度条构建、同工程任务检查等约束继续有效。
 
 ---
 

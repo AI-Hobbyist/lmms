@@ -40,3 +40,5 @@
 实时连接正确file/page并读取01/11/13；本阶段API/预设/高级/生成/附件等布局此前分别按对应实时画板核对。沿用LMMS ToolButton、Qt Widgets、系统字体及默认主题SVG；没有独立Web UI。真实截图见本目录chat-api-native.png、chat-presets-native.png、chat-advanced-native.png、chat-generation-native.png、chat-reasoning-native.png、chat-attachments-native.png、chat-transcript-native.png、chat-attachment-chip-native.png、chat-send-native.png。当前build/agent-chat-send-native.png已再次查看，中文与主题正常。完整DAW内集成、实际厂商语义和多显示器实机验收MANUAL/PENDING。
 
 生产安装未修改；没有本阶段ZIP。插件未因聊天改动重建或迁移。本记录仅关闭M2范围，不表示整个持续目标完成。
+
+阶段实现提交：ad36183547f480882acd5db81cdf59d28c9cf1a3；已推送origin/master，git ls-remote与本地一致。M2检查点DONE。

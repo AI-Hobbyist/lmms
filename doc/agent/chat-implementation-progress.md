@@ -5,7 +5,7 @@
 ## 当前状态
 
 - M1 DONE，已推送提交fd978a60d、c39002397。
-- M2实施及自动验收DONE：16预设、8协议、SSE/JSON、原生凭据、模型能力参数、自定义模板/错误映射、附件实际输入/快照、原生消息展示及失败重试。阶段提交/推送检查点正在收尾，完成后方可开始M3。
+- M2实施及自动验收DONE：16预设、8协议、SSE/JSON、原生凭据、模型能力参数、自定义模板/错误映射、附件实际输入/快照、原生消息展示及失败重试。阶段实现提交ad3618354已推送origin/master，远端哈希核对一致；M2检查点完成，下一阶段为M3。
 - Release开发程序build/Release/lmms.exe；全部8项Chat目标更新成功，CTest8/8通过13.24秒，QtTest71 passed/0 failed/skip；QM4131。记录与逐协议人工状态见[chat-m2-validation.md](chat-m2-validation.md)。真实厂商缺Key项MANUAL/PENDING，不冒充实测。
 - M3～M5 NOT STARTED；内部工具执行/批准、搜索与下载及最终ZIP尚未交付。联网搜索默认关闭、SearXNG默认后端，模型自带搜索属于M4。
 - 以下为按实施时间保留的历史日志；早期“发送禁用/尚无附件”等状态以本节和最新验收记录为准。
