@@ -5,7 +5,7 @@
 ## 当前状态
 
 - 计划已提交推送：`1cc9cb715`，`origin/master`。
-- M1：自动验证与真实窗口核对通过，正在完成提交/推送检查点。最新Release增量2/2成功，CTest 2/2通过（3.55秒），QtTest合计8 passed、0 failed、0 skipped。
+- M1：DONE。实现提交fd978a60d已推送origin/master，远端哈希一致；最新Release增量2/2成功，CTest 2/2通过（3.55秒），QtTest合计8 passed、0 failed、0 skipped。
 - M2～M5：NOT STARTED。尚无模型聊天、工程工具批准或素材下载的可运行交付。
 - 搜索要求：联网搜索可开关且默认关闭；默认后端 SearXNG，可指定自部署实例 URL；Brave 及受支持模型自带搜索可选。托管搜索须在发送启用它的模型请求前批准，M4 实现。
 

@@ -1,6 +1,6 @@
-# 当前接续：内置 Agent 聊天 M1 检查点（2026-11-16）
+# 当前接续：内置 Agent 聊天 M1 DONE（2026-11-16）
 
-- 目标active，完整范围仍为根目录《内置Agent聊天框实施计划书.md》M1～M5。M1自动验证及原生布局核对通过，正在提交/推送检查点；M2～M5未开始，不能提前进入下一阶段。
+- 目标active，完整范围仍为根目录《内置Agent聊天框实施计划书.md》M1～M5。M1自动验证、原生布局核对及提交/推送检查点完成；M2～M5未开始。
 - Penpot已恢复，实际读取文件509f8c9c-0e43-811a-8008-f310b05ce9db、页面509f8c9c-0e43-811a-8008-f310b05ce9dc，08/09/10画板核对成功。后续每次开始/恢复实施及新界面调整仍必须实时读取对应画板；不可连接停止实施。
 - M1已实现原生右侧Dock、48像素收缩、1100×1000分离与回接、会话JSON与独立管理页、全局prompt路径及批准设置、默认data/system_prompt.txt、默认主题30个SVG。发送/附件/模型等M2能力仍明确禁用；M3/M4未接入。
 - 最新Release增量2/2成功；CTest ChatStoreTest/ChatDockTest 2/2通过（3.55秒），QtTest合计8 passed、0 failed、0 skipped。真实Windows后端，未用offscreen或Computer Use。
@@ -8,8 +8,8 @@
 - 日志build/agent-chat-m1-final-build.log与agent-chat-m1-final-tests.log；截图doc/agent/chat-{m1,floating,collapsed,sessions,settings,approval}-native.png。已查看真实截图，中文正常；之前分离窗口屏幕外黑区截图已由完整可见截图取代。
 - 程序D:/UserData/Desktop/Project/lmms/build/Release/lmms.exe，默认提示词在其旁data/system_prompt.txt。原生插件DLL本轮未重建/替换，生产D:/Program Files/LMMS未改，无新ZIP。
 - 人工完整DAW操作、多屏/跨DPI验收MANUAL/PENDING，不作阻塞也不记PASS。组件测试不证明后续真实API、工具或下载集成通过。
-- 当前master；检查点提交与推送结果以实际Git记录为准。保留未跟踪.codegraph/、build.log、build-driver.log。未清理他人修改。不要频繁列对话清单，必要的编译前并发检查只输出冲突数。
-- 下一最小任务：完成M1状态/diff检查、commit、push并确认远端一致后，实时探测Penpot进入M2。复用现有Python进度脚本、SDK环境、原build目录与Windows工具链、jobs2及前台PTY完整日志。禁止WSL、Qt offscreen和无关重构。
+- 当前master；实现提交fd978a60d075838a4d9238aae33d49c695bc8499已推送，git ls-remote确认同哈希。随后文档收尾提交包含本状态，以git log为准。保留未跟踪.codegraph/、build.log、build-driver.log。未清理他人修改。不要频繁列对话清单，必要的编译前并发检查只输出冲突数。
+- 下一最小任务：实时探测Penpot进入M2，读取02/03/04/13及01附件/消息布局，按计划实现API配置、凭据保存、协议请求/流式及附件。不要重复开发M1，不提前接入M3/M4。复用现有Python进度脚本、SDK环境、原build目录与Windows工具链、jobs2及前台PTY完整日志。禁止WSL、Qt offscreen和无关重构。
 - 进度记录doc/agent/chat-implementation-progress.md；无可靠额度剩余接口，不猜测。M1～M5目标尚未完成，不标记complete。
 
 ---
