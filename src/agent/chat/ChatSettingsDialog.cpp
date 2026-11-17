@@ -266,27 +266,159 @@ void ChatSettingsDialog::buildGlobalPage()
 	card(page, "agentNetworkCard", QRect(1162, 208, 414, 624));
 	icon(page, "agent_chat_globe", pageRect(QRect(1186, 234, 25, 25)));
 	label(page, QStringLiteral("联网与外部素材"), pageRect(QRect(1227, 231, 320, 27)), 17, true);
+	buildSearchSettings(page);
+
+	// Download toggle: wired in the download milestone step.
+	label(page, QStringLiteral("允许下载素材"), pageRect(QRect(1186, 548, 250, 22)), 14);
+	label(page, QStringLiteral("按请求保存音频、MIDI 等素材到指定位置。"), pageRect(QRect(1186, 586, 356, 19)), 12);
+	auto* download = new SettingsToggle(page);
+	download->setGeometry(pageRect(QRect(1514, 551, 38, 22)));
+	download->setAccessibleName(QStringLiteral("允许下载素材"));
+	download->setChecked(true);
+	download->setEnabled(false);
+	divider(page, QRect(1186, 528, 366, 1));
+	divider(page, QRect(1186, 626, 366, 1));
+	icon(page, "agent_chat_shield", pageRect(QRect(1186, 646, 22, 22)));
+	label(page, QStringLiteral("沿用批准模式"), pageRect(QRect(1220, 644, 300, 22)), 14, true);
+	label(page, QStringLiteral("请求批准：搜索和下载前先确认。\n无需批准：直接执行并显示记录。"),
+		pageRect(QRect(1186, 689, 350, 41)));
+	m_globalApproval = label(page, {}, pageRect(QRect(1186, 765, 160, 26)), 11);
+	m_globalApproval->setProperty("agentSettingsBadge", true);
+}
+
+void ChatSettingsDialog::buildSearchSettings(QWidget* page)
+{
+	m_search = ChatSearchSettings::load();
+
 	label(page, QStringLiteral("允许联网搜索"), pageRect(QRect(1186, 294, 250, 22)), 14);
 	label(page, QStringLiteral("查找资料、读取网页和搜索素材来源。"), pageRect(QRect(1186, 331, 356, 19)), 12);
-	label(page, QStringLiteral("允许下载素材"), pageRect(QRect(1186, 428, 250, 22)), 14);
-	label(page, QStringLiteral("按请求保存音频、MIDI 等素材到指定位置。"), pageRect(QRect(1186, 466, 356, 19)), 12);
-	for (int y : {297, 431})
+	auto* toggle = new SettingsToggle(page);
+	toggle->setObjectName("agentWebSearch");
+	toggle->setGeometry(pageRect(QRect(1514, 297, 38, 22)));
+	toggle->setAccessibleName(QStringLiteral("允许联网搜索"));
+	toggle->setChecked(m_search.enabled);
+	m_webSearch = toggle;
+
+	auto* sourceLabel = label(page, QStringLiteral("搜索来源"), pageRect(QRect(1186, 366, 120, 19)), 12);
+	const QString names[3] = {QStringLiteral("SearXNG"), QStringLiteral("Brave"), QStringLiteral("模型自带")};
+	const char* objectNames[3] = {"agentSearchSearxng", "agentSearchBrave", "agentSearchModel"};
+	for (int index = 0; index < 3; ++index)
 	{
-		auto* toggle = new SettingsToggle(page);
-		toggle->setGeometry(pageRect(QRect(1514, y, 38, 22)));
-		toggle->setAccessibleName(y == 297 ? QStringLiteral("允许联网搜索") : QStringLiteral("允许下载素材"));
-		toggle->setChecked(y != 297);
-		toggle->setEnabled(false);
-		toggle->setToolTip(QStringLiteral("M4 接入；联网搜索默认关闭"));
+		auto* segment = new gui::ToolButton(page);
+		segment->setObjectName(QString::fromLatin1(objectNames[index]));
+		segment->setText(names[index]);
+		segment->setAccessibleName(names[index]);
+		segment->setCheckable(true);
+		segment->setAutoExclusive(true);
+		segment->setProperty("agentSearchSegment", true);
+		segment->setGeometry(pageRect(QRect(1186 + index * 124, 392, 118, 32)));
+		const auto backend = static_cast<ChatSearchBackend>(index);
+		connect(segment, &QToolButton::clicked, this, [this, backend] { selectSearchBackend(backend); });
+		m_searchSegments[index] = segment;
 	}
-	divider(page, QRect(1186, 391, 366, 1));
-	divider(page, QRect(1186, 530, 366, 1));
-	icon(page, "agent_chat_shield", pageRect(QRect(1186, 566, 22, 22)));
-	label(page, QStringLiteral("沿用批准模式"), pageRect(QRect(1220, 564, 300, 22)), 14, true);
-	label(page, QStringLiteral("请求批准：搜索和下载前先确认。\n无需批准：直接执行并显示记录。"),
-		  pageRect(QRect(1186, 609, 350, 41)));
-	m_globalApproval = label(page, {}, pageRect(QRect(1186, 725, 160, 26)), 11);
-	m_globalApproval->setProperty("agentSettingsBadge", true);
+
+	m_searchEndpoint = new QLineEdit(page);
+	m_searchEndpoint->setObjectName("agentSearchEndpoint");
+	m_searchEndpoint->setGeometry(pageRect(QRect(1186, 436, 366, 36)));
+	m_searchSecret = new QLineEdit(page);
+	m_searchSecret->setObjectName("agentSearchSecret");
+	m_searchSecret->setEchoMode(QLineEdit::Password);
+	m_searchSecret->setGeometry(pageRect(QRect(1186, 480, 366, 36)));
+
+	// The endpoint field edits the URL of whichever backend is selected.
+	connect(m_searchEndpoint, &QLineEdit::textEdited, this, [this](const QString& text) {
+		if (m_search.backend == ChatSearchBackend::Brave) { m_search.braveUrl = text; }
+		else if (m_search.backend == ChatSearchBackend::SearXNG) { m_search.searxngUrl = text; }
+	});
+	const auto updateEnabled = [this, sourceLabel](bool enabled) {
+		sourceLabel->setEnabled(enabled);
+		for (auto* segment : m_searchSegments)
+		{
+			segment->setEnabled(enabled);
+		}
+		const bool external = enabled && m_search.backend != ChatSearchBackend::Model;
+		m_searchEndpoint->setEnabled(external);
+		m_searchSecret->setEnabled(external);
+	};
+	connect(toggle, &QAbstractButton::toggled, this, [this, updateEnabled](bool enabled) {
+		m_search.enabled = enabled;
+		updateEnabled(enabled);
+	});
+	selectSearchBackend(m_search.backend);
+	updateEnabled(m_search.enabled);
+}
+
+void ChatSettingsDialog::selectSearchBackend(ChatSearchBackend backend)
+{
+	// A secret typed for one backend is cleared on switching, so it can never
+	// be saved under another backend's credential.
+	if (backend != m_search.backend) { m_searchSecret->clear(); }
+	m_search.backend = backend;
+	m_searchSegments[static_cast<int>(backend)]->setChecked(true);
+
+	QString error;
+	switch (backend)
+	{
+	case ChatSearchBackend::SearXNG: {
+		const bool stored = !m_connectionStore.readKey(ChatSearchSettings::searxngAuthId(), error).isEmpty();
+		m_searchEndpoint->setText(m_search.searxngUrl);
+		m_searchEndpoint->setPlaceholderText(QStringLiteral("SearXNG 实例 URL，如 http://192.168.1.20:8080"));
+		m_searchSecret->setPlaceholderText(stored ? QStringLiteral("已保存认证信息；留空保持不变")
+												  : QStringLiteral("认证信息（实例需要时填写，可留空）"));
+		break;
+	}
+	case ChatSearchBackend::Brave: {
+		const bool stored = !m_connectionStore.readKey(ChatSearchSettings::braveKeyId(), error).isEmpty();
+		m_searchEndpoint->setText(m_search.braveUrl);
+		m_searchEndpoint->setPlaceholderText(QStringLiteral("Brave Search API 地址"));
+		m_searchSecret->setPlaceholderText(
+			stored ? QStringLiteral("已保存 API Key；留空保持不变") : QStringLiteral("Brave Search API Key"));
+		break;
+	}
+	case ChatSearchBackend::Model:
+		m_searchEndpoint->clear();
+		m_searchEndpoint->setPlaceholderText(QStringLiteral("由当前模型厂商执行，发送前单独批准"));
+		m_searchSecret->setPlaceholderText({});
+		break;
+	}
+	const bool external = m_search.enabled && backend != ChatSearchBackend::Model;
+	m_searchEndpoint->setEnabled(external);
+	m_searchSecret->setEnabled(external);
+}
+
+bool ChatSettingsDialog::saveSearchSettings(QString& error)
+{
+	error.clear();
+	const auto secret = m_searchSecret->text();
+	if (m_search.enabled && m_search.backend != ChatSearchBackend::Model)
+	{
+		const bool searxng = m_search.backend == ChatSearchBackend::SearXNG;
+		const auto url = QUrl(searxng ? m_search.searxngUrl : m_search.braveUrl);
+		// Local-network instances are a supported setup: only the scheme and host are checked.
+		if (!url.isValid() || url.host().isEmpty() || (url.scheme() != "http" && url.scheme() != "https"))
+		{
+			error = searxng ? QStringLiteral("请填写有效的 SearXNG 实例 URL（http 或 https）。")
+							: QStringLiteral("请填写有效的 Brave Search API 地址（http 或 https）。");
+			return false;
+		}
+		if (!searxng && secret.isEmpty())
+		{
+			QString readError;
+			if (m_connectionStore.readKey(ChatSearchSettings::braveKeyId(), readError).isEmpty())
+			{
+				error = QStringLiteral("使用 Brave 搜索需要填写 API Key。");
+				return false;
+			}
+		}
+	}
+	if (!secret.isEmpty())
+	{
+		const auto id = m_search.backend == ChatSearchBackend::Brave ? ChatSearchSettings::braveKeyId()
+																	 : ChatSearchSettings::searxngAuthId();
+		if (!m_connectionStore.writeKey(id, secret, error)) { return false; }
+	}
+	m_search.save();
+	return true;
 }
 
 void ChatSettingsDialog::buildApprovalPage()
@@ -407,6 +539,11 @@ void ChatSettingsDialog::accept()
 	if (!m_apiPage->save(error))
 	{
 		QMessageBox::warning(this, QStringLiteral("API"), error);
+		return;
+	}
+	if (!saveSearchSettings(error))
+	{
+		QMessageBox::warning(this, QStringLiteral("联网搜索"), error);
 		return;
 	}
 	auto* config = ConfigManager::inst();

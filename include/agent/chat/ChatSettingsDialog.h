@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include "agent/chat/ChatConnection.h"
+#include "agent/chat/ChatSearchSettings.h"
 
 class QAbstractButton;
 class QDialogButtonBox;
@@ -34,6 +35,9 @@ private:
 	void selectPage(int page);
 	void updateApprovalLabels();
 	void reloadPrompt();
+	void buildSearchSettings(QWidget* page);
+	void selectSearchBackend(ChatSearchBackend backend);
+	bool saveSearchSettings(QString& error);
 	ChatConnectionStore m_connectionStore;
 	ChatApiSettingsPage* m_apiPage = nullptr;
 	ChatGenerationPage* m_generationPage = nullptr;
@@ -50,6 +54,13 @@ private:
 	QLabel* m_globalApproval = nullptr;
 	QLabel* m_currentApproval = nullptr;
 	QLabel* m_approvalCheck = nullptr;
+
+	// Web search (Penpot 05 network card).
+	QAbstractButton* m_webSearch = nullptr;
+	QAbstractButton* m_searchSegments[3] = {};
+	QLineEdit* m_searchEndpoint = nullptr;
+	QLineEdit* m_searchSecret = nullptr;
+	ChatSearchSettings m_search;
 };
 
 } // namespace lmms::agent::chat

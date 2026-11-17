@@ -20,6 +20,7 @@
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -48,6 +49,7 @@
 #include "agent/chat/ChatAttachmentsDialog.h"
 #include "agent/chat/ChatController.h"
 #include "agent/chat/ChatGenerationPage.h"
+#include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatSessionsDialog.h"
 #include "agent/chat/ChatSettingsDialog.h"
 #include "agent/chat/ChatTranscript.h"
@@ -511,6 +513,108 @@ private slots:
 		{
 			QCOMPARE(afterCancel[index].toJson(), saved[index].toJson());
 		}
+	}
+
+	void nativeWebSearchSettings()
+	{
+		using lmms::agent::chat::ChatSearchSettings;
+		QStandardPaths::setTestModeEnabled(true);
+		const auto previousName = QCoreApplication::applicationName();
+		const auto unique = lmms::agent::chat::ChatConnection::create().id;
+		QCoreApplication::setApplicationName("LMMS-AgentChatSearch-" + unique);
+		const auto restoreName = qScopeGuard([&] { QCoreApplication::setApplicationName(previousName); });
+		const auto profile = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+		const auto removeProfile = qScopeGuard([&] { QDir(profile).removeRecursively(); });
+		QTemporaryDir config;
+		lmms::ConfigManager::inst()->loadConfigFile(config.filePath("config.xml"));
+		QFile prompt(config.filePath("prompt.txt"));
+		QVERIFY(prompt.open(QIODevice::WriteOnly));
+		prompt.write("Test system prompt");
+		prompt.close();
+		lmms::ConfigManager::inst()->setValue("agentchat", "promptPath", prompt.fileName());
+		lmms::agent::chat::ChatConnectionStore store(QDir(profile).filePath("agent"));
+		const auto removeKeys = qScopeGuard([&] {
+			QString ignored;
+			store.removeKey(ChatSearchSettings::searxngAuthId(), ignored);
+			store.removeKey(ChatSearchSettings::braveKeyId(), ignored);
+		});
+		auto connection = lmms::agent::chat::ChatConnection::create();
+		connection.name = "Search";
+		connection.baseUrl = "https://example.com/v1";
+		QString error;
+		QVERIFY2(store.saveConnection(connection, error), qPrintable(error));
+		lmms::ConfigManager::inst()->setValue("agentchat", "connection", connection.id);
+
+		// Default: web search off, SearXNG selected, source controls disabled.
+		QVERIFY(!ChatSearchSettings::load().enabled);
+		lmms::agent::chat::ChatSettingsDialog dialog;
+		dialog.resize(1600, 1000);
+		dialog.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+		dialog.findChild<QToolButton*>("agentSettingsTab2")->click();
+		auto* toggle = dialog.findChild<QAbstractButton*>("agentWebSearch");
+		auto* searxng = dialog.findChild<QAbstractButton*>("agentSearchSearxng");
+		auto* brave = dialog.findChild<QAbstractButton*>("agentSearchBrave");
+		auto* endpoint = dialog.findChild<QLineEdit*>("agentSearchEndpoint");
+		auto* secret = dialog.findChild<QLineEdit*>("agentSearchSecret");
+		QVERIFY(toggle && searxng && brave && endpoint && secret);
+		QVERIFY(!toggle->isChecked());
+		QVERIFY(searxng->isChecked());
+		QVERIFY(!searxng->isEnabled() && !endpoint->isEnabled() && !secret->isEnabled());
+		QVERIFY(endpoint->text().isEmpty());
+		QCOMPARE(endpoint->mapTo(&dialog, QPoint{}), QPoint(1186, 436));
+		QCOMPARE(endpoint->size(), QSize(366, 36));
+		QCOMPARE(searxng->mapTo(&dialog, QPoint{}), QPoint(1186, 392));
+		QCOMPARE(brave->mapTo(&dialog, QPoint{}), QPoint(1310, 392));
+
+		// Enabling with a LAN SearXNG instance and optional authentication.
+		QTest::mouseClick(toggle, Qt::LeftButton);
+		QVERIFY(toggle->isChecked() && endpoint->isEnabled() && secret->isEnabled());
+		endpoint->setFocus();
+		QTest::keyClicks(endpoint, "http://192.168.1.20:8080");
+		QTest::keyClicks(secret, "lan-auth");
+		const auto evidence = qEnvironmentVariable("LMMS_CHAT_SCREENSHOT");
+		if (!evidence.isEmpty())
+		{
+			QTest::qWait(300);
+			QVERIFY(dialog.screen()
+					->grabWindow(dialog.winId())
+					.save(QFileInfo(evidence).absolutePath() + "/agent-chat-search-settings-native.png"));
+		}
+		dialog.findChild<QDialogButtonBox*>("agentSettingsButtons")->button(QDialogButtonBox::Save)->click();
+		QCOMPARE(dialog.result(), int(QDialog::Accepted));
+		auto saved = ChatSearchSettings::load();
+		QVERIFY(saved.enabled);
+		QCOMPARE(saved.backend, lmms::agent::chat::ChatSearchBackend::SearXNG);
+		QCOMPARE(saved.searxngUrl, QStringLiteral("http://192.168.1.20:8080"));
+		QCOMPARE(store.readKey(ChatSearchSettings::searxngAuthId(), error), QStringLiteral("lan-auth"));
+		QVERIFY(store.readKey(ChatSearchSettings::braveKeyId(), error).isEmpty());
+
+		// Brave without a stored key is refused with a visible message; nothing is saved.
+		lmms::agent::chat::ChatSettingsDialog second;
+		second.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&second));
+		second.findChild<QToolButton*>("agentSettingsTab2")->click();
+		QVERIFY(second.findChild<QAbstractButton*>("agentWebSearch")->isChecked());
+		QCOMPARE(second.findChild<QLineEdit*>("agentSearchEndpoint")->text(), saved.searxngUrl);
+		QVERIFY(
+			second.findChild<QLineEdit*>("agentSearchSecret")->placeholderText().contains(QStringLiteral("已保存")));
+		QTest::mouseClick(second.findChild<QAbstractButton*>("agentSearchBrave"), Qt::LeftButton);
+		QCOMPARE(second.findChild<QLineEdit*>("agentSearchEndpoint")->text(), ChatSearchSettings::defaultBraveUrl());
+		QString warning;
+		QTimer::singleShot(0, &second, [&] {
+			auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget());
+			if (box)
+			{
+				warning = box->text();
+				box->accept();
+			}
+		});
+		second.findChild<QDialogButtonBox*>("agentSettingsButtons")->button(QDialogButtonBox::Save)->click();
+		QVERIFY2(warning.contains("API Key"), qPrintable(warning));
+		QVERIFY(second.isVisible());
+		QCOMPARE(ChatSearchSettings::load().backend, lmms::agent::chat::ChatSearchBackend::SearXNG);
+		second.reject();
 	}
 
 	void nativeAttachmentSelection()

@@ -1853,6 +1853,22 @@ QLabel[agentToolResultSummary="true"] {
     color: #667a90;
 }
 
+/* Penpot 05 search source segments. */
+QToolButton[agentSearchSegment="true"] {
+    font-size: 13px;
+    margin: 0px;
+    padding: 0px;
+    background: #242d38;
+    border: 1px solid transparent;
+    border-radius: 7px;
+}
+
+QToolButton[agentSearchSegment="true"]:checked {
+    background: #1f3a35;
+    border-color: #64dab8;
+    color: #64dab8;
+}
+
 QToolButton#agentAttachmentRemove {
     background: transparent;
     border: none;

@@ -234,3 +234,8 @@ ChatToolDispatcher两类结果新增approvalRequired/executed；ChatController::
 ## M3 DONE：自动验收与回归（2026-11-17）
 
 新增commandSelfResetKeepsResultCancelsRest：批准song.clearProject后工程实际清空，保留其ok/executed结果，剩余调用补canceled，不再批准或请求模型；测试服务器在每次模型请求到达时记录CommandBus批次深度，批准前后均为0（网络等待期间无项目批次）。M3验收逐项对应：默认请求批准、拒绝零执行、批准恰好一次（sequentialApprovalAndActualResults/nativeDock…）；无需批准（noApprovalRunsAndContinues）；篡改/工程切换失效（ChatToolDispatcherTest、projectReplacementCancelsPending、自身重置）；成功编辑保留对象（ChatToolDispatcherTest）；MCP既有回归。CTest 19/19通过（11个Chat、5个MCP、CommandBus/CoreCommands/SvsCommands），27.47秒，真实Windows窗口；日志build/agent-chat-m3-regression-{build,tests}.log。真实厂商工具调用及完整DAW人工验收MANUAL/PENDING，不阻塞。下一阶段M4。
+
+
+## M4.1 联网搜索开关与搜索来源设置（2026-11-17）
+
+Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外部素材”卡片补设计：搜索来源分段SearXNG/Brave/模型自带(1186/1310/1434,392,118×32)、端点输入(1186,436,366×36)、凭据输入(1186,480,366×36)，下载开关/批准块整体下移。新增ChatSearchSettings：webSearch默认关闭、searchBackend默认searxng、SearXNG URL不预填公共实例、Brave默认官方API地址；SearXNG认证与Brave Key经ChatConnectionStore写入Windows凭据管理器，不进配置文件。全局页开关真实可用，关闭时来源区禁用；保存时校验http/https与主机（允许局域网），Brave缺Key明确提示并拒绝保存。ChatDockTest新增nativeWebSearchSettings（默认关闭、Penpot几何、局域网URL+认证保存、重开显示“已保存”、Brave缺Key拒绝），全部11个Chat CTest通过；真实窗口截图build/agent-chat-search-settings-native.png已查看。下载开关仍为展示，留待下载步骤。日志build/agent-chat-m4-search-settings-{build,tests}.log。

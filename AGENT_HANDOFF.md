@@ -4,8 +4,9 @@
 - 已完成并验证且已推送：工具执行元数据补丁（3623154b5）；工具结果卡（CTest4/4、真实窗口截图build/agent-chat-tool-result-native.png）。详见doc/agent/chat-implementation-progress.md末两节。
 - 截图：设LMMS_CHAT_SCREENSHOT为build下某个.png完整路径（nativeDockLifecycle直接保存到该路径，其余保存到同目录）。
 - 环境：python需conda base（-NoProfile时用conda shell.powershell hook）；本机无pwsh，build.py拒绝运行，构建用cmake --build build --config Release --target … --parallel 2，测试用ctest --test-dir build -C Release -R …，均经Tee-Object写日志。
+- M4.1 DONE（联网开关/搜索来源设置，Penpot 05已补设计并经用户确认）。
 - M3 DONE：自身重置与网络等待无批次测试已补；CTest19/19（Chat11+MCP5+命令3）通过，日志build/agent-chat-m3-regression-{build,tests}.log；M3检查点已提交推送。真实厂商工具调用MANUAL/PENDING。
-- 下一步：M4联网与素材（计划书第9节与第11节M4行）。先读计划书第9节，复用现有设置/批准结构；联网默认关闭。
+- 下一步：M4.2 SearXNG/Brave 搜索工具与门控（关闭时不公开工具、运行时拒绝、关闭取消在途请求）；之后M4.3页面读取、M4.4模型自带搜索、M4.5-7便携工具/下载/解压（下载可执行文件前须向用户确认文件名、来源和大小）。
 
 ---
 
