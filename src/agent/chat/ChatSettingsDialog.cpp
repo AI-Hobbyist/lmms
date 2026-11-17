@@ -22,6 +22,7 @@
 #include "ToolButton.h"
 #include "agent/chat/ChatApiSettingsPage.h"
 #include "agent/chat/ChatGenerationPage.h"
+#include "agent/chat/ChatRequest.h"
 #include "agent/chat/ChatStore.h"
 #include "embed.h"
 
@@ -336,6 +337,7 @@ void ChatSettingsDialog::buildSearchSettings(QWidget* page)
 		{
 			segment->setEnabled(enabled);
 		}
+		if (m_apiPage) { updateModelSearchAvailability(); }
 		const bool external = enabled && m_search.backend != ChatSearchBackend::Model;
 		m_searchEndpoint->setEnabled(external);
 		m_searchSecret->setEnabled(external);
@@ -386,9 +388,25 @@ void ChatSettingsDialog::selectSearchBackend(ChatSearchBackend backend)
 	m_searchSecret->setEnabled(external);
 }
 
+void ChatSettingsDialog::updateModelSearchAvailability()
+{
+	auto* segment = m_searchSegments[static_cast<int>(ChatSearchBackend::Model)];
+	const bool supported = supportsHostedWebSearch(m_apiPage->connectionDraft());
+	// An unsupported model keeps a saved choice visible but cannot newly select it.
+	segment->setEnabled(m_search.enabled && (supported || segment->isChecked()));
+	segment->setToolTip(
+		supported ? QString{} : QStringLiteral("当前模型未声明支持模型自带搜索（capabilities.hostedWebSearch）"));
+}
+
 bool ChatSettingsDialog::saveSearchSettings(QString& error)
 {
 	error.clear();
+	if (m_search.enabled && m_search.backend == ChatSearchBackend::Model
+		&& !supportsHostedWebSearch(m_apiPage->connectionDraft()))
+	{
+		error = QStringLiteral("当前模型不支持模型自带搜索，请选择 SearXNG 或 Brave，或换用支持的模型。");
+		return false;
+	}
 	const auto secret = m_searchSecret->text();
 	if (m_search.enabled && m_search.backend != ChatSearchBackend::Model)
 	{
@@ -493,6 +511,7 @@ void ChatSettingsDialog::selectPage(int page)
 	{
 		m_generationPage->setConnection(m_apiPage->connectionDraft(), m_requestApproval->isChecked());
 	}
+	if (page == 0) { updateModelSearchAvailability(); }
 	m_pages->setCurrentIndex(page);
 	m_navigation
 		->findChild<QAbstractButton*>(QStringLiteral("agentSettingsTab%1")

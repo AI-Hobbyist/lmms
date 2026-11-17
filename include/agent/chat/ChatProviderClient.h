@@ -19,7 +19,7 @@ public:
 	explicit ChatProviderClient(QObject* parent = nullptr);
 	~ChatProviderClient() override;
 	bool start(const ChatConnection& connection, const QString& key, const QString& systemPrompt,
-			   const QJsonArray& messages, QString& error, const QJsonArray& tools = {});
+		const QJsonArray& messages, QString& error, const QJsonArray& tools = {}, bool hostedSearch = false);
 	void cancel();
 	bool active() const;
 	ChatResponse response() const;

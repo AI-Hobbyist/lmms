@@ -49,6 +49,8 @@ private:
 	bool saveResult(QString& error);
 	void finish(const QString& status);
 	bool startRequest(const QJsonArray& history, QString& error);
+	bool hostedSearchEligible() const;
+	bool decideHostedSearch(const QJsonObject& approval, bool approved, QString& error);
 	void receiveTools(QJsonArray calls);
 	void dispatchNextTool();
 	bool appendToolResult(const QJsonObject& call, const QJsonObject& result, QString& error,
@@ -72,6 +74,16 @@ private:
 	QJsonObject m_nativeOrigin;
 	bool m_preparing = false;
 	std::shared_ptr<std::atomic_bool> m_preparationCanceled;
+
+	// Model-hosted web search is decided once per turn, before the first request.
+	enum class HostedSearch
+	{
+		Undecided,
+		Enabled,
+		Disabled
+	};
+	HostedSearch m_hostedSearch = HostedSearch::Undecided;
+	QJsonObject m_hostedApproval;
 };
 
 } // namespace lmms::agent::chat

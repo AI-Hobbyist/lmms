@@ -767,6 +767,96 @@ private slots:
 		QCOMPARE(local.value("error").toObject().value("code").toString(), QStringLiteral("invalid_url"));
 	}
 
+	static bool requestsGoogleSearch(const QJsonObject& request)
+	{
+		for (const auto& value : request.value("tools").toArray())
+		{
+			if (value.toObject().contains("google_search")) { return true; }
+		}
+		return false;
+	}
+
+	void hostedSearchApprovedBeforeSending_data()
+	{
+		QTest::addColumn<QString>("approval");
+		QTest::addColumn<bool>("enabled");
+		QTest::addColumn<int>("decision"); // 1 approve, 0 deny, -1 no card expected
+		QTest::addColumn<bool>("hosted");
+		QTest::newRow("approved") << "request" << true << 1 << true;
+		QTest::newRow("denied") << "request" << true << 0 << false;
+		QTest::newRow("switched off") << "request" << false << -1 << false;
+		QTest::newRow("no approval mode") << "none" << true << -1 << true;
+	}
+
+	void hostedSearchApprovedBeforeSending()
+	{
+		QFETCH(QString, approval);
+		QFETCH(bool, enabled);
+		QFETCH(int, decision);
+		QFETCH(bool, hosted);
+		lmms::ConfigManager::inst()->setValue("agentchat", "approval", approval);
+		ChatSearchSettings settings;
+		settings.enabled = enabled;
+		settings.backend = ChatSearchBackend::Model;
+		settings.save();
+		ToolTurnServer server;
+		QVERIFY(server.server.listen(QHostAddress::LocalHost));
+		auto text = protocolTextResponse("gemini");
+		auto candidates = text.value("candidates").toArray();
+		auto candidate = candidates[0].toObject();
+		candidate.insert("groundingMetadata",
+			QJsonObject{{"groundingChunks",
+				QJsonArray{QJsonObject{{"web", QJsonObject{{"uri", "https://c.example"}, {"title", "Kit C"}}}}}}});
+		candidates[0] = candidate;
+		text.insert("candidates", candidates);
+		server.responses.append(text);
+		auto connection = server.connection();
+		connection.protocol = "gemini";
+		connection.mapping.insert("stream", false);
+		connection.capabilities.insert("hostedWebSearch", true);
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		QVERIFY(store.saveSession(session, error));
+		const auto id = session.value("id").toString();
+		ChatController controller(store);
+		QSignalSpy approvals(&controller, &ChatController::approvalRequested);
+		QVERIFY2(controller.send(id, connection, "fixture-key", {}, "Find drums", error), qPrintable(error));
+		if (decision >= 0)
+		{
+			// Nothing is sent before the turn-scoped hosted search decision.
+			QTRY_COMPARE(approvals.size(), 1);
+			const auto card = approvals[0][0].toJsonObject();
+			QVERIFY(card.value("hosted").toBool());
+			QCOMPARE(card.value("command").toString(), QStringLiteral("model.webSearch"));
+			QVERIFY(controller.active());
+			QTest::qWait(100);
+			QVERIFY(server.requests.isEmpty());
+			QCOMPARE(controller.pendingApproval(), card);
+			QVERIFY(controller.decideTool(card, decision == 1, error));
+		}
+		QTRY_VERIFY(!controller.active());
+		QCOMPARE(approvals.size(), decision >= 0 ? 1 : 0);
+		QCOMPARE(server.requests.size(), 1);
+		QCOMPARE(requestsGoogleSearch(server.requests[0]), hosted);
+		const auto messages = store.session(id).value("messages").toArray();
+		const auto answer = messages.last().toObject();
+		QCOMPARE(answer.value("status").toString(), QStringLiteral("complete"));
+		QCOMPARE(answer.value("sources").toArray().size(), 1);
+
+		// The approval belongs to that turn only: the next turn asks again.
+		if (decision == 1)
+		{
+			server.responses.append(protocolTextResponse("gemini"));
+			QVERIFY(controller.send(id, connection, "fixture-key", {}, "Again", error));
+			QTRY_COMPARE(approvals.size(), 2);
+			controller.stop();
+			QVERIFY(!controller.active());
+			QCOMPARE(server.requests.size(), 1);
+		}
+	}
+
 	void commandSelfResetKeepsResultCancelsRest()
 	{
 		ToolTurnServer server;

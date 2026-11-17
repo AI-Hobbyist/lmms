@@ -11,6 +11,8 @@
 #include "agent/CommandBus.h"
 #include "agent/chat/ChatContent.h"
 #include "agent/chat/ChatProviderClient.h"
+#include "agent/chat/ChatRequest.h"
+#include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatToolDispatcher.h"
 
 namespace lmms::agent::chat {
@@ -102,6 +104,7 @@ ChatController::ChatController(ChatStore& store, QObject* parent)
 		{
 			m_message.insert("native", QJsonObject{{"origin", m_nativeOrigin}, {"content", response.nativeContent}});
 		}
+		if (!response.sources.isEmpty()) { m_message.insert("sources", response.sources); }
 		if (m_toolTurn && response.complete && !response.toolCalls.isEmpty())
 		{
 			receiveTools(response.toolCalls);
@@ -109,6 +112,14 @@ ChatController::ChatController(ChatStore& store, QObject* parent)
 		else
 		{
 			finish(response.complete ? "complete" : "error");
+		}
+	});
+	connect(ChatSearchSettingsNotifier::instance(), &ChatSearchSettingsNotifier::changed, this, [this] {
+		// Turning hosted search off stops the client request; the provider may
+		// already have run searches, which cannot be undone from here.
+		if (m_hostedSearch == HostedSearch::Enabled && m_client->active() && !hostedSearchEligible())
+		{
+			abortTurn(message("Web search was turned off; the model request was stopped."), "canceled");
 		}
 	});
 }
@@ -120,7 +131,7 @@ ChatController::~ChatController()
 }
 
 bool ChatController::active() const
-{ return m_toolTurn || m_preparing || m_client->active(); }
+{ return m_toolTurn || m_preparing || m_client->active() || !m_hostedApproval.isEmpty(); }
 
 QString ChatController::activeSessionId() const
 { return active() ? m_sessionId : QString{}; }
@@ -132,10 +143,17 @@ void ChatController::setToolsEnabled(bool enabled)
 { m_toolsEnabled = enabled; }
 
 QJsonObject ChatController::pendingApproval() const
-{ return m_toolTurn ? m_dispatcher->pendingApproval() : QJsonObject{}; }
+{
+	if (!m_hostedApproval.isEmpty()) { return m_hostedApproval; }
+	return m_toolTurn ? m_dispatcher->pendingApproval() : QJsonObject{};
+}
 
 bool ChatController::decideTool(const QJsonObject& approval, bool approved, QString& error)
 {
+	if (!m_hostedApproval.isEmpty() && approval.value("token") == m_hostedApproval.value("token"))
+	{
+		return decideHostedSearch(approval, approved, error);
+	}
 	if (!m_toolTurn || !saveResult(error))
 	{
 		error = message("The request's original session or message no longer exists.");
@@ -441,11 +459,64 @@ bool ChatController::saveResult(QString& error)
 	return false;
 }
 
+bool ChatController::hostedSearchEligible() const
+{
+	const auto settings = ChatSearchSettings::load();
+	return settings.enabled && settings.backend == ChatSearchBackend::Model && supportsHostedWebSearch(m_connection);
+}
+
 bool ChatController::startRequest(const QJsonArray& history, QString& error)
 {
 	m_history = history;
+	if (m_hostedSearch == HostedSearch::Undecided)
+	{
+		const bool request = ConfigManager::inst()->value("agentchat", "approval", "request") != "none";
+		if (!hostedSearchEligible()) { m_hostedSearch = HostedSearch::Disabled; }
+		else if (!request) { m_hostedSearch = HostedSearch::Enabled; }
+		else
+		{
+			// Hosted searches run on the provider's servers and cannot be approved
+			// one by one: ask once for this turn before anything is sent.
+			const auto model
+				= m_connection.name.isEmpty() ? m_connection.model : m_connection.name + " / " + m_connection.model;
+			m_hostedApproval = {{"token", QUuid::createUuid().toString(QUuid::WithoutBraces)},
+				{"sessionId", m_sessionId}, {"turnId", m_turnId}, {"id", "hosted-web-search"},
+				{"command", "model.webSearch"},
+				{"arguments", QJsonObject{{"protocol", m_connection.protocol}, {"model", m_connection.model}}},
+				{"approvalRequired", true}, {"hosted", true}, {"scope", QJsonArray{"web"}},
+				{"purpose",
+					message("The model provider runs web searches on its own servers during this turn; one turn may "
+							"search several times. This approval applies to this turn only.")},
+				{"targets", QJsonArray{QJsonObject{{"path", "web"}, {"name", model}}}}};
+			const auto approval = m_hostedApproval;
+			emit approvalRequested(approval);
+			return true;
+		}
+	}
 	return m_client->start(m_connection, m_key, m_systemPrompt, history, error,
-						   m_toolTurn ? m_dispatcher->definitions() : QJsonArray{});
+		m_toolTurn ? m_dispatcher->definitions() : QJsonArray{}, m_hostedSearch == HostedSearch::Enabled);
+}
+
+bool ChatController::decideHostedSearch(const QJsonObject& approval, bool approved, QString& error)
+{
+	if (approval.value("sessionId") != m_sessionId || approval.value("turnId") != m_turnId)
+	{
+		error = message("The approval no longer matches the original tool call.");
+		return false;
+	}
+	m_hostedApproval = {};
+	// A denial still answers the message, just without hosted search. Settings
+	// changed while waiting are honored: approval never re-enables search.
+	m_hostedSearch = approved && hostedSearchEligible() ? HostedSearch::Enabled : HostedSearch::Disabled;
+	m_message.insert("hostedSearch", m_hostedSearch == HostedSearch::Enabled);
+	if (!saveResult(error) || !startRequest(m_history, error))
+	{
+		m_message.insert("error", error);
+		finish("error");
+		return false;
+	}
+	emit stateChanged();
+	return true;
 }
 
 void ChatController::receiveTools(QJsonArray calls)
@@ -642,6 +713,9 @@ void ChatController::finish(const QString& status)
 	m_history = {};
 	m_pendingCalls = {};
 	m_invalidatedReason.clear();
+	// A hosted search approval never carries over to another turn.
+	m_hostedApproval = {};
+	m_hostedSearch = HostedSearch::Undecided;
 	QString error;
 	if (!saveResult(error))
 	{

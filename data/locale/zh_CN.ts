@@ -16738,6 +16738,22 @@ Latency: %2 ms</source>
         <translation>网页内容类型不是可读文本：%1</translation>
     </message>
     <message>
+        <source>The selected model does not support model-hosted web search.</source>
+        <translation>所选模型不支持模型自带联网搜索。</translation>
+    </message>
+    <message>
+        <source>Web search was turned off; the model request was stopped.</source>
+        <translation>联网搜索已关闭，模型请求已停止。</translation>
+    </message>
+    <message>
+        <source>The model provider runs web searches on its own servers during this turn; one turn may search several times. This approval applies to this turn only.</source>
+        <translation>模型厂商会在本轮中于其服务器上执行联网搜索，一轮可能搜索多次。本次批准仅适用于本轮。</translation>
+    </message>
+    <message>
+        <source>Web sources:</source>
+        <translation>联网来源：</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

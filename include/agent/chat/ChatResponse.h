@@ -19,6 +19,9 @@ struct ChatResponse
 	QJsonObject usage;
 	QJsonArray toolCalls;
 	QJsonArray nativeContent;
+	// Retrieval evidence returned by model-hosted web search ({url, title}).
+	// Only server-provided citations are collected, never links in the text.
+	QJsonArray sources;
 	bool complete = false;
 };
 
@@ -47,6 +50,7 @@ private:
 	void consumeCustom(const QJsonObject& object, bool document = false);
 	bool complete();
 	bool fail(const QString& error);
+	void addSource(const QString& url, const QString& title);
 	ChatConnection m_connection;
 	ChatResponse m_response;
 	QMap<int, PendingCall> m_calls;

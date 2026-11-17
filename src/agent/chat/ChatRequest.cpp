@@ -76,8 +76,16 @@ bool expandTemplate(QJsonValue& value, const QJsonObject& variables, QSet<QStrin
 
 } // namespace
 
+bool supportsHostedWebSearch(const ChatConnection& connection)
+{
+	const auto protocol = connection.protocol;
+	const bool protocolSupport
+		= protocol == "openai-responses" || protocol == "anthropic-messages" || protocol == "gemini";
+	return protocolSupport && connection.capabilities.value("hostedWebSearch").toBool();
+}
+
 bool buildChatRequest(const ChatConnection& connection, const QString& key, const QString& systemPrompt,
-					  const QJsonArray& messages, ChatRequest& request, QString& error, const QJsonArray& tools)
+	const QJsonArray& messages, ChatRequest& request, QString& error, const QJsonArray& tools, bool hostedSearch)
 {
 	request = {};
 	if (!connection.validate(error))
@@ -334,6 +342,23 @@ bool buildChatRequest(const ChatConnection& connection, const QString& key, cons
 	if (!encodeChatToolDefinitions(connection, tools, encodedTools, error))
 	{
 		return false;
+	}
+	if (hostedSearch)
+	{
+		if (!supportsHostedWebSearch(connection))
+		{
+			error = message("The selected model does not support model-hosted web search.");
+			return false;
+		}
+		if (connection.protocol == "openai-responses") { encodedTools.append(QJsonObject{{"type", "web_search"}}); }
+		else if (anthropic)
+		{
+			encodedTools.append(QJsonObject{{"type", "web_search_20250305"}, {"name", "web_search"}, {"max_uses", 5}});
+		}
+		else
+		{
+			encodedTools.append(QJsonObject{{"google_search", QJsonObject{}}});
+		}
 	}
 	if (!encodedTools.isEmpty())
 	{

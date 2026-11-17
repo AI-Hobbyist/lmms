@@ -92,6 +92,12 @@ bool ChatResponseDecoder::complete()
 			{
 				block.insert("input", QJsonDocument::fromJson(m_calls.value(iterator.key()).arguments).object());
 			}
+			if (protocol == "anthropic-messages" && block.contains("partial_json"))
+			{
+				block.insert(
+					"input", QJsonDocument::fromJson(block.value("partial_json").toString().toUtf8()).object());
+				block.remove("partial_json");
+			}
 			if (protocol.endsWith("responses") && block.value("type").toString() == "function_call")
 			{
 				block.insert("arguments", QString::fromUtf8(m_calls.value(iterator.key()).arguments));
@@ -121,8 +127,47 @@ bool ChatResponseDecoder::complete()
 		native.append(assistant);
 	}
 	m_response.nativeContent = native;
+
+	// Hosted web search evidence (Gemini grounding is collected while decoding).
+	for (const auto& value : native)
+	{
+		const auto block = value.toObject();
+		const auto type = block.value("type").toString();
+		if (protocol.endsWith("responses") && type == "message")
+		{
+			for (const auto& part : block.value("content").toArray())
+			{
+				for (const auto& annotation : part.toObject().value("annotations").toArray())
+				{
+					const auto citation = annotation.toObject();
+					if (citation.value("type").toString() == "url_citation")
+					{
+						addSource(citation.value("url").toString(), citation.value("title").toString());
+					}
+				}
+			}
+		}
+		else if (protocol == "anthropic-messages" && type == "web_search_tool_result")
+		{
+			for (const auto& result : block.value("content").toArray())
+			{
+				const auto item = result.toObject();
+				addSource(item.value("url").toString(), item.value("title").toString());
+			}
+		}
+	}
 	m_response.complete = true;
 	return true;
+}
+
+void ChatResponseDecoder::addSource(const QString& url, const QString& title)
+{
+	if (url.isEmpty()) { return; }
+	for (const auto& value : m_response.sources)
+	{
+		if (value.toObject().value("url").toString() == url) { return; }
+	}
+	m_response.sources.append(QJsonObject{{"url", url}, {"title", title}});
 }
 
 bool ChatResponseDecoder::consume(const ChatStreamEvent& event)
@@ -415,6 +460,14 @@ void ChatResponseDecoder::consumeAnthropic(const QJsonObject& object, const QStr
 			auto& block = m_nativeBlocks[index];
 			block.insert("signature", block.value("signature").toString() + delta.value("signature").toString());
 		}
+		else if (deltaType == "input_json_delta" && m_nativeBlocks.value(index).value("type") == "server_tool_use")
+		{
+			// Server-side tools (hosted web search) are not client calls: keep their
+			// streamed input inside the native block so it can be sent back unchanged.
+			auto& block = m_nativeBlocks[index];
+			block.insert(
+				"partial_json", block.value("partial_json").toString() + delta.value("partial_json").toString());
+		}
 		else if (deltaType == "input_json_delta")
 		{
 			auto& call = m_calls[index];
@@ -490,6 +543,12 @@ void ChatResponseDecoder::consumeGemini(const QJsonObject& object)
 								  QJsonDocument(function.value("args").toObject()).toJson(QJsonDocument::Compact)};
 				m_calls[index].providerId = function.value("id").toString();
 			}
+		}
+		const auto grounding = candidate.value("groundingMetadata").toObject();
+		for (const auto& chunk : grounding.value("groundingChunks").toArray())
+		{
+			const auto web = chunk.toObject().value("web").toObject();
+			addSource(web.value("uri").toString(), web.value("title").toString());
 		}
 		if (candidate.value("finishReason").isString())
 		{

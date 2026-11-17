@@ -249,3 +249,8 @@ Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外
 ## M4.3 页面读取工具（2026-11-17）
 
 新增chat.readPage（参数url）：Qt Network读取http/https页面，上限2 MB/20000字符，仅接受HTML与text/plain；去除script/style/noscript后经QTextDocument提取正文、合并空行，返回url/finalUrl/title/text/truncated，来源链接随工具结果进入会话记录。与搜索共用联网开关与同一门控/取消路径，不需凭据；批准卡显示“web · URL”。非http(s)返回invalid_url，非文本返回unsupported_content。ChatToolTurnTest新增2项，新增4条中文词条（lrelease 4175/0）；CTest 18/18（Chat11+MCP5+CommandBus/CoreCommands）通过，日志build/agent-chat-m4-read-page-{build,tests}.log。真实公网页面实测MANUAL/PENDING。
+
+
+## M4.4 模型自带联网搜索（2026-11-17）
+
+能力按连接在高级对话框capabilities中声明hostedWebSearch:true（模型差异大，不在厂商预设中一刀切开启）；仅openai-responses（tools添加{type:web_search}）、anthropic-messages（web_search_20250305，max_uses 5）、gemini（google_search）支持，其余协议禁用该来源，不自动切换。联网开关关闭或来源非“模型自带”时请求体不含任何托管搜索/grounding字段。请求批准模式下，控制器在本轮首个模型请求发送前发出model.webSearch合成批准卡（注明模型/厂商、本轮可能多次搜索），复用原生批准卡；批准则本轮请求带托管搜索，拒绝则不带搜索继续回答；等待期间若设置已关闭，批准也不会重新开启；批准只绑定本轮，下一轮重新询问。无需批准模式直接带搜索。开启状态下关闭开关会中止客户端请求，不声称撤销服务器已完成的搜索。来源仅收集服务器引用（Responses url_citation、Anthropic web_search_tool_result、Gemini groundingChunks），去重后存入消息sources并在正文末以“联网来源”列出；Anthropic流式server_tool_use输入不再误判为客户端工具调用，并原样回传。设置页在当前连接未声明能力时禁用“模型自带”并拒绝保存。新增4条中文词条（lrelease 4179/0）。ChatRequestTest/ChatResponseTest/ChatToolTurnTest新增托管声明、来源提取与4种批准分支；CTest 18/18通过，日志build/agent-chat-m4-hosted-search-{build,tests}.log。真实厂商托管搜索、流事件及引用实测MANUAL/PENDING。

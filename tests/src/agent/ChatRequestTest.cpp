@@ -123,6 +123,40 @@ private slots:
 		}
 	}
 
+	void hostedWebSearchDeclarations()
+	{
+		const QJsonArray history{QJsonObject{{"role", "user"}, {"content", "Find a drum kit"}}};
+		const QHash<QString, QJsonObject> expected{{"openai-responses", QJsonObject{{"type", "web_search"}}},
+			{"anthropic-messages",
+				QJsonObject{{"type", "web_search_20250305"}, {"name", "web_search"}, {"max_uses", 5}}},
+			{"gemini", QJsonObject{{"google_search", QJsonObject{}}}}};
+		for (const auto& protocol : ChatConnection::protocols())
+		{
+			auto connection = ChatConnection::create();
+			connection.protocol = protocol;
+			connection.baseUrl = "https://example.com/v1";
+			connection.model = "fixture-model";
+			if (protocol == "custom-json") { connection.mapping = {{"path", "generate"}}; }
+			ChatRequest request;
+			QString error;
+			// Off: no hosted search, grounding or related field in the body.
+			QVERIFY2(buildChatRequest(connection, "fake-key", "", history, request, error), qPrintable(error));
+			const auto plain = QString::fromUtf8(QJsonDocument(request.body).toJson(QJsonDocument::Compact));
+			QVERIFY2(!plain.contains("web_search") && !plain.contains("google_search") && !plain.contains("grounding"),
+				qPrintable(plain));
+
+			// Declared but unsupported protocols, and undeclared models, are refused.
+			connection.capabilities.insert("hostedWebSearch", true);
+			const bool supported = expected.contains(protocol);
+			QCOMPARE(supportsHostedWebSearch(connection), supported);
+			QCOMPARE(buildChatRequest(connection, "fake-key", "", history, request, error, {}, true), supported);
+			if (!supported) { continue; }
+			QCOMPARE(request.body.value("tools").toArray(), QJsonArray{expected.value(protocol)});
+			connection.capabilities.remove("hostedWebSearch");
+			QVERIFY(!buildChatRequest(connection, "fake-key", "", history, request, error, {}, true));
+		}
+	}
+
 	void invalidToolDeclarations()
 	{
 		auto connection = ChatConnection::create();

@@ -40,6 +40,19 @@ QString messageText(const QJsonObject& message)
 																		 : QJsonDocument(content.toObject()))
 														  .toJson(QJsonDocument::Indented));
 	}
+	// Citations returned by model-hosted search, never links the model wrote itself.
+	const auto sources = message.value("sources").toArray();
+	if (!sources.isEmpty())
+	{
+		text += "\n\n" + translated("Web sources:");
+		for (int index = 0; index < sources.size(); ++index)
+		{
+			const auto source = sources[index].toObject();
+			const auto title = source.value("title").toString();
+			const auto url = source.value("url").toString();
+			text += QStringLiteral("\n%1. %2").arg(index + 1).arg(title.isEmpty() ? url : title + " — " + url);
+		}
+	}
 	const auto error = message.value("error").toString();
 	if (!error.isEmpty())
 	{

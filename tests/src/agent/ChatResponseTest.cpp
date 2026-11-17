@@ -222,6 +222,64 @@ private slots:
 		QCOMPARE(responses.response().nativeContent, output);
 	}
 
+	void hostedSearchSources()
+	{
+		auto connection = ChatConnection::create();
+		connection.protocol = "openai-responses";
+		ChatResponseDecoder responses(connection);
+		const QJsonArray annotations{
+			QJsonObject{{"type", "url_citation"}, {"url", "https://a.example/kit"}, {"title", "Kit A"}},
+			QJsonObject{{"type", "url_citation"}, {"url", "https://a.example/kit"}, {"title", "Duplicate"}}};
+		const QJsonArray output{QJsonObject{{"type", "web_search_call"}, {"id", "ws1"}, {"status", "completed"}},
+			QJsonObject{{"type", "message"},
+				{"content",
+					QJsonArray{QJsonObject{{"type", "output_text"}, {"text", "See https://model.example/ok"},
+						{"annotations", annotations}}}}}};
+		QVERIFY(
+			responses.consumeJson(QJsonDocument(QJsonObject{{"status", "completed"}, {"output", output}}).toJson()));
+		// Only the server citation counts; the link the model wrote itself does not.
+		QCOMPARE(responses.response().sources,
+			(QJsonArray{QJsonObject{{"url", "https://a.example/kit"}, {"title", "Kit A"}}}));
+
+		// Anthropic streams the server tool input; it must not become a client tool call.
+		connection.protocol = "anthropic-messages";
+		ChatResponseDecoder claude(connection);
+		QVERIFY(claude.consume(event({{"type", "content_block_start"}, {"index", 0},
+			{"content_block",
+				QJsonObject{
+					{"type", "server_tool_use"}, {"id", "srv"}, {"name", "web_search"}, {"input", QJsonObject{}}}}})));
+		QVERIFY(claude.consume(event({{"type", "content_block_delta"}, {"index", 0},
+			{"delta", QJsonObject{{"type", "input_json_delta"}, {"partial_json", "{\"query\":\"lofi\"}"}}}})));
+		QVERIFY(claude.consume(event({{"type", "content_block_start"}, {"index", 1},
+			{"content_block",
+				QJsonObject{{"type", "web_search_tool_result"}, {"tool_use_id", "srv"},
+					{"content",
+						QJsonArray{QJsonObject{
+							{"type", "web_search_result"}, {"url", "https://b.example"}, {"title", "Kit B"}}}}}}})));
+		QVERIFY(claude.consume(event({{"type", "content_block_start"}, {"index", 2},
+			{"content_block", QJsonObject{{"type", "text"}, {"text", "Found it."}}}})));
+		QVERIFY(
+			claude.consume(event({{"type", "message_delta"}, {"delta", QJsonObject{{"stop_reason", "end_turn"}}}})));
+		QVERIFY(claude.consume(event({{"type", "message_stop"}})));
+		QVERIFY2(claude.response().complete, qPrintable(claude.response().error));
+		QVERIFY(claude.response().toolCalls.isEmpty());
+		QCOMPARE(
+			claude.response().nativeContent[0].toObject().value("input").toObject(), (QJsonObject{{"query", "lofi"}}));
+		QVERIFY(!claude.response().nativeContent[0].toObject().contains("partial_json"));
+		QCOMPARE(claude.response().sources[0].toObject().value("url").toString(), QStringLiteral("https://b.example"));
+
+		connection.protocol = "gemini";
+		ChatResponseDecoder gemini(connection);
+		const QJsonObject grounding{{"groundingChunks",
+			QJsonArray{QJsonObject{{"web", QJsonObject{{"uri", "https://c.example"}, {"title", "Kit C"}}}}}}};
+		QVERIFY(gemini.consume(event({{"candidates",
+			QJsonArray{QJsonObject{{"content", QJsonObject{{"parts", QJsonArray{QJsonObject{{"text", "Gemini"}}}}}},
+				{"groundingMetadata", grounding}, {"finishReason", "STOP"}}}}})));
+		QVERIFY(gemini.finish());
+		QCOMPARE(
+			gemini.response().sources, (QJsonArray{QJsonObject{{"url", "https://c.example"}, {"title", "Kit C"}}}));
+	}
+
 	void invalidJsonDocuments()
 	{
 		for (

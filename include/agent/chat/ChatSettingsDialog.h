@@ -38,6 +38,7 @@ private:
 	void buildSearchSettings(QWidget* page);
 	void selectSearchBackend(ChatSearchBackend backend);
 	bool saveSearchSettings(QString& error);
+	void updateModelSearchAvailability();
 	ChatConnectionStore m_connectionStore;
 	ChatApiSettingsPage* m_apiPage = nullptr;
 	ChatGenerationPage* m_generationPage = nullptr;
