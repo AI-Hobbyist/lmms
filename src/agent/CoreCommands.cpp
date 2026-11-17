@@ -5726,6 +5726,91 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 
 } // namespace
 
+CommandTargetIdentities commandTargetIdentities()
+{
+	CommandTargetIdentities targets;
+	auto* song = Engine::getSong();
+	if (!song || song->isLoadingProject())
+	{
+		return targets;
+	}
+	targets.insert("song", {song, {}});
+	targets.insert("pattern", {Engine::patternStore(), {}});
+	for (auto* container : {static_cast<TrackContainer*>(song), static_cast<TrackContainer*>(Engine::patternStore())})
+	{
+		for (std::size_t index = 0; index < container->tracks().size(); ++index)
+		{
+			auto* track = container->tracks()[index];
+			const auto path = trackPath(static_cast<int>(index), track);
+			targets.insert(path, {track, track->name()});
+			for (std::size_t clip = 0; clip < track->getClips().size(); ++clip)
+			{
+				auto* object = track->getClips()[clip];
+				targets.insert(clipPath(static_cast<int>(index), static_cast<int>(clip), track),
+							   {object, object->name()});
+			}
+		}
+	}
+	for (const auto& address : addressableModels(song))
+	{
+		targets.insert(address.path, {address.model, address.model->displayName()});
+	}
+	if (auto* mixer = Engine::mixer())
+	{
+		for (int index = 0; index < mixer->numChannels(); ++index)
+		{
+			auto* channel = mixer->mixerChannel(index);
+			targets.insert(mixerChannelPath(index), {&channel->m_volumeModel, channel->m_name});
+		}
+	}
+	for (std::size_t index = 0; index < song->controllers().size(); ++index)
+	{
+		auto* controller = song->controllers()[index];
+		targets.insert("song/controller:" + QString::number(index), {controller, controller->name()});
+	}
+	return targets;
+}
+
+bool includeIndexedNoteTargets(CommandTargetIdentities& targets, const QString& command, const QJsonObject& arguments,
+							   QString& error)
+{
+	const bool filtered = command.startsWith("midi.") || command == "query.notes";
+	NoteFilter filter;
+	if (filtered && !readNoteFilter(arguments, filter, error))
+	{
+		return false;
+	}
+	for (auto iterator = targets.begin(); iterator != targets.end(); ++iterator)
+	{
+		if (auto* clip = dynamic_cast<MidiClip*>(iterator.value().object.data()))
+		{
+			iterator.value().indexedObjects.clear();
+			iterator.value().indexedValues = {};
+			const int selected = command == "midi.updateNote" ? arguments.value("note").toInt(-1) : -1;
+			if (command == "midi.updateNote" && (selected < 0 || selected >= static_cast<int>(clip->notes().size())))
+			{
+				error = "The note index does not exist in this clip.";
+				return false;
+			}
+			int index = 0;
+			for (const auto* note : clip->notes())
+			{
+				if ((selected >= 0 && index == selected) || (selected < 0 && (!filtered || filter.matches(note))))
+				{
+					// Addresses are compared only, never dereferenced after the wait.
+					// Values also distinguish a replacement that reuses an allocation.
+					iterator.value().indexedObjects.append(reinterpret_cast<quintptr>(note));
+					auto value = noteDetail(note, index);
+					value.insert("type", static_cast<int>(note->type()));
+					iterator.value().indexedValues.append(value);
+				}
+				++index;
+			}
+		}
+	}
+	return true;
+}
+
 void registerCoreCommands(CommandBus& commandBus)
 {
 	const auto noArguments = objectSchema();

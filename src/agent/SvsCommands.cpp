@@ -1559,6 +1559,56 @@ void registerCommand(CommandBus& commandBus, const QString& name, const QString&
 
 } // namespace
 
+bool includeSvsNoteTargets(CommandTargetIdentities& targets, const QJsonObject& arguments, QString& error)
+{
+	QStringList ids;
+	const auto* field = arguments.contains("noteIds") ? "noteIds" : "ids";
+	bool hasRange = false;
+	double start = 0;
+	double end = 0;
+	if (!readStringArray(arguments, field, ids, error, false) || !readRange(arguments, hasRange, start, end, error))
+	{
+		return false;
+	}
+	for (const auto* selector : {"id", "noteId"})
+	{
+		if (arguments.contains(selector))
+		{
+			ids.append(arguments.value(selector).toString());
+		}
+	}
+	for (auto iterator = targets.begin(); iterator != targets.end(); ++iterator)
+	{
+		if (auto* clip = dynamic_cast<SVSClip*>(iterator.value().object.data()))
+		{
+			iterator.value().indexedValues = {};
+			int index = 0;
+			for (const auto& note : clip->notes())
+			{
+				bool selected = true;
+				if (!ids.isEmpty())
+				{
+					selected = ids.contains(note.id);
+				}
+				else if (hasRange)
+				{
+					selected = note.tick >= start && note.tick < end;
+				}
+				if (selected)
+				{
+					auto value = noteJson(note, index);
+					// SVS selectors use stable IDs rather than array indices. Changes
+					// outside the selected IDs must not invalidate their approval.
+					value.remove("index");
+					iterator.value().indexedValues.append(value);
+				}
+				++index;
+			}
+		}
+	}
+	return true;
+}
+
 void registerSvsCommands(CommandBus& commandBus)
 {
 	QJsonObject createTrackProperties = trackSchema();

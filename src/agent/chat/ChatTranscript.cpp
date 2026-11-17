@@ -8,7 +8,9 @@
 #include <QLocale>
 #include <QResizeEvent>
 #include <QScrollBar>
+#include <QToolButton>
 
+#include "ToolButton.h"
 #include "embed.h"
 
 namespace lmms::agent::chat {
@@ -51,6 +53,91 @@ QString messageText(const QJsonObject& message)
 }
 
 } // namespace
+
+class ChatApprovalCard : public QFrame
+{
+public:
+	explicit ChatApprovalCard(QWidget* parent)
+		: QFrame(parent)
+	{
+		setObjectName("agentApprovalCard");
+		setFrameShape(QFrame::StyledPanel);
+		auto* icon = label(this, 12);
+		icon->setPixmap(embed::getIconPixmap("agent_chat_shield", 19, 19));
+		icon->setGeometry(12, 15, 19, 19);
+		m_title = label(this, 13);
+		m_title->setObjectName("agentApprovalTitle");
+		m_scope = label(this, 12);
+		m_scope->setObjectName("agentApprovalScope");
+		m_explanation = label(this, 11);
+		m_explanation->setText(translated("Approve to execute the internal project tool"));
+		approve = button("agentApprovalApprove", translated("Approve once"), "agent_chat_check", {12, 109, 98, 34});
+		details = button("agentApprovalDetails", translated("View changes"), "agent_chat_open", {120, 109, 100, 34});
+		deny = button("agentApprovalDeny", translated("Deny"), "agent_chat_close", {230, 109, 65, 34});
+		hide();
+	}
+
+	void setApproval(const QJsonObject& approval)
+	{
+		const bool same = approval == m_data;
+		m_data = approval;
+		setVisible(!approval.isEmpty());
+		if (!same)
+		{
+			approve->setEnabled(true);
+			deny->setEnabled(true);
+		}
+		m_title->setText(translated("Awaiting approval: %1").arg(approval.value("command").toString()));
+		QStringList targets;
+		for (const auto& value : approval.value("targets").toArray())
+		{
+			const auto target = value.toObject();
+			const auto name = target.value("name").toString();
+			targets.append(target.value("path").toString() + (name.isEmpty() ? QString{} : " · " + name));
+		}
+		m_scopeText = targets.join(" · ");
+		m_scope->setToolTip("<qt>" + m_scopeText.toHtmlEscaped() + "</qt>");
+		m_title->setToolTip("<qt>" + approval.value("purpose").toString().toHtmlEscaped() + "</qt>");
+	}
+
+	QJsonObject approval() const
+	{ return m_data; }
+
+	void arrange(int width)
+	{
+		setFixedSize(width, 157);
+		m_title->setGeometry(39, 13, qMax(1, width - 53), 21);
+		m_scope->setGeometry(14, 48, qMax(1, width - 28), 18);
+		m_scope->setText(QFontMetrics(m_scope->font()).elidedText(m_scopeText, Qt::ElideMiddle, m_scope->width()));
+		m_explanation->setGeometry(14, 73, qMax(1, width - 28), 16);
+	}
+
+	QToolButton* approve = nullptr;
+	QToolButton* details = nullptr;
+	QToolButton* deny = nullptr;
+
+private:
+	QToolButton* button(const char* name, const QString& text, std::string_view icon, const QRect& geometry)
+	{
+		auto* result = new gui::ToolButton(this);
+		result->setObjectName(QString::fromLatin1(name));
+		result->setText(text);
+		result->setToolTip(text);
+		result->setAccessibleName(text);
+		result->setIcon(embed::getIconPixmap(icon, 16, 16));
+		result->setIconSize({16, 16});
+		result->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+		result->setProperty("agentChatControl", true);
+		result->setGeometry(geometry);
+		return result;
+	}
+
+	QJsonObject m_data;
+	QString m_scopeText;
+	QLabel* m_title = nullptr;
+	QLabel* m_scope = nullptr;
+	QLabel* m_explanation = nullptr;
+};
 
 class ChatMessage : public QFrame
 {
@@ -176,6 +263,29 @@ ChatTranscript::ChatTranscript(QWidget* parent)
 	m_empty = label(m_contents, 13);
 	m_empty->setWordWrap(true);
 	m_empty->setText(translated("Start a new music conversation."));
+	m_approval = new ChatApprovalCard(m_contents);
+	for (const auto accepted : {true, false})
+	{
+		connect(accepted ? m_approval->approve : m_approval->deny, &QToolButton::clicked, this, [this, accepted] {
+			const auto approval = m_approval->approval();
+			m_approval->approve->setEnabled(false);
+			m_approval->deny->setEnabled(false);
+			emit approvalDecided(approval, accepted);
+		});
+	}
+	connect(m_approval->details, &QToolButton::clicked, this,
+			[this] { emit approvalDetailsRequested(m_approval->approval()); });
+}
+
+void ChatTranscript::setApproval(const QJsonObject& approval)
+{
+	auto* scroll = verticalScrollBar();
+	const int position = scroll->value();
+	const bool follow = position >= scroll->maximum() - 2;
+	m_approval->setApproval(approval);
+	m_empty->setVisible(m_rows.isEmpty() && approval.isEmpty());
+	arrangeMessages();
+	scroll->setValue(follow ? scroll->maximum() : position);
 }
 
 void ChatTranscript::setMessages(const QJsonArray& messages)
@@ -187,7 +297,7 @@ void ChatTranscript::setMessages(const QJsonArray& messages)
 		m_rows.append(new ChatMessage(message.toObject(), m_contents));
 		m_rows.last()->show();
 	}
-	m_empty->setVisible(messages.isEmpty());
+	m_empty->setVisible(messages.isEmpty() && m_approval->approval().isEmpty());
 	arrangeMessages();
 }
 
@@ -237,6 +347,17 @@ void ChatTranscript::arrangeMessages()
 		row->arrange(width);
 		row->move(0, y);
 		y += row->height() + 27;
+	}
+	if (!m_approval->approval().isEmpty())
+	{
+		// Penpot 01: a 157px card follows the preceding 50px result by 16px.
+		if (y > 0)
+		{
+			y -= 11;
+		}
+		m_approval->arrange(width);
+		m_approval->move(0, y);
+		y += m_approval->height() + 27;
 	}
 	m_contents->setFixedSize(width, qMax(viewport()->height(), y > 0 ? y - 27 : 0));
 	m_empty->setGeometry(0, 0, width, 42);

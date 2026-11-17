@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QInputDialog>
+#include <QJsonDocument>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
@@ -58,6 +59,34 @@ ChatDock::ChatDock(QMainWindow* window)
 	setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 	buildWorkspace();
 	m_controller = new ChatController(m_store, this);
+	m_controller->setToolsEnabled(true);
+	connect(m_controller, &ChatController::approvalRequested, this, [this](const QJsonObject& approval) {
+		if (approval.value("sessionId") == m_current.value("id"))
+		{
+			m_current = m_store.session(m_current.value("id").toString());
+			renderSession();
+		}
+		refreshSessions();
+	});
+	connect(m_messages, &ChatTranscript::approvalDecided, this, [this](const QJsonObject& approval, bool approved) {
+		QString error;
+		if (!m_controller->decideTool(approval, approved, error))
+		{
+			showError(error);
+		}
+		updateRequestControls();
+	});
+	connect(m_messages, &ChatTranscript::approvalDetailsRequested, this, [this](const QJsonObject& approval) {
+		auto review = approval;
+		review.remove("token");
+		QMessageBox details(QMessageBox::Information, tr("Tool call details"), approval.value("command").toString(),
+							QMessageBox::Close, this);
+		details.setObjectName("agentToolDetails");
+		details.setTextFormat(Qt::PlainText);
+		details.setInformativeText(approval.value("purpose").toString());
+		details.setDetailedText(QString::fromUtf8(QJsonDocument(review).toJson(QJsonDocument::Indented)));
+		details.exec();
+	});
 	connect(m_controller, &ChatController::messageUpdated, this, &ChatDock::updateStreamingMessage);
 	connect(m_controller, &ChatController::stateChanged, this, &ChatDock::updateRequestControls);
 	connect(m_controller, &ChatController::sessionChanged, this, [this](const QString& id) {
@@ -243,6 +272,11 @@ void ChatDock::refreshSessions()
 			}
 			auto* item = new QListWidgetItem(
 				(pinned ? QStringLiteral("★ ") : QString{}) + session.value("title").toString(), m_sessions);
+			const auto approval = m_controller->pendingApproval();
+			if (approval.value("sessionId") == session.value("id") && approval.value("approvalRequired").toBool())
+			{
+				item->setText(item->text() + "\n" + tr("Awaiting tool approval"));
+			}
 			item->setData(Qt::UserRole, session.value("id").toString());
 			item->setSizeHint(QSize(152, 72));
 			if (session.value("id") == m_current.value("id"))
@@ -297,7 +331,11 @@ void ChatDock::renderSession()
 
 void ChatDock::showSessionMenu(const QPoint& position)
 {
-	const auto selected = m_sessions->selectedItems();
+	QStringList selected;
+	for (const auto* item : m_sessions->selectedItems())
+	{
+		selected.append(item->data(Qt::UserRole).toString());
+	}
 	if (selected.isEmpty())
 	{
 		return;
@@ -324,13 +362,16 @@ void ChatDock::showSessionMenu(const QPoint& position)
 	{
 		return;
 	}
-	for (const auto* item : selected)
+	for (const auto& id : selected)
 	{
-		const auto id = item->data(Qt::UserRole).toString();
 		auto session = m_store.session(id);
 		QString error;
 		if (action == remove)
 		{
+			if (m_controller->activeSessionId() == id)
+			{
+				m_controller->stop();
+			}
 			if (!m_store.removeSession(id, error))
 			{
 				showError(error);
@@ -393,6 +434,12 @@ void ChatDock::showSessionMenu(const QPoint& position)
 void ChatDock::showSessionManagement()
 {
 	ChatSessionsDialog dialog(m_store, this);
+	connect(&dialog, &ChatSessionsDialog::sessionAboutToRemove, this, [this](const QString& id) {
+		if (m_controller->activeSessionId() == id)
+		{
+			m_controller->stop();
+		}
+	});
 	dialog.exec();
 	const auto selected = dialog.selectedSession();
 	m_current = m_store.session(selected.isEmpty() ? m_current.value("id").toString() : selected);

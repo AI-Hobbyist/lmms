@@ -6,6 +6,7 @@
 #include <QUrlQuery>
 
 #include "agent/chat/ChatContent.h"
+#include "agent/chat/ChatTools.h"
 
 namespace lmms::agent::chat {
 namespace {
@@ -76,7 +77,7 @@ bool expandTemplate(QJsonValue& value, const QJsonObject& variables, QSet<QStrin
 } // namespace
 
 bool buildChatRequest(const ChatConnection& connection, const QString& key, const QString& systemPrompt,
-					  const QJsonArray& messages, ChatRequest& request, QString& error)
+					  const QJsonArray& messages, ChatRequest& request, QString& error, const QJsonArray& tools)
 {
 	request = {};
 	if (!connection.validate(error))
@@ -329,6 +330,15 @@ bool buildChatRequest(const ChatConnection& connection, const QString& key, cons
 			}
 		}
 	}
+	QJsonArray encodedTools;
+	if (!encodeChatToolDefinitions(connection, tools, encodedTools, error))
+	{
+		return false;
+	}
+	if (!encodedTools.isEmpty())
+	{
+		body.insert("tools", encodedTools);
+	}
 	if (custom && connection.mapping.contains("requestTemplate"))
 	{
 		auto value = connection.mapping.value("requestTemplate");
@@ -345,6 +355,11 @@ bool buildChatRequest(const ChatConnection& connection, const QString& key, cons
 		if (!used.contains("messages"))
 		{
 			error = message("The custom request template must be a JSON object containing the messages placeholder.");
+			return false;
+		}
+		if (!encodedTools.isEmpty() && !used.contains("tools"))
+		{
+			error = message("The custom request template must include the tools placeholder when tools are enabled.");
 			return false;
 		}
 		body = value.toObject();

@@ -59,6 +59,16 @@ void ChatDock::refreshConnection()
 void ChatDock::updateRequestControls()
 {
 	const bool running = m_controller && m_controller->active();
+	auto approval = m_controller ? m_controller->pendingApproval() : QJsonObject{};
+	if (approval.value("sessionId") != m_current.value("id") || !approval.value("approvalRequired").toBool())
+	{
+		approval = {};
+	}
+	m_messages->setApproval(approval);
+	if (!approval.isEmpty())
+	{
+		m_footer->setText(tr("Awaiting tool approval"));
+	}
 	m_model->setEnabled(!running);
 	m_reasoning->setEnabled(!running && !m_connection.id.isEmpty());
 	m_attach->setEnabled(!running);

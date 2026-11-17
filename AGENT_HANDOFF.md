@@ -1,3 +1,136 @@
+## 当前有效交接入口（2026-11-17，目标恢复，M3 进行中）
+
+- 用户已恢复目标：逐步完成计划书，每步提交推送，监测额度。Penpot实时连接已恢复并核对file/page/01一致。
+- 已完成并验证：工具执行元数据补丁（见doc/agent/chat-implementation-progress.md末节），CTest3/3通过；本步作为M3中间检查点提交推送。
+- 环境：python需conda base（-NoProfile时用conda shell.powershell hook）；本机无pwsh，build.py拒绝运行，构建用cmake --build build --config Release --target … --parallel 2，测试用ctest --test-dir build -C Release -R …，均经Tee-Object写日志。
+- 下一步：按实时Penpot01实现工具结果卡（420×50，图标(12,16,18,18)、标题(40,6)、摘要(40,27)），读取execution显示已执行/拒绝等状态；再补M3剩余验收、MCP回归，M3最终检查点后进入M4。
+
+---
+
+## 当前有效交接入口（2026-11-17，用户要求交接）
+
+- 目标保持暂停。本轮仅核对状态及更新交接，不恢复开发、不编译测试、不提交推送。接手者须先读AGENTS.md、本节和下节暂停记录，再读《内置Agent聊天框实施计划书.md》及doc/agent/chat-implementation-progress.md、doc/agent/chat-m3-lifecycle-audit.md。
+- 已核对真实Git状态：分支master，HEAD d42ac92a94e4cf00a2f0741a3d5a96f7938de6a0；M1/M2完成，M3全部实施仍在工作区，M4/M5未开始。不要清理、重置或覆盖未提交文件；没有交付新ZIP。完整修改/新增文件由git status --short --ignore-submodules查看，包含agent/chat模块、两个现有命令模块的只读身份快照、Song最小重置通知、对应测试/中文翻译和文档。
+- 最后可靠验证是元数据补丁之前：Release8/8、ChatDockTest与ChatToolTurnTest CTest2/2通过15.34秒，QtTest12+17通过，日志build/agent-chat-m3-dock-tools-{build,tests}.log。本轮重新读取该测试日志末尾确认通过。最后三处execution元数据补丁的编译/测试/格式化仍未执行，不能用前述29项为新补丁背书。下节明确列出这三处文件和下一步。
+- 当前工具目录未提供Penpot工具，不能用历史几何替代实时连接检查。用户恢复后，应先恢复并验证Penpot正确file/page连接；不可连接则按计划停止实施。当前因用户暂停保持paused，不将目标改为blocked，也不请求人工验收。
+- Penpot定位：file 509f8c9c-0e43-811a-8008-f310b05ce9db；page 509f8c9c-0e43-811a-8008-f310b05ce9dc；主画板01 f437380c-ddd4-80ad-8008-f3157cd3a933。实时设计是布局依据，历史记录只是定位索引。
+- 恢复后的具体顺序：核对用户恢复指令/Git工作区→实时Penpot→审查和格式化未验证元数据补丁→完成结果状态卡及针对性验证→补M3剩余删除入口/自身重置与重入等必要验收和既有MCP回归→完成M3检查点提交推送并核对→才开始M4。复用ToolRegistry、CommandBus、agent.runScript，不重新实现编辑工具，不做无关重构。
+- 构建必须先查同工程其他运行任务，原目录Windows工具链、SDK脚本、前台PowerShell PTY与build.log；优先现有python buildtools/build.py进度脚本，jobs2；GUI只用真实Windows窗口，禁止offscreen/WSL。人工厂商/完整DAW项MANUAL/PENDING不阻塞；生产D:/Program Files/LMMS未修改。额度不可可靠读取，本次为普通交接，由当前Agent整理，未委派Luna。
+
+---
+
+## 用户暂停：M3 工具结果卡准备中（2026-11-16）
+
+- 用户明确将目标设为paused，已停止开发；没有活动构建或测试，没有提交/推送本轮修改。master HEAD d42ac92a9，全部M3修改保留。M1/M2已推送，M4/M5未开始，无新ZIP。
+- 暂停前重新实时确认Penpot正确file/page，读取01工具结果卡：420×50，图标(12,16,18,18)、标题(40,6)、摘要(40,27)。尚未实现结果卡布局，不得报告已完成。
+- 刚完成最小原子写入：ChatToolDispatcher两类outcome新增approvalRequired与executed，区分真实调用handler与批准前失败；ChatController::appendToolResult新增可选execution参数，把实际command/arguments/approvalRequired/executed仅保存到本地工具消息，不加入发给模型的canonical tool结果。修改文件src/agent/chat/ChatToolDispatcher.cpp、include/agent/chat/ChatController.h、src/agent/chat/ChatController.cpp。本次新增元数据尚未编译/测试/最终格式化，下面上一轮29项通过仅覆盖此前状态。
+- 后续仅在用户恢复目标后继续：先实时Penpot和工作区核对；检查上述元数据改动，按参考实现结果卡及验证，随后继续原M3剩余项。不要重写已完成侧栏批准/详情或扩大范围。用户暂停期间不启动构建、测试、提交或下一阶段。
+- 当前没有可靠额度接口；此次交接因用户暂停，由当前Agent更新，未委派Luna。保留所有未提交修改和日志。
+
+---
+
+## M3 IN PROGRESS：侧栏工具批准接线已验证（2026-11-16）
+
+- 当前仍执行根计划M1～M5。M1/M2 DONE已提交推送；master HEAD d42ac92a9，M3全部修改未提交，M4/M5未开始，无ZIP、生产未修改。当前没有活动构建/测试。本轮开始实时Penpot正确file/page/01可连接，查询查看变更入口；没有独立详情画板，采用现有原生QMessageBox可展开详情，不自拟新面板几何。
+- ChatDock现已setToolsEnabled(true)，实际侧栏公开目录并连接ChatTranscript批准卡。卡片仅显示原会话的待批准调用；等待状态进入会话列表和footer。decide回传原快照，查看变更显示完整参数/展开script/vars/seed、目的和目标等，移除运行时token。详情是只读原生组件，不执行dryRun。卡片跟随底部滚动且保留用户上翻位置。
+- 两个会话删除入口均在删除前stop原会话：管理页新增sessionAboutToRemove信号，侧栏删除以会话ID快照迭代，避免stop同步刷新列表后继续使用失效item指针。Controller保存每个工具结果后立即通知原会话，避免视图草稿仍携带过时消息；信号后用QPointer检查存活/是否取消。未改既有工程编辑语义。
+- 新增真实侧栏测试nativeDockApprovalAndScriptDetails：本机HTTP返回拒绝改名+agent.runScript，实际点击发送/拒绝/详情展开/批准；完整script、vars、seed42可读，token不显示；批准后实际轨道名Scripted from dock，下一请求携带结果，最后Done且会话5条消息。使用真实Engine/CommandBus、LMMS样式和Windows窗口；不是厂商API实测。既有nativeTextConversation相应初始化真实Engine，不加入测试专用生产分支。
+- Release8/8成功（74秒），输出build/Release/lmms.exe；lrelease4155 finished/0 unfinished。ChatDockTest+ChatToolTurnTest CTest2/2通过15.34秒，QtTest12+17 passed/0 failed/skip；日志build/agent-chat-m3-dock-tools-{build,tests}.log。测试窗口均已关闭，无offscreen/Computer Use，插件未重建/迁移。
+- 用户询问阶段/范围，已说明仍为M3、无无关扩张；改动限计划内聊天、协议、批准、生命周期通知/身份快照、相应测试和文档，未进入M4或无关重构。Song的最小重置通知用于工程替换失效，不是工程处理方案重写。
+- 下一最小任务：实时Penpot，完成已执行/拒绝等工具结果状态卡与原型对应；验证管理页/侧栏删除的实际入口、命令自身工程重置/重入及取消网络等尚缺分支，运行既有MCP回归和M3最终Chat目标检查。满足M3预定验收后更新记录、检查diff、提交推送并核对，再进入M4。不要重复已通过的八协议双轮/原生卡片基础实现，不把当前29项当作整个M3已完成。
+- 已限定格式化和git diff --check --ignore-submodules检查；保留全部M3工作区与日志，无可靠额度接口，不猜额度。人工厂商/完整DAW MANUAL/PENDING不阻塞。下面“侧栏尚未启用/详情未连接”历史以本节为准。
+
+---
+
+## M3 IN PROGRESS：八协议双轮与批准卡组件已验证（2026-11-16）
+
+- 实时 Penpot 正确 file/page/01 连接成功；读取全部13个画板名称及01批准区域实际几何。本轮按01实现卡片组件，未修改Penpot。master HEAD d42ac92a9，M3全部未提交；M1/M2 DONE已推送，M4/M5未开始，无ZIP，生产未动。当前无活动构建/测试。
+- ChatToolTurnTest新增八协议数据行，每个真实控制器通过本机HTTP接收两轮调用，逐轮批准实际track.setName，再发送实际结果并完成最终文本。Gemini两轮均无服务端ID，本地ID不同、工具结果配对、出站functionCall/functionResponse不伪造id；Claude signature、Responses encrypted_content、Gemini thoughtSignature两轮均保留。Release1/1通过，CTest1/1（5.26秒），QtTest16 passed/0 failed/skip；日志build/agent-chat-m3-protocol-turn-{build,tests}.log。首次测试helper深层JSON初始化漏括号已修正，compile-red单独保留。不是实际厂商联网验收。
+- ChatTranscript新增ChatApprovalCard原生QFrame/LMMS ToolButton，复用默认主题shield/check/open/close图标；420×157，title(39,13)、scope(14,48)、说明(14,73)，按钮(12,109,98,34)/(120,109,100,34)/(230,109,65,34)，来自实时Penpot01。完整批准快照通过approvalDecided/approvalDetailsRequested信号传出；决定后禁用两个决定按钮，同一快照刷新不会重启授权，新token恢复。令牌不持久化。setApproval({})隐藏卡；组件尚未与ChatDock连接，详情信号尚未打开详情界面。
+- 新增5条中文词条，lrelease生成4153 finished/0 unfinished。Release6/6成功（71秒），输出build/Release/lmms.exe。ChatDockTest首次卡片宽418失败：夹具漏产品agentMessages对象名，未应用现有border:none主题规则；只补测试对象名，生产UI未为测试改动。最终测试目标Release1/1成功；ChatDockTest CTest1/1通过8.66秒，QtTest12 passed/0 failed/skip。日志build/agent-chat-m3-approval-card-{build,fixture-red,tests}.log。
+- 已查看真实Windows截图build/agent-chat-approval-native.png：中文正常无方框、默认LMMS主题、按钮可见；原生几何断言、鼠标点击、完整script/vars/seed快照信号、重复决定禁用/新token/清空均通过。所有测试窗口已关闭，无offscreen/Computer Use。不是完整DAW工具卡端到端验收。
+- 下一最小任务：实时Penpot；连接ChatDock与卡片/控制器，按原会话显示批准、状态与结果，查看变更必须完整展示实际参数及展开script/vars/seed；侧栏删除与管理删除应立即stop原会话。补命令自身重置/重入与网络取消等必要回归，完成既有MCP回归和M3要求，才提交推送检查点。当前ChatController默认tools=false，ChatDock尚未调用setToolsEnabled，实际侧栏仍无新工具公开/执行，不可报告M3完成。
+- 已限定功能文件格式化，交付前git diff --check --ignore-submodules。保留全部M3修改和日志；无可靠额度接口，不猜额度。人工厂商/完整DAW MANUAL/PENDING不阻塞。下面历史未验证项以本节为准。
+
+---
+
+## M3 IN PROGRESS：控制器工具回合基础已验证（2026-11-16）
+
+- 实时 Penpot 正确 file/page/01 连接成功。本轮没有修改界面布局。master HEAD d42ac92a9，M3 全部修改未提交；M1/M2 DONE 已推送，M4/M5 未开始，无 ZIP、生产安装未动。当前无活动构建/测试。
+- ChatController 新增显式 setToolsEnabled（默认false；ChatDock尚未启用）、pendingApproval/decideTool/approvalRequested 接口。开启后的真实控制器从 dispatcher 获取本轮目录，完整响应后逐项批准/执行，持久化结构化实际结果，按原连接/Key/system prompt 和显式历史继续请求。不会暗传工程上下文。Gemini providerId 为空时生成本地唯一调用ID，保留 provider_call_id 缺省语义，但跨响应的 Gemini 专项集成还未验证。
+- 停止/外部工程替换为本轮尚未执行调用补齐取消结果，已完成 assistant 工具调用消息保持complete，避免下一次发送产生孤立 tool 结果。decide/dispatch 检查原会话和消息存在，删除后不执行、不复活。dispatcher 新增只读 executing()，用于命令自身重置工程时先保留实际返回结果，再终止余下调用；该命令自身重置及事件重入分支仍需专项验证。
+- 新增 tests/src/agent/ChatToolTurnTest.cpp，CMake已加入第11个Chat目标。真实 Windows Qt 窗口 + 本机HTTP + 实际Engine/CommandBus：多调用逐项拒绝/批准、默认等待、真实轨道改名和结果出站、无隐式上下文、停止配对并可新发、无需批准执行续答、工程替换旧批准失效、删除会话不执行均通过。没有用HTTP MCP执行，也没有mock编辑handler。
+- 续答重试 RED→GREEN：原M2回溯只允许连续失败assistant，遇到tool结果就误报无可重试请求（build/agent-chat-m3-continuation-retry-red.log）。现在跨过assistant/tool找最近user，保留已完成调用与结果，只重试模型。实测工具改名后手工改名，再重试续答仍保留手工值，未再批准/编辑；历史无重复user/工具执行。
+- 原目录configure通过。首次Release9/9成功；新增测试首次因假Key漏填在请求校验失败（非工具执行失败），修正夹具后基础5项通过；记录 build/agent-chat-m3-tool-turn-fixture-red.log。最终Release2/2成功（23秒），输出build/Release/lmms.exe；ChatProviderClientTest + ChatToolTurnTest CTest2/2通过7.08秒，QtTest18+8 passed、0 failed/skip。最终日志 build/agent-chat-m3-continuation-retry-{build,tests}.log。插件未重建/迁移。
+- 下一最小任务：先实时Penpot；补控制器跨协议多轮（尤其Gemini无ID/native）、取消网络/自身工程重置/重入和会话生命周期必要回归；按Penpot接原生批准卡与完整参数/脚本详情，再由ChatDock启用工具。当前实际侧栏仍未公开工具，不把控制器测试当完整聊天UI验收。模式变更影响后续调用，待批准调用不得改变授权。删除入口须立即stop原会话；完整M3及MCP回归通过后才提交推送阶段检查点。
+- 已格式化新增/修改功能代码；交付前检查git diff --check --ignore-submodules。保留全部已有M3工作区与日志；额度接口不可可靠读取，不猜额度。人工厂商/完整DAW仍MANUAL/PENDING，不阻塞。下面“Controller未实现”历史条目以本节为准。
+
+---
+
+## M3 IN PROGRESS：音符和路由目标 RED→GREEN（2026-11-16）
+
+- 本轮实时 Penpot 正确 file/page/01 可连接；同工程任务状态查询已恢复、冲突数0。先前查询等待已结束，当前没有活动构建/测试。master HEAD d42ac92a9，所有 M3 修改未提交；M1/M2 DONE 已推送，M4/M5 未开始，无 ZIP、生产安装未动。
+- MIDI 排序错误和 SVS 范围/稳定 ID 核对已通过实际总线回归：Release5/5通过，CTest1/1（1.07秒）、QtTest11 passed/0 failed/skip；日志 build/agent-chat-m3-note-target-{build,tests}.log。SVS 单数 id 选择也有无关音符变化回归。纯快照复用原字段解析和 noteDetail/noteJson，不重新实现编辑工具。
+- 新增路由 RED：待批准 model.setValue(path=/mixerChannel,value=1) 时混音通道A/B换位，旧批准把轨道路由到B。调度器增加 value 对应目标通道身份绑定，旧批准 target_changed/轨道路由保持0，新调用value2成功。最终 Release1/1通过（16秒），CTest1/1（1.13秒），QtTest12 passed/0 failed/skip，实际Windows窗口开启并关闭。日志 build/agent-chat-m3-routing-target-{red,build,tests}.log。
+- SVS 测试目录没有 SVSCompute.dll，日志有告警；本轮只验证实际音符编辑及批准，不报告合成已验证，也没有另建插件部署目录。原开发可执行文件 build/Release/lmms.exe 已更新，插件未重建。
+- 当前最小下一步：M3 ChatController 接入目录/dispatcher、逐项批准与结果历史、多调用续答、停止/会话删除/工程替换失效；Gemini 无 providerId 的内部ID须跨响应唯一。批准卡布局必须重新实时请求 Penpot。按计划完成M3自动验收及MCP回归后，才提交推送阶段检查点，不提前进入M4。
+- 本轮源文件格式化限新增范围，最终交付前再次 git diff --check --ignore-submodules 和检查 diff。无可靠额度接口，不猜额度。下面历史“待编译/接口无响应”已由本节结果取代。
+
+---
+
+## M3 IN PROGRESS：音符目标回归已复现，修复待编译（2026-11-16）
+
+- 目标、阶段和分支不变：M1/M2 DONE 已推送，master HEAD d42ac92a9；M3 全部修改未提交，M4/M5 未开始，无新 ZIP。
+- 实时 Penpot 正确 file/page/01 连接成功；本轮没有界面布局改动。仍复用 ToolRegistry、CommandBus 和 agent.runScript，没有重新实现工程编辑命令。
+- RED 已确认：待批准 midi.updateNote(note=0) 时移动原音符造成排序，旧批准把另一音符 key64 改成72。失败日志 build/agent-chat-m3-note-target-red.log；该失败属于尚未接入聊天的新增调度器。
+- 已写入修复：CoreCommands 纯目标快照复用 readNoteFilter/noteDetail，比较所选 MIDI 音符地址（仅比较、不跨等待解引用）和字段；SvsCommands 纯快照复用 readStringArray/readRange/noteJson，按 id/noteId/ids/noteIds/范围选择。dispatcher 执行前重新读取比较，不调用修改命令进行检查。新增 MIDI 排序拒绝后重新批准，以及 SVS 范围变化拒绝/无关音符变化不误拒绝用例。修复尚未编译，不能记 GREEN。
+- 编译前 Codex list_threads 查询持续无响应。原 cell571 在查询阶段终止，未启动构建；只读重试 cell577 同样无响应后终止。操作系统确认无 python/build.py、编译器或主构建进程，只有历史 MSBuild nodeReuse 工作节点。没有重复启动编译。验证状态 PENDING（同工程任务状态接口无响应，尚不能完成必需的并发检查）。这不是人工验收阻塞，不把目标标 blocked。
+- 已格式化本次新增范围，git diff --check --ignore-submodules 通过；git status 使用 --ignore-submodules，原 doc/wiki 子模块访问限制未处理。保留所有已有修改和日志；没有活动构建或遗留自动启动构建的查询。
+- 下一最小操作：重新查询同工程运行状态；成功且无冲突后，在原目录前台 SDK 环境运行 python buildtools/build.py --config Release --target lmms ChatToolDispatcherTest --jobs 2 --window，随后前台 ctest 运行 ChatToolDispatcherTest，读取 build.log 处理真实错误。确认 GREEN 后更新记录，再继续既定 M3 Controller/批准卡/工具续答接线。不要重跑已完成阶段或提前提交 M3。
+
+---
+
+## M3 IN PROGRESS：批准调度基础已验证（2026-11-16）
+
+- 目标仍为根计划M1～M5全量实施/逐阶段提交推送/Windows增量包；get_goal确认active、无预算。M1/M2 DONE已推送；当前master HEAD d42ac92a9。所有M3修改仍未提交，不能开始M4或将M3标DONE。
+- 开始前实时Penpot正确file/page/01连接成功。本轮不改界面布局。新增include/agent/chat/ChatToolDispatcher.h、src/agent/chat/ChatToolDispatcher.cpp及tests/src/agent/ChatToolDispatcherTest.cpp，CMake已接入；CoreCommands.h/.cpp仅新增纯目标身份元数据函数，不改既有命令语义/名称/schema。
+- 调度器绑定本轮目录、会话/轮次/调用ID/完整参数/令牌/工程代次；默认包括只读都请求批准。decide按原上下文和参数核对，拒绝/篡改零执行；授权在进入CommandBus前消费，重复批准/同轮重复ID不重放。无需批准也GUI队列执行且可取消。取消/项目重置或销毁使待授权与旧队列令牌失效；同步业务已开始后不承诺中断。
+- 复用CoreCommands现有addressableModels与CommandTargets解析，比较QPointer/名称；只读身份元数据不序列化工程，不执行getContext。明确轨道/片段/参数等选择器绑定相关子树，动态脚本或全局调用绑定整体对象作用域。脚本批准前展开内置内容/vars/实际seed，执行仍走原ScriptRunner总线；等待不持有批次/audio guard。新增QObject存活检查覆盖业务函数可能分发Qt事件的路径，但销毁中执行的专项交互还需集成验证。
+- 原目录configure通过；Release7/7成功（58秒），build/Release/lmms.exe；QM4148 finished/0 unfinished。ChatToolDispatcherTest CTest1/1通过1.10秒，QtTest9 passed/0 failed/skip，真实Windows Qt窗口开启后关闭，实际Engine/总线。覆盖只读等待/一次批准、拒绝、会话/轮次/ID/参数篡改、无需批准队列取消、同路径清空失效、轨道重排拒绝后新调用、无关轨道改名不误拒绝、脚本展开和实际成功脚本保留对象/零重载/批次结束。日志build/agent-chat-m3-dispatcher-{build,tests}.log。
+- 重要未完成：身份表当前只有QObject/名称，片段内部音符等索引值对象未绑定；须按MIDI/SVS等实际工具参数补针对性回归与校验后才能正式启用。ChatController仍未传入目录，也没有连接dispatcher；实际聊天没有新批准/工具执行路径。会话删除/停止、完整多调用续答和Penpot批准卡也未接线。M3不能凭本次基础测试提前完成。
+- 下一最小任务：先实时Penpot检查，补子元素/跨对象选择器目标核对（以实际参数及回归为依据），再连接ChatController的目录/调度/结果历史/多调用与续答、取消/会话删除。Gemini无providerId时decoder内部gemini_0等跨响应重复，整轮控制器需生成本地唯一ID并保留providerId缺省语义，避免seenCalls把新调用误判重放。按实时Penpot实现批准卡、完整脚本详情；完成M3必要自动验证和既有MCP回归才提交/推送检查点。
+- 既有M3目录/schema测试Release8/8、CTest2/2（5.59秒，QtTest12+18）与生命周期Release100/100、CTest1/1（1.18秒，QtTest5）记录见下文及doc/agent/chat-m3-lifecycle-audit.md。M3目前共10个Chat测试目标，但尚未整体验证，不声称10/10。
+- 已检查限定格式、源码diff、git diff --check；新文件no-index --check无空白问题输出（no-index返回1为新文件差异）。工作区保留前轮所有M3修改与新文件，.codegraph/、build.log、build-driver.log未跟踪保留。无活动构建/测试，无ZIP，插件/生产安装未动。真实厂商/完整DAW人工项MANUAL/PENDING，不作阻塞。
+- 约束：只完成计划范围，无无关重构；Windows原目录、无WSL/offscreen/当前阶段无Computer Use；前台PowerShell+UTF8 build.log、优先Python进度脚本、jobs2，每次编译前查同工程任务。额度接口不可可靠读取，不猜订阅/余额。
+
+---
+
+## M3 IN PROGRESS：工具目录和协议声明基础（2026-11-16）
+
+- 实时Penpot01正确file/page连接成功。本轮不改界面布局。M2 ad3618354/d42ac92a9已推送；当前master HEAD d42ac92a9，M3所有本轮及生命周期修改仍未提交，不提前完成阶段检查点。
+- 新增include/agent/chat/ChatTools.h及src/agent/chat/ChatTools.cpp，CMake已接入。ChatToolCatalog从ToolRegistry::tools读取schema元数据，线名lmms_前缀、_d点号/_u下划线，反向仅查本轮快照。resolve复用src/agent/CommandSchema.h的validateArguments，返回ChatToolCall结构，不执行handler/总线/dryRun，不调用getContext。模型自带command字段不作为执行命令。
+- buildChatRequest及ProviderClient::start增加默认空的显式tools参数；Chat/兼容/Azure、Responses、Claude、Gemini声明各自编码。Gemini parametersJsonSchema保留原JSON schema；OpenAI族strict:false保留可选参数语义。custom启用工具须toolFormat/toolHistoryFormat=openai-chat、responseToolCallsPath；有requestTemplate时须引用${tools}。不隐式装载目录。
+- 重要：ChatController目前仍未传入目录！真实聊天尚无新工具公开/批准/执行路径。本轮是M3基础模块，不是完整工具回合，也不是M3 DONE。前轮最小projectAboutToReset通知及生命周期测试保留，工程代次维护/目标身份绑定还没实现。
+- 原目录configure通过；Release8/8成功（1分07秒），build/Release/lmms.exe，QM4137 finished/0 unfinished。ChatRequestTest+ChatProviderClientTest CTest2/2通过5.59秒，QtTest12/18 passed、0 failed/skip。新增目录快照与探针零执行、参数/伪造command字段、八协议声明结构与缺项错误、本机HTTP完整目录及只含显式消息。日志build/agent-chat-m3-tool-schema-{build,tests}.log。没有GUI几何变化或新增真实厂商验收结论。
+- 已检查本轮新增模块可读性/格式，git diff --check通过。现有未提交M3文件包括Song通知、ChatProjectLifetimeTest/tests CMake、ChatTools、请求/网络层、两个协议测试、中文词条及计划/进度/来源/核对文档；.codegraph/和两个build日志保持未跟踪。无活动构建/测试，无ZIP，生产与插件目录未改。真实厂商/完整DAW人工项MANUAL/PENDING，不阻塞。
+- 下一最小任务：实时确认Penpot后接批准调度器及ChatController实际目录/工具循环。绑定调用ID/完整参数/原会话轮次/工程代次，批准后重新解析目标身份；默认只读也请求批准，批准恰好一次/拒绝零执行，取消/工程替换/会话删除失效；脚本展示展开内容/vars/实际seed，复用原总线事务。再按实时Penpot接批准卡与协议续答，完成M3要求和MCP回归，才阶段提交/推送。M4/M5未开始。
+- 继续遵守计划范围、无无关重构；Windows原目录/无WSL/offscreen；前台PowerShell日志、Python进度脚本、jobs2；每次编译前查同工程运行任务。没有可靠额度接口，不猜额度。
+
+---
+
+## M3 IN PROGRESS：最小工程生命周期通知（2026-11-16）
+
+- M2已完成并推送：实现ad3618354、记录d42ac92a9。当前master/HEAD d42ac92a9，M3本轮修改尚未提交，不提前完成M3阶段检查点。
+- 开始前实时连接正确Penpot file/page及01，另读批准节点几何；本轮没有修改界面。已核对ToolRegistry/CommandBus/CommandSchema/CommandTargets、Song及ProjectJournal、ScriptRunner接口。证据与后续边界见doc/agent/chat-m3-lifecycle-audit.md。
+- 现有projectLoaded不覆盖直接clearProject/restoreProjectState；projectFileNameChanged不能覆盖同路径重载。根据计划§8“现有信号不覆盖时才补最小通知”，仅在Song信号列表末尾添加projectAboutToReset，并在clearProject的loading guard生效后、删除对象/持有audio guard前emit。无新增Song数据字段，不改变原信号顺序或事务行为。工程代次还未由聊天调度器维护，批准绑定未实现，不能把此基础通知记为完整隔离。
+- 已修改include/Song.h、src/core/Song.cpp、tests/CMakeLists.txt；新增tests/src/agent/ChatProjectLifetimeTest.cpp及doc/agent/chat-m3-lifecycle-audit.md；更新计划和进度。保留.codegraph/、build.log、build-driver.log，不清理。
+- 原目录configure成功；Release100/100源文件成功（10分23秒），输出build/Release/lmms.exe。ChatProjectLifetimeTest CTest1/1通过1.18秒，QtTest5 passed/0 failed/skip；创建并关闭真实Windows Qt窗口，无offscreen。验证通知先于旧QPointer删除、通知时project_busy、实际load/template/restore及snapshot undo/redo，普通track.setName保留对象且不通知。日志build/agent-chat-m3-lifecycle-{build,tests}.log。不是完整DAW视觉验收；直接createNewProject无模板分支当前为静态调用证据。
+- 编译只出现既有ConfigManager.cpp/main.cpp的nodiscard警告，不在本任务修复。插件未重建/迁移，生产未修改，无新ZIP。当前没有活动构建/测试；git diff --check通过。真实厂商与完整DAW人工项仍MANUAL/PENDING，不阻塞。
+- 下一最小任务：实时确认Penpot连接后实现M3工具schema公开/合法线名反向映射及批准调度器，复用总线，不暗调用getContext。绑定call ID/完整参数/会话轮次/工程代次；重新解析目标身份；默认包括只读都请求批准，批准恰好一次/拒绝零执行，取消与工程替换失效；完整脚本内容/vars/seed展示。再做协议工具续答及实时Penpot批准卡布局，完成M3要求与MCP回归后才提交/推送阶段检查点。M4/M5未开始，整体目标保持进行中。
+- 约束继续有效：仅计划范围、不做无关重构；原生Windows、无WSL/offscreen；前台PowerShell+build.log、优先Python进度脚本、jobs2；每次编译前检查同工程其他运行任务。未发现可可靠读取额度的接口，不猜额度。
+
+---
+
 ## M2 DONE：阶段检查点已推送（2026-11-16）
 
 - M2计划范围实施及自动验收完成。新增失败重试复用Penpot01既有发送位置与底部状态文字，无新增几何；实时读11/13及页面错误相关节点，未发现专用重试按钮。ChatController重试保留原用户消息/失败尝试，以retryOf追加assistant；复用附件快照，缺内容要求重选，保留草稿且不会自动重放。

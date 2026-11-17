@@ -314,6 +314,7 @@ void ChatSessionsDialog::deleteSelected()
 	for (const auto& id : m_checked)
 	{
 		QString error;
+		emit sessionAboutToRemove(id);
 		if (!m_store.removeSession(id, error))
 		{
 			reportError(error);

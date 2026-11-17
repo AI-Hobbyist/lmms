@@ -4,7 +4,10 @@
 #include <QUrlQuery>
 #include <QtTest>
 
+#include "agent/CommandBus.h"
+#include "agent/ToolRegistry.h"
 #include "agent/chat/ChatContent.h"
+#include "agent/chat/ChatTools.h"
 
 using namespace lmms::agent::chat;
 
@@ -12,6 +15,138 @@ class ChatRequestTest : public QObject
 {
 	Q_OBJECT
 private slots:
+	void registryCatalogDoesNotExecute()
+	{
+		static int executions = 0;
+		executions = 0;
+		ChatToolCatalog before;
+		QString error;
+		QVERIFY2(before.load(error), qPrintable(error));
+		lmms::agent::CommandDescriptor descriptor;
+		descriptor.name = "chat.catalog_probe";
+		descriptor.summary = "Probe catalog metadata without executing this handler.";
+		descriptor.argsSchema
+			= {{"type", "object"},
+			   {"additionalProperties", false},
+			   {"properties", QJsonObject{{"value", QJsonObject{{"type", "integer"}, {"minimum", 0}, {"maximum", 9}}}}},
+			   {"required", QJsonArray{"value"}}};
+		descriptor.handler = [](const QJsonObject&) {
+			++executions;
+			return lmms::agent::CommandResult::success();
+		};
+		QVERIFY(lmms::agent::CommandBus::instance().registerCommand(descriptor));
+		ChatToolCatalog catalog;
+		QVERIFY2(catalog.load(error), qPrintable(error));
+		QCOMPARE(catalog.definitions().size(), lmms::agent::ToolRegistry::tools().size());
+		QVERIFY(!catalog.nameForCommand("agent.runScript").isEmpty());
+		QVERIFY(catalog.nameForCommand("agent.getContext").isEmpty());
+		const auto name = catalog.nameForCommand(descriptor.name);
+		QCOMPARE(name, QStringLiteral("lmms_chat_dcatalog_uprobe"));
+		const QJsonObject call{
+			{"id", "call-1"}, {"name", name}, {"arguments", QJsonObject{{"value", 7}}}, {"command", "project.clear"}};
+		ChatToolCall resolved;
+		QVERIFY(!before.resolve(call, resolved, error));
+		QVERIFY2(catalog.resolve(call, resolved, error), qPrintable(error));
+		QCOMPARE(resolved.command, descriptor.name);
+		QCOMPARE(resolved.wireName, name);
+		QCOMPARE(resolved.arguments.value("value").toInt(), 7);
+		for (const auto& arguments : QJsonArray{QJsonObject{}, QJsonObject{{"value", 10}}, QJsonObject{{"value", "7"}},
+												QJsonObject{{"value", 1}, {"extra", true}}, QJsonArray{7}})
+		{
+			auto invalid = call;
+			invalid.insert("arguments", arguments);
+			QVERIFY(!catalog.resolve(invalid, resolved, error));
+			QVERIFY(resolved.command.isEmpty());
+			QVERIFY(!error.isEmpty());
+		}
+		auto unknown = call;
+		unknown.insert("name", descriptor.name);
+		QVERIFY(!catalog.resolve(unknown, resolved, error));
+		QCOMPARE(executions, 0);
+	}
+
+	void protocolToolDeclarations()
+	{
+		const QJsonObject schema{{"type", "object"},
+								 {"properties", QJsonObject{{"value", QJsonObject{{"type", "integer"}}}}}};
+		const QJsonArray tools{
+			QJsonObject{{"name", "lmms_fixture"}, {"description", "Fixture tool"}, {"inputSchema", schema}}};
+		const QJsonArray history{QJsonObject{{"role", "user"}, {"content", "Hello"}}};
+		for (const auto& protocol : ChatConnection::protocols())
+		{
+			auto connection = ChatConnection::create();
+			connection.protocol = protocol;
+			connection.baseUrl = "https://example.com/v1";
+			connection.model = "fixture-model";
+			if (protocol == "custom-json")
+			{
+				connection.mapping
+					= {{"path", "generate"},
+					   {"toolFormat", "openai-chat"},
+					   {"toolHistoryFormat", "openai-chat"},
+					   {"responseToolCallsPath", "calls"},
+					   {"requestTemplate", QJsonObject{{"history", "${messages}"}, {"functions", "${tools}"}}}};
+			}
+			ChatRequest request;
+			QString error;
+			QVERIFY2(buildChatRequest(connection, "fake-key", "", history, request, error, tools),
+					 qPrintable(protocol + error));
+			auto declarations = request.body.value(protocol == "custom-json" ? "functions" : "tools").toArray();
+			QCOMPARE(declarations.size(), 1);
+			if (protocol == "gemini")
+			{
+				declarations = declarations[0].toObject().value("functionDeclarations").toArray();
+			}
+			auto function = declarations[0].toObject();
+			if (protocol != "gemini" && protocol != "anthropic-messages" && !protocol.endsWith("responses"))
+			{
+				QCOMPARE(function.value("type").toString(), QStringLiteral("function"));
+				function = function.value("function").toObject();
+			}
+			QCOMPARE(function.value("name").toString(), QStringLiteral("lmms_fixture"));
+			const auto field = protocol == "gemini"
+				? "parametersJsonSchema"
+				: (protocol == "anthropic-messages" ? "input_schema" : "parameters");
+			QCOMPARE(function.value(field).toObject(), schema);
+			if (protocol != "gemini" && protocol != "anthropic-messages")
+			{
+				QCOMPARE(function.value("strict"), QJsonValue(false));
+			}
+			if (protocol == "custom-json")
+			{
+				connection.mapping.insert("requestTemplate", QJsonObject{{"history", "${messages}"}});
+				QVERIFY(!buildChatRequest(connection, "fake-key", "", history, request, error, tools));
+				connection.mapping.remove("requestTemplate");
+				connection.mapping.remove("toolFormat");
+				QVERIFY(!buildChatRequest(connection, "fake-key", "", history, request, error, tools));
+			}
+		}
+	}
+
+	void invalidToolDeclarations()
+	{
+		auto connection = ChatConnection::create();
+		connection.baseUrl = "https://example.com/v1";
+		connection.model = "fixture-model";
+		const QJsonObject valid{
+			{"name", "fixture"}, {"description", "Fixture tool"}, {"inputSchema", QJsonObject{{"type", "object"}}}};
+		const QJsonArray history{QJsonObject{{"role", "user"}, {"content", "Hello"}}};
+		for (const auto& tools : {QJsonArray{valid, valid},
+								  QJsonArray{QJsonObject{{"name", "has.dot"},
+														 {"description", "Fixture tool"},
+														 {"inputSchema", QJsonObject{{"type", "object"}}}}},
+								  QJsonArray{QJsonObject{{"name", "fixture"},
+														 {"description", "Fixture tool"},
+														 {"inputSchema", QJsonObject{{"type", "array"}}}}}})
+		{
+			ChatRequest request;
+			QString error;
+			QVERIFY(!buildChatRequest(connection, "fake-key", "", history, request, error, tools));
+			QVERIFY(request.body.isEmpty());
+			QVERIFY(!error.isEmpty());
+		}
+	}
+
 	void customRequestTemplate()
 	{
 		auto connection = ChatConnection::create();

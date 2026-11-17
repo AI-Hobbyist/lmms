@@ -7,7 +7,7 @@
 - M1 DONE，已推送提交fd978a60d、c39002397。
 - M2实施及自动验收DONE：16预设、8协议、SSE/JSON、原生凭据、模型能力参数、自定义模板/错误映射、附件实际输入/快照、原生消息展示及失败重试。阶段实现提交ad3618354已推送origin/master，远端哈希核对一致；M2检查点完成，下一阶段为M3。
 - Release开发程序build/Release/lmms.exe；全部8项Chat目标更新成功，CTest8/8通过13.24秒，QtTest71 passed/0 failed/skip；QM4131。记录与逐协议人工状态见[chat-m2-validation.md](chat-m2-validation.md)。真实厂商缺Key项MANUAL/PENDING，不冒充实测。
-- M3～M5 NOT STARTED；内部工具执行/批准、搜索与下载及最终ZIP尚未交付。联网搜索默认关闭、SearXNG默认后端，模型自带搜索属于M4。
+- M3 IN PROGRESS：生命周期、目录、协议声明及批准调度基础已验证；MIDI/SVS 音符与混音路由目标经过 RED→GREEN（调度器QtTest12项通过）。控制器已显式接入逐项批准、实际结果续答、停止/工程替换和续答重试，最新Release2/2、CTest2/2（7.08秒），QtTest18+8通过。八协议双轮实际工具回合已验证（QtTest16项）；按实时Penpot实现的批准卡组件经真实窗口/截图和ChatDockTest12项验证。实际侧栏已启用工具，批准/完整脚本详情与删除前取消已接线；最新Release8/8，ChatDockTest+ChatToolTurnTest的29项通过。结果状态卡、删除实际入口/重入专项及MCP回归待完成，M3未完成检查点。M4～M5 NOT STARTED；搜索与下载及最终ZIP尚未交付。联网搜索默认关闭、SearXNG默认后端，模型自带搜索属于M4。
 - 以下为按实施时间保留的历史日志；早期“发送禁用/尚无附件”等状态以本节和最新验收记录为准。
 
 ## M1 范围与复用
@@ -204,3 +204,23 @@
 - CTest ChatRequestTest/ChatResponseTest/ChatProviderClientTest 3/3通过，4.87秒；QtTest分别9/12/16 passed，0 failed/skip。新增模板嵌套数组/对象/布尔/null与system内容、未知占位符/缺messages拒绝、消息含占位符不解释；本机HTTP同时验证JSON/SSE两种出站模板正文、成功响应、自定义错误与Key脱敏。另测数组索引错误路径及空路径拒绝。日志build/agent-chat-m2-custom-template-{build,tests}.log。没有真实厂商API调用，也没有新增GUI验收结论。
 - 格式化限定本轮5个新增M2源/测试文件，检查新增实现可读性及git diff --check通过。当前master，M1 c39002397已推送；M2仍IN PROGRESS、全部未提交，无活动构建/测试，无ZIP，生产未动。人工真实厂商/完整DAW验收MANUAL/PENDING。
 - 下一最小任务：按实时Penpot确认失败重试入口（本轮11按名称/characters搜索无匹配，不能据此认定设计没有该状态；需读取实际节点/文本API或相关板），补计划内可用重试，再核对附件能力声明与支持类型、完整M2验收及所有8项Chat回归。完成阶段后更新记录/提交/推送确认，再进入M3；M3～M5未开始。禁止扩大计划范围、无关重构、WSL/offscreen。
+
+
+## M3 开始：生命周期核对
+
+实时Penpot01连接成功；ToolRegistry/CommandBus及Song/ProjectJournal路径已核对。发现现有projectLoaded无法覆盖直接清空/恢复，按计划条件增加最小projectAboutToReset信号，不增加Song字段或改变事务语义。详见chat-m3-lifecycle-audit.md。配置通过，Release100/100成功；ChatProjectLifetimeTest CTest1/1通过1.18秒、QtTest5 passed/0 failed/skip。只有生命周期基础完成，M3批准/执行尚未接线；日志build/agent-chat-m3-lifecycle-{build,tests}.log。
+
+
+## M3 工具目录和声明基础
+
+ChatToolCatalog复用注册表及纯schema校验，线名反查绑定目录快照；八协议工具声明和custom缺项拒绝已实现。Release8/8、QM4137、CTest2/2通过5.59秒；QtTest12+18 passed/0 failed/skip。详见chat-m3-lifecycle-audit.md与build/agent-chat-m3-tool-schema-{build,tests}.log。ChatController仍未传入目录，批准和真实执行循环未接线，不标M3完成。
+
+
+## M3 批准调度基础
+
+新增ChatToolDispatcher及复用既有模型解析的纯身份表。Release7/7、QM4148；真实Windows窗口/现有总线专项CTest1/1通过1.10秒，QtTest9 passed/0 failed/skip。覆盖默认只读批准、拒绝/篡改零执行、队列取消、工程代次失效、轨道重排与脚本成功保留对象。详见chat-m3-lifecycle-audit.md；内部音符等索引目标及正式聊天/批准卡接线仍未完成，不能标M3 DONE。
+
+
+## M3 工具执行元数据（2026-11-17）
+
+ChatToolDispatcher两类结果新增approvalRequired/executed；ChatController::appendToolResult把command/arguments/approvalRequired/executed仅存入本地工具消息execution字段，不进入发给模型的tool结果。ChatToolTurnTest新增拒绝(executed=false)/批准(executed=true)及出站不含execution断言。Release构建通过；ChatDockTest/ChatToolDispatcherTest/ChatToolTurnTest CTest3/3通过（真实Windows窗口，QT_QPA_PLATFORM未设置）。日志build/agent-chat-m3-execution-meta-{build,tests}.log。本机无pwsh，build.py不可用，改用同目录cmake --build/ctest前台执行。M3未完成：工具结果卡、剩余删除/重置重入验收及MCP回归待做。

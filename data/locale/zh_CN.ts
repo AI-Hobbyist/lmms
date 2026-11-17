@@ -17499,4 +17499,109 @@ Latency: %2 ms</source>
         <translation>请求失败 · 点击发送按钮重试</translation>
     </message>
 </context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Load the chat tool catalog on the application thread.</source>
+        <translation>请在应用主线程加载聊天工具目录。</translation>
+    </message>
+    <message>
+        <source>A registered tool cannot be represented as a model function: %1</source>
+        <translation>已注册工具无法转换为模型函数：%1</translation>
+    </message>
+    <message>
+        <source>The model requested a tool that was not offered in this turn.</source>
+        <translation>模型请求了本轮未提供的工具。</translation>
+    </message>
+    <message>
+        <source>Configure custom tool declarations, the call path and result history before enabling tools.</source>
+        <translation>启用工具前，请配置自定义工具声明、调用路径和结果历史格式。</translation>
+    </message>
+    <message>
+        <source>Chat tool declarations require distinct valid names and object schemas.</source>
+        <translation>聊天工具声明需要各不相同的有效名称及对象参数 schema。</translation>
+    </message>
+    <message>
+        <source>The custom request template must include the tools placeholder when tools are enabled.</source>
+        <translation>启用工具时，自定义请求模板必须包含 tools 占位符。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Start a distinct chat tool turn on the application thread.</source>
+        <translation>请在应用主线程开始独立的聊天工具轮次。</translation>
+    </message>
+    <message>
+        <source>The current project is unavailable or being replaced.</source>
+        <translation>当前工程不可用或正在替换。</translation>
+    </message>
+    <message>
+        <source>The project changed. Request a new tool call.</source>
+        <translation>工程已变化，请重新请求工具调用。</translation>
+    </message>
+    <message>
+        <source>No chat tool turn is ready for another call.</source>
+        <translation>当前没有可接收新调用的聊天工具轮次。</translation>
+    </message>
+    <message>
+        <source>This tool call ID has already been handled in the current turn.</source>
+        <translation>此工具调用 ID 已在当前轮次处理过。</translation>
+    </message>
+    <message>
+        <source>The requested script is empty or unknown.</source>
+        <translation>请求的脚本为空或不存在。</translation>
+    </message>
+    <message>
+        <source>This tool approval is no longer pending.</source>
+        <translation>此工具批准已不再待处理。</translation>
+    </message>
+    <message>
+        <source>The approval no longer matches the original tool call.</source>
+        <translation>批准已不匹配原始工具调用。</translation>
+    </message>
+    <message>
+        <source>The user denied this tool call.</source>
+        <translation>用户已拒绝此工具调用。</translation>
+    </message>
+    <message>
+        <source>The tool target changed. Request approval again.</source>
+        <translation>工具目标已变化，请重新请求批准。</translation>
+    </message>
+    <message>
+        <source>The chat tool turn was canceled.</source>
+        <translation>聊天工具轮次已取消。</translation>
+    </message>
+    <message>
+        <source>Approve to execute the internal project tool</source>
+        <translation>批准后调用工程内部工具执行</translation>
+    </message>
+    <message>
+        <source>Approve once</source>
+        <translation>批准本次</translation>
+    </message>
+    <message>
+        <source>View changes</source>
+        <translation>查看变更</translation>
+    </message>
+    <message>
+        <source>Deny</source>
+        <translation>拒绝</translation>
+    </message>
+    <message>
+        <source>Awaiting approval: %1</source>
+        <translation>待批准：%1</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Tool call details</source>
+        <translation>工具调用详情</translation>
+    </message>
+    <message>
+        <source>Awaiting tool approval</source>
+        <translation>等待工具批准</translation>
+    </message>
+</context>
 </TS>

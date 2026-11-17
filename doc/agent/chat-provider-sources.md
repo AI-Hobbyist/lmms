@@ -52,3 +52,8 @@ SSE分帧依据[WHATWG Server-sent events](https://html.spec.whatwg.org/multipag
 requestTemplate为完整出站JSON对象，替代默认正文；不配置时保留原有字段重命名方式。占位符必须占据整个字符串值，引用模板应用前的请求字段（model/messages/stream，以及实际启用的temperature、思考参数），保留数组、对象、数值和布尔类型。必须包含${messages}；其中已有system消息、对话和工具结果，不再递归解释消息里的占位符。模板常量保持原样，不运行任何脚本，也不做字符串拼接。温度或思考参数启用时，模板需显式引用对应字段以发送它们。API Key在模板应用后按认证配置写入，不作为模板变量。
 
 responseErrorPath默认error，可使用对象字段及数组索引的点路径，例如failures.0.message。指向字符串或含message字符串的对象；缺失、null、false和空字符串表示没有错误，其他类型报告映射错误。普通JSON和SSE都先检查错误，再读取文本/完成状态；配置路径不允许为空。协议错误仍经过现有Key脱敏。自定义字段含点号的键名不支持转义；不将未知路径语法当脚本执行。
+
+
+M3工具声明适配核对：[OpenAI Chat函数定义](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、[Responses及strict规则](https://developers.openai.com/api/docs/guides/function-calling)、[Claude工具声明](https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools)、[Gemini FunctionDeclaration](https://aistudio.google.com/api-reference/caching#FunctionDeclaration)。内部点号命令名保持原样，通过本轮目录对应合法线名；不把MCP定义对象直接原样发送。Chat使用function包装，Responses使用平铺函数对象，Claude使用input_schema，Gemini使用parametersJsonSchema保留JSON schema。注册表有真正可选参数，OpenAI族显式strict:false以保留现有参数语义，执行前仍由程序校验。
+
+自定义工具声明启用条件：mapping必须明确toolFormat=openai-chat、toolHistoryFormat=openai-chat以及非空responseToolCallsPath。模板正文还必须引用${tools}，否则发请求前报配置错误。工具声明快照通过ProviderClient显式参数传入，不隐式加载注册表、读取工程或执行工具；截至本轮仅测试请求构造与本机HTTP，聊天控制器和批准调度仍未接线，真实厂商MANUAL/PENDING。

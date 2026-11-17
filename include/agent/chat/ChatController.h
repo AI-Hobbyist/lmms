@@ -12,6 +12,7 @@
 namespace lmms::agent::chat {
 
 class ChatProviderClient;
+class ChatToolDispatcher;
 
 class ChatController : public QObject
 {
@@ -28,6 +29,9 @@ public:
 	bool active() const;
 	QString activeSessionId() const;
 	QJsonObject currentMessage() const;
+	void setToolsEnabled(bool enabled);
+	QJsonObject pendingApproval() const;
+	bool decideTool(const QJsonObject& approval, bool approved, QString& error);
 
 signals:
 	void sessionChanged(const QString& sessionId);
@@ -35,6 +39,7 @@ signals:
 	void stateChanged();
 	void requestFailed(const QString& sessionId, const QString& error);
 	void attachmentStatus(const QString& sessionId, const QString& status, qint64 sent, qint64 total);
+	void approvalRequested(const QJsonObject& approval);
 
 private:
 	bool startTurn(const QString& sessionId, const ChatConnection& connection, const QString& key,
@@ -43,8 +48,24 @@ private:
 	bool savePreparedContent(const QString& userId, const QJsonArray& content, QString& error);
 	bool saveResult(QString& error);
 	void finish(const QString& status);
+	bool startRequest(const QJsonArray& history, QString& error);
+	void receiveTools(QJsonArray calls);
+	void dispatchNextTool();
+	bool appendToolResult(const QJsonObject& call, const QJsonObject& result, QString& error,
+		const QJsonObject& execution = {});
+	void abortTurn(const QString& reason, const QString& status);
 	ChatStore& m_store;
 	ChatProviderClient* m_client = nullptr;
+	ChatToolDispatcher* m_dispatcher = nullptr;
+	bool m_toolsEnabled = false;
+	bool m_toolTurn = false;
+	QJsonArray m_history;
+	QJsonArray m_pendingCalls;
+	int m_pendingIndex = 0;
+	ChatConnection m_connection;
+	QString m_key;
+	QString m_systemPrompt;
+	QString m_invalidatedReason;
 	QString m_sessionId;
 	QString m_turnId;
 	QJsonObject m_message;

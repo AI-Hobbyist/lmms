@@ -1,12 +1,17 @@
 #include "agent/chat/ChatController.h"
 
 #include <QCoreApplication>
+#include <QJsonDocument>
 #include <QPointer>
 #include <QThreadPool>
+#include <QTimer>
 #include <QUuid>
 
+#include "ConfigManager.h"
+#include "agent/CommandBus.h"
 #include "agent/chat/ChatContent.h"
 #include "agent/chat/ChatProviderClient.h"
+#include "agent/chat/ChatToolDispatcher.h"
 
 namespace lmms::agent::chat {
 namespace {
@@ -24,6 +29,60 @@ ChatController::ChatController(ChatStore& store, QObject* parent)
 	, m_store(store)
 {
 	m_client = new ChatProviderClient(this);
+	m_dispatcher = new ChatToolDispatcher(this);
+	connect(m_dispatcher, &ChatToolDispatcher::approvalRequested, this, &ChatController::approvalRequested);
+	connect(m_dispatcher, &ChatToolDispatcher::invalidated, this,
+			[this](const QString& session, const QString& turn, const QString& reason) {
+				if (!m_toolTurn || session != m_sessionId || turn != m_turnId)
+				{
+					return;
+				}
+				if (m_dispatcher->executing())
+				{
+					// Preserve the actual result of a command that itself resets the project.
+					m_invalidatedReason = reason;
+					return;
+				}
+				abortTurn(reason, "canceled");
+			});
+	connect(m_dispatcher, &ChatToolDispatcher::toolFinished, this, [this](const QJsonObject& outcome) {
+		if (!m_toolTurn || outcome.value("sessionId") != m_sessionId || outcome.value("turnId") != m_turnId
+			|| m_pendingIndex >= m_pendingCalls.size()
+			|| outcome.value("id") != m_pendingCalls[m_pendingIndex].toObject().value("id"))
+		{
+			return;
+		}
+		QString error;
+		const QJsonObject execution{{"command", outcome.value("command")},
+			{"arguments", outcome.value("arguments")},
+			{"approvalRequired", outcome.value("approvalRequired")},
+			{"executed", outcome.value("executed")}};
+		const auto call = m_pendingCalls[m_pendingIndex].toObject();
+		if (!appendToolResult(call, outcome.value("result").toObject(), error, execution))
+		{
+			abortTurn(error, "error");
+			return;
+		}
+		++m_pendingIndex;
+		const QPointer<ChatController> alive(this);
+		emit sessionChanged(m_sessionId);
+		if (!alive || !m_toolTurn)
+		{
+			return;
+		}
+		if (!m_invalidatedReason.isEmpty())
+		{
+			abortTurn(m_invalidatedReason, "canceled");
+			return;
+		}
+		const auto turn = m_turnId;
+		QTimer::singleShot(0, this, [this, turn] {
+			if (m_toolTurn && m_turnId == turn)
+			{
+				dispatchNextTool();
+			}
+		});
+	});
 	connect(m_client, &ChatProviderClient::uploadProgress, this,
 			[this](qint64 sent, qint64 total) { emit attachmentStatus(m_sessionId, "uploading", sent, total); });
 	connect(m_client, &ChatProviderClient::updated, this, [this](const QString& text, const QString& summary) {
@@ -43,7 +102,14 @@ ChatController::ChatController(ChatStore& store, QObject* parent)
 		{
 			m_message.insert("native", QJsonObject{{"origin", m_nativeOrigin}, {"content", response.nativeContent}});
 		}
-		finish(response.complete ? "complete" : "error");
+		if (m_toolTurn && response.complete && !response.toolCalls.isEmpty())
+		{
+			receiveTools(response.toolCalls);
+		}
+		else
+		{
+			finish(response.complete ? "complete" : "error");
+		}
 	});
 }
 
@@ -54,13 +120,35 @@ ChatController::~ChatController()
 }
 
 bool ChatController::active() const
-{ return m_preparing || m_client->active(); }
+{ return m_toolTurn || m_preparing || m_client->active(); }
 
 QString ChatController::activeSessionId() const
 { return active() ? m_sessionId : QString{}; }
 
 QJsonObject ChatController::currentMessage() const
 { return m_message; }
+
+void ChatController::setToolsEnabled(bool enabled)
+{ m_toolsEnabled = enabled; }
+
+QJsonObject ChatController::pendingApproval() const
+{ return m_toolTurn ? m_dispatcher->pendingApproval() : QJsonObject{}; }
+
+bool ChatController::decideTool(const QJsonObject& approval, bool approved, QString& error)
+{
+	if (!m_toolTurn || !saveResult(error))
+	{
+		error = message("The request's original session or message no longer exists.");
+		if (m_toolTurn)
+		{
+			abortTurn(error, "canceled");
+		}
+		return false;
+	}
+	return m_dispatcher->decide(approval.value("token").toString(), approval.value("sessionId").toString(),
+								approval.value("turnId").toString(), approval.value("id").toString(),
+								approval.value("arguments").toObject(), approved, error);
+}
 
 bool ChatController::send(const QString& sessionId, const ChatConnection& connection, const QString& key,
 						  const QString& systemPrompt, const QString& text, QString& error,
@@ -121,7 +209,9 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 					retryUser = item;
 					break;
 				}
-				if (item.value("role") != "assistant" || item.value("status") != "error")
+				// A failed continuation follows completed assistant/tool pairs.
+				// Keep those results in history and retry only the model request.
+				if (item.value("role") != "assistant" && item.value("role") != "tool")
 				{
 					break;
 				}
@@ -150,6 +240,12 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 							{"name", item.value("name")},
 							{"is_error", item.value("is_error").toBool()},
 							{"content", item.contains("content") ? item.value("content") : item.value("text")}});
+			if (item.contains("provider_call_id"))
+			{
+				auto tool = history.last().toObject();
+				tool.insert("provider_call_id", item.value("provider_call_id"));
+				history[history.size() - 1] = tool;
+			}
 			continue;
 		}
 		if (role == "user" || (role == "assistant" && item.value("status").toString("complete") == "complete"))
@@ -191,6 +287,12 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 	m_sessionId = sessionId;
 	m_nativeOrigin = chatNativeOrigin(connection);
 	m_turnId = newId();
+	m_connection = connection;
+	m_key = key;
+	m_systemPrompt = systemPrompt;
+	m_pendingCalls = {};
+	m_pendingIndex = 0;
+	m_invalidatedReason.clear();
 	QJsonObject user{{"id", newId()}, {"turnId", m_turnId}, {"role", "user"}, {"text", text}, {"status", "complete"}};
 	if (!references.isEmpty())
 	{
@@ -216,6 +318,16 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 	if (!m_store.saveSession(session, error))
 	{
 		return false;
+	}
+	if (m_toolsEnabled)
+	{
+		if (!m_dispatcher->beginTurn(m_sessionId, m_turnId, error))
+		{
+			m_message.insert("error", error);
+			finish("error");
+			return false;
+		}
+		m_toolTurn = true;
 	}
 	if (!attachments.isEmpty())
 	{
@@ -253,7 +365,7 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 					}
 					controller->m_preparing = false;
 					if (!error.isEmpty() || !controller->savePreparedContent(userId, parts, error)
-						|| !controller->m_client->start(connection, key, systemPrompt, history, error))
+						|| !controller->startRequest(history, error))
 					{
 						controller->m_message.insert("error", error);
 						controller->finish("error");
@@ -266,7 +378,7 @@ bool ChatController::startTurn(const QString& sessionId, const ChatConnection& c
 		emit attachmentStatus(m_sessionId, "preparing", 0, -1);
 		return true;
 	}
-	if (!m_client->start(connection, key, systemPrompt, history, error))
+	if (!startRequest(history, error))
 	{
 		m_message.insert("error", error);
 		finish("error");
@@ -329,9 +441,207 @@ bool ChatController::saveResult(QString& error)
 	return false;
 }
 
+bool ChatController::startRequest(const QJsonArray& history, QString& error)
+{
+	m_history = history;
+	return m_client->start(m_connection, m_key, m_systemPrompt, history, error,
+						   m_toolTurn ? m_dispatcher->definitions() : QJsonArray{});
+}
+
+void ChatController::receiveTools(QJsonArray calls)
+{
+	for (int index = 0; index < calls.size(); ++index)
+	{
+		auto call = calls[index].toObject();
+		if (call.contains("providerId") && call.value("providerId").toString().isEmpty())
+		{
+			// Gemini may omit IDs. Keep that wire-level omission while assigning a
+			// fresh local ID across every response in this turn.
+			call.insert("id", newId());
+			calls[index] = call;
+		}
+	}
+	m_message.insert("tool_calls", calls);
+	m_message.insert("status", "complete");
+	QString error;
+	if (!saveResult(error))
+	{
+		abortTurn(error, "error");
+		return;
+	}
+	QJsonObject assistant{{"role", "assistant"}, {"content", m_message.value("text")}, {"tool_calls", calls}};
+	if (m_message.contains("native"))
+	{
+		assistant.insert("native", m_message.value("native"));
+	}
+	m_history.append(assistant);
+	m_pendingCalls = calls;
+	m_pendingIndex = 0;
+	const auto turn = m_turnId;
+	QTimer::singleShot(0, this, [this, turn] {
+		if (m_toolTurn && m_turnId == turn)
+		{
+			dispatchNextTool();
+		}
+	});
+	emit sessionChanged(m_sessionId);
+	emit stateChanged();
+}
+
+bool ChatController::appendToolResult(const QJsonObject& call, const QJsonObject& result, QString& error,
+	const QJsonObject& execution)
+{
+	auto session = m_store.session(m_sessionId);
+	auto messages = session.value("messages").toArray();
+	bool originalExists = false;
+	for (const auto& value : messages)
+	{
+		const auto item = value.toObject();
+		originalExists = originalExists
+			|| (item.value("id") == m_message.value("id") && item.value("turnId").toString() == m_turnId);
+	}
+	if (!originalExists)
+	{
+		error = message("The request's original session or message no longer exists.");
+		return false;
+	}
+	const auto text = QString::fromUtf8(QJsonDocument(result).toJson(QJsonDocument::Compact));
+	QJsonObject tool{{"role", "tool"},
+					 {"tool_call_id", call.value("id")},
+					 {"name", call.value("name")},
+					 {"is_error", !result.value("ok").toBool()},
+					 {"content", text}};
+	if (call.contains("providerId"))
+	{
+		tool.insert("provider_call_id", call.value("providerId"));
+	}
+	auto stored = tool;
+	stored.insert("id", newId());
+	stored.insert("turnId", m_turnId);
+	stored.insert("status", "complete");
+	stored.insert("text", text);
+	if (!execution.isEmpty())
+	{
+		stored.insert("execution", execution);
+	}
+	messages.append(stored);
+	session.insert("messages", messages);
+	if (!m_store.saveSession(session, error))
+	{
+		return false;
+	}
+	m_history.append(tool);
+	return true;
+}
+
+void ChatController::dispatchNextTool()
+{
+	if (!m_toolTurn)
+	{
+		return;
+	}
+	QString error;
+	// Check the original persisted message before approving/executing another
+	// call. A deleted session is never recreated by this controller.
+	if (!saveResult(error))
+	{
+		abortTurn(error, "canceled");
+		return;
+	}
+	if (m_pendingIndex < m_pendingCalls.size())
+	{
+		const auto call = m_pendingCalls[m_pendingIndex].toObject();
+		const auto mode = ConfigManager::inst()->value("agentchat", "approval", "request") == "none"
+			? ChatApprovalMode::None
+			: ChatApprovalMode::Request;
+		if (!m_dispatcher->submit(call, error, mode))
+		{
+			const auto result = CommandResult::failure("invalid_tool_call", error).toJson();
+			if (!appendToolResult(call, result, error))
+			{
+				abortTurn(error, "error");
+				return;
+			}
+			++m_pendingIndex;
+			const QPointer<ChatController> alive(this);
+			emit sessionChanged(m_sessionId);
+			if (!alive || !m_toolTurn)
+			{
+				return;
+			}
+			const auto turn = m_turnId;
+			QTimer::singleShot(0, this, [this, turn] {
+				if (m_toolTurn && m_turnId == turn)
+				{
+					dispatchNextTool();
+				}
+			});
+		}
+		return;
+	}
+	if (!validateChatToolHistory(m_history, error))
+	{
+		abortTurn(error, "error");
+		return;
+	}
+	auto session = m_store.session(m_sessionId);
+	auto messages = session.value("messages").toArray();
+	m_message = {{"id", newId()}, {"turnId", m_turnId}, {"role", "assistant"}, {"text", ""}, {"status", "streaming"}};
+	messages.append(m_message);
+	session.insert("messages", messages);
+	m_pendingCalls = {};
+	m_pendingIndex = 0;
+	if (!m_store.saveSession(session, error) || !startRequest(m_history, error))
+	{
+		m_message.insert("error", error);
+		finish("error");
+		return;
+	}
+	emit sessionChanged(m_sessionId);
+	emit stateChanged();
+}
+
+void ChatController::abortTurn(const QString& reason, const QString& status)
+{
+	if (m_preparing)
+	{
+		m_preparationCanceled->store(true);
+		m_preparing = false;
+	}
+	m_client->cancel();
+	while (m_toolTurn && m_pendingIndex < m_pendingCalls.size())
+	{
+		QString error;
+		const auto result = CommandResult::failure("canceled", reason).toJson();
+		if (!appendToolResult(m_pendingCalls[m_pendingIndex].toObject(), result, error))
+		{
+			break;
+		}
+		++m_pendingIndex;
+	}
+	m_message.insert("error", reason);
+	finish(status);
+}
+
 void ChatController::finish(const QString& status)
 {
-	m_message.insert("status", status);
+	if (m_message.value("status") == "complete" && !m_message.value("tool_calls").toArray().isEmpty())
+	{
+		// Keep a completed tool-call message paired with its cancellation results
+		// in future history even when the overall turn is stopped.
+		m_message.insert("turnStatus", status);
+	}
+	else
+	{
+		m_message.insert("status", status);
+	}
+	m_toolTurn = false;
+	m_dispatcher->cancel();
+	m_key.clear();
+	m_systemPrompt.clear();
+	m_history = {};
+	m_pendingCalls = {};
+	m_invalidatedReason.clear();
 	QString error;
 	if (!saveResult(error))
 	{
@@ -351,6 +661,11 @@ void ChatController::stop()
 {
 	if (!active())
 	{
+		return;
+	}
+	if (m_toolTurn)
+	{
+		abortTurn(message("The chat tool turn was canceled."), "canceled");
 		return;
 	}
 	if (m_preparing)

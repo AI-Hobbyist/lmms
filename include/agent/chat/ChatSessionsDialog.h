@@ -17,9 +17,13 @@ class ChatStore;
 
 class ChatSessionsDialog : public QDialog
 {
+	Q_OBJECT
 public:
 	explicit ChatSessionsDialog(ChatStore& store, QWidget* parent = nullptr);
 	QString selectedSession() const;
+
+signals:
+	void sessionAboutToRemove(const QString& id);
 
 private:
 	void refresh();

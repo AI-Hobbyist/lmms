@@ -512,6 +512,8 @@ signals:
 	void projectFileNameChanged();
 	void scaleListChanged(int index);
 	void keymapListChanged(int index);
+	// Emitted while loading is guarded, before replacing any project objects.
+	void projectAboutToReset();
 } ;
 
 

@@ -19,8 +19,9 @@ struct ChatRequest
 // Messages contain user/assistant content, normalized tool_calls, or tool results
 // with tool_call_id/name/content/is_error. Native assistant blocks retain origin.
 // Attachments must be explicitly prepared from user-selected files beforehand.
+// Tools are an explicit catalog snapshot; this function never loads or runs them.
 bool buildChatRequest(const ChatConnection& connection, const QString& key, const QString& systemPrompt,
-					  const QJsonArray& messages, ChatRequest& request, QString& error);
+					  const QJsonArray& messages, ChatRequest& request, QString& error, const QJsonArray& tools = {});
 
 } // namespace lmms::agent::chat
 #endif

@@ -1,0 +1,426 @@
+#include "agent/chat/ChatToolDispatcher.h"
+
+#include <QCoreApplication>
+#include <QPointer>
+#include <QSet>
+#include <QThread>
+#include <QTimer>
+#include <QUuid>
+
+#include "../CommandTargets.h"
+#include "../CoreCommands.h"
+#include "../SvsCommands.h"
+#include "Engine.h"
+#include "Song.h"
+#include "agent/CommandBus.h"
+#include "agent/ScriptRunner.h"
+#include "agent/ToolRegistry.h"
+
+namespace lmms::agent::chat {
+namespace {
+
+QString message(const char* source)
+{ return QCoreApplication::translate("AgentChat", source); }
+
+bool onApplicationThread()
+{ return QCoreApplication::instance() && QCoreApplication::instance()->thread() == QThread::currentThread(); }
+
+bool captureTargets(const ChatToolCall& call, CommandTargetIdentities& targets, QStringList& scopes, QString& error)
+{
+	const auto all = commandTargetIdentities();
+	if (all.isEmpty())
+	{
+		error = message("The current project is unavailable or being replaced.");
+		return false;
+	}
+	scopes.clear();
+	const auto arguments = call.arguments;
+	if (call.command != "agent.runScript")
+	{
+		if (arguments.contains("track"))
+		{
+			CommandResult failure;
+			Track* track = nullptr;
+			int index = -1;
+			if (!resolveTrack(Engine::getSong(), arguments, track, index, failure))
+			{
+				error = failure.errorMessage;
+				return false;
+			}
+			const auto path = trackPath(index, track);
+			if (arguments.contains("clip"))
+			{
+				ClipAddress address;
+				if (!resolveClip(Engine::getSong(), arguments, address, failure))
+				{
+					error = failure.errorMessage;
+					return false;
+				}
+				scopes.append(clipPath(index, address.clipIndex, track));
+				// Keep the parent identity without binding unrelated sibling clips.
+				targets.insert(path, all.value(path));
+			}
+			else
+			{
+				scopes.append(path);
+			}
+		}
+		for (const auto* field : {"path", "target", "owner"})
+		{
+			const auto path = arguments.value(field).toString();
+			if (all.contains(path))
+			{
+				scopes.append(path);
+			}
+		}
+		if (call.command == "model.setValue" && arguments.value("path").toString().endsWith("/mixerChannel"))
+		{
+			// The value selects another object; the parameter alone does not bind
+			// the destination when mixer channels are reordered while awaiting approval.
+			const auto value = arguments.value("value");
+			if (value.isDouble())
+			{
+				const auto destination = QStringLiteral("song/channel:%1").arg(value.toInt(-1));
+				if (all.contains(destination))
+				{
+					scopes.append(destination);
+				}
+			}
+		}
+		for (const auto* field : {"channel", "from", "to", "controller"})
+		{
+			if ((QString::fromLatin1(field) == "from" || QString::fromLatin1(field) == "to")
+				&& !call.command.startsWith("mixer."))
+			{
+				continue;
+			}
+			const auto value = arguments.value(field);
+			if (value.isDouble())
+			{
+				const auto path = QStringLiteral("song/%1:%2")
+									  .arg(QString::fromLatin1(field) == "controller" ? "controller" : "channel")
+									  .arg(value.toInt());
+				if (all.contains(path))
+				{
+					scopes.append(path);
+				}
+			}
+		}
+	}
+	if (scopes.isEmpty())
+	{
+		scopes = {"song", "pattern"};
+	}
+	scopes.removeDuplicates();
+	for (auto iterator = all.cbegin(); iterator != all.cend(); ++iterator)
+	{
+		for (const auto& scope : scopes)
+		{
+			if (iterator.key() == scope || iterator.key().startsWith(scope + '/'))
+			{
+				targets.insert(iterator.key(), iterator.value());
+				break;
+			}
+		}
+	}
+	const bool scripted = call.command.startsWith("compose.") || call.command.startsWith("arrange.")
+		|| call.command == "agent.runScript";
+	if ((call.command.startsWith("midi.") && call.command != "midi.addNotes") || call.command == "query.notes"
+		|| scripted)
+	{
+		if (!includeIndexedNoteTargets(targets, call.command, arguments, error))
+		{
+			return false;
+		}
+	}
+	if ((call.command.startsWith("svs.") && call.command != "svs.addNotes") || scripted)
+	{
+		if (!includeSvsNoteTargets(targets, arguments, error))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+} // namespace
+
+struct ChatToolDispatcher::State
+{
+	ChatToolCatalog catalog;
+	QPointer<Song> song;
+	QMetaObject::Connection resetConnection;
+	QMetaObject::Connection destroyedConnection;
+	QString sessionId;
+	QString turnId;
+	quint64 generation = 0;
+	bool active = false;
+	bool executing = false;
+	bool authorized = false;
+	QSet<QString> seenCalls;
+	ChatToolCall call;
+	QJsonObject approval;
+	CommandTargetIdentities targets;
+};
+
+ChatToolDispatcher::ChatToolDispatcher(QObject* parent)
+	: QObject(parent)
+	, m_state(std::make_unique<State>())
+{
+}
+
+ChatToolDispatcher::~ChatToolDispatcher() = default;
+
+bool ChatToolDispatcher::beginTurn(const QString& sessionId, const QString& turnId, QString& error)
+{
+	error.clear();
+	if (!onApplicationThread() || m_state->active || m_state->executing || sessionId.isEmpty() || turnId.isEmpty())
+	{
+		error = message("Start a distinct chat tool turn on the application thread.");
+		return false;
+	}
+	auto* song = Engine::getSong();
+	if (!song || song->isLoadingProject() || CommandBus::instance().isBatchActive())
+	{
+		error = message("The current project is unavailable or being replaced.");
+		return false;
+	}
+	if (!m_state->catalog.load(error))
+	{
+		return false;
+	}
+	if (m_state->song != song)
+	{
+		disconnect(m_state->resetConnection);
+		disconnect(m_state->destroyedConnection);
+		m_state->song = song;
+		m_state->resetConnection = connect(song, &Song::projectAboutToReset, this, [this] {
+			++m_state->generation;
+			invalidate(message("The project changed. Request a new tool call."));
+		});
+		m_state->destroyedConnection = connect(song, &QObject::destroyed, this, [this] {
+			++m_state->generation;
+			invalidate(message("The project changed. Request a new tool call."));
+		});
+	}
+	m_state->sessionId = sessionId;
+	m_state->turnId = turnId;
+	m_state->seenCalls.clear();
+	m_state->active = true;
+	return true;
+}
+
+QJsonArray ChatToolDispatcher::definitions() const
+{ return m_state->active ? m_state->catalog.definitions() : QJsonArray{}; }
+
+QJsonObject ChatToolDispatcher::pendingApproval() const
+{ return m_state->approval; }
+
+bool ChatToolDispatcher::executing() const
+{ return m_state->executing; }
+
+bool ChatToolDispatcher::submit(const QJsonObject& call, QString& error, ChatApprovalMode mode)
+{
+	error.clear();
+	if (!onApplicationThread() || !m_state->active || m_state->executing || !m_state->approval.isEmpty())
+	{
+		error = message("No chat tool turn is ready for another call.");
+		return false;
+	}
+	if (!m_state->song || m_state->song != Engine::getSong() || m_state->song->isLoadingProject()
+		|| CommandBus::instance().isBatchActive())
+	{
+		error = message("The current project is unavailable or being replaced.");
+		return false;
+	}
+	ChatToolCall resolved;
+	if (!m_state->catalog.resolve(call, resolved, error))
+	{
+		return false;
+	}
+	if (m_state->seenCalls.contains(resolved.id))
+	{
+		error = message("This tool call ID has already been handled in the current turn.");
+		return false;
+	}
+	if (resolved.command == "agent.runScript")
+	{
+		const auto input = resolved.arguments.value("script");
+		const auto script = input.isString() ? ScriptRunner::loadBuiltIn(input.toString()) : input.toObject();
+		if (script.isEmpty())
+		{
+			error = message("The requested script is empty or unknown.");
+			return false;
+		}
+		auto expanded = call;
+		auto arguments = resolved.arguments;
+		arguments.insert("script", script);
+		arguments.insert("vars", arguments.value("vars").toObject());
+		if (!arguments.contains("seed"))
+		{
+			const auto seed = script.value("seed");
+			arguments.insert("seed", seed.isUndefined() ? QJsonValue(0) : seed);
+		}
+		expanded.insert("arguments", arguments);
+		if (!m_state->catalog.resolve(expanded, resolved, error))
+		{
+			return false;
+		}
+	}
+	CommandTargetIdentities targets;
+	QStringList scopes;
+	if (!captureTargets(resolved, targets, scopes, error))
+	{
+		return false;
+	}
+	const auto token = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	const auto help = ToolRegistry::commandHelp(resolved.command);
+	QJsonArray labels;
+	for (const auto& scope : scopes)
+	{
+		labels.append(QJsonObject{{"path", scope}, {"name", targets.value(scope).name}});
+	}
+	m_state->call = resolved;
+	m_state->targets = targets;
+	m_state->authorized = mode == ChatApprovalMode::None;
+	m_state->seenCalls.insert(resolved.id);
+	m_state->approval = {{"token", token},
+						 {"sessionId", m_state->sessionId},
+						 {"turnId", m_state->turnId},
+						 {"id", resolved.id},
+						 {"wireName", resolved.wireName},
+						 {"command", resolved.command},
+						 {"arguments", resolved.arguments},
+						 {"approvalRequired", !m_state->authorized},
+						 {"generation", QString::number(m_state->generation)},
+						 {"scope", QJsonArray::fromStringList(scopes)},
+						 {"purpose", help.value("description")},
+						 {"annotations", help.value("annotations")},
+						 {"targets", labels}};
+	if (m_state->authorized)
+	{
+		QTimer::singleShot(0, this, [this, token] { execute(token); });
+	}
+	else
+	{
+		const auto approval = m_state->approval;
+		emit approvalRequested(approval);
+	}
+	return true;
+}
+
+bool ChatToolDispatcher::decide(const QString& token, const QString& sessionId, const QString& turnId,
+								const QString& callId, const QJsonObject& arguments, bool approved, QString& error)
+{
+	error.clear();
+	if (!onApplicationThread() || !m_state->active || m_state->approval.isEmpty() || m_state->authorized
+		|| token != m_state->approval.value("token").toString())
+	{
+		error = message("This tool approval is no longer pending.");
+		return false;
+	}
+	if (sessionId != m_state->sessionId || turnId != m_state->turnId || callId != m_state->call.id
+		|| arguments != m_state->call.arguments)
+	{
+		error = message("The approval no longer matches the original tool call.");
+		finishPending(CommandResult::failure("approval_mismatch", error).toJson());
+		return false;
+	}
+	if (!approved)
+	{
+		finishPending(CommandResult::failure("permission_denied", message("The user denied this tool call.")).toJson());
+		return true;
+	}
+	m_state->authorized = true;
+	QTimer::singleShot(0, this, [this, token] { execute(token); });
+	return true;
+}
+
+void ChatToolDispatcher::finishPending(const QJsonObject& result)
+{
+	const QJsonObject outcome{{"sessionId", m_state->sessionId},
+							  {"turnId", m_state->turnId},
+							  {"id", m_state->call.id},
+							  {"wireName", m_state->call.wireName},
+							  {"command", m_state->call.command},
+							  {"arguments", m_state->call.arguments},
+							  {"approvalRequired", m_state->approval.value("approvalRequired")},
+							  {"executed", false},
+							  {"result", result}};
+	m_state->approval = {};
+	m_state->targets.clear();
+	m_state->authorized = false;
+	emit toolFinished(outcome);
+}
+
+void ChatToolDispatcher::execute(const QString& token)
+{
+	if (!m_state->active || !m_state->authorized || m_state->approval.value("token") != token)
+	{
+		return;
+	}
+	if (!m_state->song || m_state->song != Engine::getSong() || m_state->song->isLoadingProject()
+		|| CommandBus::instance().isBatchActive())
+	{
+		finishPending(
+			CommandResult::failure("project_busy", message("The current project is unavailable or being replaced."))
+				.toJson());
+		return;
+	}
+	CommandTargetIdentities targets;
+	QStringList scopes;
+	QString error;
+	if (!captureTargets(m_state->call, targets, scopes, error) || targets != m_state->targets)
+	{
+		finishPending(
+			CommandResult::failure("target_changed", message("The tool target changed. Request approval again."))
+				.toJson());
+		return;
+	}
+	// Consume authorization before entering a handler, which may dispatch Qt
+	// events or replace the project. Reentrant decisions cannot replay this call.
+	const auto call = m_state->call;
+	const auto sessionId = m_state->sessionId;
+	const auto turnId = m_state->turnId;
+	const auto approvalRequired = m_state->approval.value("approvalRequired");
+	m_state->approval = {};
+	m_state->targets.clear();
+	m_state->authorized = false;
+	m_state->executing = true;
+	const QPointer<ChatToolDispatcher> alive(this);
+	const auto result = CommandBus::instance().execute(call.command, call.arguments).toJson();
+	if (!alive)
+	{
+		return;
+	}
+	m_state->executing = false;
+	emit toolFinished(QJsonObject{{"sessionId", sessionId},
+								  {"turnId", turnId},
+								  {"id", call.id},
+								  {"wireName", call.wireName},
+								  {"command", call.command},
+								  {"arguments", call.arguments},
+								  {"approvalRequired", approvalRequired},
+								  {"executed", true},
+								  {"result", result}});
+}
+
+void ChatToolDispatcher::invalidate(const QString& reason)
+{
+	const bool wasActive = m_state->active;
+	m_state->active = false;
+	m_state->approval = {};
+	m_state->targets.clear();
+	m_state->authorized = false;
+	if (wasActive)
+	{
+		const auto sessionId = m_state->sessionId;
+		const auto turnId = m_state->turnId;
+		emit invalidated(sessionId, turnId, reason);
+	}
+}
+
+void ChatToolDispatcher::cancel()
+{ invalidate(message("The chat tool turn was canceled.")); }
+
+} // namespace lmms::agent::chat

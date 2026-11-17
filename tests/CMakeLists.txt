@@ -68,7 +68,8 @@ endif()
 if(WANT_AGENT_CHAT)
 	list(APPEND LMMS_TESTS src/agent/ChatStoreTest.cpp src/agent/ChatDockTest.cpp src/agent/ChatConnectionTest.cpp
 		src/agent/ChatEventStreamTest.cpp src/agent/ChatRequestTest.cpp src/agent/ChatResponseTest.cpp
-		src/agent/ChatProviderClientTest.cpp src/agent/ChatAttachmentTest.cpp)
+		src/agent/ChatProviderClientTest.cpp src/agent/ChatAttachmentTest.cpp src/agent/ChatProjectLifetimeTest.cpp
+		src/agent/ChatToolDispatcherTest.cpp src/agent/ChatToolTurnTest.cpp)
 endif()
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)

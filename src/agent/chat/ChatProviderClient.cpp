@@ -47,7 +47,7 @@ void ChatProviderClient::releaseReply()
 }
 
 bool ChatProviderClient::start(const ChatConnection& connection, const QString& key, const QString& systemPrompt,
-							   const QJsonArray& messages, QString& error)
+							   const QJsonArray& messages, QString& error, const QJsonArray& tools)
 {
 	if (active())
 	{
@@ -55,7 +55,7 @@ bool ChatProviderClient::start(const ChatConnection& connection, const QString& 
 		return false;
 	}
 	ChatRequest request;
-	if (!buildChatRequest(connection, key, systemPrompt, messages, request, error))
+	if (!buildChatRequest(connection, key, systemPrompt, messages, request, error, tools))
 	{
 		return false;
 	}

@@ -40,6 +40,7 @@
 #include <QtTest>
 
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "LmmsPalette.h"
 #include "LmmsStyle.h"
 #include "agent/chat/ChatAdvancedDialog.h"
@@ -562,6 +563,78 @@ private slots:
 		dialog.close();
 	}
 
+	void nativeApprovalCardLayout()
+	{
+		QCOMPARE(QGuiApplication::platformName(), QStringLiteral("windows"));
+		QTranslator translator;
+		QVERIFY(translator.load(qEnvironmentVariable("LMMS_DATA_DIR") + "/locale/zh_CN.qm"));
+		QVERIFY(QCoreApplication::installTranslator(&translator));
+		const auto removeTranslator = qScopeGuard([&] { QCoreApplication::removeTranslator(&translator); });
+		QWidget window;
+		window.setWindowTitle(QStringLiteral("LMMS 批准卡原生窗口验收"));
+		window.resize(420, 200);
+		lmms::agent::chat::ChatTranscript transcript(&window);
+		transcript.setObjectName("agentMessages");
+		transcript.resize(420, 200);
+		QJsonObject approval{
+			{"token", "token-one"},
+			{"sessionId", "session"},
+			{"turnId", "turn"},
+			{"id", "call-one"},
+			{"command", "agent.runScript"},
+			{"purpose", "Approved script"},
+			{"arguments",
+			 QJsonObject{{"script", QJsonObject{{"name", "Full script"}, {"steps", QJsonArray{}}}},
+						 {"vars", QJsonObject{{"bars", 8}}},
+						 {"seed", 42}}},
+			{"targets", QJsonArray{QJsonObject{{"path", "song/track:0"}, {"name", QStringLiteral("柔和 Pad")}}}}};
+		transcript.setApproval(approval);
+		QSignalSpy decisions(&transcript, &lmms::agent::chat::ChatTranscript::approvalDecided);
+		QSignalSpy details(&transcript, &lmms::agent::chat::ChatTranscript::approvalDetailsRequested);
+		window.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&window));
+		QTest::qWait(200);
+		auto* card = transcript.findChild<QFrame*>("agentApprovalCard");
+		QVERIFY(card && card->isVisible());
+		QCOMPARE(card->size(), QSize(420, 157));
+		auto* approve = card->findChild<QToolButton*>("agentApprovalApprove");
+		auto* view = card->findChild<QToolButton*>("agentApprovalDetails");
+		auto* deny = card->findChild<QToolButton*>("agentApprovalDeny");
+		QCOMPARE(approve->geometry(), QRect(12, 109, 98, 34));
+		QCOMPARE(view->geometry(), QRect(120, 109, 100, 34));
+		QCOMPARE(deny->geometry(), QRect(230, 109, 65, 34));
+		QCOMPARE(approve->text(), QStringLiteral("批准本次"));
+		QCOMPARE(view->text(), QStringLiteral("查看变更"));
+		QCOMPARE(deny->text(), QStringLiteral("拒绝"));
+		QCOMPARE(card->findChild<QLabel*>("agentApprovalTitle")->pos(), QPoint(39, 13));
+		QCOMPARE(card->findChild<QLabel*>("agentApprovalScope")->pos(), QPoint(14, 48));
+		const auto evidence = qEnvironmentVariable("LMMS_CHAT_SCREENSHOT");
+		if (!evidence.isEmpty())
+		{
+			QVERIFY(window.screen()
+						->grabWindow(window.winId())
+						.save(QFileInfo(evidence).absolutePath() + "/agent-chat-approval-native.png"));
+		}
+		QTest::mouseClick(view, Qt::LeftButton);
+		QCOMPARE(details.size(), 1);
+		QCOMPARE(details[0][0].toJsonObject(), approval);
+		QTest::mouseClick(approve, Qt::LeftButton);
+		QCOMPARE(decisions.size(), 1);
+		QCOMPARE(decisions[0][0].toJsonObject(), approval);
+		QVERIFY(decisions[0][1].toBool());
+		transcript.setApproval(approval);
+		QVERIFY(!approve->isEnabled());
+		QVERIFY(!deny->isEnabled());
+		approval.insert("token", "token-two");
+		transcript.setApproval(approval);
+		QTest::mouseClick(deny, Qt::LeftButton);
+		QCOMPARE(decisions.size(), 2);
+		QVERIFY(!decisions[1][1].toBool());
+		transcript.setApproval({});
+		QVERIFY(!card->isVisible());
+		window.close();
+	}
+
 	void nativeTranscriptLayout()
 	{
 		QTranslator translator;
@@ -637,6 +710,8 @@ private slots:
 
 	void nativeTextConversation()
 	{
+		lmms::Engine::init(true);
+		const auto destroyEngine = qScopeGuard([] { lmms::Engine::destroy(); });
 		QTranslator translator;
 		QVERIFY(translator.load(qEnvironmentVariable("LMMS_DATA_DIR") + "/locale/zh_CN.qm"));
 		QVERIFY(QCoreApplication::installTranslator(&translator));

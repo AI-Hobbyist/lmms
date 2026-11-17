@@ -11,6 +11,7 @@
 
 #include "agent/chat/ChatContent.h"
 #include "agent/chat/ChatController.h"
+#include "agent/chat/ChatTools.h"
 
 using namespace lmms::agent::chat;
 
@@ -84,6 +85,41 @@ private:
 	const QByteArray m_done = "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n";
 
 private slots:
+	void toolCatalogOverHttp()
+	{
+		HttpFixture fixture;
+		QVERIFY(fixture.server.listen(QHostAddress::LocalHost));
+		fixture.body = m_text + m_done;
+		ChatToolCatalog catalog;
+		QString error;
+		QVERIFY2(catalog.load(error), qPrintable(error));
+		ChatProviderClient client;
+		QSignalSpy finished(&client, &ChatProviderClient::finished);
+		QVERIFY(client.start(fixture.connection(), "fake-key", "Prompt", m_messages, error, catalog.definitions()));
+		QTRY_COMPARE(finished.count(), 1);
+		QVERIFY(client.response().complete);
+		const auto body
+			= QJsonDocument::fromJson(fixture.received.mid(fixture.received.indexOf("\r\n\r\n") + 4)).object();
+		const auto tools = body.value("tools").toArray();
+		QCOMPARE(tools.size(), catalog.definitions().size());
+		bool found = false;
+		for (const auto& value : tools)
+		{
+			const auto function = value.toObject().value("function").toObject();
+			if (function.value("name") == catalog.nameForCommand("query.songSummary"))
+			{
+				found = true;
+				QVERIFY(function.value("parameters").isObject());
+			}
+		}
+		QVERIFY(found);
+		// Only the caller's message and prompt are sent; listing schemas does not
+		// execute query.songSummary or add a project snapshot to the conversation.
+		QCOMPARE(body.value("messages").toArray().size(), 2);
+		QCOMPARE(body.value("messages").toArray().last().toObject().value("content").toString(),
+				 QStringLiteral("Hello"));
+	}
+
 	void retryFailedRequest()
 	{
 		QTemporaryDir directory;

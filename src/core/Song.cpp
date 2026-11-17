@@ -991,6 +991,7 @@ void Song::clearProject()
 	using gui::getGUI;
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
+	emit projectAboutToReset();
 
 	Engine::projectJournal()->setJournalling( false );
 
