@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include "agent/chat/ChatConnection.h"
+#include "agent/chat/ChatPortableTools.h"
 #include "agent/chat/ChatSearchSettings.h"
 
 class QAbstractButton;
@@ -32,6 +33,7 @@ private:
 	void buildChrome();
 	void buildGlobalPage();
 	void buildApprovalPage();
+	void buildDownloadPage();
 	void selectPage(int page);
 	void updateApprovalLabels();
 	void reloadPrompt();
@@ -62,6 +64,14 @@ private:
 	QLineEdit* m_searchEndpoint = nullptr;
 	QLineEdit* m_searchSecret = nullptr;
 	ChatSearchSettings m_search;
+
+	// Asset downloads (Penpot 05 toggle and Penpot 07 page).
+	ChatDownloadSettings m_downloadSettings;
+	QAbstractButton* m_allowDownloads = nullptr;
+	QLineEdit* m_aria2Path = nullptr;
+	QLineEdit* m_sevenZipPath = nullptr;
+	QAbstractButton* m_extractArchives = nullptr;
+	QLabel* m_toolStatus = nullptr;
 };
 
 } // namespace lmms::agent::chat

@@ -1,6 +1,7 @@
 #include "agent/chat/ChatSettingsDialog.h"
 
 #include <QAbstractButton>
+#include <QCheckBox>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -82,6 +83,14 @@ QFrame* card(QWidget* page, const char* name, QRect rectangle)
 	return result;
 }
 
+// Navigation order: API, generation, global, approval, downloads.
+// Stacked page order: global, approval, API, generation, downloads.
+int pageForTab(int tab)
+{
+	const int pages[]{2, 3, 0, 1, 4};
+	return pages[tab];
+}
+
 void divider(QWidget* page, QRect rectangle)
 {
 	auto* line = new QFrame(page);
@@ -146,6 +155,7 @@ ChatSettingsDialog::ChatSettingsDialog(QWidget* parent)
 	m_pages->addWidget(m_apiPage);
 	m_generationPage = new ChatGenerationPage;
 	m_pages->addWidget(m_generationPage);
+	buildDownloadPage();
 	buildChrome();
 	selectPage(0);
 	updateApprovalLabels();
@@ -180,17 +190,7 @@ void ChatSettingsDialog::buildChrome()
 		button->setCheckable(true);
 		button->setAutoExclusive(true);
 		button->setObjectName(QStringLiteral("agentSettingsTab%1").arg(index));
-		if (index < 4)
-		{
-			connect(button, &QToolButton::clicked, this, [this, index] {
-				selectPage(index == 0 ? 2 : index == 1 ? 3 : index - 2);
-			});
-		}
-		else
-		{
-			button->setEnabled(false);
-			button->setToolTip(index == 4 ? QStringLiteral("M4 接入") : QStringLiteral("M2 接入"));
-		}
+		connect(button, &QToolButton::clicked, this, [this, index] { selectPage(pageForTab(index)); });
 	}
 	m_footer = new QWidget(this);
 	m_footer->setObjectName("agentSettingsFooter");
@@ -269,14 +269,15 @@ void ChatSettingsDialog::buildGlobalPage()
 	label(page, QStringLiteral("联网与外部素材"), pageRect(QRect(1227, 231, 320, 27)), 17, true);
 	buildSearchSettings(page);
 
-	// Download toggle: wired in the download milestone step.
+	m_downloadSettings = ChatDownloadSettings::load();
 	label(page, QStringLiteral("允许下载素材"), pageRect(QRect(1186, 548, 250, 22)), 14);
 	label(page, QStringLiteral("按请求保存音频、MIDI 等素材到指定位置。"), pageRect(QRect(1186, 586, 356, 19)), 12);
 	auto* download = new SettingsToggle(page);
+	download->setObjectName("agentAllowDownloads");
 	download->setGeometry(pageRect(QRect(1514, 551, 38, 22)));
 	download->setAccessibleName(QStringLiteral("允许下载素材"));
-	download->setChecked(true);
-	download->setEnabled(false);
+	download->setChecked(m_downloadSettings.enabled);
+	m_allowDownloads = download;
 	divider(page, QRect(1186, 528, 366, 1));
 	divider(page, QRect(1186, 626, 366, 1));
 	icon(page, "agent_chat_shield", pageRect(QRect(1186, 646, 22, 22)));
@@ -439,6 +440,91 @@ bool ChatSettingsDialog::saveSearchSettings(QString& error)
 	return true;
 }
 
+void ChatSettingsDialog::buildDownloadPage()
+{
+	// Penpot 07: tool locations, download flow and tool verification.
+	auto* page = new QWidget;
+	page->setObjectName("agentDownloadSettingsPage");
+	m_pages->addWidget(page);
+	label(page, QStringLiteral("素材下载"), pageRect(QRect(280, 101, 350, 39)), 25, true);
+	label(
+		page, QStringLiteral("通过下载工具获取外部素材，压缩包下载完成后解压。"), pageRect(QRect(280, 145, 1190, 21)));
+
+	card(page, "agentToolCard", QRect(280, 208, 850, 625));
+	label(page, QStringLiteral("工具位置"), pageRect(QRect(306, 232, 300, 28)), 18, true);
+	auto* portable = label(page, QStringLiteral("优先便携版"), pageRect(QRect(968, 233, 130, 26)), 11);
+	portable->setProperty("agentSettingsBadge", true);
+	label(page, QStringLiteral("工具按文件夹放在 lmms.exe 旁的 tools 目录，路径可调整。"),
+		pageRect(QRect(306, 277, 780, 21)));
+
+	const auto pathRow = [this, page](const QString& caption, int y, const QString& value, const char* name) {
+		label(page, caption, pageRect(QRect(306, y, 300, 19)), 12);
+		auto* path = new QLineEdit(value, page);
+		path->setObjectName(QString::fromLatin1(name));
+		path->setGeometry(pageRect(QRect(306, y + 26, 622, 43)));
+		auto* browse
+			= textButton(page, QStringLiteral("选择文件…"), pageRect(QRect(946, y + 26, 156, 43)), "agent_chat_folder");
+		connect(browse, &QToolButton::clicked, this, [this, path] {
+			const auto file = QFileDialog::getOpenFileName(
+				this, QStringLiteral("选择工具"), ChatPortableTools::resolve(path->text()), "Programs (*.exe)");
+			if (!file.isEmpty()) { path->setText(file); }
+		});
+		return path;
+	};
+	m_aria2Path = pathRow(QStringLiteral("aria2 下载工具"), 326, m_downloadSettings.aria2Path, "agentAria2Path");
+	m_sevenZipPath
+		= pathRow(QStringLiteral("压缩包解压工具"), 429, m_downloadSettings.sevenZipPath, "agentSevenZipPath");
+	label(page, QStringLiteral("7zip 所需的配套文件保留在 tools/7zip/ 内。"), pageRect(QRect(306, 511, 600, 18)), 11);
+	divider(page, QRect(306, 560, 796, 1));
+
+	label(page, QStringLiteral("素材保存位置"), pageRect(QRect(306, 589, 300, 24)), 16, true);
+	// The save location is chosen per request; this read-only field explains that.
+	auto* target = new QLineEdit(QStringLiteral("由当前下载请求指定，可选择工程素材目录"), page);
+	target->setObjectName("agentDownloadTarget");
+	target->setReadOnly(true);
+	target->setGeometry(pageRect(QRect(306, 632, 796, 44)));
+	icon(page, "agent_chat_folder", pageRect(QRect(1067, 645, 18, 18)));
+
+	auto* extract = new QCheckBox(QStringLiteral("压缩包下载完成后解压"), page);
+	extract->setObjectName("agentExtractArchives");
+	extract->setGeometry(pageRect(QRect(306, 712, 400, 24)));
+	extract->setChecked(m_downloadSettings.extractArchives);
+	m_extractArchives = extract;
+	label(page, QStringLiteral("下载前同时展示文件保存位置与解压目录。"), pageRect(QRect(339, 746, 600, 18)), 11);
+
+	card(page, "agentDownloadFlowCard", QRect(1162, 208, 414, 625));
+	label(page, QStringLiteral("下载流程"), pageRect(QRect(1186, 234, 300, 27)), 17, true);
+	const struct
+	{
+		std::string_view icon;
+		const char* title;
+		const char* detail;
+		int y;
+	} steps[]{{"agent_chat_open", "确认来源与目标", "显示 URL、文件名和保存目录", 295},
+		{"agent_chat_download", "下载素材", "aria2 进度、速度和剩余时间", 404},
+		{"agent_chat_archive", "识别压缩包并解压", "显示解压位置和处理结果", 513},
+		{"agent_chat_check", "加入当前会话", "可选择导入工程或保留文件", 622}};
+	for (const auto& step : steps)
+	{
+		icon(page, step.icon, pageRect(QRect(1188, step.y + 4, 23, 23)));
+		label(page, QString::fromUtf8(step.title), pageRect(QRect(1226, step.y, 310, 22)), 14);
+		label(page, QString::fromUtf8(step.detail), pageRect(QRect(1226, step.y + 34, 310, 18)), 12);
+	}
+
+	auto* check = textButton(page, QStringLiteral("检查工具"), pageRect(QRect(280, 868, 140, 36)), "agent_chat_reload");
+	check->setObjectName("agentCheckTools");
+	m_toolStatus = label(page, QStringLiteral("尚未检查"), pageRect(QRect(438, 878, 900, 18)), 12);
+	m_toolStatus->setObjectName("agentToolStatus");
+	connect(check, &QToolButton::clicked, this, [this] {
+		auto settings = m_downloadSettings;
+		settings.aria2Path = m_aria2Path->text();
+		settings.sevenZipPath = m_sevenZipPath->text();
+		QString report;
+		const bool ok = ChatPortableTools::verify(settings, report);
+		m_toolStatus->setText((ok ? QStringLiteral("工具可用：") : QStringLiteral("工具不可用：")) + report);
+	});
+}
+
 void ChatSettingsDialog::buildApprovalPage()
 {
 	auto* page = new QWidget;
@@ -513,12 +599,13 @@ void ChatSettingsDialog::selectPage(int page)
 	}
 	if (page == 0) { updateModelSearchAvailability(); }
 	m_pages->setCurrentIndex(page);
-	m_navigation
-		->findChild<QAbstractButton*>(QStringLiteral("agentSettingsTab%1")
-										  .arg(page == 2	   ? 0
-												   : page == 3 ? 1
-															   : page + 2))
-		->setChecked(true);
+	for (int tab = 0; tab < 5; ++tab)
+	{
+		if (pageForTab(tab) == page)
+		{
+			m_navigation->findChild<QAbstractButton*>(QStringLiteral("agentSettingsTab%1").arg(tab))->setChecked(true);
+		}
+	}
 }
 
 void ChatSettingsDialog::updateApprovalLabels()
@@ -569,6 +656,11 @@ void ChatSettingsDialog::accept()
 	config->setValue("agentchat", "connection", m_apiPage->selectedConnectionId());
 	config->setValue("agentchat", "promptPath", m_promptPath->text());
 	config->setValue("agentchat", "approval", m_noApproval->isChecked() ? "none" : "request");
+	m_downloadSettings.enabled = m_allowDownloads->isChecked();
+	m_downloadSettings.aria2Path = m_aria2Path->text();
+	m_downloadSettings.sevenZipPath = m_sevenZipPath->text();
+	m_downloadSettings.extractArchives = m_extractArchives->isChecked();
+	m_downloadSettings.save();
 	config->saveConfigFile();
 	QDialog::accept();
 }

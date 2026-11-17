@@ -16754,6 +16754,22 @@ Latency: %2 ms</source>
         <translation>联网来源：</translation>
     </message>
     <message>
+        <source>%1: not found at %2</source>
+        <translation>%1：在 %2 未找到</translation>
+    </message>
+    <message>
+        <source>%1: found, not listed in tools/manifest.json</source>
+        <translation>%1：已找到，未列入 tools/manifest.json</translation>
+    </message>
+    <message>
+        <source>%1: SHA256 does not match tools/manifest.json</source>
+        <translation>%1：SHA256 与 tools/manifest.json 不一致</translation>
+    </message>
+    <message>
+        <source>%1: verified against tools/manifest.json</source>
+        <translation>%1：已按 tools/manifest.json 校验</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

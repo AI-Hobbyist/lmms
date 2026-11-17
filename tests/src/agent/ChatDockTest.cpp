@@ -49,6 +49,7 @@
 #include "agent/chat/ChatAttachmentsDialog.h"
 #include "agent/chat/ChatController.h"
 #include "agent/chat/ChatGenerationPage.h"
+#include "agent/chat/ChatPortableTools.h"
 #include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatSessionsDialog.h"
 #include "agent/chat/ChatSettingsDialog.h"
@@ -615,6 +616,87 @@ private slots:
 		QVERIFY(second.isVisible());
 		QCOMPARE(ChatSearchSettings::load().backend, lmms::agent::chat::ChatSearchBackend::SearXNG);
 		second.reject();
+	}
+
+	void nativeDownloadSettings()
+	{
+		using lmms::agent::chat::ChatDownloadSettings;
+		QStandardPaths::setTestModeEnabled(true);
+		const auto previousName = QCoreApplication::applicationName();
+		QCoreApplication::setApplicationName(
+			"LMMS-AgentChatDownloads-" + lmms::agent::chat::ChatConnection::create().id);
+		const auto restoreName = qScopeGuard([&] { QCoreApplication::setApplicationName(previousName); });
+		const auto profile = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+		const auto removeProfile = qScopeGuard([&] { QDir(profile).removeRecursively(); });
+		QTemporaryDir config;
+		lmms::ConfigManager::inst()->loadConfigFile(config.filePath("config.xml"));
+		QFile prompt(config.filePath("prompt.txt"));
+		QVERIFY(prompt.open(QIODevice::WriteOnly));
+		prompt.write("Test system prompt");
+		prompt.close();
+		lmms::ConfigManager::inst()->setValue("agentchat", "promptPath", prompt.fileName());
+		lmms::agent::chat::ChatConnectionStore store(QDir(profile).filePath("agent"));
+		auto connection = lmms::agent::chat::ChatConnection::create();
+		connection.name = "Downloads";
+		connection.baseUrl = "https://example.com/v1";
+		QString error;
+		QVERIFY2(store.saveConnection(connection, error), qPrintable(error));
+		lmms::ConfigManager::inst()->setValue("agentchat", "connection", connection.id);
+
+		lmms::agent::chat::ChatSettingsDialog dialog;
+		dialog.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+		auto* tab = dialog.findChild<QToolButton*>("agentSettingsTab4");
+		QVERIFY(tab && tab->isEnabled());
+		QTest::mouseClick(tab, Qt::LeftButton);
+		auto* aria2 = dialog.findChild<QLineEdit*>("agentAria2Path");
+		auto* sevenZip = dialog.findChild<QLineEdit*>("agentSevenZipPath");
+		auto* status = dialog.findChild<QLabel*>("agentToolStatus");
+		auto* check = dialog.findChild<QToolButton*>("agentCheckTools");
+		QVERIFY(aria2 && sevenZip && status && check && aria2->isVisible());
+		QVERIFY(tab->isChecked());
+		QCOMPARE(aria2->text(), ChatDownloadSettings::defaultAria2Path());
+		QCOMPARE(aria2->mapTo(&dialog, QPoint{}), QPoint(306, 352));
+		QCOMPARE(aria2->size(), QSize(622, 43));
+		QCOMPARE(sevenZip->mapTo(&dialog, QPoint{}), QPoint(306, 455));
+		QCOMPARE(check->mapTo(&dialog, QPoint{}), QPoint(280, 868));
+		QCOMPARE(status->text(), QStringLiteral("尚未检查"));
+
+		// The test executable has no tools/ beside it: reported, not assumed.
+		QTest::mouseClick(check, Qt::LeftButton);
+		QVERIFY2(status->text().startsWith(QStringLiteral("工具不可用")), qPrintable(status->text()));
+
+		// The deployed development tools verify against their manifest.
+		const auto tools = QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("../../Release/tools");
+		if (!QFileInfo::exists(tools + "/manifest.json"))
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		aria2->setText(QDir::cleanPath(tools + "/aria2/aria2c.exe"));
+		sevenZip->setText(QDir::cleanPath(tools + "/7zip/7z.exe"));
+		QTest::mouseClick(check, Qt::LeftButton);
+		QVERIFY2(status->text().startsWith(QStringLiteral("工具可用")), qPrintable(status->text()));
+		QCOMPARE(status->text().count("verified"), 2);
+		const auto evidence = qEnvironmentVariable("LMMS_CHAT_SCREENSHOT");
+		if (!evidence.isEmpty())
+		{
+			QTest::qWait(300);
+			QVERIFY(dialog.screen()
+					->grabWindow(dialog.winId())
+					.save(QFileInfo(evidence).absolutePath() + "/agent-chat-download-settings-native.png"));
+		}
+
+		dialog.findChild<QCheckBox*>("agentExtractArchives")->setChecked(false);
+		dialog.findChild<QToolButton*>("agentSettingsTab2")->click();
+		auto* allow = dialog.findChild<QAbstractButton*>("agentAllowDownloads");
+		QVERIFY(allow->isChecked() && allow->isEnabled());
+		QTest::mouseClick(allow, Qt::LeftButton);
+		dialog.findChild<QDialogButtonBox*>("agentSettingsButtons")->button(QDialogButtonBox::Save)->click();
+		QCOMPARE(dialog.result(), int(QDialog::Accepted));
+		const auto saved = ChatDownloadSettings::load();
+		QVERIFY(!saved.enabled);
+		QVERIFY(!saved.extractArchives);
+		QCOMPARE(saved.aria2Path, QDir::cleanPath(tools + "/aria2/aria2c.exe"));
 	}
 
 	void nativeAttachmentSelection()
