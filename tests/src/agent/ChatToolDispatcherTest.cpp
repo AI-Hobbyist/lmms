@@ -404,6 +404,43 @@ private slots:
 		QVERIFY(!lmms::Engine::projectJournal()->hasActiveTransaction());
 	}
 
+	void instrumentPresetLoadKeepsTurnValid_data()
+	{
+		QTest::addColumn<bool>("loads");
+		QTest::newRow("AnalogBell.xpf") << true;
+		// A failing command is rolled back by CommandBus, which restores the project
+		// snapshot; that rollback must not cancel the rest of the turn.
+		QTest::newRow("Missing.xpf") << false;
+	}
+
+	void instrumentPresetLoadKeepsTurnValid()
+	{
+		auto& bus = CommandBus::instance();
+		QVERIFY(bus.execute("track.create", {{"type", "instrument"}, {"name", "Lead"}}).ok);
+		const auto preset = QDir(qEnvironmentVariable("LMMS_DATA_DIR"))
+								.absoluteFilePath("presets/TripleOscillator/" + QString(QTest::currentDataTag()));
+		QFETCH(bool, loads);
+		QVERIFY2(QFileInfo(preset).isFile() == loads, qPrintable(preset));
+		ChatToolDispatcher dispatcher;
+		QString error;
+		QVERIFY(dispatcher.beginTurn("session-p", "turn-p", error));
+		QSignalSpy invalidated(&dispatcher, &ChatToolDispatcher::invalidated);
+		QSignalSpy finished(&dispatcher, &ChatToolDispatcher::toolFinished);
+		QVERIFY2(dispatcher.submit(
+					 call("instrument.loadPreset", {{"track", 0}, {"path", preset}}), error, ChatApprovalMode::None),
+			qPrintable(error));
+		QTRY_COMPARE(finished.count(), 1);
+		const auto outcome = finished[0][0].toJsonObject();
+		QVERIFY2(outcome.value("result").toObject().value("ok").toBool() == loads,
+			qPrintable(QString::fromUtf8(QJsonDocument(outcome).toJson())));
+		// Editing one track, or rolling a failed edit back, is not a project replacement.
+		QCOMPARE(invalidated.count(), 0);
+		// The turn stays usable for the next call.
+		QVERIFY2(dispatcher.submit(call("track.list", {}, "call-2"), error, ChatApprovalMode::None), qPrintable(error));
+		QTRY_COMPARE(finished.count(), 2);
+		QVERIFY(finished[1][0].toJsonObject().value("result").toObject().value("ok").toBool());
+	}
+
 private:
 	QWidget m_window;
 	ChatToolCatalog m_catalog;

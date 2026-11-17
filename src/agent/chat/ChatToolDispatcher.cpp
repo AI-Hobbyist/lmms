@@ -163,6 +163,7 @@ struct ChatToolDispatcher::State
 	quint64 generation = 0;
 	bool active = false;
 	bool executing = false;
+	bool resetWhileExecuting = false;
 	bool authorized = false;
 	QSet<QString> seenCalls;
 	ChatToolCall call;
@@ -232,6 +233,13 @@ bool ChatToolDispatcher::beginTurn(const QString& sessionId, const QString& turn
 		m_state->song = song;
 		m_state->resetConnection = connect(song, &Song::projectAboutToReset, this, [this] {
 			++m_state->generation;
+			if (m_state->executing)
+			{
+				// Decided when the command returns: a failed command's rollback restores
+				// the project snapshot, which is not a project replacement.
+				m_state->resetWhileExecuting = true;
+				return;
+			}
 			invalidate(message("The project changed. Request a new tool call."));
 		});
 		m_state->destroyedConnection = connect(song, &QObject::destroyed, this, [this] {
@@ -462,12 +470,20 @@ void ChatToolDispatcher::execute(const QString& token)
 	m_state->targets.clear();
 	m_state->authorized = false;
 	m_state->executing = true;
+	m_state->resetWhileExecuting = false;
 	const QPointer<ChatToolDispatcher> alive(this);
 	const auto result = CommandBus::instance().execute(call.command, call.arguments).toJson();
 	if (!alive)
 	{
 		return;
 	}
+	if (m_state->resetWhileExecuting && result.value("ok").toBool())
+	{
+		// The command itself replaced the project (for example song.clearProject):
+		// its result is kept and the remaining calls of this turn are canceled.
+		invalidate(message("The project changed. Request a new tool call."));
+	}
+	m_state->resetWhileExecuting = false;
 	m_state->executing = false;
 	emit toolFinished(QJsonObject{{"sessionId", sessionId},
 								  {"turnId", turnId},
