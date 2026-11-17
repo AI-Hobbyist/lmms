@@ -66,3 +66,11 @@
 - 修复（f5528ac94）：命令失败时 CommandBus 用快照回滚工程并发出 projectAboutToReset，调度器曾因此判定“工程已变化”并取消同轮其余调用（实际出现在引用缺失采样 samples/empty.wav 的出厂预设上）。现在执行期间的重置在命令返回后判断：失败回滚不使回合失效；命令本身成功替换工程仍保留结果并取消其余调用。
 - 新功能（82809e865）：Agent 回复按 GitHub 方言 Markdown 渲染，禁用内嵌 HTML（原样显示），代码块外单换行保留，链接仅点击打开；用户消息保持纯文本，复制/导出为原文。
 - 替换包：build/packages/lmms-agent-chat-20261117-220216-win64.zip（仅 lmms.exe），SHA256 A24B9A9D3FD0C13D9F3EA7E4EE932726F34934D5729886A9718ACF4FE701AC93；导出 3138→3138 删除 0，VerifyOnly 通过且无写入。CTest 18/18。出厂预设所缺 samples/empty.wav 属于既有数据问题，未在本次处理。
+
+## 更新：Agent 操作后新建工程闪退修复（2026-11-17）
+
+- 源码提交 `165be940b` 已推送 master。修复 Pattern 视图延迟删除重新插入失效登记项，以及排队视图创建晚于清理/模型删除的问题；Pattern 下拉框增加空值保护。未修改事务回滚、撤销语义或插件 ABI。完整分析见 `analysis-project-reload-and-new-project-crash.md` 第 6～7 节。
+- Release 构建通过；真实 Windows MainWindow 生命周期测试连续三轮各 12 项通过，覆盖成功、dryRun、undo、redo、失败批次后模板新建与直接新建。Chat 11 + MCP 5 + 命令 3，CTest 19/19 通过（45.05 秒）。日志 `build/agent-new-project-final-{build,lifetime-tests,regression-tests}.log`。
+- 新包：`D:\UserData\Desktop\Project\lmms\build\packages\lmms-agent-chat-20261117-224748-win64.zip`，3,092,041 字节；SHA256 `03B561E87FF601B169C06241F5D54B74C9A6870842DAEE56042D656AD5E6375F`。按当前生产目录比对，仅替换 `lmms.exe`。备份原文件，关闭 LMMS 后覆盖即可。
+- 打包核验：基线 367 个二进制，导出 3138→3138、删除 0，依赖全部可解析；安装器 VerifyOnly 通过 1 个文件，无写入生产目录。日志 `build/agent-new-project-package.log`、`build/agent-new-project-verifyonly.log`。插件未重建/迁移；开发可执行文件为 `build/Release/lmms.exe`。
+- 替换后的整机操作验收 MANUAL/PENDING；不阻塞本次交付。失败回滚仍按现有实现恢复快照，并非已实现“全部工具永不重载”。

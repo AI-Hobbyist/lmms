@@ -4,10 +4,11 @@
 - 已完成：PatternTrackView 改只读登记表查询；Song 在视图清理前处理排队创建；TrackContainerView 对所有排队创建复用 QPointer；PatternStore 下拉框空值保护。生产修改仅四个 cpp，没有修改事务/撤销行为或插件 ABI。
 - 已验证：原生 Windows 完整 MainWindow 的 ChatProjectLifetimeTest，最小登记表 RED 复现后 GREEN；成功/dryRun/undo/redo/失败批次后模板新建和直接新建均通过，连续三轮每轮 QtTest 12 项通过；完整 CTest 19/19 通过（45.05 秒）。日志 build/agent-new-project-final-{build,lifetime-tests,regression-tests}.log。未使用 offscreen，测试窗口已自动关闭。
 - 分析：普通成功编辑不重载；批次外校验/preflight 失败不重载；事务失败、批次失败、写操作预演和快照撤销仍需恢复工程。若全面取消隐式重建，需要独立的增量撤销/隔离预演设计，本次未实施。详见 doc/agent/analysis-project-reload-and-new-project-crash.md 第 6～7 节。
-- 当前分支 master，起点 ff5f3795ea4fcb416d2f7094793dcfd0dfd83634；本轮修复/测试/分析/本交接待提交推送，随后用现有脚本生成并 VerifyOnly 增量包，再记录最终包路径。没有正在运行的构建测试。工作区原有未跟踪 .codegraph/、.omc/、build-driver.log、build.log 保留。
+- 当前分支 master，修复/测试/分析已提交 165be940b1ddeb23eff3b926f0d09fab67b5e181 并推送，远端哈希已核对一致。本交付文档更新随独立 docs 提交推送；没有正在运行的构建测试。工作区原有未跟踪 .codegraph/、.omc/、build-driver.log、build.log 保留。
+- 新增量包 build/packages/lmms-agent-chat-20261117-224748-win64.zip，3,092,041 字节，SHA256 03B561E87FF601B169C06241F5D54B74C9A6870842DAEE56042D656AD5E6375F。只含 lmms.exe；基线 367 个二进制、导出 3138→3138 无删除、依赖可解析、VerifyOnly 通过且无写入。日志 build/agent-new-project-{package,verifyonly}.log。
 - 输出 build/Release/lmms.exe，复用原插件目录，没有重建插件。生产 D:/Program Files/LMMS 未修改。替换后整机操作验收 MANUAL/PENDING，不阻塞交付。独立的 restoreProjectState 进度计数缺陷留作后续，未修改。
 - 环境更正：当前可用原生运行时 pwsh，python buildtools/build.py --config Release --jobs 2 --window 已成功运行（最终 126 秒），不采用下方历史“无 pwsh”结论。编译前检查同工程任务冲突，前台 PTY、SDK 环境脚本、完整 build.log；禁止 WSL/offscreen/无关重构。Penpot 本轮开始实时连接成功，本次没有布局修改。
-- 额度：可靠接口返回周窗口 usedPercent=49（剩余 51%），本次不是额度交接，无需 Luna。下一最小操作仅提交推送、增量包及交付记录，无新增功能阶段。
+- 额度：可靠接口返回周窗口 usedPercent=49（剩余 51%），本次不是额度交接，无需 Luna。当前修复及请求的分析已完成，无剩余实施阶段；人工替换/验收为 MANUAL/PENDING，不阻塞。全面无隐式重建仅作分析，须另行授权后设计实施。
 
 ---
 
