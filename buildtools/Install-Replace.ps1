@@ -120,6 +120,18 @@ try {
             $stream.Dispose()
         }
     }
+    # Files the user may have edited (for example data/system_prompt.txt): an
+    # existing copy is kept and the new default is written beside it as .default.
+    $preserve = @{}
+    foreach ($relative in @($manifest.PreserveFiles)) {
+        if (-not $relative) {
+            continue
+        }
+        if (-not $names.ContainsKey($relative)) {
+            throw "Preserved file is not in the payload: $relative"
+        }
+        $preserve[$relative] = $true
+    }
     if (-not $incremental -and (-not $names.ContainsKey('lmms.exe') -or -not $names.ContainsKey('platforms/qwindows.dll'))) {
         throw 'Incomplete Windows runtime.'
     }
@@ -184,6 +196,10 @@ try {
     }
     foreach ($file in $manifest.Files) {
         $destination = Get-ContainedPath $target $file.Path
+        if ($preserve.ContainsKey($file.Path) -and (Test-Path -LiteralPath $destination -PathType Leaf)) {
+            $destination = Get-ContainedPath $target ($file.Path + '.default')
+            Write-Output "Kept existing $($file.Path); new default written as $($file.Path).default"
+        }
         $parent = [IO.Path]::GetDirectoryName($destination)
         if (-not (Test-Path -LiteralPath $parent)) {
             $null = New-Item -ItemType Directory -Path $parent
