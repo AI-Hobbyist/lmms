@@ -88,6 +88,44 @@ private slots:
 		ExecutionThread = nullptr;
 	}
 
+	void approvalModesCannotPermitProjectReset()
+	{
+		auto& bus = CommandBus::instance();
+		QVERIFY(m_catalog.nameForCommand("song.clearProject").isEmpty());
+		QVERIFY(m_catalog.nameForCommand("song.load").isEmpty());
+		QVERIFY(bus.execute("track.create", {{"type", "sample"}, {"name", "Original"}}).ok);
+		QPointer<lmms::Track> original(lmms::Engine::getSong()->tracks()[0]);
+		QSignalSpy reset(lmms::Engine::getSong(), &lmms::Song::projectAboutToReset);
+		for (const bool automatic : {false, true})
+		{
+			ChatToolDispatcher dispatcher;
+			QString error;
+			QVERIFY(dispatcher.beginTurn("reset-session", automatic ? "automatic" : "approved", error));
+			QSignalSpy finished(&dispatcher, &ChatToolDispatcher::toolFinished);
+			QSignalSpy invalidated(&dispatcher, &ChatToolDispatcher::invalidated);
+			const QJsonArray steps{
+				QJsonObject{{"cmd", "track.setName"}, {"args", QJsonObject{{"track", 0}, {"value", "Partial"}}}},
+				QJsonObject{{"cmd", "song.clearProject"}}};
+			const auto request = call("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+			if (automatic)
+			{
+				QVERIFY(dispatcher.submit(request, error, ChatApprovalMode::None));
+			}
+			else
+			{
+				QVERIFY(dispatcher.submit(request, error));
+				QVERIFY(decide(dispatcher, dispatcher.pendingApproval(), true, error));
+			}
+			QTRY_COMPARE(finished.count(), 1);
+			QCOMPARE(resultCode(finished), QStringLiteral("agent_project_reset_forbidden"));
+			QCOMPARE(invalidated.count(), 0);
+			QCOMPARE(reset.count(), 0);
+			QVERIFY(original);
+			QCOMPARE(original->name(), QStringLiteral("Original"));
+			QCOMPARE(bus.batchDepth(), 0);
+		}
+	}
+
 	void readOnlyRequiresApprovalExactlyOnce()
 	{
 		ChatToolDispatcher dispatcher;

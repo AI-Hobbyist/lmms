@@ -1,4 +1,15 @@
-## 当前有效交接入口（2026-11-17，持续目标 P1 已验证）
+## 当前有效交接入口（2026-11-17，持续目标 P2 已验证）
+
+- 持续目标 active：按增量回滚计划 P1～P5 执行。P1 已提交推送 d78ec841f，P2 已完成定向 GREEN，正在检查点提交推送，P3～P5 未开始。进度 doc/agent/incremental-rollback-progress.md；不得把部分迁移当目标完成。
+- P2：可信 executeForAgent 已接聊天/MCP，禁止工程替换且五个 Song 公共入口写入前硬拦截；ProjectJournal 原历史栈增加局部正反操作/保存点/增量历史；track.setName 和 song.setTempo 已迁移。其余事务性写命令目前临时前置拒绝，须 P3 逐项恢复；普通内部 execute/手动 GUI 的旧快照路径保留。
+- 已验证原生 Windows：ChatProjectLifetimeTest 定向 29/29（含原生命周期基线），ChatToolDispatcherTest 定向 10/10；两批准模式的脚本清空都拒绝且撤回前序改名。日志 build/agent-incremental-p2-{build,tests,dispatcher-build,dispatcher-tests}.log。初次 fixture schema 失败已更正，日志保留。未运行全套 CTest，composition-preview 及其他编辑未迁移，不能报告完整通过。
+- 当前仅更新测试可执行文件和静态构建对象，build/Release/lmms.exe/生产目录未更新，无新 ZIP；测试窗口已关闭，无活动构建。原未跟踪目录和日志保留。
+- 下一最小步骤：完成 P2 diff/提交/推送并核对远端，再开始 P3：先基础属性/音符/自动化，再对象创建删除/重排连接，再预设与 SVS/SVC；不得直接用整轨 loadSettings 恢复简单属性（会删除片段），不得退回整工程快照。每个阶段保持约定自动验证与独立检查点。
+- 本轮 Penpot 已实时确认正确 file/page，无布局改动。最新额度接口周窗口已用 51%（剩余 49%），未达交接阈值；未委派 Luna。遵守原 SDK/前台日志/真实窗口/jobs2/禁止 WSL/offscreen/无关重构约束。
+
+---
+
+## 历史：持续目标 P1 已验证
 
 - 用户已授权持续执行增量回滚计划，目标 active，不再等待实施授权。P1 命令盘点与 RED DONE，P2～P5 未开始；每阶段单独验证、提交推送及核对远端。进度 doc/agent/incremental-rollback-progress.md；204 条真实注册命令清单 doc/agent/incremental-rollback-command-inventory.csv。
 - 本轮仅增加既有 ChatProjectLifetimeTest 中命令清单导出与 9 个无重置契约用例。Release 测试编译成功；9 个 RED 实际全部失败于重置计数，原有真实 Windows 生命周期基线 12/12 通过。build/agent-incremental-p1-{build,red,baseline}.log；不能把新 RED 当成产品已通过。未修改生产代码/安装，无新 ZIP。

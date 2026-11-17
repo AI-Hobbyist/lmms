@@ -7,6 +7,7 @@
 #include <QString>
 
 #include <functional>
+#include <stdexcept>
 #include <vector>
 
 #include "lmms_export.h"
@@ -52,6 +53,17 @@ struct LMMS_EXPORT CommandDescriptor
 	CommandHandler handler;
 	// Read-only model validation runs before creating a project snapshot.
 	CommandHandler preflight;
+	// True only after every project mutation has a registered local inverse.
+	bool incremental = false;
+};
+
+class AgentProjectResetError : public std::runtime_error
+{
+public:
+	AgentProjectResetError()
+		: std::runtime_error("Agent tools cannot replace or reload the project.")
+	{
+	}
 };
 
 class LMMS_EXPORT CommandBus
@@ -61,6 +73,9 @@ public:
 
 	bool registerCommand(const CommandDescriptor& descriptor);
 	CommandResult execute(const QString& name, const QJsonObject& arguments = {});
+	CommandResult executeForAgent(const QString& name, const QJsonObject& arguments = {});
+	bool agentExecutionActive() const { return m_agentExecution; }
+	static bool isProjectResetCommand(const QString& name);
 	QList<CommandDescriptor> descriptors() const;
 
 	bool beginBatch(const QString& label);
@@ -79,6 +94,7 @@ private:
 
 	QHash<QString, CommandDescriptor> m_commands;
 	std::vector<Batch> m_batches;
+	bool m_agentExecution = false;
 };
 
 } // namespace lmms::agent

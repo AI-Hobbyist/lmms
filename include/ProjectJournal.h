@@ -29,6 +29,8 @@
 #include <QStack>
 
 #include <vector>
+#include <functional>
+#include <memory>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -59,6 +61,17 @@ public:
 
 	void addJournalCheckPoint( JournallingObject *jo );
 	bool beginTransaction(Song* song);
+	struct IncrementalChange
+	{
+		std::function<bool()> valid;
+		std::function<void()> undo;
+		std::function<void()> redo;
+	};
+	bool beginIncrementalTransaction(Song* song);
+	bool isIncrementalTransaction() const;
+	bool addIncrementalChange(IncrementalChange change);
+	bool canUndoIncrementally() const;
+	bool canRedoIncrementally() const;
 	bool commitTransaction();
 	bool rollbackTransaction();
 	bool hasActiveTransaction() const;
@@ -127,8 +140,11 @@ private:
 		DataFile data;
 		bool projectSnapshot;
 		bool modified;
+		std::shared_ptr<std::vector<IncrementalChange>> changes;
+		bool modifiedAfter = false;
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
+	bool replayIncremental(const CheckPoint& checkpoint, bool redo);
 
 	struct Transaction
 	{

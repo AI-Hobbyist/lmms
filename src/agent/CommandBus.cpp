@@ -13,6 +13,7 @@
 #include <QJsonArray>
 #include <QMap>
 #include <QThread>
+#include <QScopedValueRollback>
 
 #include <algorithm>
 #include <exception>
@@ -114,6 +115,11 @@ CommandBus::CommandBus()
 			return CommandResult::failure("nothing_to_undo", "There is no project change to undo.");
 		}
 
+		if (CommandBus::instance().agentExecutionActive() && !journal->canUndoIncrementally())
+		{
+			return CommandResult::failure("agent_history_not_incremental",
+										  "This history entry requires a manual undo.");
+		}
 		journal->undo();
 		return CommandResult::success(QJsonObject{{"canUndo", journal->canUndo()}, {"canRedo", journal->canRedo()}});
 	};
@@ -143,6 +149,11 @@ CommandBus::CommandBus()
 			return CommandResult::failure("nothing_to_redo", "There is no project change to redo.");
 		}
 
+		if (CommandBus::instance().agentExecutionActive() && !journal->canRedoIncrementally())
+		{
+			return CommandResult::failure("agent_history_not_incremental",
+										  "This history entry requires a manual redo.");
+		}
 		journal->redo();
 		return CommandResult::success(QJsonObject{{"canUndo", journal->canUndo()}, {"canRedo", journal->canRedo()}});
 	};
@@ -204,6 +215,25 @@ bool CommandBus::registerCommand(const CommandDescriptor& descriptor)
 	return true;
 }
 
+bool CommandBus::isProjectResetCommand(const QString& name)
+{
+	return name == "song.load" || name == "song.clearProject";
+}
+
+CommandResult CommandBus::executeForAgent(const QString& name, const QJsonObject& arguments)
+{
+	if (!onMainThread())
+	{
+		return CommandResult::failure("wrong_thread", "Commands must execute on the main thread.");
+	}
+	if (!m_agentExecution && isBatchActive() && !Engine::projectJournal()->isIncrementalTransaction())
+	{
+		return CommandResult::failure("transaction_active", "A manual project transaction is active.");
+	}
+	const QScopedValueRollback<bool> agentGuard(m_agentExecution, true);
+	return execute(name, arguments);
+}
+
 CommandResult CommandBus::execute(const QString& name, const QJsonObject& arguments)
 {
 	if (!onMainThread())
@@ -217,6 +247,19 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 		return CommandResult::failure("project_busy", "Wait for the project to finish loading or restoring.");
 	}
 
+	if (m_agentExecution && isProjectResetCommand(name))
+	{
+		if (isBatchActive())
+		{
+			const auto rollback = rollbackBatch();
+			if (!rollback.ok)
+			{
+				return rollback;
+			}
+		}
+		return CommandResult::failure("agent_project_reset_forbidden",
+									  "Agent tools cannot reload or clear the project.");
+	}
 	const auto command = m_commands.constFind(name);
 	if (command == m_commands.cend())
 	{
@@ -239,6 +282,21 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 	}
 	// Copy before calling a handler: registration during a handler must not invalidate the QHash iterator.
 	const auto descriptor = command.value();
+	if (m_agentExecution && descriptor.mutability != Mutability::ReadOnly && descriptor.scope != TxScope::None
+		&& !descriptor.incremental)
+	{
+		if (isBatchActive())
+		{
+			const auto rollback = rollbackBatch();
+			if (!rollback.ok)
+			{
+				return rollback;
+			}
+		}
+		return CommandResult::failure(
+			"incremental_rollback_unavailable",
+			"This edit has not yet been migrated to incremental rollback; no changes were made.");
+	}
 	const bool rendering = hasActiveAudioExport() || (Engine::getSong() && Engine::getSong()->isExporting());
 	if (rendering && descriptor.mutability != Mutability::ReadOnly && name != "export.cancel")
 	{
@@ -275,7 +333,7 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 	}
 	// Keep preview models inaccessible to rendering, and read models between render periods.
 	const auto previewGuard = Engine::audioEngine()
-			&& (arguments.value("dryRun").toBool()
+			&& ((m_agentExecution && descriptor.scope != TxScope::None) || arguments.value("dryRun").toBool()
 				|| (rendering && descriptor.mutability == Mutability::ReadOnly && name != "export.status"))
 		? Engine::audioEngine()->requestChangesGuard()
 		: AudioEngine::RequestChangesGuard{};
@@ -300,6 +358,10 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 				result.data.insert("diff", projectDiff(name, before, projectFields()));
 			}
 		}
+	}
+	catch (const AgentProjectResetError& exception)
+	{
+		result = CommandResult::failure("agent_project_reset_forbidden", QString::fromUtf8(exception.what()));
 	}
 	catch (const std::exception& exception)
 	{
@@ -353,7 +415,9 @@ bool CommandBus::beginBatch(const QString& label)
 	{
 		return false;
 	}
-	if (!Engine::projectJournal()->beginTransaction(Engine::getSong()))
+	const bool started = m_agentExecution ? Engine::projectJournal()->beginIncrementalTransaction(Engine::getSong())
+										  : Engine::projectJournal()->beginTransaction(Engine::getSong());
+	if (!started)
 	{
 		return false;
 	}
@@ -376,11 +440,11 @@ CommandResult CommandBus::endBatch(bool success)
 	const QString label = m_batches.back().label;
 	const bool completed
 		= success ? Engine::projectJournal()->commitTransaction() : Engine::projectJournal()->rollbackTransaction();
-	m_batches.pop_back();
 	if (!completed)
 	{
 		return CommandResult::failure("transaction_failed", "Could not finalize the project transaction.");
 	}
+	m_batches.pop_back();
 
 	return CommandResult::success(QJsonObject{{"label", label}, {"batchDepth", batchDepth()}});
 }

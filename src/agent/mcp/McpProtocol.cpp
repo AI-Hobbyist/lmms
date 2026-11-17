@@ -84,7 +84,7 @@ McpProtocol::McpProtocol(HttpMcpServer& server)
 		}
 		if (server.state() == HttpMcpServer::State::Stopping && !m_exportTask.isEmpty())
 		{
-			CommandBus::instance().execute("export.cancel", {{"task", m_exportTask}});
+			CommandBus::instance().executeForAgent("export.cancel", {{"task", m_exportTask}});
 			m_exportTask.clear();
 		}
 	});
@@ -111,7 +111,7 @@ void McpProtocol::drain()
 	m_queue.pop_front();
 	m_executing = true;
 	const bool exportingBefore = hasActiveAudioExport();
-	const auto result = CommandBus::instance().execute(request.name, request.arguments);
+	const auto result = CommandBus::instance().executeForAgent(request.name, request.arguments);
 	if (result.ok && !exportingBefore && hasActiveAudioExport() && !request.arguments.value("dryRun").toBool())
 	{
 		auto task = result.data.value("task").toString();

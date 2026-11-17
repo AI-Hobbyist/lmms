@@ -46,6 +46,51 @@ private slots:
 		window->resize(1200, 800);
 		window->show();
 		QVERIFY(QTest::qWaitForWindowExposed(window));
+		lmms::agent::CommandDescriptor probe;
+		probe.name = "test.incrementalFailure";
+		probe.summary = "Exercise failures after a real nested edit.";
+		probe.mutability = lmms::agent::Mutability::Mutating;
+		probe.scope = lmms::agent::TxScope::Batch;
+		probe.incremental = true;
+		probe.argsSchema = {{"type", "object"},
+							{"properties", QJsonObject{{"mode", QJsonObject{{"type", "string"}}}}},
+							{"required", QJsonArray{"mode"}}};
+		probe.handler = [](const QJsonObject& arguments) {
+			auto result
+				= lmms::agent::CommandBus::instance().execute("track.setName", {{"track", 0}, {"value", "Partial"}});
+			if (!result.ok)
+			{
+				return result;
+			}
+			const auto mode = arguments.value("mode").toString();
+			if (mode == "exception")
+			{
+				throw std::runtime_error("Failure after a real edit");
+			}
+			if (mode == "reset")
+			{
+				lmms::Engine::getSong()->clearProject();
+			}
+			else if (mode == "reset-new")
+			{
+				lmms::Engine::getSong()->createNewProject();
+			}
+			else if (mode == "reset-template")
+			{
+				lmms::Engine::getSong()->createNewProjectFromTemplate("not-read.mpt");
+			}
+			else if (mode == "reset-load")
+			{
+				lmms::Engine::getSong()->loadProject("not-read.mmp");
+			}
+			else if (mode == "reset-restore")
+			{
+				lmms::DataFile state(lmms::DataFile::Type::SongProject);
+				lmms::Engine::getSong()->restoreProjectState(state);
+			}
+			return lmms::agent::CommandResult::failure("test_failure", "Failure after a real edit");
+		};
+		QVERIFY(lmms::agent::CommandBus::instance().registerCommand(probe));
 	}
 
 	void cleanupTestCase()
@@ -141,32 +186,32 @@ private slots:
 		{
 			auto arguments = edit;
 			arguments.insert("dryRun", true);
-			result = bus.execute("track.setName", arguments);
+			result = bus.executeForAgent("track.setName", arguments);
 			QVERIFY(result.ok);
 		}
 		else if (operation == "failed-batch")
 		{
-			QVERIFY(bus.beginBatch("No-reset contract"));
-			QVERIFY(bus.execute("track.setName", edit).ok);
-			result = bus.execute("missing.command");
+			const QJsonArray steps{QJsonObject{{"cmd", "track.setName"}, {"args", edit}},
+								   QJsonObject{{"cmd", "missing.command"}}};
+			result = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
 			QVERIFY(!result.ok);
 		}
 		else if (operation == "script-failure")
 		{
 			const QJsonArray steps{QJsonObject{{"cmd", "track.setName"}, {"args", edit}},
 								   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
-			result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+			result = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
 			QVERIFY(!result.ok);
 		}
 		else if (operation == "composition-preview")
 		{
-			result = bus.execute("compose.drumPattern", {{"bars", 1}, {"dryRun", true}});
+			result = bus.executeForAgent("compose.drumPattern", {{"bars", 1}, {"dryRun", true}});
 			QVERIFY(result.ok);
 		}
 		else if (operation == "undo")
 		{
-			QVERIFY(bus.execute("track.setName", edit).ok);
-			result = bus.execute("history.undo");
+			QVERIFY(bus.executeForAgent("track.setName", edit).ok);
+			result = bus.executeForAgent("history.undo");
 			QVERIFY(result.ok);
 		}
 		else if (operation == "clear" || operation == "script-clear")
@@ -174,11 +219,11 @@ private slots:
 			if (operation == "script-clear")
 			{
 				const QJsonArray steps{QJsonObject{{"cmd", "song.clearProject"}}};
-				result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+				result = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
 			}
 			else
 			{
-				result = bus.execute("song.clearProject");
+				result = bus.executeForAgent("song.clearProject");
 			}
 		}
 		else
@@ -190,11 +235,11 @@ private slots:
 			if (operation == "script-load")
 			{
 				const QJsonArray steps{QJsonObject{{"cmd", "song.load"}, {"args", QJsonObject{{"path", path}}}}};
-				result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+				result = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
 			}
 			else
 			{
-				result = bus.execute("song.load", {{"path", path}});
+				result = bus.executeForAgent("song.load", {{"path", path}});
 			}
 		}
 		QCOMPARE(reset.count(), 0);
@@ -207,6 +252,94 @@ private slots:
 			QVERIFY(!result.ok);
 			QCOMPARE(result.errorCode, QStringLiteral("agent_project_reset_forbidden"));
 		}
+	}
+
+	void incrementalFailuresPreserveObjects_data()
+	{
+		QTest::addColumn<QString>("mode");
+		for (const auto* mode :
+			 {"return", "exception", "reset", "reset-new", "reset-template", "reset-load", "reset-restore"})
+		{
+			QTest::newRow(mode) << QString::fromLatin1(mode);
+		}
+	}
+
+	void incrementalFailuresPreserveObjects()
+	{
+		QFETCH(QString, mode);
+		auto* song = lmms::Engine::getSong();
+		QPointer<lmms::Track> track(lmms::Track::create(lmms::Track::Type::Sample, song));
+		track->setName("Original");
+		auto* journal = lmms::Engine::projectJournal();
+		journal->clearJournal();
+		song->setModified(false);
+		QSignalSpy reset(song, &lmms::Song::projectAboutToReset);
+		const auto result
+			= lmms::agent::CommandBus::instance().executeForAgent("test.incrementalFailure", {{"mode", mode}});
+		QVERIFY(!result.ok);
+		QCOMPARE(result.errorCode,
+				 mode.startsWith("reset")  ? QStringLiteral("agent_project_reset_forbidden")
+					 : mode == "exception" ? QStringLiteral("command_exception")
+										   : QStringLiteral("test_failure"));
+		QCOMPARE(reset.count(), 0);
+		QVERIFY(track);
+		QCOMPARE(track->name(), QStringLiteral("Original"));
+		QVERIFY(!song->isModified());
+		QCOMPARE(journal->transactionDepth(), 0);
+		QCOMPARE(journal->undoDepth(), 0);
+	}
+
+	void incrementalPreviewPreservesRedoAndParentChanges()
+	{
+		auto* song = lmms::Engine::getSong();
+		QPointer<lmms::Track> track(lmms::Track::create(lmms::Track::Type::Sample, song));
+		track->setName("Original");
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* journal = lmms::Engine::projectJournal();
+		journal->clearJournal();
+		QVERIFY(bus.executeForAgent("track.setName", {{"track", 0}, {"value", "Committed"}}).ok);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(journal->redoDepth(), 1);
+		song->setModified(false);
+		QSignalSpy reset(song, &lmms::Song::projectAboutToReset);
+		QVERIFY(bus.executeForAgent("track.setName", {{"track", 0}, {"value", "Preview"}, {"dryRun", true}}).ok);
+		QVERIFY(track);
+		QCOMPARE(track->name(), QStringLiteral("Original"));
+		QCOMPARE(journal->redoDepth(), 1);
+		QVERIFY(!song->isModified());
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(track->name(), QStringLiteral("Committed"));
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(track->name(), QStringLiteral("Original"));
+		QCOMPARE(reset.count(), 0);
+
+		// A local dry-run savepoint must not discard an already applied parent edit.
+		QVERIFY(journal->beginIncrementalTransaction(song));
+		QVERIFY(
+			journal->addIncrementalChange({[track] { return !track.isNull(); }, [track] { track->setName("Original"); },
+										   [track] { track->setName("Parent"); }}));
+		track->setName("Parent");
+		QVERIFY(bus.executeForAgent("track.setName", {{"track", 0}, {"value", "Preview"}, {"dryRun", true}}).ok);
+		QCOMPARE(track->name(), QStringLiteral("Parent"));
+		QCOMPARE(journal->transactionDepth(), 1);
+		QVERIFY(journal->rollbackTransaction());
+		QCOMPARE(track->name(), QStringLiteral("Original"));
+	}
+
+	void agentRejectsLegacyHistoryWithoutPoppingIt()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("song.setTempo", {{"bpm", 133}}).ok);
+		const auto undoDepth = journal->undoDepth();
+		QSignalSpy reset(lmms::Engine::getSong(), &lmms::Song::projectAboutToReset);
+		const auto result = bus.executeForAgent("history.undo");
+		QVERIFY(!result.ok);
+		QCOMPARE(result.errorCode, QStringLiteral("agent_history_not_incremental"));
+		QCOMPARE(journal->undoDepth(), undoDepth);
+		QCOMPARE(reset.count(), 0);
+		QVERIFY(bus.execute("history.undo").ok);
+		QCOMPARE(reset.count(), 1);
 	}
 
 	void patternViewDeletionKeepsRegistryEmpty()

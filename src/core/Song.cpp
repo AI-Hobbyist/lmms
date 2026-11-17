@@ -23,6 +23,7 @@
  */
 
 #include "Song.h"
+#include "agent/CommandBus.h"
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
@@ -988,6 +989,10 @@ AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 
 void Song::clearProject()
 {
+	if (agent::CommandBus::instance().agentExecutionActive())
+	{
+		throw agent::AgentProjectResetError();
+	}
 	using gui::getGUI;
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
@@ -1076,6 +1081,10 @@ void Song::clearProject()
 // create new file
 void Song::createNewProject()
 {
+	if (agent::CommandBus::instance().agentExecutionActive())
+	{
+		throw agent::AgentProjectResetError();
+	}
 
 	QString defaultTemplate = ConfigManager::inst()->userTemplateDir()
 						+ "default.mpt";
@@ -1138,6 +1147,10 @@ void Song::createNewProject()
 
 void Song::createNewProjectFromTemplate( const QString & templ )
 {
+	if (agent::CommandBus::instance().agentExecutionActive())
+	{
+		throw agent::AgentProjectResetError();
+	}
 	loadProject( templ );
 	// clear file-name so that user doesn't overwrite template when
 	// saving...
@@ -1213,6 +1226,10 @@ void Song::saveProjectState(DataFile& dataFile)
 
 void Song::restoreProjectState(DataFile& dataFile)
 {
+	if (agent::CommandBus::instance().agentExecutionActive())
+	{
+		throw agent::AgentProjectResetError();
+	}
 	using gui::getGUI;
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
@@ -1390,6 +1407,10 @@ void Song::restoreProjectState(DataFile& dataFile)
 // load given song
 void Song::loadProject( const QString & fileName )
 {
+	if (agent::CommandBus::instance().agentExecutionActive())
+	{
+		throw agent::AgentProjectResetError();
+	}
 	using gui::getGUI;
 
 	QDomNode node;

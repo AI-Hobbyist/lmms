@@ -472,7 +472,7 @@ void ChatToolDispatcher::execute(const QString& token)
 	m_state->executing = true;
 	m_state->resetWhileExecuting = false;
 	const QPointer<ChatToolDispatcher> alive(this);
-	const auto result = CommandBus::instance().execute(call.command, call.arguments).toJson();
+	const auto result = CommandBus::instance().executeForAgent(call.command, call.arguments).toJson();
 	if (!alive)
 	{
 		return;

@@ -25,6 +25,10 @@ QJsonArray ToolRegistry::tools()
 	QJsonArray result;
 	for (const auto& command : CommandBus::instance().descriptors())
 	{
+		if (CommandBus::isProjectResetCommand(command.name))
+		{
+			continue;
+		}
 		if (command.name.startsWith("agent.") && command.name != "agent.runScript")
 		{
 			continue;

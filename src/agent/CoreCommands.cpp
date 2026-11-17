@@ -10,6 +10,7 @@
 #include <QTemporaryFile>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QPointer>
 #include <QRegularExpression>
 
 #include <algorithm>
@@ -2668,6 +2669,18 @@ CommandResult executeSongSetTempo(const QJsonObject& arguments)
 		return invalidArguments(QStringLiteral("'bpm' must be between %1 and %2.").arg(MinTempo).arg(MaxTempo));
 	}
 
+	auto* journal = Engine::projectJournal();
+	if (journal->isIncrementalTransaction())
+	{
+		const QPointer<Song> target(song);
+		const auto previous = song->getTempo();
+		if (!journal->addIncrementalChange({[target] { return !target.isNull(); },
+											[target, previous] { target->tempoModel().setValue(previous); },
+											[target, tempo] { target->tempoModel().setValue(tempo); }}))
+		{
+			return CommandResult::failure("transaction_failed", "Could not record the tempo inverse.");
+		}
+	}
 	song->tempoModel().setValue(tempo);
 	return CommandResult::success(QJsonObject{{"tempo", song->getTempo()}});
 }
@@ -3558,6 +3571,18 @@ CommandResult executeTrackSetName(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 
+	auto* journal = Engine::projectJournal();
+	if (journal->isIncrementalTransaction())
+	{
+		const QPointer<Track> target(track);
+		const auto previous = track->name();
+		if (!journal->addIncrementalChange({[target] { return !target.isNull(); },
+											[target, previous] { target->setName(previous); },
+											[target, name] { target->setName(name); }}))
+		{
+			return CommandResult::failure("transaction_failed", "Could not record the track name inverse.");
+		}
+	}
 	track->setName(name);
 	return CommandResult::success(trackDetail(song, track, trackIndex));
 }
@@ -5721,6 +5746,7 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 	descriptor.scope = scope;
 	descriptor.handler = std::move(handler);
 	descriptor.preflight = std::move(preflight);
+	descriptor.incremental = name == "song.setTempo" || name == "track.setName";
 	commandBus.registerCommand(descriptor);
 }
 

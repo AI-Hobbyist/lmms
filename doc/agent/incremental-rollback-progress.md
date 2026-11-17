@@ -29,4 +29,23 @@ P2 接口决策：CommandBus 新增可信 Agent 执行入口并传播进程内�
 - 既有基线 12 passed/0 failed/0 skipped，日志 build/agent-incremental-p1-baseline.log；新 RED 不作为旧基线退化。
 - 生产代码和 build/Release/lmms.exe 未改；仅重建测试。全套 CTest 当前包含新增 RED，不能报告全部通过。P2 开始时将这些用例切到可信 Agent 入口，未迁移的组合编辑留待 P3/P4 转绿。
 
-P2～P5 NOT STARTED。下一步在 P1 提交推送检查点后实施 P2，不扩展为全面重写用户历史系统。
+P1 提交 d78ec841f，已推送并核对远端一致。
+
+## P2 DONE：增量事务基础与硬限制（2026-11-17）
+
+- CommandBus::executeForAgent 建立程序设置的上下文，聊天执行和 MCP drain/export.cancel 进入该入口；脚本及组合命令的内部 execute 继承限制。普通 execute 与用户原生 GUI 保留原有快照兼容路径。
+- Agent 直接调用 song.load/clearProject 返回 agent_project_reset_forbidden，工具目录隐藏两者；Song 的 clearProject/createNewProject/createNewProjectFromTemplate/loadProject/restoreProjectState 在任何写入与重置信号之前检查上下文，防止内部 handler 绕过命令名限制。两种批准模式均不能解禁。
+- ProjectJournal 原历史栈新增局部正反回调记录，支持嵌套事务合并、局部 rollback/savepoint、modified 状态恢复及增量 undo/redo；QPointer 有效性检查拒绝失效目标。失败/预演不清 redo、不提交历史；事务结束失败不丢弃批次状态。不引入第二套聊天历史栈或自动快照 fallback。
+- 首批支持 track.setName、song.setTempo：调用原处理器，在写入前记录原值和正反 setter。其余事务性写命令暂时在写入前返回 incremental_rollback_unavailable，必须继续 P3 迁移；这是过渡状态，不是最终能力验收。Agent 遇旧快照历史在出栈前拒绝，用户手动 undo 仍可用。
+
+验证：
+
+- 首次依赖重编译成功（35 cpp，259 秒），定向改动后的增量构建成功（3 cpp，32 秒）；dispatcher 测试目标构建成功（1 cpp，12 秒）。仅构建测试，lmms.exe 和生产安装未更新。
+- 原生 Windows 完整 MainWindow 定向测试 29 passed/0 failed/0 skipped：P1 的八个基础场景转绿；实际写入后返回失败/抛异常/调用五个重置公共入口均局部恢复且零重置；预演保留对象/redo/父保存点，旧快照拒绝且不出栈；原有 12 项生命周期基线保留。日志 build/agent-incremental-p2-tests.log。
+- 聊天真实调度/批准定向测试 10 passed/0 failed/0 skipped：两模式批准脚本在改名后试图清空工程均拒绝、恢复原名、零重置、不使回合失效；原批准/取消/身份/脚本基线通过。日志 build/agent-incremental-p2-dispatcher-tests.log。
+- 初次故障探针漏写 mode schema，三项止于 invalid_arguments，已补夹具后转绿；保留 build/agent-incremental-p2-fixture-red.log，不将其当产品 RED。
+- 格式审查撤回 formatter 对原有 include 顺序的无关调整，仅保留新 include；逻辑未变，git diff --check 通过。没有调试日志/offscreen/插件目录迁移。
+
+未验证/未完成：组合预演（P1 的 composition-preview）和其他编辑工具留待 P3；完整 Chat/MCP 回归与能力覆盖留待 P5，当前不能宣称全套 CTest 通过。外部操作的逐项审查及完整脚本/历史契约仍在 P3/P4。人工安装验收 MANUAL/PENDING，无新 ZIP。
+
+下一步：P2 提交推送核对后，P3 按命令清单迁移基础编辑与对象生命周期；不通过降低最终覆盖标准收尾。

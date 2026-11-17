@@ -24,6 +24,10 @@
 
 #include <cstdlib>
 #include <QDomElement>
+#include <QScopedValueRollback>
+#include <algorithm>
+#include <QScopedValueRollback>
+#include <algorithm>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
@@ -31,6 +35,8 @@
 #include "lmms_math.h"
 #include "Song.h"
 #include "AutomationClip.h"
+#include "AudioEngine.h"
+#include "AudioEngine.h"
 
 namespace lmms
 {
@@ -56,6 +62,17 @@ void ProjectJournal::undo()
 {
 	if (hasActiveTransaction())
 	{
+		return;
+	}
+
+	if (!m_undoCheckPoints.isEmpty() && m_undoCheckPoints.top().changes)
+	{
+		const auto checkpoint = m_undoCheckPoints.top();
+		if (replayIncremental(checkpoint, false))
+		{
+			m_undoCheckPoints.pop();
+			m_redoCheckPoints.push(checkpoint);
+		}
 		return;
 	}
 
@@ -114,6 +131,17 @@ void ProjectJournal::redo()
 {
 	if (hasActiveTransaction())
 	{
+		return;
+	}
+
+	if (!m_redoCheckPoints.isEmpty() && m_redoCheckPoints.top().changes)
+	{
+		const auto checkpoint = m_redoCheckPoints.top();
+		if (replayIncremental(checkpoint, true))
+		{
+			m_redoCheckPoints.pop();
+			m_undoCheckPoints.push(checkpoint);
+		}
 		return;
 	}
 
@@ -205,6 +233,94 @@ bool ProjectJournal::beginTransaction(Song* song)
 	return true;
 }
 
+bool ProjectJournal::beginIncrementalTransaction(Song* song)
+{
+	if (!song || !song->isJournalling() || (hasActiveTransaction() && !isIncrementalTransaction()))
+	{
+		return false;
+	}
+	CheckPoint checkpoint(song->id(), DataFile(DataFile::Type::JournalData), false, song->isModified());
+	checkpoint.changes = std::make_shared<std::vector<IncrementalChange>>();
+	const bool journalling = isJournalling();
+	m_transactions.push_back(Transaction{std::move(checkpoint), journalling});
+	setJournalling(false);
+	return true;
+}
+
+bool ProjectJournal::isIncrementalTransaction() const
+{
+	return hasActiveTransaction() && bool(m_transactions.back().checkpoint.changes);
+}
+
+bool ProjectJournal::addIncrementalChange(IncrementalChange change)
+{
+	if (!isIncrementalTransaction() || !change.valid || !change.undo || !change.redo || !change.valid())
+	{
+		return false;
+	}
+	m_transactions.back().checkpoint.changes->push_back(std::move(change));
+	return true;
+}
+
+bool ProjectJournal::canUndoIncrementally() const
+{
+	if (!canUndo() || !m_undoCheckPoints.top().changes)
+	{
+		return false;
+	}
+	const auto& changes = *m_undoCheckPoints.top().changes;
+	return std::all_of(changes.begin(), changes.end(), [](const auto& change) { return change.valid(); });
+}
+
+bool ProjectJournal::canRedoIncrementally() const
+{
+	if (!canRedo() || !m_redoCheckPoints.top().changes)
+	{
+		return false;
+	}
+	const auto& changes = *m_redoCheckPoints.top().changes;
+	return std::all_of(changes.begin(), changes.end(), [](const auto& change) { return change.valid(); });
+}
+
+bool ProjectJournal::replayIncremental(const CheckPoint& checkpoint, bool redo)
+{
+	auto* song = dynamic_cast<Song*>(m_joIDs.value(checkpoint.joID, nullptr));
+	if (!song || !checkpoint.changes)
+	{
+		return false;
+	}
+	for (const auto& change : *checkpoint.changes)
+	{
+		if (!change.valid())
+		{
+			return false;
+		}
+	}
+	auto audioGuard = Engine::audioEngine()->requestChangesGuard();
+	const bool journalling = isJournalling();
+	const QScopedValueRollback<bool> restoring(m_restoringProject, true);
+	setJournalling(false);
+	if (redo)
+	{
+		for (const auto& change : *checkpoint.changes)
+		{
+			change.redo();
+		}
+	}
+	else
+	{
+		for (auto it = checkpoint.changes->rbegin(); it != checkpoint.changes->rend(); ++it)
+		{
+			it->undo();
+		}
+	}
+	song->setModified(redo ? checkpoint.modifiedAfter : checkpoint.modified);
+	// The restoring guard must be cleared before restoring journal mode.
+	m_restoringProject = false;
+	setJournalling(journalling);
+	return true;
+}
+
 bool ProjectJournal::commitTransaction()
 {
 	if (!hasActiveTransaction())
@@ -212,7 +328,26 @@ bool ProjectJournal::commitTransaction()
 		return false;
 	}
 
-	if (m_transactions.size() == 1)
+	auto& checkpoint = m_transactions.back().checkpoint;
+	if (checkpoint.changes)
+	{
+		auto* song = dynamic_cast<Song*>(m_joIDs.value(checkpoint.joID, nullptr));
+		if (!song)
+		{
+			return false;
+		}
+		checkpoint.modifiedAfter = song->isModified();
+		if (m_transactions.size() > 1)
+		{
+			auto& parent = m_transactions[m_transactions.size() - 2].checkpoint.changes;
+			if (!parent)
+			{
+				return false;
+			}
+			parent->insert(parent->end(), checkpoint.changes->begin(), checkpoint.changes->end());
+		}
+	}
+	if (m_transactions.size() == 1 && (!checkpoint.changes || !checkpoint.changes->empty()))
 	{
 		m_redoCheckPoints.clear();
 		m_undoCheckPoints.push(m_transactions.back().checkpoint);
@@ -237,6 +372,16 @@ bool ProjectJournal::rollbackTransaction()
 
 	auto checkpoint = m_transactions.back().checkpoint;
 	const bool journalling = m_transactions.back().journalling;
+	if (checkpoint.changes)
+	{
+		if (!replayIncremental(checkpoint, false))
+		{
+			return false;
+		}
+		m_transactions.pop_back();
+		setJournalling(journalling);
+		return true;
+	}
 	auto* song = dynamic_cast<Song*>(m_joIDs.value(checkpoint.joID, nullptr));
 	if (song == nullptr || !checkpoint.projectSnapshot)
 	{
