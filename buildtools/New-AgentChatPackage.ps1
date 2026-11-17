@@ -133,7 +133,8 @@ $manifest = [ordered]@{
     BaseVersion    = (Get-Item -LiteralPath (Join-Path $base 'lmms.exe')).VersionInfo.FileVersion
     BaseFiles      = $baseline
     Files          = $files
-    PreserveFiles  = @('data/system_prompt.txt')
+    # Only files actually in this payload can be preserved.
+    PreserveFiles  = @($files | Where-Object { $_.Path -eq 'data/system_prompt.txt' } | ForEach-Object { $_.Path })
     RemoveFiles    = @()
 }
 
