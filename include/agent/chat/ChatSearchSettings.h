@@ -1,9 +1,22 @@
 #ifndef LMMS_AGENT_CHAT_SEARCH_SETTINGS_H
 #define LMMS_AGENT_CHAT_SEARCH_SETTINGS_H
 
+#include <QObject>
 #include <QString>
 
 namespace lmms::agent::chat {
+
+// Emits changed() after ChatSearchSettings::save(), so running searches can be
+// canceled as soon as the user turns web search off.
+class ChatSearchSettingsNotifier : public QObject
+{
+	Q_OBJECT
+public:
+	static ChatSearchSettingsNotifier* instance();
+
+signals:
+	void changed();
+};
 
 enum class ChatSearchBackend
 {

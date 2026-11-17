@@ -32,7 +32,7 @@ bool validDefinition(const QJsonObject& definition)
 
 } // namespace
 
-bool ChatToolCatalog::load(QString& error)
+bool ChatToolCatalog::load(QString& error, const QJsonArray& localTools)
 {
 	error.clear();
 	const auto* application = QCoreApplication::instance();
@@ -58,6 +58,22 @@ bool ChatToolCatalog::load(QString& error)
 		definition.insert("command", command);
 		byWireName.insert(name, definition);
 	}
+	for (const auto& value : localTools)
+	{
+		auto definition = value.toObject();
+		const auto command = definition.value("name").toString();
+		const auto name = wireName(command);
+		definition.insert("name", name);
+		if (command.isEmpty() || !validDefinition(definition) || byWireName.contains(name))
+		{
+			error = message("A chat tool cannot be represented as a model function: %1").arg(command);
+			return false;
+		}
+		definitions.append(definition);
+		definition.insert("command", command);
+		definition.insert("local", true);
+		byWireName.insert(name, definition);
+	}
 	m_definitions = definitions;
 	m_byWireName = byWireName;
 	return true;
@@ -71,6 +87,12 @@ QString ChatToolCatalog::nameForCommand(const QString& command) const
 	const auto name = wireName(command);
 	return m_byWireName.value(name).value("command") == command ? name : QString{};
 }
+
+bool ChatToolCatalog::isLocal(const QString& command) const
+{ return m_byWireName.value(wireName(command)).value("local").toBool(); }
+
+QString ChatToolCatalog::description(const QString& command) const
+{ return m_byWireName.value(wireName(command)).value("description").toString(); }
 
 bool ChatToolCatalog::resolve(const QJsonObject& call, ChatToolCall& resolved, QString& error) const
 {

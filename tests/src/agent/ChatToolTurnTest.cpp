@@ -22,6 +22,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QtTest>
+#include <functional>
 
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -32,8 +33,10 @@
 #include "agent/CommandBus.h"
 #include "agent/chat/ChatController.h"
 #include "agent/chat/ChatDock.h"
+#include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatTools.h"
 #include "agent/chat/ChatTranscript.h"
+#include "agent/chat/ChatWebSearch.h"
 
 using namespace lmms::agent;
 using namespace lmms::agent::chat;
@@ -46,6 +49,12 @@ public:
 	QList<QJsonObject> requests;
 	// CommandBus batch depth observed while each model request was in flight.
 	QList<int> batchDepths;
+	// Request headers (request line first) of every received request.
+	QList<QByteArray> heads;
+	// Complete raw HTTP responses, used before the JSON responses when present.
+	QList<QByteArray> rawResponses;
+	// Keep requests open without answering, to simulate a slow search.
+	bool hold = false;
 
 	ToolTurnServer()
 	{
@@ -75,6 +84,14 @@ public:
 				socket->setProperty("responded", true);
 				requests.append(QJsonDocument::fromJson(bytes.mid(separator + 4, length)).object());
 				batchDepths.append(CommandBus::instance().batchDepth());
+				heads.append(bytes.left(separator));
+				if (hold) { return; }
+				if (!rawResponses.isEmpty())
+				{
+					socket->write(rawResponses.takeFirst());
+					socket->disconnectFromHost();
+					return;
+				}
 				const auto body = QJsonDocument(responses.isEmpty() ? QJsonObject{} : responses.takeFirst()).toJson();
 				socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n" + body);
 				socket->disconnectFromHost();
@@ -110,6 +127,66 @@ private:
 				{"function",
 				 QJsonObject{{"name", m_catalog.nameForCommand("track.setName")},
 							 {"arguments", QString::fromUtf8(arguments)}}}};
+	}
+
+	static QStringList toolNames(const QJsonObject& request)
+	{
+		QStringList names;
+		for (const auto& value : request.value("tools").toArray())
+		{
+			names.append(value.toObject().value("function").toObject().value("name").toString());
+		}
+		return names;
+	}
+
+	static QString searchWireName()
+	{
+		ChatToolCatalog catalog;
+		QString error;
+		catalog.load(error, {ChatWebSearch::definition()});
+		return catalog.nameForCommand(ChatWebSearch::command());
+	}
+
+	static QJsonObject searchCall(const QString& id, const QString& query, int count)
+	{
+		const QJsonObject arguments{{"query", query}, {"count", count}};
+		return {{"id", id}, {"type", "function"},
+			{"function",
+				QJsonObject{{"name", searchWireName()},
+					{"arguments", QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact))}}}};
+	}
+
+	static void enableSearch(const QString& url)
+	{
+		ChatSearchSettings settings;
+		settings.enabled = true;
+		settings.searxngUrl = url;
+		settings.save();
+	}
+
+	// Runs one approved search call and returns the tool result sent back to the model.
+	QJsonObject runSingleSearch(
+		const std::function<void()>& beforeDecide = {}, const std::function<void()>& afterDecide = {})
+	{
+		ToolTurnServer model;
+		if (!model.server.listen(QHostAddress::LocalHost)) { return {}; }
+		queueCalls(model, {searchCall("find", "drums", 3)});
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		store.saveSession(session, error);
+		ChatController controller(store);
+		controller.setToolsEnabled(true);
+		QSignalSpy approvals(&controller, &ChatController::approvalRequested);
+		controller.send(session.value("id").toString(), model.connection(), "fixture-key", {}, "Search", error);
+		if (!QTest::qWaitFor([&] { return approvals.size() == 1; }, 5000)) { return {}; }
+		if (beforeDecide) { beforeDecide(); }
+		controller.decideTool(approvals[0][0].toJsonObject(), true, error);
+		if (afterDecide) { afterDecide(); }
+		if (!QTest::qWaitFor([&] { return !controller.active(); }, 10000) || model.requests.size() != 2) { return {}; }
+		const auto history = model.requests[1].value("messages").toArray();
+		return QJsonDocument::fromJson(history.last().toObject().value("content").toString().toUtf8()).object();
 	}
 
 	void queueCalls(ToolTurnServer& server, const QJsonArray& calls)
@@ -209,7 +286,157 @@ private slots:
 	{
 		lmms::Engine::getSong()->clearProject();
 		lmms::ConfigManager::inst()->setValue("agentchat", "approval", "request");
+		ChatSearchSettings{}.save();
 		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "sample"}, {"name", "Original"}}).ok);
+	}
+
+	void webSearchOfferedOnlyWhenEnabled()
+	{
+		ToolTurnServer server;
+		QVERIFY(server.server.listen(QHostAddress::LocalHost));
+		server.responses.append(ToolTurnServer::response({{"role", "assistant"}, {"content", "Done"}}, "stop"));
+		server.responses.append(ToolTurnServer::response({{"role", "assistant"}, {"content", "Done"}}, "stop"));
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		QVERIFY(store.saveSession(session, error));
+		ChatController controller(store);
+		controller.setToolsEnabled(true);
+		const auto id = session.value("id").toString();
+		QVERIFY(controller.send(id, server.connection(), "fixture-key", {}, "Off", error));
+		QTRY_VERIFY(!controller.active());
+		QVERIFY(!toolNames(server.requests[0]).contains(searchWireName()));
+		QVERIFY(toolNames(server.requests[0]).contains(m_catalog.nameForCommand("track.setName")));
+		enableSearch("http://127.0.0.1:1");
+		QVERIFY(controller.send(id, server.connection(), "fixture-key", {}, "On", error));
+		QTRY_VERIFY(!controller.active());
+		QVERIFY(toolNames(server.requests[1]).contains(searchWireName()));
+		// The model-hosted source is not an external search tool.
+		auto settings = ChatSearchSettings::load();
+		settings.backend = ChatSearchBackend::Model;
+		settings.save();
+		server.responses.append(ToolTurnServer::response({{"role", "assistant"}, {"content", "Done"}}, "stop"));
+		QVERIFY(controller.send(id, server.connection(), "fixture-key", {}, "Model", error));
+		QTRY_VERIFY(!controller.active());
+		QVERIFY(!toolNames(server.requests[2]).contains(searchWireName()));
+	}
+
+	void webSearchSearxngRoundTrip()
+	{
+		ToolTurnServer search;
+		QVERIFY(search.server.listen(QHostAddress::LocalHost));
+		search.responses.append(QJsonObject{{"results",
+			QJsonArray{QJsonObject{{"title", "Lofi kit"}, {"url", "https://samples.example.org/kit"}, {"content", "A"}},
+				QJsonObject{{"title", "Dusty drums"}, {"url", "https://samples.example.org/dusty"}, {"content", "B"}},
+				QJsonObject{{"title", "Third"}, {"url", "https://samples.example.org/3"}, {"content", "C"}}}}});
+		enableSearch(QStringLiteral("http://127.0.0.1:%1/searx").arg(search.server.serverPort()));
+		ToolTurnServer model;
+		QVERIFY(model.server.listen(QHostAddress::LocalHost));
+		queueCalls(model, {searchCall("find", "lofi drums", 2)});
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		QVERIFY(store.saveSession(session, error));
+		const auto id = session.value("id").toString();
+		ChatController controller(store);
+		controller.setToolsEnabled(true);
+		QSignalSpy approvals(&controller, &ChatController::approvalRequested);
+		QVERIFY(controller.send(id, model.connection(), "fixture-key", {}, "Search", error));
+		QTRY_COMPARE(approvals.size(), 1);
+
+		// Approval shows the query and source before anything is sent.
+		const auto approval = approvals[0][0].toJsonObject();
+		QCOMPARE(approval.value("command").toString(), QStringLiteral("chat.webSearch"));
+		QCOMPARE(approval.value("targets").toArray()[0].toObject().value("name").toString(),
+			QStringLiteral("searxng · lofi drums"));
+		QVERIFY(search.heads.isEmpty());
+		QVERIFY(controller.decideTool(approval, true, error));
+		QTRY_VERIFY(!controller.active());
+
+		QCOMPARE(search.heads.size(), 1);
+		QVERIFY2(
+			search.heads[0].startsWith("GET /searx/search?q=lofi%20drums&format=json"), search.heads[0].constData());
+		QCOMPARE(search.batchDepths, QList<int>{0});
+		QCOMPARE(model.requests.size(), 2);
+		const auto history = model.requests[1].value("messages").toArray();
+		const auto result
+			= QJsonDocument::fromJson(history.last().toObject().value("content").toString().toUtf8()).object();
+		QVERIFY(result.value("ok").toBool());
+		const auto results = result.value("data").toObject().value("results").toArray();
+		QCOMPARE(results.size(), 2);
+		QCOMPARE(results[0].toObject().value("url").toString(), QStringLiteral("https://samples.example.org/kit"));
+		QCOMPARE(lmms::Engine::getSong()->tracks()[0]->name(), QStringLiteral("Original"));
+	}
+
+	void webSearchSearxngWithoutJsonExplainsFix()
+	{
+		ToolTurnServer search;
+		QVERIFY(search.server.listen(QHostAddress::LocalHost));
+		search.rawResponses.append("HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n"
+								   "<html>Forbidden</html>");
+		enableSearch(QStringLiteral("http://127.0.0.1:%1").arg(search.server.serverPort()));
+		const auto result = runSingleSearch();
+		QCOMPARE(result.value("error").toObject().value("code").toString(), QStringLiteral("searxng_json_unavailable"));
+		QVERIFY(result.value("error").toObject().value("hint").toString().contains("json"));
+	}
+
+	void webSearchRefusedAfterTurnedOff()
+	{
+		ToolTurnServer search;
+		QVERIFY(search.server.listen(QHostAddress::LocalHost));
+		enableSearch(QStringLiteral("http://127.0.0.1:%1").arg(search.server.serverPort()));
+		const auto result = runSingleSearch([] { ChatSearchSettings{}.save(); });
+		QCOMPARE(result.value("error").toObject().value("code").toString(), QStringLiteral("web_search_disabled"));
+		QVERIFY(search.heads.isEmpty());
+	}
+
+	void webSearchBraveUsesStoredKey()
+	{
+		ToolTurnServer search;
+		QVERIFY(search.server.listen(QHostAddress::LocalHost));
+		search.responses.append(QJsonObject{{"web",
+			QJsonObject{{"results",
+				QJsonArray{QJsonObject{
+					{"title", "Brave kit"}, {"url", "https://samples.example.org/brave"}, {"description", "D"}}}}}}});
+		ChatSearchSettings settings;
+		settings.enabled = true;
+		settings.backend = ChatSearchBackend::Brave;
+		settings.braveUrl = QStringLiteral("http://127.0.0.1:%1/res/v1/web/search").arg(search.server.serverPort());
+		settings.save();
+		const ChatConnectionStore keys(
+			QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"));
+		QString error;
+		QVERIFY(keys.removeKey(ChatSearchSettings::braveKeyId(), error));
+
+		// Without a key the call is refused before any request is sent.
+		const auto missing = runSingleSearch();
+		QCOMPARE(missing.value("error").toObject().value("code").toString(), QStringLiteral("search_not_configured"));
+		QVERIFY(search.heads.isEmpty());
+
+		QVERIFY2(keys.writeKey(ChatSearchSettings::braveKeyId(), "brave-fixture-key", error), qPrintable(error));
+		const auto removeKey = qScopeGuard([&] { keys.removeKey(ChatSearchSettings::braveKeyId(), error); });
+		const auto result = runSingleSearch();
+		QVERIFY(result.value("ok").toBool());
+		QCOMPARE(result.value("data").toObject().value("results").toArray()[0].toObject().value("snippet").toString(),
+			QStringLiteral("D"));
+		QCOMPARE(search.heads.size(), 1);
+		QVERIFY(search.heads[0].startsWith("GET /res/v1/web/search?q=drums&count=3"));
+		QVERIFY(search.heads[0].contains("X-Subscription-Token: brave-fixture-key"));
+	}
+
+	void webSearchCanceledWhenTurnedOff()
+	{
+		ToolTurnServer search;
+		QVERIFY(search.server.listen(QHostAddress::LocalHost));
+		search.hold = true;
+		enableSearch(QStringLiteral("http://127.0.0.1:%1").arg(search.server.serverPort()));
+		const auto result = runSingleSearch({}, [&] {
+			QTRY_COMPARE(search.heads.size(), 1);
+			ChatSearchSettings{}.save();
+		});
+		QCOMPARE(result.value("error").toObject().value("code").toString(), QStringLiteral("web_search_disabled"));
 	}
 
 	void protocolMultipleRounds_data()

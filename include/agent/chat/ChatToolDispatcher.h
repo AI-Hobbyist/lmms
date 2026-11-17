@@ -41,6 +41,8 @@ private:
 	std::unique_ptr<State> m_state;
 	void invalidate(const QString& reason);
 	void execute(const QString& token);
+	void executeNetworkTask();
+	void finishNetworkTask(const QJsonObject& result);
 	void finishPending(const QJsonObject& result);
 };
 

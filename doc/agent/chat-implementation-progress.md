@@ -239,3 +239,8 @@ ChatToolDispatcher两类结果新增approvalRequired/executed；ChatController::
 ## M4.1 联网搜索开关与搜索来源设置（2026-11-17）
 
 Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外部素材”卡片补设计：搜索来源分段SearXNG/Brave/模型自带(1186/1310/1434,392,118×32)、端点输入(1186,436,366×36)、凭据输入(1186,480,366×36)，下载开关/批准块整体下移。新增ChatSearchSettings：webSearch默认关闭、searchBackend默认searxng、SearXNG URL不预填公共实例、Brave默认官方API地址；SearXNG认证与Brave Key经ChatConnectionStore写入Windows凭据管理器，不进配置文件。全局页开关真实可用，关闭时来源区禁用；保存时校验http/https与主机（允许局域网），Brave缺Key明确提示并拒绝保存。ChatDockTest新增nativeWebSearchSettings（默认关闭、Penpot几何、局域网URL+认证保存、重开显示“已保存”、Brave缺Key拒绝），全部11个Chat CTest通过；真实窗口截图build/agent-chat-search-settings-native.png已查看。下载开关仍为展示，留待下载步骤。日志build/agent-chat-m4-search-settings-{build,tests}.log。
+
+
+## M4.2 SearXNG/Brave 搜索工具与门控（2026-11-17）
+
+新增ChatWebSearch（chat.webSearch，参数query/count1–10）：SearXNG按实例URL请求/search?q=…&format=json（可选认证：user:password为Basic，否则Bearer），Brave用X-Subscription-Token；结果统一为CommandResult（title/url/snippet）。工具目录新增本地工具通道，不经CommandBus、不占项目批次。仅在联网开关开启且来源非“模型自带”时向模型公开；执行时再次读取设置，关闭则拒绝（web_search_disabled）；保存设置关闭搜索时经ChatSearchSettingsNotifier中止在途请求；轮次失效/停止/工程替换时丢弃旧回调。SearXNG非JSON/403返回searxng_json_unavailable并提示在settings.yml的search.formats启用json，不切换其他来源；Brave缺Key返回search_not_configured且不发请求。批准卡显示“web · 后端 · 查询”。ChatToolTurnTest新增6项（公开门控、SearXNG往返含批次深度0、JSON未启用提示、批准后关闭拒绝、搜索中关闭取消、Brave Key），新增8条中文词条（lrelease 4171/0）。CTest 18/18（Chat11+MCP5+CommandBus/CoreCommands）通过，日志build/agent-chat-m4-web-search-{build,tests}.log。本机HTTP夹具，非真实SearXNG/Brave实测：MANUAL/PENDING。

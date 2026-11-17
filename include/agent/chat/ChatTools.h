@@ -21,9 +21,12 @@ struct ChatToolCall
 class ChatToolCatalog
 {
 public:
-	bool load(QString& error);
+	// Local tools are chat-owned (for example web search) and never run through CommandBus.
+	bool load(QString& error, const QJsonArray& localTools = {});
 	QJsonArray definitions() const;
 	QString nameForCommand(const QString& command) const;
+	bool isLocal(const QString& command) const;
+	QString description(const QString& command) const;
 	bool resolve(const QJsonObject& call, ChatToolCall& resolved, QString& error) const;
 
 private:

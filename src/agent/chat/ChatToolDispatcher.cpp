@@ -1,8 +1,10 @@
 #include "agent/chat/ChatToolDispatcher.h"
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QPointer>
 #include <QSet>
+#include <QStandardPaths>
 #include <QThread>
 #include <QTimer>
 #include <QUuid>
@@ -15,6 +17,8 @@
 #include "agent/CommandBus.h"
 #include "agent/ScriptRunner.h"
 #include "agent/ToolRegistry.h"
+#include "agent/chat/ChatSearchSettings.h"
+#include "agent/chat/ChatWebSearch.h"
 
 namespace lmms::agent::chat {
 namespace {
@@ -161,12 +165,29 @@ struct ChatToolDispatcher::State
 	ChatToolCall call;
 	QJsonObject approval;
 	CommandTargetIdentities targets;
+
+	// Chat-owned network tool currently waiting for its reply (never a project batch).
+	ChatWebSearch* search = nullptr;
+	QJsonObject networkOutcome;
 };
 
 ChatToolDispatcher::ChatToolDispatcher(QObject* parent)
 	: QObject(parent)
 	, m_state(std::make_unique<State>())
 {
+	m_state->search = new ChatWebSearch(this);
+	connect(m_state->search, &ChatWebSearch::finished, this,
+		[this](const QJsonObject& result) { finishNetworkTask(result); });
+	connect(ChatSearchSettingsNotifier::instance(), &ChatSearchSettingsNotifier::changed, this, [this] {
+		const auto settings = ChatSearchSettings::load();
+		if (!m_state->networkOutcome.isEmpty() && (!settings.enabled || settings.backend == ChatSearchBackend::Model))
+		{
+			m_state->search->abort();
+			finishNetworkTask(CommandResult::failure(
+				"web_search_disabled", message("Web search was turned off; the running search was canceled."))
+					.toJson());
+		}
+	});
 }
 
 ChatToolDispatcher::~ChatToolDispatcher() = default;
@@ -185,10 +206,14 @@ bool ChatToolDispatcher::beginTurn(const QString& sessionId, const QString& turn
 		error = message("The current project is unavailable or being replaced.");
 		return false;
 	}
-	if (!m_state->catalog.load(error))
+	// Web search is offered only while the user has it enabled with an external source.
+	const auto search = ChatSearchSettings::load();
+	QJsonArray localTools;
+	if (search.enabled && search.backend != ChatSearchBackend::Model)
 	{
-		return false;
+		localTools.append(ChatWebSearch::definition());
 	}
+	if (!m_state->catalog.load(error, localTools)) { return false; }
 	if (m_state->song != song)
 	{
 		disconnect(m_state->resetConnection);
@@ -269,17 +294,27 @@ bool ChatToolDispatcher::submit(const QJsonObject& call, QString& error, ChatApp
 	}
 	CommandTargetIdentities targets;
 	QStringList scopes;
-	if (!captureTargets(resolved, targets, scopes, error))
+	QJsonArray labels;
+	QJsonObject help;
+	if (m_state->catalog.isLocal(resolved.command))
 	{
-		return false;
+		// Network tools touch no project object; the approval shows what is sent.
+		const auto backend = ChatSearchSettings::backendName(ChatSearchSettings::load().backend);
+		scopes.append(QStringLiteral("web"));
+		labels.append(
+			QJsonObject{{"path", "web"}, {"name", backend + " · " + resolved.arguments.value("query").toString()}});
+		help = {{"description", m_state->catalog.description(resolved.command)}};
+	}
+	else
+	{
+		if (!captureTargets(resolved, targets, scopes, error)) { return false; }
+		help = ToolRegistry::commandHelp(resolved.command);
+		for (const auto& scope : scopes)
+		{
+			labels.append(QJsonObject{{"path", scope}, {"name", targets.value(scope).name}});
+		}
 	}
 	const auto token = QUuid::createUuid().toString(QUuid::WithoutBraces);
-	const auto help = ToolRegistry::commandHelp(resolved.command);
-	QJsonArray labels;
-	for (const auto& scope : scopes)
-	{
-		labels.append(QJsonObject{{"path", scope}, {"name", targets.value(scope).name}});
-	}
 	m_state->call = resolved;
 	m_state->targets = targets;
 	m_state->authorized = mode == ChatApprovalMode::None;
@@ -367,6 +402,11 @@ void ChatToolDispatcher::execute(const QString& token)
 				.toJson());
 		return;
 	}
+	if (m_state->catalog.isLocal(m_state->call.command))
+	{
+		executeNetworkTask();
+		return;
+	}
 	CommandTargetIdentities targets;
 	QStringList scopes;
 	QString error;
@@ -405,8 +445,57 @@ void ChatToolDispatcher::execute(const QString& token)
 								  {"result", result}});
 }
 
+void ChatToolDispatcher::executeNetworkTask()
+{
+	// Re-check at run time: approval does not keep a disabled search alive.
+	const auto settings = ChatSearchSettings::load();
+	if (!settings.enabled || settings.backend == ChatSearchBackend::Model)
+	{
+		finishPending(
+			CommandResult::failure("web_search_disabled", message("Web search is turned off in the Agent settings."))
+				.toJson());
+		return;
+	}
+	const ChatConnectionStore store(
+		QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"));
+	QString error;
+	const bool brave = settings.backend == ChatSearchBackend::Brave;
+	const auto credential
+		= store.readKey(brave ? ChatSearchSettings::braveKeyId() : ChatSearchSettings::searxngAuthId(), error);
+	if (!error.isEmpty() || (brave && credential.isEmpty()))
+	{
+		finishPending(CommandResult::failure("search_not_configured",
+			error.isEmpty() ? message("Brave search needs an API key in the Agent settings.") : error)
+				.toJson());
+		return;
+	}
+
+	// Consume the authorization before the asynchronous request starts.
+	const auto& call = m_state->call;
+	m_state->networkOutcome = {{"sessionId", m_state->sessionId}, {"turnId", m_state->turnId}, {"id", call.id},
+		{"wireName", call.wireName}, {"command", call.command}, {"arguments", call.arguments},
+		{"approvalRequired", m_state->approval.value("approvalRequired")}, {"executed", true}};
+	m_state->approval = {};
+	m_state->targets.clear();
+	m_state->authorized = false;
+	const int count = call.arguments.contains("count") ? call.arguments.value("count").toInt() : 5;
+	m_state->search->start(settings, credential, call.arguments.value("query").toString(), count);
+}
+
+void ChatToolDispatcher::finishNetworkTask(const QJsonObject& result)
+{
+	if (m_state->networkOutcome.isEmpty()) { return; }
+	auto outcome = m_state->networkOutcome;
+	m_state->networkOutcome = {};
+	outcome.insert("result", result);
+	emit toolFinished(outcome);
+}
+
 void ChatToolDispatcher::invalidate(const QString& reason)
 {
+	// A running search belongs to the invalidated turn; its reply is dropped.
+	m_state->search->abort();
+	m_state->networkOutcome = {};
 	const bool wasActive = m_state->active;
 	m_state->active = false;
 	m_state->approval = {};

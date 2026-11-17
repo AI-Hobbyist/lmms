@@ -16690,6 +16690,38 @@ Latency: %2 ms</source>
         <translation>未执行 · %1</translation>
     </message>
     <message>
+        <source>A chat tool cannot be represented as a model function: %1</source>
+        <translation>聊天工具无法表示为模型函数：%1</translation>
+    </message>
+    <message>
+        <source>Web search was turned off; the running search was canceled.</source>
+        <translation>联网搜索已关闭，正在进行的搜索已取消。</translation>
+    </message>
+    <message>
+        <source>Web search is turned off in the Agent settings.</source>
+        <translation>Agent 设置中已关闭联网搜索。</translation>
+    </message>
+    <message>
+        <source>Brave search needs an API key in the Agent settings.</source>
+        <translation>使用 Brave 搜索需要在 Agent 设置中填写 API Key。</translation>
+    </message>
+    <message>
+        <source>The response is not JSON (HTTP %1).</source>
+        <translation>响应不是 JSON（HTTP %1）。</translation>
+    </message>
+    <message>
+        <source>SearXNG search failed: %1</source>
+        <translation>SearXNG 搜索失败：%1</translation>
+    </message>
+    <message>
+        <source>Enable the json format under search.formats in the instance&apos;s settings.yml.</source>
+        <translation>请在该实例 settings.yml 的 search.formats 中启用 json 格式。</translation>
+    </message>
+    <message>
+        <source>Brave search failed: %1</source>
+        <translation>Brave 搜索失败：%1</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

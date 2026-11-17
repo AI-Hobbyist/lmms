@@ -22,6 +22,14 @@ void ChatSearchSettings::save() const
 	config->setValue("agentchat", "searchBackend", backendName(backend));
 	config->setValue("agentchat", "searxngUrl", searxngUrl);
 	config->setValue("agentchat", "braveUrl", braveUrl);
+	auto* notifier = ChatSearchSettingsNotifier::instance();
+	emit notifier->changed();
+}
+
+ChatSearchSettingsNotifier* ChatSearchSettingsNotifier::instance()
+{
+	static ChatSearchSettingsNotifier notifier;
+	return &notifier;
 }
 
 QString ChatSearchSettings::defaultBraveUrl()
