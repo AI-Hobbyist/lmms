@@ -6,9 +6,9 @@
 
 | 项目 | 值 |
 | --- | --- |
-| 路径 | `D:\UserData\Desktop\Project\lmms\build\packages\lmms-agent-chat-20261117-212914-win64.zip` |
+| 路径 | `D:\UserData\Desktop\Project\lmms\build\packages\lmms-agent-chat-20261117-213547-win64.zip` |
 | 大小 | 6,733,415 字节 |
-| ZIP SHA256 | `F152C122B2E3FADAB9E6CDAFDC14326694D5C3DF98367FB6DBE97A9217854529` |
+| ZIP SHA256 | `DEA1F2C7B9873D346F9FC2C8C8BC66B0B27749B23EA4279126F40952F76B7F2A` |
 | 生成脚本 | `buildtools/New-AgentChatPackage.ps1`（日志 `build/agent-chat-m5-package.log`） |
 | 基线 | 实际安装 `D:\Program Files\LMMS` 的 367 个二进制 SHA256 |
 
@@ -56,3 +56,7 @@
 | M5 包与安装 | PASS（导出/依赖核验、安装器 VerifyOnly 41 文件） | 生产替换由用户手动执行 | 替换后整机 GUI 验收 MANUAL/PENDING |
 
 最终回归：CTest 19/19（11 Chat、5 MCP、CommandBus/CoreCommands/SvsCommands），日志 `build/agent-chat-m4-regression-{build,tests}.log`；VerifyOnly 日志 `build/agent-chat-m5-verifyonly.log`。按用户要求，本阶段未启动应用做整机 GUI 测试。
+
+## 更新：侧栏默认收起（2026-11-17，提交 5fa76001a）
+
+首次启动时 Agent 侧栏默认收起为 48 px 标签，用户展开或收起后按保存的状态恢复。此时生产目录已由用户手动替换为上一版包（`lmms-agent-chat-20261117-212914-win64.zip`），因此新包按实际安装比对后只含 `lmms.exe` 1 个文件：`build/packages/lmms-agent-chat-20261117-213547-win64.zip`，SHA256 `DEA1F2C7B9873D346F9FC2C8C8BC66B0B27749B23EA4279126F40952F76B7F2A`；导出 3138→3138 删除 0，依赖可解析，VerifyOnly 通过且无写入。替换方法：关闭 LMMS，备份并覆盖安装目录中的 `lmms.exe`。
