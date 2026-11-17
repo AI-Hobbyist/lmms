@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QLabel>
 #include <QListWidget>
@@ -10,6 +11,7 @@
 #include <QPlainTextEdit>
 #include <QScopeGuard>
 #include <QScreen>
+#include <QScrollBar>
 #include <QSignalSpy>
 #include <QStandardPaths>
 #include <QTcpServer>
@@ -387,6 +389,39 @@ private slots:
 		ChatStore store(QDir(profile).filePath("agent/sessions"));
 		QCOMPARE(store.session(id).value("messages").toArray().size(), 5);
 		QVERIFY(transcript->toPlainText().contains("Done"));
+
+		// Penpot 01 result cards: denied call stays unexecuted, approved script ran.
+		QList<QFrame*> results;
+		for (auto* frame : transcript->findChildren<QFrame*>())
+		{
+			if (frame->property("agentToolResult").toBool() && frame->isVisible())
+			{
+				results.append(frame);
+			}
+		}
+		QCOMPARE(results.size(), 2);
+		for (auto* result : results)
+		{
+			QCOMPARE(result->height(), 50);
+			auto* icon = result->findChild<QLabel*>(QString(), Qt::FindDirectChildrenOnly);
+			QVERIFY(icon);
+			QCOMPARE(icon->geometry(), QRect(12, 16, 18, 18));
+		}
+		const auto plain = transcript->toPlainText();
+		QVERIFY2(plain.contains("Denied · track.setName"), qPrintable(plain));
+		QVERIFY(plain.contains("Approved · agent.runScript"));
+		QVERIFY(plain.contains("Not executed; project unchanged"));
+		QVERIFY(plain.contains("Completed"));
+		QVERIFY(!plain.contains("\"ok\""));
+		const auto evidence = qEnvironmentVariable("LMMS_CHAT_SCREENSHOT");
+		if (!evidence.isEmpty())
+		{
+			transcript->verticalScrollBar()->setValue(transcript->verticalScrollBar()->maximum());
+			QTest::qWait(300);
+			QVERIFY(window.screen()
+						->grabWindow(window.winId(), dock->x(), dock->y(), dock->width(), dock->height())
+						.save(QFileInfo(evidence).absolutePath() + "/agent-chat-tool-result-native.png"));
+		}
 		window.close();
 	}
 

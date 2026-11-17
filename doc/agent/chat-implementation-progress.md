@@ -224,3 +224,8 @@ ChatToolCatalog复用注册表及纯schema校验，线名反查绑定目录快�
 ## M3 工具执行元数据（2026-11-17）
 
 ChatToolDispatcher两类结果新增approvalRequired/executed；ChatController::appendToolResult把command/arguments/approvalRequired/executed仅存入本地工具消息execution字段，不进入发给模型的tool结果。ChatToolTurnTest新增拒绝(executed=false)/批准(executed=true)及出站不含execution断言。Release构建通过；ChatDockTest/ChatToolDispatcherTest/ChatToolTurnTest CTest3/3通过（真实Windows窗口，QT_QPA_PLATFORM未设置）。日志build/agent-chat-m3-execution-meta-{build,tests}.log。本机无pwsh，build.py不可用，改用同目录cmake --build/ctest前台执行。M3未完成：工具结果卡、剩余删除/重置重入验收及MCP回归待做。
+
+
+## M3 工具结果卡（2026-11-17）
+
+实时Penpot01结果卡：420×50、#171e26圆角6，图标(12,16,18,18)，标题(40,6)11px，摘要(40,27)10px #667a90。ChatTranscript对role=tool消息渲染紧凑结果卡，按实际CommandResult与本地execution区分已批准/自动执行/拒绝/取消/执行失败/未执行，完整结果放tooltip；非CommandResult内容（协议历史数组等）沿用“工具结果”并原样摘要。新增8条中文词条，lrelease 4163 finished/0 unfinished。Release构建通过；ChatDockTest/ChatProviderClientTest/ChatToolDispatcherTest/ChatToolTurnTest CTest4/4（QtTest12+17等）通过，真实Windows窗口截图build/agent-chat-tool-result-native.png已查看。日志build/agent-chat-m3-result-card-{build,tests}.log。M3剩余：删除入口/命令自身重置与重入/网络取消验收及MCP回归。

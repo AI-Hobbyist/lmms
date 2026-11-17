@@ -52,6 +52,62 @@ QString messageText(const QJsonObject& message)
 	return text;
 }
 
+struct ToolResultView
+{
+	bool success = false;
+	QString title;
+	QString summary;
+};
+
+// Summarizes a stored tool message from its actual result and the local-only
+// execution metadata. Older messages without metadata fall back to the tool name.
+ToolResultView toolResultView(const QJsonObject& message)
+{
+	const auto execution = message.value("execution").toObject();
+	auto command = execution.value("command").toString();
+	if (command.isEmpty())
+	{
+		command = message.value("name").toString();
+	}
+	const auto result = QJsonDocument::fromJson(message.value("content").toString().toUtf8()).object();
+	const auto error = result.value("error").toObject();
+	const auto code = error.value("code").toString();
+
+	ToolResultView view;
+	if (!result.contains("ok"))
+	{
+		// Not a CommandBus result (for example protocol history content): show it as is.
+		view.success = true;
+		view.title = command.isEmpty() ? translated("Tool result") : translated("Tool result") + " · " + command;
+		view.summary = messageText(message).simplified();
+		return view;
+	}
+	view.success = result.value("ok").toBool();
+	if (view.success)
+	{
+		const bool approved = execution.value("approvalRequired").toBool();
+		view.title = (approved ? translated("Approved · %1") : translated("Ran automatically · %1")).arg(command);
+		view.summary = translated("Completed");
+	}
+	else if (code == "permission_denied")
+	{
+		view.title = translated("Denied · %1").arg(command);
+		view.summary = translated("Not executed; project unchanged");
+	}
+	else if (code == "canceled")
+	{
+		view.title = translated("Canceled · %1").arg(command);
+		view.summary = translated("Not executed; project unchanged");
+	}
+	else
+	{
+		const bool executed = execution.value("executed").toBool();
+		view.title = (executed ? translated("Failed · %1") : translated("Not executed · %1")).arg(command);
+		view.summary = error.value("message").toString();
+	}
+	return view;
+}
+
 } // namespace
 
 class ChatApprovalCard : public QFrame
@@ -145,10 +201,26 @@ public:
 	ChatMessage(const QJsonObject& message, QWidget* parent)
 		: QFrame(parent)
 		, m_user(message.value("role").toString() == "user")
+		, m_tool(message.value("role").toString() == "tool")
 	{
 		const auto id = message.value("id").toString();
 		setObjectName("agentMessage_" + id);
 		setProperty("agentUserBubble", m_user);
+		setProperty("agentToolResult", m_tool);
+		if (m_tool)
+		{
+			// Penpot 01 tool result card: 50px high, icon (12,16), title (40,6), summary (40,27).
+			m_icon = label(this, 12);
+			m_icon->setObjectName("agentToolResultIcon_" + id);
+			m_icon->setGeometry(12, 16, 18, 18);
+			m_title = label(this, 11);
+			m_title->setObjectName("agentToolResultTitle_" + id);
+			m_summary = label(this, 10);
+			m_summary->setObjectName("agentToolResultSummary_" + id);
+			m_summary->setProperty("agentToolResultSummary", true);
+			setMessage(message);
+			return;
+		}
 		m_body = label(this, 13);
 		m_body->setObjectName("agentMessageText_" + id);
 		m_body->setWordWrap(true);
@@ -160,8 +232,7 @@ public:
 			m_icon->setPixmap(embed::getIconPixmap("agent_chat_agent", 22, 22));
 			m_icon->setGeometry(0, 0, 22, 22);
 			m_title = label(this, 12);
-			m_title->setText(message.value("role").toString() == "tool" ? translated("Tool result")
-																		: QStringLiteral("Agent"));
+			m_title->setText(QStringLiteral("Agent"));
 			m_title->setGeometry(32, 0, 66, 19);
 			m_summary = label(this, 11);
 			m_summary->setText(translated("Thought · Summary"));
@@ -195,6 +266,16 @@ public:
 	void setMessage(const QJsonObject& message)
 	{
 		m_message = message;
+		if (m_tool)
+		{
+			const auto view = toolResultView(message);
+			m_icon->setPixmap(embed::getIconPixmap(view.success ? "agent_chat_check" : "agent_chat_close", 18, 18));
+			m_titleText = view.title;
+			m_summaryText = view.summary;
+			setToolTip("<qt><pre>" + messageText(message).toHtmlEscaped() + "</pre></qt>");
+			elideToolText();
+			return;
+		}
 		m_body->setText(messageText(message));
 		if (m_summary)
 		{
@@ -209,6 +290,10 @@ public:
 
 	QString plainText() const
 	{
+		if (m_tool)
+		{
+			return m_titleText + "\n" + m_summaryText;
+		}
 		auto text = m_body->text();
 		for (const auto& value : m_message.value("attachments").toArray())
 		{
@@ -219,6 +304,14 @@ public:
 
 	void arrange(int width)
 	{
+		if (m_tool)
+		{
+			setFixedSize(width, 50);
+			m_title->setGeometry(40, 6, qMax(1, width - 52), 18);
+			m_summary->setGeometry(40, 27, qMax(1, width - 52), 16);
+			elideToolText();
+			return;
+		}
 		const int left = m_user ? 14 : 0;
 		const int top = m_user ? 13 : 37;
 		const int bodyWidth = qMax(1, width - 2 * left);
@@ -242,8 +335,19 @@ public:
 	}
 
 private:
+	void elideToolText()
+	{
+		m_title->setText(
+			QFontMetrics(m_title->font()).elidedText(m_titleText, Qt::ElideRight, m_title->width()));
+		m_summary->setText(
+			QFontMetrics(m_summary->font()).elidedText(m_summaryText, Qt::ElideRight, m_summary->width()));
+	}
+
 	QJsonObject m_message;
 	bool m_user;
+	bool m_tool;
+	QString m_titleText;
+	QString m_summaryText;
 	QLabel* m_body = nullptr;
 	QLabel* m_icon = nullptr;
 	QLabel* m_title = nullptr;

@@ -1842,6 +1842,17 @@ QFrame[agentUserBubble="true"] {
     border-radius: 8px;
 }
 
+/* Penpot 01 tool result card. */
+QFrame[agentToolResult="true"] {
+    background: #171e26;
+    border: none;
+    border-radius: 6px;
+}
+
+QLabel[agentToolResultSummary="true"] {
+    color: #667a90;
+}
+
 QToolButton#agentAttachmentRemove {
     background: transparent;
     border: none;

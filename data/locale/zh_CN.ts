@@ -16658,6 +16658,38 @@ Latency: %2 ms</source>
         <translation>已思考 · 摘要</translation>
     </message>
     <message>
+        <source>Approved · %1</source>
+        <translation>已批准 · %1</translation>
+    </message>
+    <message>
+        <source>Ran automatically · %1</source>
+        <translation>已自动执行 · %1</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>已完成</translation>
+    </message>
+    <message>
+        <source>Denied · %1</source>
+        <translation>已拒绝 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed; project unchanged</source>
+        <translation>未执行，工程未改动</translation>
+    </message>
+    <message>
+        <source>Canceled · %1</source>
+        <translation>已取消 · %1</translation>
+    </message>
+    <message>
+        <source>Failed · %1</source>
+        <translation>执行失败 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed · %1</source>
+        <translation>未执行 · %1</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>
