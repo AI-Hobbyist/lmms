@@ -1,6 +1,6 @@
 # 分析：工程重载触发条件，及 Agent 执行后“新建工程”卡死闪退
 
-日期：2026-11-17。性质：只读分析，未修改产品代码。供后续 Agent 修复使用。
+日期：2026-11-17。第 1～5 节保留首次只读分析；第 6 节起记录后续实验证据与最小修复，以后者为当前结论。
 
 ## 1. 结论摘要
 
@@ -57,5 +57,41 @@
 修复方向（需按根因选择，不要只做防御）：
 - 根因修复：确保整体重建（`clearProject`/`restoreProjectState`）后 `s_infoMap` 与 Song 一致，例如重建后从 Song 的轨道顺序重排编号，或在 `clearProject` 中校验并清理残留条目。
 - 防御（与根因修复一并做）：`updateComboBox` 及其他 `findPatternTrack` 调用点（`PatternStore.cpp:86/149/165`）对空指针判空，避免 UI 刷新直接导致进程崩溃。
-- 顺带修复 `restoreProjectState` 中修改循环上界的计数缺陷。
+- `restoreProjectState` 的计数缺陷另列后续事项，不在本次崩溃修复范围内。
 - 验收：上述复现序列全部通过；新建、打开、撤销/重做 Agent 编辑无崩溃；Agent/MCP 既有回归（Chat 11、MCP 5、CommandBus/CoreCommands）通过；替换后真实应用操作验收记为 MANUAL/PENDING。
+
+## 6. 已复现的根因与最小修复
+
+使用实际 `GuiApplication`、MainWindow、PatternEditor 与 CommandBus 的原生 Windows QtTest 复现，未使用 offscreen，也未改生产安装。
+
+1. `PatternTrackView` 析构/关闭以 `s_infoMap[m_patternTrack]` 读取编号。模型先删除、视图延迟销毁时，QMap 下标操作会重新插入已删除模型的 key。最小用例“创建 Pattern → clearProject → 处理 DeferredDelete”明确失败于登记表不变量，日志 `build/agent-pattern-view-repro-red.log`；改用 `constFind` 后同一用例通过，日志 `build/agent-pattern-view-green.log`。
+2. 原 `Song::clearProject` 先清理已有视图，再处理排队事件。尚未执行的 trackAdded 回调会在视图清理之后创建旧轨道视图，随后模型被删除。完整窗口复现还在 InstrumentTrackView 定时更新与析构处访问失效模型；链接 MAP 定位用于确认调用点，没有保留临时调试代码。修复把已有 `sendPostedEvents` 移到视图清理之前，使排队视图在模型存活时建立，并随即一起清理。
+3. `TrackContainerView` 原来只有 SVC 的排队创建回调携带 QPointer，其他轨道携带裸指针。现在统一复用已有 QPointer 检查，模型已删除则不创建视图。
+4. `PatternStore::updateComboBox` 对 `findPatternTrack` 返回空值判空，避免不完整登记状态直接解引用；这是根因修复之外的调用点保护。
+
+修改限上述四处生产文件及既有 `ChatProjectLifetimeTest`。未改事务、撤销语义、聊天布局、插件 ABI 或独立的计数缺陷。测试检查登记表连续编号、当前 Song 轨道成员关系，并实际经过成功、dryRun、撤销、重做、失败批次回滚后的模板新建与直接新建入口。名称断言同时检查成功编辑保留、回滚恢复，避免用“未崩溃”代替功能正确。
+
+最终验证：Release 构建通过（现有 Python 进度脚本、jobs=2，126 秒），`build/Release/lmms.exe` 已更新；生命周期测试连续三轮各 12 passed/0 failed/0 skipped（18.78 秒）；既有 Chat 11、MCP 5、命令 3 的 CTest 19/19 通过（45.05 秒）。日志 `build/agent-new-project-final-build.log`、`build/agent-new-project-final-lifetime-tests.log`、`build/agent-new-project-final-regression-tests.log`。临时诊断日志代码已移除。生产替换后的整机操作仍为 MANUAL/PENDING。
+
+## 7. 调用工具时能否永远不重载工程
+
+结论：常规成功编辑已可直接操作现有对象；按现有事务与撤销实现，不能让全部失败调用、预演及历史操作永远不重建，同时保留现有原子回滚能力。
+
+| 调用情况 | 当前行为 |
+| --- | --- |
+| 普通只读、普通成功写操作 | 不因快照保存/提交而重建；写操作先保存快照，直接编辑当前对象 |
+| 没有活动批次时，未知命令、参数校验或 preflight 失败 | 直接返回错误，不进入回滚重建 |
+| 活动批次中发生上述失败 | 整批回滚，可能包含此前已成功的写操作，因此恢复快照 |
+| 事务性 handler 执行失败/抛异常 | 有活动事务时回滚快照，重建工程；执行前检查不能代替执行中失败恢复 |
+| 多数事务性写操作 dryRun | 真正执行后恢复快照，因此重建；纯只读调用不按此路径处理 |
+| 撤销/重做 Agent 快照检查点 | 恢复快照，重建工程 |
+| 显式新建、清空、载入工程 | 按命令本意重置工程 |
+
+依据为 `CommandBus::execute` 的 schema/preflight、ownsBatch、handler 失败及 `endBatch(!dryRun)` 分支，和 `ProjectJournal` 的 projectSnapshot 恢复路径。即使当前失败调用本身没有写入，若它结束的是已有批次，也不能省略对前序写入的回滚。第 2 节“任意写命令失败/每次预演”的概括应以上表条件为准。
+
+可行选择：
+
+- 最小方案：保留快照事务，修复重建时的生命周期；对已有证据支持的可预测失败使用纯 preflight，可减少无效重建。本次只落实生命周期修复，未新增命令预检。
+- 全面取消隐式重建：写命令逐个实现可靠的逆操作/增量撤销，并覆盖脚本、插件状态与批次失败；或在隔离工程上预演，再设计安全提交。两种方案都涉及 CommandBus、ProjectJournal 和写工具边界，属于独立设计与实施范围。
+
+不能以删除 rollback、把失败标为成功、禁止工具能力或跳过 dryRun 来实现“永不重载”。本次不实施事务架构改造；失败后的回滚仍会触发重置，但应由修复后的真实窗口生命周期正确承接。

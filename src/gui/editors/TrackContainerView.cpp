@@ -123,20 +123,16 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	connect(
 		m_tc, &TrackContainer::trackAdded, this,
 		[this](Track* track) {
-			if (track->type() == Track::Type::SVC)
-			{
-				const QPointer<Track> guarded(track);
-				QMetaObject::invokeMethod(
-					this,
-					[this, guarded]() {
-						if (guarded) { createTrackView(guarded.data()); }
-					},
-					Qt::QueuedConnection);
-			}
-			else
-			{
-				QMetaObject::invokeMethod(this, "createTrackView", Qt::QueuedConnection, Q_ARG(lmms::Track*, track));
-			}
+			const QPointer<Track> guarded(track);
+			QMetaObject::invokeMethod(
+				this,
+				[this, guarded]() {
+					if (guarded)
+					{
+						createTrackView(guarded.data());
+					}
+				},
+				Qt::QueuedConnection);
 		},
 		Qt::DirectConnection);
 }

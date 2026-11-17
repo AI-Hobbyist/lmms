@@ -1008,6 +1008,9 @@ void Song::clearProject()
 
 	Engine::audioEngine()->requestChangeInModel();
 
+	// Materialize queued track views while their models still exist, so the
+	// following view teardown also removes them before deleting the tracks.
+	QCoreApplication::sendPostedEvents();
 	if( getGUI() != nullptr && getGUI()->patternEditor() )
 	{
 		getGUI()->patternEditor()->m_editor->clearAllTracks();
@@ -1020,7 +1023,6 @@ void Song::clearProject()
 	{
 		getGUI()->mixerView()->clear();
 	}
-	QCoreApplication::sendPostedEvents();
 	Engine::patternStore()->clearAllTracks();
 	clearAllTracks();
 

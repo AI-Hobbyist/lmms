@@ -1,4 +1,17 @@
-## 当前有效交接入口（2026-11-17，M1–M5 全部 DONE）
+## 当前有效交接入口（2026-11-17，新建工程闪退修复已验证）
+
+- 当前任务：Agent 操作后新建工程卡死闪退的最小修复，以及失败工具调用能否永不重载的分析。原计划 M1～M5 已完成，不重开阶段，不做无关重构。
+- 已完成：PatternTrackView 改只读登记表查询；Song 在视图清理前处理排队创建；TrackContainerView 对所有排队创建复用 QPointer；PatternStore 下拉框空值保护。生产修改仅四个 cpp，没有修改事务/撤销行为或插件 ABI。
+- 已验证：原生 Windows 完整 MainWindow 的 ChatProjectLifetimeTest，最小登记表 RED 复现后 GREEN；成功/dryRun/undo/redo/失败批次后模板新建和直接新建均通过，连续三轮每轮 QtTest 12 项通过；完整 CTest 19/19 通过（45.05 秒）。日志 build/agent-new-project-final-{build,lifetime-tests,regression-tests}.log。未使用 offscreen，测试窗口已自动关闭。
+- 分析：普通成功编辑不重载；批次外校验/preflight 失败不重载；事务失败、批次失败、写操作预演和快照撤销仍需恢复工程。若全面取消隐式重建，需要独立的增量撤销/隔离预演设计，本次未实施。详见 doc/agent/analysis-project-reload-and-new-project-crash.md 第 6～7 节。
+- 当前分支 master，起点 ff5f3795ea4fcb416d2f7094793dcfd0dfd83634；本轮修复/测试/分析/本交接待提交推送，随后用现有脚本生成并 VerifyOnly 增量包，再记录最终包路径。没有正在运行的构建测试。工作区原有未跟踪 .codegraph/、.omc/、build-driver.log、build.log 保留。
+- 输出 build/Release/lmms.exe，复用原插件目录，没有重建插件。生产 D:/Program Files/LMMS 未修改。替换后整机操作验收 MANUAL/PENDING，不阻塞交付。独立的 restoreProjectState 进度计数缺陷留作后续，未修改。
+- 环境更正：当前可用原生运行时 pwsh，python buildtools/build.py --config Release --jobs 2 --window 已成功运行（最终 126 秒），不采用下方历史“无 pwsh”结论。编译前检查同工程任务冲突，前台 PTY、SDK 环境脚本、完整 build.log；禁止 WSL/offscreen/无关重构。Penpot 本轮开始实时连接成功，本次没有布局修改。
+- 额度：可靠接口返回周窗口 usedPercent=49（剩余 51%），本次不是额度交接，无需 Luna。下一最小操作仅提交推送、增量包及交付记录，无新增功能阶段。
+
+---
+
+## 历史：M1–M5 全部 DONE 时交接
 
 - 计划书M1～M5全部完成并逐步提交推送。2026-11-17 因5小时额度已用88%，用户要求暂停，闪退修复尚未开始（见下条），无进行中的构建/测试/改动。交付说明与验收矩阵：doc/agent/chat-delivery.md。
 - 增量包：build/packages/lmms-agent-chat-20261117-220216-win64.zip（SHA256 A24B9A9D3FD0C13D9F3EA7E4EE932726F34934D5729886A9718ACF4FE701AC93），VerifyOnly通过；生产目录D:/Program Files/LMMS未修改，由用户手动替换。
