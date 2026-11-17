@@ -212,6 +212,7 @@ bool ChatToolDispatcher::beginTurn(const QString& sessionId, const QString& turn
 	if (search.enabled && search.backend != ChatSearchBackend::Model)
 	{
 		localTools.append(ChatWebSearch::definition());
+		localTools.append(ChatWebSearch::readDefinition());
 	}
 	if (!m_state->catalog.load(error, localTools)) { return false; }
 	if (m_state->song != song)
@@ -299,10 +300,15 @@ bool ChatToolDispatcher::submit(const QJsonObject& call, QString& error, ChatApp
 	if (m_state->catalog.isLocal(resolved.command))
 	{
 		// Network tools touch no project object; the approval shows what is sent.
-		const auto backend = ChatSearchSettings::backendName(ChatSearchSettings::load().backend);
+		QString target;
+		if (resolved.command == ChatWebSearch::readCommand()) { target = resolved.arguments.value("url").toString(); }
+		else
+		{
+			const auto backend = ChatSearchSettings::backendName(ChatSearchSettings::load().backend);
+			target = backend + " · " + resolved.arguments.value("query").toString();
+		}
 		scopes.append(QStringLiteral("web"));
-		labels.append(
-			QJsonObject{{"path", "web"}, {"name", backend + " · " + resolved.arguments.value("query").toString()}});
+		labels.append(QJsonObject{{"path", "web"}, {"name", target}});
 		help = {{"description", m_state->catalog.description(resolved.command)}};
 	}
 	else
@@ -456,28 +462,38 @@ void ChatToolDispatcher::executeNetworkTask()
 				.toJson());
 		return;
 	}
-	const ChatConnectionStore store(
-		QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"));
-	QString error;
-	const bool brave = settings.backend == ChatSearchBackend::Brave;
-	const auto credential
-		= store.readKey(brave ? ChatSearchSettings::braveKeyId() : ChatSearchSettings::searxngAuthId(), error);
-	if (!error.isEmpty() || (brave && credential.isEmpty()))
+	const auto& call = m_state->call;
+	const bool reading = call.command == ChatWebSearch::readCommand();
+	QString credential;
+	if (!reading)
 	{
-		finishPending(CommandResult::failure("search_not_configured",
-			error.isEmpty() ? message("Brave search needs an API key in the Agent settings.") : error)
-				.toJson());
-		return;
+		const ChatConnectionStore store(
+			QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("agent"));
+		QString error;
+		const bool brave = settings.backend == ChatSearchBackend::Brave;
+		credential
+			= store.readKey(brave ? ChatSearchSettings::braveKeyId() : ChatSearchSettings::searxngAuthId(), error);
+		if (!error.isEmpty() || (brave && credential.isEmpty()))
+		{
+			finishPending(CommandResult::failure("search_not_configured",
+				error.isEmpty() ? message("Brave search needs an API key in the Agent settings.") : error)
+					.toJson());
+			return;
+		}
 	}
 
 	// Consume the authorization before the asynchronous request starts.
-	const auto& call = m_state->call;
 	m_state->networkOutcome = {{"sessionId", m_state->sessionId}, {"turnId", m_state->turnId}, {"id", call.id},
 		{"wireName", call.wireName}, {"command", call.command}, {"arguments", call.arguments},
 		{"approvalRequired", m_state->approval.value("approvalRequired")}, {"executed", true}};
 	m_state->approval = {};
 	m_state->targets.clear();
 	m_state->authorized = false;
+	if (reading)
+	{
+		m_state->search->startRead(call.arguments.value("url").toString());
+		return;
+	}
 	const int count = call.arguments.contains("count") ? call.arguments.value("count").toInt() : 5;
 	m_state->search->start(settings, credential, call.arguments.value("query").toString(), count);
 }

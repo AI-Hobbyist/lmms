@@ -244,3 +244,8 @@ Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外
 ## M4.2 SearXNG/Brave 搜索工具与门控（2026-11-17）
 
 新增ChatWebSearch（chat.webSearch，参数query/count1–10）：SearXNG按实例URL请求/search?q=…&format=json（可选认证：user:password为Basic，否则Bearer），Brave用X-Subscription-Token；结果统一为CommandResult（title/url/snippet）。工具目录新增本地工具通道，不经CommandBus、不占项目批次。仅在联网开关开启且来源非“模型自带”时向模型公开；执行时再次读取设置，关闭则拒绝（web_search_disabled）；保存设置关闭搜索时经ChatSearchSettingsNotifier中止在途请求；轮次失效/停止/工程替换时丢弃旧回调。SearXNG非JSON/403返回searxng_json_unavailable并提示在settings.yml的search.formats启用json，不切换其他来源；Brave缺Key返回search_not_configured且不发请求。批准卡显示“web · 后端 · 查询”。ChatToolTurnTest新增6项（公开门控、SearXNG往返含批次深度0、JSON未启用提示、批准后关闭拒绝、搜索中关闭取消、Brave Key），新增8条中文词条（lrelease 4171/0）。CTest 18/18（Chat11+MCP5+CommandBus/CoreCommands）通过，日志build/agent-chat-m4-web-search-{build,tests}.log。本机HTTP夹具，非真实SearXNG/Brave实测：MANUAL/PENDING。
+
+
+## M4.3 页面读取工具（2026-11-17）
+
+新增chat.readPage（参数url）：Qt Network读取http/https页面，上限2 MB/20000字符，仅接受HTML与text/plain；去除script/style/noscript后经QTextDocument提取正文、合并空行，返回url/finalUrl/title/text/truncated，来源链接随工具结果进入会话记录。与搜索共用联网开关与同一门控/取消路径，不需凭据；批准卡显示“web · URL”。非http(s)返回invalid_url，非文本返回unsupported_content。ChatToolTurnTest新增2项，新增4条中文词条（lrelease 4175/0）；CTest 18/18（Chat11+MCP5+CommandBus/CoreCommands）通过，日志build/agent-chat-m4-read-page-{build,tests}.log。真实公网页面实测MANUAL/PENDING。

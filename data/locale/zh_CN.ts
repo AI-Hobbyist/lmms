@@ -16722,6 +16722,22 @@ Latency: %2 ms</source>
         <translation>Brave 搜索失败：%1</translation>
     </message>
     <message>
+        <source>Only http and https page addresses can be read.</source>
+        <translation>只能读取 http 或 https 网页地址。</translation>
+    </message>
+    <message>
+        <source>The page is larger than the 2 MB reading limit.</source>
+        <translation>网页超过 2 MB 读取上限。</translation>
+    </message>
+    <message>
+        <source>Reading the page failed: %1</source>
+        <translation>读取网页失败：%1</translation>
+    </message>
+    <message>
+        <source>The page content type is not readable text: %1</source>
+        <translation>网页内容类型不是可读文本：%1</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

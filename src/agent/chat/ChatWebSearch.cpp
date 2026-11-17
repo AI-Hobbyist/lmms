@@ -6,6 +6,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QRegularExpression>
+#include <QTextDocument>
+#include <QTimer>
 #include <QUrlQuery>
 
 #include "agent/CommandBus.h"
@@ -17,6 +20,8 @@ QString message(const char* source)
 { return QCoreApplication::translate("AgentChat", source); }
 
 constexpr int TransferTimeoutMs = 20000;
+constexpr qint64 MaximumPageBytes = 2 * 1024 * 1024;
+constexpr int MaximumPageCharacters = 20000;
 
 QJsonObject failure(const QString& code, const QString& text, const QString& hint = {})
 { return CommandResult::failure(code, text, hint).toJson(); }
@@ -105,6 +110,7 @@ void ChatWebSearch::start(
 	const ChatSearchSettings& settings, const QString& credential, const QString& query, int count)
 {
 	abort();
+	m_reading = false;
 	m_backend = settings.backend;
 	m_query = query;
 	m_count = count;
@@ -132,6 +138,99 @@ void ChatWebSearch::start(
 	connect(reply, &QNetworkReply::finished, this, [this, reply] { handleReply(reply); });
 }
 
+QString ChatWebSearch::readCommand()
+{ return QStringLiteral("chat.readPage"); }
+
+QJsonObject ChatWebSearch::readDefinition()
+{
+	const QJsonObject properties{
+		{"url", QJsonObject{{"type", "string"}, {"description", "http or https address of the page to read."}}}};
+	return {{"name", readCommand()},
+		{"description", "Read a web page and return its title and readable text, for example a search result to cite."},
+		{"inputSchema",
+			QJsonObject{{"type", "object"}, {"properties", properties}, {"required", QJsonArray{"url"}},
+				{"additionalProperties", false}}},
+		{"annotations", QJsonObject{{"readOnlyHint", true}, {"openWorldHint", true}}}};
+}
+
+void ChatWebSearch::startRead(const QString& address)
+{
+	abort();
+	const QUrl url(address);
+	if (!url.isValid() || url.host().isEmpty() || (url.scheme() != "http" && url.scheme() != "https"))
+	{
+		// Report asynchronously like a network result, so callers have one code path.
+		QTimer::singleShot(0, this, [this] {
+			emit finished(failure("invalid_url", message("Only http and https page addresses can be read.")));
+		});
+		return;
+	}
+	m_reading = true;
+	m_pageUrl = url;
+
+	QNetworkRequest request(url);
+	request.setTransferTimeout(TransferTimeoutMs);
+	request.setRawHeader("Accept", "text/html, text/plain;q=0.9");
+	auto* reply = m_network->get(request);
+	m_reply = reply;
+	connect(reply, &QNetworkReply::finished, this, [this, reply] { handleReply(reply); });
+	connect(reply, &QNetworkReply::downloadProgress, this, [this, reply](qint64 received, qint64) {
+		if (reply == m_reply && received > MaximumPageBytes)
+		{
+			abort();
+			emit finished(failure("page_too_large", message("The page is larger than the 2 MB reading limit.")));
+		}
+	});
+}
+
+void ChatWebSearch::handlePage(QNetworkReply* reply)
+{
+	if (reply->error() != QNetworkReply::NoError)
+	{
+		emit finished(failure("page_read_failed", message("Reading the page failed: %1").arg(reply->errorString())));
+		return;
+	}
+	const auto type = reply->header(QNetworkRequest::ContentTypeHeader).toString().toLower();
+	const bool html = type.contains("html");
+	if (!html && !type.startsWith("text/plain"))
+	{
+		emit finished(failure("unsupported_content",
+			message("The page content type is not readable text: %1").arg(type.isEmpty() ? "unknown" : type)));
+		return;
+	}
+	const auto content = QString::fromUtf8(reply->readAll());
+	QString title;
+	QString text = content;
+	if (html)
+	{
+		static const QRegularExpression titlePattern("<title[^>]*>(.*?)</title>",
+			QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
+		static const QRegularExpression hiddenPattern("<(script|style|noscript)[^>]*>.*?</\\1>",
+			QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
+		QTextDocument document;
+		document.setHtml(titlePattern.match(content).captured(1));
+		title = document.toPlainText().simplified();
+		auto visible = content;
+		visible.remove(hiddenPattern);
+		document.setHtml(visible);
+		text = document.toPlainText();
+	}
+	// Collapse blank runs so the limit is spent on readable text.
+	QStringList lines;
+	for (const auto& line : text.split('\n'))
+	{
+		const auto trimmed = line.simplified();
+		if (!trimmed.isEmpty()) { lines.append(trimmed); }
+	}
+	text = lines.join('\n');
+	const bool truncated = text.size() > MaximumPageCharacters;
+	text.truncate(MaximumPageCharacters);
+	emit finished(
+		CommandResult::success(QJsonObject{{"url", m_pageUrl.toString()}, {"finalUrl", reply->url().toString()},
+								   {"title", title}, {"text", text}, {"truncated", truncated}})
+			.toJson());
+}
+
 void ChatWebSearch::abort()
 {
 	if (!m_reply) { return; }
@@ -155,6 +254,12 @@ void ChatWebSearch::handleReply(QNetworkReply* reply)
 	}
 	m_reply = nullptr;
 	reply->deleteLater();
+	if (m_reading)
+	{
+		m_reading = false;
+		handlePage(reply);
+		return;
+	}
 
 	const bool searxng = m_backend != ChatSearchBackend::Brave;
 	const auto status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();

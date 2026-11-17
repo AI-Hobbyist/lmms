@@ -167,10 +167,15 @@ private:
 	// Runs one approved search call and returns the tool result sent back to the model.
 	QJsonObject runSingleSearch(
 		const std::function<void()>& beforeDecide = {}, const std::function<void()>& afterDecide = {})
+	{ return runSingleCall(searchCall("find", "drums", 3), beforeDecide, afterDecide); }
+
+	// Runs one approved chat tool call and returns the tool result sent back to the model.
+	QJsonObject runSingleCall(const QJsonObject& call, const std::function<void()>& beforeDecide = {},
+		const std::function<void()>& afterDecide = {})
 	{
 		ToolTurnServer model;
 		if (!model.server.listen(QHostAddress::LocalHost)) { return {}; }
-		queueCalls(model, {searchCall("find", "drums", 3)});
+		queueCalls(model, {call});
 		QTemporaryDir directory;
 		ChatStore store(directory.path());
 		auto session = ChatStore::newSession();
@@ -710,6 +715,56 @@ private slots:
 		QVERIFY(!history[4].toObject().contains("execution"));
 
 		QVERIFY(!controller.decideTool(approvals[1][0].toJsonObject(), true, error));
+	}
+
+	static QJsonObject readCall(const QString& url)
+	{
+		ChatToolCatalog catalog;
+		QString error;
+		catalog.load(error, {ChatWebSearch::readDefinition()});
+		const auto arguments = QJsonDocument(QJsonObject{{"url", url}}).toJson(QJsonDocument::Compact);
+		return {{"id", "read"}, {"type", "function"},
+			{"function",
+				QJsonObject{{"name", catalog.nameForCommand(ChatWebSearch::readCommand())},
+					{"arguments", QString::fromUtf8(arguments)}}}};
+	}
+
+	void readPageExtractsReadableText()
+	{
+		ToolTurnServer page;
+		QVERIFY(page.server.listen(QHostAddress::LocalHost));
+		page.rawResponses.append(
+			"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n"
+			"<html><head><title>Lofi &amp; Dusty</title><style>p{color:red}</style>"
+			"<script>var secret = 1;</script></head><body><h1>Kit notes</h1>"
+			"<p>Tempo 80 BPM.</p><p>  </p><p>License: CC0</p></body></html>");
+		enableSearch("http://127.0.0.1:1");
+		const auto url = QStringLiteral("http://127.0.0.1:%1/kit").arg(page.server.serverPort());
+		const auto result = runSingleCall(readCall(url));
+		QVERIFY(result.value("ok").toBool());
+		const auto data = result.value("data").toObject();
+		QCOMPARE(data.value("url").toString(), url);
+		QCOMPARE(data.value("title").toString(), QStringLiteral("Lofi & Dusty"));
+		const auto text = data.value("text").toString();
+		QVERIFY2(text.contains("Kit notes") && text.contains("Tempo 80 BPM.") && text.contains("License: CC0"),
+			qPrintable(text));
+		QVERIFY(!text.contains("secret") && !text.contains("color"));
+		QVERIFY(!data.value("truncated").toBool());
+		QVERIFY(page.heads[0].startsWith("GET /kit"));
+	}
+
+	void readPageRejectsNonTextAndNonHttp()
+	{
+		ToolTurnServer page;
+		QVERIFY(page.server.listen(QHostAddress::LocalHost));
+		page.rawResponses.append(
+			"HTTP/1.1 200 OK\r\nContent-Type: application/zip\r\nConnection: close\r\n\r\nPK\x03\x04");
+		enableSearch("http://127.0.0.1:1");
+		const auto binary
+			= runSingleCall(readCall(QStringLiteral("http://127.0.0.1:%1/a.zip").arg(page.server.serverPort())));
+		QCOMPARE(binary.value("error").toObject().value("code").toString(), QStringLiteral("unsupported_content"));
+		const auto local = runSingleCall(readCall("file:///C:/Windows/win.ini"));
+		QCOMPARE(local.value("error").toObject().value("code").toString(), QStringLiteral("invalid_url"));
 	}
 
 	void commandSelfResetKeepsResultCancelsRest()

@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QPointer>
+#include <QUrl>
 
 #include "agent/chat/ChatSearchSettings.h"
 
@@ -25,9 +26,13 @@ public:
 	// Model-visible tool name and its definition for the chat tool catalog.
 	static QString command();
 	static QJsonObject definition();
+	static QString readCommand();
+	static QJsonObject readDefinition();
 
 	// Starts a search; any running search is aborted first (its result is dropped).
 	void start(const ChatSearchSettings& settings, const QString& credential, const QString& query, int count);
+	// Reads one http/https page and returns its title and readable text.
+	void startRead(const QString& address);
 	void abort();
 	bool active() const;
 
@@ -36,12 +41,15 @@ signals:
 
 private:
 	void handleReply(QNetworkReply* reply);
+	void handlePage(QNetworkReply* reply);
 
 	QNetworkAccessManager* m_network = nullptr;
 	QPointer<QNetworkReply> m_reply;
 	ChatSearchBackend m_backend = ChatSearchBackend::SearXNG;
 	QString m_query;
 	int m_count = 5;
+	bool m_reading = false;
+	QUrl m_pageUrl;
 };
 
 } // namespace lmms::agent::chat
