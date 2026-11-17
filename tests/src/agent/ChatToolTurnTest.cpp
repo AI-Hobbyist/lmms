@@ -1,6 +1,7 @@
 #include <QAbstractButton>
 #include <QApplication>
 #include <QCryptographicHash>
+#include <QDataStream>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -297,6 +298,7 @@ private slots:
 		ChatSearchSettings{}.save();
 		ChatDownloadSettings downloads;
 		downloads.aria2Path = deployedTool("aria2/aria2c.exe");
+		downloads.sevenZipPath = deployedTool("7zip/7z.exe");
 		downloads.save();
 		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "sample"}, {"name", "Original"}}).ok);
 	}
@@ -975,6 +977,107 @@ private slots:
 		ChatDownloadSettings{}.save();
 		const auto relative = runSingleCall(downloadCall({{"url", url}, {"directory", "assets/drums"}}));
 		QVERIFY(relative.isEmpty());
+	}
+
+	static quint32 crc32(const QByteArray& data)
+	{
+		quint32 crc = 0xFFFFFFFFu;
+		for (const auto byte : data)
+		{
+			crc ^= static_cast<quint8>(byte);
+			for (int bit = 0; bit < 8; ++bit)
+			{
+				crc = (crc >> 1) ^ (0xEDB88320u & (0u - (crc & 1u)));
+			}
+		}
+		return ~crc;
+	}
+
+	// A minimal stored zip whose member names are written verbatim, so tests
+	// can build archives that normal tools refuse to create.
+	static QByteArray storedZip(const QList<QPair<QByteArray, QByteArray>>& members)
+	{
+		QByteArray local;
+		QByteArray central;
+		QDataStream localStream(&local, QIODevice::WriteOnly);
+		QDataStream centralStream(&central, QIODevice::WriteOnly);
+		localStream.setByteOrder(QDataStream::LittleEndian);
+		centralStream.setByteOrder(QDataStream::LittleEndian);
+		for (const auto& [name, data] : members)
+		{
+			const quint32 offset = local.size();
+			const quint32 crc = crc32(data);
+			localStream << quint32(0x04034b50) << quint16(10) << quint16(0) << quint16(0) << quint16(0) << quint16(0)
+						<< crc << quint32(data.size()) << quint32(data.size()) << quint16(name.size()) << quint16(0);
+			localStream.writeRawData(name.constData(), name.size());
+			localStream.writeRawData(data.constData(), data.size());
+			centralStream << quint32(0x02014b50) << quint16(20) << quint16(10) << quint16(0) << quint16(0) << quint16(0)
+						  << quint16(0) << crc << quint32(data.size()) << quint32(data.size()) << quint16(name.size())
+						  << quint16(0) << quint16(0) << quint16(0) << quint16(0) << quint32(0) << offset;
+			centralStream.writeRawData(name.constData(), name.size());
+		}
+		QByteArray end;
+		QDataStream endStream(&end, QIODevice::WriteOnly);
+		endStream.setByteOrder(QDataStream::LittleEndian);
+		endStream << quint32(0x06054b50) << quint16(0) << quint16(0) << quint16(members.size())
+				  << quint16(members.size()) << quint32(central.size()) << quint32(local.size()) << quint16(0);
+		return local + central + end;
+	}
+
+	void downloadExtractsCheckedArchive()
+	{
+		if (!QFileInfo(deployedTool("7zip/7z.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		const auto archive = storedZip({{"kit/kick.wav", "kick"}, {"kit/snare.wav", "snare"}});
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		files.rawResponses.append(fileResponse(archive));
+		files.rawResponses.append(fileResponse(archive));
+		QTemporaryDir target;
+		const auto url = QStringLiteral("http://127.0.0.1:%1/drums.zip").arg(files.server.serverPort());
+		const auto result
+			= runSingleCall(downloadCall({{"url", url}, {"directory", target.path()}, {"extract", true}}));
+		QVERIFY2(result.value("ok").toBool(), qPrintable(QJsonDocument(result).toJson()));
+		const auto data = result.value("data").toObject();
+		QCOMPARE(data.value("extractedFiles").toInt(), 2);
+		QCOMPARE(QDir::fromNativeSeparators(data.value("extractedTo").toString()), target.filePath("drums"));
+		QFile kick(target.filePath("drums/kit/kick.wav"));
+		QVERIFY(kick.open(QIODevice::ReadOnly));
+		QCOMPARE(kick.readAll(), QByteArray("kick"));
+		// The archive is kept; no temporary folder remains.
+		QCOMPARE(QDir(target.path()).entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden),
+			(QStringList{"drums", "drums.zip"}));
+
+		// A non-empty extraction folder is not merged into without overwrite.
+		const auto again = runSingleCall(downloadCall({{"url", url}, {"directory", target.path()},
+			{"fileName", "drums-2.zip"}, {"extract", true}, {"extractTo", "drums"}}));
+		QCOMPARE(again.value("error").toObject().value("code").toString(), QStringLiteral("extract_target_exists"));
+		QVERIFY(again.value("error").toObject().value("message").toString().contains("drums-2.zip"));
+	}
+
+	void downloadRefusesUnsafeArchive()
+	{
+		if (!QFileInfo(deployedTool("7zip/7z.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		files.rawResponses.append(fileResponse(storedZip({{"ok.wav", "fine"}, {"../escape.txt", "escaped"}})));
+		QTemporaryDir parent;
+		QDir().mkpath(parent.filePath("target"));
+		const auto url = QStringLiteral("http://127.0.0.1:%1/evil.zip").arg(files.server.serverPort());
+		const auto result
+			= runSingleCall(downloadCall({{"url", url}, {"directory", parent.filePath("target")}, {"extract", true}}));
+		QCOMPARE(result.value("error").toObject().value("code").toString(), QStringLiteral("unsafe_archive"));
+		QVERIFY(result.value("error").toObject().value("message").toString().contains("escape.txt"));
+		// Nothing was extracted anywhere; only the downloaded archive remains.
+		QVERIFY(!QFileInfo::exists(parent.filePath("escape.txt")));
+		QVERIFY(!QFileInfo::exists(parent.filePath("target/evil/ok.wav")));
+		QCOMPARE(QDir(parent.filePath("target")).entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden),
+			QStringList{"evil.zip"});
 	}
 
 	void downloadStopRemovesPartialFiles()

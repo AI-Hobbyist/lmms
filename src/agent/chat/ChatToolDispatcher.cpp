@@ -320,6 +320,11 @@ bool ChatToolDispatcher::submit(const QJsonObject& call, QString& error, ChatApp
 				+ " · "
 				+ (plan.value("overwrite").toBool() ? message("replaces a file with the same name")
 													: message("keeps an existing file with the same name"));
+			if (plan.value("extract").toBool())
+			{
+				target += " · "
+					+ message("extract to %1").arg(QDir::toNativeSeparators(plan.value("extractTo").toString()));
+			}
 			m_state->downloadPlan = plan;
 		}
 		else if (resolved.command == ChatWebSearch::readCommand())
@@ -504,6 +509,15 @@ void ChatToolDispatcher::executeDownload()
 				.toJson());
 		return;
 	}
+	const auto sevenZip = ChatPortableTools::resolve(settings.sevenZipPath);
+	if (plan.value("extract").toBool() && !QFileInfo(sevenZip).isFile())
+	{
+		finishPending(CommandResult::failure("tool_missing",
+			message("7-Zip was not found at %1. Check the tools in the Agent settings.")
+				.arg(QDir::toNativeSeparators(sevenZip)))
+				.toJson());
+		return;
+	}
 	const auto& call = m_state->call;
 	m_state->networkOutcome = {{"sessionId", m_state->sessionId}, {"turnId", m_state->turnId}, {"id", call.id},
 		{"wireName", call.wireName}, {"command", call.command}, {"arguments", call.arguments},
@@ -511,7 +525,7 @@ void ChatToolDispatcher::executeDownload()
 	m_state->approval = {};
 	m_state->targets.clear();
 	m_state->authorized = false;
-	m_state->download->start(plan, aria2);
+	m_state->download->start(plan, aria2, sevenZip);
 }
 
 void ChatToolDispatcher::executeNetworkTask()

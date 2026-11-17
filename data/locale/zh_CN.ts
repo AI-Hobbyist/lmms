@@ -16822,6 +16822,62 @@ Latency: %2 ms</source>
         <translation>在 %1 未找到 aria2，请在 Agent 设置中检查工具。</translation>
     </message>
     <message>
+        <source>7-Zip could not be started.</source>
+        <translation>无法启动 7-Zip。</translation>
+    </message>
+    <message>
+        <source>Downloaded to %1, but it was not extracted: %2</source>
+        <translation>已下载到 %1，但未解压：%2</translation>
+    </message>
+    <message>
+        <source>7-Zip cannot read it as an archive.</source>
+        <translation>7-Zip 无法将其识别为压缩包。</translation>
+    </message>
+    <message>
+        <source>the archive contains a link: %1</source>
+        <translation>压缩包包含链接：%1</translation>
+    </message>
+    <message>
+        <source>the archive member leaves the extraction folder: %1</source>
+        <translation>压缩包成员会越出解压目录：%1</translation>
+    </message>
+    <message>
+        <source>the archive is empty.</source>
+        <translation>压缩包为空。</translation>
+    </message>
+    <message>
+        <source>%1 is not empty; ask again with overwrite to merge into it.</source>
+        <translation>%1 不为空；如需合并，请在请求中明确覆盖。</translation>
+    </message>
+    <message>
+        <source>Cannot create the extraction folder in %1.</source>
+        <translation>无法在 %1 中创建解压文件夹。</translation>
+    </message>
+    <message>
+        <source>7-Zip exited with code %1.</source>
+        <translation>7-Zip 退出码 %1。</translation>
+    </message>
+    <message>
+        <source>an extracted entry is a link or outside the folder.</source>
+        <translation>解压出的条目是链接或位于目录之外。</translation>
+    </message>
+    <message>
+        <source>%1 already exists.</source>
+        <translation>%1 已存在。</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 into place.</source>
+        <translation>无法将 %1 移动到位。</translation>
+    </message>
+    <message>
+        <source>extract to %1</source>
+        <translation>解压到 %1</translation>
+    </message>
+    <message>
+        <source>7-Zip was not found at %1. Check the tools in the Agent settings.</source>
+        <translation>在 %1 未找到 7-Zip，请在 Agent 设置中检查工具。</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

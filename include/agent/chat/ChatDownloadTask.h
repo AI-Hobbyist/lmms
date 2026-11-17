@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QPointer>
+#include <functional>
 
 class QProcess;
 
@@ -26,7 +27,7 @@ public:
 	// target, overwrite}. A relative directory needs a saved project.
 	static bool plan(const QJsonObject& arguments, QJsonObject& plan, QString& error);
 
-	void start(const QJsonObject& plan, const QString& aria2Path);
+	void start(const QJsonObject& plan, const QString& aria2Path, const QString& sevenZipPath);
 	void abort();
 	bool active() const;
 
@@ -39,7 +40,16 @@ private:
 	void complete(int exitCode);
 	void cleanup();
 
+	// Archive phase: list and check every member, extract to a temporary
+	// folder, re-check what was written, then move files into place.
+	void run7Zip(const QStringList& arguments, const std::function<void(int, QByteArray)>& done);
+	void listArchive();
+	void extractArchive();
+	void failExtraction(const QString& code, const QString& reason);
+
 	QPointer<QProcess> m_process;
+	QString m_sevenZip;
+	QJsonObject m_downloaded;
 	QJsonObject m_plan;
 	QString m_temporary;
 	QByteArray m_output;

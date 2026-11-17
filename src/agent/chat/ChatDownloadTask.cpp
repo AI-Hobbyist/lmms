@@ -3,8 +3,10 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QJsonArray>
 #include <QProcess>
 #include <QRegularExpression>
@@ -64,7 +66,14 @@ QJsonObject ChatDownloadTask::definition()
 					"Target folder: absolute, or relative to the saved project's folder (for example assets/drums)."}}},
 		{"fileName", QJsonObject{{"type", "string"}, {"description", "File name; defaults to the URL's name."}}},
 		{"overwrite",
-			QJsonObject{{"type", "boolean"}, {"description", "Replace an existing file with the same name."}}}};
+			QJsonObject{{"type", "boolean"},
+				{"description", "Replace an existing file (and same-named extracted files) instead of refusing."}}},
+		{"extract", QJsonObject{{"type", "boolean"}, {"description", "Extract the downloaded archive with 7-Zip."}}},
+		{"extractTo",
+			QJsonObject{{"type", "string"},
+				{"description",
+					"Extraction folder, absolute or relative to the target folder; defaults to a folder named "
+					"after the archive."}}}};
 	return {{"name", command()},
 		{"description",
 			"Download one audio, MIDI or other asset file the user asked for into a folder. "
@@ -111,13 +120,22 @@ bool ChatDownloadTask::plan(const QJsonObject& arguments, QJsonObject& plan, QSt
 	}
 	plan = {{"url", url.toString()}, {"directory", directory}, {"fileName", fileName},
 		{"target", QDir(directory).absoluteFilePath(fileName)}, {"overwrite", arguments.value("overwrite").toBool()}};
+	if (arguments.value("extract").toBool())
+	{
+		auto extractTo = arguments.value("extractTo").toString().trimmed();
+		if (extractTo.isEmpty()) { extractTo = QFileInfo(fileName).completeBaseName(); }
+		extractTo = QDir::cleanPath(QDir(directory).absoluteFilePath(extractTo));
+		plan.insert("extract", true);
+		plan.insert("extractTo", extractTo);
+	}
 	return true;
 }
 
-void ChatDownloadTask::start(const QJsonObject& plan, const QString& aria2Path)
+void ChatDownloadTask::start(const QJsonObject& plan, const QString& aria2Path, const QString& sevenZipPath)
 {
 	abort();
 	m_plan = plan;
+	m_sevenZip = sevenZipPath;
 	m_output.clear();
 	m_lastProgress = {};
 	const auto target = plan.value("target").toString();
@@ -231,10 +249,166 @@ void ChatDownloadTask::complete(int exitCode)
 		return;
 	}
 	cleanup();
-	emit finished(
-		CommandResult::success(QJsonObject{{"url", m_plan.value("url")}, {"path", QDir::toNativeSeparators(target)},
-								   {"size", size}, {"sha256", hash}, {"overwritten", existed}})
-			.toJson());
+	m_downloaded = QJsonObject{{"url", m_plan.value("url")}, {"path", QDir::toNativeSeparators(target)}, {"size", size},
+		{"sha256", hash}, {"overwritten", existed}};
+	if (m_plan.value("extract").toBool())
+	{
+		listArchive();
+		return;
+	}
+	emit finished(CommandResult::success(m_downloaded).toJson());
+}
+
+void ChatDownloadTask::run7Zip(const QStringList& arguments, const std::function<void(int, QByteArray)>& done)
+{
+	auto* process = new QProcess(this);
+	m_process = process;
+	process->setProcessChannelMode(QProcess::MergedChannels);
+	connect(process, &QProcess::finished, this, [this, process, done](int exitCode, QProcess::ExitStatus status) {
+		if (process != m_process) { return; }
+		const auto output = process->readAll();
+		process->deleteLater();
+		m_process = nullptr;
+		done(status == QProcess::NormalExit ? exitCode : -1, output);
+	});
+	connect(process, &QProcess::errorOccurred, this, [this, process, done](QProcess::ProcessError error) {
+		if (error == QProcess::FailedToStart && process == m_process)
+		{
+			process->deleteLater();
+			m_process = nullptr;
+			done(-1, message("7-Zip could not be started.").toUtf8());
+		}
+	});
+	process->start(m_sevenZip, arguments);
+}
+
+void ChatDownloadTask::failExtraction(const QString& code, const QString& reason)
+{
+	// The download itself succeeded and stays in place; the result says so.
+	cleanup();
+	emit finished(failure(code,
+		message("Downloaded to %1, but it was not extracted: %2").arg(m_downloaded.value("path").toString(), reason)));
+}
+
+void ChatDownloadTask::listArchive()
+{
+	const auto archive = QDir::fromNativeSeparators(m_downloaded.value("path").toString());
+	run7Zip({"l", "-slt", "-ba", "--", QDir::toNativeSeparators(archive)}, [this](int exitCode, QByteArray output) {
+		if (exitCode != 0)
+		{
+			failExtraction("extract_failed", message("7-Zip cannot read it as an archive."));
+			return;
+		}
+		// Every member is checked before anything is written.
+		static const QRegularExpression drive("^[A-Za-z]:");
+		int members = 0;
+		for (const auto& block : QString::fromUtf8(output).split(QRegularExpression("\\r?\\n\\r?\\n")))
+		{
+			QHash<QString, QString> fields;
+			for (const auto& line : block.split(QRegularExpression("\\r?\\n")))
+			{
+				const int separator = line.indexOf(" = ");
+				if (separator > 0) { fields.insert(line.left(separator), line.mid(separator + 3)); }
+				else if (line.endsWith(" =")) { fields.insert(line.chopped(2), {}); }
+			}
+			if (!fields.contains("Path")) { continue; }
+			++members;
+			const auto path = QDir::fromNativeSeparators(fields.value("Path"));
+			const bool escapes = path.isEmpty() || path.startsWith('/') || drive.match(path).hasMatch()
+				|| path.split('/').contains("..");
+			const bool link = !fields.value("Symbolic Link").isEmpty() || !fields.value("Hard Link").isEmpty()
+				|| fields.value("Mode").startsWith('l');
+			if (escapes || link)
+			{
+				failExtraction("unsafe_archive",
+					(link ? message("the archive contains a link: %1")
+						  : message("the archive member leaves the "
+									"extraction folder: %1"))
+						.arg(fields.value("Path")));
+				return;
+			}
+		}
+		if (members == 0)
+		{
+			failExtraction("extract_failed", message("the archive is empty."));
+			return;
+		}
+		extractArchive();
+	});
+}
+
+void ChatDownloadTask::extractArchive()
+{
+	const auto extractTo = m_plan.value("extractTo").toString();
+	const bool overwrite = m_plan.value("overwrite").toBool();
+	if (!overwrite && QDir(extractTo).exists()
+		&& !QDir(extractTo).isEmpty(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden))
+	{
+		failExtraction("extract_target_exists",
+			message("%1 is not empty; ask again with overwrite to merge into it.")
+				.arg(QDir::toNativeSeparators(extractTo)));
+		return;
+	}
+	const auto parent = QFileInfo(extractTo).absolutePath();
+	m_temporary = QDir(parent).absoluteFilePath(".lmms-extract-" + QUuid::createUuid().toString(QUuid::Id128));
+	if (!QDir().mkpath(m_temporary))
+	{
+		failExtraction("target_unwritable",
+			message("Cannot create the extraction folder in %1.").arg(QDir::toNativeSeparators(parent)));
+		return;
+	}
+	const auto archive = m_downloaded.value("path").toString();
+	// -snl- extracts links as plain files at most; nested archives are left packed.
+	run7Zip({"x", "-y", "-snl-", "-o" + QDir::toNativeSeparators(m_temporary), "--", archive},
+		[this, extractTo, overwrite](int exitCode, QByteArray) {
+			if (exitCode != 0)
+			{
+				failExtraction("extract_failed", message("7-Zip exited with code %1.").arg(exitCode));
+				return;
+			}
+			const auto root = QFileInfo(m_temporary).canonicalFilePath();
+			QStringList files;
+			QDirIterator iterator(m_temporary, QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System,
+				QDirIterator::Subdirectories);
+			while (iterator.hasNext())
+			{
+				const QFileInfo info(iterator.next());
+				// A second check on what was actually written: no links, nothing outside.
+				if (info.isSymLink() || info.isJunction() || !info.canonicalFilePath().startsWith(root + '/'))
+				{
+					failExtraction("unsafe_archive", message("an extracted entry is a link or outside the folder."));
+					return;
+				}
+				if (info.isFile()) { files.append(QDir(root).relativeFilePath(info.canonicalFilePath())); }
+			}
+			QString error;
+			for (const auto& relative : files)
+			{
+				const auto destination = QDir(extractTo).absoluteFilePath(relative);
+				QDir().mkpath(QFileInfo(destination).absolutePath());
+				if (QFileInfo::exists(destination) && (!overwrite || !QFile::remove(destination)))
+				{
+					error = message("%1 already exists.").arg(QDir::toNativeSeparators(destination));
+					break;
+				}
+				if (!QFile::rename(QDir(root).absoluteFilePath(relative), destination))
+				{
+					error = message("Cannot move %1 into place.").arg(QDir::toNativeSeparators(destination));
+					break;
+				}
+			}
+			if (!error.isEmpty())
+			{
+				failExtraction("extract_failed", error);
+				return;
+			}
+			cleanup();
+			auto data = m_downloaded;
+			data.insert("extractedTo", QDir::toNativeSeparators(extractTo));
+			data.insert("extractedFiles", files.size());
+			data.insert("entries", QJsonArray::fromStringList(files.mid(0, 50)));
+			emit finished(CommandResult::success(data).toJson());
+		});
 }
 
 void ChatDownloadTask::abort()

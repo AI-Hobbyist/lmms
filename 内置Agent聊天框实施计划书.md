@@ -206,7 +206,7 @@ MainWindow 等公共类若增加布局字段或改变 ABI，不能沿用上一�
 | M4 联网与素材 | 联网搜索开关（默认关闭）；SearXNG（默认后端，自定义实例 URL）、Brave、受支持模型自带搜索；下载/解压；正式获取便携工具并记录清单 | 默认关闭时无搜索工具与托管搜索请求参数、开关保存恢复、关闭取消在途搜索；SearXNG 自部署实例 JSON 搜索及失败提示；Brave 切换；模型自带搜索能力禁用/启用、请求前批准与真实引用；普通文件及压缩包下载、解压、取消、失败、同名处理；路径逃逸防护；工具版本及哈希可复核；无自动执行下载程序 |
 | M5 集成与交付 | 全流程、原生 GUI、资源安装与增量 ZIP；说明和最终交接 | 聊天→批准→实际工程编辑、搜索→下载→解压实际链路；ABI 与依赖核验；包清单/校验/安装器 VerifyOnly；给出 ZIP 绝对路径和每项真实验证状态 |
 
-实施进度：M1 DONE；M2实施及自动验收DONE，8/8 Chat CTest通过，逐协议真实厂商项MANUAL/PENDING，阶段检查点已完成并推送ad3618354。M3 DONE（自动验收19/19 Chat+MCP+命令回归通过，真实厂商工具调用MANUAL/PENDING）；M4 NEXT，M5 NOT STARTED。详见 `doc/agent/chat-m2-validation.md` 和 `doc/agent/chat-implementation-progress.md`。不将本机夹具记为真实厂商或内部工具执行验收。
+实施进度：M1 DONE；M2实施及自动验收DONE，8/8 Chat CTest通过，逐协议真实厂商项MANUAL/PENDING，阶段检查点已完成并推送ad3618354。M3 DONE（自动验收19/19 Chat+MCP+命令回归通过，真实厂商工具调用MANUAL/PENDING）；M4 DONE（联网/搜索/页面读取/模型自带搜索/aria2下载/7-Zip解压/工具清单，自动验收19/19，真实实例/厂商/公网下载MANUAL/PENDING）；M5 NEXT。详见 `doc/agent/chat-m2-validation.md` 和 `doc/agent/chat-implementation-progress.md`。不将本机夹具记为真实厂商或内部工具执行验收。
 
 ## 12. 验证与构建执行规则
 
