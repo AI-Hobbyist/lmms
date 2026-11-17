@@ -1,5 +1,6 @@
 #include <QAbstractButton>
 #include <QApplication>
+#include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -33,6 +34,8 @@
 #include "agent/CommandBus.h"
 #include "agent/chat/ChatController.h"
 #include "agent/chat/ChatDock.h"
+#include "agent/chat/ChatDownloadTask.h"
+#include "agent/chat/ChatPortableTools.h"
 #include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatTools.h"
 #include "agent/chat/ChatTranscript.h"
@@ -292,6 +295,9 @@ private slots:
 		lmms::Engine::getSong()->clearProject();
 		lmms::ConfigManager::inst()->setValue("agentchat", "approval", "request");
 		ChatSearchSettings{}.save();
+		ChatDownloadSettings downloads;
+		downloads.aria2Path = deployedTool("aria2/aria2c.exe");
+		downloads.save();
 		QVERIFY(CommandBus::instance().execute("track.create", {{"type", "sample"}, {"name", "Original"}}).ok);
 	}
 
@@ -855,6 +861,152 @@ private slots:
 			QVERIFY(!controller.active());
 			QCOMPARE(server.requests.size(), 1);
 		}
+	}
+
+	// Tools deployed by buildtools/Get-AgentChatTools.ps1 beside build/Release/lmms.exe.
+	static QString deployedTool(const QString& relative)
+	{
+		return QDir::cleanPath(
+			QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("../../Release/tools/" + relative));
+	}
+
+	static QJsonObject downloadCall(const QJsonObject& arguments)
+	{
+		ChatToolCatalog catalog;
+		QString error;
+		catalog.load(error, {ChatDownloadTask::definition()});
+		return {{"id", "download"}, {"type", "function"},
+			{"function",
+				QJsonObject{{"name", catalog.nameForCommand(ChatDownloadTask::command())},
+					{"arguments", QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact))}}}};
+	}
+
+	static QByteArray fileResponse(const QByteArray& body)
+	{
+		return "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: "
+			+ QByteArray::number(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+	}
+
+	void downloadMovesVerifiedFileIntoTarget()
+	{
+		if (!QFileInfo(deployedTool("aria2/aria2c.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		const QByteArray body = QByteArray("RIFF-fixture-kick-").repeated(512);
+		files.rawResponses.append(fileResponse(body));
+		QTemporaryDir target;
+		const auto url = QStringLiteral("http://127.0.0.1:%1/kits/kick.wav").arg(files.server.serverPort());
+		const auto result = runSingleCall(downloadCall({{"url", url}, {"directory", target.path() + "/drums"}}));
+		QVERIFY2(result.value("ok").toBool(), qPrintable(QJsonDocument(result).toJson()));
+		const auto data = result.value("data").toObject();
+		const auto path = QDir(target.path()).absoluteFilePath("drums/kick.wav");
+		QCOMPARE(QDir::fromNativeSeparators(data.value("path").toString()), path);
+		QFile file(path);
+		QVERIFY(file.open(QIODevice::ReadOnly));
+		QCOMPARE(file.readAll(), body);
+		QCOMPARE(data.value("sha256").toString(),
+			QString::fromLatin1(QCryptographicHash::hash(body, QCryptographicHash::Sha256).toHex()));
+		QVERIFY(!data.value("overwritten").toBool());
+		// The temporary download folder is gone; only the approved file remains.
+		QCOMPARE(QDir(target.path() + "/drums").entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden),
+			QStringList{"kick.wav"});
+		QVERIFY(files.heads[0].startsWith("GET /kits/kick.wav"));
+	}
+
+	void downloadSameNameNeedsOverwrite()
+	{
+		if (!QFileInfo(deployedTool("aria2/aria2c.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		files.rawResponses.append(fileResponse("new content"));
+		QTemporaryDir target;
+		QFile existing(target.filePath("loop.wav"));
+		QVERIFY(existing.open(QIODevice::WriteOnly));
+		existing.write("original");
+		existing.close();
+		const auto url = QStringLiteral("http://127.0.0.1:%1/loop.wav").arg(files.server.serverPort());
+
+		const auto refused = runSingleCall(downloadCall({{"url", url}, {"directory", target.path()}}));
+		QCOMPARE(refused.value("error").toObject().value("code").toString(), QStringLiteral("file_exists"));
+		QVERIFY(files.heads.isEmpty());
+		QVERIFY(existing.open(QIODevice::ReadOnly));
+		QCOMPARE(existing.readAll(), QByteArray("original"));
+		existing.close();
+
+		const auto replaced
+			= runSingleCall(downloadCall({{"url", url}, {"directory", target.path()}, {"overwrite", true}}));
+		QVERIFY2(replaced.value("ok").toBool(), qPrintable(QJsonDocument(replaced).toJson()));
+		QVERIFY(replaced.value("data").toObject().value("overwritten").toBool());
+		QVERIFY(existing.open(QIODevice::ReadOnly));
+		QCOMPARE(existing.readAll(), QByteArray("new content"));
+	}
+
+	void downloadFailuresLeaveNoFile()
+	{
+		if (!QFileInfo(deployedTool("aria2/aria2c.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		files.rawResponses.append("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+		QTemporaryDir target;
+		const auto url = QStringLiteral("http://127.0.0.1:%1/missing.wav").arg(files.server.serverPort());
+		const auto missing = runSingleCall(downloadCall({{"url", url}, {"directory", target.path()}}));
+		QCOMPARE(missing.value("error").toObject().value("code").toString(), QStringLiteral("download_failed"));
+		QVERIFY(QDir(target.path()).isEmpty(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden));
+
+		// Turned off after approval: refused at run time, nothing requested.
+		const auto disabled = runSingleCall(downloadCall({{"url", url}, {"directory", target.path()}}), [] {
+			auto settings = ChatDownloadSettings::load();
+			settings.enabled = false;
+			settings.save();
+		});
+		QCOMPARE(disabled.value("error").toObject().value("code").toString(), QStringLiteral("downloads_disabled"));
+		QCOMPARE(files.heads.size(), 1);
+
+		// A relative folder needs a saved project; the call never reaches approval.
+		ChatDownloadSettings{}.save();
+		const auto relative = runSingleCall(downloadCall({{"url", url}, {"directory", "assets/drums"}}));
+		QVERIFY(relative.isEmpty());
+	}
+
+	void downloadStopRemovesPartialFiles()
+	{
+		if (!QFileInfo(deployedTool("aria2/aria2c.exe")).isFile())
+		{
+			QSKIP("build/Release/tools is not deployed; run buildtools/Get-AgentChatTools.ps1");
+		}
+		ToolTurnServer files;
+		QVERIFY(files.server.listen(QHostAddress::LocalHost));
+		files.hold = true;
+		QTemporaryDir target;
+		ToolTurnServer model;
+		QVERIFY(model.server.listen(QHostAddress::LocalHost));
+		const auto url = QStringLiteral("http://127.0.0.1:%1/slow.wav").arg(files.server.serverPort());
+		queueCalls(model, {downloadCall({{"url", url}, {"directory", target.path()}})});
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		QVERIFY(store.saveSession(session, error));
+		ChatController controller(store);
+		controller.setToolsEnabled(true);
+		QSignalSpy approvals(&controller, &ChatController::approvalRequested);
+		QVERIFY(controller.send(session.value("id").toString(), model.connection(), "fixture-key", {}, "Get", error));
+		QTRY_COMPARE(approvals.size(), 1);
+		QVERIFY(controller.decideTool(approvals[0][0].toJsonObject(), true, error));
+		QTRY_COMPARE_WITH_TIMEOUT(files.heads.size(), 1, 10000);
+		controller.stop();
+		QVERIFY(!controller.active());
+		QVERIFY(QDir(target.path()).isEmpty(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden));
+		QCOMPARE(model.requests.size(), 1);
 	}
 
 	void commandSelfResetKeepsResultCancelsRest()

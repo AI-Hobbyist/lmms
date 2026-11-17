@@ -264,3 +264,8 @@ Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外
 ## M4.6a 素材下载设置页与工具复核（2026-11-17）
 
 按实时Penpot 07实现“素材下载”设置页（原导航标签禁用，现启用）：aria2/7-Zip路径输入(306,352/455,622×43)与选择文件、“优先便携版”、素材保存位置说明（只读，按请求指定）、“压缩包下载完成后解压”复选、下载流程四步、“检查工具”(280,868)及状态。新增ChatDownloadSettings（downloads默认开启、aria2Path/sevenZipPath默认tools/…相对lmms.exe目录、extractArchives默认开启）与ChatPortableTools::verify：工具存在性检查，并按tools/<tool>/<program>同级上层tools/manifest.json复核SHA256；未列入清单如实报告。全局页“允许下载素材”开关已接线保存。导航页码映射改为显式表。ChatDockTest新增nativeDownloadSettings（几何、默认路径、缺失报告、真实build/Release/tools按manifest复核两项verified、开关与路径保存），新增4条中文词条（lrelease 4183/0）；CTest 18/18通过；真实窗口截图build/agent-chat-download-settings-native.png已查看。日志build/agent-chat-m4-download-settings-{build,tests}.log。
+
+
+## M4.6b aria2 素材下载工具（2026-11-17）
+
+新增chat.downloadAsset（url/directory/fileName/overwrite）：受“允许下载素材”开关控制，与联网搜索开关无关；仅http/https；目录为绝对路径或已保存工程目录下的相对路径（未保存工程时拒绝），文件名须为单纯文件名。批准卡显示“URL → 目标路径 · 覆盖/不覆盖同名文件”；执行时重新解析目标，变化则target_changed；运行时关闭开关→downloads_disabled；aria2缺失→tool_missing。aria2c经QProcess参数数组启动（--allow-overwrite=false、--auto-file-renaming=false、禁用torrent/metalink/RPC），先下载到目标目录内的.lmms-download-<uuid>临时目录，成功后计算SHA256并按覆盖策略移入目标，删除临时目录；同名且未声明覆盖时在下载前拒绝（file_exists）。解析aria2控制台读数产生进度（未知总量不给百分比）。停止/失效时结束进程并清理临时文件。不执行下载文件。ChatToolTurnTest新增4项（真实aria2c 1.37.0 + 本机HTTP：下载核对字节与哈希且仅剩目标文件、同名拒绝不发请求/覆盖替换、404失败无残留/运行时关闭/相对目录需工程、下载中停止无残留），新增13条中文词条（lrelease 4196/0）；CTest 18/18通过，日志build/agent-chat-m4-download-{build,tests}.log。下载进度尚未在聊天界面实时显示（结果卡显示最终结果），真实公网素材下载MANUAL/PENDING。

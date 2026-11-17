@@ -16770,6 +16770,58 @@ Latency: %2 ms</source>
         <translation>%1：已按 tools/manifest.json 校验</translation>
     </message>
     <message>
+        <source>Only http and https assets can be downloaded.</source>
+        <translation>只能下载 http 或 https 素材。</translation>
+    </message>
+    <message>
+        <source>A target folder is required.</source>
+        <translation>需要指定目标文件夹。</translation>
+    </message>
+    <message>
+        <source>Save the project first, or give an absolute target folder.</source>
+        <translation>请先保存工程，或指定绝对路径的目标文件夹。</translation>
+    </message>
+    <message>
+        <source>The file name is missing or not a plain file name.</source>
+        <translation>文件名缺失或不是单纯的文件名。</translation>
+    </message>
+    <message>
+        <source>%1 already exists; ask again with overwrite to replace it.</source>
+        <translation>%1 已存在；如需替换，请在请求中明确覆盖。</translation>
+    </message>
+    <message>
+        <source>Cannot create the download folder in %1.</source>
+        <translation>无法在 %1 中创建下载文件夹。</translation>
+    </message>
+    <message>
+        <source>aria2 could not be started.</source>
+        <translation>无法启动 aria2。</translation>
+    </message>
+    <message>
+        <source>aria2 exited with code %1. %2</source>
+        <translation>aria2 退出码 %1。%2</translation>
+    </message>
+    <message>
+        <source>Cannot move the download to %1.</source>
+        <translation>无法将下载文件移动到 %1。</translation>
+    </message>
+    <message>
+        <source>replaces a file with the same name</source>
+        <translation>覆盖同名文件</translation>
+    </message>
+    <message>
+        <source>keeps an existing file with the same name</source>
+        <translation>不覆盖同名文件</translation>
+    </message>
+    <message>
+        <source>Asset downloads are turned off in the Agent settings.</source>
+        <translation>Agent 设置中已关闭素材下载。</translation>
+    </message>
+    <message>
+        <source>aria2 was not found at %1. Check the tools in the Agent settings.</source>
+        <translation>在 %1 未找到 aria2，请在 Agent 设置中检查工具。</translation>
+    </message>
+    <message>
         <source>Start a new music conversation.</source>
         <translation>开始新的音乐创作会话。</translation>
     </message>

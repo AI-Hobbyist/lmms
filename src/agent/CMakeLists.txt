@@ -11,7 +11,7 @@ if(WANT_AGENT_CHAT)
 		agent/chat/ChatAttachment.cpp agent/chat/ChatContent.cpp agent/chat/ChatAttachmentsDialog.cpp
 		agent/chat/ChatTranscript.cpp agent/chat/ChatTools.cpp agent/chat/ChatToolDispatcher.cpp
 		agent/chat/ChatSearchSettings.cpp agent/chat/ChatWebSearch.cpp
-		agent/chat/ChatPortableTools.cpp)
+		agent/chat/ChatPortableTools.cpp agent/chat/ChatDownloadTask.cpp)
 endif()
 
 set(LMMS_SRCS

@@ -4,9 +4,9 @@
 - 已完成并验证且已推送：工具执行元数据补丁（3623154b5）；工具结果卡（CTest4/4、真实窗口截图build/agent-chat-tool-result-native.png）。详见doc/agent/chat-implementation-progress.md末两节。
 - 截图：设LMMS_CHAT_SCREENSHOT为build下某个.png完整路径（nativeDockLifecycle直接保存到该路径，其余保存到同目录）。
 - 环境：python需conda base（-NoProfile时用conda shell.powershell hook）；本机无pwsh，build.py拒绝运行，构建用cmake --build build --config Release --target … --parallel 2，测试用ctest --test-dir build -C Release -R …，均经Tee-Object写日志。
-- M4.1 DONE（联网开关/搜索来源设置，Penpot 05已补设计并经用户确认）；M4.2 DONE（SearXNG/Brave搜索工具与门控，真实实例实测MANUAL/PENDING）；M4.3 DONE（页面读取）；M4.4 DONE（模型自带搜索，capabilities.hostedWebSearch，真实厂商实测MANUAL/PENDING）；M4.5 DONE（aria2 1.37.0/7-Zip 26.06已获取到build/Release/tools，脚本buildtools/Get-AgentChatTools.ps1）；M4.6a DONE（素材下载设置页/工具复核/允许下载开关）。
+- M4.1 DONE（联网开关/搜索来源设置，Penpot 05已补设计并经用户确认）；M4.2 DONE（SearXNG/Brave搜索工具与门控，真实实例实测MANUAL/PENDING）；M4.3 DONE（页面读取）；M4.4 DONE（模型自带搜索，capabilities.hostedWebSearch，真实厂商实测MANUAL/PENDING）；M4.5 DONE（aria2 1.37.0/7-Zip 26.06已获取到build/Release/tools，脚本buildtools/Get-AgentChatTools.ps1）；M4.6a DONE（素材下载设置页/工具复核/允许下载开关）；M4.6b DONE（aria2下载工具）。
 - M3 DONE：自身重置与网络等待无批次测试已补；CTest19/19（Chat11+MCP5+命令3）通过，日志build/agent-chat-m3-regression-{build,tests}.log；M3检查点已提交推送。真实厂商工具调用MANUAL/PENDING。
-- 下一步：M4.6 aria2下载任务（QProcess参数数组、临时位置、进度/取消、同名覆盖须明确）；M4.7 7-Zip列目录检查后解压（路径逃逸防护）。
+- 下一步：M4.7 7-Zip列目录检查后解压（路径逃逸防护）。
 
 ---
 

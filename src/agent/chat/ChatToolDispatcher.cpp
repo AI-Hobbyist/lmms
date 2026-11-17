@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <QPointer>
 #include <QSet>
 #include <QStandardPaths>
@@ -17,6 +18,8 @@
 #include "agent/CommandBus.h"
 #include "agent/ScriptRunner.h"
 #include "agent/ToolRegistry.h"
+#include "agent/chat/ChatDownloadTask.h"
+#include "agent/chat/ChatPortableTools.h"
 #include "agent/chat/ChatSearchSettings.h"
 #include "agent/chat/ChatWebSearch.h"
 
@@ -168,6 +171,8 @@ struct ChatToolDispatcher::State
 
 	// Chat-owned network tool currently waiting for its reply (never a project batch).
 	ChatWebSearch* search = nullptr;
+	ChatDownloadTask* download = nullptr;
+	QJsonObject downloadPlan;
 	QJsonObject networkOutcome;
 };
 
@@ -176,6 +181,9 @@ ChatToolDispatcher::ChatToolDispatcher(QObject* parent)
 	, m_state(std::make_unique<State>())
 {
 	m_state->search = new ChatWebSearch(this);
+	m_state->download = new ChatDownloadTask(this);
+	connect(m_state->download, &ChatDownloadTask::finished, this,
+		[this](const QJsonObject& result) { finishNetworkTask(result); });
 	connect(m_state->search, &ChatWebSearch::finished, this,
 		[this](const QJsonObject& result) { finishNetworkTask(result); });
 	connect(ChatSearchSettingsNotifier::instance(), &ChatSearchSettingsNotifier::changed, this, [this] {
@@ -214,6 +222,8 @@ bool ChatToolDispatcher::beginTurn(const QString& sessionId, const QString& turn
 		localTools.append(ChatWebSearch::definition());
 		localTools.append(ChatWebSearch::readDefinition());
 	}
+	// Asset downloads are their own switch; they never depend on web search.
+	if (ChatDownloadSettings::load().enabled) { localTools.append(ChatDownloadTask::definition()); }
 	if (!m_state->catalog.load(error, localTools)) { return false; }
 	if (m_state->song != song)
 	{
@@ -301,7 +311,21 @@ bool ChatToolDispatcher::submit(const QJsonObject& call, QString& error, ChatApp
 	{
 		// Network tools touch no project object; the approval shows what is sent.
 		QString target;
-		if (resolved.command == ChatWebSearch::readCommand()) { target = resolved.arguments.value("url").toString(); }
+		if (resolved.command == ChatDownloadTask::command())
+		{
+			// The card shows the source, the resolved target and the overwrite choice.
+			QJsonObject plan;
+			if (!ChatDownloadTask::plan(resolved.arguments, plan, error)) { return false; }
+			target = plan.value("url").toString() + " → " + QDir::toNativeSeparators(plan.value("target").toString())
+				+ " · "
+				+ (plan.value("overwrite").toBool() ? message("replaces a file with the same name")
+													: message("keeps an existing file with the same name"));
+			m_state->downloadPlan = plan;
+		}
+		else if (resolved.command == ChatWebSearch::readCommand())
+		{
+			target = resolved.arguments.value("url").toString();
+		}
 		else
 		{
 			const auto backend = ChatSearchSettings::backendName(ChatSearchSettings::load().backend);
@@ -451,8 +475,52 @@ void ChatToolDispatcher::execute(const QString& token)
 								  {"result", result}});
 }
 
+void ChatToolDispatcher::executeDownload()
+{
+	const auto settings = ChatDownloadSettings::load();
+	if (!settings.enabled)
+	{
+		finishPending(CommandResult::failure(
+			"downloads_disabled", message("Asset downloads are turned off in the Agent settings."))
+				.toJson());
+		return;
+	}
+	// The target is resolved again: a moved project or folder needs a new approval.
+	QJsonObject plan;
+	QString error;
+	if (!ChatDownloadTask::plan(m_state->call.arguments, plan, error) || plan != m_state->downloadPlan)
+	{
+		finishPending(CommandResult::failure(
+			"target_changed", error.isEmpty() ? message("The tool target changed. Request approval again.") : error)
+				.toJson());
+		return;
+	}
+	const auto aria2 = ChatPortableTools::resolve(settings.aria2Path);
+	if (!QFileInfo(aria2).isFile())
+	{
+		finishPending(CommandResult::failure("tool_missing",
+			message("aria2 was not found at %1. Check the tools in the Agent settings.")
+				.arg(QDir::toNativeSeparators(aria2)))
+				.toJson());
+		return;
+	}
+	const auto& call = m_state->call;
+	m_state->networkOutcome = {{"sessionId", m_state->sessionId}, {"turnId", m_state->turnId}, {"id", call.id},
+		{"wireName", call.wireName}, {"command", call.command}, {"arguments", call.arguments},
+		{"approvalRequired", m_state->approval.value("approvalRequired")}, {"executed", true}};
+	m_state->approval = {};
+	m_state->targets.clear();
+	m_state->authorized = false;
+	m_state->download->start(plan, aria2);
+}
+
 void ChatToolDispatcher::executeNetworkTask()
 {
+	if (m_state->call.command == ChatDownloadTask::command())
+	{
+		executeDownload();
+		return;
+	}
 	// Re-check at run time: approval does not keep a disabled search alive.
 	const auto settings = ChatSearchSettings::load();
 	if (!settings.enabled || settings.backend == ChatSearchBackend::Model)
@@ -509,8 +577,9 @@ void ChatToolDispatcher::finishNetworkTask(const QJsonObject& result)
 
 void ChatToolDispatcher::invalidate(const QString& reason)
 {
-	// A running search belongs to the invalidated turn; its reply is dropped.
+	// A running search or download belongs to the invalidated turn; its result is dropped.
 	m_state->search->abort();
+	m_state->download->abort();
 	m_state->networkOutcome = {};
 	const bool wasActive = m_state->active;
 	m_state->active = false;
