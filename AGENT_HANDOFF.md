@@ -1,7 +1,7 @@
 ## 当前有效交接入口（2026-11-17，M1–M5 全部 DONE）
 
 - 计划书M1～M5全部完成并逐步提交推送；无剩余实施任务。交付说明与验收矩阵：doc/agent/chat-delivery.md。
-- 增量包：build/packages/lmms-agent-chat-20261117-213718-win64.zip（SHA256 C62B896C4DA10E72E236B8F912D976C0472B4F40BA232D1938F8333C9F7E7A33），VerifyOnly通过；生产目录D:/Program Files/LMMS未修改，由用户手动替换。
+- 增量包：build/packages/lmms-agent-chat-20261117-220216-win64.zip（SHA256 A24B9A9D3FD0C13D9F3EA7E4EE932726F34934D5729886A9718ACF4FE701AC93），VerifyOnly通过；生产目录D:/Program Files/LMMS未修改，由用户手动替换。
 - MANUAL/PENDING：替换后整机GUI验收、真实厂商API/工具调用、真实SearXNG/Brave/托管搜索、公网下载。
 - 环境：python需conda base；无pwsh，构建用cmake --build/ctest；PS5脚本含中文须UTF-8 BOM。
 

@@ -60,3 +60,9 @@
 ## 更新：侧栏默认收起（2026-11-17，提交 5fa76001a）
 
 首次启动时 Agent 侧栏默认收起为 48 px 标签，用户展开或收起后按保存的状态恢复。此时生产目录已由用户手动替换为上一版包（`lmms-agent-chat-20261117-212914-win64.zip`），因此新包按实际安装比对后只含 `lmms.exe` 1 个文件：`build/packages/lmms-agent-chat-20261117-213718-win64.zip`，SHA256 `C62B896C4DA10E72E236B8F912D976C0472B4F40BA232D1938F8333C9F7E7A33`；导出 3138→3138 删除 0，依赖可解析，VerifyOnly 通过且无写入。替换方法：关闭 LMMS，备份并覆盖安装目录中的 `lmms.exe`。
+
+## 更新：失败调用不再取消整轮、Agent 回复 Markdown 排版（2026-11-17）
+
+- 修复（f5528ac94）：命令失败时 CommandBus 用快照回滚工程并发出 projectAboutToReset，调度器曾因此判定“工程已变化”并取消同轮其余调用（实际出现在引用缺失采样 samples/empty.wav 的出厂预设上）。现在执行期间的重置在命令返回后判断：失败回滚不使回合失效；命令本身成功替换工程仍保留结果并取消其余调用。
+- 新功能（82809e865）：Agent 回复按 GitHub 方言 Markdown 渲染，禁用内嵌 HTML（原样显示），代码块外单换行保留，链接仅点击打开；用户消息保持纯文本，复制/导出为原文。
+- 替换包：build/packages/lmms-agent-chat-20261117-220216-win64.zip（仅 lmms.exe），SHA256 A24B9A9D3FD0C13D9F3EA7E4EE932726F34934D5729886A9718ACF4FE701AC93；导出 3138→3138 删除 0，VerifyOnly 通过且无写入。CTest 18/18。出厂预设所缺 samples/empty.wav 属于既有数据问题，未在本次处理。
