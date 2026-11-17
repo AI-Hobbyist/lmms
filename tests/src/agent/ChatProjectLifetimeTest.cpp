@@ -1,4 +1,7 @@
 #include <QDir>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QPointer>
 #include <QSet>
 #include <QSignalSpy>
@@ -88,6 +91,121 @@ private slots:
 		for (const auto* operation : {"success", "dryRun", "undo", "redo", "failed-batch"})
 		{
 			QTest::newRow(operation) << QString::fromLatin1(operation);
+		}
+	}
+
+	void exportsRegisteredCommandInventory()
+	{
+		const auto path = qEnvironmentVariable("LMMS_COMMAND_INVENTORY");
+		if (path.isEmpty())
+		{
+			return;
+		}
+		QJsonArray commands;
+		for (const auto& descriptor : lmms::agent::CommandBus::instance().descriptors())
+		{
+			commands.append(QJsonObject{{"name", descriptor.name},
+										{"summary", descriptor.summary},
+										{"mutability", static_cast<int>(descriptor.mutability)},
+										{"scope", static_cast<int>(descriptor.scope)},
+										{"preflight", bool(descriptor.preflight)},
+										{"schema", descriptor.argsSchema}});
+		}
+		QFile output(path);
+		QVERIFY(output.open(QIODevice::WriteOnly));
+		QVERIFY(output.write(QJsonDocument(commands).toJson()) > 0);
+	}
+
+	void agentOperationsNeverResetProject_data()
+	{
+		QTest::addColumn<QString>("operation");
+		for (const auto* operation : {"dryRun", "failed-batch", "script-failure", "composition-preview", "undo",
+									  "clear", "load", "script-clear", "script-load"})
+		{
+			QTest::newRow(operation) << QString::fromLatin1(operation);
+		}
+	}
+
+	void agentOperationsNeverResetProject()
+	{
+		QFETCH(QString, operation);
+		auto* song = lmms::Engine::getSong();
+		auto& bus = lmms::agent::CommandBus::instance();
+		QPointer<lmms::Track> original(lmms::Track::create(lmms::Track::Type::Sample, song));
+		original->setName("Original");
+		lmms::Engine::projectJournal()->clearJournal();
+		QSignalSpy reset(song, &lmms::Song::projectAboutToReset);
+		lmms::agent::CommandResult result;
+		const QJsonObject edit{{"track", 0}, {"value", "Edited"}};
+		if (operation == "dryRun")
+		{
+			auto arguments = edit;
+			arguments.insert("dryRun", true);
+			result = bus.execute("track.setName", arguments);
+			QVERIFY(result.ok);
+		}
+		else if (operation == "failed-batch")
+		{
+			QVERIFY(bus.beginBatch("No-reset contract"));
+			QVERIFY(bus.execute("track.setName", edit).ok);
+			result = bus.execute("missing.command");
+			QVERIFY(!result.ok);
+		}
+		else if (operation == "script-failure")
+		{
+			const QJsonArray steps{QJsonObject{{"cmd", "track.setName"}, {"args", edit}},
+								   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+			result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+			QVERIFY(!result.ok);
+		}
+		else if (operation == "composition-preview")
+		{
+			result = bus.execute("compose.drumPattern", {{"bars", 1}, {"dryRun", true}});
+			QVERIFY(result.ok);
+		}
+		else if (operation == "undo")
+		{
+			QVERIFY(bus.execute("track.setName", edit).ok);
+			result = bus.execute("history.undo");
+			QVERIFY(result.ok);
+		}
+		else if (operation == "clear" || operation == "script-clear")
+		{
+			if (operation == "script-clear")
+			{
+				const QJsonArray steps{QJsonObject{{"cmd", "song.clearProject"}}};
+				result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+			}
+			else
+			{
+				result = bus.execute("song.clearProject");
+			}
+		}
+		else
+		{
+			lmms::DataFile snapshot(lmms::DataFile::Type::SongProject);
+			song->saveProjectState(snapshot);
+			const auto path = m_profile.filePath("agent-reset-contract.mmp");
+			QVERIFY(snapshot.writeFile(path, false));
+			if (operation == "script-load")
+			{
+				const QJsonArray steps{QJsonObject{{"cmd", "song.load"}, {"args", QJsonObject{{"path", path}}}}};
+				result = bus.execute("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+			}
+			else
+			{
+				result = bus.execute("song.load", {{"path", path}});
+			}
+		}
+		QCOMPARE(reset.count(), 0);
+		QVERIFY(!original.isNull());
+		QCOMPARE(song->tracks().front(), original.data());
+		QCOMPARE(original->name(), QStringLiteral("Original"));
+		QCOMPARE(bus.batchDepth(), 0);
+		if (operation == "clear" || operation == "load" || operation == "script-clear" || operation == "script-load")
+		{
+			QVERIFY(!result.ok);
+			QCOMPARE(result.errorCode, QStringLiteral("agent_project_reset_forbidden"));
 		}
 	}
 

@@ -1,4 +1,23 @@
-## 当前有效交接入口（2026-11-17，新建工程闪退修复已验证）
+## 当前有效交接入口（2026-11-17，持续目标 P1 已验证）
+
+- 用户已授权持续执行增量回滚计划，目标 active，不再等待实施授权。P1 命令盘点与 RED DONE，P2～P5 未开始；每阶段单独验证、提交推送及核对远端。进度 doc/agent/incremental-rollback-progress.md；204 条真实注册命令清单 doc/agent/incremental-rollback-command-inventory.csv。
+- 本轮仅增加既有 ChatProjectLifetimeTest 中命令清单导出与 9 个无重置契约用例。Release 测试编译成功；9 个 RED 实际全部失败于重置计数，原有真实 Windows 生命周期基线 12/12 通过。build/agent-incremental-p1-{build,red,baseline}.log；不能把新 RED 当成产品已通过。未修改生产代码/安装，无新 ZIP。
+- 下一步：完成 P1 提交推送并核对后进入 P2：可信 Agent 上下文、公共工程重置入口硬限制、ProjectJournal 增量正反记录与保存点、简单属性工具迁移；未迁移写操作只可暂时前置拒绝，不能以禁用工具宣称最终完成。详见进度文档的接口决策和现有契约。
+- Penpot 实时连接正确 file/page，当前无布局修改；同工程任务冲突 0。主分支 master；保留原未跟踪 .codegraph/、.omc/、build-driver.log、build.log。额度接口周窗口用量 50%，未触发交接阈值，无 Luna 委派。
+
+---
+
+## 历史：增量回滚计划已编写，尚未实施
+
+- 本轮用户只要求写实施计划，不开始实现。新增 doc/agent/incremental-rollback-implementation-plan.md，P1～P5 全部 NOT STARTED；没有修改代码、编译测试、打包或生产安装。
+- 最新硬要求：Agent 干脆不能重载工程，不能经批准、无需批准、脚本、组合命令、MCP 或历史快照恢复绕过。用户手动 GUI 的工程操作保留。Agent 失败及 dry-run 要保留原子回滚，以局部增量逆操作实现，不能回退整工程快照。
+- 计划包含可信执行上下文、工程重置边界保护、局部日志/保存点/对象所有权、命令覆盖盘点、预设和插件可逆性、脚本批次及增量历史、真实窗口验收与阶段提交推送检查点。尚未具备逆操作的命令仅可阶段性写入前拒绝，不得永久下架现有编辑能力冒充迁移完成。
+- 当前 master，起点/HEAD 02efedce1c809788a3aa5559011cf16fef194196（前次修复与交付记录已推送）。本轮计划及本交接为未提交文档修改；原有未跟踪目录与日志保留。文档执行 git diff --check；没有新构建结果或新 ZIP。
+- 下一步：等待用户授权实施后，从计划 P1 命令盘点与真实 RED 用例开始；不要直接跳到改 ProjectJournal，也不要将旧 19/19 视为新计划通过。没有活动构建或测试。
+
+---
+
+## 历史：新建工程闪退修复已验证
 
 - 当前任务：Agent 操作后新建工程卡死闪退的最小修复，以及失败工具调用能否永不重载的分析。原计划 M1～M5 已完成，不重开阶段，不做无关重构。
 - 已完成：PatternTrackView 改只读登记表查询；Song 在视图清理前处理排队创建；TrackContainerView 对所有排队创建复用 QPointer；PatternStore 下拉框空值保护。生产修改仅四个 cpp，没有修改事务/撤销行为或插件 ABI。
