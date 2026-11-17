@@ -276,3 +276,8 @@ Penpot 05缺少搜索后端控件，经用户确认后在画板05“联网与外
 chat.downloadAsset新增extract/extractTo（默认与压缩包同名子目录，相对路径基于下载目录）；批准卡同时显示下载目标与解压目录；需解压而7-Zip缺失时下载前即失败。下载完成后先以7z l -slt列出全部成员，任何绝对路径/盘符/..越级或Symbolic Link/Hard Link/Mode l成员即整体拒绝（unsafe_archive）；解压目录非空且未声明覆盖→extract_target_exists；通过后以-snl-解压到同级.lmms-extract-<uuid>临时目录，再逐项复核解出条目非链接且位于临时目录内，最后按覆盖策略移入目标并清理；嵌套压缩包不递归。解压任何失败都保留已下载压缩包并明确报告“已下载到X，但未解压”，不报告部分成功。新增14条中文词条（lrelease 4210/0）。ChatToolTurnTest新增2项（手写存储型zip经真实7-Zip 26.06：正常解压、非空目标拒绝；../escape.txt整体拒绝且无任何解出文件）。
 
 M4验收对照：默认关闭无搜索工具与托管参数、开关保存恢复、关闭取消在途搜索（M4.1/4.2）；SearXNG JSON搜索与失败提示、Brave切换（M4.2）；模型自带搜索能力启停、请求前批准与服务器引用（M4.4）；普通文件及压缩包下载、解压、取消、失败、同名处理与路径逃逸防护（M4.6b/4.7）；工具版本及哈希可复核（M4.5/4.6a）；不执行下载程序。CTest 19/19（11 Chat、5 MCP、CommandBus/CoreCommands/SvsCommands）42.69秒通过，真实Windows窗口；日志build/agent-chat-m4-regression-{build,tests}.log。真实SearXNG/Brave实例、厂商托管搜索、公网页面与素材下载：MANUAL/PENDING，不阻塞。下一阶段M5。
+
+
+## M5 DONE：集成与交付（2026-11-17）
+
+按用户要求不启动应用做整机测试、不自动覆盖生产目录。新增buildtools/New-AgentChatPackage.ps1：与实际安装逐文件比哈希，仅打包聊天相关新增/变更文件（41个：lmms.exe、zh_CN.qm、style.css仅末尾新增聊天段、31个agent_chat_*.svg、system_prompt.txt、tools 6个），排除无关ui-*.svg；dumpbin核对导出3120→3138删除0、依赖全部可解析；ZIP条目用正斜杠。Install-Replace.ps1新增PreserveFiles：已存在的system_prompt.txt不覆盖，新默认写为.default。包build/packages/lmms-agent-chat-20261117-212914-win64.zip（6,733,415字节，SHA256 F152C122B2E3FADAB9E6CDAFDC14326694D5C3DF98367FB6DBE97A9217854529），安装器VerifyOnly对生产目录核验41文件+367基线通过且无写入。交付说明与验收矩阵见doc/agent/chat-delivery.md。
