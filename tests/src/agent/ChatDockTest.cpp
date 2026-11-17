@@ -82,6 +82,9 @@ private slots:
 		auto* dock = new lmms::agent::chat::ChatDock(&window);
 		window.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&window));
+		// First start: the dock is collapsed until the user expands it.
+		QTRY_COMPARE(dock->width(), 48);
+		dock->setCollapsed(false);
 		window.resizeDocks({dock}, {640}, Qt::Horizontal);
 		QTRY_COMPARE(dock->size(), QSize(640, 878));
 		auto* newSession = dock->findChild<QToolButton*>("agentNewSession");
@@ -981,6 +984,7 @@ private slots:
 		QMainWindow window;
 		window.resize(1600, 878);
 		window.setCentralWidget(new QWidget(&window));
+		lmms::ConfigManager::inst()->setValue("agentchat", "collapsed", "0");
 		auto* dock = new lmms::agent::chat::ChatDock(&window);
 		window.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&window));

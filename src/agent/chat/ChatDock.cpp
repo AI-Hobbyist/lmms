@@ -154,7 +154,8 @@ ChatDock::ChatDock(QMainWindow* window)
 			move(window->pos() + QPoint(40, 40));
 		}
 	}
-	setCollapsed(setting("collapsed") == "1");
+	// Collapsed by default until the user expands the dock; their choice is then remembered.
+	setCollapsed(setting("collapsed", "1") == "1");
 	refreshConnection();
 	arrangeWorkspace();
 }

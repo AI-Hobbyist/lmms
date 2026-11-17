@@ -581,6 +581,7 @@ private slots:
 		QMainWindow window;
 		window.resize(1600, 878);
 		window.setCentralWidget(new QWidget(&window));
+		lmms::ConfigManager::inst()->setValue("agentchat", "collapsed", "0");
 		auto* dock = new ChatDock(&window);
 		window.show();
 		QVERIFY(QTest::qWaitForWindowExposed(&window));
