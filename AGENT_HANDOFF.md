@@ -1,9 +1,9 @@
 ## 当前有效交接入口（2026-11-17，M1–M5 全部 DONE）
 
-- 计划书M1～M5全部完成并逐步提交推送；无剩余实施任务。交付说明与验收矩阵：doc/agent/chat-delivery.md。
+- 计划书M1～M5全部完成并逐步提交推送。2026-11-17 因5小时额度已用88%，用户要求暂停，闪退修复尚未开始（见下条），无进行中的构建/测试/改动。交付说明与验收矩阵：doc/agent/chat-delivery.md。
 - 增量包：build/packages/lmms-agent-chat-20261117-220216-win64.zip（SHA256 A24B9A9D3FD0C13D9F3EA7E4EE932726F34934D5729886A9718ACF4FE701AC93），VerifyOnly通过；生产目录D:/Program Files/LMMS未修改，由用户手动替换。
 - MANUAL/PENDING：替换后整机GUI验收、真实厂商API/工具调用、真实SearXNG/Brave/托管搜索、公网下载。
-- 待修复（只读分析已完成）：Agent执行后“新建工程”卡死闪退，崩溃于PatternStore::updateComboBox空指针（PatternTrack::s_infoMap与Song失步）。分析、证据、触发入口与复现/修复方向见doc/agent/analysis-project-reload-and-new-project-crash.md。
+- 下一步（待用户恢复后执行）：先读该分析文档，按其第5节写原生QtTest复现，找出破坏PatternTrack::s_infoMap与Song一致性的那一步，再修根因并在findPatternTrack调用点判空；已备好任务卡片“修复 Agent 执行后新建工程闪退”。问题：Agent执行后“新建工程”卡死闪退，崩溃于PatternStore::updateComboBox空指针（PatternTrack::s_infoMap与Song失步）。分析、证据、触发入口与复现/修复方向见doc/agent/analysis-project-reload-and-new-project-crash.md。
 - 环境：python需conda base；无pwsh，构建用cmake --build/ctest；PS5脚本含中文须UTF-8 BOM。
 
 ---
