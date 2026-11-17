@@ -893,7 +893,39 @@ private slots:
 		QVERIFY(transcript.toPlainText().contains("result-array"));
 		QVERIFY(transcript.toPlainText().contains(QStringLiteral("请求失败：测试错误")));
 		QVERIFY(transcript.toPlainText().contains(QStringLiteral("已停止")));
-		QCOMPARE(transcript.findChild<QLabel*>("agentMessageText_error-message")->textFormat(), Qt::PlainText);
+		// Raw HTML from the model is shown literally, never interpreted.
+		const auto literal = transcript.findChild<QLabel*>("agentMessageText_error-message")->text();
+		QVERIFY2(
+			literal.contains("&lt;b&gt;Literal&lt;/b&gt;") && !literal.contains("<b>Literal</b>"), qPrintable(literal));
+		QVERIFY(transcript.toPlainText().contains("<b>Literal</b>"));
+
+		// Agent replies are rendered as Markdown; copy/export keep the original text.
+		const auto markdown = QStringLiteral("## 编配建议\n\n- **主旋律**：使用 `Fat Flute`\n- 鼓组：四拍\n\n"
+											 "```\ntrack.list\n```\n");
+		transcript.setMessages(QJsonArray{
+			QJsonObject{{"id", "markdown"}, {"role", "assistant"}, {"text", markdown}, {"status", "complete"}},
+			QJsonObject{{"id", "plain-user"}, {"role", "user"}, {"text", "**not bold**"}}});
+		auto* rendered = transcript.findChild<QLabel*>("agentMessageText_markdown");
+		QVERIFY(rendered);
+		QCOMPARE(rendered->textFormat(), Qt::RichText);
+		const auto html = rendered->text();
+		QVERIFY2(html.contains("<h2") && html.contains("<li") && html.contains("font-weight:700")
+				&& html.contains("track.list") && !html.contains("**"),
+			qPrintable(html));
+		// The row grows with the rendered heading, list and code block.
+		QVERIFY(rendered->height() > 4 * QFontMetrics(rendered->font()).height());
+		QVERIFY(transcript.toPlainText().contains(markdown));
+		auto* plainUser = transcript.findChild<QLabel*>("agentMessageText_plain-user");
+		QCOMPARE(plainUser->textFormat(), Qt::PlainText);
+		QCOMPARE(plainUser->text(), QStringLiteral("**not bold**"));
+		const auto markdownEvidence = qEnvironmentVariable("LMMS_CHAT_SCREENSHOT");
+		if (!markdownEvidence.isEmpty())
+		{
+			QTest::qWait(300);
+			QVERIFY(window.screen()
+					->grabWindow(window.winId())
+					.save(QFileInfo(markdownEvidence).absolutePath() + "/agent-chat-markdown-native.png"));
+		}
 		window.close();
 	}
 

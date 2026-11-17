@@ -8,6 +8,7 @@
 #include <QLocale>
 #include <QResizeEvent>
 #include <QScrollBar>
+#include <QTextDocument>
 #include <QToolButton>
 
 #include "ToolButton.h"
@@ -63,6 +64,25 @@ QString messageText(const QJsonObject& message)
 		text += "\n\n" + translated("Stopped");
 	}
 	return text;
+}
+
+// Chat replies use single newlines as line breaks. Markdown would join them into
+// one paragraph, so outside fenced code blocks every line ends with a hard break.
+QString withChatLineBreaks(const QString& text)
+{
+	QStringList lines = text.split('\n');
+	bool fenced = false;
+	for (int index = 0; index + 1 < lines.size(); ++index)
+	{
+		const auto trimmed = lines[index].trimmed();
+		if (trimmed.startsWith("```") || trimmed.startsWith("~~~"))
+		{
+			fenced = !fenced;
+			continue;
+		}
+		if (!fenced && !trimmed.isEmpty()) { lines[index] += "  "; }
+	}
+	return lines.join('\n');
 }
 
 struct ToolResultView
@@ -241,6 +261,13 @@ public:
 		m_body->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		if (!m_user)
 		{
+			m_body->setTextFormat(Qt::RichText);
+			// Links open only when the user clicks them.
+			m_body->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
+			m_body->setOpenExternalLinks(true);
+		}
+		if (!m_user)
+		{
 			m_icon = label(this, 12);
 			m_icon->setPixmap(embed::getIconPixmap("agent_chat_agent", 22, 22));
 			m_icon->setGeometry(0, 0, 22, 22);
@@ -289,7 +316,18 @@ public:
 			elideToolText();
 			return;
 		}
-		m_body->setText(messageText(message));
+		m_text = messageText(message);
+		if (m_user) { m_body->setText(m_text); }
+		else
+		{
+			// Agent replies are Markdown. Raw HTML in the model output is not
+			// interpreted: it is shown as literal text.
+			QTextDocument document;
+			document.setDefaultFont(m_body->font());
+			document.setMarkdown(withChatLineBreaks(m_text),
+				QTextDocument::MarkdownFeatures(QTextDocument::MarkdownDialectGitHub | QTextDocument::MarkdownNoHTML));
+			m_body->setText(document.toHtml());
+		}
 		if (m_summary)
 		{
 			const auto summary = message.value("summary").toString();
@@ -307,7 +345,8 @@ public:
 		{
 			return m_titleText + "\n" + m_summaryText;
 		}
-		auto text = m_body->text();
+		// Copy and export use the original text, not the rendered HTML.
+		auto text = m_text;
 		for (const auto& value : m_message.value("attachments").toArray())
 		{
 			text += "\n" + value.toObject().value("name").toString();
@@ -328,10 +367,13 @@ public:
 		const int left = m_user ? 14 : 0;
 		const int top = m_user ? 13 : 37;
 		const int bodyWidth = qMax(1, width - 2 * left);
-		const int bodyHeight = qMax(21,
-									QFontMetrics(m_body->font())
-										.boundingRect(QRect(0, 0, bodyWidth, 1000000), Qt::TextWordWrap, m_body->text())
-										.height());
+		// Rendered Markdown (lists, code blocks, headings) is measured by its own layout.
+		const int textHeight = m_user
+			? QFontMetrics(m_body->font())
+				  .boundingRect(QRect(0, 0, bodyWidth, 1000000), Qt::TextWordWrap, m_body->text())
+				  .height()
+			: m_body->heightForWidth(bodyWidth);
+		const int bodyHeight = qMax(21, textHeight);
 		m_body->setGeometry(left, top, bodyWidth, bodyHeight);
 		int height = top + bodyHeight + (m_user ? 13 : 0);
 		if (!m_attachments.isEmpty())
@@ -357,6 +399,7 @@ private:
 	}
 
 	QJsonObject m_message;
+	QString m_text;
 	bool m_user;
 	bool m_tool;
 	QString m_titleText;
