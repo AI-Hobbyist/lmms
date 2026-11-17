@@ -44,6 +44,8 @@ public:
 	QTcpServer server;
 	QList<QJsonObject> responses;
 	QList<QJsonObject> requests;
+	// CommandBus batch depth observed while each model request was in flight.
+	QList<int> batchDepths;
 
 	ToolTurnServer()
 	{
@@ -72,6 +74,7 @@ public:
 				}
 				socket->setProperty("responded", true);
 				requests.append(QJsonDocument::fromJson(bytes.mid(separator + 4, length)).object());
+				batchDepths.append(CommandBus::instance().batchDepth());
 				const auto body = QJsonDocument(responses.isEmpty() ? QJsonObject{} : responses.takeFirst()).toJson();
 				socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n" + body);
 				socket->disconnectFromHost();
@@ -453,6 +456,8 @@ private slots:
 		QTRY_VERIFY(!controller.active());
 		QCOMPARE(lmms::Engine::getSong()->tracks()[0]->name(), QStringLiteral("Approved"));
 		QCOMPARE(server.requests.size(), 2);
+		// No project batch is held while waiting for the model, before or after execution.
+		QCOMPARE(server.batchDepths, (QList<int>{0, 0}));
 		const auto history = server.requests[1].value("messages").toArray();
 		QCOMPARE(history.size(), 5);
 		const auto denied
@@ -478,6 +483,45 @@ private slots:
 		QVERIFY(!history[4].toObject().contains("execution"));
 
 		QVERIFY(!controller.decideTool(approvals[1][0].toJsonObject(), true, error));
+	}
+
+	void commandSelfResetKeepsResultCancelsRest()
+	{
+		ToolTurnServer server;
+		QVERIFY(server.server.listen(QHostAddress::LocalHost));
+		const QJsonObject clearCall{
+			{"id", "clear"},
+			{"type", "function"},
+			{"function", QJsonObject{{"name", m_catalog.nameForCommand("song.clearProject")}, {"arguments", "{}"}}}};
+		queueCalls(server, {clearCall, renameCall("after", "Never")});
+		QTemporaryDir directory;
+		ChatStore store(directory.path());
+		auto session = ChatStore::newSession();
+		QString error;
+		QVERIFY(store.saveSession(session, error));
+		const auto id = session.value("id").toString();
+		ChatController controller(store);
+		controller.setToolsEnabled(true);
+		QSignalSpy approvals(&controller, &ChatController::approvalRequested);
+		QVERIFY(controller.send(id, server.connection(), "fixture-key", {}, "Clear", error));
+		QTRY_COMPARE(approvals.size(), 1);
+		QVERIFY(controller.decideTool(approvals[0][0].toJsonObject(), true, error));
+		QTRY_VERIFY(!controller.active());
+
+		// The command really reset the project; its actual result is kept,
+		// the remaining call is canceled and never reaches approval or the model.
+		QVERIFY(lmms::Engine::getSong()->tracks().empty());
+		QCOMPARE(approvals.size(), 1);
+		QCOMPARE(server.requests.size(), 1);
+		const auto stored = store.session(id).value("messages").toArray();
+		QCOMPARE(stored.size(), 4);
+		const auto cleared = stored[2].toObject();
+		QVERIFY(QJsonDocument::fromJson(cleared.value("content").toString().toUtf8()).object().value("ok").toBool());
+		QVERIFY(cleared.value("execution").toObject().value("executed").toBool());
+		const auto skipped
+			= QJsonDocument::fromJson(stored[3].toObject().value("content").toString().toUtf8()).object();
+		QCOMPARE(skipped.value("error").toObject().value("code").toString(), QStringLiteral("canceled"));
+		QCOMPARE(CommandBus::instance().batchDepth(), 0);
 	}
 
 	void stopPairsAllUnexecutedCalls()

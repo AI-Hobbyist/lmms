@@ -229,3 +229,8 @@ ChatToolDispatcher两类结果新增approvalRequired/executed；ChatController::
 ## M3 工具结果卡（2026-11-17）
 
 实时Penpot01结果卡：420×50、#171e26圆角6，图标(12,16,18,18)，标题(40,6)11px，摘要(40,27)10px #667a90。ChatTranscript对role=tool消息渲染紧凑结果卡，按实际CommandResult与本地execution区分已批准/自动执行/拒绝/取消/执行失败/未执行，完整结果放tooltip；非CommandResult内容（协议历史数组等）沿用“工具结果”并原样摘要。新增8条中文词条，lrelease 4163 finished/0 unfinished。Release构建通过；ChatDockTest/ChatProviderClientTest/ChatToolDispatcherTest/ChatToolTurnTest CTest4/4（QtTest12+17等）通过，真实Windows窗口截图build/agent-chat-tool-result-native.png已查看。日志build/agent-chat-m3-result-card-{build,tests}.log。M3剩余：删除入口/命令自身重置与重入/网络取消验收及MCP回归。
+
+
+## M3 DONE：自动验收与回归（2026-11-17）
+
+新增commandSelfResetKeepsResultCancelsRest：批准song.clearProject后工程实际清空，保留其ok/executed结果，剩余调用补canceled，不再批准或请求模型；测试服务器在每次模型请求到达时记录CommandBus批次深度，批准前后均为0（网络等待期间无项目批次）。M3验收逐项对应：默认请求批准、拒绝零执行、批准恰好一次（sequentialApprovalAndActualResults/nativeDock…）；无需批准（noApprovalRunsAndContinues）；篡改/工程切换失效（ChatToolDispatcherTest、projectReplacementCancelsPending、自身重置）；成功编辑保留对象（ChatToolDispatcherTest）；MCP既有回归。CTest 19/19通过（11个Chat、5个MCP、CommandBus/CoreCommands/SvsCommands），27.47秒，真实Windows窗口；日志build/agent-chat-m3-regression-{build,tests}.log。真实厂商工具调用及完整DAW人工验收MANUAL/PENDING，不阻塞。下一阶段M4。

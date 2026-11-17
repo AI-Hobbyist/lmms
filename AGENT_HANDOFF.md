@@ -1,10 +1,11 @@
-## 当前有效交接入口（2026-11-17，目标恢复，M3 进行中）
+## 当前有效交接入口（2026-11-17，M3 DONE，M4 待开始）
 
 - 用户已恢复目标：逐步完成计划书，每步提交推送，监测额度。Penpot实时连接已恢复并核对file/page/01一致。
 - 已完成并验证且已推送：工具执行元数据补丁（3623154b5）；工具结果卡（CTest4/4、真实窗口截图build/agent-chat-tool-result-native.png）。详见doc/agent/chat-implementation-progress.md末两节。
 - 截图：设LMMS_CHAT_SCREENSHOT为build下某个.png完整路径（nativeDockLifecycle直接保存到该路径，其余保存到同目录）。
 - 环境：python需conda base（-NoProfile时用conda shell.powershell hook）；本机无pwsh，build.py拒绝运行，构建用cmake --build build --config Release --target … --parallel 2，测试用ctest --test-dir build -C Release -R …，均经Tee-Object写日志。
-- 下一步：补M3剩余验收——管理页/侧栏删除入口立即stop、命令自身重置工程与事件重入、网络取消；运行既有MCP回归与全部Chat测试；对照计划书M3验收标准，M3最终检查点提交推送后进入M4。
+- M3 DONE：自身重置与网络等待无批次测试已补；CTest19/19（Chat11+MCP5+命令3）通过，日志build/agent-chat-m3-regression-{build,tests}.log；M3检查点已提交推送。真实厂商工具调用MANUAL/PENDING。
+- 下一步：M4联网与素材（计划书第9节与第11节M4行）。先读计划书第9节，复用现有设置/批准结构；联网默认关闭。
 
 ---
 
