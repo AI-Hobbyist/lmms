@@ -8,8 +8,11 @@
 
 #include "agent/CommandBus.h"
 #include "Engine.h"
+#include "ControllerConnection.h"
+#include "MidiController.h"
 #include "ProjectJournal.h"
 #include "PatternStore.h"
+#include "PatternTrack.h"
 #include "PluginFactory.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
@@ -66,6 +69,173 @@ private slots:
 			QVERIFY(bus.rollbackBatch().ok);
 		}
 		lmms::Engine::getSong()->stop();
+	}
+
+	void agentControllerMembershipRoundTrip_data()
+	{
+		QTest::addColumn<bool>("remove");
+		QTest::addColumn<QString>("type");
+		QTest::newRow("add-lfo") << false << QString("LFO");
+		QTest::newRow("remove-connected-lfo") << true << QString("LFO");
+		QTest::newRow("add-midi") << false << QString("MIDI");
+		QTest::newRow("remove-connected-midi") << true << QString("MIDI");
+	}
+
+	void agentControllerMembershipRoundTrip()
+	{
+		QFETCH(bool, remove);
+		QFETCH(QString, type);
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* song = lmms::Engine::getSong();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("track.create", {{"type", "instrument"}}).ok);
+		QVERIFY(bus.execute("controller.add", {{"type", type}, {"name", "Existing"}}).ok);
+		auto* existing = song->controllers().front();
+		auto* instrument = static_cast<lmms::InstrumentTrack*>(song->tracks().front());
+		auto* volume = instrument->volumeModel();
+		if (remove)
+		{
+			QVERIFY(bus.execute("controller.connect", {{"controller", 0}, {"target", "song/track:0/instrument/volume"}})
+						.ok);
+		}
+		auto* connection = volume->controllerConnection();
+		journal->clearJournal();
+		const QString command = remove ? "controller.remove" : "controller.add";
+		const QJsonObject arguments
+			= remove ? QJsonObject{{"controller", 0}} : QJsonObject{{"type", type}, {"name", "Added"}};
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent(command, preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(song->controllers().size(), std::size_t{1});
+		QCOMPARE(song->controllers().front(), existing);
+		QCOMPARE(volume->controllerConnection(), connection);
+		QCOMPARE(journal->undoDepth(), 0);
+
+		const QJsonArray steps{QJsonObject{{"cmd", command}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(song->controllers().size(), std::size_t{1});
+		QCOMPARE(song->controllers().front(), existing);
+		QCOMPARE(volume->controllerConnection(), connection);
+
+		QVERIFY(bus.executeForAgent(command, arguments).ok);
+		QCOMPARE(song->controllers().size(), remove ? std::size_t{0} : std::size_t{2});
+		auto* edited = remove ? existing : song->controllers().back();
+		auto* midi = dynamic_cast<lmms::MidiController*>(edited);
+		if (midi)
+		{
+			QCOMPARE(midi->midiPort()->isInputEnabled(), !remove);
+		}
+		QVERIFY(!volume->controllerConnection());
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(song->controllers().size(), std::size_t{1});
+		QCOMPARE(song->controllers().front(), existing);
+		QCOMPARE(volume->controllerConnection(), connection);
+		QCOMPARE(existing->connectionCount(), remove ? 1 : 0);
+		if (midi)
+		{
+			QCOMPARE(midi->midiPort()->isInputEnabled(), remove);
+		}
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(song->controllers().size(), remove ? std::size_t{0} : std::size_t{2});
+		if (!remove)
+		{
+			QCOMPARE(song->controllers().back(), edited);
+		}
+		QVERIFY(!volume->controllerConnection());
+		if (midi)
+		{
+			QCOMPARE(midi->midiPort()->isInputEnabled(), !remove);
+		}
+	}
+
+	void agentPatternColumnsRoundTrip_data()
+	{
+		QTest::addColumn<bool>("remove");
+		QTest::newRow("insert-first-column") << false;
+		QTest::newRow("remove-first-column") << true;
+	}
+
+	void agentPatternColumnsRoundTrip()
+	{
+		QFETCH(bool, remove);
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* store = lmms::Engine::patternStore();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("pattern.create", {{"name", "First"}}).ok);
+		QVERIFY(bus.execute("pattern.create", {{"name", "Second"}}).ok);
+		QVERIFY(bus.execute("track.create", {{"parent", "pattern"}, {"type", "instrument"}}).ok);
+		auto* row = store->tracks().front();
+		auto* first = lmms::PatternTrack::findPatternTrack(0);
+		auto* second = lmms::PatternTrack::findPatternTrack(1);
+		auto* firstClip = row->getClip(0);
+		auto* secondClip = row->getClip(1);
+		QVERIFY(first && second && firstClip && secondClip);
+		journal->clearJournal();
+		const QString command = remove ? "pattern.remove" : "pattern.create";
+		const QJsonObject arguments
+			= remove ? QJsonObject{{"pattern", 0}} : QJsonObject{{"index", 0}, {"name", "Inserted"}};
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent(command, preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(store->numOfPatterns(), 2);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(0), first);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(1), second);
+		QCOMPARE(row->getClip(0), firstClip);
+		QCOMPARE(row->getClip(1), secondClip);
+		QCOMPARE(journal->undoDepth(), 0);
+		const QJsonArray steps{QJsonObject{{"cmd", command}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(store->numOfPatterns(), 2);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(0), first);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(1), second);
+		QCOMPARE(row->getClip(0), firstClip);
+		QCOMPARE(row->getClip(1), secondClip);
+		QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.executeForAgent(command, arguments).ok);
+		const int shiftedIndex = remove ? 0 : 2;
+		const int changedCount = remove ? 1 : 3;
+		QCOMPARE(store->numOfPatterns(), changedCount);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(shiftedIndex), second);
+		QCOMPARE(row->getClip(shiftedIndex), secondClip);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(store->numOfPatterns(), 2);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(0), first);
+		QCOMPARE(row->getClip(0), firstClip);
+		QCOMPARE(row->getClip(1), secondClip);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(store->numOfPatterns(), changedCount);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(shiftedIndex), second);
+		QCOMPARE(row->getClip(shiftedIndex), secondClip);
+	}
+
+	void agentPatternInsertThenRemoveRollsBack()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* store = lmms::Engine::patternStore();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("pattern.create", {{"name", "Existing"}}).ok);
+		QVERIFY(bus.execute("track.create", {{"parent", "pattern"}, {"type", "instrument"}}).ok);
+		auto* original = lmms::PatternTrack::findPatternTrack(0);
+		auto* row = store->tracks().front();
+		auto* originalClip = row->getClip(0);
+		const int selected = store->currentPattern();
+		journal->clearJournal();
+		const QJsonArray steps{QJsonObject{{"cmd", "pattern.create"}, {"args", QJsonObject{{"index", 0}}}},
+							   QJsonObject{{"cmd", "pattern.remove"}, {"args", QJsonObject{{"pattern", 0}}}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(store->numOfPatterns(), 1);
+		QCOMPARE(lmms::PatternTrack::findPatternTrack(0), original);
+		QCOMPARE(row->getClip(0), originalClip);
+		QCOMPARE(store->currentPattern(), selected);
+		QCOMPARE(journal->undoDepth(), 0);
 	}
 
 	void registersThePlannedA1ThroughA3Commands()

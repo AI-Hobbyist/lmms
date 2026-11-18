@@ -215,6 +215,7 @@ public:
 	MixerRouteVector m_mixerRoutes;
 
 private:
+	void recordRouteMembership(MixerRoute* route, bool removing);
 	// the mixer channels in the mixer. index 0 is always master.
 	std::vector<MixerChannel*> m_mixerChannels;
 

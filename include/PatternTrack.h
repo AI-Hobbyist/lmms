@@ -61,11 +61,9 @@ public:
 
 	static PatternTrack* findPatternTrack(int pattern_num);
 	static void swapPatternTracks(Track* track1, Track* track2);
+	void recordPatternRegistration(bool removing);
 
-	int patternIndex()
-	{
-		return s_infoMap[this];
-	}
+	int patternIndex() { return s_infoMap.value(this, -1); }
 
 	// Zero keeps the native length derived from the clips in the PatternStore.
 	int explicitLengthBars() const { return m_explicitLengthBars; }

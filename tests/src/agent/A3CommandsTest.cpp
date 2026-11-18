@@ -904,6 +904,52 @@ private slots:
 		QCOMPARE(song->tracks().size(), std::size_t(1));
 	}
 
+	void agentControllerConnectionRollsBack()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* song = lmms::Engine::getSong();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("track.create", {{"type", "instrument"}}).ok);
+		QVERIFY(bus.execute("controller.add", {{"type", "LFO"}}).ok);
+		QVERIFY(bus.execute("controller.add", {{"type", "MIDI"}}).ok);
+		const QString target("song/track:0/instrument/volume");
+		QVERIFY(bus.execute("controller.connect", {{"controller", 0}, {"target", target}}).ok);
+		auto* instrument = static_cast<lmms::InstrumentTrack*>(song->tracks().front());
+		auto* model = instrument->volumeModel();
+		auto* original = model->controllerConnection();
+		QVERIFY(original);
+		journal->clearJournal();
+		const QJsonObject arguments{{"controller", 1}, {"target", target}};
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent("controller.connect", preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(model->controllerConnection(), original);
+		QCOMPARE(original->getController()->connectionCount(), 1);
+		QCOMPARE(song->controllers()[1]->connectionCount(), 0);
+		QCOMPARE(journal->undoDepth(), 0);
+
+		const QJsonArray steps{QJsonObject{{"cmd", "controller.connect"}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QStringLiteral("script_assertion_failed"));
+		QCOMPARE(model->controllerConnection(), original);
+		QCOMPARE(song->controllers()[1]->connectionCount(), 0);
+		QVERIFY(bus.executeForAgent("controller.connect", arguments).ok);
+		auto* replacement = model->controllerConnection();
+		QVERIFY(replacement && replacement != original);
+		QCOMPARE(song->controllers()[0]->connectionCount(), 0);
+		QCOMPARE(song->controllers()[1]->connectionCount(), 1);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(model->controllerConnection(), original);
+		QCOMPARE(song->controllers()[0]->connectionCount(), 1);
+		QCOMPARE(song->controllers()[1]->connectionCount(), 0);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(model->controllerConnection(), replacement);
+		QCOMPARE(song->controllers()[0]->connectionCount(), 0);
+		QCOMPARE(song->controllers()[1]->connectionCount(), 1);
+	}
+
 	void editsControllersAndRestoresConnections()
 	{
 		auto& bus = lmms::agent::CommandBus::instance();

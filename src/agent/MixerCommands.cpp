@@ -12,6 +12,8 @@
 #include "GuiApplication.h"
 #include "Mixer.h"
 #include "MixerView.h"
+#include "ProjectJournal.h"
+#include "agent/IncrementalUndo.h"
 
 namespace lmms::agent {
 namespace {
@@ -46,6 +48,18 @@ void refreshMixerViews()
 	{
 		mixerView->refreshDisplay();
 	}
+}
+
+// Agent previews never rebuild views. A committed move and either history
+// direction refresh the view once the mixer order and routes agree.
+bool deferMixerViewRefresh(Mixer* mixer)
+{
+	if (!Engine::projectJournal()->isIncrementalTransaction())
+	{
+		return false;
+	}
+	recordIncrementalValue(mixer, 0, 0, [](Mixer*, int) {}, refreshMixerViews);
+	return true;
 }
 
 // Mirrors the shape returned by the existing mixer.get*/mixer.set* commands so
@@ -197,6 +211,7 @@ CommandResult executeMixerAddChannel(const QJsonObject& arguments)
 	}
 
 	const int previousCount = static_cast<int>(mixer->numChannels());
+	const bool deferred = deferMixerViewRefresh(mixer);
 	const int channelIndex = mixer->createChannel();
 	const int currentCount = static_cast<int>(mixer->numChannels());
 	if (channelIndex != previousCount || currentCount != previousCount + 1)
@@ -211,7 +226,10 @@ CommandResult executeMixerAddChannel(const QJsonObject& arguments)
 		channel->m_name = name;
 	}
 
-	refreshMixerViews();
+	if (!deferred)
+	{
+		refreshMixerViews();
+	}
 
 	auto detail = mixerChannelDetail(channel);
 	detail.insert("numChannels", currentCount);
@@ -256,8 +274,12 @@ CommandResult executeMixerRemoveChannel(const QJsonObject& arguments)
 			"Pass force:true to reroute those tracks to the master channel and remove the channel.");
 	}
 
+	const bool deferred = deferMixerViewRefresh(mixer);
 	mixer->deleteChannel(channelIndex);
-	refreshMixerViews();
+	if (!deferred)
+	{
+		refreshMixerViews();
+	}
 	return CommandResult::success(
 		QJsonObject{{"removed", channelIndex}, {"numChannels", static_cast<int>(mixer->numChannels())}});
 }
@@ -304,8 +326,12 @@ CommandResult executeMixerMoveChannel(const QJsonObject& arguments)
 				QStringLiteral("Mixer channel %1 cannot move left.").arg(channelIndex),
 				"Channel 1 cannot move in front of the master channel.");
 		}
+		const bool deferred = deferMixerViewRefresh(mixer);
 		mixer->moveChannelLeft(channelIndex);
-		refreshMixerViews();
+		if (!deferred)
+		{
+			refreshMixerViews();
+		}
 		auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex - 1));
 		detail.insert("numChannels", channelCount);
 		return CommandResult::success(detail);
@@ -317,8 +343,12 @@ CommandResult executeMixerMoveChannel(const QJsonObject& arguments)
 			QStringLiteral("Mixer channel %1 cannot move right.").arg(channelIndex),
 			"Only channels between the master channel and the last channel can move right.");
 	}
+	const bool deferred = deferMixerViewRefresh(mixer);
 	mixer->moveChannelRight(channelIndex);
-	refreshMixerViews();
+	if (!deferred)
+	{
+		refreshMixerViews();
+	}
 	auto detail = mixerChannelDetail(mixer->mixerChannel(channelIndex + 1));
 	detail.insert("numChannels", channelCount);
 	return CommandResult::success(detail);
@@ -339,6 +369,7 @@ void addCommand(CommandBus& commandBus, const QString& name, const QString& summ
 	descriptor.argsSchema = schema;
 	descriptor.mutability = mutability;
 	descriptor.scope = scope;
+	descriptor.incremental = name == "mixer.moveChannel" || name == "mixer.addChannel" || name == "mixer.removeChannel";
 	descriptor.handler = std::move(handler);
 	commandBus.registerCommand(descriptor);
 }

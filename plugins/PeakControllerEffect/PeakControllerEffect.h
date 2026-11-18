@@ -26,14 +26,15 @@
 #ifndef PEAK_CONTROLLER_EFFECT_H
 #define PEAK_CONTROLLER_EFFECT_H
 
+#include <QPointer>
+
 #include "Effect.h"
+#include "PeakController.h"
 #include "PeakControllerEffectControls.h"
 
 namespace lmms
 {
 
-
-class PeakController;
 
 class PeakControllerEffect : public Effect
 {
@@ -54,10 +55,7 @@ public:
 		return m_lastSample;
 	}
 
-	PeakController * controller()
-	{
-		return m_autoController;
-	}
+	PeakController* controller() { return m_autoController.data(); }
 	
 	FloatModel * attackModel()
 	{
@@ -76,7 +74,7 @@ private:
 
 	float m_lastSample;
 
-	PeakController * m_autoController;
+	QPointer<PeakController> m_autoController;
 
 	friend class PeakControllerEffectControls;
 

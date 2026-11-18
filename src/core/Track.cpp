@@ -413,6 +413,9 @@ void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 
 void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 {
+	const auto swapSlots
+		= [clipNum1, clipNum2](Track* track, int) { qSwap(track->m_clips[clipNum1], track->m_clips[clipNum2]); };
+	agent::recordIncrementalValue(this, 0, 0, swapSlots);
 	qSwap( m_clips[clipNum1], m_clips[clipNum2] );
 
 	const TimePos pos = m_clips[clipNum1]->startPosition();

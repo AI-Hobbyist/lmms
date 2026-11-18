@@ -30,6 +30,7 @@
 
 #include "Song.h"
 #include "ControllerConnection.h"
+#include "AutomatableModel.h"
 
 namespace lmms
 {
@@ -72,7 +73,7 @@ ControllerConnection::ControllerConnection( int _controllerId ) :
 
 ControllerConnection::~ControllerConnection()
 {
-	if( m_controller && m_controller->type() != Controller::ControllerType::Dummy )
+	if (m_attachedToTarget && m_controller && m_controller->type() != Controller::ControllerType::Dummy)
 	{
 		m_controller->removeConnection( this );
 	}
@@ -86,8 +87,45 @@ ControllerConnection::~ControllerConnection()
 	}
 }
 
+void ControllerConnection::setAttachedToTarget(bool attached)
+{
+	if (m_attachedToTarget == attached)
+	{
+		return;
+	}
+	m_attachedToTarget = attached;
+	if (!m_controller || m_controller->type() == Controller::ControllerType::Dummy)
+	{
+		return;
+	}
+	if (attached)
+	{
+		m_controller->addConnection(this);
+		connect(m_controller, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()), Qt::DirectConnection);
+	}
+	else
+	{
+		m_controller->removeConnection(this);
+		disconnect(m_controller, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
+	}
+}
 
-
+std::vector<AutomatableModel*> ControllerConnection::targetsForController(const Controller* controller)
+{
+	std::vector<AutomatableModel*> targets;
+	for (auto* connection : s_connections)
+	{
+		if (connection->m_attachedToTarget && connection->m_controller == controller)
+		{
+			if (auto* target = qobject_cast<AutomatableModel*>(connection->parent());
+				target && target->controllerConnection() == connection)
+			{
+				targets.push_back(target);
+			}
+		}
+	}
+	return targets;
+}
 
 void ControllerConnection::setController( int /*_controllerId*/ )
 {

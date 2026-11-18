@@ -61,6 +61,9 @@ public:
 
 	void appendEffect( Effect * _effect );
 	void removeEffect( Effect * _effect );
+	void insertEffectIncrementally(Effect* effect, int index);
+	void removeEffectIncrementally(Effect* effect);
+	void clearIncrementally();
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
 	int effectCount() const { return static_cast<int>(m_effects.size()); }
@@ -71,6 +74,7 @@ public:
 
 
 private:
+	void recordEffectMembership(Effect* effect, int index, bool removing);
 	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
@@ -82,6 +86,7 @@ private:
 
 signals:
 	void aboutToClear();
+	void incrementalContentsChanged();
 
 } ;
 

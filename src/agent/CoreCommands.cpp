@@ -940,14 +940,12 @@ CommandResult executeMixerListChannels(const QJsonObject&)
 // Mixer channels are not QObjects; the mixer owns them and their index is
 // checked again before either history direction touches the channel.
 template <typename Value, typename Setter>
-void recordMixerChannelValue(Mixer* mixer, int index, MixerChannel* channel, Value before, Value after, Setter setter)
+void recordMixerChannelValue(Mixer* mixer, MixerChannel* channel, Value before, Value after, Setter setter)
 {
-	const auto present = [index, channel](Mixer* owner) {
-		return index >= 0 && index < static_cast<int>(owner->numChannels()) && owner->mixerChannel(index) == channel;
-	};
-	recordIncrementalOwnedValue(mixer, present, before, after, [index, setter](Mixer* owner, const Value& value) {
-		setter(owner->mixerChannel(index), value);
-	});
+	const QPointer<FloatModel> identity(&channel->m_volumeModel);
+	const auto present = [identity](Mixer*) { return !identity.isNull(); };
+	recordIncrementalOwnedValue(mixer, present, before, after,
+								[channel, setter](Mixer*, const Value& value) { setter(channel, value); });
 }
 
 // Restoring a whole serialized plugin state is not a proven local inverse for a
@@ -965,35 +963,6 @@ CommandResult serializedStateEditRefusal()
 }
 
 bool incrementalTransactionActive();
-
-// A send is identified by its channel pair. History recreates a removed send
-// with its captured amount; the route object itself is new, and its position in
-// the channel's send lists may move to the end (routing is unchanged).
-void recordMixerSendExistence(Mixer* mixer, int from, int to, float amount, bool existsAfter)
-{
-	if (!incrementalTransactionActive())
-	{
-		return;
-	}
-	auto* fromChannel = mixer->mixerChannel(from);
-	auto* toChannel = mixer->mixerChannel(to);
-	const auto present = [from, to, fromChannel, toChannel](Mixer* owner) {
-		const int count = static_cast<int>(owner->numChannels());
-		return from < count && to < count && owner->mixerChannel(from) == fromChannel
-			&& owner->mixerChannel(to) == toChannel;
-	};
-	recordIncrementalOwnedValue(mixer, present, !existsAfter, existsAfter,
-		[from, to, amount](Mixer* owner, bool exists) {
-			if (exists)
-			{
-				owner->createChannelSend(from, to, amount);
-			}
-			else
-			{
-				owner->deleteChannelSend(from, to);
-			}
-		});
-}
 
 CommandResult executeMixerSetName(const QJsonObject& arguments)
 {
@@ -1017,8 +986,8 @@ CommandResult executeMixerSetName(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
-	recordMixerChannelValue(mixer, channelIndex, channel, channel->m_name, name,
-		[](MixerChannel* target, const QString& value) { target->m_name = value; });
+	recordMixerChannelValue(mixer, channel, channel->m_name, name,
+							[](MixerChannel* target, const QString& value) { target->m_name = value; });
 	channel->m_name = name;
 	return CommandResult::success(mixerChannelDetail(channel));
 }
@@ -1134,7 +1103,8 @@ CommandResult executeMixerSetColor(const QJsonObject& arguments)
 	}
 	if (value.isEmpty())
 	{
-		recordMixerChannelValue(mixer, channelIndex, channel, channel->color(), std::optional<QColor>{},
+		recordMixerChannelValue(
+			mixer, channel, channel->color(), std::optional<QColor>{},
 			[](MixerChannel* target, const std::optional<QColor>& color) { target->setColor(color); });
 		channel->setColor(std::nullopt);
 	}
@@ -1145,7 +1115,8 @@ CommandResult executeMixerSetColor(const QJsonObject& arguments)
 		{
 			return invalidArguments("'value' must be a valid color name or an empty string.");
 		}
-		recordMixerChannelValue(mixer, channelIndex, channel, channel->color(), std::optional<QColor>{color},
+		recordMixerChannelValue(
+			mixer, channel, channel->color(), std::optional<QColor>{color},
 			[](MixerChannel* target, const std::optional<QColor>& color) { target->setColor(color); });
 		channel->setColor(color);
 	}
@@ -1186,11 +1157,6 @@ CommandResult executeMixerAddSend(const QJsonObject& arguments)
 		return CommandResult::failure("mixer_send_loop", "The requested send would create a mixer routing loop.");
 	}
 
-	if (mixer->channelSendModel(fromIndex, toIndex) == nullptr)
-	{
-		// An existing send only changes its amount model, which records itself.
-		recordMixerSendExistence(mixer, fromIndex, toIndex, static_cast<float>(amount), true);
-	}
 	if (mixer->createChannelSend(fromIndex, toIndex, static_cast<float>(amount)) == nullptr)
 	{
 		return CommandResult::failure("mixer_send_failed", "LMMS could not create the requested send.");
@@ -1259,8 +1225,6 @@ CommandResult executeMixerRemoveSend(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("mixer_send_not_found", "The requested mixer send does not exist.");
 	}
-	recordMixerSendExistence(
-		mixer, fromIndex, toIndex, mixer->channelSendModel(fromIndex, toIndex)->value(), false);
 	mixer->deleteChannelSend(fromIndex, toIndex);
 	return CommandResult::success(mixerChannelDetail(fromChannel));
 }
@@ -1827,6 +1791,14 @@ CommandResult executeEffectAdd(const QJsonObject& arguments)
 		delete effect;
 		return CommandResult::failure(
 			"effect_load_failed", QStringLiteral("LMMS could not load effect '%1'.").arg(plugin));
+	}
+
+	if (incrementalTransactionActive())
+	{
+		const int slot = hasIndex ? index : owner.effectChain->effectCount();
+		owner.effectChain->insertEffectIncrementally(effect, slot);
+		song->setModified();
+		return CommandResult::success(effectDetail(owner, slot, effect));
 	}
 
 	owner.effectChain->appendEffect(effect);
@@ -3438,6 +3410,10 @@ void recordTrackMembership(Track* track, bool removed)
 		{
 			return false;
 		}
+		if (state->track->type() == Track::Type::Pattern)
+		{
+			return state->track->trackContainer() == state->container.data();
+		}
 		if (state->registering)
 		{
 			return true;
@@ -3538,6 +3514,10 @@ void recordClipMembership(Clip* clip, bool removed)
 		if (!state->clip || !state->track)
 		{
 			return false;
+		}
+		if (state->track->trackContainer() == Engine::patternStore())
+		{
+			return state->clip->getTrack() == state->track.data();
 		}
 		if (state->registering)
 		{
@@ -5845,9 +5825,10 @@ CommandResult executeController(const QString& action, const QJsonObject& argume
 		Controller* controller = nullptr;
 		if (type == "lfo" || type == "midi")
 		{
-			controller = Controller::create(
-				type == "lfo" ? Controller::ControllerType::Lfo : Controller::ControllerType::Midi, song);
-			song->addController(controller);
+			auto created = std::unique_ptr<Controller>(Controller::create(
+				type == "lfo" ? Controller::ControllerType::Lfo : Controller::ControllerType::Midi, song));
+			song->addController(created.get());
+			controller = created.release();
 		}
 		else if (type == "peak")
 		{
@@ -5883,7 +5864,24 @@ CommandResult executeController(const QString& action, const QJsonObject& argume
 	auto* controller = song->controllers()[index];
 	if (action == "remove")
 	{
-		song->removeController(controller);
+		if (auto* peak = incrementalTransactionActive() ? dynamic_cast<PeakController*>(controller) : nullptr)
+		{
+			auto* effect = peak->effect();
+			auto* chain = effect ? effect->effectChain() : nullptr;
+			if (chain)
+			{
+				chain->removeEffectIncrementally(effect);
+			}
+			if (std::find(song->controllers().begin(), song->controllers().end(), peak)
+				!= song->controllers().end())
+			{
+				song->removeController(peak);
+			}
+		}
+		else
+		{
+			song->removeController(controller);
+		}
 		return CommandResult::success({{"removed", index}});
 	}
 	if (action == "connect")
@@ -5898,8 +5896,15 @@ CommandResult executeController(const QString& action, const QJsonObject& argume
 		{
 			return invalidArguments("This connection would create a controller cycle.");
 		}
-		delete target.model->controllerConnection();
-		target.model->setControllerConnection(new ControllerConnection(controller));
+		if (incrementalTransactionActive())
+		{
+			target.model->replaceControllerConnectionIncrementally(new ControllerConnection(controller));
+		}
+		else
+		{
+			delete target.model->controllerConnection();
+			target.model->setControllerConnection(new ControllerConnection(controller));
+		}
 		song->setModified();
 		return CommandResult::success({{"controller", index}, {"target", target.path}});
 	}
@@ -5965,6 +5970,24 @@ PatternTrack* resolvePattern(const QJsonObject& arguments)
 	return PatternTrack::findPatternTrack(arguments.value("pattern").toInt(-1));
 }
 
+void recordPatternSelection(PatternStore* store, int index, bool undo)
+{
+	const QPointer<PatternStore> target(store);
+	const auto restore = [target, index] {
+		target->updateComboBox();
+		target->setCurrentPattern(index);
+	};
+	const auto valid = [target] { return !target.isNull(); };
+	const auto noop = [] {};
+	auto* journal = Engine::projectJournal();
+	const bool recorded = undo ? journal->addIncrementalChange({valid, restore, noop})
+							   : journal->addIncrementalChange({valid, noop, restore});
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record the pattern selection.");
+	}
+}
+
 CommandResult executePattern(const QString& action, const QJsonObject& arguments)
 {
 	auto* song = Engine::getSong();
@@ -5992,13 +6015,30 @@ CommandResult executePattern(const QString& action, const QJsonObject& arguments
 		}
 		auto guard = Engine::audioEngine()->requestChangesGuard();
 		const int songIndex = index < count ? indexOfTrack(song, PatternTrack::findPatternTrack(index)) : -1;
+		const bool incremental = incrementalTransactionActive();
+		if (incremental)
+		{
+			recordPatternSelection(store, store->currentPattern(), true);
+		}
 		auto* created = static_cast<PatternTrack*>(Track::create(Track::Type::Pattern, song));
+		if (incremental)
+		{
+			recordCreatedTrack(created);
+			for (auto* row : store->tracks())
+			{
+				recordCreatedClip(row->getClip(count));
+			}
+			created->recordPatternRegistration(false);
+		}
 		for (int i = count; i > index; --i)
 		{
 			PatternTrack::swapPatternTracks(PatternTrack::findPatternTrack(i), PatternTrack::findPatternTrack(i - 1));
 		}
 		if (songIndex >= 0)
 		{
+			recordIncrementalValue(
+				created, indexOfTrack(song, created), songIndex,
+				[](PatternTrack* track, int position) { track->trackContainer()->moveTrack(track, position); });
 			song->moveTrack(created, songIndex);
 		}
 		if (arguments.contains("name"))
@@ -6006,6 +6046,10 @@ CommandResult executePattern(const QString& action, const QJsonObject& arguments
 			created->setName(arguments.value("name").toString());
 		}
 		store->setCurrentPattern(index);
+		if (incremental)
+		{
+			recordPatternSelection(store, index, false);
+		}
 		song->setModified();
 		return CommandResult::success(patternDetail(created));
 	}
@@ -6022,11 +6066,30 @@ CommandResult executePattern(const QString& action, const QJsonObject& arguments
 	if (action == "remove")
 	{
 		const int index = pattern->patternIndex();
-		if (song->isPlaying())
+		if (incrementalTransactionActive())
 		{
-			song->stop();
+			const int current = store->currentPattern();
+			recordPatternSelection(store, current, true);
+			for (auto* row : store->tracks())
+			{
+				recordClipMembership(row->getClip(index), true);
+				row->removeBar(index * DefaultTicksPerBar);
+			}
+			pattern->recordPatternRegistration(true);
+			recordTrackMembership(pattern, true);
+			store->updateComboBox();
+			const int next = index <= current ? std::max(0, current - 1) : current;
+			store->setCurrentPattern(next);
+			recordPatternSelection(store, next, false);
 		}
-		delete pattern;
+		else
+		{
+			if (song->isPlaying())
+			{
+				song->stop();
+			}
+			delete pattern;
+		}
 		song->setModified();
 		return CommandResult::success({{"removed", index}, {"count", store->numOfPatterns()}});
 	}
@@ -6352,6 +6415,7 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 												   "mixer.setMute",
 												   "mixer.setSolo",
 												   "mixer.setSendAmount",
+												   "mixer.clearChannel",
 												   "instrument.setArpeggio",
 												   "instrument.setNoteStacking",
 												   "instrument.setMidiIn",
@@ -6362,6 +6426,11 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 												   "automation.setTension",
 												   "pattern.rename",
 												   "pattern.setLength",
+												   "pattern.create",
+												   "pattern.remove",
+												   "controller.add",
+												   "controller.connect",
+												   "controller.remove",
 												   "controller.setParam",
 												   "song.setTimeSignature",
 												   "transport.setLoopRange"};

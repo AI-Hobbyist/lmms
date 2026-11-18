@@ -204,26 +204,26 @@ void EffectRackView::update()
 		}
 	}
 
-	int i = 0, nView = 0;
+	for (auto i = m_effectViews.size(); i > 0; --i)
+	{
+		if (!view_map[i - 1])
+		{
+			delete m_effectViews.takeAt(i - 1);
+		}
+	}
+
+	const auto& effects = fxChain()->m_effects;
+	std::sort(m_effectViews.begin(), m_effectViews.end(), [&effects](EffectView* left, EffectView* right) {
+		return std::find(effects.begin(), effects.end(), left->effect())
+			< std::find(effects.begin(), effects.end(), right->effect());
+	});
 
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
-
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); i++ )
+	for (auto* view : m_effectViews)
 	{
-		if( i < view_map.size() && view_map[i] == false )
-		{
-			delete m_effectViews[nView];
-			it = m_effectViews.erase( it );
-		}
-		else
-		{
-			( *it )->move( EffectViewMargin, m_lastY );
-			m_lastY += ( *it )->height();
-			++nView;
-			++it;
-		}
+		view->move(EffectViewMargin, m_lastY);
+		m_lastY += view->height();
 	}
 
 	w->setFixedSize(EffectView::DEFAULT_WIDTH + 2 * EffectViewMargin, m_lastY);
@@ -270,6 +270,8 @@ void EffectRackView::modelChanged()
 	//clearViews();
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	connect( fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));
+	connect(fxChain(), &EffectChain::incrementalContentsChanged, this, &EffectRackView::update,
+		Qt::UniqueConnection);
 	update();
 }
 

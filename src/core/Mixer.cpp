@@ -25,6 +25,7 @@
 #include "Mixer.h"
 
 #include <QDomElement>
+#include <tuple>
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
@@ -263,6 +264,47 @@ Mixer::~Mixer()
 int Mixer::createChannel()
 {
 	const int index = m_mixerChannels.size();
+	auto* journal = Engine::projectJournal();
+	if (index > 0 && journal && journal->isIncrementalTransaction())
+	{
+		// The embedded models are owned by the channel, including while it is
+		// parked off the mixer in the redo history.
+		auto parked = std::make_shared<std::unique_ptr<MixerChannel>>(std::make_unique<MixerChannel>(index, nullptr));
+		auto* channel = parked->get();
+		auto* master = m_mixerChannels.front();
+		channel->m_name = tr("Channel %1").arg(index);
+		channel->m_volumeModel.setDisplayName(channel->m_name + ">" + tr("Volume"));
+		channel->m_muteModel.setDisplayName(channel->m_name + ">" + tr("Mute"));
+		channel->m_soloModel.setDisplayName(channel->m_name + ">" + tr("Solo"));
+		channel->m_muteBeforeSolo = false;
+		if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
+		{
+			channel->m_muteModel.setValue(true);
+		}
+		m_mixerChannels.reserve(m_mixerChannels.size() + 1);
+		const QPointer<Mixer> mixer(this);
+		const auto attach = [mixer, channel, parked] {
+			channel->setIndex(static_cast<int>(mixer->m_mixerChannels.size()));
+			mixer->m_mixerChannels.push_back(parked->release());
+		};
+		const auto detach = [mixer, channel, parked] {
+			std::erase(mixer->m_mixerChannels, channel);
+			parked->reset(channel);
+		};
+		const QPointer<FloatModel> identity(&channel->m_volumeModel);
+		const auto valid = [mixer, master, identity] {
+			// A later edit in this batch may already have parked the channel.
+			return mixer && identity && !mixer->m_mixerChannels.empty() && mixer->m_mixerChannels.front() == master;
+		};
+		if (!journal->addIncrementalChange({valid, detach, attach}))
+		{
+			throw std::runtime_error("Could not record the new mixer channel.");
+		}
+		attach();
+		createChannelSend(index, 0);
+		Engine::getSong()->setModified();
+		return index;
+	}
 	// create new channel
 	m_mixerChannels.push_back( new MixerChannel( index, this ) );
 
@@ -284,11 +326,10 @@ void Mixer::activateSolo()
 	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		auto* channel = m_mixerChannels[i];
-		const auto present = [i, channel](Mixer* mixer) {
-			return i < mixer->m_mixerChannels.size() && mixer->m_mixerChannels[i] == channel;
-		};
+		const QPointer<FloatModel> identity(&channel->m_volumeModel);
+		const auto present = [identity](Mixer*) { return !identity.isNull(); };
 		agent::recordIncrementalOwnedValue(this, present, channel->m_muteBeforeSolo, channel->m_muteModel.value(),
-			[i](Mixer* mixer, bool value) { mixer->m_mixerChannels[i]->m_muteBeforeSolo = value; });
+										   [channel](Mixer*, bool value) { channel->m_muteBeforeSolo = value; });
 		m_mixerChannels[i]->m_muteBeforeSolo = m_mixerChannels[i]->m_muteModel.value();
 		m_mixerChannels[i]->m_muteModel.setValue( true );
 	}
@@ -349,7 +390,9 @@ void Mixer::toggledSolo()
 void Mixer::deleteChannel( int index )
 {
 	// channel deletion is performed between mixer rounds
-	Engine::audioEngine()->requestChangeInModel();
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto* journal = Engine::projectJournal();
+	const bool incremental = journal && journal->isIncrementalTransaction();
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
@@ -421,6 +464,77 @@ void Mixer::deleteChannel( int index )
 		deleteChannelSend(ch->m_receives.front());
 	}
 
+	if (incremental)
+	{
+		ch->m_fxChain.clearIncrementally();
+		const auto parked = std::make_shared<std::unique_ptr<MixerChannel>>();
+		const QPointer<Mixer> owner(this);
+		const QPointer<FloatModel> identity(&ch->m_volumeModel);
+		const int soloBefore = m_lastSoloed;
+		const int soloAfter = soloBefore == index ? -1 : soloBefore - (soloBefore > index);
+		const bool parented = ch->m_volumeModel.parent() == this;
+		std::vector<std::tuple<MixerChannel*, QPointer<FloatModel>, QString>> names;
+		for (auto i = static_cast<std::size_t>(index + 1); i < m_mixerChannels.size(); ++i)
+		{
+			auto* sibling = m_mixerChannels[i];
+			names.emplace_back(sibling, &sibling->m_volumeModel, sibling->m_name);
+		}
+		const auto refreshIndices = [owner, index] {
+			for (auto i = static_cast<std::size_t>(index); i < owner->m_mixerChannels.size(); ++i)
+			{
+				owner->m_mixerChannels[i]->setIndex(i);
+			}
+			for (auto* route : owner->m_mixerRoutes)
+			{
+				route->updateName();
+			}
+		};
+		const auto attach = [owner, parked, names, index, soloBefore, parented, refreshIndices] {
+			auto* restored = parked->release();
+			if (parented)
+			{
+				restored->m_volumeModel.setParent(owner.data());
+				restored->m_muteModel.setParent(owner.data());
+				restored->m_soloModel.setParent(owner.data());
+			}
+			owner->m_mixerChannels.insert(owner->m_mixerChannels.begin() + index, restored);
+			owner->m_lastSoloed = soloBefore;
+			for (const auto& [target, model, name] : names)
+			{
+				target->m_name = name;
+			}
+			refreshIndices();
+		};
+		const auto detach = [owner, parked, ch, index, soloAfter, parented, refreshIndices] {
+			std::erase(owner->m_mixerChannels, ch);
+			if (parented)
+			{
+				ch->m_volumeModel.setParent(nullptr);
+				ch->m_muteModel.setParent(nullptr);
+				ch->m_soloModel.setParent(nullptr);
+			}
+			parked->reset(ch);
+			owner->m_lastSoloed = soloAfter;
+			for (auto i = static_cast<std::size_t>(index); i < owner->m_mixerChannels.size(); ++i)
+			{
+				owner->validateChannelName(i, i + 1);
+			}
+			refreshIndices();
+		};
+		const auto valid = [owner, identity, names] {
+			return owner && identity && std::all_of(names.begin(), names.end(), [](const auto& record) {
+					   return !std::get<1>(record).isNull();
+				   });
+		};
+		if (!journal->addIncrementalChange({valid, attach, detach}))
+		{
+			throw std::runtime_error("Could not record mixer channel removal.");
+		}
+		detach();
+		Engine::getSong()->setModified();
+		return;
+	}
+
 	// if m_lastSoloed was our index, reset it
 	if (m_lastSoloed == index) { m_lastSoloed = -1; }
 	// if m_lastSoloed is > delete index, it will move left
@@ -448,7 +562,6 @@ void Mixer::deleteChannel( int index )
 		}
 	}
 
-	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -462,10 +575,6 @@ void Mixer::moveChannelLeft( int index )
 	}
 	// channels to swap
 	int a = index - 1, b = index;
-
-	// check if m_lastSoloed is one of our swaps
-	if (m_lastSoloed == a) { m_lastSoloed = b; }
-	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
 	const TrackContainer::TrackList& songTrackList = Engine::getSong()->tracks();
@@ -518,12 +627,27 @@ void Mixer::moveChannelLeft( int index )
 		}
 	}
 
-	// Swap positions in array
-	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
-
-	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->setIndex(index);
-	m_mixerChannels[index - 1]->setIndex(index - 1);
+	auto* first = m_mixerChannels[a];
+	auto* second = m_mixerChannels[b];
+	const int soloAfter = m_lastSoloed == a ? b : m_lastSoloed == b ? a : m_lastSoloed;
+	const auto apply = [a, b](Mixer* mixer, const auto& state) {
+		const auto& [left, right, solo] = state;
+		mixer->m_mixerChannels[a] = left;
+		mixer->m_mixerChannels[b] = right;
+		left->setIndex(a);
+		right->setIndex(b);
+		mixer->m_lastSoloed = solo;
+	};
+	const QPointer<FloatModel> firstIdentity(&first->m_volumeModel);
+	const QPointer<FloatModel> secondIdentity(&second->m_volumeModel);
+	agent::recordIncrementalOwnedValue(
+		this, [firstIdentity, secondIdentity](Mixer*) { return firstIdentity && secondIdentity; },
+		std::tuple{first, second, m_lastSoloed}, std::tuple{second, first, soloAfter}, apply);
+	apply(this, std::tuple{second, first, soloAfter});
+	if (Engine::projectJournal()->isIncrementalTransaction())
+	{
+		Engine::getSong()->setModified();
+	}
 }
 
 
@@ -564,6 +688,12 @@ MixerRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float a
 	{
 		return nullptr;
 	}
+	if (auto* journal = Engine::projectJournal(); journal && journal->isIncrementalTransaction())
+	{
+		auto* route = new MixerRoute(from, to, amount);
+		recordRouteMembership(route, false);
+		return route;
+	}
 	Engine::audioEngine()->requestChangeInModel();
 	auto route = new MixerRoute(from, to, amount);
 
@@ -599,9 +729,72 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 	}
 }
 
+void Mixer::recordRouteMembership(MixerRoute* route, bool removing)
+{
+	std::unique_ptr<MixerRoute> candidate(removing ? nullptr : route);
+	auto* sender = route->sender();
+	auto* receiver = route->receiver();
+	const auto indexOf = [route](const MixerRouteVector& routes) {
+		return std::distance(routes.begin(), std::find(routes.begin(), routes.end(), route));
+	};
+	const auto senderIndex = indexOf(sender->m_sends);
+	const auto receiverIndex = indexOf(receiver->m_receives);
+	const auto mixerIndex = indexOf(m_mixerRoutes);
+	const auto parked = std::make_shared<std::unique_ptr<MixerRoute>>();
+	if (!removing)
+	{
+		*parked = std::move(candidate);
+		sender->m_sends.reserve(sender->m_sends.size() + 1);
+		receiver->m_receives.reserve(receiver->m_receives.size() + 1);
+		m_mixerRoutes.reserve(m_mixerRoutes.size() + 1);
+	}
+	const QPointer<Mixer> mixer(this);
+	const QPointer<MixerRoute> connection(route);
+	const QPointer<FloatModel> sourceModel(&sender->m_volumeModel);
+	const QPointer<FloatModel> destinationModel(&receiver->m_volumeModel);
+	const auto valid = [mixer, connection, sourceModel, destinationModel] {
+		return mixer && connection && sourceModel && destinationModel;
+	};
+	const auto attach = [mixer, parked, senderIndex, receiverIndex, mixerIndex] {
+		auto* active = parked->release();
+		auto insert = [active](MixerRouteVector& routes, std::ptrdiff_t index) {
+			routes.insert(routes.begin() + std::min<std::size_t>(index, routes.size()), active);
+		};
+		insert(active->sender()->m_sends, senderIndex);
+		insert(active->receiver()->m_receives, receiverIndex);
+		insert(mixer->m_mixerRoutes, mixerIndex);
+	};
+	const auto detach = [mixer, connection, parked] {
+		auto* active = connection.data();
+		std::erase(active->sender()->m_sends, active);
+		std::erase(active->receiver()->m_receives, active);
+		std::erase(mixer->m_mixerRoutes, active);
+		parked->reset(active);
+	};
+	auto* journal = Engine::projectJournal();
+	const bool recorded = removing ? journal->addIncrementalChange({valid, attach, detach})
+								   : journal->addIncrementalChange({valid, detach, attach});
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record mixer route membership.");
+	}
+	if (removing)
+	{
+		detach();
+	}
+	else
+	{
+		attach();
+	}
+}
 
 void Mixer::deleteChannelSend( MixerRoute * route )
 {
+	if (auto* journal = Engine::projectJournal(); journal && journal->isIncrementalTransaction())
+	{
+		recordRouteMembership(route, true);
+		return;
+	}
 	Engine::audioEngine()->requestChangeInModel();
 
 	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec)
@@ -805,11 +998,33 @@ void Mixer::clear()
 void Mixer::clearChannel(mix_ch_t index)
 {
 	MixerChannel * ch = m_mixerChannels[index];
-	ch->m_fxChain.clear();
+	const bool incremental = Engine::projectJournal() && Engine::projectJournal()->isIncrementalTransaction();
+	const auto resetName = index == 0 ? tr("Master") : tr("Channel %1").arg(index);
+	const QPointer<FloatModel> identity(&ch->m_volumeModel);
+	const auto present = [identity](Mixer*) { return !identity.isNull(); };
+	agent::recordIncrementalOwnedValue(this, present, ch->m_name, resetName,
+									   [ch](Mixer*, const QString& name) { ch->m_name = name; });
+	agent::recordIncrementalOwnedValue(this, present, ch->color(), std::optional<QColor>{},
+									   [ch](Mixer*, const std::optional<QColor>& color) { ch->setColor(color); });
+	for (const auto& [model, label] : {std::pair<Model*, QString>{&ch->m_volumeModel, tr("Volume")},
+									   std::pair<Model*, QString>{&ch->m_muteModel, tr("Mute")},
+									   std::pair<Model*, QString>{&ch->m_soloModel, tr("Solo")}})
+	{
+		agent::recordIncrementalValue(model, model->displayName(), resetName + ">" + label,
+									  [](Model* target, const QString& name) { target->setDisplayName(name); });
+	}
+	if (incremental)
+	{
+		ch->m_fxChain.clearIncrementally();
+	}
+	else
+	{
+		ch->m_fxChain.clear();
+	}
 	ch->m_volumeModel.setValue( 1.0f );
 	ch->m_muteModel.setValue( false );
 	ch->m_soloModel.setValue( false );
-	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "Channel %1" ).arg( index );
+	ch->m_name = resetName;
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );
@@ -825,13 +1040,17 @@ void Mixer::clearChannel(mix_ch_t index)
 		}
 
 		// add send to master
-		createChannelSend( index, 0 );
+		createChannelSend(index, 0);
 	}
 
 	// delete receives
 	while (!ch->m_receives.empty())
 	{
 		deleteChannelSend(ch->m_receives.front());
+	}
+	if (incremental)
+	{
+		Engine::getSong()->setModified();
 	}
 }
 

@@ -68,7 +68,8 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	if( m_peakEffect != nullptr && m_peakEffect->effectChain() != nullptr )
+	if( m_peakEffect != nullptr && m_peakEffect->parentModel() == m_peakEffect->effectChain()
+		&& m_peakEffect->effectChain() != nullptr )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
@@ -167,7 +168,7 @@ void PeakController::loadSettings( const QDomElement & _this )
 
 	for (const auto& effect : s_effects)
 	{
-		if (effect->m_effectId == effectId)
+		if (effect->parentModel() && effect->m_effectId == effectId)
 		{
 			m_peakEffect = effect;
 			return;
@@ -200,7 +201,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	{
 		for (const auto& effect : s_effects)
 		{
-			if (effect->m_effectId == effectId)
+			if (effect->parentModel() && effect->m_effectId == effectId)
 			{
 				foundCount++;
 			}
@@ -211,7 +212,10 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 			int newEffectId = 0;
 			for (const auto& effect : s_effects)
 			{
-				effect->m_effectId = newEffectId++;
+				if (effect->parentModel())
+				{
+					effect->m_effectId = newEffectId++;
+				}
 			}
 			QMessageBox msgBox;
 			msgBox.setIcon( QMessageBox::Information );
@@ -234,7 +238,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 
 	for (const auto& effect : s_effects)
 	{
-		if (effect->m_effectId == effectId)
+		if (effect->parentModel() && effect->m_effectId == effectId)
 		{
 			return effect->controller();
 		}

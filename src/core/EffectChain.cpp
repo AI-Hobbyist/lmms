@@ -26,11 +26,17 @@
 #include "EffectChain.h"
 
 #include <QDomElement>
+#include <QPointer>
 #include <cassert>
+#include <memory>
+#include <stdexcept>
 
 #include "AudioBuffer.h"
 #include "Effect.h"
 #include "DummyEffect.h"
+#include "PeakController.h"
+#include "ProjectJournal.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -157,6 +163,107 @@ void EffectChain::removeEffect( Effect * _effect )
 
 
 
+
+void EffectChain::recordEffectMembership(Effect* effect, int index, bool removing)
+{
+	struct ParkedEffect
+	{
+		QPointer<Effect> effect;
+		bool detached = false;
+
+		~ParkedEffect()
+		{
+			if (detached)
+			{
+				delete effect.data();
+			}
+		}
+	};
+
+	if (!removing)
+	{
+		m_effects.reserve(m_effects.size() + 1);
+	}
+	const QPointer<EffectChain> chain(this);
+	const QPointer<QObject> parent(effect->parent());
+	auto parked = std::make_shared<ParkedEffect>();
+	parked->effect = effect;
+	const auto attach = [chain, parent, parked, index] {
+		auto* target = parked->effect.data();
+		target->setParent(parent.data());
+		chain->m_effects.insert(chain->m_effects.begin() + index, target);
+		parked->detached = false;
+	};
+	const auto detach = [chain, parked] {
+		auto* target = parked->effect.data();
+		std::erase(chain->m_effects, target);
+		target->setParent(nullptr);
+		parked->detached = true;
+	};
+	const auto valid = [chain, parked] { return chain && parked->effect; };
+	const auto refresh = [chain] {
+		if (chain)
+		{
+			emit chain->incrementalContentsChanged();
+		}
+	};
+	auto* journal = Engine::projectJournal();
+	if (!(removing ? journal->addIncrementalChange({valid, attach, detach, refresh})
+				   : journal->addIncrementalChange({valid, detach, attach, refresh})))
+	{
+		throw std::runtime_error("Could not record effect membership.");
+	}
+	if (removing)
+	{
+		detach();
+	}
+	else
+	{
+		attach();
+	}
+}
+
+void EffectChain::insertEffectIncrementally(Effect* effect, int index)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	recordEffectMembership(effect, index, false);
+	m_enabledModel.setValue(true);
+}
+
+void EffectChain::removeEffectIncrementally(Effect* effect)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto position = std::find(m_effects.begin(), m_effects.end(), effect);
+	if (position == m_effects.end())
+	{
+		return;
+	}
+	auto* song = Engine::getSong();
+	for (auto* controller : song->controllers())
+	{
+		auto* peak = dynamic_cast<PeakController*>(controller);
+		if (peak && peak->effect() == effect)
+		{
+			song->removeController(peak);
+			break;
+		}
+	}
+	recordEffectMembership(effect, std::distance(m_effects.begin(), position), true);
+	if (m_effects.empty())
+	{
+		m_enabledModel.setValue(false);
+	}
+}
+
+void EffectChain::clearIncrementally()
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	while (!m_effects.empty())
+	{
+		removeEffectIncrementally(m_effects.back());
+	}
+	m_enabledModel.setValue(false);
+}
 
 void EffectChain::moveDown( Effect * _effect )
 {

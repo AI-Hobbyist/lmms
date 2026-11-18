@@ -163,6 +163,175 @@ private slots:
 		QCOMPARE(Engine::mixer()->mixerChannel(1)->m_name, QStringLiteral("First"));
 	}
 
+	void agentChannelRemovalOrClearRestoresRoutes_data()
+	{
+		QTest::addColumn<bool>("remove");
+		QTest::newRow("remove") << true;
+		QTest::newRow("clear") << false;
+	}
+
+	void agentChannelRemovalOrClearRestoresRoutes()
+	{
+		QFETCH(bool, remove);
+		auto& bus = CommandBus::instance();
+		auto* mixer = Engine::mixer();
+		auto* journal = Engine::projectJournal();
+		QVERIFY(bus.execute("mixer.addChannel", {{"name", "Selected"}}).ok);
+		QVERIFY(bus.execute("mixer.addChannel", {{"name", "Next"}}).ok);
+		QVERIFY(bus.execute("mixer.addSend", {{"from", 2}, {"to", 1}, {"amount", 0.4}}).ok);
+		QVERIFY(bus.execute("mixer.setVolume", {{"channel", 1}, {"value", 0.7}}).ok);
+		QVERIFY(bus.execute("track.create", {{"type", "sample"}}).ok);
+		QVERIFY(bus.execute("track.setMixerChannel", {{"track", 0}, {"channel", 1}}).ok);
+		auto* selected = mixer->mixerChannel(1);
+		auto* next = mixer->mixerChannel(2);
+		const auto routes = mixer->m_mixerRoutes;
+		const auto sends = selected->m_sends;
+		const auto receives = selected->m_receives;
+		const auto trackRoute
+			= [&] { return bus.execute("track.get", {{"track", 0}}).data.value("mixerChannel").toInt(-1); };
+		journal->clearJournal();
+		const QString command = remove ? "mixer.removeChannel" : "mixer.clearChannel";
+		QJsonObject arguments{{"channel", 1}};
+		if (remove)
+		{
+			arguments.insert("force", true);
+		}
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent(command, preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(mixer->mixerChannel(1), selected);
+		QVERIFY(mixer->m_mixerRoutes == routes);
+		QCOMPARE(trackRoute(), 1);
+		QCOMPARE(journal->undoDepth(), 0);
+		const QJsonArray steps{QJsonObject{{"cmd", command}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QStringLiteral("script_assertion_failed"));
+		QVERIFY(mixer->m_mixerRoutes == routes);
+		QCOMPARE(trackRoute(), 1);
+		QVERIFY(bus.executeForAgent(command, arguments).ok);
+		QCOMPARE(mixer->mixerChannel(1), remove ? next : selected);
+		QCOMPARE(trackRoute(), remove ? 0 : 1);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(mixer->mixerChannel(1), selected);
+		QCOMPARE(mixer->mixerChannel(2), next);
+		QVERIFY(mixer->m_mixerRoutes == routes);
+		QVERIFY(selected->m_sends == sends);
+		QVERIFY(selected->m_receives == receives);
+		QVERIFY(qAbs(selected->m_volumeModel.value() - 0.7f) < 0.001f);
+		QCOMPARE(trackRoute(), 1);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(mixer->mixerChannel(1), remove ? next : selected);
+		QCOMPARE(trackRoute(), remove ? 0 : 1);
+	}
+
+	void agentAddPreservesDefaultRoute()
+	{
+		auto& bus = CommandBus::instance();
+		auto* mixer = Engine::mixer();
+		auto* journal = Engine::projectJournal();
+		auto* master = mixer->mixerChannel(0);
+		const auto receives = master->m_receives.size();
+		const auto count = mixer->numChannels();
+		journal->clearJournal();
+		const QJsonObject arguments{{"name", "Agent channel"}};
+		const auto preview = bus.executeForAgent("mixer.addChannel", {{"name", "Agent channel"}, {"dryRun", true}});
+		QVERIFY2(preview.ok, qPrintable(preview.errorCode));
+		QCOMPARE(mixer->numChannels(), count);
+		QCOMPARE(master->m_receives.size(), receives);
+		QCOMPARE(journal->undoDepth(), 0);
+		const QJsonArray steps{QJsonObject{{"cmd", "mixer.addChannel"}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QStringLiteral("script_assertion_failed"));
+		QCOMPARE(mixer->numChannels(), count);
+		QCOMPARE(master->m_receives.size(), receives);
+		QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.executeForAgent("mixer.addChannel", arguments).ok);
+		auto* channel = mixer->mixerChannel(count);
+		QCOMPARE(channel->m_name, QStringLiteral("Agent channel"));
+		QCOMPARE(channel->m_sends.size(), std::size_t{1});
+		auto* route = channel->m_sends.front();
+		QCOMPARE(route->receiver(), master);
+		QCOMPARE(master->m_receives.back(), route);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(mixer->numChannels(), count);
+		QCOMPARE(master->m_receives.size(), receives);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(mixer->mixerChannel(count), channel);
+		QCOMPARE(channel->m_sends.front(), route);
+		QCOMPARE(master->m_receives.back(), route);
+	}
+
+	void agentAddThenRemoveRollsBackAsOneBatch()
+	{
+		auto& bus = CommandBus::instance();
+		auto* mixer = Engine::mixer();
+		auto* journal = Engine::projectJournal();
+		auto* master = mixer->mixerChannel(0);
+		const auto count = mixer->numChannels();
+		const auto routes = mixer->m_mixerRoutes;
+		journal->clearJournal();
+		const QJsonArray steps{QJsonObject{{"cmd", "mixer.addChannel"}, {"args", QJsonObject{{"name", "Temporary"}}}},
+							   QJsonObject{{"cmd", "mixer.removeChannel"}, {"args", QJsonObject{{"channel", count}}}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QStringLiteral("script_assertion_failed"));
+		QCOMPARE(mixer->numChannels(), count);
+		QCOMPARE(mixer->mixerChannel(0), master);
+		QVERIFY(mixer->m_mixerRoutes == routes);
+		QCOMPARE(journal->undoDepth(), 0);
+	}
+
+	void agentMovePreservesRoutesAndIdentity()
+	{
+		auto& bus = CommandBus::instance();
+		auto* mixer = Engine::mixer();
+		auto* journal = Engine::projectJournal();
+		QVERIFY(bus.execute("mixer.addChannel", {{"name", "First"}}).ok);
+		QVERIFY(bus.execute("mixer.addChannel", {{"name", "Second"}}).ok);
+		QVERIFY(bus.execute("mixer.addSend", {{"from", 1}, {"to", 2}, {"amount", 0.4}}).ok);
+		QVERIFY(bus.execute("track.create", {{"type", "sample"}}).ok);
+		QVERIFY(bus.execute("track.setMixerChannel", {{"track", 0}, {"channel", 1}}).ok);
+		auto* first = mixer->mixerChannel(1);
+		auto* second = mixer->mixerChannel(2);
+		auto* const route = first->m_sends.back();
+		const auto trackRoute
+			= [&] { return bus.execute("track.get", {{"track", 0}}).data.value("mixerChannel").toInt(-1); };
+		journal->clearJournal();
+		const QJsonObject arguments{{"channel", 2}, {"direction", "left"}};
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent("mixer.moveChannel", preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(mixer->mixerChannel(1), first);
+		QCOMPARE(mixer->mixerChannel(2), second);
+		QCOMPARE(trackRoute(), 1);
+		QCOMPARE(journal->undoDepth(), 0);
+		const QJsonArray steps{QJsonObject{{"cmd", "mixer.moveChannel"}, {"args", arguments}},
+							   QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QStringLiteral("script_assertion_failed"));
+		QCOMPARE(mixer->mixerChannel(1), first);
+		QCOMPARE(mixer->mixerChannel(2), second);
+		QCOMPARE(trackRoute(), 1);
+		QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.executeForAgent("mixer.moveChannel", arguments).ok);
+		QCOMPARE(mixer->mixerChannel(2), first);
+		QCOMPARE(trackRoute(), 2);
+		QCOMPARE(first->m_sends.back(), route);
+		QCOMPARE(route->receiverIndex(), 1);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(mixer->mixerChannel(1), first);
+		QCOMPARE(trackRoute(), 1);
+		QCOMPARE(route->receiverIndex(), 2);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(mixer->mixerChannel(2), first);
+		QCOMPARE(trackRoute(), 2);
+		QCOMPARE(route->receiverIndex(), 1);
+	}
+
 	void moveChannelRejectsEdges()
 	{
 		const auto master = CommandBus::instance().execute("mixer.moveChannel", {{"channel", 0}, {"direction", "right"}});

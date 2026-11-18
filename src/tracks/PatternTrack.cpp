@@ -22,6 +22,7 @@
  *
  */
 #include "PatternTrack.h"
+#include "agent/IncrementalUndo.h"
 
 #include <QDomElement>
 #include <algorithm>
@@ -66,7 +67,12 @@ PatternTrack::~PatternTrack()
 					| PlayHandle::Type::InstrumentPlayHandle
 					| PlayHandle::Type::SamplePlayHandle );
 
-	const int pattern = s_infoMap[this];
+	const auto registration = s_infoMap.constFind(this);
+	if (registration == s_infoMap.cend())
+	{
+		return;
+	}
+	const int pattern = registration.value();
 	Engine::patternStore()->removePattern(pattern);
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
@@ -244,11 +250,61 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 	auto t2 = dynamic_cast<PatternTrack*>(track2);
 	if( t1 != nullptr && t2 != nullptr )
 	{
+		const QPointer<PatternTrack> other(t2);
+		auto* journal = Engine::projectJournal();
+		if (journal->isIncrementalTransaction())
+		{
+			const QPointer<PatternTrack> first(t1);
+			const auto exchange = [first, other] { qSwap(s_infoMap[first.data()], s_infoMap[other.data()]); };
+			if (!journal->addIncrementalChange({[first, other] { return first && other; }, exchange, exchange}))
+			{
+				throw std::runtime_error("Could not record the pattern index swap.");
+			}
+		}
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
 		Engine::patternStore()->swapPattern(s_infoMap[t1], s_infoMap[t2]);
 		Engine::patternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }
 
+void PatternTrack::recordPatternRegistration(bool removing)
+{
+	const QPointer<PatternTrack> pattern(this);
+	const int index = patternIndex();
+	const auto attach = [pattern, index] {
+		for (auto entry = s_infoMap.begin(); entry != s_infoMap.end(); ++entry)
+		{
+			if (entry.value() >= index)
+			{
+				++entry.value();
+			}
+		}
+		s_infoMap.insert(pattern.data(), index);
+	};
+	const auto detach = [pattern] {
+		const auto position = s_infoMap.find(pattern.data());
+		const int current = position.value();
+		s_infoMap.erase(position);
+		for (auto entry = s_infoMap.begin(); entry != s_infoMap.end(); ++entry)
+		{
+			if (entry.value() > current)
+			{
+				--entry.value();
+			}
+		}
+	};
+	auto* journal = Engine::projectJournal();
+	const auto valid = [pattern] { return !pattern.isNull(); };
+	const bool recorded = removing ? journal->addIncrementalChange({valid, attach, detach})
+								   : journal->addIncrementalChange({valid, detach, attach});
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record pattern registration.");
+	}
+	if (removing)
+	{
+		detach();
+	}
+}
 
 } // namespace lmms

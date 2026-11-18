@@ -189,6 +189,9 @@ void Engine::destroy()
 	PresetPreviewPlayHandle::cleanup();
 
 	s_song->clearProject();
+	// Incremental history can retain detached MIDI controllers. Release their
+	// ports while the audio engine and its MIDI client still exist.
+	s_projectJournal->clearJournal();
 
 	deleteHelper( &s_patternStore );
 

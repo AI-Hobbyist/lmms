@@ -41,6 +41,7 @@ namespace lmms
 {
 
 class ControllerConnection;
+class AutomatableModel;
 
 namespace gui
 {
@@ -65,6 +66,9 @@ public:
 	}
 
 	void setController( Controller * _controller );
+	// Park a connection without disposing of its controller or losing identity.
+	void setAttachedToTarget(bool attached);
+	static std::vector<AutomatableModel*> targetsForController(const Controller* controller);
 
 	inline void setController( int _controllerId );
 
@@ -115,6 +119,7 @@ protected:
 	int m_controllerId;
 	
 	bool m_ownsController;
+	bool m_attachedToTarget = true;
 
 	static ControllerConnectionVector s_connections;
 

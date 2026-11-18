@@ -31,10 +31,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
+#include <QPointer>
 #include <QScopedValueRollback>
 
 #include <algorithm>
 #include <cmath>
+#include <stdexcept>
 
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
@@ -42,6 +44,7 @@
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "EnvelopeAndLfoParameters.h"
+#include "MidiController.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -1859,6 +1862,10 @@ void Song::addController( Controller * controller )
 	bool containsController = std::find(m_controllers.begin(), m_controllers.end(), controller) != m_controllers.end();
 	if (controller && !containsController)
 	{
+		if (Engine::projectJournal()->isIncrementalTransaction())
+		{
+			recordControllerMembership(controller, m_controllers.size(), false);
+		}
 		m_controllers.push_back(controller);
 		emit controllerAdded( controller );
 
@@ -1866,14 +1873,90 @@ void Song::addController( Controller * controller )
 	}
 }
 
-
-
+void Song::recordControllerMembership(Controller* controller, std::size_t rackIndex, bool removing)
+{
+	struct ParkedController
+	{
+		QPointer<Controller> controller;
+		MidiPort::Mode midiMode = MidiPort::Mode::Disabled;
+		bool detached = false;
+		~ParkedController()
+		{
+			if (detached)
+			{
+				delete controller.data();
+			}
+		}
+	};
+	if (!removing)
+	{
+		m_controllers.reserve(m_controllers.size() + 1);
+	}
+	auto parked = std::make_shared<ParkedController>();
+	parked->controller = controller;
+	const auto processing = std::find(Controller::s_controllers.begin(), Controller::s_controllers.end(), controller);
+	const auto processingIndex = processing == Controller::s_controllers.end()
+		? -1
+		: std::distance(Controller::s_controllers.begin(), processing);
+	const QPointer<Song> song(this);
+	const auto attach = [song, parked, rackIndex, processingIndex] {
+		auto* target = parked->controller.data();
+		auto& rack = song->m_controllers;
+		rack.insert(rack.begin() + std::min(rackIndex, rack.size()), target);
+		if (processingIndex >= 0)
+		{
+			auto& list = Controller::s_controllers;
+			list.insert(list.begin() + std::min<std::size_t>(processingIndex, list.size()), target);
+		}
+		if (auto* midi = dynamic_cast<MidiController*>(target))
+		{
+			midi->midiPort()->setMode(parked->midiMode);
+		}
+		parked->detached = false;
+		emit song->controllerAdded(target);
+	};
+	const auto detach = [song, parked] {
+		auto* target = parked->controller.data();
+		if (auto* midi = dynamic_cast<MidiController*>(target))
+		{
+			parked->midiMode = midi->midiPort()->mode();
+			midi->midiPort()->setMode(MidiPort::Mode::Disabled);
+		}
+		std::erase(song->m_controllers, target);
+		std::erase(Controller::s_controllers, target);
+		parked->detached = true;
+		emit song->controllerRemoved(target);
+	};
+	const auto valid = [song, parked] { return song && parked->controller; };
+	const bool recorded = removing ? Engine::projectJournal()->addIncrementalChange({valid, attach, detach})
+								   : Engine::projectJournal()->addIncrementalChange({valid, detach, attach});
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record controller membership.");
+	}
+	if (removing)
+	{
+		detach();
+	}
+}
 
 void Song::removeController( Controller * controller )
 {
 	auto it = std::find(m_controllers.begin(), m_controllers.end(), controller);
 	if (it != m_controllers.end())
 	{
+		if (Engine::projectJournal()->isIncrementalTransaction())
+		{
+			const auto index = std::distance(m_controllers.begin(), it);
+			const auto targets = ControllerConnection::targetsForController(controller);
+			for (auto* target : targets)
+			{
+				target->replaceControllerConnectionIncrementally(nullptr);
+			}
+			recordControllerMembership(controller, index, true);
+			setModified();
+			return;
+		}
 		m_controllers.erase(it);
 
 		emit controllerRemoved( controller );

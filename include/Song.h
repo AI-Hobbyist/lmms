@@ -444,6 +444,7 @@ private:
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
 
+	void recordControllerMembership(Controller* controller, std::size_t rackIndex, bool removing);
 	ControllerVector m_controllers;
 
 	int m_nLoadingTrack;

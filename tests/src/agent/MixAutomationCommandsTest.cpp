@@ -123,6 +123,60 @@ private slots:
 		QCOMPARE(bus.execute("model.getValue", {{"path", "song/channel:0/mute"}}).data.value("value").toBool(), false);
 	}
 
+	void agentMixerEditsRetainEffects_data()
+	{
+		QTest::addColumn<QString>("command");
+		QTest::newRow("clear") << QString("mixer.clearChannel");
+		QTest::newRow("remove") << QString("mixer.removeChannel");
+	}
+
+	void agentMixerEditsRetainEffects()
+	{
+		QFETCH(QString, command);
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* mixer = lmms::Engine::mixer();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("mixer.addChannel").ok);
+		auto* channel = mixer->mixerChannel(1);
+		auto& chain = channel->m_fxChain;
+		const QPointer<lmms::Effect> first(new AgentTestEffect(&chain));
+		const QPointer<lmms::Effect> second(new AgentTestEffect(&chain));
+		chain.appendEffect(first.data());
+		chain.appendEffect(second.data());
+		journal->clearJournal();
+		QJsonObject args{{"channel", 1}};
+		if (command == "mixer.removeChannel")
+		{
+			args.insert("force", true);
+		}
+		auto preview = args;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent(command, preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QCOMPARE(chain.effectAt(0), first.data());
+		QCOMPARE(chain.effectAt(1), second.data());
+		QCOMPARE(journal->undoDepth(), 0);
+
+		const QJsonArray steps{QJsonObject{{"cmd", command}, {"args", args}},
+			QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(chain.effectAt(0), first.data());
+		QCOMPARE(chain.effectAt(1), second.data());
+
+		QVERIFY(bus.executeForAgent(command, args).ok);
+		QCOMPARE(chain.effectCount(), 0);
+		QVERIFY(first && second);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(chain.effectAt(0), first.data());
+		QCOMPARE(chain.effectAt(1), second.data());
+		QCOMPARE(first->parentModel(), &chain);
+		QCOMPARE(second->parentModel(), &chain);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(chain.effectCount(), 0);
+		QVERIFY(first && second);
+	}
+
 	void agentAutomationTargetRollsBack()
 	{
 		auto& bus = lmms::agent::CommandBus::instance();

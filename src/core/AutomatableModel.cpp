@@ -513,6 +513,7 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	m_controllerConnection = c;
 	if( c )
 	{
+		c->setParent(this);
 		QObject::connect( m_controllerConnection, SIGNAL(valueChanged()),
 				this, SIGNAL(dataChanged()), Qt::DirectConnection );
 		QObject::connect( m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
@@ -521,8 +522,59 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	}
 }
 
-
-
+void AutomatableModel::replaceControllerConnectionIncrementally(ControllerConnection* connection)
+{
+	std::unique_ptr<ControllerConnection> owner(connection);
+	struct ParkedConnection
+	{
+		QPointer<ControllerConnection> connection;
+		bool valueChanged;
+		~ParkedConnection() { delete connection.data(); }
+	};
+	auto saved = std::make_shared<ParkedConnection>();
+	saved->connection = owner.release();
+	saved->valueChanged = connection || m_valueChanged;
+	if (connection)
+	{
+		connection->setAttachedToTarget(false);
+	}
+	const QPointer<AutomatableModel> model(this);
+	const QPointer<ControllerConnection> original(m_controllerConnection);
+	const QPointer<ControllerConnection> replacement(connection);
+	const bool hasOriginal = !original.isNull();
+	const bool hasReplacement = !replacement.isNull();
+	const auto valid = [model, original, replacement, hasOriginal, hasReplacement] {
+		return model && (!hasOriginal || original) && (!hasReplacement || replacement);
+	};
+	const auto exchange = [model, saved] {
+		auto* current = model->m_controllerConnection;
+		if (current)
+		{
+			current->setAttachedToTarget(false);
+			model->unlinkControllerConnection();
+			current->setParent(nullptr);
+		}
+		auto* next = saved->connection.data();
+		saved->connection = current;
+		const bool valueChanged = model->m_valueChanged;
+		if (next)
+		{
+			next->setAttachedToTarget(true);
+			model->setControllerConnection(next);
+		}
+		else
+		{
+			emit model->dataChanged();
+		}
+		model->m_valueChanged = saved->valueChanged;
+		saved->valueChanged = valueChanged;
+	};
+	if (!Engine::projectJournal()->addIncrementalChange({valid, exchange, exchange}))
+	{
+		throw std::runtime_error("Could not record controller connection replacement.");
+	}
+	exchange();
+}
 
 float AutomatableModel::controllerValue( int frameOffset ) const
 {

@@ -1,9 +1,11 @@
-## 当前补充交接（2026-11-18）
+## 当前交接：Agent 增量回滚 R2（2026-11-18）
 
-- R1 七条命令已接入并通过 Release 构建与六个定向用例或数据行。日志 build/agent-remaining-r1-final-*.log。真实声库 MANUAL/PENDING，生命周期测试 SKIPPED（用户禁止）。R1 进入提交推送检查点，R2 下一步从不依赖效果器实例改动的子组开始。R3 插件实例管理已单独发出确认请求。
-
-- 计划路径为 doc/agent/incremental-rollback-remaining-commands-plan.md。自动验证限定快速单元测试。下方保留此前交付和验证记录。
-
+- 持续目标：按 doc/agent/incremental-rollback-remaining-commands-plan.md 顺序完成 R1～R4，每阶段快速单元测试通过后单独提交推送。用户已批准保留原乐器实例与效果器原槽摘挂。
+- R1 提交 fed638aa4 已推送并核对 origin/master。
+- R2 九条命令已实现，master 阶段检查点包含混音通道/路由、效果器原位摘挂、控制器连接及成员、Pattern 列。R2 Release 构建和 15 条定向业务用例通过，日志在 build/agent-remaining-r2-effects-build.log 和 build/agent-remaining-r2-final-*.log。构建产物为 build/Release/lmms.exe 和 build/Release/plugins/peakcontrollereffect.dll。
+- Peak 真实宿主联动和原生效果架显示为 MANUAL/PENDING。生命周期测试 SKIPPED（用户禁止）。
+- 接续顺序：先确认 R2 提交确实推送至 origin/master，再做 R3 的乐器候选准备、旧实例保留及效果命令，随后 R4 导入。仅运行计划内快速业务单元测试，按需使用 buildtools/build.py，不做无关重构。保留未跟踪 .codegraph/、.omc/、build-driver.log、build.log。
+- 下列条目是旧阶段的历史记录。
 ## 当前有效交接入口（2026-11-18，增量回滚计划按用户口径收尾）
 
 - 用户口径：除可快速单元测试的项目外，其余一律注明人工验收并跳过；不再运行耗时的 lifetime 测试。

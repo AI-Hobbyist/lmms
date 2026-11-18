@@ -88,10 +88,12 @@ PeakControllerEffect::~PeakControllerEffect()
 	if (it != PeakController::s_effects.end())
 	{
 		PeakController::s_effects.erase(it);
-		Engine::getSong()->removeController(m_autoController);
+		if (m_autoController)
+		{
+			Engine::getSong()->removeController(m_autoController);
+		}
 	}
 }
-
 
 Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {

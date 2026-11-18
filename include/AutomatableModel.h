@@ -130,7 +130,7 @@ public:
 
 
 	void setControllerConnection( ControllerConnection* c );
-
+	void replaceControllerConnectionIncrementally(ControllerConnection* connection);
 
 	template<class T>
 	static T castValue( const float v )

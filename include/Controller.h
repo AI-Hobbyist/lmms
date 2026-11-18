@@ -49,6 +49,7 @@ using ControllerVector = std::vector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
+	friend class Song;
 	Q_OBJECT
 public:
 	enum class ControllerType

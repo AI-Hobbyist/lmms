@@ -13,11 +13,11 @@
 | 阶段 | 命令 | 实施范围 | 快速单元测试 |
 |---|---|---|---|
 | R1 局部数据（7） | `automation.addTarget`、`svs.setParameters`、`svs.setPitchCurve`、`svs.setVoice`、`svc.setChunkConfig`、`svc.setModel`、`svc.setSourceFile` | 自动化保存目标顺序、信号连接、首节点与切线。SVS/SVC 先验证候选配置，保留旧选择、参数和受影响数据，缓存按实际写入范围恢复或失效。回放不触发合成、转换、模型下载或重新读文件。 | 验证目标重复、节点校验失败、配置部分更新失败、曲线及缓存状态恢复。用内存数据覆盖配置逻辑。 |
-| R2 工程成员与引用（9） | `mixer.addChannel`、`mixer.clearChannel`、`mixer.moveChannel`、`mixer.removeChannel`、`controller.add`、`controller.connect`、`controller.remove`、`pattern.create`、`pattern.remove` | 混音器恢复通道顺序、发送/接收、轨道路由和效果链。控制器恢复原目标与双向连接。Pattern 恢复编号、列片段和歌曲引用。复用现有成员变更记录，按对象身份定位。混音器涉及效果链的分支依赖 R3，须在 R3 通过后才放开相关整条命令。 | 用小型内存模型验证重排、双向引用、编号与索引、失败后状态等价。 |
+| R2 工程成员与引用（9） | `mixer.addChannel`、`mixer.clearChannel`、`mixer.moveChannel`、`mixer.removeChannel`、`controller.add`、`controller.connect`、`controller.remove`、`pattern.create`、`pattern.remove` | 混音器恢复通道顺序、发送/接收、轨道路由和效果链。控制器恢复原目标与双向连接。Pattern 恢复编号、列片段和歌曲引用。复用现有成员变更记录，按对象身份定位。用户已确认在 R2 完成混音器及 Peak 控制器所需的效果器原位摘挂，R3 复用该能力。 | 用小型内存模型验证重排、双向引用、编号与索引、失败后状态等价。 |
 | R3 插件与参数（9） | `instrument.load`、`instrument.loadPreset`、`instrument.setParam`、`effect.add`、`effect.move`、`effect.remove`、`effect.setEnabled`、`effect.setParam`、`effect.setWetDry` | 插件实例管理见下节。参数优先复用现有模型记录，对序列化参数分支先确认完整的局部逆操作。效果重排恢复原槽次和对象身份。 | 用轻量替身验证候选准备失败、交换失败和逆序回放。验证参数原始值、槽次与路由。真实插件行为记为 `MANUAL/PENDING`。 |
 | R4 导入（3） | `import.hydrogen`、`import.midi`、`import.sampleToTrack` | 依赖已验证的轨道、片段、自动化、路由及所用插件能力。解析和资源准备在工程写入前完成，再把新增内容纳入一个批次。核对导入器的间接写入，禁止进入整工程替换路径。 | 用小型内存输入和替身验证解析错误无写入、中段失败撤回已添加内容、预演保持历史和原工程数据。 |
 
-四阶段合计 **28** 条。R1 与 R2 的独立子组可先完成。R3 未获授权时继续实施可独立验证的子组，依赖 R3 的分支保留写入前拒绝。
+四阶段合计 **28** 条。按 R1～R4 顺序验收。实例管理已获确认，范围为保留原乐器实例及效果器原位摘挂。
 
 ## 需要改插件实例管理的命令
 
@@ -40,4 +40,6 @@
 
 - R1 的七条命令已接入。Release 构建通过，三个无界面测试目标的六个定向用例或数据行全部通过。覆盖目标绑定失败后的连接与节点恢复、SVC 三项配置的预演及回放、SVS 音高曲线与本地声库字段和宿主音量恢复。日志为 `build/agent-remaining-r1-final-*.log`。
 - SVS 真实声库的能力刷新与合成仍为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。
-- R2～R4 待实施。R3 插件实例管理已单独发出确认请求。
+- R2 九条命令已接入。Release 构建通过，15 个定向业务用例或数据行全部通过。覆盖混音通道、路由、效果链原槽与同一实例、LFO/MIDI 连接和成员，以及 Pattern 列编辑。日志为 `build/agent-remaining-r2-effects-build.log` 和 `build/agent-remaining-r2-final-*.log`。
+- Peak 插件已编译至 `build/Release/plugins/peakcontrollereffect.dll`。真实宿主内 Peak 效果器和控制器联动，以及效果架显示为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。
+- R3～R4 按阶段检查点继续。
