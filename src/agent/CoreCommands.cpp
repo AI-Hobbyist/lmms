@@ -2513,6 +2513,7 @@ CommandResult executeAutomationAddTarget(const QJsonObject& arguments)
 	{
 		return failure;
 	}
+	recordAutomationNodes(automationClip);
 	if (!automationClip->addObject(target.model, true))
 	{
 		return CommandResult::failure("automation_target_exists",
@@ -6333,6 +6334,7 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 												   "clip.duplicate",
 												   "automation.createTrack",
 												   "automation.addClip",
+												   "automation.addTarget",
 												   "automation.putValue",
 												   "automation.putValues",
 												   "automation.removeNode",

@@ -95,6 +95,77 @@ private slots:
 			QString("identity"));
 	}
 
+	void agentSettingsRollBack_data()
+	{
+		QTest::addColumn<QString>("command");
+		QTest::newRow("model") << QString("svc.setModel");
+		QTest::newRow("source") << QString("svc.setSourceFile");
+		QTest::newRow("chunks") << QString("svc.setChunkConfig");
+	}
+
+	void agentSettingsRollBack()
+	{
+		QFETCH(QString, command);
+		const int track = createTrack();
+		QVERIFY(track >= 0);
+		const int clip = createClip(track);
+		QVERIFY(clip >= 0);
+		auto& bus = CommandBus::instance();
+		auto* journal = Engine::projectJournal();
+		journal->clearJournal();
+		QJsonObject arguments{{"track", track}};
+		if (command == "svc.setModel")
+		{
+			arguments.insert("engine_id", "reference");
+			arguments.insert("model_id", "identity");
+		}
+		else if (command == "svc.setSourceFile")
+		{
+			arguments.insert("clip", clip);
+			arguments.insert("path", sourceAudio());
+		}
+		else
+		{
+			arguments.insert("silenceThresholdDbfs", -60);
+			arguments.insert("lengthThresholdSeconds", 5);
+			arguments.insert("forcedChunkSeconds", 2);
+		}
+		auto* model = qobject_cast<SVCTrack*>(Engine::getSong()->tracks().at(track));
+		QVERIFY(model);
+		auto* source = qobject_cast<SVCClip*>(model->getClips().at(clip));
+		QVERIFY(source);
+		const auto state = [&] {
+			const auto config = model->chunkConfig();
+			return QJsonObject{{"selection", model->selection()}, {"name", model->name()},
+				{"silence", config.silenceThresholdDbfs}, {"length", config.lengthThresholdSeconds},
+				{"forced", config.forcedChunkSeconds}, {"source", source->sourceFile()},
+				{"status", source->status()}, {"complete", source->conversionComplete()},
+				{"failed", source->conversionFailed()}, {"cache", source->cacheReferences()},
+				{"ticks", source->length().getTicks()}, {"offset", source->startTimeOffset().getTicks()},
+				{"autoResize", source->getAutoResize()}};
+		};
+		const auto before = state();
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto result = bus.executeForAgent(command, preview);
+		QVERIFY2(result.ok, qPrintable(result.errorCode + ": " + result.errorMessage));
+		QCOMPARE(state(), before);
+		QCOMPARE(journal->undoDepth(), 0);
+		const QJsonArray steps{QJsonObject{{"cmd", command}, {"args", arguments}},
+			QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(state(), before);
+		QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.executeForAgent(command, arguments).ok);
+		const auto after = state();
+		QVERIFY(after != before);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(state(), before);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(state(), after);
+	}
+
 	void sourceAndChunkConfig()
 	{
 		const int trackIndex = createTrack();

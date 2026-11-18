@@ -139,7 +139,7 @@ CommandResult executeSetPitchCurve(const QJsonObject& arguments)
 			return CommandResult::failure(
 				"svs_curve_not_found", "The clip does not have a pitch curve to clear.");
 		}
-		clip->setEditorData(clip->notes(), curves);
+		clip->setEditorData(clip->notes(), curves, true);
 		return CommandResult::success(QJsonObject{{"path", clipPath(trackIndex, clipIndex, clip->getTrack())},
 			{"id", pitchCurveId()}, {"cleared", true}, {"curves", svs::curvesToJson(clip->curves())}});
 	}
@@ -199,7 +199,7 @@ CommandResult executeSetPitchCurve(const QJsonObject& arguments)
 	}
 
 	curves[pitchCurveId()] = curve;
-	clip->setEditorData(clip->notes(), curves);
+	clip->setEditorData(clip->notes(), curves, true);
 	return CommandResult::success(QJsonObject{{"path", clipPath(trackIndex, clipIndex, clip->getTrack())},
 		{"id", pitchCurveId()}, {"pointCount", jsonPoints.size()}, {"relative", relative},
 		{"curves", svs::curvesToJson(clip->curves())}});
@@ -230,6 +230,7 @@ void registerSvsPitchCommands(CommandBus& commandBus)
 		{"required", QJsonArray{"track", "clip"}}};
 	descriptor.mutability = Mutability::Mutating;
 	descriptor.scope = TxScope::Single;
+	descriptor.incremental = true;
 	descriptor.handler = executeSetPitchCurve;
 	commandBus.registerCommand(descriptor);
 }

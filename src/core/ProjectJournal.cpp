@@ -72,6 +72,7 @@ void ProjectJournal::undo()
 		{
 			m_undoCheckPoints.pop();
 			m_redoCheckPoints.push(checkpoint);
+			refreshIncremental(checkpoint.changes);
 		}
 		return;
 	}
@@ -141,6 +142,7 @@ void ProjectJournal::redo()
 		{
 			m_redoCheckPoints.pop();
 			m_undoCheckPoints.push(checkpoint);
+			refreshIncremental(checkpoint.changes);
 		}
 		return;
 	}
@@ -322,6 +324,17 @@ bool ProjectJournal::replayIncremental(const CheckPoint& checkpoint, bool redo)
 	return true;
 }
 
+void ProjectJournal::refreshIncremental(const std::shared_ptr<std::vector<IncrementalChange>>& changes)
+{
+	for (const auto& change : *changes)
+	{
+		if (change.afterApply)
+		{
+			change.afterApply();
+		}
+	}
+}
+
 bool ProjectJournal::commitTransaction()
 {
 	if (!hasActiveTransaction())
@@ -358,9 +371,14 @@ bool ProjectJournal::commitTransaction()
 		}
 	}
 
+	const auto committed = m_transactions.size() == 1 ? checkpoint.changes : nullptr;
 	const bool journalling = m_transactions.back().journalling;
 	m_transactions.pop_back();
 	setJournalling(journalling);
+	if (committed)
+	{
+		refreshIncremental(committed);
+	}
 	return true;
 }
 

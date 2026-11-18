@@ -249,6 +249,7 @@ protected:
 
 private:
 	void cleanObjects();
+	void appendTarget(AutomatableModel* target);
 	void generateTangents();
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;

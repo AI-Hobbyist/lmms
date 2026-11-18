@@ -17,6 +17,7 @@
 #include "SVCConversion.h"
 #include "SVCViews.h"
 #include "Song.h"
+#include "agent/IncrementalUndo.h"
 #include "panning.h"
 #include "volume.h"
 
@@ -309,6 +310,11 @@ bool SVCTrack::setSelection(const QJsonObject& selection)
 	const auto defaultName
 		= name() == tr("Singing Voice Conversion") || (!previousModel.isEmpty() && name() == previousModel);
 	addJournalCheckPoint();
+	agent::recordIncrementalValue(this, m_selection, selection,
+		[](SVCTrack* track, const QJsonObject& value) {
+			track->m_selection = value;
+			emit track->dataChanged();
+		});
 	m_selection = selection;
 	if (defaultName && !nextModel.isEmpty()) { setName(nextModel); }
 	invalidateClips();
@@ -320,6 +326,11 @@ bool SVCTrack::setChunkConfig(const svc::ChunkConfig& config)
 {
 	if (!config.validate().isEmpty()) { return false; }
 	addJournalCheckPoint();
+	agent::recordIncrementalValue(this, m_chunks, config,
+		[](SVCTrack* track, const svc::ChunkConfig& value) {
+			track->m_chunks = value;
+			emit track->dataChanged();
+		});
 	m_chunks = config;
 	invalidateClips();
 	Engine::getSong()->setModified();

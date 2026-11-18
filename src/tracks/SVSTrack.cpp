@@ -9,12 +9,14 @@
 #include "AudioEngine.h"
 #include "Mixer.h"
 #include "Song.h"
+#include "agent/IncrementalUndo.h"
 #include "EffectChain.h"
 #include "SampleFrame.h"
 #include "volume.h"
 #include "panning.h"
 #include <cmath>
 #include <algorithm>
+#include <tuple>
 #include <QFile>
 #include <QDir>
 #include <QJsonDocument>
@@ -143,7 +145,12 @@ SVSTrack::~SVSTrack()
 }
 void SVSTrack::setName(const QString& name)
 {
-	m_customName = true;
+	if (!Engine::projectJournal()->isRestoringIncrementally())
+	{
+		agent::recordIncrementalValue(this, m_customName, true,
+			[](SVSTrack* track, bool custom) { track->m_customName = custom; });
+		m_customName = true;
+	}
 	Track::setName(name);
 	m_bus.setName(name);
 }
@@ -159,6 +166,37 @@ void SVSTrack::bindVoice(const QString& plugin, const QString& voice)
 	if (readOnly())
 		return;
 	addJournalCheckPoint();
+	const bool incremental = Engine::projectJournal()->isIncrementalTransaction();
+	if (incremental)
+	{
+		const auto fields = [](SVSTrack* track) {
+			return std::tie(track->m_pluginId, track->m_voiceId, track->m_voice, track->m_capabilities,
+				track->m_capabilitiesReady, track->m_dictionaries, track->m_portraitSettings,
+				track->m_capabilityDiagnostics);
+		};
+		auto saved = std::make_shared<decltype(std::make_tuple(m_pluginId, m_voiceId, m_voice, m_capabilities,
+			m_capabilitiesReady, m_dictionaries, m_portraitSettings, m_capabilityDiagnostics))>(fields(this));
+		QPointer<SVSTrack> track(this);
+		agent::recordIncrementalValue(this, 0, 0, [fields, saved](SVSTrack* target, int) {
+			auto current = fields(target);
+			std::apply([&](auto&... values) {
+				std::apply([&](auto&... previous) { (std::swap(values, previous), ...); }, *saved);
+			}, current);
+			emit target->dataChanged();
+		}, [track] {
+			if (track)
+			{
+				++track->m_capabilityRequest;
+				track->refreshCapabilities();
+				for (auto* base : track->getClips())
+				{
+					auto* clip = static_cast<SVSClip*>(base);
+					clip->invalidate();
+					clip->synthesize();
+				}
+			}
+		});
+	}
 	m_pluginId = plugin;
 	m_voiceId = voice;
 	m_voice = {};
@@ -176,21 +214,30 @@ void SVSTrack::bindVoice(const QString& plugin, const QString& voice)
 			if (!m_portraitSettings.contains(key) && !path.isEmpty())
 				m_portraitSettings[key] = path;
 		}
-	++m_capabilityRequest;
+	if (!incremental)
+	{
+		++m_capabilityRequest;
+	}
 	m_capabilities = {};
 	svs::addHostVolume(m_capabilities);
 	m_capabilitiesReady = false;
 	m_dictionaries.clear();
 	m_capabilityDiagnostics.clear();
-	refreshCapabilities();
+	if (!incremental)
+	{
+		refreshCapabilities();
+	}
 	if (!m_customName)
 		Track::setName(m_voice.name.isEmpty() ? "SVS" : m_voice.name);
 	m_bus.setName(name());
-	for (auto* clip : getClips())
+	if (!incremental)
 	{
-		auto* c = static_cast<SVSClip*>(clip);
-		c->invalidate();
-		c->synthesize();
+		for (auto* clip : getClips())
+		{
+			auto* c = static_cast<SVSClip*>(clip);
+			c->invalidate();
+			c->synthesize();
+		}
 	}
 	emit dataChanged();
 	Engine::getSong()->setModified();
@@ -211,6 +258,32 @@ bool SVSTrack::setParameter(const QString& id, const QJsonValue& value)
 	if (m_parameters.value(id) == value)
 		return true;
 	addJournalCheckPoint();
+	if (Engine::projectJournal()->isIncrementalTransaction())
+	{
+		auto parameters = m_parameters;
+		parameters[id] = value;
+		const QPointer<SVSTrack> track(this);
+		agent::recordIncrementalValue(this, m_parameters, parameters,
+			[](SVSTrack* target, const QJsonObject& state) {
+				target->m_parameters = state;
+				emit target->dataChanged();
+			}, [track] {
+				if (track)
+				{
+					track->refreshCapabilities();
+					for (auto* base : track->getClips())
+					{
+						auto* clip = static_cast<SVSClip*>(base);
+						clip->invalidate();
+						clip->synthesize();
+					}
+				}
+			});
+		m_parameters = parameters;
+		emit dataChanged();
+		Engine::getSong()->setModified();
+		return true;
+	}
 	m_parameters[id] = value;
 	refreshCapabilities();
 	for (auto* clip : getClips())

@@ -659,7 +659,8 @@ void registerCommand(CommandBus& commandBus, const QString& name, const QString&
 	descriptor.mutability = mutability;
 	descriptor.scope = scope;
 	// Creation is recorded inside these handlers through the shared membership records.
-	descriptor.incremental = name == "svc.createTrack" || name == "svc.createClip";
+	descriptor.incremental = name == "svc.createTrack" || name == "svc.createClip"
+		|| name == "svc.setModel" || name == "svc.setSourceFile" || name == "svc.setChunkConfig";
 	descriptor.handler = std::move(handler);
 	commandBus.registerCommand(descriptor);
 }

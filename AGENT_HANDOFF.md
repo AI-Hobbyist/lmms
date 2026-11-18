@@ -1,3 +1,9 @@
+## 当前补充交接（2026-11-18）
+
+- R1 七条命令已接入并通过 Release 构建与六个定向用例或数据行。日志 build/agent-remaining-r1-final-*.log。真实声库 MANUAL/PENDING，生命周期测试 SKIPPED（用户禁止）。R1 进入提交推送检查点，R2 下一步从不依赖效果器实例改动的子组开始。R3 插件实例管理已单独发出确认请求。
+
+- 计划路径为 doc/agent/incremental-rollback-remaining-commands-plan.md。自动验证限定快速单元测试。下方保留此前交付和验证记录。
+
 ## 当前有效交接入口（2026-11-18，增量回滚计划按用户口径收尾）
 
 - 用户口径：除可快速单元测试的项目外，其余一律注明人工验收并跳过；不再运行耗时的 lifetime 测试。

@@ -7,6 +7,8 @@
 #include "Engine.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "SVSClip.h"
+#include "SVSTrack.h"
 
 using namespace lmms;
 using namespace lmms::agent;
@@ -88,6 +90,74 @@ private slots:
 				{"points", QJsonArray{QJsonObject{{"tick", 0}, {"value", 200.0}}}}});
 		QVERIFY(!result.ok);
 		QCOMPARE(result.errorCode, QStringLiteral("invalid_arguments"));
+	}
+
+	void agentPitchCurveRollsBack()
+	{
+		const int track = createClipWithNotes();
+		QVERIFY(track >= 0);
+		auto& bus = CommandBus::instance();
+		auto* journal = Engine::projectJournal();
+		journal->clearJournal();
+		auto* clip = qobject_cast<SVSClip*>(Engine::getSong()->tracks().at(track)->getClips().front());
+		QVERIFY(clip);
+		clip->cancelSynthesis();
+		const auto originalStatus = clip->status();
+		const QJsonObject arguments{{"track", track}, {"clip", 0}, {"relative", false},
+			{"points", QJsonArray{QJsonObject{{"tick", 0}, {"value", 61.0}}}}};
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent("svs.setPitchCurve", preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		QVERIFY(curvePoints(track).isEmpty());
+		QCOMPARE(clip->status(), originalStatus);
+		QCOMPARE(journal->undoDepth(), 0);
+		QVERIFY(bus.executeForAgent("svs.setPitchCurve", arguments).ok);
+		const auto original = curvePoints(track);
+		QCOMPARE(original.size(), 1);
+		const QJsonArray steps{
+			QJsonObject{{"cmd", "svs.setPitchCurve"},
+				{"args", QJsonObject{{"track", track}, {"clip", 0}, {"clear", true}}}},
+			QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(curvePoints(track), original);
+		QCOMPARE(journal->undoDepth(), 1);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QVERIFY(curvePoints(track).isEmpty());
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(curvePoints(track), original);
+	}
+
+	void voiceAndHostVolumeRollback()
+	{
+		const int index = createClipWithNotes();
+		QVERIFY(index >= 0);
+		auto* song = Engine::getSong();
+		auto* track = qobject_cast<SVSTrack*>(song->tracks().at(index));
+		QVERIFY(track);
+		auto* clip = qobject_cast<SVSClip*>(track->getClips().front());
+		QVERIFY(clip);
+		auto* journal = Engine::projectJournal();
+		journal->clearJournal();
+		clip->cancelSynthesis();
+		const auto status = clip->status();
+		const auto parameters = clip->parameters();
+		const auto beforeVoice = track->voiceId();
+		const auto beforePlugin = track->pluginId();
+
+		QVERIFY(journal->beginIncrementalTransaction(song));
+		QVERIFY(clip->setParameter(svs::VolumeId, 0.25));
+		track->bindVoice("fixture-engine", "fixture-voice");
+		QCOMPARE(track->voiceId(), QString("fixture-voice"));
+		QCOMPARE(clip->parameters().value(svs::VolumeId).toDouble(), 0.25);
+		QCOMPARE(clip->status(), status);
+		QVERIFY(journal->rollbackTransaction());
+		QCOMPARE(track->voiceId(), beforeVoice);
+		QCOMPARE(track->pluginId(), beforePlugin);
+		QCOMPARE(clip->parameters(), parameters);
+		QCOMPARE(clip->status(), status);
+		QCOMPARE(journal->undoDepth(), 0);
 	}
 
 	void clearsPitchCurve()

@@ -1626,6 +1626,7 @@ void registerCommand(CommandBus& commandBus, const QString& name, const QString&
 	else
 	{
 		descriptor.incremental = isSvsCreationCommand(name);
+		descriptor.incremental = descriptor.incremental || name == "svs.setVoice" || name == "svs.setParameters";
 		descriptor.handler = std::move(handler);
 	}
 	commandBus.registerCommand(descriptor);

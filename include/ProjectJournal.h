@@ -66,6 +66,9 @@ public:
 		std::function<bool()> valid;
 		std::function<void()> undo;
 		std::function<void()> redo;
+		// Refresh derived state after a committed edit or history replay.
+		// Rollback and dry-run discard this callback.
+		std::function<void()> afterApply = {};
 	};
 	bool beginIncrementalTransaction(Song* song);
 	bool isIncrementalTransaction() const;
@@ -147,6 +150,7 @@ private:
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
 	bool replayIncremental(const CheckPoint& checkpoint, bool redo);
+	static void refreshIncremental(const std::shared_ptr<std::vector<IncrementalChange>>& changes);
 
 	struct Transaction
 	{

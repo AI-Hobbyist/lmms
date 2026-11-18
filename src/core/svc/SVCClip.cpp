@@ -8,8 +8,13 @@
 #include <QRegularExpression>
 #include <QtEndian>
 #include <cmath>
+#include <stdexcept>
+#include <tuple>
 
 #include "ConfigManager.h"
+#include "ProjectJournal.h"
+#include "SVCConversion.h"
+#include "agent/IncrementalUndo.h"
 #include "SVCViews.h"
 #include "SampleDecoder.h"
 #include "Song.h"
@@ -60,8 +65,41 @@ void SVCClip::setStatus(const QString& status)
 	emit dataChanged();
 }
 
+void SVCClip::recordIncrementalState()
+{
+	auto* journal = Engine::projectJournal();
+	if (!journal || !journal->isIncrementalTransaction())
+	{
+		return;
+	}
+	const QPointer<SVCClip> clip(this);
+	const auto valid = [clip] {
+		return clip && !svc::ConversionService::instance().hasPendingConversion(clip.data());
+	};
+	const auto fields = [](SVCClip* target) {
+		return std::tie(target->m_sourceFile, target->m_sourceDigest, target->m_status,
+			target->m_playback, target->m_cacheReferences, target->m_activeSegments,
+			target->m_complete, target->m_failed);
+	};
+	auto saved = std::make_shared<decltype(std::make_tuple(m_sourceFile, m_sourceDigest,
+		m_status, m_playback, m_cacheReferences, m_activeSegments, m_complete, m_failed))>(
+		fields(this));
+	const auto exchange = [clip, fields, saved] {
+		auto live = fields(clip.data());
+		std::apply([&](auto&... values) {
+			std::apply([&](auto&... previous) { (std::swap(values, previous), ...); }, *saved);
+		}, live);
+		emit clip->dataChanged();
+	};
+	if (!journal->addIncrementalChange({valid, exchange, exchange}))
+	{
+		throw std::runtime_error("Cannot edit an SVC clip while conversion is pending.");
+	}
+}
+
 bool SVCClip::setSourceFile(const QString& file)
 {
+	recordIncrementalState();
 	const auto buffer = SampleDecoder::decode(file);
 	if (!buffer || buffer->data.empty())
 	{
@@ -94,6 +132,8 @@ bool SVCClip::setSourceFile(const QString& file)
 	if (!m_loading)
 	{
 		setStartTimeOffset(0);
+		agent::recordIncrementalValue(this, getAutoResize(), true,
+			[](SVCClip* clip, bool resize) { clip->setAutoResize(resize); });
 		setAutoResize(true);
 		updateLength();
 		Engine::getSong()->setModified();
@@ -115,6 +155,7 @@ void SVCClip::updateLength()
 
 void SVCClip::invalidate()
 {
+	recordIncrementalState();
 	m_complete = false;
 	m_failed = false;
 	if (m_playback) { m_playback->invalidate(); }
@@ -124,13 +165,19 @@ void SVCClip::invalidate()
 
 void SVCClip::setStartTimeOffset(const TimePos& offset)
 {
-	if (offset != startTimeOffset() && !m_loading) { invalidate(); }
+	if (offset != startTimeOffset() && !m_loading && !Engine::projectJournal()->isRestoringIncrementally())
+	{
+		invalidate();
+	}
 	Clip::setStartTimeOffset(offset);
 }
 
 void SVCClip::changeLength(const TimePos& length)
 {
-	if (length != this->length() && !m_loading) { invalidate(); }
+	if (length != this->length() && !m_loading && !Engine::projectJournal()->isRestoringIncrementally())
+	{
+		invalidate();
+	}
 	Clip::changeLength(length);
 }
 

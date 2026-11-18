@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace lmms {
 class SVCClip;
@@ -21,6 +22,7 @@ public:
 	void render(SVCTrack* track);
 	void renderClip(SVCClip* clip);
 	void cancel(SVCTrack* track);
+	bool hasPendingConversion(const SVCClip* clip);
 	void shutdown();
 	~ConversionService() override;
 
@@ -34,6 +36,7 @@ private:
 	std::mutex m_mutex;
 	std::condition_variable m_wake;
 	std::deque<std::shared_ptr<Task>> m_queue;
+	std::vector<std::weak_ptr<Task>> m_pending;
 	std::thread m_worker;
 };
 } // namespace svc

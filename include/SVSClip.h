@@ -32,6 +32,7 @@ public:
 	const QVector<svs::Note>& notes() const { return m_notes; }
 	const svs::Curves& curves() const { return m_curves; }
 	void setEditorData(const QVector<svs::Note>&, const svs::Curves&);
+	void setEditorData(const QVector<svs::Note>&, const svs::Curves&, bool incremental);
 	const QJsonObject& editorState() const { return m_editorState; }
 	void setEditorState(const QJsonObject&);
 	void synthesize();

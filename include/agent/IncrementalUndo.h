@@ -12,7 +12,8 @@ namespace lmms::agent {
 // Register before writing. Both directions use captured values and the existing
 // local restoration function, rather than executing commands or reading files.
 template <typename Target, typename Before, typename After, typename Setter>
-void recordIncrementalValue(Target* object, Before before, After after, Setter setter)
+void recordIncrementalValue(Target* object, Before before, After after, Setter setter,
+	std::function<void()> afterApply = {})
 {
 	auto* journal = Engine::projectJournal();
 	if (!journal || !journal->isIncrementalTransaction())
@@ -22,7 +23,8 @@ void recordIncrementalValue(Target* object, Before before, After after, Setter s
 	const QPointer<Target> target(object);
 	if (!journal->addIncrementalChange({[target] { return !target.isNull(); },
 										[target, before, setter] { setter(target.data(), before); },
-										[target, after, setter] { setter(target.data(), after); }}))
+										[target, after, setter] { setter(target.data(), after); },
+										std::move(afterApply)}))
 	{
 		throw std::runtime_error("Could not record the local edit inverse.");
 	}

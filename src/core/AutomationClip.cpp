@@ -26,6 +26,8 @@
 
 #include "AutomationClip.h"
 
+#include <stdexcept>
+
 #include "AutomationNode.h"
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
@@ -102,15 +104,44 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
-	m_objects.push_back(_obj);
+	auto* journal = Engine::projectJournal();
+	if (journal && journal->isIncrementalTransaction())
+	{
+		const QPointer<AutomationClip> clip(this);
+		const QPointer<AutomatableModel> target(_obj);
+		if (!journal->addIncrementalChange({
+				[clip, target] { return clip && target; },
+				[clip, target] {
+					QMutexLocker lock(&clip->m_clipMutex);
+					auto position = std::find(clip->m_objects.begin(), clip->m_objects.end(), target);
+					if (position != clip->m_objects.end())
+					{
+						clip->m_objects.erase(position);
+						disconnect(target.data(), SIGNAL(destroyed(lmms::jo_id_t)),
+							clip.data(), SLOT(objectDestroyed(lmms::jo_id_t)));
+					}
+					emit clip->dataChanged();
+				},
+				[clip, target] {
+					QMutexLocker lock(&clip->m_clipMutex);
+					clip->appendTarget(target.data());
+					emit clip->dataChanged();
+				}}))
+		{
+			throw std::runtime_error("Could not record the automation target inverse.");
+		}
+	}
+	appendTarget(_obj);
+	emit dataChanged();
+	return true;
+}
 
-	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
+void AutomationClip::appendTarget(AutomatableModel* target)
+{
+	m_objects.push_back(target);
+	connect( target, SIGNAL(destroyed(lmms::jo_id_t)),
 			this, SLOT(objectDestroyed(lmms::jo_id_t)),
 						Qt::DirectConnection );
-
-	emit dataChanged();
-
-	return true;
 }
 
 

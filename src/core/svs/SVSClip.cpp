@@ -25,6 +25,7 @@
 #include "SVSViews.h"
 #include "SVSXml.h"
 #include "Song.h"
+#include "agent/IncrementalUndo.h"
 namespace lmms {
 namespace {
 QString lyricName(QVector<svs::Note> notes)
@@ -193,6 +194,11 @@ void SVSClip::setNotes(const QVector<svs::Note>& notes)
 }
 void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& curves)
 {
+	setEditorData(notes, curves, false);
+}
+
+void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& curves, bool incremental)
+{
 	if (readOnly() || (notes == m_notes && curves == m_curves))
 		return;
 	auto synthesisCurves = [](svs::Curves value) {
@@ -201,6 +207,33 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 	};
 	const bool volumeOnly = notes == m_notes && synthesisCurves(curves) == synthesisCurves(m_curves);
 	addJournalCheckPoint();
+	incremental = incremental && Engine::projectJournal()->isIncrementalTransaction();
+	if (incremental)
+	{
+		const QPointer<SVSClip> clip(this);
+		using EditorData = std::pair<QVector<svs::Note>, svs::Curves>;
+		agent::recordIncrementalValue(this, EditorData{m_notes, m_curves}, EditorData{notes, curves},
+			[](SVSClip* target, const EditorData& data) {
+				target->m_notes = data.first;
+				target->m_curves = data.second;
+				target->refreshVolumeAutomation();
+				emit target->dataChanged();
+			}, [clip, volumeOnly] {
+				if (clip && !volumeOnly)
+				{
+					static_cast<SVSTrack*>(clip->getTrack())->refreshCapabilities(
+						{{"clipParameters", clip->m_parameters}, {"noteCount", clip->m_notes.size()}});
+					clip->invalidate();
+					clip->synthesize();
+				}
+			});
+		const auto nextName = lyricName(notes);
+		if ((name() == "SVS" || name() == lyricName(m_notes)) && name() != nextName)
+		{
+			agent::recordIncrementalValue(this, name(), nextName,
+				[](SVSClip* target, const QString& value) { target->setName(value); });
+		}
+	}
 	const bool followsLyrics = name() == "SVS" || name() == lyricName(m_notes);
 	m_notes = notes;
 	m_curves = curves;
@@ -220,10 +253,17 @@ void SVSClip::setEditorData(const QVector<svs::Note>& notes, const svs::Curves& 
 		const auto bars = std::ceil(end / TimePos::ticksPerBar());
 		changeLength(TimePos(int(bars) * TimePos::ticksPerBar()));
 	}
-	static_cast<SVSTrack*>(getTrack())
-		->refreshCapabilities({{"clipParameters", m_parameters}, {"noteCount", notes.size()}});
-	invalidate();
-	synthesize();
+	if (!incremental)
+	{
+		static_cast<SVSTrack*>(getTrack())
+			->refreshCapabilities({{"clipParameters", m_parameters}, {"noteCount", notes.size()}});
+		invalidate();
+		synthesize();
+	}
+	else
+	{
+		emit dataChanged();
+	}
 	Engine::getSong()->setModified();
 }
 void SVSClip::regeneratePitch(const QVector<QPair<double, double>>& ranges)
@@ -324,6 +364,37 @@ bool SVSClip::setParameter(const QString& id, const QJsonValue& value)
 	if (m_parameters.value(id) == value)
 		return true;
 	addJournalCheckPoint();
+	if (Engine::projectJournal()->isIncrementalTransaction())
+	{
+		auto parameters = m_parameters;
+		parameters[id] = value;
+		const bool volume = id == svs::VolumeId;
+		const QPointer<SVSClip> clip(this);
+		agent::recordIncrementalValue(this, m_parameters, parameters,
+			[volume](SVSClip* target, const QJsonObject& state) {
+				target->m_parameters = state;
+				if (volume)
+				{
+					target->refreshVolumeAutomation();
+				}
+				emit target->dataChanged();
+			}, [clip, volume] {
+				if (clip && !volume)
+				{
+					static_cast<SVSTrack*>(clip->getTrack())->refreshCapabilities({{"clipParameters", clip->m_parameters}});
+					clip->invalidate();
+					clip->synthesize();
+				}
+			});
+		m_parameters = parameters;
+		if (volume)
+		{
+			refreshVolumeAutomation();
+		}
+		emit dataChanged();
+		Engine::getSong()->setModified();
+		return true;
+	}
 	m_parameters[id] = value;
 	if (id == svs::VolumeId)
 	{
@@ -359,6 +430,27 @@ bool SVSClip::setGlobalParameter(const QString& id, const QJsonValue& value)
 	if (m_globalParameters.value(id) == value)
 		return true;
 	addJournalCheckPoint();
+	if (Engine::projectJournal()->isIncrementalTransaction())
+	{
+		auto parameters = m_globalParameters;
+		parameters[id] = value;
+		const QPointer<SVSClip> clip(this);
+		agent::recordIncrementalValue(this, m_globalParameters, parameters,
+			[](SVSClip* target, const QJsonObject& state) {
+				target->m_globalParameters = state;
+				emit target->dataChanged();
+			}, [clip] {
+				if (clip)
+				{
+					clip->invalidate();
+					clip->synthesize();
+				}
+			});
+		m_globalParameters = parameters;
+		emit dataChanged();
+		Engine::getSong()->setModified();
+		return true;
+	}
 	m_globalParameters[id] = value;
 	invalidate();
 	synthesize();

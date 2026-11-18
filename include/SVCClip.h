@@ -20,6 +20,7 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 	bool setSourceFile(const QString& file);
+	void recordIncrementalState();
 	QString sourceFile() const { return m_sourceFile; }
 	std::shared_ptr<svc::PlaybackState> playback() const { return m_playback; }
 	QString status() const { return m_status; }

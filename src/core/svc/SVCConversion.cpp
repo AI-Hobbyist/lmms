@@ -165,6 +165,8 @@ void ConversionService::renderClip(SVCClip* clip)
 		clip->invalidate();
 		task->generation = task->playback->generation();
 		clip->setStatus(tr("Queued for silence analysis and conversion"));
+		std::erase_if(m_pending, [](const auto& pending) { return pending.expired(); });
+		m_pending.push_back(task);
 		m_queue.push_back(task);
 		if (!m_worker.joinable())
 		{
@@ -177,6 +179,19 @@ void ConversionService::renderClip(SVCClip* clip)
 	{
 		clip->setStatus(QString::fromUtf8(exception.what()));
 	}
+}
+
+bool ConversionService::hasPendingConversion(const SVCClip* clip)
+{
+	std::lock_guard lock(m_mutex);
+	for (const auto& pending : m_pending)
+	{
+		if (const auto task = pending.lock(); task && task->clip.data() == clip)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void ConversionService::cancel(SVCTrack* track)

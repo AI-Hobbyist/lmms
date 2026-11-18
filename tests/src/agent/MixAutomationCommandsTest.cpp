@@ -123,6 +123,44 @@ private slots:
 		QCOMPARE(bus.execute("model.getValue", {{"path", "song/channel:0/mute"}}).data.value("value").toBool(), false);
 	}
 
+	void agentAutomationTargetRollsBack()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("automation.createTrack").ok);
+		QVERIFY(bus.execute("automation.addClip", {{"track", 0}, {"position", 0}, {"length", 192}}).ok);
+		auto* clip = qobject_cast<lmms::AutomationClip*>(lmms::Engine::getSong()->tracks().front()->getClips().front());
+		QVERIFY(clip);
+		journal->clearJournal();
+		const QJsonObject arguments{{"track", 0}, {"clip", 0}, {"target", "song/masterVolume"}};
+		auto malformed = arguments;
+		malformed.insert("nodes", QJsonArray{QJsonObject{{"pos", 5}, {"value", 1000000}}});
+		const auto failed = bus.executeForAgent("automation.addTarget", malformed);
+		QCOMPARE(failed.errorCode, QString("invalid_arguments"));
+		QVERIFY(clip->objects().empty());
+		QVERIFY(clip->getTimeMap().isEmpty());
+		QCOMPARE(journal->undoDepth(), 0);
+
+		auto preview = arguments;
+		preview.insert("dryRun", true);
+		QVERIFY(bus.executeForAgent("automation.addTarget", preview).ok);
+		QVERIFY(clip->objects().empty());
+		QVERIFY(clip->getTimeMap().isEmpty());
+		QCOMPARE(journal->undoDepth(), 0);
+
+		QVERIFY(bus.executeForAgent("automation.addTarget", arguments).ok);
+		QCOMPARE(clip->objects().size(), std::size_t{1});
+		auto* model = clip->objects().front().data();
+		const auto firstValue = clip->valueAt(lmms::TimePos(0));
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QVERIFY(clip->objects().empty());
+		QVERIFY(clip->getTimeMap().isEmpty());
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(clip->objects().size(), std::size_t{1});
+		QCOMPARE(clip->objects().front().data(), model);
+		QCOMPARE(clip->valueAt(lmms::TimePos(0)), firstValue);
+	}
+
 	void removesAutomationNodesByInclusiveRange()
 	{
 		auto& bus = lmms::agent::CommandBus::instance();
