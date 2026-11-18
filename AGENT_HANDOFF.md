@@ -4,7 +4,7 @@
 - P1 d78ec841f、P2 afa15f095、P3 e450cb792 已提交并推送 master，已核对与 origin 同步。P4/P5 未新增代码，覆盖与 MANUAL/PENDING 清单写在 doc/agent/incremental-rollback-progress.md 末尾。
 - 最近自动验证：ChatProjectLifetimeTest 263/263，ChatToolDispatcherTest 14/15（instrument.loadPreset 属 MANUAL/PENDING）。svc.createTrack/createClip 仅编译。
 - 未迁移命令在 Agent 调用中写入前拒绝，不会整工程重载；instrument.load/loadPreset 需批准插件实例生命周期改动后才能迁移。
-- lmms.exe、插件目录与安装包未更新（MANUAL/PENDING）。保留未跟踪 .codegraph/、.omc/、build-driver.log、build.log。
+- P5 构建与增量包已完成：build/Release/lmms.exe 已更新；包 build/packages/lmms-agent-chat-20261118-214037-win64.zip（SHA256 51CD06D8A8D0AF6344E11337E8DF2B65D27DFCC902B12913ACA91FE278158C3E，只含 lmms.exe，导出删除 0，VerifyOnly 通过）。生产目录未修改，由用户手动替换；整机验收 MANUAL/PENDING。保留未跟踪 .codegraph/、.omc/、build-driver.log、build.log。
 
 ---
 
