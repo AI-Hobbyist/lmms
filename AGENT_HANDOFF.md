@@ -1,3 +1,13 @@
+## 当前有效交接入口（2026-11-18，增量回滚计划按用户口径收尾）
+
+- 用户口径：除可快速单元测试的项目外，其余一律注明人工验收并跳过；不再运行耗时的 lifetime 测试。
+- P1 d78ec841f、P2 afa15f095、P3 e450cb792 已提交并推送 master，已核对与 origin 同步。P4/P5 未新增代码，覆盖与 MANUAL/PENDING 清单写在 doc/agent/incremental-rollback-progress.md 末尾。
+- 最近自动验证：ChatProjectLifetimeTest 263/263，ChatToolDispatcherTest 14/15（instrument.loadPreset 属 MANUAL/PENDING）。svc.createTrack/createClip 仅编译。
+- 未迁移命令在 Agent 调用中写入前拒绝，不会整工程重载；instrument.load/loadPreset 需批准插件实例生命周期改动后才能迁移。
+- lmms.exe、插件目录与安装包未更新（MANUAL/PENDING）。保留未跟踪 .codegraph/、.omc/、build-driver.log、build.log。
+
+---
+
 ## 当前有效交接入口（2026-11-18，持续目标：完成计划书剩余工作，P3 进行中、等待决策）
 
 - 用户设 /goal「完成计划书剩余工作」。P1/P2 已提交推送；P3 进行中、全部未提交（规则：P3 验证完成后才做阶段检查点提交推送）。进度详见 doc/agent/incremental-rollback-progress.md 末尾 2026-11-18 条目。

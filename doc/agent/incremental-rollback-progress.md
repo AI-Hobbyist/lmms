@@ -104,3 +104,5 @@ P2 提交 afa15f095，已推送并核对远端一致。
   - MANUAL/PENDING（已实现未测试）：svc.createTrack/createClip。
   - 人工验收：sample.setFile 解码失败模态框路径；有界面时 mixer.setSolo 重复切换（范围外）。
 - P3 检查点：最近一次完整自动验证 ChatProjectLifetimeTest 263/263、ChatToolDispatcherTest 14/15（失败项 instrument.loadPreset 属上述 MANUAL/PENDING）。
+- P4（按用户口径）：已由自动测试覆盖——脚本后续步骤失败撤回前序（各 failure 行）、预演保存点与 redo 共存（preview 行、P2 incrementalPreviewPreservesRedoAndParentChanges）、Agent undo/redo（history 行）、旧快照历史拒绝且不出栈（P2）、用户手动历史保留（P2 基线）。MANUAL/PENDING：嵌套 call 与 diffPreview 的专门验证、迁移目录能力说明文案。
+- P5（按用户口径）：覆盖清单见本文件各子组与 MANUAL/PENDING 列表。MANUAL/PENDING 跳过：全量 Chat/MCP/命令回归、开发版 lmms.exe 与插件部署（build/Release/plugins 不存在）、增量 ZIP/SHA256/VerifyOnly、真实安装验收。
