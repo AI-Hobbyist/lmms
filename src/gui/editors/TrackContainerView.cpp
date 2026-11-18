@@ -25,6 +25,8 @@
 #include "TrackContainerView.h"
 
 
+#include <algorithm>
+
 #include <QLayout>
 #include <QJsonDocument>
 #include <QPointer>
@@ -127,9 +129,35 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 			QMetaObject::invokeMethod(
 				this,
 				[this, guarded]() {
-					if (guarded)
+					if (!guarded)
 					{
-						createTrackView(guarded.data());
+						return;
+					}
+					// Incremental history can detach the same track again (or
+					// re-attach it twice) before this queued call runs.
+					const auto& tracks = m_tc->tracks();
+					const bool attached = std::find(tracks.begin(), tracks.end(), guarded.data()) != tracks.end();
+					const bool hasView = std::any_of(m_trackViews.begin(), m_trackViews.end(),
+						[&guarded](TrackView* view) {
+							// A closed view awaits deferred deletion and no longer counts.
+							return view->getTrack() == guarded.data() && !view->isHidden();
+						});
+					if (!attached || hasView)
+					{
+						return;
+					}
+					auto* view = createTrackView(guarded.data());
+					// A re-attached track may sit before existing tracks; place
+					// only its widget, since the model order is already correct.
+					const int target = static_cast<int>(
+						std::distance(tracks.begin(), std::find(tracks.begin(), tracks.end(), guarded.data())));
+					const int from = m_trackViews.indexOf(view);
+					if (view && from != target && target < m_trackViews.size())
+					{
+						m_scrollLayout->removeWidget(view);
+						m_scrollLayout->insertWidget(target, view);
+						m_trackViews.move(from, target);
+						realignTracks();
 					}
 				},
 				Qt::QueuedConnection);

@@ -27,12 +27,18 @@
 
 #include <algorithm>
 #include <QDomElement>
+#include <QPointer>
+#include <memory>
+#include <tuple>
+#include <stdexcept>
 
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "MidiClipView.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
+#include "ProjectJournal.h"
+#include "agent/IncrementalUndo.h"
 
 
 
@@ -185,6 +191,7 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
 	}
 
+	recordIncrementalNoteMembership(new_note, false);
 	instrumentTrack()->lock();
 	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
 	instrumentTrack()->unlock();
@@ -202,8 +209,12 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
 {
+	const bool retained = recordIncrementalNoteMembership(*it, true);
 	instrumentTrack()->lock();
-	delete *it;
+	if (!retained)
+	{
+		delete *it;
+	}
 	auto new_it = m_notes.erase(it);
 	instrumentTrack()->unlock();
 
@@ -221,7 +232,10 @@ NoteVector::const_iterator MidiClip::removeNote(Note* note)
 	auto it = std::find(m_notes.begin(), m_notes.end(), note);
 	if (it != m_notes.end())
 	{
-		delete *it;
+		if (!recordIncrementalNoteMembership(*it, true))
+		{
+			delete *it;
+		}
 		it = m_notes.erase(it);
 	}
 
@@ -267,12 +281,160 @@ void MidiClip::updateNotes()
 	emit dataChanged();
 }
 
+void MidiClip::recordIncrementalNoteEdit()
+{
+	auto* journal = Engine::projectJournal();
+	if (!journal || !journal->isIncrementalTransaction())
+	{
+		return;
+	}
+	using Values = std::tuple<Note*, TimePos, TimePos, int, volume_t, panning_t, Note::Type>;
+	struct State
+	{
+		NoteVector order;
+		std::vector<Values> values;
+		Type type;
+		int steps;
+	};
+	auto state = std::make_shared<State>();
+	state->order = m_notes;
+	state->type = m_clipType;
+	state->steps = m_steps;
+	state->values.reserve(m_notes.size());
+	for (auto* note : m_notes)
+	{
+		state->values.emplace_back(note, note->pos(), note->length(), note->key(),
+			note->getVolume(), note->getPanning(), note->type());
+	}
+	const QPointer<MidiClip> target(this);
+	const auto valid = [target, state] {
+		if (!target || target->m_notes.size() != state->order.size())
+		{
+			return false;
+		}
+		return std::all_of(state->order.begin(), state->order.end(), [target](Note* note) {
+			return std::find(target->m_notes.begin(), target->m_notes.end(), note) != target->m_notes.end();
+		});
+	};
+	// Exchanging captured values keeps the original Note objects in place and
+	// makes both history directions independent of the forward command.
+	const auto exchange = [target, state] {
+		for (auto& saved : state->values)
+		{
+			auto* note = std::get<0>(saved);
+			Values current{note, note->pos(), note->length(), note->key(),
+				note->getVolume(), note->getPanning(), note->type()};
+			note->setPos(std::get<1>(saved));
+			note->setLength(std::get<2>(saved));
+			note->setKey(std::get<3>(saved));
+			note->setVolume(std::get<4>(saved));
+			note->setPanning(std::get<5>(saved));
+			note->setType(std::get<6>(saved));
+			saved = current;
+		}
+		target->m_notes.swap(state->order);
+		std::swap(target->m_clipType, state->type);
+		std::swap(target->m_steps, state->steps);
+		// Geometry has its own inverse records. Do not run updateLength here:
+		// its forward resize logic would overwrite an already restored offset.
+		emit target->dataChanged();
+	};
+	if (!journal->addIncrementalChange({valid, exchange, exchange}))
+	{
+		throw std::runtime_error("Could not record the MIDI note edit inverse.");
+	}
+}
+
+namespace
+{
+
+// One note whose membership an Agent transaction changed. The note is owned by
+// the clip while attached and by this record while detached.
+struct IncrementalNoteMembership
+{
+	QPointer<MidiClip> clip;
+	Note* note = nullptr;
+	std::unique_ptr<Note> detached;
+	// The journal validates at registration, before an added note is inserted.
+	bool registeringAddition = false;
+};
+
+} // namespace
+
+bool MidiClip::recordIncrementalNoteMembership(Note* note, bool removed)
+{
+	auto* journal = Engine::projectJournal();
+	if (!journal || !journal->isIncrementalTransaction())
+	{
+		return false;
+	}
+	auto state = std::make_shared<IncrementalNoteMembership>();
+	state->clip = this;
+	state->note = note;
+	const auto valid = [state] {
+		if (!state->clip)
+		{
+			return false;
+		}
+		if (state->registeringAddition)
+		{
+			return true;
+		}
+		const auto& notes = state->clip->m_notes;
+		const bool attached = std::find(notes.begin(), notes.end(), state->note) != notes.end();
+		return state->detached ? !attached : attached;
+	};
+	// Replay changes only membership: type and length have their own records,
+	// and running checkType/updateLength here would repeat forward logic.
+	const auto attach = [state] {
+		auto* clip = state->clip.data();
+		auto* restored = state->detached.release();
+		clip->instrumentTrack()->lock();
+		clip->m_notes.insert(
+			std::upper_bound(clip->m_notes.begin(), clip->m_notes.end(), restored, Note::lessThan), restored);
+		clip->instrumentTrack()->unlock();
+		emit clip->dataChanged();
+	};
+	const auto detach = [state] {
+		auto* clip = state->clip.data();
+		clip->instrumentTrack()->lock();
+		clip->m_notes.erase(std::find(clip->m_notes.begin(), clip->m_notes.end(), state->note));
+		clip->instrumentTrack()->unlock();
+		state->detached.reset(state->note);
+		emit clip->dataChanged();
+	};
+	state->registeringAddition = !removed;
+	const bool recorded = removed ? journal->addIncrementalChange({valid, attach, detach})
+								  : journal->addIncrementalChange({valid, detach, attach});
+	state->registeringAddition = false;
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record the MIDI note membership inverse.");
+	}
+	if (removed)
+	{
+		// Ownership moves only after the inverse exists; the caller then erases
+		// the pointer from m_notes without deleting it.
+		state->detached.reset(note);
+	}
+	return removed;
+}
+
 void MidiClip::clearNotes()
 {
-	instrumentTrack()->lock();
-	for (const auto& note : m_notes)
+	std::vector<bool> retained;
+	retained.reserve(m_notes.size());
+	for (auto* note : m_notes)
 	{
-		delete note;
+		retained.push_back(recordIncrementalNoteMembership(note, true));
+	}
+	instrumentTrack()->lock();
+	for (std::size_t index = 0; index < m_notes.size(); ++index)
+	{
+		if (!retained[index])
+		{
+			delete m_notes[index];
+		}
 	}
 	m_notes.clear();
 	instrumentTrack()->unlock();
@@ -448,7 +610,11 @@ void MidiClip::checkType()
 	// If all notes are StepNotes, we have a BeatClip
 	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
 
-	m_clipType = beatClip ? Type::BeatClip : Type::MelodyClip;
+	const auto type = beatClip ? Type::BeatClip : Type::MelodyClip;
+	agent::recordIncrementalValue(this, m_clipType, type, [](MidiClip* target, Type value) {
+		target->m_clipType = value;
+	});
+	m_clipType = type;
 }
 
 
@@ -689,6 +855,12 @@ bool MidiClip::empty()
 
 void MidiClip::changeTimeSignature()
 {
+	// Steps and length changes from the forward edit are recorded below and by
+	// changeLength; replay restores them and must not recompute them.
+	if (Engine::projectJournal()->isRestoringIncrementally())
+	{
+		return;
+	}
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
 	for (const auto& note : m_notes)
 	{
@@ -698,8 +870,11 @@ void MidiClip::changeTimeSignature()
 		}
 	}
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
-				last_pos.getBar() * TimePos::stepsPerBar());
+	const int steps = std::max<tick_t>(TimePos::stepsPerBar(), last_pos.getBar() * TimePos::stepsPerBar());
+	agent::recordIncrementalValue(this, m_steps, steps, [](MidiClip* target, int value) {
+		target->m_steps = value;
+	});
+	m_steps = steps;
 	updateLength();
 }
 

@@ -1,4 +1,35 @@
-## 当前有效交接入口（2026-11-17，持续目标 P2 已验证）
+## 当前有效交接入口（2026-11-18，持续目标：完成计划书剩余工作，P3 进行中、等待决策）
+
+- 用户设 /goal「完成计划书剩余工作」。P1/P2 已提交推送；P3 进行中、全部未提交（规则：P3 验证完成后才做阶段检查点提交推送）。进度详见 doc/agent/incremental-rollback-progress.md 末尾 2026-11-18 条目。
+- 已迁移并验证（原生 Windows 真实窗口）：属性 25、MIDI 音符值/成员/humanize、组合命令 5 组、局部状态 19、发送 2、Pattern 放置 2、采样文件、轨道 5、片段 4、自动化 6、SVS 片段编辑 7 与创建 2。完整 ChatProjectLifetimeTest 257/257（build/agent-incremental-p3-exit-regression.log），ChatToolDispatcherTest 14/15（剩 instrument.loadPreset 过渡拒绝）。
+- 2026-11-18 用户要求：后续不再运行耗时的 ChatProjectLifetimeTest。最近一次完整运行 263/263（scale 之后）；之后的 svc.createTrack/createClip 仅编译通过、未测试（PENDING）。
+- 等待用户决策：instrument.load/loadPreset 需改插件实例生命周期（计划书要求先批准）；其余未迁移项见进度文档最后两条。
+- 运行测试：powershell -File build/Run-LifetimeTest.ps1 <日志名> [测试函数] [可执行名]（设置 LMMS_DATA_DIR=data 以加载默认主题）。构建：cmake --build build --config Release --target ChatProjectLifetimeTest ChatToolDispatcherTest -j 2，日志 Tee 到 build/agent-incremental-p3-*.log。lmms.exe 与生产目录未更新，无新 ZIP；build/Release/plugins 不存在。
+- 范围外后续：GUI 下 mixer.setSolo 被重复 toggledSolo 取消；JO-ID already in use 警告来源待查；非音频文件解码失败弹模态框（MANUAL/PENDING）。
+
+## 当前有效交接入口（2026-11-18，持续目标：完成计划书剩余工作，P3 进行中）
+
+- 用户已设 /goal「完成计划书剩余工作」。P1/P2 已提交推送；P3 进行中、未提交（按规则 P3 完成验证后才做检查点提交推送）。进度详见 doc/agent/incremental-rollback-progress.md 末尾 2026-11-18 条目。
+- 已迁移并验证（原生 Windows 真实窗口）：属性 25、MIDI 音符值/成员/humanize、组合命令、局部状态 19、轨道 5、片段 4、自动化 6。完整 ChatProjectLifetimeTest 227/227（build/agent-incremental-p3-automation-regression.log），P1 的 composition-preview 已转绿。ChatToolDispatcherTest 最近一次 13/15，失败为 svs.removeNotes 与 instrument.loadPreset 的过渡拒绝。
+- 运行测试：powershell -File build/Run-LifetimeTest.ps1 <日志名> [测试函数] [可执行名]（设置 LMMS_DATA_DIR=data 加载默认主题；直接运行测试 exe 不设此变量会缺主题图标）。构建：cmake --build build --config Release --target ChatProjectLifetimeTest -j 2，日志 Tee 到 build/agent-incremental-p3-*.log；改 MidiClip.h/Track.h 等头文件会超 10 分钟。
+- 剩余：见进度文档 "P3 剩余" 列表；之后 P4（脚本/历史集成）、P5（覆盖审计、Agent/MCP 回归、开发构建与增量包）。build/Release/plugins 不存在，效果类无法真实验证；lmms.exe 与生产目录未更新。
+- 后续问题（范围外）：GUI 下 mixer.setSolo 设置独奏被 handler 与 MixerView 重复 toggledSolo 取消；JO-ID already in use 警告来源待查。
+
+---
+
+## 当前有效交接入口（2026-11-17，用户暂停，P3 未完成）
+
+- 目标 paused，用户已要求暂停。不继续开发或新测试，不擅自提交推送。P1 d78ec841f、P2 afa15f095 已提交推送且核对远端。P3 未完成，P4/P5 未开始；各阶段验证后独立提交推送，不做无关重构。
+- P3 首批 25 条属性/别名及独奏修正已通过原生 Windows MainWindow 定向测试 80/80（含 50 属性数据行、重入保护和 P2/生命周期基线），日志 build/agent-incremental-p3-properties-green.log。仅更新测试构建，lmms.exe 与生产目录未更新，无新 ZIP。
+- 当前继续 MIDI 子组：新增 MidiClip::recordIncrementalNoteEdit 局部字段/顺序交换辅助方法与 15 个数据行（updateNote/transpose/quantize/setSteps/setClipType × failure/preview/history）。为保留音符身份，不交换整个音符对象集合。辅助方法尚未接入 handler、许可尚未放开，先运行 RED；新增/删除/humanize detune 不在本子组已完成范围。
+- 暂停前在执行的 ChatProjectLifetimeTest 编译已安全完成：18 cpp、183 秒、exit 0，日志 build/agent-incremental-p3-midi-red-build.log；目前没有活动构建或测试。新增 15 个 MIDI 数据行尚未执行，辅助方法未接入 handler/增量许可，不能记为 RED 或 GREEN 已验证。恢复后先运行 incrementalNoteValuesKeepIdentity 建立 RED，再接入五种命令的捕获与精确许可，格式化本次改动、GREEN 与属性回归；暂停期间不开始这些操作。
+- 首批属性夹具更正：saveProjectState 自身置 modified 并创建两个历史检查点；事务基线必须在序列化后清历史/modified，历史断言必须在后置序列化之前。不是事务故障，不在本任务重构该序列化。独奏真正缺陷已修：仅增量回放跳过 toggleSolo 前向副作用，手动原路径不变。
+- 工作区未提交文件以 git status --short --ignore-submodules 为准，包含新 include/agent/IncrementalUndo.h，保留原 .codegraph/、.omc/、build-driver.log、build.log。下一步仍需音符所有权、自动化、对象/连接、旧插件保留与 SVS/SVC，不能永久拒绝现有编辑能力冒充迁移完成。
+- Penpot 本目标开始时实时连接成功，本任务无布局修改。最近可靠额度周窗口 usedPercent54（剩余46%），未达交接阈值，无 Luna 委派。遵守 SDK 脚本/前台 PTY 日志/真实窗口/jobs2/禁止 offscreen 和 WSL。人工验收 MANUAL/PENDING，不阻塞。
+
+---
+
+## 历史：持续目标 P2 已验证
 
 - 持续目标 active：按增量回滚计划 P1～P5 执行。P1 已提交推送 d78ec841f，P2 已完成定向 GREEN，正在检查点提交推送，P3～P5 未开始。进度 doc/agent/incremental-rollback-progress.md；不得把部分迁移当目标完成。
 - P2：可信 executeForAgent 已接聊天/MCP，禁止工程替换且五个 Song 公共入口写入前硬拦截；ProjectJournal 原历史栈增加局部正反操作/保存点/增量历史；track.setName 和 song.setTempo 已迁移。其余事务性写命令目前临时前置拒绝，须 P3 逐项恢复；普通内部 execute/手动 GUI 的旧快照路径保留。

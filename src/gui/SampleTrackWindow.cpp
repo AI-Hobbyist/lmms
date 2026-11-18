@@ -29,6 +29,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include "AutomatableButton.h"
@@ -186,7 +187,11 @@ void SampleTrackWindow::modelChanged()
 {
 	m_track = castModel<SampleTrack>();
 
-	m_nameLineEdit->setText(m_track->name());
+	{
+		// Showing the model's name is not a user edit and must not mark the song modified.
+		const QSignalBlocker blocker(m_nameLineEdit);
+		m_nameLineEdit->setText(m_track->name());
+	}
 
 	m_track->disconnect(SIGNAL(nameChanged()), this);
 
@@ -209,6 +214,7 @@ void SampleTrackWindow::updateName()
 
 	if(m_nameLineEdit->text() != m_track->name())
 	{
+		const QSignalBlocker blocker(m_nameLineEdit);
 		m_nameLineEdit->setText(m_track->name());
 	}
 }

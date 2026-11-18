@@ -1,4 +1,5 @@
 #include "CoreCommands.h"
+#include "agent/IncrementalUndo.h"
 
 #include <QColor>
 #include <QDir>
@@ -11,6 +12,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QPointer>
+#include <QSet>
 #include <QRegularExpression>
 
 #include <algorithm>
@@ -19,6 +21,7 @@
 #include <limits>
 #include <memory>
 #include <optional>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -934,6 +937,64 @@ CommandResult executeMixerListChannels(const QJsonObject&)
 	return CommandResult::success(QJsonObject{{"channels", channels}});
 }
 
+// Mixer channels are not QObjects; the mixer owns them and their index is
+// checked again before either history direction touches the channel.
+template <typename Value, typename Setter>
+void recordMixerChannelValue(Mixer* mixer, int index, MixerChannel* channel, Value before, Value after, Setter setter)
+{
+	const auto present = [index, channel](Mixer* owner) {
+		return index >= 0 && index < static_cast<int>(owner->numChannels()) && owner->mixerChannel(index) == channel;
+	};
+	recordIncrementalOwnedValue(mixer, present, before, after, [index, setter](Mixer* owner, const Value& value) {
+		setter(owner->mixerChannel(index), value);
+	});
+}
+
+// Restoring a whole serialized plugin state is not a proven local inverse for a
+// running plugin instance, so Agent transactions refuse it before writing.
+bool serializedStateEditUnavailable()
+{
+	auto* journal = Engine::projectJournal();
+	return journal && journal->isIncrementalTransaction();
+}
+
+CommandResult serializedStateEditRefusal()
+{
+	return CommandResult::failure("incremental_rollback_unavailable",
+		"This serialized plugin parameter has not yet been migrated to incremental rollback; no changes were made.");
+}
+
+bool incrementalTransactionActive();
+
+// A send is identified by its channel pair. History recreates a removed send
+// with its captured amount; the route object itself is new, and its position in
+// the channel's send lists may move to the end (routing is unchanged).
+void recordMixerSendExistence(Mixer* mixer, int from, int to, float amount, bool existsAfter)
+{
+	if (!incrementalTransactionActive())
+	{
+		return;
+	}
+	auto* fromChannel = mixer->mixerChannel(from);
+	auto* toChannel = mixer->mixerChannel(to);
+	const auto present = [from, to, fromChannel, toChannel](Mixer* owner) {
+		const int count = static_cast<int>(owner->numChannels());
+		return from < count && to < count && owner->mixerChannel(from) == fromChannel
+			&& owner->mixerChannel(to) == toChannel;
+	};
+	recordIncrementalOwnedValue(mixer, present, !existsAfter, existsAfter,
+		[from, to, amount](Mixer* owner, bool exists) {
+			if (exists)
+			{
+				owner->createChannelSend(from, to, amount);
+			}
+			else
+			{
+				owner->deleteChannelSend(from, to);
+			}
+		});
+}
+
 CommandResult executeMixerSetName(const QJsonObject& arguments)
 {
 	auto* mixer = Engine::mixer();
@@ -956,6 +1017,8 @@ CommandResult executeMixerSetName(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
+	recordMixerChannelValue(mixer, channelIndex, channel, channel->m_name, name,
+		[](MixerChannel* target, const QString& value) { target->m_name = value; });
 	channel->m_name = name;
 	return CommandResult::success(mixerChannelDetail(channel));
 }
@@ -1071,6 +1134,8 @@ CommandResult executeMixerSetColor(const QJsonObject& arguments)
 	}
 	if (value.isEmpty())
 	{
+		recordMixerChannelValue(mixer, channelIndex, channel, channel->color(), std::optional<QColor>{},
+			[](MixerChannel* target, const std::optional<QColor>& color) { target->setColor(color); });
 		channel->setColor(std::nullopt);
 	}
 	else
@@ -1080,6 +1145,8 @@ CommandResult executeMixerSetColor(const QJsonObject& arguments)
 		{
 			return invalidArguments("'value' must be a valid color name or an empty string.");
 		}
+		recordMixerChannelValue(mixer, channelIndex, channel, channel->color(), std::optional<QColor>{color},
+			[](MixerChannel* target, const std::optional<QColor>& color) { target->setColor(color); });
 		channel->setColor(color);
 	}
 	return CommandResult::success(mixerChannelDetail(channel));
@@ -1119,6 +1186,11 @@ CommandResult executeMixerAddSend(const QJsonObject& arguments)
 		return CommandResult::failure("mixer_send_loop", "The requested send would create a mixer routing loop.");
 	}
 
+	if (mixer->channelSendModel(fromIndex, toIndex) == nullptr)
+	{
+		// An existing send only changes its amount model, which records itself.
+		recordMixerSendExistence(mixer, fromIndex, toIndex, static_cast<float>(amount), true);
+	}
 	if (mixer->createChannelSend(fromIndex, toIndex, static_cast<float>(amount)) == nullptr)
 	{
 		return CommandResult::failure("mixer_send_failed", "LMMS could not create the requested send.");
@@ -1187,6 +1259,8 @@ CommandResult executeMixerRemoveSend(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("mixer_send_not_found", "The requested mixer send does not exist.");
 	}
+	recordMixerSendExistence(
+		mixer, fromIndex, toIndex, mixer->channelSendModel(fromIndex, toIndex)->value(), false);
 	mixer->deleteChannelSend(fromIndex, toIndex);
 	return CommandResult::success(mixerChannelDetail(fromChannel));
 }
@@ -2015,6 +2089,10 @@ CommandResult executeEffectSetParam(const QJsonObject& arguments)
 		return CommandResult::failure(
 			"effect_parameter_not_found", QStringLiteral("Effect parameter '%1' does not exist.").arg(name));
 	}
+	if (serializedStateEditUnavailable())
+	{
+		return serializedStateEditRefusal();
+	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	effect->controls()->restoreState(state);
 
@@ -2101,6 +2179,10 @@ CommandResult executeInstrumentSetParam(const QJsonObject& arguments)
 	{
 		return CommandResult::failure(
 			"instrument_parameter_not_found", QStringLiteral("Instrument parameter '%1' does not exist.").arg(name));
+	}
+	if (serializedStateEditUnavailable())
+	{
+		return serializedStateEditRefusal();
 	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	track->instrument()->restoreState(state);
@@ -2328,6 +2410,25 @@ void putAutomationValues(AutomationClip* automationClip, const std::vector<Autom
 
 CommandResult executeTrackCreate(const QJsonObject& arguments);
 
+bool incrementalTransactionActive();
+void recordCreatedClip(Clip* clip);
+
+// Node edits change only the time map (values and tangents) and the clip length,
+// which has its own record; swapping the whole map restores both directions.
+void recordAutomationNodes(AutomationClip* clip)
+{
+	if (!incrementalTransactionActive())
+	{
+		return;
+	}
+	auto saved = std::make_shared<AutomationClip::timeMap>(clip->getTimeMap());
+	recordIncrementalValue(clip, 0, 0, [saved](AutomationClip* target, int) {
+		auto guard = Engine::audioEngine()->requestChangesGuard();
+		std::swap(target->getTimeMap(), *saved);
+		emit target->dataChanged();
+	});
+}
+
 CommandResult executeAutomationCreateTrack(QJsonObject arguments)
 {
 	arguments.insert("type", "automation");
@@ -2371,6 +2472,10 @@ CommandResult executeAutomationAddClip(const QJsonObject& arguments)
 	}
 
 	auto* automationClip = new AutomationClip(track);
+	if (incrementalTransactionActive())
+	{
+		recordCreatedClip(automationClip);
+	}
 	automationClip->movePosition(TimePos(position));
 	automationClip->changeLength(TimePos(length));
 	if (hasName)
@@ -2456,6 +2561,7 @@ CommandResult executeAutomationPutValue(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
+	recordAutomationNodes(automationClip);
 	automationClip->putValue(TimePos(position), automationStoredValue(automationClip, value), false, true);
 	auto data = automationClipDetail(song, address, automationClip);
 	data.insert("valueAt", automationClip->valueAt(TimePos(position)));
@@ -2489,6 +2595,7 @@ CommandResult executeAutomationPutValues(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
+	recordAutomationNodes(automationClip);
 	putAutomationValues(automationClip, values);
 	return CommandResult::success(automationClipDetail(song, address, automationClip));
 }
@@ -2515,6 +2622,7 @@ CommandResult executeAutomationRemoveNode(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
+	recordAutomationNodes(automationClip);
 	automationClip->removeNode(TimePos(position));
 	return CommandResult::success(automationClipDetail(song, address, automationClip));
 }
@@ -2547,6 +2655,7 @@ CommandResult executeAutomationRemoveNodes(const QJsonObject& arguments)
 	{
 		return invalidArguments(error);
 	}
+	recordAutomationNodes(automationClip);
 	automationClip->removeNodes(start, end);
 	return CommandResult::success(automationClipDetail(song, address, automationClip));
 }
@@ -2578,6 +2687,8 @@ CommandResult executeAutomationSetProgression(const QJsonObject& arguments)
 	{
 		return invalidArguments("'type' must be discrete, linear, or cubicHermite.");
 	}
+	recordIncrementalValue(automationClip, automationClip->progressionType(), progressionType,
+		[](AutomationClip* target, AutomationClip::ProgressionType value) { target->setProgressionType(value); });
 	automationClip->setProgressionType(progressionType);
 	return CommandResult::success(automationClipDetail(song, address, automationClip));
 }
@@ -2608,7 +2719,10 @@ CommandResult executeAutomationSetTension(const QJsonObject& arguments)
 	{
 		return invalidArguments("'value' must be between 0 and 1.");
 	}
-	automationClip->setTension(QString::number(value, 'g', 15));
+	const auto tensionText = QString::number(value, 'g', 15);
+	recordIncrementalValue(automationClip, QString::number(automationClip->getTension(), 'g', 15), tensionText,
+		[](AutomationClip* target, const QString& tension) { target->setTension(tension); });
+	automationClip->setTension(tensionText);
 	return CommandResult::success(automationClipDetail(song, address, automationClip));
 }
 
@@ -2669,18 +2783,6 @@ CommandResult executeSongSetTempo(const QJsonObject& arguments)
 		return invalidArguments(QStringLiteral("'bpm' must be between %1 and %2.").arg(MinTempo).arg(MaxTempo));
 	}
 
-	auto* journal = Engine::projectJournal();
-	if (journal->isIncrementalTransaction())
-	{
-		const QPointer<Song> target(song);
-		const auto previous = song->getTempo();
-		if (!journal->addIncrementalChange({[target] { return !target.isNull(); },
-											[target, previous] { target->tempoModel().setValue(previous); },
-											[target, tempo] { target->tempoModel().setValue(tempo); }}))
-		{
-			return CommandResult::failure("transaction_failed", "Could not record the tempo inverse.");
-		}
-	}
 	song->tempoModel().setValue(tempo);
 	return CommandResult::success(QJsonObject{{"tempo", song->getTempo()}});
 }
@@ -3167,6 +3269,13 @@ CommandResult executeTransportSetLoopRange(const QJsonObject& arguments)
 	}
 
 	auto& timeline = song->getTimeline(Song::PlayMode::Song);
+	using LoopState = std::tuple<TimePos, TimePos, bool>;
+	const LoopState loopBefore{timeline.loopBegin(), timeline.loopEnd(), timeline.loopEnabled()};
+	const LoopState loopAfter{TimePos(startBar * ticksPerBar), TimePos(endBar * ticksPerBar), true};
+	recordIncrementalValue(&timeline, loopBefore, loopAfter, [](Timeline* target, const LoopState& state) {
+		target->setLoopPoints(std::get<0>(state), std::get<1>(state));
+		target->setLoopEnabled(std::get<2>(state));
+	});
 	timeline.setLoopPoints(TimePos(startBar * ticksPerBar), TimePos(endBar * ticksPerBar));
 	timeline.setLoopEnabled(true);
 	song->setModified();
@@ -3234,6 +3343,245 @@ bool trackTypeFromName(const QString& name, Track::Type& type)
 	return false;
 }
 
+bool incrementalTransactionActive()
+{
+	auto* journal = Engine::projectJournal();
+	return journal && journal->isIncrementalTransaction();
+}
+
+CommandResult incrementalRefusal(const QString& what)
+{
+	return CommandResult::failure("incremental_rollback_unavailable",
+		what + " has not yet been migrated to incremental rollback; no changes were made.");
+}
+
+// A detached track is not part of the project. Its record can be discarded while
+// the container is locked (for example when serialization adds a checkpoint and
+// clears redo), and ~Track calls removeTrack, so deletion is queued. Deleting it
+// also deletes its clips, which must not mark the song modified. If the event
+// loop never runs again, ~TrackContainer deletes the remaining detached tracks.
+struct DetachedTrackDeleter
+{
+	void operator()(Track* track) const
+	{
+		const QPointer<Track> guarded(track);
+		QMetaObject::invokeMethod(
+			QCoreApplication::instance(),
+			[guarded] {
+				if (!guarded)
+				{
+					return;
+				}
+				auto* song = Engine::getSong();
+				const bool wasModified = song && song->isModified();
+				delete guarded.data();
+				if (song)
+				{
+					song->setModified(wasModified);
+				}
+			},
+			Qt::QueuedConnection);
+	}
+};
+
+// Ownership while detached stays with the QObject parent (the container), so a
+// record only deletes the track if it is still alive when the record goes away.
+struct IncrementalTrackMembership
+{
+	QPointer<Track> track;
+	QPointer<TrackContainer> container;
+	int index = 0;
+	bool detached = false;
+	// The journal validates at registration, before a removal detaches.
+	bool registering = false;
+
+	~IncrementalTrackMembership()
+	{
+		if (detached && track)
+		{
+			DetachedTrackDeleter{}(track.data());
+		}
+	}
+};
+
+void detachIncrementalTrack(IncrementalTrackMembership& state)
+{
+	const auto& tracks = state.container->tracks();
+	state.index = static_cast<int>(
+		std::distance(tracks.begin(), std::find(tracks.begin(), tracks.end(), state.track.data())));
+	emit state.track->destroyedTrack();
+	state.container->removeTrack(state.track);
+	state.track->setProperty(Track::DetachedByHistoryProperty, true);
+	state.detached = true;
+	Engine::getSong()->updateLength();
+}
+
+void attachIncrementalTrack(IncrementalTrackMembership& state)
+{
+	auto* track = state.track.data();
+	track->setProperty(Track::DetachedByHistoryProperty, QVariant());
+	state.detached = false;
+	state.container->addTrack(track);
+	state.container->moveTrack(track, state.index);
+	Engine::getSong()->updateLength();
+}
+
+// Records a track that has just been created, or detaches one being removed.
+void recordTrackMembership(Track* track, bool removed)
+{
+	auto state = std::make_shared<IncrementalTrackMembership>();
+	state->track = track;
+	state->container = track->trackContainer();
+	const auto valid = [state] {
+		if (!state->track || !state->container)
+		{
+			return false;
+		}
+		if (state->registering)
+		{
+			return true;
+		}
+		const auto& tracks = state->container->tracks();
+		const bool attached = std::find(tracks.begin(), tracks.end(), state->track.data()) != tracks.end();
+		return state->detached ? !attached : attached;
+	};
+	const auto attach = [state] { attachIncrementalTrack(*state); };
+	const auto detach = [state] { detachIncrementalTrack(*state); };
+	state->registering = true;
+	const bool recorded = removed ? Engine::projectJournal()->addIncrementalChange({valid, attach, detach})
+								  : Engine::projectJournal()->addIncrementalChange({valid, detach, attach});
+	state->registering = false;
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record the track membership inverse.");
+	}
+	if (removed)
+	{
+		detachIncrementalTrack(*state);
+	}
+}
+
+// Creation has already happened when the new track is known; if recording its
+// inverse fails, remove it again so the failed command leaves no object.
+void recordCreatedTrack(Track* track)
+{
+	try
+	{
+		recordTrackMembership(track, false);
+	}
+	catch (...)
+	{
+		delete track;
+		throw;
+	}
+}
+
+// Same ownership rules as tracks: a detached clip is owned by its record, and
+// destroying it there must not mark the song modified.
+struct DetachedClipDeleter
+{
+	void operator()(Clip* clip) const
+	{
+		auto* song = Engine::getSong();
+		const bool wasModified = song && song->isModified();
+		delete clip;
+		if (song)
+		{
+			song->setModified(wasModified);
+		}
+	}
+};
+
+// A detached clip remains a QObject child of its track; ~Track deletes it if
+// the track goes first, otherwise the record deletes it.
+struct IncrementalClipMembership
+{
+	QPointer<Clip> clip;
+	QPointer<Track> track;
+	std::size_t index = 0;
+	bool detached = false;
+	bool registering = false;
+
+	~IncrementalClipMembership()
+	{
+		if (detached && clip)
+		{
+			DetachedClipDeleter{}(clip.data());
+		}
+	}
+};
+
+void detachIncrementalClip(IncrementalClipMembership& state)
+{
+	state.index = static_cast<std::size_t>(state.track->getClipNum(state.clip));
+	Engine::getSong()->stopPreviewOf(state.clip);
+	// Clip views close on this signal, as they do when a clip is deleted.
+	emit state.clip->destroyedClip();
+	state.track->removeClip(state.clip);
+	state.detached = true;
+}
+
+void attachIncrementalClip(IncrementalClipMembership& state)
+{
+	state.detached = false;
+	state.track->restoreClip(state.clip, state.index);
+}
+
+// Records a clip that has just been created, or detaches one being removed.
+void recordClipMembership(Clip* clip, bool removed)
+{
+	auto state = std::make_shared<IncrementalClipMembership>();
+	state->clip = clip;
+	state->track = clip->getTrack();
+	const auto valid = [state] {
+		if (!state->clip || !state->track)
+		{
+			return false;
+		}
+		if (state->registering)
+		{
+			return true;
+		}
+		const auto& clips = state->track->getClips();
+		const bool attached = std::find(clips.begin(), clips.end(), state->clip.data()) != clips.end();
+		return state->detached ? !attached : attached;
+	};
+	const auto attach = [state] { attachIncrementalClip(*state); };
+	const auto detach = [state] { detachIncrementalClip(*state); };
+	state->registering = true;
+	const bool recorded = removed ? Engine::projectJournal()->addIncrementalChange({valid, attach, detach})
+								  : Engine::projectJournal()->addIncrementalChange({valid, detach, attach});
+	state->registering = false;
+	if (!recorded)
+	{
+		throw std::runtime_error("Could not record the clip membership inverse.");
+	}
+	if (removed)
+	{
+		detachIncrementalClip(*state);
+	}
+}
+
+void recordCreatedClip(Clip* clip)
+{
+	try
+	{
+		recordClipMembership(clip, false);
+	}
+	catch (...)
+	{
+		delete clip;
+		throw;
+	}
+}
+
+// Pattern-editor clips form one column per pattern; adding or removing one
+// alone would break that layout, so those stay unmigrated.
+bool isPatternEditorClipTrack(const Track* track)
+{
+	return track->trackContainer() == Engine::patternStore();
+}
+
 CommandResult executeTrackCreate(const QJsonObject& arguments)
 {
 	auto* song = Engine::getSong();
@@ -3280,10 +3628,20 @@ CommandResult executeTrackCreate(const QJsonObject& arguments)
 	{
 		return invalidArguments("'index' must be an insertion position in the selected container.");
 	}
+	const bool incremental = incrementalTransactionActive();
+	if (incremental && container == Engine::patternStore() && Engine::patternStore()->numOfPatterns() == 0)
+	{
+		// LMMS would also create a Pattern track in the song as a side effect.
+		return incrementalRefusal("Creating the first Pattern-editor track");
+	}
 	auto* track = Track::create(type, container);
 	if (track == nullptr)
 	{
 		return CommandResult::failure("track_creation_failed", "LMMS could not create the requested track.");
+	}
+	if (incremental)
+	{
+		recordCreatedTrack(track);
 	}
 	if (hasName)
 	{
@@ -3313,6 +3671,15 @@ CommandResult executeTrackRemove(const QJsonObject& arguments)
 	}
 
 	const QString path = trackPath(trackIndex, track);
+	if (incrementalTransactionActive())
+	{
+		if (track->type() == Track::Type::Pattern)
+		{
+			return incrementalRefusal("Removing a Pattern track");
+		}
+		recordTrackMembership(track, true);
+		return CommandResult::success(QJsonObject{{"removed", path}});
+	}
 	delete track;
 	return CommandResult::success(QJsonObject{{"removed", path}});
 }
@@ -3331,11 +3698,20 @@ CommandResult executeTrackClone(const QJsonObject& arguments)
 	{
 		return failure;
 	}
+	const bool incremental = incrementalTransactionActive();
+	if (incremental && track->type() == Track::Type::Pattern)
+	{
+		return incrementalRefusal("Cloning a Pattern track");
+	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	auto* clone = track->clone();
 	if (!clone)
 	{
 		return CommandResult::failure("track_creation_failed", "Could not clone the track.");
+	}
+	if (incremental)
+	{
+		recordCreatedTrack(clone);
 	}
 	if (arguments.contains("name"))
 	{
@@ -3363,6 +3739,24 @@ CommandResult executeTrackMove(const QJsonObject& arguments)
 	if (destination < 0 || destination >= static_cast<int>(track->trackContainer()->tracks().size()))
 	{
 		return invalidArguments("'newIndex' must identify a position in the selected track container.");
+	}
+	if (incrementalTransactionActive())
+	{
+		if (track->type() == Track::Type::Pattern)
+		{
+			return incrementalRefusal("Moving a Pattern track");
+		}
+		auto* container = track->trackContainer();
+		const auto& current = container->tracks();
+		const int from = static_cast<int>(
+			std::distance(current.begin(), std::find(current.begin(), current.end(), track)));
+		const QPointer<Track> moved(track);
+		const auto present = [moved](TrackContainer* owner) {
+			const auto& tracks = owner->tracks();
+			return moved && std::find(tracks.begin(), tracks.end(), moved.data()) != tracks.end();
+		};
+		recordIncrementalOwnedValue(container, present, from, destination,
+			[moved](TrackContainer* owner, int position) { owner->moveTrack(moved, position); });
 	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	if (auto* pattern = dynamic_cast<PatternTrack*>(track))
@@ -3424,6 +3818,10 @@ CommandResult executeTrackProperty(const QJsonObject& arguments, const QString& 
 		{
 			return invalidArguments("Track height must be between the minimum track height and 4096 pixels.");
 		}
+		recordIncrementalValue(track, track->storedHeight(), height, [](Track* target, int value) {
+			target->setHeight(value);
+			emit target->dataChanged();
+		});
 		track->setHeight(height);
 		emit track->dataChanged();
 	}
@@ -3495,11 +3893,20 @@ CommandResult executeClipDuplicate(const QJsonObject& arguments)
 	{
 		return invalidArguments("The duplicate exceeds the maximum song length.");
 	}
+	const bool incremental = incrementalTransactionActive();
+	if (incremental && isPatternEditorClipTrack(address.track))
+	{
+		return incrementalRefusal("Duplicating a Pattern-editor clip");
+	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	auto* clone = address.clip->clone();
 	if (!clone)
 	{
 		return CommandResult::failure("clip_creation_failed", "Could not duplicate the clip.");
+	}
+	if (incremental)
+	{
+		recordCreatedClip(clone);
 	}
 	clone->movePosition(TimePos(position));
 	address.clip = clone;
@@ -3532,6 +3939,11 @@ CommandResult executeClipProperty(const QJsonObject& arguments, const QString& p
 	}
 	else if (property == "autoResize")
 	{
+		recordIncrementalValue(address.clip, address.clip->getAutoResize(), arguments.value("value").toBool(),
+							   [](Clip* target, bool value) {
+								   target->setAutoResize(value);
+								   emit target->dataChanged();
+							   });
 		address.clip->setAutoResize(arguments.value("value").toBool());
 		emit address.clip->dataChanged();
 	}
@@ -3571,18 +3983,6 @@ CommandResult executeTrackSetName(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 
-	auto* journal = Engine::projectJournal();
-	if (journal->isIncrementalTransaction())
-	{
-		const QPointer<Track> target(track);
-		const auto previous = track->name();
-		if (!journal->addIncrementalChange({[target] { return !target.isNull(); },
-											[target, previous] { target->setName(previous); },
-											[target, name] { target->setName(name); }}))
-		{
-			return CommandResult::failure("transaction_failed", "Could not record the track name inverse.");
-		}
-	}
 	track->setName(name);
 	return CommandResult::success(trackDetail(song, track, trackIndex));
 }
@@ -4062,6 +4462,11 @@ CommandResult executeClipCreate(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 
+	const bool incremental = incrementalTransactionActive();
+	if (incremental && isPatternEditorClipTrack(track))
+	{
+		return incrementalRefusal("Creating a Pattern-editor clip");
+	}
 	Clip* clip = nullptr;
 	if (track->type() == Track::Type::Instrument)
 	{
@@ -4097,6 +4502,10 @@ CommandResult executeClipCreate(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("clip_creation_failed", "LMMS could not create the requested clip.");
 	}
+	if (incremental)
+	{
+		recordCreatedClip(clip);
+	}
 	clip->movePosition(TimePos(start));
 	clip->changeLength(TimePos(length));
 	if (hasName)
@@ -4128,6 +4537,15 @@ CommandResult executeClipRemove(const QJsonObject& arguments)
 	}
 
 	const QString path = clipPath(address.trackIndex, address.clipIndex, address.track);
+	if (incrementalTransactionActive())
+	{
+		if (isPatternEditorClipTrack(address.track))
+		{
+			return incrementalRefusal("Removing a Pattern-editor clip");
+		}
+		recordClipMembership(address.clip, true);
+		return CommandResult::success(QJsonObject{{"removed", path}});
+	}
 	delete address.clip;
 	return CommandResult::success(QJsonObject{{"removed", path}});
 }
@@ -4334,6 +4752,27 @@ QJsonObject noteDetail(const Note* note, int index)
 		{"key", note->key()}, {"volume", note->getVolume()}, {"panning", note->getPanning()}};
 }
 
+// Detuning is created by the forward edit, so swapping the whole note value
+// returns the note to having no detuning object, and back again on redo.
+void recordIncrementalNoteDetuning(MidiClip* clip, Note* note)
+{
+	auto saved = std::make_shared<Note>(*note);
+	const auto present = [note](MidiClip* owner) {
+		const auto& notes = owner->notes();
+		return std::find(notes.begin(), notes.end(), note) != notes.end();
+	};
+	const auto exchange = [note, saved](MidiClip* owner) {
+		const Note current(*note);
+		*note = *saved;
+		*saved = current;
+		emit owner->dataChanged();
+	};
+	// The same exchange serves both directions; the value argument is unused.
+	recordIncrementalOwnedValue(clip, present, 0, 0, [exchange](MidiClip* owner, int) {
+		exchange(owner);
+	});
+}
+
 CommandResult executeMidiUpdateNote(const QJsonObject& arguments)
 {
 	auto* song = Engine::getSong();
@@ -4374,6 +4813,7 @@ CommandResult executeMidiUpdateNote(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 	const auto& value = parsed.front();
+	clip->recordIncrementalNoteEdit();
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	note->setPos(TimePos(value.position));
 	if (fields.contains("length"))
@@ -4466,6 +4906,11 @@ CommandResult executeMidiEditNotes(const QJsonObject& arguments, const QString& 
 				return invalidArguments("Quantization would exceed the maximum song length.");
 			}
 		}
+	}
+	if (operation != "remove")
+	{
+		// Removal changes note ownership and is migrated separately.
+		clip->recordIncrementalNoteEdit();
 	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	for (auto* note : selected)
@@ -4585,6 +5030,7 @@ CommandResult executeMidiSetSteps(const QJsonObject& arguments)
 		return invalidArguments(QStringLiteral("'steps' must be between 1 and %1.").arg(maxSteps));
 	}
 
+	midiClip->recordIncrementalNoteEdit();
 	midiClip->setSteps(steps);
 	song->setModified();
 	return CommandResult::success(QJsonObject{{"path", clipPath(address.trackIndex, address.clipIndex, address.track)},
@@ -4628,6 +5074,7 @@ CommandResult executeMidiSetClipType(const QJsonObject& arguments)
 		return invalidArguments("'type' must be 'beat' or 'melody'.");
 	}
 
+	midiClip->recordIncrementalNoteEdit();
 	midiClip->setClipType(clipType);
 	song->setModified();
 	return CommandResult::success(QJsonObject{{"path", clipPath(address.trackIndex, address.clipIndex, address.track)},
@@ -4683,6 +5130,35 @@ CommandResult executeMidiHumanize(const QJsonObject& arguments)
 	if (!readNoteFilter(arguments, filter, error))
 	{
 		return invalidArguments(error);
+	}
+	auto* journal = Engine::projectJournal();
+	if (journal && journal->isIncrementalTransaction())
+	{
+		if (hasDetune)
+		{
+			for (const auto* note : midiClip->notes())
+			{
+				// Existing detuning automation is shared and edited in place;
+				// there is no local inverse for that object yet.
+				if (filter.matches(note) && note->detuning())
+				{
+					return CommandResult::failure("incremental_rollback_unavailable",
+						"Humanizing existing note detuning has not yet been migrated to incremental rollback; "
+						"no changes were made.");
+				}
+			}
+		}
+		midiClip->recordIncrementalNoteEdit();
+		if (hasDetune)
+		{
+			for (auto* note : midiClip->notes())
+			{
+				if (filter.matches(note))
+				{
+					recordIncrementalNoteDetuning(midiClip, note);
+				}
+			}
+		}
 	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	int changed = 0;
@@ -4761,6 +5237,20 @@ CommandResult executeSampleSetFile(const QJsonObject& arguments)
 		return CommandResult::failure("sample_file_not_found", "The requested sample file does not exist.");
 	}
 
+	if (incrementalTransactionActive())
+	{
+		// The previous sample shares its decoded buffer, so history restores it
+		// without reading any file; offset and length record themselves.
+		auto saved = std::make_shared<Sample>(sampleClip->sample());
+		recordIncrementalValue(sampleClip, 0, 0, [saved](SampleClip* target, int) {
+			auto guard = Engine::audioEngine()->requestChangesGuard();
+			Sample current(target->sample());
+			target->sample() = *saved;
+			*saved = std::move(current);
+			emit target->sampleChanged();
+			emit target->playbackPositionChanged();
+		});
+	}
 	sampleClip->setSampleFile(sourceFile.absoluteFilePath());
 	if (sampleClip->sample().sampleSize() == 0)
 	{
@@ -4794,6 +5284,8 @@ CommandResult executeSampleSetReversed(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 
+	recordIncrementalValue(sampleClip, sampleClip->reversed(), reversed,
+		[](SampleClip* target, bool value) { target->setReversed(value); });
 	sampleClip->setReversed(reversed);
 	song->setModified();
 	return CommandResult::success(sampleInfo(address, sampleClip));
@@ -4942,6 +5434,23 @@ CommandResult executeScale(const QString& action, const QJsonObject& arguments)
 		}
 		intervals.emplace_back(1200.f);
 		const int base = 60 + root;
+		if (incrementalTransactionActive())
+		{
+			// Scale and Keymap are not copyable; rebuild equal definitions from their values.
+			using Definitions = std::pair<std::shared_ptr<const Scale>, std::shared_ptr<const Keymap>>;
+			const Definitions before{song->getScale(index), song->getKeymap(index)};
+			auto saved = std::make_shared<Definitions>(before);
+			recordIncrementalValue(song, 0, 0, [index, saved](Song* target, int) {
+				const Definitions current{target->getScale(index), target->getKeymap(index)};
+				const auto& scale = *saved->first;
+				const auto& keymap = *saved->second;
+				target->setScale(index, std::make_shared<Scale>(scale.getDescription(), scale.getIntervals()));
+				target->setKeymap(index,
+					std::make_shared<Keymap>(keymap.getDescription(), keymap.getMap(), keymap.getFirstKey(),
+						keymap.getLastKey(), keymap.getMiddleKey(), keymap.getBaseKey(), keymap.getBaseFreq()));
+				*saved = current;
+			});
+		}
 		auto guard = Engine::audioEngine()->requestChangesGuard();
 		song->setScale(index, std::make_shared<Scale>(type, std::move(intervals)));
 		song->setKeymap(index,
@@ -4981,6 +5490,7 @@ CommandResult executeScale(const QString& action, const QJsonObject& arguments)
 		classes.push_back((static_cast<int>(std::lround(semitones)) + keymap->getMiddleKey()) % 12);
 	}
 	int changed = 0;
+	clip->recordIncrementalNoteEdit();
 	auto guard = Engine::audioEngine()->requestChangesGuard();
 	for (auto* note : clip->notes())
 	{
@@ -5102,6 +5612,30 @@ CommandResult executeInstrumentExtended(const QString& action, const QJsonObject
 			&& !ports.contains(arguments.value("port").toString()))
 		{
 			return CommandResult::failure("midi_port_not_found", "The MIDI port is not available.");
+		}
+		if (arguments.contains("port"))
+		{
+			// Subscriptions are not models; restore them through the port so the
+			// MIDI client connections follow the restored table.
+			auto selectedPorts = ports;
+			for (auto it = selectedPorts.begin(); it != selectedPorts.end(); ++it)
+			{
+				it.value() = it.key() == arguments.value("port").toString();
+			}
+			recordIncrementalValue(track, ports, selectedPorts, [input](InstrumentTrack* target, const auto& table) {
+				auto* targetPort = target->midiPort();
+				for (auto it = table.cbegin(); it != table.cend(); ++it)
+				{
+					if (input)
+					{
+						targetPort->subscribeReadablePort(it.key(), it.value());
+					}
+					else
+					{
+						targetPort->subscribeWritablePort(it.key(), it.value());
+					}
+				}
+			});
 		}
 		auto guard = Engine::audioEngine()->requestChangesGuard();
 		if (input)
@@ -5372,6 +5906,8 @@ CommandResult executeController(const QString& action, const QJsonObject& argume
 	const auto value = arguments.value("value");
 	if (name == "name" && value.isString())
 	{
+		recordIncrementalValue(controller, controller->name(), value.toString(),
+			[](Controller* target, const QString& text) { target->setName(text); });
 		controller->setName(value.toString());
 	}
 	else if (auto* lfo = dynamic_cast<LfoController*>(controller))
@@ -5504,6 +6040,8 @@ CommandResult executePattern(const QString& action, const QJsonObject& arguments
 		{
 			return invalidArguments("'bars' must be positive and within the maximum song length.");
 		}
+		recordIncrementalValue(pattern, pattern->explicitLengthBars(), bars,
+			[](PatternTrack* target, int value) { target->setExplicitLengthBars(value); });
 		pattern->setExplicitLengthBars(bars);
 	}
 	else if (action == "placeInSong")
@@ -5516,6 +6054,10 @@ CommandResult executePattern(const QString& action, const QJsonObject& arguments
 			return invalidArguments("Pattern placement must fit within the maximum song length.");
 		}
 		auto* clip = pattern->createClip(TimePos(position));
+		if (incrementalTransactionActive())
+		{
+			recordCreatedClip(clip);
+		}
 		clip->changeLength(TimePos(length));
 		song->setModified();
 		const auto& clips = pattern->getClips();
@@ -5746,11 +6288,102 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 	descriptor.scope = scope;
 	descriptor.handler = std::move(handler);
 	descriptor.preflight = std::move(preflight);
-	descriptor.incremental = name == "song.setTempo" || name == "track.setName";
+	static const QSet<QString> incrementalCommands{"song.setTempo",
+												   "song.setMasterVolume",
+												   "song.setMasterPitch",
+												   "track.setName",
+												   "track.setMute",
+												   "track.setMuted",
+												   "track.setSolo",
+												   "track.setHeight",
+												   "track.setColor",
+												   "track.setMixerChannel",
+												   "model.setValue",
+												   "instrument.setParameters",
+												   "instrument.setVolume",
+												   "instrument.setPanning",
+												   "instrument.setPitch",
+												   "instrument.setPitchRange",
+												   "instrument.setBaseNote",
+												   "clip.setPosition",
+												   "clip.move",
+												   "clip.setLength",
+												   "clip.resize",
+												   "clip.setMute",
+												   "clip.setColor",
+												   "clip.setAutoResize",
+												   "clip.setStartTimeOffset",
+												   "midi.updateNote",
+												   "midi.transpose",
+												   "midi.quantize",
+												   "midi.setSteps",
+												   "midi.setClipType",
+												   "midi.addNotes",
+												   "midi.removeNotes",
+												   "midi.clearNotes",
+												   "midi.humanize",
+												   "track.create",
+												   "track.delete",
+												   "track.remove",
+												   "track.clone",
+												   "track.move",
+												   "clip.create",
+												   "clip.delete",
+												   "clip.remove",
+												   "clip.duplicate",
+												   "automation.createTrack",
+												   "automation.addClip",
+												   "automation.putValue",
+												   "automation.putValues",
+												   "automation.removeNode",
+												   "automation.removeNodes",
+												   "mixer.addSend",
+												   "mixer.removeSend",
+												   "pattern.placeInSong",
+												   "pattern.removeFromSong",
+												   "sample.setFile",
+												   "scale.set",
+												   "scale.snapNotes",
+												   "mixer.setName",
+												   "mixer.setColor",
+												   "mixer.setVolume",
+												   "mixer.setMute",
+												   "mixer.setSolo",
+												   "mixer.setSendAmount",
+												   "instrument.setArpeggio",
+												   "instrument.setNoteStacking",
+												   "instrument.setMidiIn",
+												   "instrument.setMidiOut",
+												   "sample.setReversed",
+												   "sample.setOffset",
+												   "automation.setProgression",
+												   "automation.setTension",
+												   "pattern.rename",
+												   "pattern.setLength",
+												   "controller.setParam",
+												   "song.setTimeSignature",
+												   "transport.setLoopRange"};
+	descriptor.incremental = incrementalCommands.contains(name);
 	commandBus.registerCommand(descriptor);
 }
 
 } // namespace
+
+void recordAgentCreatedTrack(Track* track)
+{
+	if (incrementalTransactionActive())
+	{
+		recordCreatedTrack(track);
+	}
+}
+
+void recordAgentCreatedClip(Clip* clip)
+{
+	if (incrementalTransactionActive())
+	{
+		recordCreatedClip(clip);
+	}
+}
 
 CommandTargetIdentities commandTargetIdentities()
 {

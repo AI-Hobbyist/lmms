@@ -30,6 +30,7 @@
 #include "AudioEngineWorkerThread.h"
 #include "Mixer.h"
 #include "Song.h"
+#include "agent/IncrementalUndo.h"
 
 #include "InstrumentTrack.h"
 #include "MixHelpers.h"
@@ -282,6 +283,12 @@ void Mixer::activateSolo()
 {
 	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
+		auto* channel = m_mixerChannels[i];
+		const auto present = [i, channel](Mixer* mixer) {
+			return i < mixer->m_mixerChannels.size() && mixer->m_mixerChannels[i] == channel;
+		};
+		agent::recordIncrementalOwnedValue(this, present, channel->m_muteBeforeSolo, channel->m_muteModel.value(),
+			[i](Mixer* mixer, bool value) { mixer->m_mixerChannels[i]->m_muteBeforeSolo = value; });
 		m_mixerChannels[i]->m_muteBeforeSolo = m_mixerChannels[i]->m_muteModel.value();
 		m_mixerChannels[i]->m_muteModel.setValue( true );
 	}
@@ -297,6 +304,12 @@ void Mixer::deactivateSolo()
 
 void Mixer::toggledSolo()
 {
+	// Incremental replay restores every solo/mute value and the saved mute flags.
+	// Re-running the forward solo transition would overwrite those restored values.
+	if (Engine::projectJournal()->isRestoringIncrementally())
+	{
+		return;
+	}
 	int soloedChan = -1;
 	bool resetSolo = m_lastSoloed != -1;
 	//untoggle if lastsoloed is entered
@@ -325,6 +338,9 @@ void Mixer::toggledSolo()
 	} else {
 		deactivateSolo();
 	}
+	agent::recordIncrementalValue(this, m_lastSoloed, soloedChan, [](Mixer* mixer, int value) {
+		mixer->m_lastSoloed = value;
+	});
 	m_lastSoloed = soloedChan;
 }
 

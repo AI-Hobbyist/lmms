@@ -70,6 +70,8 @@ public:
 	void rearrangeAllNotes();
 	void updateNotes();
 	void clearNotes();
+	// Capture local values and ordering before an Agent edits existing notes.
+	void recordIncrementalNoteEdit();
 
 	inline const NoteVector & notes() const
 	{
@@ -147,6 +149,9 @@ private:
 	TimePos beatClipLength() const;
 
 	void checkType();
+	// Agent transactions keep the same Note object in both history directions.
+	// Returns true when a removed note's ownership moved to the history record.
+	bool recordIncrementalNoteMembership(Note* note, bool removed);
 
 	void resizeToFirstTrack();
 

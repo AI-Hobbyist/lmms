@@ -29,6 +29,7 @@
 
 #include "PatternStore.h"
 #include "PathUtil.h"
+#include "ProjectJournal.h"
 #include "SampleClipView.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -240,6 +241,12 @@ void SampleClip::setIsPlaying(bool isPlaying)
 
 void SampleClip::updateLength()
 {
+	// Incremental replay restores the recorded length directly; resizing again
+	// from a signal emitted during replay would overwrite that restored value.
+	if (Engine::projectJournal()->isRestoringIncrementally())
+	{
+		return;
+	}
 	// If the clip has already been manually resized, don't automatically resize it.
 	if (getAutoResize())
 	{

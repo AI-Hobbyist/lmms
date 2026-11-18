@@ -246,6 +246,17 @@ void TrackContainer::clearAllTracks()
 	{
 		delete m_tracks.front();
 	}
+	// Tracks detached by incremental history are still QObject children (other
+	// child tracks, such as the global automation track, are owned elsewhere).
+	// Delete them with the attached ones, while the engine they use is still
+	// alive (a project clear happens before engine teardown).
+	for (auto* track : findChildren<Track*>(Qt::FindDirectChildrenOnly))
+	{
+		if (track->property(Track::DetachedByHistoryProperty).toBool())
+		{
+			delete track;
+		}
+	}
 	//m_tracksMutex.unlock();
 }
 

@@ -23,6 +23,8 @@
  */
 
 #include "AutomatableModel.h"
+#include "agent/IncrementalUndo.h"
+#include <tuple>
 
 #include <QRegularExpression>
 
@@ -315,6 +317,15 @@ void AutomatableModel::setValue(const float value, const bool isAutomated)
 
 void AutomatableModel::setValueInternal(const float value)
 {
+	const auto nextValue = fittedValue(value);
+	const auto before = std::make_tuple(m_value, m_oldValue, m_valueChanged);
+	const auto after = std::make_tuple(nextValue, m_value, m_valueChanged || m_value != nextValue);
+	agent::recordIncrementalValue(this, before, after, [](AutomatableModel* target, const auto& state) {
+		target->m_value = std::get<0>(state);
+		target->m_oldValue = std::get<1>(state);
+		target->m_valueChanged = std::get<2>(state);
+		emit target->dataChanged();
+	});
 	m_oldValue = m_value;
 	m_value = fittedValue(value);
 
@@ -369,6 +380,14 @@ void AutomatableModel::setRange( const float min, const float max,
 {
 	if( ( m_maxValue != max ) || ( m_minValue != min ) )
 	{
+		agent::recordIncrementalValue(this, std::make_pair(m_minValue, m_maxValue),
+									  std::make_pair(std::min(min, max), std::max(min, max)),
+									  [](AutomatableModel* target, const auto& bounds) {
+										  target->m_minValue = bounds.first;
+										  target->m_maxValue = bounds.second;
+										  target->m_range = bounds.second - bounds.first;
+										  emit target->propertiesChanged();
+									  });
 		m_minValue = min;
 		m_maxValue = max;
 		if( m_minValue > m_maxValue )
@@ -393,6 +412,10 @@ void AutomatableModel::setStep( const float step )
 {
 	if( m_step != step )
 	{
+		agent::recordIncrementalValue(this, m_step, step, [](AutomatableModel* target, float value) {
+			target->m_step = value;
+			emit target->propertiesChanged();
+		});
 		m_step = step;
 		emit propertiesChanged();
 	}

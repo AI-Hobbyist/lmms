@@ -28,6 +28,7 @@
 
 
 #include "Track.h"
+#include "agent/IncrementalUndo.h"
 
 #include <QDomElement>
 #include <QVariant>
@@ -74,6 +75,12 @@ Track::~Track()
 	while (!m_clips.empty())
 	{
 		delete m_clips.back();
+	}
+	// Clips detached by incremental history are still QObject children. Delete
+	// them while this track is intact, since ~Clip calls back into its track.
+	for (auto* clip : findChildren<Clip*>(Qt::FindDirectChildrenOnly))
+	{
+		delete clip;
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -311,6 +318,19 @@ Clip * Track::addClip( Clip * clip )
 
 
 
+void Track::restoreClip(Clip* clip, std::size_t index)
+{
+	m_clips.insert(m_clips.begin() + std::min(index, m_clips.size()), clip);
+	emit clipAdded(clip);
+	if (auto* song = Engine::getSong())
+	{
+		song->updateLength();
+	}
+}
+
+
+
+
 void Track::removeClip( Clip * clip )
 {
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
@@ -479,11 +499,15 @@ bar_t Track::length() const
 	return last / TimePos::ticksPerBar();
 }
 
-
-
 void Track::toggleSolo()
 {
-	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
+	// Incremental replay restores every mute/solo value and the saved mute flags.
+	// Re-running the forward solo transition would overwrite those restored values.
+	if (Engine::projectJournal()->isRestoringIncrementally())
+	{
+		return;
+	}
+	const TrackContainer::TrackList& tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
 	for (const auto& track : tl)
@@ -509,6 +533,8 @@ void Track::toggleSolo()
 			// save mute-state in case no track was solo before
 			if (!soloBefore)
 			{
+				agent::recordIncrementalValue(track, track->m_mutedBeforeSolo, track->isMuted(),
+											  [](Track* target, bool value) { target->m_mutedBeforeSolo = value; });
 				track->m_mutedBeforeSolo = track->isMuted();
 			}
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
@@ -539,6 +565,8 @@ void Track::toggleSolo()
 
 void Track::setColor(const std::optional<QColor>& color)
 {
+	agent::recordIncrementalValue(this, m_color, color,
+								  [](Track* target, const auto& value) { target->setColor(value); });
 	m_color = color;
 	emit colorChanged();
 }
@@ -552,6 +580,8 @@ void Track::setName(const QString& newName)
 {
 	if (m_name != newName)
 	{
+		agent::recordIncrementalValue(this, m_name, newName,
+									  [](Track* target, const QString& value) { target->setName(value); });
 		m_name = newName;
 
 		if (auto song = Engine::getSong())

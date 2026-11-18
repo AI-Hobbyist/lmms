@@ -25,6 +25,8 @@
 
 #include "TrackView.h"
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
@@ -339,6 +341,21 @@ void TrackView::paintEvent( QPaintEvent * pe )
 
 void TrackView::createClipView( Clip * clip )
 {
+	// This slot is queued: incremental history may have detached the clip (or
+	// re-attached it twice) meanwhile. Compare the pointer before using it.
+	const auto& clips = m_track->getClips();
+	if (std::find(clips.begin(), clips.end(), clip) == clips.end())
+	{
+		return;
+	}
+	const auto views = m_trackContentWidget.findChildren<ClipView*>();
+	const bool hasOpenView = std::any_of(views.begin(), views.end(), [clip](ClipView* view) {
+		return view->getClip() == clip && !view->isHidden();
+	});
+	if (hasOpenView)
+	{
+		return;
+	}
 	ClipView * tv = clip->createView( this );
 	if( clip->getSelectViewOnCreate() == true )
 	{

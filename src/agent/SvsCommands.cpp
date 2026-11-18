@@ -2,12 +2,14 @@
 
 #include "agent/CommandBus.h"
 #include "CommandTargets.h"
+#include "CoreCommands.h"
 #include "DiscoverySupport.h"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QDomDocument>
 #include <QJsonObject>
 #include <QSet>
 #include <QStringList>
@@ -24,6 +26,8 @@
 #include "SVSTrack.h"
 #include "Song.h"
 #include "TimePos.h"
+#include "ProjectJournal.h"
+#include "agent/IncrementalUndo.h"
 
 namespace lmms::agent {
 namespace {
@@ -568,6 +572,7 @@ CommandResult executeCreateTrack(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("track_creation_failed", "LMMS could not create the SVS track.");
 	}
+	recordAgentCreatedTrack(track);
 	song->moveTrack(track, index);
 	auto* svsTrack = static_cast<SVSTrack*>(track);
 	if (!name.isEmpty())
@@ -579,7 +584,13 @@ CommandResult executeCreateTrack(const QJsonObject& arguments)
 		const auto bound = bindVoice(svsTrack, pluginId, voiceId);
 		if (!bound.ok)
 		{
-			delete track;
+			// Inside an Agent transaction the creation record detaches the track
+			// on rollback; deleting it here would invalidate that record.
+			auto* journal = Engine::projectJournal();
+			if (!journal || !journal->isIncrementalTransaction())
+			{
+				delete track;
+			}
 			return bound;
 		}
 	}
@@ -618,6 +629,7 @@ CommandResult executeCreateClip(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("clip_creation_failed", "LMMS could not create the SVS clip.");
 	}
+	recordAgentCreatedClip(clip);
 	clip->changeLength(TimePos(length));
 	if (!name.isEmpty())
 	{
@@ -1544,6 +1556,47 @@ QJsonObject rangeSchema()
 	return schema;
 }
 
+// Notes, curves, lyrics, note parameters and the clip dictionary all live in the
+// clip's own serialized state. History exchanges that state on the same clip
+// object, so its identity is kept and no file or voicebank is read again.
+void recordSvsClipState(SVSClip* clip)
+{
+	auto* journal = Engine::projectJournal();
+	if (!journal || !journal->isIncrementalTransaction())
+	{
+		return;
+	}
+	const auto capture = [](SVSClip* target) {
+		// saveSettings, not saveState: the journalling metadata node would be
+		// kept by loadSettings as unparsed content and serialized again.
+		auto document = std::make_shared<QDomDocument>();
+		auto root = document->createElement(target->nodeName());
+		document->appendChild(root);
+		target->saveSettings(*document, root);
+		return document;
+	};
+	auto saved = std::make_shared<std::shared_ptr<QDomDocument>>(capture(clip));
+	recordIncrementalValue(clip, 0, 0, [saved, capture](SVSClip* target, int) {
+		auto current = capture(target);
+		target->loadSettings((*saved)->documentElement());
+		*saved = current;
+	});
+}
+
+// Clip-local SVS edits whose whole effect is the clip's serialized state.
+bool isSvsClipStateCommand(const QString& name)
+{
+	static const QSet<QString> commands{"svs.addNotes", "svs.updateNote", "svs.removeNotes", "svs.setLyrics",
+		"svs.setNoteParameter", "svs.setCurve", "svs.importDictionary"};
+	return commands.contains(name);
+}
+
+// Creation is recorded inside the handlers through the shared membership records.
+bool isSvsCreationCommand(const QString& name)
+{
+	return name == "svs.createTrack" || name == "svs.createClip";
+}
+
 void registerCommand(CommandBus& commandBus, const QString& name, const QString& summary,
 	const QJsonObject& schema, Mutability mutability, TxScope scope, CommandHandler handler)
 {
@@ -1553,7 +1606,28 @@ void registerCommand(CommandBus& commandBus, const QString& name, const QString&
 	descriptor.argsSchema = schema;
 	descriptor.mutability = mutability;
 	descriptor.scope = scope;
-	descriptor.handler = std::move(handler);
+	if (isSvsClipStateCommand(name))
+	{
+		descriptor.incremental = true;
+		descriptor.handler = [inner = std::move(handler)](const QJsonObject& arguments) {
+			SVSTrack* track = nullptr;
+			SVSClip* clip = nullptr;
+			int trackIndex = -1;
+			int clipIndex = -1;
+			CommandResult failure;
+			// Resolution failures are reported by the handler itself.
+			if (resolveSvsClip(arguments, track, clip, trackIndex, clipIndex, failure) && !clip->readOnly())
+			{
+				recordSvsClipState(clip);
+			}
+			return inner(arguments);
+		};
+	}
+	else
+	{
+		descriptor.incremental = isSvsCreationCommand(name);
+		descriptor.handler = std::move(handler);
+	}
 	commandBus.registerCommand(descriptor);
 }
 

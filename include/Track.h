@@ -146,6 +146,12 @@ public:
 	//! @brief Remove a given Clip from this track
 	//! @param clip The Clip to remove from this track.
 	void removeClip(Clip* clip);
+
+	//! @brief Re-attach a detached Clip at its former list position (incremental history).
+	void restoreClip(Clip* clip, std::size_t index);
+
+	//! Dynamic property marking a track that incremental history detached from its container.
+	static constexpr const char* DetachedByHistoryProperty = "lmmsDetachedByHistory";
 	// -------------------------------------------------------
 
 	//! @brief Remove all Clips from this track
@@ -242,6 +248,7 @@ public:
 	{
 		m_height = height;
 	}
+	int storedHeight() const { return m_height; }
 
 	void lock()
 	{

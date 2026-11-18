@@ -1,5 +1,7 @@
 #include "SvcCommands.h"
 
+#include "CoreCommands.h"
+#include "ProjectJournal.h"
 #include "agent/CommandBus.h"
 #include "CommandTargets.h"
 #include "DiscoverySupport.h"
@@ -302,6 +304,17 @@ bool normalizeSelection(const QString& engineId, const QString& modelId, const Q
 	return true;
 }
 
+// Inside an Agent transaction the creation record detaches a failed new track on
+// rollback; deleting it here would invalidate that record.
+void deleteUnlessRecorded(Track* track)
+{
+	auto* journal = Engine::projectJournal();
+	if (!journal || !journal->isIncrementalTransaction())
+	{
+		delete track;
+	}
+}
+
 CommandResult executeCreateTrack(const QJsonObject& arguments)
 {
 	auto* song = Engine::getSong();
@@ -339,6 +352,7 @@ CommandResult executeCreateTrack(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("track_creation_failed", "LMMS could not create the SVC track.");
 	}
+	recordAgentCreatedTrack(track);
 	song->moveTrack(track, index);
 	auto* svcTrack = static_cast<SVCTrack*>(track);
 	if (!name.isEmpty())
@@ -353,12 +367,12 @@ CommandResult executeCreateTrack(const QJsonObject& arguments)
 				selection.value("weight_id").toString(), selection.value("speaker_id").toString(),
 				selection.value("parameters").toObject(), normalized, failure))
 		{
-			delete track;
+			deleteUnlessRecorded(track);
 			return failure;
 		}
 		if (!svcTrack->setSelection(normalized))
 		{
-			delete track;
+			deleteUnlessRecorded(track);
 			return CommandResult::failure("svc_selection_rejected", "The SVC track rejected the selection.");
 		}
 	}
@@ -397,6 +411,7 @@ CommandResult executeCreateClip(const QJsonObject& arguments)
 	{
 		return CommandResult::failure("clip_creation_failed", "LMMS could not create the SVC clip.");
 	}
+	recordAgentCreatedClip(clip);
 	clip->changeLength(TimePos(length));
 	if (!name.isEmpty())
 	{
@@ -643,6 +658,8 @@ void registerCommand(CommandBus& commandBus, const QString& name, const QString&
 	descriptor.argsSchema = schema;
 	descriptor.mutability = mutability;
 	descriptor.scope = scope;
+	// Creation is recorded inside these handlers through the shared membership records.
+	descriptor.incremental = name == "svc.createTrack" || name == "svc.createClip";
 	descriptor.handler = std::move(handler);
 	commandBus.registerCommand(descriptor);
 }

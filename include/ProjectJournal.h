@@ -69,6 +69,8 @@ public:
 	};
 	bool beginIncrementalTransaction(Song* song);
 	bool isIncrementalTransaction() const;
+	bool isRestoring() const { return m_restoringProject; }
+	bool isRestoringIncrementally() const { return m_incrementalReplay; }
 	bool addIncrementalChange(IncrementalChange change);
 	bool canUndoIncrementally() const;
 	bool canRedoIncrementally() const;
@@ -160,6 +162,7 @@ private:
 	bool m_restoringProject = false;
 
 	bool m_journalling;
+	bool m_incrementalReplay = false;
 
 } ;
 

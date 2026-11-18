@@ -23,7 +23,9 @@
  */
 
 #include "Song.h"
+#ifdef WANT_AGENT
 #include "agent/CommandBus.h"
+#endif
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
@@ -989,10 +991,12 @@ AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 
 void Song::clearProject()
 {
+#ifdef WANT_AGENT
 	if (agent::CommandBus::instance().agentExecutionActive())
 	{
 		throw agent::AgentProjectResetError();
 	}
+#endif
 	using gui::getGUI;
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
@@ -1081,10 +1085,12 @@ void Song::clearProject()
 // create new file
 void Song::createNewProject()
 {
+#ifdef WANT_AGENT
 	if (agent::CommandBus::instance().agentExecutionActive())
 	{
 		throw agent::AgentProjectResetError();
 	}
+#endif
 
 	QString defaultTemplate = ConfigManager::inst()->userTemplateDir()
 						+ "default.mpt";
@@ -1147,10 +1153,12 @@ void Song::createNewProject()
 
 void Song::createNewProjectFromTemplate( const QString & templ )
 {
+#ifdef WANT_AGENT
 	if (agent::CommandBus::instance().agentExecutionActive())
 	{
 		throw agent::AgentProjectResetError();
 	}
+#endif
 	loadProject( templ );
 	// clear file-name so that user doesn't overwrite template when
 	// saving...
@@ -1226,10 +1234,12 @@ void Song::saveProjectState(DataFile& dataFile)
 
 void Song::restoreProjectState(DataFile& dataFile)
 {
+#ifdef WANT_AGENT
 	if (agent::CommandBus::instance().agentExecutionActive())
 	{
 		throw agent::AgentProjectResetError();
 	}
+#endif
 	using gui::getGUI;
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
@@ -1407,10 +1417,12 @@ void Song::restoreProjectState(DataFile& dataFile)
 // load given song
 void Song::loadProject( const QString & fileName )
 {
+#ifdef WANT_AGENT
 	if (agent::CommandBus::instance().agentExecutionActive())
 	{
 		throw agent::AgentProjectResetError();
 	}
+#endif
 	using gui::getGUI;
 
 	QDomNode node;

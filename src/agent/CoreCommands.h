@@ -8,11 +8,21 @@
 #include <QPointer>
 #include <QString>
 
+namespace lmms {
+class Clip;
+class Track;
+} // namespace lmms
+
 namespace lmms::agent {
 
 class CommandBus;
 
 void registerCoreCommands(CommandBus& commandBus);
+
+// Inside an Agent transaction, record a track or clip that was just created so
+// rollback and history detach it (keeping the same object). No-op otherwise.
+void recordAgentCreatedTrack(Track* track);
+void recordAgentCreatedClip(Clip* clip);
 
 struct CommandTargetIdentity
 {

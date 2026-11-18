@@ -23,6 +23,7 @@
  */
 
 #include "Clip.h"
+#include "agent/IncrementalUndo.h"
 
 #include <QDomDocument>
 
@@ -96,6 +97,8 @@ void Clip::movePosition( const TimePos & pos )
 	TimePos newPos = std::max(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
+		agent::recordIncrementalValue(this, m_startPosition, newPos,
+									  [](Clip* target, const TimePos& value) { target->movePosition(value); });
 		Engine::audioEngine()->requestChangeInModel();
 		m_startPosition = newPos;
 		Engine::audioEngine()->doneChangeInModel();
@@ -109,6 +112,8 @@ void Clip::changeLength( const TimePos & length )
 {
 	if (m_length == length) { return; }
 
+	agent::recordIncrementalValue(this, m_length, length,
+								  [](Clip* target, const TimePos& value) { target->changeLength(value); });
 	m_length = length;
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
@@ -170,11 +175,15 @@ TimePos Clip::startTimeOffset() const
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
+	agent::recordIncrementalValue(this, m_startTimeOffset, startTimeOffset,
+								  [](Clip* target, const TimePos& value) { target->setStartTimeOffset(value); });
 	m_startTimeOffset = startTimeOffset;
 }
 
 void Clip::setColor(const std::optional<QColor>& color)
 {
+	agent::recordIncrementalValue(this, m_color, color,
+								  [](Clip* target, const auto& value) { target->setColor(value); });
 	m_color = color;
 	emit colorChanged();
 }

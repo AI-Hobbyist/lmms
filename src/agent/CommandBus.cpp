@@ -242,7 +242,8 @@ CommandResult CommandBus::execute(const QString& name, const QJsonObject& argume
 	}
 	// Project loading dispatches Qt events while the model tree is incomplete.
 	// Reject before validation, which can otherwise roll back an active batch.
-	if (Engine::getSong() && Engine::getSong()->isLoadingProject())
+	if ((Engine::getSong() && Engine::getSong()->isLoadingProject())
+		|| (Engine::projectJournal() && Engine::projectJournal()->isRestoring()))
 	{
 		return CommandResult::failure("project_busy", "Wait for the project to finish loading or restoring.");
 	}

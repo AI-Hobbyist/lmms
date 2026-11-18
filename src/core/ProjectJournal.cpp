@@ -249,7 +249,7 @@ bool ProjectJournal::beginIncrementalTransaction(Song* song)
 
 bool ProjectJournal::isIncrementalTransaction() const
 {
-	return hasActiveTransaction() && bool(m_transactions.back().checkpoint.changes);
+	return !m_restoringProject && hasActiveTransaction() && bool(m_transactions.back().checkpoint.changes);
 }
 
 bool ProjectJournal::addIncrementalChange(IncrementalChange change)
@@ -299,6 +299,7 @@ bool ProjectJournal::replayIncremental(const CheckPoint& checkpoint, bool redo)
 	auto audioGuard = Engine::audioEngine()->requestChangesGuard();
 	const bool journalling = isJournalling();
 	const QScopedValueRollback<bool> restoring(m_restoringProject, true);
+	const QScopedValueRollback<bool> incrementalReplay(m_incrementalReplay, true);
 	setJournalling(false);
 	if (redo)
 	{

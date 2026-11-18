@@ -457,6 +457,9 @@ void registerHighLevelCommands(CommandBus& bus)
 		command.summary
 			= "Compose " + QString(action) + " as native MIDI notes; root uses LMMS C0=0, positions use ticks.";
 		command.scope = TxScope::Batch;
+		// Composite steps run through ScriptRunner and are gated one by one, so the
+		// composite is reversible exactly when every step it issues is.
+		command.incremental = true;
 		command.mutability = Mutability::Mutating;
 		command.argsSchema = schema({{"track", integer()}, {"clip", integer()}, {"name", string()},
 			{"instrument", string()}, {"start", integer(0, 9999 * 192)}, {"bars", integer(1, 512)},
@@ -484,6 +487,9 @@ void registerHighLevelCommands(CommandBus& bus)
 			}
 		}
 		command.scope = TxScope::Batch;
+		// Composite steps run through ScriptRunner and are gated one by one, so the
+		// composite is reversible exactly when every step it issues is.
+		command.incremental = true;
 		command.mutability = Mutability::Mutating;
 		command.handler = [action](QJsonObject arguments) {
 			const auto options = arguments;
@@ -505,6 +511,9 @@ void registerHighLevelCommands(CommandBus& bus)
 		command.summary
 			= "Arrange all Song tracks using a half-open bar interval; split crossing clips and preserve native offsets.";
 		command.scope = TxScope::Batch;
+		// Composite steps run through ScriptRunner and are gated one by one, so the
+		// composite is reversible exactly when every step it issues is.
+		command.incremental = true;
 		command.mutability = QString(action) == "deleteBars" ? Mutability::Destructive : Mutability::Mutating;
 		command.argsSchema = schema({{"startBar", integer(0, 9999)}, {"endBar", integer(1, 9999)},
 										{"destinationBar", integer(0, 9999)}, {"bars", integer(1, 9999)}},
@@ -519,6 +528,9 @@ void registerHighLevelCommands(CommandBus& bus)
 	gain.summary
 		= "Adjust selected mixer gains from caller-provided measured peakDb to targetDb minus headroomDb; no automatic audio analysis.";
 	gain.scope = TxScope::Batch;
+	// Composite steps run through ScriptRunner and are gated one by one, so the
+	// composite is reversible exactly when every step it issues is.
+	gain.incremental = true;
 	gain.mutability = Mutability::Mutating;
 	gain.argsSchema
 		= schema({{"channels", QJsonObject{{"type", "array"}, {"maxItems", 512}, {"items", integer()}}},
@@ -573,6 +585,8 @@ void registerHighLevelCommands(CommandBus& bus)
 	variation.summary = "Duplicate a MIDI clip, optionally transpose, then apply seeded timing and velocity variation.";
 	variation.mutability = Mutability::Mutating;
 	variation.scope = TxScope::Batch;
+	// Gated per step like the other composites.
+	variation.incremental = true;
 	variation.argsSchema
 		= schema({{"track", integer()}, {"clip", integer()}, {"position", integer()}, {"semitones", integer(-127, 127)},
 					 {"timing", integer(0, 48)}, {"velocity", integer(0, 200)}, {"seed", integer(-2147483647 - 1)}},
