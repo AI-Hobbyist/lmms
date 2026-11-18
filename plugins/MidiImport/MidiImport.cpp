@@ -194,10 +194,9 @@ class smfMidiChannel
 
 public:
 	InstrumentTrack* it = nullptr;
-	MidiClip* p = nullptr;
+	std::vector<Note> notes;
 	Instrument* it_inst = nullptr;
 	bool isSF2 = false;
-	bool hasNotes = false;
 	QString trackName;
 	MidiPatch currentPatch;
 
@@ -247,8 +246,6 @@ public:
 			}
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
-			// Create a default pattern
-			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
 		return this;
 	}
@@ -256,9 +253,7 @@ public:
 
 	void addNote(Note& n)
 	{
-		if (!p) { p = dynamic_cast<MidiClip*>(it->createClip(0)); }
-		p->addNote(n, false);
-		hasNotes = true;
+		notes.push_back(n);
 	}
 
 
@@ -267,23 +262,22 @@ public:
 		MidiClip* newMidiClip = nullptr;
 		TimePos lastEnd(0);
 
-		p->rearrangeAllNotes();
-		for (auto n : p->notes())
+		std::stable_sort(notes.begin(), notes.end(), [](const Note& left, const Note& right) {
+			return Note::lessThan(&left, &right);
+		});
+		for (const auto& note : notes)
 		{
-			if (!newMidiClip || n->pos() > lastEnd + DefaultTicksPerBar)
+			if (!newMidiClip || note.pos() > lastEnd + DefaultTicksPerBar)
 			{
-				TimePos pPos = TimePos(n->pos().getBar(), 0);
+				TimePos pPos = TimePos(note.pos().getBar(), 0);
 				newMidiClip = dynamic_cast<MidiClip*>(it->createClip(pPos));
 			}
-			lastEnd = n->pos() + n->length();
+			lastEnd = note.pos() + note.length();
 
-			Note newNote(*n);
-			newNote.setPos(n->pos(newMidiClip->startPosition()));
+			Note newNote(note);
+			newNote.setPos(note.pos(newMidiClip->startPosition()));
 			newMidiClip->addNote(newNote, false);
 		}
-
-		delete p;
-		p = nullptr;
 	}
 };
 
@@ -592,20 +586,17 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 	for (auto& c: chs)
 	{
-		if (c.second.hasNotes)
+		if (!c.second.notes.empty())
 		{
 			c.second.splitMidiClips();
 		}
 		else if (c.second.it)
 		{
-			printf(" Should remove empty track\n");
-			// must delete trackView first - but where is it?
-			//tc->removeTrack(chs[c].it);
-			//it->deleteLater();
+			c.second.it->createClip(0);
 		}
 		// Set channel 10 to drums as per General MIDI's orders
 		if (c.first % 16l == 9 /* channel 10 */
-			&& c.second.hasNotes && c.second.it_inst && c.second.isSF2)
+			&& !c.second.notes.empty() && c.second.it_inst && c.second.isSF2)
 		{
 			auto bank = c.second.it_inst->childModel("bank");
 			assert(bank != nullptr);

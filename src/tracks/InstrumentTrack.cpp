@@ -1168,8 +1168,18 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate(_plugin_name, this,
-					key, keyFromDnd);
+	auto* journal = Engine::projectJournal();
+	if (journal && journal->isIncrementalTransaction())
+	{
+		// Native import uses this path only for newly added tracks. The resulting
+		// instrument is part of the track's membership record.
+		const auto recording = journal->pauseIncrementalRecording();
+		m_instrument = Instrument::instantiate(_plugin_name, this, key, keyFromDnd);
+	}
+	else
+	{
+		m_instrument = Instrument::instantiate(_plugin_name, this, key, keyFromDnd);
+	}
 	unlock();
 	setName(m_instrument->displayName());
 

@@ -1,3 +1,10 @@
+## 当前交接：Agent 增量回滚 R1～R4（2026-11-18）
+
+- R1 fed638aa4、R2 0d34114db、R3 5aeb72fab 已分别推送并核对远端。R4 检查点为本节所在的 master 提交。
+- R4 已迁移 MIDI、Hydrogen 和音频采样导入。MIDI 音符先在内存归集，已追加成员按对象身份回滚，音频在写入前解码。已修复同批导入并移除后脚本失败时，回滚校验拒绝和清理无限重试。
+- 最终 Release 构建和 20 条定向业务用例通过。其中导入 3 条，R2/R3 回归 17 条。日志见 build/agent-remaining-r4-final-build.log、build/agent-remaining-r4-import-unit.log、build/agent-remaining-r4-regression-*.log。开发产物是 build/Release/lmms.exe 和 build/Release/plugins 下的原生 DLL。
+- 实施检查点见 doc/agent/incremental-rollback-remaining-commands-plan.md。此阶段无后续实施项。真实插件、音频播放、原生效果架和大型真实导入为 MANUAL/PENDING。Agent 写入前拒绝含旧版内嵌自动化的预设。生命周期测试 SKIPPED（用户禁止）。
+- 在已有开发输出目录构建。Git 忽略以外的 .codegraph/、.omc/、build-driver.log、build.log 仍为未跟踪本地文件。
 ## 当前交接：Agent 增量回滚 R3（2026-11-18）
 
 - R1 fed638aa4、R2 0d34114db 已分别推送。R3 Windows Release 构建与 5 条定向业务用例通过，日志 build/agent-remaining-r3-final-{build,unit}.log。提交后核对 origin/master，再开始 R4。

@@ -66,6 +66,7 @@ AutomatableModel::AutomatableModel(
 
 {
 	m_value = fittedValue( val );
+	m_initValue = m_value;
 	setInitValue( val );
 }
 
@@ -299,15 +300,6 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		if( element.hasAttribute( name ) )
 		{
 			const float value = LocaleHelper::toFloat(element.attribute(name));
-			const float initial = fittedValue(value);
-			if (initial != m_initValue)
-			{
-				agent::recordIncrementalValue(this, m_initValue, initial,
-					[](AutomatableModel* model, float target) {
-						model->m_initValue = target;
-						emit model->initValueChanged(target);
-					});
-			}
 			setInitValue(value);
 		}
 		else
@@ -738,7 +730,16 @@ void AutomatableModel::unlinkControllerConnection()
 
 void AutomatableModel::setInitValue( const float value )
 {
-	m_initValue = fittedValue( value );
+	const float initial = fittedValue(value);
+	if (initial != m_initValue)
+	{
+		agent::recordIncrementalValue(this, m_initValue, initial,
+			[](AutomatableModel* model, float target) {
+				model->m_initValue = target;
+				emit model->initValueChanged(target);
+			});
+	}
+	m_initValue = initial;
 	bool journalling = testAndSetJournalling( false );
 	setValue( value );
 	m_oldValue = m_value;

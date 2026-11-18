@@ -545,13 +545,19 @@ private slots:
 		QVERIFY(!QFileInfo::exists(directory.filePath("batch.mid")));
 	}
 
-	void importsNativeMidiAndHydrogenWithoutDialogs()
+	void agentImportsMidiWithoutReload()
 	{
 		const auto pluginDirectory = qEnvironmentVariable("LMMS_AGENT_PLUGIN_TEST_PATH");
 		if (pluginDirectory.isEmpty())
 		{
 			QSKIP("Set LMMS_AGENT_PLUGIN_TEST_PATH to run native DLL integration.");
 		}
+#ifdef Q_OS_WIN
+		if (QCoreApplication::applicationName().compare("lmms", Qt::CaseInsensitive) != 0)
+		{
+			QSKIP("Run the test host as lmms.exe so the plugin imports resolve to the test host.");
+		}
+#endif
 		QDir::setSearchPaths("plugins", {pluginDirectory});
 		lmms::PluginFactory::instance()->discoverPlugins();
 		auto& bus = lmms::agent::CommandBus::instance();
@@ -564,30 +570,59 @@ private slots:
 		const auto bytes = QByteArray::fromHex("4d546864000000060000000100604d54726b0000000c00903c6460803c0000ff2f00");
 		QCOMPARE(midi.write(bytes), qint64(bytes.size()));
 		midi.close();
-		const auto preview = bus.execute("import.midi", {{"path", midiPath}, {"dryRun", true}});
+		const auto preview = bus.executeForAgent("import.midi", {{"path", midiPath}, {"dryRun", true}});
 		QVERIFY2(preview.ok, qPrintable(preview.errorMessage));
 		QCOMPARE(song->tracks().size(), std::size_t(0));
 		QVERIFY(bus.execute("track.create", {{"name", "Target"}}).ok);
-		const auto imported = bus.execute("import.midi", {{"path", midiPath}, {"track", 0}});
+		auto* target = static_cast<lmms::InstrumentTrack*>(song->tracks().front());
+		target->pitchRangeModel()->setInitValue(4);
+		target->pitchRangeModel()->setValue(3);
+		const auto imported = bus.executeForAgent("import.midi", {{"path", midiPath}, {"track", 0}});
 		QVERIFY2(imported.ok, qPrintable(imported.errorMessage));
 		QCOMPARE(song->tracks()[0]->name(), QString("Target"));
 		QCOMPARE(song->tracks()[0]->getClips().size(), std::size_t(1));
 		const auto notes = bus.execute("midi.getNotes", {{"track", 0}, {"clip", 0}});
 		QCOMPARE(notes.data.value("total").toInt(), 1);
 		QCOMPARE(notes.data.value("notes").toArray()[0].toObject().value("key").toInt(), 60);
-		QVERIFY(bus.execute("history.undo").ok);
+		auto* importedClip = target->getClips().front();
+		QVERIFY(bus.executeForAgent("history.undo").ok);
 		QCOMPARE(song->tracks().size(), std::size_t(1));
+		QCOMPARE(song->tracks().front(), target);
+		QCOMPARE(target->pitchRangeModel()->initValue(), 4);
+		QCOMPARE(target->pitchRangeModel()->value(), 3);
 		QCOMPARE(song->tracks()[0]->getClips().size(), std::size_t(0));
-		QVERIFY(bus.execute("history.redo").ok);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
 		QCOMPARE(song->tracks()[0]->getClips().size(), std::size_t(1));
+		QCOMPARE(target->getClips().front(), importedClip);
 		QFile invalidMidi(directory.filePath("bad.mid"));
 		QVERIFY(invalidMidi.open(QIODevice::WriteOnly));
 		invalidMidi.write("MThd");
 		invalidMidi.close();
 		const auto trackCount = song->tracks().size();
-		QVERIFY(!bus.execute("import.midi", {{"path", invalidMidi.fileName()}}).ok);
+		QCOMPARE(bus.executeForAgent("import.midi", {{"path", invalidMidi.fileName()}}).errorCode,
+			QString("import_failed"));
 		QCOMPARE(song->tracks().size(), trackCount);
-		QVERIFY(bus.execute("song.clearProject").ok);
+	}
+
+	void agentImportsHydrogenWithoutReload()
+	{
+		const auto pluginDirectory = qEnvironmentVariable("LMMS_AGENT_PLUGIN_TEST_PATH");
+		if (pluginDirectory.isEmpty())
+		{
+			QSKIP("Set LMMS_AGENT_PLUGIN_TEST_PATH to run native import fixtures.");
+		}
+#ifdef Q_OS_WIN
+		if (QCoreApplication::applicationName().compare("lmms", Qt::CaseInsensitive) != 0)
+		{
+			QSKIP("Run the test host as lmms.exe so the plugin imports resolve to the test host.");
+		}
+#endif
+		QDir::setSearchPaths("plugins", {pluginDirectory});
+		lmms::PluginFactory::instance()->discoverPlugins();
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* song = lmms::Engine::getSong();
+		QTemporaryDir directory;
+		QVERIFY(directory.isValid());
 		const auto sample = writeTestWave(directory);
 		const auto hydrogenPath = directory.filePath("drums.h2song");
 		const auto xml = QString(
@@ -603,22 +638,29 @@ private slots:
 		QVERIFY(hydrogen.open(QIODevice::WriteOnly));
 		hydrogen.write(xml.toUtf8());
 		hydrogen.close();
-		const auto hydrogenPreview = bus.execute("import.hydrogen", {{"path", hydrogenPath}, {"dryRun", true}});
+		const auto hydrogenPreview = bus.executeForAgent("import.hydrogen", {{"path", hydrogenPath}, {"dryRun", true}});
 		QVERIFY2(hydrogenPreview.ok, qPrintable(hydrogenPreview.errorMessage));
 		QCOMPARE(song->tracks().size(), std::size_t(0));
-		const auto hydrogenImport = bus.execute("import.hydrogen", {{"path", hydrogenPath}});
+		const auto hydrogenImport = bus.executeForAgent("import.hydrogen", {{"path", hydrogenPath}});
 		QVERIFY2(hydrogenImport.ok, qPrintable(hydrogenImport.errorMessage));
 		QCOMPARE(lmms::Engine::patternStore()->numOfPatterns(), 2);
 		QCOMPARE(bus.execute("midi.getNotes", {{"parent", "pattern"}, {"track", 0}, {"clip", 1}})
 					 .data.value("total")
 					 .toInt(),
 			1);
-		QVERIFY(bus.execute("history.undo").ok);
+		auto* pattern = song->tracks().front();
+		auto* row = lmms::Engine::patternStore()->tracks().front();
+		QVERIFY(bus.executeForAgent("history.undo").ok);
 		QCOMPARE(song->tracks().size(), std::size_t(0));
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(song->tracks().front(), pattern);
+		QCOMPARE(lmms::Engine::patternStore()->tracks().front(), row);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
 		QVERIFY(hydrogen.open(QIODevice::WriteOnly | QIODevice::Truncate));
 		hydrogen.write(QString(xml).replace("<instrument>0</instrument>", "<instrument>999</instrument>").toUtf8());
 		hydrogen.close();
-		QVERIFY(!bus.execute("import.hydrogen", {{"path", hydrogenPath}}).ok);
+		QCOMPARE(bus.executeForAgent("import.hydrogen", {{"path", hydrogenPath}}).errorCode,
+			QString("import_failed"));
 		QCOMPARE(song->tracks().size(), std::size_t(0));
 		QCOMPARE(lmms::Engine::patternStore()->tracks().size(), std::size_t(0));
 	}
@@ -631,31 +673,47 @@ private slots:
 		QVERIFY(directory.isValid());
 		const auto path = writeTestWave(directory);
 		QVERIFY(!path.isEmpty());
-		const auto preview = bus.execute("import.sampleToTrack", {{"path", path}, {"position", 96}, {"dryRun", true}});
+		const auto preview = bus.executeForAgent("import.sampleToTrack", {{"path", path}, {"position", 96}, {"dryRun", true}});
 		QVERIFY2(preview.ok, qPrintable(preview.errorMessage));
 		QCOMPARE(song->tracks().size(), std::size_t(0));
 		const auto imported
-			= bus.execute("import.sampleToTrack", {{"path", path}, {"position", 96}, {"name", "Sample"}});
+			= bus.executeForAgent("import.sampleToTrack", {{"path", path}, {"position", 96}, {"name", "Sample"}});
 		QVERIFY2(imported.ok, qPrintable(imported.errorMessage));
 		QCOMPARE(song->tracks().size(), std::size_t(1));
 		QCOMPARE(song->tracks().at(0)->name(), QString("Sample"));
 		QCOMPARE(song->tracks().at(0)->getClips().at(0)->startPosition().getTicks(), 96);
-		QVERIFY(bus.execute("history.undo").ok);
+		auto* importedTrack = song->tracks().front();
+		auto* importedClip = importedTrack->getClips().front();
+		QVERIFY(bus.executeForAgent("history.undo").ok);
 		QCOMPARE(song->tracks().size(), std::size_t(0));
-		QVERIFY(bus.execute("history.redo").ok);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
 		QCOMPARE(song->tracks().size(), std::size_t(1));
-		QVERIFY(bus.execute("import.sampleToTrack", {{"path", path}, {"track", 0}, {"position", 192}}).ok);
+		QCOMPARE(song->tracks().front(), importedTrack);
+		QCOMPARE(importedTrack->getClips().front(), importedClip);
+		const QJsonArray steps{
+			QJsonObject{{"cmd", "import.sampleToTrack"}, {"args", QJsonObject{{"path", path}, {"track", 0}, {"position", 192}}}},
+			QJsonObject{{"assert", QJsonObject{{"expr", false}}}}};
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", steps}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(importedTrack->getClips().size(), std::size_t(1));
+		const QJsonArray removeImported{
+			steps[0], QJsonObject{{"cmd", "clip.remove"}, {"args", QJsonObject{{"track", 0}, {"clip", 1}}}}, steps[1]};
+		const auto removed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", removeImported}}}});
+		QCOMPARE(removed.errorCode, QString("script_assertion_failed"));
+		QCOMPARE(importedTrack->getClips().size(), std::size_t(1));
+		QVERIFY(bus.executeForAgent("import.sampleToTrack", {{"path", path}, {"track", 0}, {"position", 192}}).ok);
 		QCOMPARE(song->tracks().at(0)->getClips().size(), std::size_t(2));
-		QVERIFY(!bus.execute("import.sampleToTrack", {{"path", directory.filePath("missing.wav")}}).ok);
+		QVERIFY(!bus.executeForAgent("import.sampleToTrack", {{"path", directory.filePath("missing.wav")}}).ok);
 		QFile bad(directory.filePath("invalid.wav"));
 		QVERIFY(bad.open(QIODevice::WriteOnly));
 		bad.write("not audio");
 		bad.close();
-		QVERIFY(!bus.execute("import.sampleToTrack", {{"path", bad.fileName()}}).ok);
+		QCOMPARE(bus.executeForAgent("import.sampleToTrack", {{"path", bad.fileName()}}).errorCode,
+			QString("sample_load_failed"));
 		QCOMPARE(song->tracks().size(), std::size_t(1));
 		QCOMPARE(song->tracks().at(0)->getClips().size(), std::size_t(2));
 		QVERIFY(bus.execute("track.create", {{"type", "instrument"}}).ok);
-		QVERIFY(!bus.execute("import.sampleToTrack", {{"path", path}, {"track", 1}}).ok);
+		QVERIFY(!bus.executeForAgent("import.sampleToTrack", {{"path", path}, {"track", 1}}).ok);
 		QCOMPARE(song->tracks().at(1)->getClips().size(), std::size_t(0));
 	}
 

@@ -44,4 +44,7 @@
 - Peak 插件已编译至 `build/Release/plugins/peakcontrollereffect.dll`。真实宿主内 Peak 效果器和控制器联动，以及效果架显示为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。
 - R3 九条命令已接入。重点验证乐器实例保留、预设的宿主字段与效果链、同一效果实例的槽位和参数，以及 R2 的效果器回归。Windows Release 构建和 5 条定向用例或数据行通过，见 `build/agent-remaining-r3-final-*.log`。
 - 真实插件候选、持续音频渲染和第三方资源型参数为 `MANUAL/PENDING`。Agent 预设路径对含旧版内嵌自动化的数据在写入前明确拒绝，避免覆盖现有全局自动化。生命周期测试 `SKIPPED（用户禁止）`。
-- R4 按阶段检查点继续。
+- R4 三条命令已接入。MIDI 先在内存归集音符，再生成正式片段。Hydrogen 和 MIDI 的新增轨道、片段和 Pattern 注册在失败时以对象身份撤回。音频导入先解码，再提交轨道和片段。脚本清理遇到回滚失败立即结束循环。
+- R4 定向 Release 构建、三条导入业务用例和十七条 R2/R3 回归通过。用例涵盖 Hydrogen 中段错误、MIDI 格式错误和原轨道默认值恢复、采样导入后同批移除再失败。日志为 `build/agent-remaining-r4-final-build.log`、`build/agent-remaining-r4-import-unit.log` 与 `build/agent-remaining-r4-regression-*.log`。RED 日志为 `build/agent-remaining-r4-import-red.log` 与 `build/agent-remaining-r4-sample-composition-red.log`，后者为手动终止卡死用例时的日志。
+- Windows 快速原生导入用例从现有 `build/tests/Release` 以临时同名 `lmms.exe` 测试宿主运行，`LMMS_AGENT_PLUGIN_TEST_PATH` 指向 `build/Release/plugins`，以便插件导入表解析到测试宿主。运行结束后已清除临时副本。
+- 大型真实工程导入为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。

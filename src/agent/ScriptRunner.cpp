@@ -379,7 +379,10 @@ struct BatchGuard
 	{
 		while (bus.batchDepth() > depth)
 		{
-			bus.endBatch(false);
+			if (!bus.endBatch(false).ok)
+			{
+				break;
+			}
 		}
 	}
 };

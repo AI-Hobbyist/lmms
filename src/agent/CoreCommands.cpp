@@ -46,12 +46,14 @@
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "Instrument.h"
+#include "InstrumentPlayHandle.h"
 #include "ImportFilter.h"
 #include "InstrumentTrack.h"
 #include "MeterModel.h"
 #include "MidiClip.h"
 #include "Mixer.h"
 #include "Note.h"
+#include "PathUtil.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "PatternClip.h"
@@ -60,6 +62,7 @@
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "SampleClip.h"
+#include "SampleDecoder.h"
 #include "SampleFrame.h"
 #include "SampleTrack.h"
 #include "Scale.h"
@@ -3406,8 +3409,6 @@ struct IncrementalTrackMembership
 	QPointer<TrackContainer> container;
 	int index = 0;
 	bool detached = false;
-	// The journal validates at registration, before a removal detaches.
-	bool registering = false;
 
 	~IncrementalTrackMembership()
 	{
@@ -3446,29 +3447,14 @@ void recordTrackMembership(Track* track, bool removed)
 	auto state = std::make_shared<IncrementalTrackMembership>();
 	state->track = track;
 	state->container = track->trackContainer();
+	// Later edits in the same batch may have parked this instance already.
 	const auto valid = [state] {
-		if (!state->track || !state->container)
-		{
-			return false;
-		}
-		if (state->track->type() == Track::Type::Pattern)
-		{
-			return state->track->trackContainer() == state->container.data();
-		}
-		if (state->registering)
-		{
-			return true;
-		}
-		const auto& tracks = state->container->tracks();
-		const bool attached = std::find(tracks.begin(), tracks.end(), state->track.data()) != tracks.end();
-		return state->detached ? !attached : attached;
+		return state->track && state->container && state->track->trackContainer() == state->container.data();
 	};
 	const auto attach = [state] { attachIncrementalTrack(*state); };
 	const auto detach = [state] { detachIncrementalTrack(*state); };
-	state->registering = true;
 	const bool recorded = removed ? Engine::projectJournal()->addIncrementalChange({valid, attach, detach})
 								  : Engine::projectJournal()->addIncrementalChange({valid, detach, attach});
-	state->registering = false;
 	if (!recorded)
 	{
 		throw std::runtime_error("Could not record the track membership inverse.");
@@ -3518,7 +3504,6 @@ struct IncrementalClipMembership
 	QPointer<Track> track;
 	std::size_t index = 0;
 	bool detached = false;
-	bool registering = false;
 
 	~IncrementalClipMembership()
 	{
@@ -3552,28 +3537,12 @@ void recordClipMembership(Clip* clip, bool removed)
 	state->clip = clip;
 	state->track = clip->getTrack();
 	const auto valid = [state] {
-		if (!state->clip || !state->track)
-		{
-			return false;
-		}
-		if (state->track->trackContainer() == Engine::patternStore())
-		{
-			return state->clip->getTrack() == state->track.data();
-		}
-		if (state->registering)
-		{
-			return true;
-		}
-		const auto& clips = state->track->getClips();
-		const bool attached = std::find(clips.begin(), clips.end(), state->clip.data()) != clips.end();
-		return state->detached ? !attached : attached;
+		return state->clip && state->track && state->clip->getTrack() == state->track.data();
 	};
 	const auto attach = [state] { attachIncrementalClip(*state); };
 	const auto detach = [state] { detachIncrementalClip(*state); };
-	state->registering = true;
 	const bool recorded = removed ? Engine::projectJournal()->addIncrementalChange({valid, attach, detach})
 								  : Engine::projectJournal()->addIncrementalChange({valid, detach, attach});
-	state->registering = false;
 	if (!recorded)
 	{
 		throw std::runtime_error("Could not record the clip membership inverse.");
@@ -6082,6 +6051,106 @@ void recordPatternSelection(PatternStore* store, int index, bool undo)
 	}
 }
 
+// Native importers append members and may reject a later event or layer.
+// Capture only the original membership so the existing inverse records can
+// retain the imported objects even on that failure path.
+class NativeImportMembership
+{
+public:
+	NativeImportMembership(Song* song, InstrumentTrack* target, bool importsPatterns)
+		: m_song(song)
+		, m_store(importsPatterns ? Engine::patternStore() : nullptr)
+		, m_songTracks(song->tracks())
+		, m_rows(m_store ? m_store->tracks() : TrackContainer::TrackList{})
+	{
+		if (m_store)
+		{
+			recordPatternSelection(m_store, m_store->currentPattern(), true);
+		}
+		for (auto* row : m_rows)
+		{
+			m_existingClips.emplace_back(row, row->getClips());
+		}
+		if (target)
+		{
+			m_existingClips.emplace_back(target, target->getClips());
+		}
+	}
+
+	void recordAdded() const
+	{
+		for (auto* track : m_song->tracks())
+		{
+			if (std::find(m_songTracks.begin(), m_songTracks.end(), track) != m_songTracks.end())
+			{
+				continue;
+			}
+			recordImportedTrack(track);
+			if (auto* pattern = dynamic_cast<PatternTrack*>(track))
+			{
+				pattern->recordPatternRegistration(false);
+			}
+		}
+		if (m_store)
+		{
+			for (auto* row : m_store->tracks())
+			{
+				if (std::find(m_rows.begin(), m_rows.end(), row) == m_rows.end())
+				{
+					recordImportedTrack(row);
+				}
+			}
+		}
+		for (const auto& [track, original] : m_existingClips)
+		{
+			for (auto* clip : track->getClips())
+			{
+				if (std::find(original.begin(), original.end(), clip) == original.end())
+				{
+					recordCreatedClip(clip);
+				}
+			}
+		}
+		if (m_store)
+		{
+			recordPatternSelection(m_store, m_store->currentPattern(), false);
+		}
+	}
+
+private:
+	static void recordImportedTrack(Track* track)
+	{
+		if (auto* instrument = dynamic_cast<InstrumentTrack*>(track))
+		{
+			const QPointer<InstrumentTrack> target(instrument);
+			const auto portMode = instrument->midiPort()->mode();
+			const auto detach = [target] {
+				target->silenceAllNotes(true);
+				target->midiPort()->setMode(MidiPort::Mode::Disabled);
+			};
+			const auto attach = [target, portMode] {
+				target->midiPort()->setMode(portMode);
+				if (auto* plugin = target->instrument(); plugin && plugin->isSingleStreamed())
+				{
+					Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(plugin, target.data()));
+				}
+			};
+			const auto valid = [target] { return !target.isNull(); };
+			if (!Engine::projectJournal()->addIncrementalChange({valid, detach, attach}))
+			{
+				throw std::runtime_error("Could not record imported instrument playback.");
+			}
+		}
+		recordCreatedTrack(track);
+	}
+
+	Song* m_song;
+	PatternStore* m_store;
+	TrackContainer::TrackList m_songTracks;
+	TrackContainer::TrackList m_rows;
+	std::vector<std::pair<Track*, Track::clipVector>> m_existingClips;
+};
+
 CommandResult executePattern(const QString& action, const QJsonObject& arguments)
 {
 	auto* song = Engine::getSong();
@@ -6519,6 +6588,9 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 											   "effect.setEnabled",
 											   "effect.setParam",
 											   "effect.setWetDry",
+											   "import.hydrogen",
+											   "import.midi",
+											   "import.sampleToTrack",
 												   "instrument.setArpeggio",
 												   "instrument.setNoteStacking",
 												   "instrument.setMidiIn",
@@ -6800,7 +6872,29 @@ void registerCoreCommands(CommandBus& commandBus)
 						"Native MIDI file import requires Song tracks. Use MIDI note commands to populate Pattern rows.");
 				}
 				auto guard = Engine::audioEngine()->requestChangesGuard();
-				if (!ImportFilter::tryImportFile(source.absoluteFilePath(), container, plugin, target))
+				std::optional<NativeImportMembership> membership;
+				if (incrementalTransactionActive())
+				{
+					membership.emplace(song, target, format == "hydrogen");
+				}
+				bool imported = false;
+				try
+				{
+					imported = ImportFilter::tryImportFile(source.absoluteFilePath(), container, plugin, target);
+				}
+				catch (...)
+				{
+					if (membership)
+					{
+						membership->recordAdded();
+					}
+					throw;
+				}
+				if (membership)
+				{
+					membership->recordAdded();
+				}
+				if (!imported)
 				{
 					return CommandResult::failure(
 						"import_failed", "The native import filter rejected the file; project edits were rolled back.");
@@ -6872,6 +6966,19 @@ void registerCoreCommands(CommandBus& commandBus)
 			{
 				return invalidArguments("Sample position is outside the song range.");
 			}
+			const bool incremental = incrementalTransactionActive();
+			std::shared_ptr<const SampleBuffer> prepared;
+			if (incremental)
+			{
+				const auto path = source.absoluteFilePath();
+				auto decoded = SampleDecoder::decode(path);
+				if (!decoded || decoded->data.empty())
+				{
+					return CommandResult::failure("sample_load_failed", "LMMS could not decode the requested sample file.");
+				}
+				auto& [frames, sampleRate] = *decoded;
+				prepared = std::make_shared<SampleBuffer>(std::move(frames), sampleRate, PathUtil::toShortestRelative(path));
+			}
 			QJsonObject address{{"parent", arguments.value("parent").toString("song")}};
 			if (arguments.contains("track"))
 			{
@@ -6908,6 +7015,23 @@ void registerCoreCommands(CommandBus& commandBus)
 				return clip;
 			}
 			address.insert("clip", clip.data.value("index"));
+			if (prepared)
+			{
+				SampleClip* sampleClip = nullptr;
+				ClipAddress resolved;
+				CommandResult failure;
+				if (!resolveSampleClip(song, address, sampleClip, resolved, failure))
+				{
+					return failure;
+				}
+				const auto guard = Engine::audioEngine()->requestChangesGuard();
+				sampleClip->sample() = Sample(prepared);
+				sampleClip->updateLength();
+				emit sampleClip->sampleChanged();
+				emit sampleClip->playbackPositionChanged();
+				song->setModified();
+				return CommandResult::success(sampleInfo(resolved, sampleClip));
+			}
 			address.insert("path", source.absoluteFilePath());
 			return executeSampleSetFile(address);
 		});
