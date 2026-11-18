@@ -63,6 +63,7 @@ public:
 	void removeEffect( Effect * _effect );
 	void insertEffectIncrementally(Effect* effect, int index);
 	void removeEffectIncrementally(Effect* effect);
+	void moveEffectIncrementally(Effect* effect, int from, int to);
 	void clearIncrementally();
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );

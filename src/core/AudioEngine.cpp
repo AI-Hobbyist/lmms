@@ -35,6 +35,7 @@
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
+#include "InstrumentPlayHandle.h"
 #include "ConfigManager.h"
 
 // platform-specific audio-interface-classes
@@ -539,6 +540,21 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 
 void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
+	removeMatchingPlayHandles([track, types](PlayHandle* handle) {
+		return (handle->type() & types) && handle->isFromTrack(track);
+	});
+}
+
+void AudioEngine::removeInstrumentPlayHandles(const Instrument* instrument)
+{
+	removeMatchingPlayHandles([instrument](PlayHandle* handle) {
+		return handle->type() == PlayHandle::Type::InstrumentPlayHandle
+			&& static_cast<InstrumentPlayHandle*>(handle)->instrument() == instrument;
+	});
+}
+
+void AudioEngine::removeMatchingPlayHandles(const std::function<bool(PlayHandle*)>& matches)
+{
 	requestChangeInModel();
 	// A newly created instrument may be replaced before the next audio period.
 	// Remove its queued handles while their owning track is still alive, too.
@@ -546,7 +562,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	{
 		auto* next = entry->next;
 		auto* handle = entry->value;
-		if ((handle->type() & types) && handle->isFromTrack(track))
+		if (matches(handle))
 		{
 			if (previous)
 			{
@@ -576,7 +592,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
+		if (matches(*it))
 		{
 			(*it)->audioBusHandle()->removePlayHandle(*it);
 			if((*it)->type() == PlayHandle::Type::NotePlayHandle)

@@ -99,6 +99,7 @@ public:
 	{
 		return m_instrument;
 	}
+	void replaceInstrumentIncrementally(Instrument* replacement);
 
 	void deleteNotePluginData( NotePlayHandle * _n );
 

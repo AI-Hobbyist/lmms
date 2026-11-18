@@ -1,3 +1,8 @@
+## 当前交接：Agent 增量回滚 R3（2026-11-18）
+
+- R1 fed638aa4、R2 0d34114db 已分别推送。R3 Windows Release 构建与 5 条定向业务用例通过，日志 build/agent-remaining-r3-final-{build,unit}.log。提交后核对 origin/master，再开始 R4。
+- R3 实施范围为乐器旧实例保留、播放句柄切换、预设宿主字段和局部效果链、效果命令及参数回放。真实插件和文件型参数 MANUAL/PENDING。内嵌旧版自动化预设写入前拒绝。生命周期测试 SKIPPED（用户禁止）。
+- R4 接续三条导入命令。先准备资源，失败时恢复被导入器追加的轨道、片段和 Pattern 列关系，验证后独立提交推送。计划见 doc/agent/incremental-rollback-remaining-commands-plan.md。
 ## 当前交接：Agent 增量回滚 R2（2026-11-18）
 
 - 持续目标：按 doc/agent/incremental-rollback-remaining-commands-plan.md 顺序完成 R1～R4，每阶段快速单元测试通过后单独提交推送。用户已批准保留原乐器实例与效果器原槽摘挂。

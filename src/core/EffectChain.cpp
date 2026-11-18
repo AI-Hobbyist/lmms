@@ -82,11 +82,23 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void EffectChain::loadSettings( const QDomElement & _this )
 {
-	clear();
+	auto* journal = Engine::projectJournal();
+	const bool incremental = journal && journal->isIncrementalTransaction();
+	if (incremental)
+	{
+		clearIncrementally();
+	}
+	else
+	{
+		clear();
+	}
 
 	// TODO This method should probably also lock the audio engine
 
-	m_enabledModel.loadSettings( _this, "enabled" );
+	if (!incremental)
+	{
+		m_enabledModel.loadSettings( _this, "enabled" );
+	}
 
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
 
@@ -113,13 +125,27 @@ void EffectChain::loadSettings( const QDomElement & _this )
 				e = new DummyEffect( parentModel(), effectData );
 			}
 
-			m_effects.push_back( e );
+			if (incremental)
+			{
+				insertEffectIncrementally(e, effectCount());
+			}
+			else
+			{
+				m_effects.push_back( e );
+			}
 			++fx_loaded;
 		}
 		node = node.nextSibling();
 	}
 
-	emit dataChanged();
+	if (incremental)
+	{
+		m_enabledModel.loadSettings(_this, "enabled");
+	}
+	else
+	{
+		emit dataChanged();
+	}
 }
 
 
@@ -263,6 +289,36 @@ void EffectChain::clearIncrementally()
 		removeEffectIncrementally(m_effects.back());
 	}
 	m_enabledModel.setValue(false);
+}
+
+void EffectChain::moveEffectIncrementally(Effect* effect, int from, int to)
+{
+	if (from == to)
+	{
+		return;
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const QPointer<Effect> identity(effect);
+	const QPointer<EffectChain> chain(this);
+	const auto move = [identity](EffectChain* target, int index) {
+		auto& effects = target->m_effects;
+		std::erase(effects, identity.data());
+		effects.insert(effects.begin() + index, identity.data());
+	};
+	const auto refresh = [chain] {
+		if (chain)
+		{
+			emit chain->incrementalContentsChanged();
+		}
+	};
+	auto* journal = Engine::projectJournal();
+	if (!journal->addIncrementalChange({[chain, identity] { return chain && identity; },
+			[chain, move, from] { move(chain.data(), from); },
+			[chain, move, to] { move(chain.data(), to); }, refresh}))
+	{
+		throw std::runtime_error("Could not record effect order.");
+	}
+	move(this, to);
 }
 
 void EffectChain::moveDown( Effect * _effect )

@@ -23,6 +23,8 @@
  */
 #include "InstrumentTrack.h"
 
+#include <QScopeGuard>
+
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
@@ -32,6 +34,7 @@
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "InstrumentPlayHandle.h"
 #include "Keymap.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
@@ -41,6 +44,7 @@
 #include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
+#include "agent/IncrementalUndo.h"
 
 namespace lmms
 {
@@ -205,6 +209,14 @@ InstrumentTrack::~InstrumentTrack()
 
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
+	const auto ownedModels = children();
+	for (auto* model : ownedModels)
+	{
+		if (auto* parked = dynamic_cast<Instrument*>(model))
+		{
+			delete parked;
+		}
+	}
 }
 
 
@@ -879,13 +891,19 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
+	auto* journal = Engine::projectJournal();
+	const bool incremental = journal && journal->isIncrementalTransaction();
 	// don't delete instrument in preview mode if it's the same
 	// we can't do this for other situations due to some issues with linked models
 	bool reuseInstrument = m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
 	// remove the InstrumentPlayHandle if and only if we need to delete the instrument
-	silenceAllNotes(!reuseInstrument);
+	if (!incremental)
+	{
+		silenceAllNotes(!reuseInstrument);
+	}
 
 	lock();
+	const auto unlockTrack = qScopeGuard([this] { unlock(); });
 
 	m_volumeModel.loadSettings( thisElement, "vol" );
 	m_panningModel.loadSettings( thisElement, "pan" );
@@ -903,7 +921,38 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
-	m_audioBusHandle.effects()->clear();
+	if (incremental)
+	{
+		m_audioBusHandle.effects()->clearIncrementally();
+	}
+	else
+	{
+		m_audioBusHandle.effects()->clear();
+	}
+
+	const auto loadInstrumentState = [this, journal](const QString& name, const Plugin::Descriptor::SubPluginFeatures::Key* key,
+										 const QDomElement& state, bool fromDrag) {
+		const auto disposeCandidate = [](Instrument* instrument) {
+			Engine::audioEngine()->removeInstrumentPlayHandles(instrument);
+			delete instrument;
+		};
+		std::unique_ptr<Instrument, decltype(disposeCandidate)> candidate(nullptr, disposeCandidate);
+		QString preparedName;
+		{
+			const auto recording = journal->pauseIncrementalRecording();
+			const QString originalName = this->name();
+			candidate.reset(Instrument::instantiate(name, this, key, fromDrag));
+			if (!fromDrag || candidate->nodeName() == name)
+			{
+				candidate->restoreState(state);
+			}
+			preparedName = this->name();
+			setName(originalName);
+		}
+		replaceInstrumentIncrementally(candidate.get());
+		candidate.release();
+		setName(preparedName);
+	};
 
 	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
 	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
@@ -939,7 +988,11 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 				using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				if (reuseInstrument)
+				if (incremental)
+				{
+					loadInstrumentState(node.toElement().attribute("name"), &key, node.firstChildElement(), false);
+				}
+				else if (reuseInstrument)
 				{
 					m_instrument->restoreState(node.firstChildElement());
 				}
@@ -967,15 +1020,20 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ))
 			{
-				delete m_instrument;
-				m_instrument = nullptr;
-				m_instrument = Instrument::instantiate(
-					node.nodeName(), this, nullptr, true);
-				if (m_instrument->nodeName() == node.nodeName())
+				if (incremental)
 				{
-					m_instrument->restoreState(node.toElement());
+					loadInstrumentState(node.nodeName(), nullptr, node.toElement(), true);
 				}
-				emit instrumentChanged();
+				else
+				{
+					delete m_instrument;
+					m_instrument = Instrument::instantiate(node.nodeName(), this, nullptr, true);
+					if (m_instrument->nodeName() == node.nodeName())
+					{
+						m_instrument->restoreState(node.toElement());
+					}
+					emit instrumentChanged();
+				}
 			}
 		}
 		node = node.nextSibling();
@@ -985,7 +1043,6 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_midiCCEnable->loadSettings(thisElement, "enablecc");
 
 	updatePitchRange();
-	unlock();
 }
 
 
@@ -1036,6 +1093,70 @@ QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) 
 
 
 
+
+void InstrumentTrack::replaceInstrumentIncrementally(Instrument* replacement)
+{
+	struct RetainedInstrument
+	{
+		QPointer<Instrument> instrument;
+		bool parked = false;
+
+		~RetainedInstrument()
+		{
+			if (parked)
+			{
+				delete instrument.data();
+			}
+		}
+	};
+
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const QPointer<InstrumentTrack> track(this);
+	auto before = std::make_shared<RetainedInstrument>();
+	auto after = std::make_shared<RetainedInstrument>();
+	before->instrument = m_instrument;
+	after->instrument = replacement;
+	const bool hadInstrument = m_instrument != nullptr;
+	const auto switchInstrument = [track](const auto& outgoing, const auto& incoming) {
+		track->silenceAllNotes(false);
+		auto* engine = Engine::audioEngine();
+		auto* old = outgoing->instrument.data();
+		if (old)
+		{
+			engine->removeInstrumentPlayHandles(old);
+			old->setParent(track.data());
+			outgoing->parked = true;
+		}
+		auto* next = incoming->instrument.data();
+		track->m_instrument = next;
+		if (next)
+		{
+			next->setParent(nullptr);
+			if (incoming->parked && next->isSingleStreamed())
+			{
+				engine->addPlayHandle(new InstrumentPlayHandle(next, track.data()));
+			}
+			incoming->parked = false;
+		}
+	};
+	const auto valid = [track, before, after, hadInstrument] {
+		return track && after->instrument && (!hadInstrument || before->instrument);
+	};
+	const auto refresh = [track] {
+		if (track)
+		{
+			emit track->instrumentChanged();
+		}
+	};
+	auto* journal = Engine::projectJournal();
+	if (!journal->addIncrementalChange({valid,
+			[switchInstrument, before, after] { switchInstrument(after, before); },
+			[switchInstrument, before, after] { switchInstrument(before, after); }, refresh}))
+	{
+		throw std::runtime_error("Could not record the instrument replacement.");
+	}
+	switchInstrument(before, after);
+}
 
 Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 	const Plugin::Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)

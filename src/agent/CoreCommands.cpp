@@ -950,18 +950,6 @@ void recordMixerChannelValue(Mixer* mixer, MixerChannel* channel, Value before, 
 
 // Restoring a whole serialized plugin state is not a proven local inverse for a
 // running plugin instance, so Agent transactions refuse it before writing.
-bool serializedStateEditUnavailable()
-{
-	auto* journal = Engine::projectJournal();
-	return journal && journal->isIncrementalTransaction();
-}
-
-CommandResult serializedStateEditRefusal()
-{
-	return CommandResult::failure("incremental_rollback_unavailable",
-		"This serialized plugin parameter has not yet been migrated to incremental rollback; no changes were made.");
-}
-
 bool incrementalTransactionActive();
 
 CommandResult executeMixerSetName(const QJsonObject& arguments)
@@ -1833,8 +1821,16 @@ CommandResult executeEffectRemove(const QJsonObject& arguments)
 	}
 
 	const QString path = QStringLiteral("%1/fx:%2").arg(owner.path).arg(slot);
-	owner.effectChain->removeEffect(effect);
-	effect->deleteLater();
+	if (incrementalTransactionActive())
+	{
+		owner.effectChain->removeEffectIncrementally(effect);
+		song->setModified();
+	}
+	else
+	{
+		owner.effectChain->removeEffect(effect);
+		effect->deleteLater();
+	}
 	return CommandResult::success(QJsonObject{{"removed", path}});
 }
 
@@ -1872,6 +1868,15 @@ CommandResult executeEffectMove(const QJsonObject& arguments)
 	}
 
 	auto guard = Engine::audioEngine()->requestChangesGuard();
+	if (incrementalTransactionActive())
+	{
+		owner.effectChain->moveEffectIncrementally(effect, slot, index);
+		if (slot != index)
+		{
+			song->setModified();
+		}
+		return CommandResult::success(effectDetail(owner, index, effect));
+	}
 	while (slot > index)
 	{
 		owner.effectChain->moveUp(effect);
@@ -1910,6 +1915,10 @@ CommandResult executeEffectSetEnabled(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 	effect->enabledModel()->setValue(value);
+	if (incrementalTransactionActive())
+	{
+		song->setModified();
+	}
 	return CommandResult::success(effectDetail(owner, slot, effect));
 }
 
@@ -1938,6 +1947,10 @@ CommandResult executeEffectSetWetDry(const QJsonObject& arguments)
 		return invalidArguments(error);
 	}
 	effect->wetDryModel()->setValue(static_cast<float>(value));
+	if (incrementalTransactionActive())
+	{
+		song->setModified();
+	}
 	return CommandResult::success(effectDetail(owner, slot, effect));
 }
 
@@ -1988,7 +2001,21 @@ bool setReflectedParameter(AutomatableModel* model, const QJsonValue& value, QSt
 	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	model->setValue(static_cast<float>(number));
+	if (incrementalTransactionActive())
+	{
+		Engine::getSong()->setModified();
+	}
 	return true;
+}
+
+void removeSerializedConnections(QDomElement& state)
+{
+	const auto connections = state.elementsByTagName("connection");
+	while (!connections.isEmpty())
+	{
+		const auto connection = connections.item(0);
+		connection.parentNode().removeChild(connection);
+	}
 }
 
 CommandResult executeEffectGetParams(const QJsonObject& arguments)
@@ -2056,17 +2083,24 @@ CommandResult executeEffectSetParam(const QJsonObject& arguments)
 	auto root = document.createElement("agent");
 	document.appendChild(root);
 	auto state = effect->controls()->saveState(document, root);
+	if (incrementalTransactionActive())
+	{
+		removeSerializedConnections(state);
+	}
+	const auto before = state.cloneNode(true).toElement();
 	if (!setSerializedParameter(state, QString(), name, serializedParameterText(value)))
 	{
 		return CommandResult::failure(
 			"effect_parameter_not_found", QStringLiteral("Effect parameter '%1' does not exist.").arg(name));
 	}
-	if (serializedStateEditUnavailable())
-	{
-		return serializedStateEditRefusal();
-	}
 	auto guard = Engine::audioEngine()->requestChangesGuard();
+	recordIncrementalValue(effect->controls(), before, state,
+		[](EffectControls* controls, const QDomElement& settings) { controls->restoreState(settings); });
 	effect->controls()->restoreState(state);
+	if (incrementalTransactionActive())
+	{
+		song->setModified();
+	}
 
 	auto data = effectDetail(owner, slot, effect);
 	data.insert(
@@ -2147,17 +2181,24 @@ CommandResult executeInstrumentSetParam(const QJsonObject& arguments)
 	auto root = document.createElement("agent");
 	document.appendChild(root);
 	auto state = track->instrument()->saveState(document, root);
+	if (incrementalTransactionActive())
+	{
+		removeSerializedConnections(state);
+	}
+	const auto before = state.cloneNode(true).toElement();
 	if (!setSerializedParameter(state, QString(), name, serializedParameterText(value)))
 	{
 		return CommandResult::failure(
 			"instrument_parameter_not_found", QStringLiteral("Instrument parameter '%1' does not exist.").arg(name));
 	}
-	if (serializedStateEditUnavailable())
-	{
-		return serializedStateEditRefusal();
-	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	recordIncrementalValue(track->instrument(), before, state,
+		[](Instrument* instrument, const QDomElement& settings) { instrument->restoreState(settings); });
 	track->instrument()->restoreState(state);
+	if (incrementalTransactionActive())
+	{
+		song->setModified();
+	}
 
 	auto data = serializedParameters(state);
 	data.insert("path", trackPath(trackIndex, track));
@@ -4215,28 +4256,68 @@ CommandResult prepareAndLoadInstrument(const QJsonObject& arguments, bool valida
 	{
 		return CommandResult::success();
 	}
-	auto* instrument = track->loadInstrument(plugin, subKey ? &*subKey : nullptr);
-	if (instrument == nullptr || instrument->descriptor() != pluginInfo.descriptor)
-	{
-		return CommandResult::failure(
-			"instrument_load_failed", QStringLiteral("LMMS could not load instrument '%1'.").arg(plugin));
-	}
-
-	if (!nativeState.isNull())
-	{
-		instrument->restoreState(nativeState);
-		const auto loaded = instrument->saveState(nativeDocument, nativeState);
-		if (loaded.attribute("format") != "vst3" || loaded.attribute("classid") != nativeState.attribute("classid")
-			|| loaded.attribute("architecture") != nativeState.attribute("architecture")
-			|| !loaded.hasAttribute("vst3state"))
+	const bool incremental = incrementalTransactionActive();
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto deleteCandidate = [](Instrument* candidate) {
+		Engine::audioEngine()->removeInstrumentPlayHandles(candidate);
+		delete candidate;
+	};
+	std::unique_ptr<Instrument, decltype(deleteCandidate)> candidate(nullptr, deleteCandidate);
+	auto* key = subKey ? &*subKey : nullptr;
+	const auto initialize = [&](Instrument* instrument) {
+		if (!instrument || instrument->descriptor() != pluginInfo.descriptor)
 		{
 			return CommandResult::failure(
-				"instrument_load_failed", "The selected VST3 instance could not be initialized.");
+				"instrument_load_failed", QStringLiteral("LMMS could not load instrument '%1'.").arg(plugin));
 		}
-	}
-	else if (!path.isEmpty())
+		if (!nativeState.isNull())
+		{
+			instrument->restoreState(nativeState);
+			const auto loaded = instrument->saveState(nativeDocument, nativeState);
+			if (loaded.attribute("format") != "vst3"
+				|| loaded.attribute("classid") != nativeState.attribute("classid")
+				|| loaded.attribute("architecture") != nativeState.attribute("architecture")
+				|| !loaded.hasAttribute("vst3state"))
+			{
+				return CommandResult::failure(
+					"instrument_load_failed", "The selected VST3 instance could not be initialized.");
+			}
+		}
+		else if (!path.isEmpty())
+		{
+			instrument->loadFile(path);
+		}
+		return CommandResult::success();
+	};
+
+	if (incremental)
 	{
-		instrument->loadFile(path);
+		QString preparedName;
+		{
+			// Detached models are covered by the instance membership record after attachment.
+			const auto recording = Engine::projectJournal()->pauseIncrementalRecording();
+			const QString originalName = track->name();
+			candidate.reset(Instrument::instantiate(plugin, track, key));
+			if (candidate)
+			{
+				track->setName(candidate->displayName());
+			}
+			const auto initialized = initialize(candidate.get());
+			preparedName = track->name();
+			track->setName(originalName);
+			if (!initialized.ok)
+			{
+				return initialized;
+			}
+		}
+		track->replaceInstrumentIncrementally(candidate.get());
+		candidate.release();
+		track->setName(preparedName);
+		song->setModified();
+	}
+	else if (const auto initialized = initialize(track->loadInstrument(plugin, key)); !initialized.ok)
+	{
+		return initialized;
 	}
 	return CommandResult::success(QJsonObject{
 		{"path", trackPath(trackIndex, track)}, {"plugin", plugin}, {"parameters", instrumentParameters(track)}});
@@ -5538,11 +5619,24 @@ CommandResult executeInstrumentExtended(const QString& action, const QJsonObject
 			{
 				return CommandResult::failure("unsafe_preset", "The preset contains local plugin paths.");
 			}
+			const bool incremental = incrementalTransactionActive();
+			if (incremental
+				&& !preset.content().toElement().elementsByTagName(AutomationClip::classNodeName()).isEmpty())
+			{
+				return CommandResult::failure("incremental_rollback_unavailable",
+					"Legacy preset automation requires a separate project edit.");
+			}
+			const bool hadErrors = song->hasErrors();
 			auto guard = Engine::audioEngine()->requestChangesGuard();
 			track->replaceInstrument(preset);
 			if (song->hasErrors())
 			{
-				return CommandResult::failure("preset_load_failed", song->errorSummary());
+				const auto error = song->errorSummary();
+				if (incremental && !hadErrors)
+				{
+					song->clearErrors();
+				}
+				return CommandResult::failure("preset_load_failed", error);
 			}
 		}
 		else
@@ -6364,6 +6458,9 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 												   "track.setMixerChannel",
 												   "model.setValue",
 												   "instrument.setParameters",
+											   "instrument.load",
+											   "instrument.loadPreset",
+											   "instrument.setParam",
 												   "instrument.setVolume",
 												   "instrument.setPanning",
 												   "instrument.setPitch",
@@ -6416,6 +6513,12 @@ void registerDescriptor(CommandBus& commandBus, const QString& name, const QStri
 												   "mixer.setSolo",
 												   "mixer.setSendAmount",
 												   "mixer.clearChannel",
+											   "effect.add",
+											   "effect.move",
+											   "effect.remove",
+											   "effect.setEnabled",
+											   "effect.setParam",
+											   "effect.setWetDry",
 												   "instrument.setArpeggio",
 												   "instrument.setNoteStacking",
 												   "instrument.setMidiIn",

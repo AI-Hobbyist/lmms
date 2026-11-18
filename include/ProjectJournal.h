@@ -26,6 +26,7 @@
 #define LMMS_PROJECT_JOURNAL_H
 
 #include <QHash>
+#include <QScopedValueRollback>
 #include <QStack>
 
 #include <vector>
@@ -74,6 +75,10 @@ public:
 	bool isIncrementalTransaction() const;
 	bool isRestoring() const { return m_restoringProject; }
 	bool isRestoringIncrementally() const { return m_incrementalReplay; }
+	QScopedValueRollback<bool> pauseIncrementalRecording()
+	{
+		return QScopedValueRollback<bool>{m_incrementalRecordingPaused, true};
+	}
 	bool addIncrementalChange(IncrementalChange change);
 	bool canUndoIncrementally() const;
 	bool canRedoIncrementally() const;
@@ -167,6 +172,7 @@ private:
 
 	bool m_journalling;
 	bool m_incrementalReplay = false;
+	bool m_incrementalRecordingPaused = false;
 
 } ;
 

@@ -49,6 +49,7 @@ public:
 	}
 
 	bool isFromTrack(const Track* track) const override;
+	const Instrument* instrument() const { return m_instrument; }
 
 private:
 	Instrument* m_instrument;

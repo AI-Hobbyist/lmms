@@ -179,6 +179,14 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
+	const auto loadScale = [this](ScaleType scale) {
+		if (scale != m_scaleType)
+		{
+			agent::recordIncrementalValue(this, m_scaleType, scale,
+				[](AutomatableModel* model, ScaleType value) { model->setScaleType(value); });
+			setScaleType(scale);
+		}
+	};
 	// compat code
 	QDomNode node = element.namedItem( AutomationClip::classNodeName() );
 	if( node.isElement() )
@@ -219,7 +227,14 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		}
 		if( thisConnection.isElement() )
 		{
-			setControllerConnection(new ControllerConnection(nullptr));
+			if (Engine::projectJournal()->isIncrementalTransaction())
+			{
+				replaceControllerConnectionIncrementally(new ControllerConnection(nullptr));
+			}
+			else
+			{
+				setControllerConnection(new ControllerConnection(nullptr));
+			}
 			m_controllerConnection->loadSettings( thisConnection.toElement() );
 			//m_controllerConnection->setTargetName( displayName() );
 		}
@@ -259,29 +274,41 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( node.isElement() )
 	{
 		QDomElement nodeElement = node.toElement();
-		changeID( nodeElement.attribute( "id" ).toInt() );
+		if (!Engine::projectJournal()->isIncrementalTransaction())
+		{
+			changeID(nodeElement.attribute("id").toInt());
+		}
 		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
 		if( nodeElement.hasAttribute( "scale_type" ) )
 		{
 			if( nodeElement.attribute( "scale_type" ) == "linear" )
 			{
-				setScaleType( ScaleType::Linear );
+				loadScale(ScaleType::Linear);
 			}
 			else if( nodeElement.attribute( "scale_type" ) == "log" )
 			{
-				setScaleType( ScaleType::Logarithmic );
+				loadScale(ScaleType::Logarithmic);
 			}
 		}
 	}
 	else
 	{
 
-		setScaleType( ScaleType::Linear );
+		loadScale(ScaleType::Linear);
 
 		if( element.hasAttribute( name ) )
-			// attribute => read the element's value from the attribute list
 		{
-			setInitValue( LocaleHelper::toFloat( element.attribute( name ) ) );
+			const float value = LocaleHelper::toFloat(element.attribute(name));
+			const float initial = fittedValue(value);
+			if (initial != m_initValue)
+			{
+				agent::recordIncrementalValue(this, m_initValue, initial,
+					[](AutomatableModel* model, float target) {
+						model->m_initValue = target;
+						emit model->initValueChanged(target);
+					});
+			}
+			setInitValue(value);
 		}
 		else
 		{

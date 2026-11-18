@@ -25,6 +25,7 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
+#include <functional>
 #include <mutex>
 
 #include <QThread>
@@ -46,6 +47,7 @@ namespace lmms
 {
 
 class MidiClient;
+class Instrument;
 class AudioBusHandle;  // IWYU pragma: keep
 class AudioEngineWorkerThread;
 
@@ -170,6 +172,7 @@ public:
 	}
 
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
+	void removeInstrumentPlayHandles(const Instrument* instrument);
 
 	AudioEngineProfiler& profiler()
 	{
@@ -314,6 +317,7 @@ signals:
 
 
 private:
+	void removeMatchingPlayHandles(const std::function<bool(PlayHandle*)>& matches);
 	void renderNextBuffer(AudioBufferView<float> auto dst)
 	{
 		for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)

@@ -251,7 +251,8 @@ bool ProjectJournal::beginIncrementalTransaction(Song* song)
 
 bool ProjectJournal::isIncrementalTransaction() const
 {
-	return !m_restoringProject && hasActiveTransaction() && bool(m_transactions.back().checkpoint.changes);
+	return !m_restoringProject && !m_incrementalRecordingPaused && hasActiveTransaction()
+		&& bool(m_transactions.back().checkpoint.changes);
 }
 
 bool ProjectJournal::addIncrementalChange(IncrementalChange change)

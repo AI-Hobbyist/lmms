@@ -2,14 +2,17 @@
 
 #include <QJsonArray>
 #include <QDir>
+#include <QTemporaryDir>
 #include <QtMath>
 
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "AutomatableModel.h"
+#include "DataFile.h"
 #include "Engine.h"
 #include "Effect.h"
 #include "EffectControls.h"
+#include "DummyInstrument.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "PatternStore.h"
@@ -175,6 +178,152 @@ private slots:
 		QVERIFY(bus.executeForAgent("history.redo").ok);
 		QCOMPARE(chain.effectCount(), 0);
 		QVERIFY(first && second);
+	}
+
+	void agentEffectEditsRollBackInPlace()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* journal = lmms::Engine::projectJournal();
+		auto& chain = lmms::Engine::mixer()->mixerChannel(0)->m_fxChain;
+		const QPointer<lmms::Effect> first(new AgentTestEffect(&chain));
+		const QPointer<lmms::Effect> second(new AgentTestEffect(&chain));
+		chain.appendEffect(first.data());
+		chain.appendEffect(second.data());
+		journal->clearJournal();
+
+		const QJsonArray edits{
+			QJsonObject{{"cmd", "effect.move"}, {"args", QJsonObject{{"owner", "channel:0"}, {"slot", 0}, {"index", 1}}}},
+			QJsonObject{{"cmd", "effect.setWetDry"}, {"args", QJsonObject{{"owner", "channel:0"}, {"slot", 1}, {"value", -0.25}}}},
+			QJsonObject{{"cmd", "effect.setEnabled"}, {"args", QJsonObject{{"owner", "channel:0"}, {"slot", 1}, {"value", false}}}},
+			QJsonObject{{"cmd", "effect.setParam"}, {"args", QJsonObject{{"owner", "channel:0"}, {"slot", 1}, {"name", "volume"}, {"value", 75.0}}}},
+			QJsonObject{{"cmd", "effect.remove"}, {"args", QJsonObject{{"owner", "channel:0"}, {"slot", 0}}}}};
+		const auto parameter = [&] {
+			const auto result = bus.execute("effect.getParams", {{"owner", "channel:0"}, {"slot", 0}});
+			return parameterValue(result.data.value("parameters").toArray(), "volume").toDouble();
+		};
+		const auto verifyOriginal = [&] {
+			QCOMPARE(chain.effectAt(0), first.data());
+			QCOMPARE(chain.effectAt(1), second.data());
+			QCOMPARE(first->wetDryModel()->value(), 1.0f);
+			QVERIFY(first->enabledModel()->value());
+			QCOMPARE(parameter(), 100.0);
+		};
+		const auto preview = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", edits}}}, {"dryRun", true}});
+		QVERIFY2(preview.ok, qPrintable(preview.errorCode));
+		verifyOriginal();
+		QCOMPARE(journal->undoDepth(), 0);
+
+		auto failing = edits;
+		failing.append(QJsonObject{{"assert", QJsonObject{{"expr", false}}}});
+		const auto failed = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", failing}}}});
+		QCOMPARE(failed.errorCode, QString("script_assertion_failed"));
+		verifyOriginal();
+
+		const auto applied = bus.executeForAgent("agent.runScript", {{"script", QJsonObject{{"steps", edits}}}});
+		QVERIFY2(applied.ok, qPrintable(applied.errorCode));
+		QCOMPARE(chain.effectAt(0), first.data());
+		QCOMPARE(chain.effectCount(), 1);
+		QVERIFY(second);
+		QCOMPARE(first->wetDryModel()->value(), -0.25f);
+		QVERIFY(!first->enabledModel()->value());
+		QCOMPARE(parameter(), 75.0);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		verifyOriginal();
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(chain.effectAt(0), first.data());
+		QCOMPARE(chain.effectCount(), 1);
+		QCOMPARE(parameter(), 75.0);
+	}
+
+	void agentInstrumentSwapRetainsBothInstances()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* song = lmms::Engine::getSong();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("track.create", {{"type", "instrument"}}).ok);
+		auto* track = static_cast<lmms::InstrumentTrack*>(song->tracks().front());
+		journal->clearJournal();
+		QVERIFY(journal->beginIncrementalTransaction(song));
+		const QPointer<lmms::Instrument> oldInstrument(new lmms::DummyInstrument(track));
+		track->replaceInstrumentIncrementally(oldInstrument.data());
+		QVERIFY(journal->commitTransaction());
+		journal->clearJournal();
+		QCOMPARE(track->instrument(), oldInstrument.data());
+
+		QVERIFY(journal->beginIncrementalTransaction(song));
+		auto* preview = new lmms::DummyInstrument(track);
+		track->replaceInstrumentIncrementally(preview);
+		QVERIFY(journal->rollbackTransaction());
+		QCOMPARE(track->instrument(), oldInstrument.data());
+		QCOMPARE(journal->undoDepth(), 0);
+
+		const QPointer<lmms::Instrument> replacement(new lmms::DummyInstrument(track));
+		QVERIFY(journal->beginIncrementalTransaction(song));
+		track->replaceInstrumentIncrementally(replacement.data());
+		QVERIFY(journal->commitTransaction());
+		QCOMPARE(track->instrument(), replacement.data());
+		QVERIFY(oldInstrument);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		QCOMPARE(track->instrument(), oldInstrument.data());
+		QVERIFY(replacement);
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(track->instrument(), replacement.data());
+	}
+
+	void agentPresetRestoresHostFieldsAndEffects()
+	{
+		auto& bus = lmms::agent::CommandBus::instance();
+		auto* song = lmms::Engine::getSong();
+		auto* journal = lmms::Engine::projectJournal();
+		QVERIFY(bus.execute("mixer.addChannel").ok);
+		QVERIFY(bus.execute("track.create", {{"type", "instrument"}, {"name", "Original"}}).ok);
+		QVERIFY(bus.execute("track.setMixerChannel", {{"track", 0}, {"channel", 1}}).ok);
+		auto* track = static_cast<lmms::InstrumentTrack*>(song->tracks().front());
+		auto* chain = track->audioBusHandle()->effects();
+		const QPointer<lmms::Effect> effect(new AgentTestEffect(chain));
+		chain->appendEffect(effect.data());
+		track->volumeModel()->setInitValue(80.0f);
+		track->volumeModel()->setValue(60.0f);
+		journal->clearJournal();
+
+		QTemporaryDir directory;
+		QVERIFY(directory.isValid());
+		lmms::DataFile preset(lmms::DataFile::Type::InstrumentTrackSettings);
+		auto content = preset.content().toElement();
+		content.setAttribute("name", "Prepared");
+		content.setAttribute("type", static_cast<int>(lmms::Track::Type::Instrument));
+		auto settings = preset.createElement("instrumenttrack");
+		settings.setAttribute("vol", 40);
+		content.appendChild(settings);
+		const auto path = directory.filePath("agent-host-fields.xpf");
+		QVERIFY(preset.writeFile(path));
+
+		const auto original = [&] {
+			QCOMPARE(track->name(), QString("Original"));
+			QCOMPARE(track->volumeModel()->value(), 60.0f);
+			QCOMPARE(track->volumeModel()->initValue(), 80.0f);
+			QCOMPARE(track->mixerChannelModel()->value(), 1);
+			QCOMPARE(chain->effectAt(0), effect.data());
+		};
+		const QJsonObject args{{"track", 0}, {"path", path}};
+		auto preview = args;
+		preview.insert("dryRun", true);
+		const auto previewed = bus.executeForAgent("instrument.loadPreset", preview);
+		QVERIFY2(previewed.ok, qPrintable(previewed.errorCode));
+		original();
+		QCOMPARE(journal->undoDepth(), 0);
+
+		const auto loaded = bus.executeForAgent("instrument.loadPreset", args);
+		QVERIFY2(loaded.ok, qPrintable(loaded.errorCode));
+		QCOMPARE(track->name(), QString("Prepared"));
+		QCOMPARE(track->volumeModel()->value(), 40.0f);
+		QCOMPARE(track->mixerChannelModel()->value(), 1);
+		QCOMPARE(chain->effectCount(), 0);
+		QVERIFY(bus.executeForAgent("history.undo").ok);
+		original();
+		QVERIFY(bus.executeForAgent("history.redo").ok);
+		QCOMPARE(track->volumeModel()->value(), 40.0f);
+		QCOMPARE(chain->effectCount(), 0);
 	}
 
 	void agentAutomationTargetRollsBack()

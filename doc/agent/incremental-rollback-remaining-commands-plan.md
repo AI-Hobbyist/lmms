@@ -42,4 +42,6 @@
 - SVS 真实声库的能力刷新与合成仍为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。
 - R2 九条命令已接入。Release 构建通过，15 个定向业务用例或数据行全部通过。覆盖混音通道、路由、效果链原槽与同一实例、LFO/MIDI 连接和成员，以及 Pattern 列编辑。日志为 `build/agent-remaining-r2-effects-build.log` 和 `build/agent-remaining-r2-final-*.log`。
 - Peak 插件已编译至 `build/Release/plugins/peakcontrollereffect.dll`。真实宿主内 Peak 效果器和控制器联动，以及效果架显示为 `MANUAL/PENDING`。生命周期测试 `SKIPPED（用户禁止）`。
-- R3～R4 按阶段检查点继续。
+- R3 九条命令已接入。重点验证乐器实例保留、预设的宿主字段与效果链、同一效果实例的槽位和参数，以及 R2 的效果器回归。Windows Release 构建和 5 条定向用例或数据行通过，见 `build/agent-remaining-r3-final-*.log`。
+- 真实插件候选、持续音频渲染和第三方资源型参数为 `MANUAL/PENDING`。Agent 预设路径对含旧版内嵌自动化的数据在写入前明确拒绝，避免覆盖现有全局自动化。生命周期测试 `SKIPPED（用户禁止）`。
+- R4 按阶段检查点继续。
