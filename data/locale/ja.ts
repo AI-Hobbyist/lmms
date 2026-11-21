@@ -17417,4 +17417,794 @@ Latency: %2 ms</source>
         <translation>ノードを削除</translation>
     </message>
 </context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Agent Settings</source>
+        <translation>エージェント設定</translation>
+    </message>
+    <message>
+        <source>Expand Agent</source>
+        <translation>Agent を展開</translation>
+    </message>
+    <message>
+        <source>Collapse Agent</source>
+        <translation>Agent を折りたたむ</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>名前を変更</translation>
+    </message>
+    <message>
+        <source>Toggle Pin</source>
+        <translation>ピン留めを切り替え</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>アーカイブを解除</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>アーカイブ</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>削除</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>セッションを削除</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
+        <translation>選択した %1 件のセッションを削除しますか？元の添付ファイルとプロジェクト素材は保持されます。</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>セッション名を変更</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名前</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>承認不要</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>承認を求める</translation>
+    </message>
+    <message>
+        <source>Tool call details</source>
+        <translation>ツール呼び出しの詳細</translation>
+    </message>
+    <message>
+        <source>Reading and encoding selected attachments…</source>
+        <translation>選択した添付ファイルを読み込んでエンコードしています…</translation>
+    </message>
+    <message>
+        <source>Request upload: %1 / %2 bytes</source>
+        <translation>リクエストのアップロード：%1 / %2 バイト</translation>
+    </message>
+    <message>
+        <source>Awaiting tool approval</source>
+        <translation>ツール操作の承認を待っています</translation>
+    </message>
+    <message>
+        <source>Export JSON (includes sent attachment content)</source>
+        <translation>JSON をエクスポート（送信済みの添付内容を含む）</translation>
+    </message>
+    <message>
+        <source>Export session (includes sent attachment content)</source>
+        <translation>セッションをエクスポート（送信済みの添付内容を含む）</translation>
+    </message>
+    <message>
+        <source>Configure a model</source>
+        <translation>モデルを設定</translation>
+    </message>
+    <message>
+        <source>API and model settings</source>
+        <translation>API とモデルの設定</translation>
+    </message>
+    <message>
+        <source>Add attachments</source>
+        <translation>添付ファイルを追加</translation>
+    </message>
+    <message>
+        <source>Remove attachment: %1</source>
+        <translation>添付ファイルを削除：%1</translation>
+    </message>
+    <message>
+        <source>Request failed · Click Send to retry</source>
+        <translation>リクエスト失敗 · 送信をクリックして再試行</translation>
+    </message>
+    <message>
+        <source>Enter to send · Shift+Enter for a new line</source>
+        <translation>Enter で送信 · Shift+Enter で改行</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>自動</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>オフ</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
+    <message>
+        <source>Extra high</source>
+        <translation>最高</translation>
+    </message>
+    <message>
+        <source>Reasoning · %1</source>
+        <translation>推論 · %1</translation>
+    </message>
+    <message>
+        <source>Stop current request</source>
+        <translation>現在のリクエストを停止</translation>
+    </message>
+    <message>
+        <source>Retry last failed request</source>
+        <translation>前回失敗したリクエストを再試行</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>送信</translation>
+    </message>
+    <message>
+        <source>Reasoning level</source>
+        <translation>推論レベル</translation>
+    </message>
+    <message>
+        <source>Not supported</source>
+        <translation>非対応</translation>
+    </message>
+    <message>
+        <source>Close Chat Window</source>
+        <translation>チャットウィンドウを閉じる</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>現在のプロジェクト</translation>
+    </message>
+    <message>
+        <source>Dock on the Right</source>
+        <translation>右側にドッキング</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>セッション</translation>
+    </message>
+    <message>
+        <source>Expand Chat Window</source>
+        <translation>チャットウィンドウを展開</translation>
+    </message>
+    <message>
+        <source>Undock or Redock</source>
+        <translation>ドッキングを切り替え</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>新規セッション</translation>
+    </message>
+    <message>
+        <source>Search Sessions</source>
+        <translation>セッションを検索</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>セッション管理</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>セッション操作</translation>
+    </message>
+    <message>
+        <source>Describe the arrangement you want…</source>
+        <translation>希望するアレンジを入力…</translation>
+    </message>
+    <message>
+        <source>Reasoning · Auto</source>
+        <translation>推論 · 自動</translation>
+    </message>
+    <message>
+        <source>Agent Chat</source>
+        <translation>Agent チャット</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSessionsDialog</name>
+    <message>
+        <source>Back to Chat</source>
+        <translation>チャットに戻る</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>セッション管理</translation>
+    </message>
+    <message>
+        <source>Sessions are stored separately from projects. Switching sessions keeps the current project open.</source>
+        <translation>セッションはプロジェクトと別に保存されます。セッションを切り替えても現在のプロジェクトは開いたままです。</translation>
+    </message>
+    <message>
+        <source>Search titles, messages, or project names</source>
+        <translation>タイトル、メッセージ、プロジェクト名を検索</translation>
+    </message>
+    <message>
+        <source>All Projects</source>
+        <translation>すべてのプロジェクト</translation>
+    </message>
+    <message>
+        <source>Import Session</source>
+        <translation>セッションをインポート</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>新規セッション</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>すべて</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>ピン留め済み</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>アーカイブ済み</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>エクスポート</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>アーカイブ</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>削除</translation>
+    </message>
+    <message>
+        <source>Session</source>
+        <translation>セッション</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>プロジェクト</translation>
+    </message>
+    <message>
+        <source>Model Connection</source>
+        <translation>モデル接続</translation>
+    </message>
+    <message>
+        <source>Last Updated</source>
+        <translation>最終更新</translation>
+    </message>
+    <message>
+        <source>Deleting or archiving a session keeps LMMS project files and downloaded assets.</source>
+        <translation>セッションを削除またはアーカイブしても、LMMS プロジェクトファイルとダウンロード済みの素材は保持されます。</translation>
+    </message>
+    <message>
+        <source>Select %1</source>
+        <translation>%1 を選択</translation>
+    </message>
+    <message>
+        <source>No linked project</source>
+        <translation>関連プロジェクトなし</translation>
+    </message>
+    <message>
+        <source>Not configured</source>
+        <translation>未設定</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>セッション操作</translation>
+    </message>
+    <message>
+        <source>Manage %1</source>
+        <translation>%1 を管理</translation>
+    </message>
+    <message>
+        <source>%1 sessions selected</source>
+        <translation>%1 件のセッションを選択中</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>名前を変更</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>ピン留めを解除</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>ピン留め</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>アーカイブを解除</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>セッション名を変更</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名前</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>セッションを削除</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Project files and assets will be kept.</source>
+        <translation>選択した %1 件のセッションを削除しますか？プロジェクトファイルと素材は保持されます。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSettingsDialog</name>
+    <message>
+        <source>Close Settings</source>
+        <translation>設定を閉じる</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>ワークスペース</translation>
+    </message>
+    <message>
+        <source>API and Model</source>
+        <translation>API とモデル</translation>
+    </message>
+    <message>
+        <source>Generation Parameters</source>
+        <translation>生成パラメーター</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>全体設定</translation>
+    </message>
+    <message>
+        <source>Approval Mode</source>
+        <translation>承認モード</translation>
+    </message>
+    <message>
+        <source>Asset Downloads</source>
+        <translation>素材のダウンロード</translation>
+    </message>
+    <message>
+        <source>Back to Chat</source>
+        <translation>チャットに戻る</translation>
+    </message>
+    <message>
+        <source>Save local settings only. No test request is sent.</source>
+        <translation>ローカル設定のみ保存します。テストリクエストは送信されません。</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Save Settings</source>
+        <translation>設定を保存</translation>
+    </message>
+    <message>
+        <source>Load the system prompt from a file and manage web search and asset downloads.</source>
+        <translation>ファイルからシステムプロンプトを読み込み、ウェブ検索と素材ダウンロードを管理します。</translation>
+    </message>
+    <message>
+        <source>The prompt is stored in a text file. Set its path here.</source>
+        <translation>プロンプトはテキストファイルに保存されます。ここでパスを指定します。</translation>
+    </message>
+    <message>
+        <source>File Path</source>
+        <translation>ファイルパス</translation>
+    </message>
+    <message>
+        <source>Choose File…</source>
+        <translation>ファイルを選択…</translation>
+    </message>
+    <message>
+        <source>Choose System Prompt</source>
+        <translation>システムプロンプトを選択</translation>
+    </message>
+    <message>
+        <source>Relative paths start from the LMMS program directory. You can select another .txt file.</source>
+        <translation>相対パスは LMMS のプログラムディレクトリを基準にします。別の .txt ファイルも選択できます。</translation>
+    </message>
+    <message>
+        <source>Default Source</source>
+        <translation>既定のソース</translation>
+    </message>
+    <message>
+        <source>Custom Source</source>
+        <translation>カスタムソース</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>ファイルを開く</translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation>再読み込み</translation>
+    </message>
+    <message>
+        <source>Restore Default Path</source>
+        <translation>既定のパスに戻す</translation>
+    </message>
+    <message>
+        <source>Default Prompt Scope</source>
+        <translation>既定のプロンプトの範囲</translation>
+    </message>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent 設定</translation>
+    </message>
+    <message>
+        <source>System Prompt File</source>
+        <translation>システムプロンプトファイル</translation>
+    </message>
+    <message>
+        <source>UTF-8 text · External file</source>
+        <translation>UTF-8 テキスト · 外部ファイル</translation>
+    </message>
+    <message>
+        <source>Web and External Assets</source>
+        <translation>ウェブと外部素材</translation>
+    </message>
+    <message>
+        <source>Allow Asset Downloads</source>
+        <translation>素材のダウンロードを許可</translation>
+    </message>
+    <message>
+        <source>Use Current Approval Mode</source>
+        <translation>現在の承認モードを使用</translation>
+    </message>
+    <message>
+        <source>Allow Web Search</source>
+        <translation>ウェブ検索を許可</translation>
+    </message>
+    <message>
+        <source>Search Provider</source>
+        <translation>検索プロバイダー</translation>
+    </message>
+    <message>
+        <source>Model-provided search</source>
+        <translation>モデル提供の検索</translation>
+    </message>
+    <message>
+        <source>Brave Search API URL</source>
+        <translation>Brave Search API URL</translation>
+    </message>
+    <message>
+        <source>Web Search</source>
+        <translation>ウェブ検索</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>承認を求める</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>承認不要</translation>
+    </message>
+    <message>
+        <source>Current Mode</source>
+        <translation>現在のモード</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>既定</translation>
+    </message>
+    <message>
+        <source>Project Tools</source>
+        <translation>プロジェクトツール</translation>
+    </message>
+    <message>
+        <source>External Asset Downloads</source>
+        <translation>外部素材のダウンロード</translation>
+    </message>
+    <message>
+        <source>Download Tools</source>
+        <translation>ダウンロードツール</translation>
+    </message>
+    <message>
+        <source>Prefer Portable Tools</source>
+        <translation>ポータブルツールを優先</translation>
+    </message>
+    <message>
+        <source>Choose Tool</source>
+        <translation>ツールを選択</translation>
+    </message>
+    <message>
+        <source>aria2 Download Tool</source>
+        <translation>aria2 ダウンロードツール</translation>
+    </message>
+    <message>
+        <source>Archive Extraction Tool</source>
+        <translation>アーカイブ展開ツール</translation>
+    </message>
+    <message>
+        <source>Asset Destination</source>
+        <translation>素材の保存先</translation>
+    </message>
+    <message>
+        <source>Extract archives after download</source>
+        <translation>ダウンロード後にアーカイブを展開</translation>
+    </message>
+    <message>
+        <source>Download Workflow</source>
+        <translation>ダウンロードの手順</translation>
+    </message>
+    <message>
+        <source>Check Tools</source>
+        <translation>ツールを確認</translation>
+    </message>
+    <message>
+        <source>Not yet checked</source>
+        <translation>未確認</translation>
+    </message>
+    <message>
+        <source>Save audio, MIDI and other assets to the requested location.</source>
+        <translation>オーディオ、MIDI などの素材を指定した場所に保存します。</translation>
+    </message>
+    <message>
+        <source>Find references, read pages and locate asset sources.</source>
+        <translation>資料や素材の入手先を検索し、ウェブページを読み取ります。</translation>
+    </message>
+    <message>
+        <source>SearXNG instance URL, e.g. http://192.168.1.20:8080</source>
+        <translation>SearXNG インスタンス URL（例：http://192.168.1.20:8080）</translation>
+    </message>
+    <message>
+        <source>Credentials saved. Leave blank to keep them.</source>
+        <translation>認証情報は保存済みです。保持するには空欄にしてください。</translation>
+    </message>
+    <message>
+        <source>Credentials (optional, if required by the instance)</source>
+        <translation>認証情報（インスタンスで必要な場合のみ）</translation>
+    </message>
+    <message>
+        <source>API key saved. Leave blank to keep it.</source>
+        <translation>API キーは保存済みです。保持するには空欄にしてください。</translation>
+    </message>
+    <message>
+        <source>The model provider runs the search after separate approval.</source>
+        <translation>個別の承認後にモデルプロバイダーが検索を実行します。</translation>
+    </message>
+    <message>
+        <source>The model does not declare support for hosted search (capabilities.hostedWebSearch).</source>
+        <translation>現在のモデルはホスト側の検索対応を宣言していません（capabilities.hostedWebSearch）。</translation>
+    </message>
+    <message>
+        <source>Select SearXNG, Brave or a model with hosted search support.</source>
+        <translation>SearXNG、Brave、またはホスト側の検索に対応するモデルを選択してください。</translation>
+    </message>
+    <message>
+        <source>Enter a valid SearXNG instance URL (http or https).</source>
+        <translation>有効な SearXNG インスタンス URL（http または https）を入力してください。</translation>
+    </message>
+    <message>
+        <source>Enter a valid Brave Search API URL (http or https).</source>
+        <translation>有効な Brave Search API URL（http または https）を入力してください。</translation>
+    </message>
+    <message>
+        <source>Brave Search requires an API key.</source>
+        <translation>Brave Search には API キーが必要です。</translation>
+    </message>
+    <message>
+        <source>Use the download tool to fetch external assets and extract archives after downloading.</source>
+        <translation>ダウンロードツールで外部素材を取得し、完了後にアーカイブを展開します。</translation>
+    </message>
+    <message>
+        <source>Tools are stored in subfolders of the tools directory beside lmms.exe. You can change their paths.</source>
+        <translation>ツールは lmms.exe と同じ場所にある tools ディレクトリのサブフォルダーに置きます。パスは変更できます。</translation>
+    </message>
+    <message>
+        <source>Keep the files required by 7-Zip in tools/7zip/.</source>
+        <translation>7-Zip に必要なファイルは tools/7zip/ に置いてください。</translation>
+    </message>
+    <message>
+        <source>Choose the destination in the download request. You can use the project assets folder.</source>
+        <translation>ダウンロードのリクエストで保存先を指定します。プロジェクトの素材フォルダーも使用できます。</translation>
+    </message>
+    <message>
+        <source>The file destination and extraction folder are shown before downloading.</source>
+        <translation>ダウンロード前にファイルの保存先と展開先を表示します。</translation>
+    </message>
+    <message>
+        <source>Tools available: </source>
+        <translation>利用可能なツール：</translation>
+    </message>
+    <message>
+        <source>Tools unavailable: </source>
+        <translation>利用できないツール：</translation>
+    </message>
+    <message>
+        <source>Choose whether project operations, web searches and asset downloads require confirmation.</source>
+        <translation>プロジェクト操作、ウェブ検索、素材のダウンロードに確認が必要か選択します。</translation>
+    </message>
+    <message>
+        <source>Review the purpose and scope before approving the tool action.</source>
+        <translation>ツール操作を承認する前に目的と影響範囲を確認できます。</translation>
+    </message>
+    <message>
+        <source>Tools requested by the model run immediately without an approval prompt.</source>
+        <translation>モデルが要求したツールは承認ダイアログを表示せず、すぐに実行されます。</translation>
+    </message>
+    <message>
+        <source>The activity log remains visible. You can stop at any time. Changes may apply immediately to the current project.</source>
+        <translation>操作履歴は表示されたままで、いつでも停止できます。変更は現在のプロジェクトにすぐ適用される場合があります。</translation>
+    </message>
+    <message>
+        <source>Applies to</source>
+        <translation>適用対象</translation>
+    </message>
+    <message>
+        <source>Approval requests appear in the chat transcript.</source>
+        <translation>承認リクエストはチャット履歴に表示されます。</translation>
+    </message>
+    <message>
+        <source>The composer always shows the current approval mode.</source>
+        <translation>入力欄には現在の承認モードが常に表示されます。</translation>
+    </message>
+    <message>
+        <source>Current mode: </source>
+        <translation>現在のモード：</translation>
+    </message>
+    <message>
+        <source>Loaded %1 characters. Save the settings to use this prompt for future requests.</source>
+        <translation>%1 文字を読み込みました。以降のリクエストで使うには設定を保存してください。</translation>
+    </message>
+    <message>
+        <source>Reload after editing the file. Later messages use the updated prompt.</source>
+        <translation>ファイルを編集したら再読み込みしてください。以降のメッセージには更新したプロンプトが使われます。</translation>
+    </message>
+    <message>
+        <source>Confirm source and destination</source>
+        <translation>取得元と保存先を確認</translation>
+    </message>
+    <message>
+        <source>Review the URL, file name and destination folder.</source>
+        <translation>URL、ファイル名、保存先フォルダーを確認します。</translation>
+    </message>
+    <message>
+        <source>Download the asset</source>
+        <translation>素材をダウンロード</translation>
+    </message>
+    <message>
+        <source>aria2 shows progress, speed and remaining time.</source>
+        <translation>aria2 の進捗、速度、残り時間を表示します。</translation>
+    </message>
+    <message>
+        <source>Detect and extract archives</source>
+        <translation>アーカイブを検出して展開</translation>
+    </message>
+    <message>
+        <source>Review the extraction location and result.</source>
+        <translation>展開先と処理結果を確認します。</translation>
+    </message>
+    <message>
+        <source>Add to the current session</source>
+        <translation>現在のセッションに追加</translation>
+    </message>
+    <message>
+        <source>Import into the project or keep the file.</source>
+        <translation>プロジェクトにインポートするか、ファイルを保持します。</translation>
+    </message>
+    <message>
+        <source>Approve once, review the changes, or decline. The project and download destination stay unchanged until approval.</source>
+        <translation>今回だけ承認、変更内容の確認、拒否を選べます。承認するまでプロジェクトとダウンロード先は変更されません。</translation>
+    </message>
+    <message>
+        <source>Create and edit music, use built-in tools, and follow the active approval mode.
+Check tool results and find or download assets on request.</source>
+        <translation>音楽を作成・編集し、内蔵ツールと現在の承認モードを使用します。
+ツールの結果を確認し、依頼に応じて素材を検索・ダウンロードします。</translation>
+    </message>
+    <message>
+        <source>Request approval: Confirm before searching or downloading.
+No approval required: Run immediately and show the activity log.</source>
+        <translation>承認を求める：検索やダウンロードの前に確認します。
+承認不要：すぐに実行し、操作履歴を表示します。</translation>
+    </message>
+    <message>
+        <source>Project edits: Review affected tracks, clips and notes.
+Web search: Review the query. Downloads: Review the source and destination.</source>
+        <translation>プロジェクト編集：対象のトラック、クリップ、ノートを確認します。
+ウェブ検索：検索語を確認します。ダウンロード：取得元と保存先を確認します。</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Approve once</source>
+        <translation>今回のみ承認</translation>
+    </message>
+    <message>
+        <source>Approve to execute the internal project tool</source>
+        <translation>プロジェクト内のツールの実行を承認</translation>
+    </message>
+    <message>
+        <source>Approved · %1</source>
+        <translation>承認済み · %1</translation>
+    </message>
+    <message>
+        <source>Awaiting approval: %1</source>
+        <translation>承認待ち：%1</translation>
+    </message>
+    <message>
+        <source>Canceled · %1</source>
+        <translation>キャンセル済み · %1</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <source>Denied · %1</source>
+        <translation>拒否済み · %1</translation>
+    </message>
+    <message>
+        <source>Deny</source>
+        <translation>拒否</translation>
+    </message>
+    <message>
+        <source>Failed · %1</source>
+        <translation>失敗 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed · %1</source>
+        <translation>未実行 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed; project unchanged</source>
+        <translation>未実行。プロジェクトに変更はありません</translation>
+    </message>
+    <message>
+        <source>Ran automatically · %1</source>
+        <translation>自動実行済み · %1</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>リクエストに失敗しました：%1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>停止しました</translation>
+    </message>
+    <message>
+        <source>Thought · Summary</source>
+        <translation>推論 · 要約</translation>
+    </message>
+    <message>
+        <source>Tool result</source>
+        <translation>ツールの実行結果</translation>
+    </message>
+    <message>
+        <source>View changes</source>
+        <translation>変更内容を表示</translation>
+    </message>
+    <message>
+        <source>Web sources:</source>
+        <translation>ウェブ上の出典：</translation>
+    </message>
+    <message>
+        <source>Start a new music conversation.</source>
+        <translation>音楽制作の新しい会話を始めましょう。</translation>
+    </message>
+</context>
 </TS>

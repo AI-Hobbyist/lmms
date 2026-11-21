@@ -88,18 +88,18 @@ ChatSessionsDialog::ChatSessionsDialog(ChatStore& store, QWidget* parent)
 	auto* agent = label(header, {}, {24, 23, 23, 23});
 	agent->setPixmap(embed::getIconPixmap("agent_chat_agent", 23, 23));
 	label(header, QStringLiteral("Agent 会话"), {60, 17, 200, 33}, 21, true);
-	auto* back = button(header, QStringLiteral("返回聊天"), {1406, 15, 166, 36}, "agent_chat_left");
+	auto* back = button(header, tr("Back to Chat"), {1406, 15, 166, 36}, "agent_chat_left");
 	connect(back, &QToolButton::clicked, this, &QDialog::reject);
-	label(page, QStringLiteral("会话管理"), {48, 111, 400, 42}, 27, true);
-	label(page, QStringLiteral("会话与工程文件分开管理，切换会话不会重新加载工程。"), {48, 156, 800, 21});
+	label(page, tr("Session Management"), {48, 111, 400, 42}, 27, true);
+	label(page, tr("Sessions are stored separately from projects. Switching sessions keeps the current project open."), {48, 156, 800, 21});
 	m_search = new QLineEdit(page);
 	m_search->setObjectName("agentManagerSearch");
 	m_search->setGeometry(48, 215, 716, 44);
-	m_search->setPlaceholderText(QStringLiteral("搜索标题、消息或工程名称"));
+	m_search->setPlaceholderText(tr("Search titles, messages, or project names"));
 	m_search->addAction(QIcon(embed::getIconPixmap("agent_chat_search", 18, 18)), QLineEdit::LeadingPosition);
 	m_projects = new QComboBox(page);
 	m_projects->setGeometry(786, 218, 172, 38);
-	m_projects->addItem(QStringLiteral("全部工程"), QString{});
+	m_projects->addItem(tr("All Projects"), QString{});
 	QSet<QString> projects;
 	for (const auto& value : store.sessions())
 	{
@@ -110,9 +110,9 @@ ChatSessionsDialog::ChatSessionsDialog(ChatStore& store, QWidget* parent)
 			m_projects->addItem(project, project);
 		}
 	}
-	auto* importButton = button(page, QStringLiteral("导入会话"), {1222, 218, 128, 38}, "agent_chat_upload");
+	auto* importButton = button(page, tr("Import Session"), {1222, 218, 128, 38}, "agent_chat_upload");
 	connect(importButton, &QToolButton::clicked, this, &ChatSessionsDialog::importSessions);
-	auto* create = button(page, QStringLiteral("新建会话"), {1366, 218, 186, 38}, "agent_chat_new");
+	auto* create = button(page, tr("New Session"), {1366, 218, 186, 38}, "agent_chat_new");
 	connect(create, &QToolButton::clicked, this, [this] {
 		auto session = ChatStore::newSession();
 		QString error;
@@ -125,7 +125,7 @@ ChatSessionsDialog::ChatSessionsDialog(ChatStore& store, QWidget* parent)
 			reportError(error);
 		}
 	});
-	const QStringList filters{QStringLiteral("全部"), QStringLiteral("已置顶"), QStringLiteral("已归档")};
+	const QStringList filters{tr("All"), tr("Pinned"), tr("Archived")};
 	const QRect filterRects[]{{48, 289, 95, 34}, {157, 289, 102, 34}, {273, 289, 102, 34}};
 	for (int i = 0; i < filters.size(); ++i)
 	{
@@ -143,24 +143,24 @@ ChatSessionsDialog::ChatSessionsDialog(ChatStore& store, QWidget* parent)
 	batch->setProperty("agentSettingsCard", true);
 	batch->setGeometry(48, 350, 1504, 53);
 	m_selection = label(batch, {}, {21, 16, 900, 21});
-	m_export = button(batch, QStringLiteral("导出"), {1150, 8, 100, 36}, "agent_chat_export");
-	m_archive = button(batch, QStringLiteral("归档"), {1256, 8, 100, 36}, "agent_chat_archive");
+	m_export = button(batch, tr("Export"), {1150, 8, 100, 36}, "agent_chat_export");
+	m_archive = button(batch, tr("Archive"), {1256, 8, 100, 36}, "agent_chat_archive");
 	m_archive->setObjectName("agentManagerArchive");
-	m_delete = button(batch, QStringLiteral("删除"), {1362, 8, 122, 36}, "agent_chat_trash");
+	m_delete = button(batch, tr("Delete"), {1362, 8, 122, 36}, "agent_chat_trash");
 	connect(m_export, &QToolButton::clicked, this, &ChatSessionsDialog::exportSelected);
 	connect(m_archive, &QToolButton::clicked, this, &ChatSessionsDialog::archiveSelected);
 	connect(m_delete, &QToolButton::clicked, this, &ChatSessionsDialog::deleteSelected);
-	label(page, QStringLiteral("会话"), {95, 432, 400, 18}, 11);
-	label(page, QStringLiteral("工程"), {692, 432, 240, 18}, 11);
-	label(page, QStringLiteral("模型连接"), {985, 432, 200, 18}, 11);
-	label(page, QStringLiteral("最近更新"), {1219, 432, 200, 18}, 11);
+	label(page, tr("Session"), {95, 432, 400, 18}, 11);
+	label(page, tr("Project"), {692, 432, 240, 18}, 11);
+	label(page, tr("Model Connection"), {985, 432, 200, 18}, 11);
+	label(page, tr("Last Updated"), {1219, 432, 200, 18}, 11);
 	divider(page, {48, 466, 1504, 1});
 	m_rows = new QScrollArea(page);
 	m_rows->setObjectName("agentManagerRows");
 	m_rows->setFrameShape(QFrame::NoFrame);
 	m_rows->setGeometry(48, 469, 1504, 440);
 	m_rows->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	label(page, QStringLiteral("删除或归档会话不会删除 LMMS 工程文件和已下载素材。"), {48, 934, 1000, 19}, 12);
+	label(page, tr("Deleting or archiving a session keeps LMMS project files and downloaded assets."), {48, 934, 1000, 19}, 12);
 	connect(m_search, &QLineEdit::textChanged, this, &ChatSessionsDialog::refresh);
 	connect(m_projects, &QComboBox::currentIndexChanged, this, &ChatSessionsDialog::refresh);
 	refresh();
@@ -193,7 +193,7 @@ void ChatSessionsDialog::refresh()
 		auto* check = new QCheckBox(rows);
 		check->setGeometry(14, y + 31, 17, 17);
 		check->setObjectName("agentManagerSelect_" + id);
-		check->setAccessibleName(QStringLiteral("选择 %1").arg(title));
+		check->setAccessibleName(tr("Select %1").arg(title));
 		connect(check, &QCheckBox::toggled, this, [this, id](bool selected) {
 			if (selected)
 			{
@@ -215,18 +215,18 @@ void ChatSessionsDialog::refresh()
 		open->setObjectName("agentManagerOpen_" + id);
 		open->setProperty("agentSessionTitle", true);
 		connect(open, &QToolButton::clicked, this, [this, id] { openSession(id); });
-		const auto state = session.value("archived").toBool() ? QStringLiteral("已归档")
-			: session.value("pinned").toBool()				  ? QStringLiteral("已置顶")
-															  : QStringLiteral("会话");
+		const auto state = session.value("archived").toBool() ? tr("Archived")
+			: session.value("pinned").toBool()				  ? tr("Pinned")
+															  : tr("Session");
 		label(rows, state, {85, y + 49, 480, 16}, 10);
-		label(rows, project.isEmpty() ? QStringLiteral("未关联工程") : project, {644, y + 27, 260, 21});
+		label(rows, project.isEmpty() ? tr("No linked project") : project, {644, y + 27, 260, 21});
 		const auto model = session.value("connectionName").toString();
-		label(rows, model.isEmpty() ? QStringLiteral("未配置") : model, {937, y + 27, 210, 21});
+		label(rows, model.isEmpty() ? tr("Not configured") : model, {937, y + 27, 210, 21});
 		const auto updated = QDateTime::fromString(session.value("updatedAt").toString(), Qt::ISODateWithMs);
 		label(rows, updated.toLocalTime().toString("yyyy-MM-dd HH:mm"), {1171, y + 27, 220, 19}, 12);
 		auto* more = button(rows, {}, {1439, y + 22, 34, 34}, "agent_chat_more");
-		more->setToolTip(QStringLiteral("会话操作"));
-		more->setAccessibleName(QStringLiteral("管理 %1").arg(title));
+		more->setToolTip(tr("Session Actions"));
+		more->setAccessibleName(tr("Manage %1").arg(title));
 		connect(more, &QToolButton::clicked, this, [this, id, more] { sessionMenu(id, more); });
 		divider(rows, {0, y + 79, 1504, 1});
 	}
@@ -237,7 +237,7 @@ void ChatSessionsDialog::refresh()
 
 void ChatSessionsDialog::updateSelection()
 {
-	m_selection->setText(QStringLiteral("已选择 %1 个会话").arg(m_checked.size()));
+	m_selection->setText(tr("%1 sessions selected").arg(m_checked.size()));
 	m_export->setEnabled(!m_checked.isEmpty());
 	m_archive->setEnabled(!m_checked.isEmpty());
 	m_delete->setEnabled(!m_checked.isEmpty());
@@ -253,15 +253,15 @@ void ChatSessionsDialog::sessionMenu(const QString& id, QToolButton* anchor)
 {
 	auto session = m_store.session(id);
 	QMenu menu(this);
-	auto* rename = menu.addAction(QStringLiteral("重命名"));
-	auto* pin = menu.addAction(session.value("pinned").toBool() ? QStringLiteral("取消置顶") : QStringLiteral("置顶"));
+	auto* rename = menu.addAction(tr("Rename"));
+	auto* pin = menu.addAction(session.value("pinned").toBool() ? tr("Unpin") : tr("Pin"));
 	auto* archive
-		= menu.addAction(session.value("archived").toBool() ? QStringLiteral("取消归档") : QStringLiteral("归档"));
+		= menu.addAction(session.value("archived").toBool() ? tr("Unarchive") : tr("Archive"));
 	const auto* action = menu.exec(anchor->mapToGlobal(QPoint(0, anchor->height())));
 	if (action == rename)
 	{
 		bool ok = false;
-		const auto title = QInputDialog::getText(this, QStringLiteral("重命名会话"), QStringLiteral("名称"),
+		const auto title = QInputDialog::getText(this, tr("Rename Session"), tr("Name"),
 												 QLineEdit::Normal, session.value("title").toString(), &ok)
 							   .trimmed();
 		if (!ok || title.isEmpty())
@@ -305,8 +305,8 @@ void ChatSessionsDialog::archiveSelected()
 
 void ChatSessionsDialog::deleteSelected()
 {
-	if (QMessageBox::question(this, QStringLiteral("删除会话"),
-							  QStringLiteral("删除所选 %1 个会话？工程文件和素材不会被删除。").arg(m_checked.size()))
+	if (QMessageBox::question(this, tr("Delete Sessions"),
+							  tr("Delete %1 selected sessions? Project files and assets will be kept.").arg(m_checked.size()))
 		!= QMessageBox::Yes)
 	{
 		return;
@@ -345,7 +345,7 @@ void ChatSessionsDialog::exportSelected()
 
 void ChatSessionsDialog::importSessions()
 {
-	const auto paths = QFileDialog::getOpenFileNames(this, QStringLiteral("导入会话"), {}, "JSON (*.json)");
+	const auto paths = QFileDialog::getOpenFileNames(this, tr("Import Session"), {}, "JSON (*.json)");
 	for (const auto& path : paths)
 	{
 		QString error;
@@ -359,6 +359,6 @@ void ChatSessionsDialog::importSessions()
 }
 
 void ChatSessionsDialog::reportError(const QString& error)
-{ QMessageBox::warning(this, QStringLiteral("会话管理"), error); }
+{ QMessageBox::warning(this, tr("Session Management"), error); }
 
 } // namespace lmms::agent::chat

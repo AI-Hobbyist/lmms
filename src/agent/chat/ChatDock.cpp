@@ -130,13 +130,15 @@ ChatDock::ChatDock(QMainWindow* window)
 	m_current = m_store.session(setting("session"));
 	if (m_current.isEmpty())
 	{
-		createSession();
+		m_current = ChatStore::newSession();
+		QString error;
+		if (!m_store.saveSession(m_current, error))
+		{
+			qWarning().noquote() << "Agent session initialization:" << m_store.directory() << error;
+		}
 	}
-	else
-	{
-		refreshSessions();
-		renderSession();
-	}
+	refreshSessions();
+	renderSession();
 	window->addDockWidget(Qt::RightDockWidgetArea, this);
 	m_expandedWidth = qBound(560, setting("width", "640").toInt(), 1200);
 	window->resizeDocks({this}, {m_expandedWidth}, Qt::Horizontal);
@@ -179,7 +181,7 @@ void ChatDock::setCollapsed(bool collapsed)
 	m_expand->setText(collapsed ? QStringLiteral("Agent ›") : QStringLiteral("‹ 收起"));
 	m_expand->setIcon(embed::getIconPixmap(collapsed ? "agent_chat_agent" : "agent_chat_collapse", 20, 20));
 	m_expand->setIconSize(collapsed ? QSize(23, 23) : QSize(18, 18));
-	m_expand->setToolTip(collapsed ? QStringLiteral("展开 Agent") : QStringLiteral("收起 Agent"));
+	m_expand->setToolTip(collapsed ? tr("Expand Agent") : tr("Collapse Agent"));
 	m_expand->setAccessibleName(m_expand->toolTip());
 	setMinimumWidth(collapsed ? 48 : (isFloating() ? 600 : 560));
 	setMaximumWidth(collapsed ? 48 : QWIDGETSIZE_MAX);
@@ -342,14 +344,14 @@ void ChatDock::showSessionMenu(const QPoint& position)
 		return;
 	}
 	QMenu menu(this);
-	auto* rename = menu.addAction(QStringLiteral("重命名"));
+	auto* rename = menu.addAction(tr("Rename"));
 	rename->setEnabled(selected.size() == 1);
-	auto* pin = menu.addAction(QStringLiteral("切换置顶"));
-	auto* archive = menu.addAction(m_archived->isChecked() ? QStringLiteral("取消归档") : QStringLiteral("归档"));
+	auto* pin = menu.addAction(tr("Toggle Pin"));
+	auto* archive = menu.addAction(m_archived->isChecked() ? tr("Unarchive") : tr("Archive"));
 	auto* exportAction = menu.addAction(tr("Export JSON (includes sent attachment content)"));
 	exportAction->setEnabled(selected.size() == 1);
 	menu.addSeparator();
-	auto* remove = menu.addAction(QStringLiteral("删除"));
+	auto* remove = menu.addAction(tr("Delete"));
 	auto* action = menu.exec(m_sessions->viewport()->mapToGlobal(position));
 	if (!action)
 	{
@@ -357,8 +359,8 @@ void ChatDock::showSessionMenu(const QPoint& position)
 	}
 	if (action == remove
 		&& QMessageBox::question(
-			   this, QStringLiteral("删除会话"),
-			   QStringLiteral("删除所选 %1 个会话？原始附件和工程素材不会被删除。").arg(selected.size()))
+			   this, tr("Delete Sessions"),
+			   tr("Delete %1 selected sessions? Original attachments and project assets will be kept.").arg(selected.size()))
 			!= QMessageBox::Yes)
 	{
 		return;
@@ -396,7 +398,7 @@ void ChatDock::showSessionMenu(const QPoint& position)
 		if (action == rename)
 		{
 			bool ok = false;
-			const auto title = QInputDialog::getText(this, QStringLiteral("重命名会话"), QStringLiteral("名称"),
+			const auto title = QInputDialog::getText(this, tr("Rename Session"), tr("Name"),
 													 QLineEdit::Normal, session.value("title").toString(), &ok)
 								   .trimmed();
 			if (!ok || title.isEmpty())
@@ -460,8 +462,8 @@ void ChatDock::showSettings()
 	ChatSettingsDialog dialog(this);
 	if (dialog.exec() == QDialog::Accepted)
 	{
-		m_approval->setText(setting("approval", "request") == "none" ? QStringLiteral("无需批准")
-																	 : QStringLiteral("请求批准"));
+		m_approval->setText(setting("approval", "request") == "none" ? tr("No approval required")
+																	 : tr("Request approval"));
 		refreshConnection();
 	}
 }
@@ -469,7 +471,8 @@ void ChatDock::showSettings()
 void attachChatDock(QMainWindow* window, QMenu* viewMenu)
 {
 	auto* dock = new ChatDock(window);
-	auto* action = new QAction(QStringLiteral("Agent 聊天"), dock);
+	auto* action = new QAction(ChatDock::tr("Agent Chat"), dock);
+	action->setObjectName("showAgentChat");
 	viewMenu->addAction(action);
 	// MainWindow rebuilds this menu before each display.
 	QObject::connect(viewMenu, &QMenu::aboutToShow, dock, [viewMenu, action] { viewMenu->addAction(action); });

@@ -63,15 +63,15 @@ void ChatDock::buildWorkspace()
 	floatingIcon->setGeometry(16, 9, 18, 18);
 	auto* floatingTitle = new QLabel(QStringLiteral("LMMS Agent · 独立窗口"), m_floatingChrome);
 	floatingTitle->setGeometry(43, 7, 500, 21);
-	auto* floatingClose = iconButton(m_floatingChrome, QStringLiteral("关闭聊天窗口"), "agent_chat_close");
+	auto* floatingClose = iconButton(m_floatingChrome, tr("Close Chat Window"), "agent_chat_close");
 	floatingClose->setObjectName("agentFloatingClose");
 	connect(floatingClose, &QToolButton::clicked, this, &QWidget::hide);
 	auto* projectIcon = new QLabel(m_floatingChrome);
 	projectIcon->setPixmap(embed::getIconPixmap("agent_chat_folder", 18, 18));
 	projectIcon->setGeometry(22, 57, 18, 18);
-	auto* floatingProject = new QLabel(QStringLiteral("当前工程"), m_floatingChrome);
+	auto* floatingProject = new QLabel(tr("Current Project"), m_floatingChrome);
 	floatingProject->setGeometry(52, 53, 700, 21);
-	auto* redock = iconButton(m_floatingChrome, QStringLiteral("吸附回右侧"), "agent_chat_detach", true);
+	auto* redock = iconButton(m_floatingChrome, tr("Dock on the Right"), "agent_chat_detach", true);
 	redock->setObjectName("agentRedock");
 	connect(redock, &QToolButton::clicked, this, [this] { setFloating(false); });
 	m_headerActions = new QWidget(m_header);
@@ -81,14 +81,14 @@ void ChatDock::buildWorkspace()
 	auto* title = new QLabel(QStringLiteral("Agent"), m_headerActions);
 	title->setObjectName("agentHeaderTitle");
 	title->setGeometry(49, 14, 70, 27);
-	auto* sessionsToggle = iconButton(m_headerActions, QStringLiteral("会话"), "agent_chat_sessions", true);
+	auto* sessionsToggle = iconButton(m_headerActions, tr("Sessions"), "agent_chat_sessions", true);
 	sessionsToggle->setObjectName("agentSessionToggle");
 	sessionsToggle->setGeometry(119, 10, 65, 34);
-	auto* maximize = iconButton(m_headerActions, QStringLiteral("展开聊天窗口"), "agent_chat_expand");
+	auto* maximize = iconButton(m_headerActions, tr("Expand Chat Window"), "agent_chat_expand");
 	maximize->setObjectName("agentMaximize");
-	auto* detach = iconButton(m_headerActions, QStringLiteral("分离 / 回接"), "agent_chat_detach");
+	auto* detach = iconButton(m_headerActions, tr("Undock or Redock"), "agent_chat_detach");
 	detach->setObjectName("agentDetach");
-	m_expand = iconButton(m_header, QStringLiteral("收起 Agent"), "agent_chat_collapse");
+	m_expand = iconButton(m_header, tr("Collapse Agent"), "agent_chat_collapse");
 	m_expand->setObjectName("agentCollapse");
 	connect(sessionsToggle, &QToolButton::clicked, this, [this] {
 		m_sessionsVisible = !m_sessionsVisible;
@@ -106,15 +106,15 @@ void ChatDock::buildWorkspace()
 	m_content->installEventFilter(this);
 	setWidget(m_content);
 	m_collapsedLabel = new QLabel(QStringLiteral("AI"), m_content);
-	m_restore = iconButton(m_content, QStringLiteral("展开 Agent"), "agent_chat_left");
+	m_restore = iconButton(m_content, tr("Expand Agent"), "agent_chat_left");
 	connect(m_restore, &QToolButton::clicked, this, [this] { setCollapsed(false); });
 	m_sessionPanel = new QWidget(m_content);
 	m_sessionPanel->setObjectName("agentSessionPanel");
-	m_newSession = iconButton(m_sessionPanel, QStringLiteral("新建会话"), "agent_chat_new", true);
+	m_newSession = iconButton(m_sessionPanel, tr("New Session"), "agent_chat_new", true);
 	m_newSession->setObjectName("agentNewSession");
 	m_search = new QLineEdit(m_sessionPanel);
 	m_search->setObjectName("agentSessionSearch");
-	m_search->setPlaceholderText(QStringLiteral("搜索会话"));
+	m_search->setPlaceholderText(tr("Search Sessions"));
 	m_search->addAction(QIcon(embed::getIconPixmap("agent_chat_search", 15, 15)), QLineEdit::LeadingPosition);
 	m_archived = new QCheckBox(m_sessionPanel);
 	m_archived->hide();
@@ -124,9 +124,9 @@ void ChatDock::buildWorkspace()
 	m_sessions->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_sessions->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	m_sessions->setContextMenuPolicy(Qt::CustomContextMenu);
-	m_manage = iconButton(m_sessionPanel, QStringLiteral("会话管理"), "agent_chat_archive", true);
+	m_manage = iconButton(m_sessionPanel, tr("Session Management"), "agent_chat_archive", true);
 	m_manage->setObjectName("agentSessionManagement");
-	m_settings = iconButton(m_sessionPanel, QStringLiteral("Agent 设置"), "agent_chat_settings", true);
+	m_settings = iconButton(m_sessionPanel, tr("Agent Settings"), "agent_chat_settings", true);
 	m_settings->setObjectName("agentSettings");
 	connect(m_newSession, &QToolButton::clicked, this, &ChatDock::createSession);
 	connect(m_settings, &QToolButton::clicked, this, &ChatDock::showSettings);
@@ -136,14 +136,14 @@ void ChatDock::buildWorkspace()
 	m_chatPanel->setObjectName("agentConversation");
 	m_title = new QLabel(m_chatPanel);
 	m_title->setObjectName("agentConversationTitle");
-	m_more = iconButton(m_chatPanel, QStringLiteral("会话操作"), "agent_chat_more");
+	m_more = iconButton(m_chatPanel, tr("Session Actions"), "agent_chat_more");
 	connect(m_more, &QToolButton::clicked, this, [this] { showSessionMenu(QPoint(0, 0)); });
-	m_context = new QLabel(QStringLiteral("  当前工程"), m_chatPanel);
+	m_context = new QLabel(QStringLiteral("  ") + tr("Current Project"), m_chatPanel);
 	m_context->setObjectName("agentProjectContext");
 	m_messages = new ChatTranscript(m_chatPanel);
 	m_messages->setObjectName("agentMessages");
 	m_messages->setFrameShape(QFrame::NoFrame);
-	m_model = iconButton(m_chatPanel, QStringLiteral("未配置模型"), "agent_chat_settings", true);
+	m_model = iconButton(m_chatPanel, tr("Configure a model"), "agent_chat_settings", true);
 	m_model->setObjectName("agentModel");
 	m_model->setEnabled(false);
 	m_composer = new QFrame(m_chatPanel);
@@ -151,8 +151,8 @@ void ChatDock::buildWorkspace()
 	m_input = new QPlainTextEdit(m_composer);
 	m_input->setObjectName("agentInput");
 	m_input->setFrameShape(QFrame::NoFrame);
-	m_input->setPlaceholderText(QStringLiteral("继续描述你想要的编配…"));
-	m_attach = iconButton(m_composer, QStringLiteral("添加附件（M2 接入）"), "agent_chat_attach");
+	m_input->setPlaceholderText(tr("Describe the arrangement you want…"));
+	m_attach = iconButton(m_composer, tr("Add attachments"), "agent_chat_attach");
 	m_attach->setObjectName("agentAttach");
 	m_attachmentChip = iconButton(m_composer, {}, "agent_chat_attach", true);
 	m_attachmentChip->setIcon({});
@@ -175,16 +175,16 @@ void ChatDock::buildWorkspace()
 	m_attachmentRemove->setGeometry(141, 8, 12, 12);
 	m_attachmentRemove->setIconSize({12, 12});
 	m_attachmentChip->hide();
-	m_reasoning = iconButton(m_composer, QStringLiteral("思考 · 自动"), "agent_chat_brain", true);
+	m_reasoning = iconButton(m_composer, tr("Reasoning · Auto"), "agent_chat_brain", true);
 	m_reasoning->setObjectName("agentReasoning");
 	m_reasoning->setEnabled(false);
 	const auto approvalMode = ConfigManager::inst()->value("agentchat", "approval", "request");
 	m_approval
-		= iconButton(m_composer, approvalMode == "none" ? QStringLiteral("无需批准") : QStringLiteral("请求批准"),
+		= iconButton(m_composer, approvalMode == "none" ? tr("No approval required") : tr("Request approval"),
 					 "agent_chat_shield", true);
 	connect(m_approval, &QToolButton::clicked, this, &ChatDock::showSettings);
 	m_approval->setObjectName("agentApproval");
-	m_send = iconButton(m_composer, QStringLiteral("发送（尚未接入 API）"), "agent_chat_send");
+	m_send = iconButton(m_composer, tr("Send"), "agent_chat_send");
 	m_send->setObjectName("agentSend");
 	m_send->setEnabled(false);
 	m_footer = new QLabel(QStringLiteral("Enter 发送  ·  Shift+Enter 换行"), m_chatPanel);

@@ -17417,4 +17417,794 @@ Latency: %2 ms</source>
         <translation>노드 삭제</translation>
     </message>
 </context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Agent Settings</source>
+        <translation>에이전트 설정</translation>
+    </message>
+    <message>
+        <source>Expand Agent</source>
+        <translation>Agent 펼치기</translation>
+    </message>
+    <message>
+        <source>Collapse Agent</source>
+        <translation>Agent 접기</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>Toggle Pin</source>
+        <translation>고정 전환</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>보관 해제</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>보관</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>삭제</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>세션 삭제</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
+        <translation>선택한 세션 %1개를 삭제할까요? 원본 첨부 파일과 프로젝트 자료는 유지됩니다.</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>세션 이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>이름</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>승인 불필요</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>승인 요청</translation>
+    </message>
+    <message>
+        <source>Tool call details</source>
+        <translation>도구 호출 세부 정보</translation>
+    </message>
+    <message>
+        <source>Reading and encoding selected attachments…</source>
+        <translation>선택한 첨부 파일을 읽고 인코딩하는 중…</translation>
+    </message>
+    <message>
+        <source>Request upload: %1 / %2 bytes</source>
+        <translation>요청 업로드 %1 / %2바이트</translation>
+    </message>
+    <message>
+        <source>Awaiting tool approval</source>
+        <translation>도구 작업 승인 대기 중</translation>
+    </message>
+    <message>
+        <source>Export JSON (includes sent attachment content)</source>
+        <translation>JSON 내보내기(전송한 첨부 내용 포함)</translation>
+    </message>
+    <message>
+        <source>Export session (includes sent attachment content)</source>
+        <translation>세션 내보내기(전송한 첨부 내용 포함)</translation>
+    </message>
+    <message>
+        <source>Configure a model</source>
+        <translation>모델 설정</translation>
+    </message>
+    <message>
+        <source>API and model settings</source>
+        <translation>API 및 모델 설정</translation>
+    </message>
+    <message>
+        <source>Add attachments</source>
+        <translation>첨부 파일 추가</translation>
+    </message>
+    <message>
+        <source>Remove attachment: %1</source>
+        <translation>첨부 파일 제거 %1</translation>
+    </message>
+    <message>
+        <source>Request failed · Click Send to retry</source>
+        <translation>요청 실패 · 보내기를 눌러 다시 시도</translation>
+    </message>
+    <message>
+        <source>Enter to send · Shift+Enter for a new line</source>
+        <translation>Enter로 보내기 · Shift+Enter로 줄 바꿈</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>자동</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>끔</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>낮음</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>중간</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>높음</translation>
+    </message>
+    <message>
+        <source>Extra high</source>
+        <translation>매우 높음</translation>
+    </message>
+    <message>
+        <source>Reasoning · %1</source>
+        <translation>추론 · %1</translation>
+    </message>
+    <message>
+        <source>Stop current request</source>
+        <translation>현재 요청 중지</translation>
+    </message>
+    <message>
+        <source>Retry last failed request</source>
+        <translation>마지막 실패 요청 다시 시도</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>보내기</translation>
+    </message>
+    <message>
+        <source>Reasoning level</source>
+        <translation>추론 수준</translation>
+    </message>
+    <message>
+        <source>Not supported</source>
+        <translation>지원되지 않음</translation>
+    </message>
+    <message>
+        <source>Close Chat Window</source>
+        <translation>채팅 창 닫기</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>현재 프로젝트</translation>
+    </message>
+    <message>
+        <source>Dock on the Right</source>
+        <translation>오른쪽에 도킹</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>세션</translation>
+    </message>
+    <message>
+        <source>Expand Chat Window</source>
+        <translation>채팅 창 펼치기</translation>
+    </message>
+    <message>
+        <source>Undock or Redock</source>
+        <translation>도킹 전환</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>새 세션</translation>
+    </message>
+    <message>
+        <source>Search Sessions</source>
+        <translation>세션 검색</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>세션 관리</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>세션 작업</translation>
+    </message>
+    <message>
+        <source>Describe the arrangement you want…</source>
+        <translation>원하는 편곡을 입력하세요…</translation>
+    </message>
+    <message>
+        <source>Reasoning · Auto</source>
+        <translation>추론 · 자동</translation>
+    </message>
+    <message>
+        <source>Agent Chat</source>
+        <translation>Agent 채팅</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSessionsDialog</name>
+    <message>
+        <source>Back to Chat</source>
+        <translation>채팅으로 돌아가기</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>세션 관리</translation>
+    </message>
+    <message>
+        <source>Sessions are stored separately from projects. Switching sessions keeps the current project open.</source>
+        <translation>세션은 프로젝트와 별도로 저장됩니다. 세션을 전환해도 현재 프로젝트가 열린 상태로 유지됩니다.</translation>
+    </message>
+    <message>
+        <source>Search titles, messages, or project names</source>
+        <translation>제목, 메시지 또는 프로젝트 이름 검색</translation>
+    </message>
+    <message>
+        <source>All Projects</source>
+        <translation>모든 프로젝트</translation>
+    </message>
+    <message>
+        <source>Import Session</source>
+        <translation>세션 가져오기</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>새 세션</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>전체</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>고정됨</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>보관됨</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>내보내기</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>보관</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>삭제</translation>
+    </message>
+    <message>
+        <source>Session</source>
+        <translation>세션</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>프로젝트</translation>
+    </message>
+    <message>
+        <source>Model Connection</source>
+        <translation>모델 연결</translation>
+    </message>
+    <message>
+        <source>Last Updated</source>
+        <translation>최근 업데이트</translation>
+    </message>
+    <message>
+        <source>Deleting or archiving a session keeps LMMS project files and downloaded assets.</source>
+        <translation>세션을 삭제하거나 보관해도 LMMS 프로젝트 파일과 다운로드한 자료는 유지됩니다.</translation>
+    </message>
+    <message>
+        <source>Select %1</source>
+        <translation>%1 선택</translation>
+    </message>
+    <message>
+        <source>No linked project</source>
+        <translation>연결된 프로젝트 없음</translation>
+    </message>
+    <message>
+        <source>Not configured</source>
+        <translation>설정되지 않음</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>세션 작업</translation>
+    </message>
+    <message>
+        <source>Manage %1</source>
+        <translation>%1 관리</translation>
+    </message>
+    <message>
+        <source>%1 sessions selected</source>
+        <translation>세션 %1개 선택됨</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>고정 해제</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>고정</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>보관 해제</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>세션 이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>이름</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>세션 삭제</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Project files and assets will be kept.</source>
+        <translation>선택한 세션 %1개를 삭제할까요? 프로젝트 파일과 자료는 유지됩니다.</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSettingsDialog</name>
+    <message>
+        <source>Close Settings</source>
+        <translation>설정 닫기</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>작업 공간</translation>
+    </message>
+    <message>
+        <source>API and Model</source>
+        <translation>API 및 모델</translation>
+    </message>
+    <message>
+        <source>Generation Parameters</source>
+        <translation>생성 매개변수</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>전역 설정</translation>
+    </message>
+    <message>
+        <source>Approval Mode</source>
+        <translation>승인 모드</translation>
+    </message>
+    <message>
+        <source>Asset Downloads</source>
+        <translation>자료 다운로드</translation>
+    </message>
+    <message>
+        <source>Back to Chat</source>
+        <translation>채팅으로 돌아가기</translation>
+    </message>
+    <message>
+        <source>Save local settings only. No test request is sent.</source>
+        <translation>로컬 설정만 저장하며 테스트 요청은 보내지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>취소</translation>
+    </message>
+    <message>
+        <source>Save Settings</source>
+        <translation>설정 저장</translation>
+    </message>
+    <message>
+        <source>Load the system prompt from a file and manage web search and asset downloads.</source>
+        <translation>파일에서 시스템 프롬프트를 읽고 웹 검색과 자료 다운로드를 관리합니다.</translation>
+    </message>
+    <message>
+        <source>The prompt is stored in a text file. Set its path here.</source>
+        <translation>프롬프트는 텍스트 파일에 저장됩니다. 여기에서 경로를 지정합니다.</translation>
+    </message>
+    <message>
+        <source>File Path</source>
+        <translation>파일 경로</translation>
+    </message>
+    <message>
+        <source>Choose File…</source>
+        <translation>파일 선택…</translation>
+    </message>
+    <message>
+        <source>Choose System Prompt</source>
+        <translation>시스템 프롬프트 선택</translation>
+    </message>
+    <message>
+        <source>Relative paths start from the LMMS program directory. You can select another .txt file.</source>
+        <translation>상대 경로는 LMMS 프로그램 디렉터리를 기준으로 합니다. 다른 .txt 파일도 선택할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Default Source</source>
+        <translation>기본 소스</translation>
+    </message>
+    <message>
+        <source>Custom Source</source>
+        <translation>사용자 지정 소스</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>파일 열기</translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation>다시 불러오기</translation>
+    </message>
+    <message>
+        <source>Restore Default Path</source>
+        <translation>기본 경로 복원</translation>
+    </message>
+    <message>
+        <source>Default Prompt Scope</source>
+        <translation>기본 프롬프트 범위</translation>
+    </message>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent 설정</translation>
+    </message>
+    <message>
+        <source>System Prompt File</source>
+        <translation>시스템 프롬프트 파일</translation>
+    </message>
+    <message>
+        <source>UTF-8 text · External file</source>
+        <translation>UTF-8 텍스트 · 외부 파일</translation>
+    </message>
+    <message>
+        <source>Web and External Assets</source>
+        <translation>웹 및 외부 자료</translation>
+    </message>
+    <message>
+        <source>Allow Asset Downloads</source>
+        <translation>자료 다운로드 허용</translation>
+    </message>
+    <message>
+        <source>Use Current Approval Mode</source>
+        <translation>현재 승인 모드 사용</translation>
+    </message>
+    <message>
+        <source>Allow Web Search</source>
+        <translation>웹 검색 허용</translation>
+    </message>
+    <message>
+        <source>Search Provider</source>
+        <translation>검색 제공자</translation>
+    </message>
+    <message>
+        <source>Model-provided search</source>
+        <translation>모델 제공 검색</translation>
+    </message>
+    <message>
+        <source>Brave Search API URL</source>
+        <translation>Brave Search API URL</translation>
+    </message>
+    <message>
+        <source>Web Search</source>
+        <translation>웹 검색</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>승인 요청</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>승인 불필요</translation>
+    </message>
+    <message>
+        <source>Current Mode</source>
+        <translation>현재 모드</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>기본값</translation>
+    </message>
+    <message>
+        <source>Project Tools</source>
+        <translation>프로젝트 도구</translation>
+    </message>
+    <message>
+        <source>External Asset Downloads</source>
+        <translation>외부 자료 다운로드</translation>
+    </message>
+    <message>
+        <source>Download Tools</source>
+        <translation>다운로드 도구</translation>
+    </message>
+    <message>
+        <source>Prefer Portable Tools</source>
+        <translation>휴대용 도구 우선</translation>
+    </message>
+    <message>
+        <source>Choose Tool</source>
+        <translation>도구 선택</translation>
+    </message>
+    <message>
+        <source>aria2 Download Tool</source>
+        <translation>aria2 다운로드 도구</translation>
+    </message>
+    <message>
+        <source>Archive Extraction Tool</source>
+        <translation>압축 풀기 도구</translation>
+    </message>
+    <message>
+        <source>Asset Destination</source>
+        <translation>자료 저장 위치</translation>
+    </message>
+    <message>
+        <source>Extract archives after download</source>
+        <translation>다운로드 후 압축 풀기</translation>
+    </message>
+    <message>
+        <source>Download Workflow</source>
+        <translation>다운로드 절차</translation>
+    </message>
+    <message>
+        <source>Check Tools</source>
+        <translation>도구 확인</translation>
+    </message>
+    <message>
+        <source>Not yet checked</source>
+        <translation>아직 확인하지 않음</translation>
+    </message>
+    <message>
+        <source>Save audio, MIDI and other assets to the requested location.</source>
+        <translation>오디오, MIDI 등 자료를 요청한 위치에 저장합니다.</translation>
+    </message>
+    <message>
+        <source>Find references, read pages and locate asset sources.</source>
+        <translation>참고 자료를 찾고 웹페이지를 읽으며 자료 출처를 검색합니다.</translation>
+    </message>
+    <message>
+        <source>SearXNG instance URL, e.g. http://192.168.1.20:8080</source>
+        <translation>SearXNG 인스턴스 URL(예: http://192.168.1.20:8080)</translation>
+    </message>
+    <message>
+        <source>Credentials saved. Leave blank to keep them.</source>
+        <translation>인증 정보가 저장되었습니다. 유지하려면 비워 두세요.</translation>
+    </message>
+    <message>
+        <source>Credentials (optional, if required by the instance)</source>
+        <translation>인증 정보(인스턴스에서 요구하는 경우에만)</translation>
+    </message>
+    <message>
+        <source>API key saved. Leave blank to keep it.</source>
+        <translation>API 키가 저장되었습니다. 유지하려면 비워 두세요.</translation>
+    </message>
+    <message>
+        <source>The model provider runs the search after separate approval.</source>
+        <translation>별도 승인 후 모델 제공자가 검색을 실행합니다.</translation>
+    </message>
+    <message>
+        <source>The model does not declare support for hosted search (capabilities.hostedWebSearch).</source>
+        <translation>현재 모델은 호스팅 검색 지원을 선언하지 않았습니다(capabilities.hostedWebSearch).</translation>
+    </message>
+    <message>
+        <source>Select SearXNG, Brave or a model with hosted search support.</source>
+        <translation>SearXNG, Brave 또는 호스팅 검색을 지원하는 모델을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Enter a valid SearXNG instance URL (http or https).</source>
+        <translation>올바른 SearXNG 인스턴스 URL(http 또는 https)을 입력하세요.</translation>
+    </message>
+    <message>
+        <source>Enter a valid Brave Search API URL (http or https).</source>
+        <translation>올바른 Brave Search API URL(http 또는 https)을 입력하세요.</translation>
+    </message>
+    <message>
+        <source>Brave Search requires an API key.</source>
+        <translation>Brave Search에는 API 키가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>Use the download tool to fetch external assets and extract archives after downloading.</source>
+        <translation>다운로드 도구로 외부 자료를 받고 완료 후 압축을 풉니다.</translation>
+    </message>
+    <message>
+        <source>Tools are stored in subfolders of the tools directory beside lmms.exe. You can change their paths.</source>
+        <translation>도구는 lmms.exe 옆 tools 디렉터리의 하위 폴더에 저장됩니다. 경로를 변경할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Keep the files required by 7-Zip in tools/7zip/.</source>
+        <translation>7-Zip에 필요한 파일을 tools/7zip/에 보관하세요.</translation>
+    </message>
+    <message>
+        <source>Choose the destination in the download request. You can use the project assets folder.</source>
+        <translation>다운로드 요청에서 저장 위치를 지정합니다. 프로젝트 자료 폴더를 사용할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>The file destination and extraction folder are shown before downloading.</source>
+        <translation>다운로드 전에 파일 저장 위치와 압축을 풀 폴더를 표시합니다.</translation>
+    </message>
+    <message>
+        <source>Tools available: </source>
+        <translation>사용 가능한 도구: </translation>
+    </message>
+    <message>
+        <source>Tools unavailable: </source>
+        <translation>사용할 수 없는 도구: </translation>
+    </message>
+    <message>
+        <source>Choose whether project operations, web searches and asset downloads require confirmation.</source>
+        <translation>프로젝트 작업, 웹 검색 및 자료 다운로드에 확인이 필요한지 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Review the purpose and scope before approving the tool action.</source>
+        <translation>도구 작업을 승인하기 전에 목적과 영향 범위를 확인합니다.</translation>
+    </message>
+    <message>
+        <source>Tools requested by the model run immediately without an approval prompt.</source>
+        <translation>모델이 요청한 도구가 승인 창 없이 바로 실행됩니다.</translation>
+    </message>
+    <message>
+        <source>The activity log remains visible. You can stop at any time. Changes may apply immediately to the current project.</source>
+        <translation>작업 기록은 계속 표시되며 언제든 중지할 수 있습니다. 변경 사항이 현재 프로젝트에 즉시 적용될 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Applies to</source>
+        <translation>적용 대상</translation>
+    </message>
+    <message>
+        <source>Approval requests appear in the chat transcript.</source>
+        <translation>승인 요청은 채팅 기록에 표시됩니다.</translation>
+    </message>
+    <message>
+        <source>The composer always shows the current approval mode.</source>
+        <translation>입력 영역에 현재 승인 모드가 항상 표시됩니다.</translation>
+    </message>
+    <message>
+        <source>Current mode: </source>
+        <translation>현재 모드: </translation>
+    </message>
+    <message>
+        <source>Loaded %1 characters. Save the settings to use this prompt for future requests.</source>
+        <translation>%1자를 읽었습니다. 이후 요청에 적용하려면 설정을 저장하세요.</translation>
+    </message>
+    <message>
+        <source>Reload after editing the file. Later messages use the updated prompt.</source>
+        <translation>파일을 편집한 뒤 다시 불러오세요. 이후 메시지에는 갱신한 프롬프트가 적용됩니다.</translation>
+    </message>
+    <message>
+        <source>Confirm source and destination</source>
+        <translation>출처와 저장 위치 확인</translation>
+    </message>
+    <message>
+        <source>Review the URL, file name and destination folder.</source>
+        <translation>URL, 파일 이름, 저장 폴더를 확인합니다.</translation>
+    </message>
+    <message>
+        <source>Download the asset</source>
+        <translation>자료 다운로드</translation>
+    </message>
+    <message>
+        <source>aria2 shows progress, speed and remaining time.</source>
+        <translation>aria2 진행률, 속도, 남은 시간을 표시합니다.</translation>
+    </message>
+    <message>
+        <source>Detect and extract archives</source>
+        <translation>압축 파일 감지 및 풀기</translation>
+    </message>
+    <message>
+        <source>Review the extraction location and result.</source>
+        <translation>압축을 푼 위치와 결과를 확인합니다.</translation>
+    </message>
+    <message>
+        <source>Add to the current session</source>
+        <translation>현재 세션에 추가</translation>
+    </message>
+    <message>
+        <source>Import into the project or keep the file.</source>
+        <translation>프로젝트로 가져오거나 파일을 유지합니다.</translation>
+    </message>
+    <message>
+        <source>Approve once, review the changes, or decline. The project and download destination stay unchanged until approval.</source>
+        <translation>한 번 승인, 변경 사항 확인 또는 거부를 선택할 수 있습니다. 승인 전까지 프로젝트와 다운로드 위치는 바뀌지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Create and edit music, use built-in tools, and follow the active approval mode.
+Check tool results and find or download assets on request.</source>
+        <translation>음악을 만들고 편집하며 내장 도구와 현재 승인 모드를 사용합니다.
+도구 결과를 확인하고 요청에 따라 자료를 검색하거나 다운로드합니다.</translation>
+    </message>
+    <message>
+        <source>Request approval: Confirm before searching or downloading.
+No approval required: Run immediately and show the activity log.</source>
+        <translation>승인 요청: 검색하거나 다운로드하기 전에 확인합니다.
+승인 불필요: 바로 실행하고 작업 기록을 표시합니다.</translation>
+    </message>
+    <message>
+        <source>Project edits: Review affected tracks, clips and notes.
+Web search: Review the query. Downloads: Review the source and destination.</source>
+        <translation>프로젝트 편집: 영향을 받는 트랙, 클립, 음표를 확인합니다.
+웹 검색: 검색어를 확인합니다. 다운로드: 출처와 저장 위치를 확인합니다.</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Approve once</source>
+        <translation>한 번 승인</translation>
+    </message>
+    <message>
+        <source>Approve to execute the internal project tool</source>
+        <translation>프로젝트 내부 도구 실행 승인</translation>
+    </message>
+    <message>
+        <source>Approved · %1</source>
+        <translation>승인됨 · %1</translation>
+    </message>
+    <message>
+        <source>Awaiting approval: %1</source>
+        <translation>승인 대기 중: %1</translation>
+    </message>
+    <message>
+        <source>Canceled · %1</source>
+        <translation>취소됨 · %1</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>완료</translation>
+    </message>
+    <message>
+        <source>Denied · %1</source>
+        <translation>거부됨 · %1</translation>
+    </message>
+    <message>
+        <source>Deny</source>
+        <translation>거부</translation>
+    </message>
+    <message>
+        <source>Failed · %1</source>
+        <translation>실패 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed · %1</source>
+        <translation>실행되지 않음 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed; project unchanged</source>
+        <translation>실행되지 않았습니다. 프로젝트는 그대로입니다</translation>
+    </message>
+    <message>
+        <source>Ran automatically · %1</source>
+        <translation>자동 실행됨 · %1</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>요청 실패: %1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>중지됨</translation>
+    </message>
+    <message>
+        <source>Thought · Summary</source>
+        <translation>추론 · 요약</translation>
+    </message>
+    <message>
+        <source>Tool result</source>
+        <translation>도구 실행 결과</translation>
+    </message>
+    <message>
+        <source>View changes</source>
+        <translation>변경 사항 보기</translation>
+    </message>
+    <message>
+        <source>Web sources:</source>
+        <translation>웹 출처:</translation>
+    </message>
+    <message>
+        <source>Start a new music conversation.</source>
+        <translation>새 음악 작업 대화를 시작하세요.</translation>
+    </message>
+</context>
 </TS>

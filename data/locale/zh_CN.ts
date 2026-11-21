@@ -18484,6 +18484,134 @@ Latency: %2 ms</source>
         <source>Export folder (includes sent attachment content)</source>
         <translation>选择导出目录（包含已发送的附件内容）</translation>
     </message>
+    <message>
+        <source>Back to Chat</source>
+        <translation>返回聊天</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>会话管理</translation>
+    </message>
+    <message>
+        <source>Sessions are stored separately from projects. Switching sessions keeps the current project open.</source>
+        <translation>会话与工程文件分开管理，切换会话不会重新加载工程。</translation>
+    </message>
+    <message>
+        <source>Search titles, messages, or project names</source>
+        <translation>搜索标题、消息或工程名称</translation>
+    </message>
+    <message>
+        <source>All Projects</source>
+        <translation>全部工程</translation>
+    </message>
+    <message>
+        <source>Import Session</source>
+        <translation>导入会话</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>新建会话</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>全部</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>已置顶</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>已归档</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>导出</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>归档</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Session</source>
+        <translation>会话</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>工程</translation>
+    </message>
+    <message>
+        <source>Model Connection</source>
+        <translation>模型连接</translation>
+    </message>
+    <message>
+        <source>Last Updated</source>
+        <translation>最近更新</translation>
+    </message>
+    <message>
+        <source>Deleting or archiving a session keeps LMMS project files and downloaded assets.</source>
+        <translation>删除或归档会话不会删除 LMMS 工程文件和已下载素材。</translation>
+    </message>
+    <message>
+        <source>Select %1</source>
+        <translation>选择 %1</translation>
+    </message>
+    <message>
+        <source>No linked project</source>
+        <translation>未关联工程</translation>
+    </message>
+    <message>
+        <source>Not configured</source>
+        <translation>未配置</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>会话操作</translation>
+    </message>
+    <message>
+        <source>Manage %1</source>
+        <translation>管理 %1</translation>
+    </message>
+    <message>
+        <source>%1 sessions selected</source>
+        <translation>已选择 %1 个会话</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>取消置顶</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>置顶</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>取消归档</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>重命名会话</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>删除会话</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Project files and assets will be kept.</source>
+        <translation>删除所选 %1 个会话？工程文件和素材不会被删除。</translation>
+    </message>
 </context>
 <context>
     <name>AgentChat</name>
@@ -18619,6 +18747,326 @@ Latency: %2 ms</source>
         <source>Awaiting approval: %1</source>
         <translation>待批准：%1</translation>
     </message>
+    <message>
+        <source>New connection</source>
+        <translation>新连接</translation>
+    </message>
+    <message>
+        <source>Windows Credential Manager error %1.</source>
+        <translation>Windows 凭据管理器错误 %1。</translation>
+    </message>
+    <message>
+        <source>Invalid connection identifier, name or protocol.</source>
+        <translation>连接标识、名称或请求格式无效。</translation>
+    </message>
+    <message>
+        <source>API base URL must be HTTP(S), without credentials, query or fragment.</source>
+        <translation>API 基础地址须使用 HTTP(S)，且不能包含凭据、查询参数或片段。</translation>
+    </message>
+    <message>
+        <source>Temperature must be between 0 and 2.</source>
+        <translation>温度须介于 0 和 2 之间。</translation>
+    </message>
+    <message>
+        <source>Invalid API key header configuration.</source>
+        <translation>API Key 请求头配置无效。</translation>
+    </message>
+    <message>
+        <source>Invalid connection settings JSON or unsupported version.</source>
+        <translation>连接设置 JSON 无效或版本不受支持。</translation>
+    </message>
+    <message>
+        <source>Duplicate connection identifier.</source>
+        <translation>连接标识重复。</translation>
+    </message>
+    <message>
+        <source>Cannot create connection settings directory.</source>
+        <translation>无法创建连接设置目录。</translation>
+    </message>
+    <message>
+        <source>Connection not found.</source>
+        <translation>未找到连接。</translation>
+    </message>
+    <message>
+        <source>A valid connection and non-empty API key are required.</source>
+        <translation>需要有效连接和非空的 API Key。</translation>
+    </message>
+    <message>
+        <source>API key exceeds the Windows credential size limit.</source>
+        <translation>API Key 超过 Windows 凭据大小限制。</translation>
+    </message>
+    <message>
+        <source>Native API key storage is available on Windows only.</source>
+        <translation>原生 API Key 存储仅支持 Windows。</translation>
+    </message>
+    <message>
+        <source>Invalid connection identifier.</source>
+        <translation>连接标识无效。</translation>
+    </message>
+    <message>
+        <source>Selected attachments exceed the 64 MiB request limit.</source>
+        <translation>所选附件总大小超过 64 MiB 请求限制。</translation>
+    </message>
+    <message>
+        <source>Previous attachment: %1 (content unavailable; select it again to send).</source>
+        <translation>先前附件：%1（内容不可用；请重新选择后发送）。</translation>
+    </message>
+    <message>
+        <source>The model response contained invalid JSON.</source>
+        <translation>模型响应包含无效 JSON。</translation>
+    </message>
+    <message>
+        <source>The configured response text path did not contain a string.</source>
+        <translation>配置的响应文本路径未包含字符串。</translation>
+    </message>
+    <message>
+        <source>The model response did not contain the expected message fields.</source>
+        <translation>模型响应未包含预期的消息字段。</translation>
+    </message>
+    <message>
+        <source>Invalid, incomplete or unsupported tool history for this protocol.</source>
+        <translation>工具历史无效、不完整，或当前协议不支持该格式。</translation>
+    </message>
+    <message>
+        <source>Tool result</source>
+        <translation>工具结果</translation>
+    </message>
+    <message>
+        <source>Thought · Summary</source>
+        <translation>已思考 · 摘要</translation>
+    </message>
+    <message>
+        <source>Approved · %1</source>
+        <translation>已批准 · %1</translation>
+    </message>
+    <message>
+        <source>Ran automatically · %1</source>
+        <translation>已自动执行 · %1</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>已完成</translation>
+    </message>
+    <message>
+        <source>Denied · %1</source>
+        <translation>已拒绝 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed; project unchanged</source>
+        <translation>未执行，工程未改动</translation>
+    </message>
+    <message>
+        <source>Canceled · %1</source>
+        <translation>已取消 · %1</translation>
+    </message>
+    <message>
+        <source>Failed · %1</source>
+        <translation>执行失败 · %1</translation>
+    </message>
+    <message>
+        <source>Not executed · %1</source>
+        <translation>未执行 · %1</translation>
+    </message>
+    <message>
+        <source>A chat tool cannot be represented as a model function: %1</source>
+        <translation>聊天工具无法表示为模型函数：%1</translation>
+    </message>
+    <message>
+        <source>Web search was turned off; the running search was canceled.</source>
+        <translation>联网搜索已关闭，正在进行的搜索已取消。</translation>
+    </message>
+    <message>
+        <source>Web search is turned off in the Agent settings.</source>
+        <translation>Agent 设置中已关闭联网搜索。</translation>
+    </message>
+    <message>
+        <source>Brave search needs an API key in the Agent settings.</source>
+        <translation>使用 Brave 搜索需要在 Agent 设置中填写 API Key。</translation>
+    </message>
+    <message>
+        <source>The response is not JSON (HTTP %1).</source>
+        <translation>响应不是 JSON（HTTP %1）。</translation>
+    </message>
+    <message>
+        <source>SearXNG search failed: %1</source>
+        <translation>SearXNG 搜索失败：%1</translation>
+    </message>
+    <message>
+        <source>Enable the json format under search.formats in the instance&apos;s settings.yml.</source>
+        <translation>请在该实例 settings.yml 的 search.formats 中启用 json 格式。</translation>
+    </message>
+    <message>
+        <source>Brave search failed: %1</source>
+        <translation>Brave 搜索失败：%1</translation>
+    </message>
+    <message>
+        <source>Only http and https page addresses can be read.</source>
+        <translation>只能读取 http 或 https 网页地址。</translation>
+    </message>
+    <message>
+        <source>The page is larger than the 2 MB reading limit.</source>
+        <translation>网页超过 2 MB 读取上限。</translation>
+    </message>
+    <message>
+        <source>Reading the page failed: %1</source>
+        <translation>读取网页失败：%1</translation>
+    </message>
+    <message>
+        <source>The page content type is not readable text: %1</source>
+        <translation>网页内容类型不是可读文本：%1</translation>
+    </message>
+    <message>
+        <source>The selected model does not support model-hosted web search.</source>
+        <translation>所选模型不支持模型自带联网搜索。</translation>
+    </message>
+    <message>
+        <source>Web search was turned off; the model request was stopped.</source>
+        <translation>联网搜索已关闭，模型请求已停止。</translation>
+    </message>
+    <message>
+        <source>The model provider runs web searches on its own servers during this turn; one turn may search several times. This approval applies to this turn only.</source>
+        <translation>模型厂商会在本轮中于其服务器上执行联网搜索，一轮可能搜索多次。本次批准仅适用于本轮。</translation>
+    </message>
+    <message>
+        <source>Web sources:</source>
+        <translation>联网来源：</translation>
+    </message>
+    <message>
+        <source>%1: not found at %2</source>
+        <translation>%1：在 %2 未找到</translation>
+    </message>
+    <message>
+        <source>%1: found, not listed in tools/manifest.json</source>
+        <translation>%1：已找到，未列入 tools/manifest.json</translation>
+    </message>
+    <message>
+        <source>%1: SHA256 does not match tools/manifest.json</source>
+        <translation>%1：SHA256 与 tools/manifest.json 不一致</translation>
+    </message>
+    <message>
+        <source>%1: verified against tools/manifest.json</source>
+        <translation>%1：已按 tools/manifest.json 校验</translation>
+    </message>
+    <message>
+        <source>Only http and https assets can be downloaded.</source>
+        <translation>只能下载 http 或 https 素材。</translation>
+    </message>
+    <message>
+        <source>A target folder is required.</source>
+        <translation>需要指定目标文件夹。</translation>
+    </message>
+    <message>
+        <source>Save the project first, or give an absolute target folder.</source>
+        <translation>请先保存工程，或指定绝对路径的目标文件夹。</translation>
+    </message>
+    <message>
+        <source>The file name is missing or not a plain file name.</source>
+        <translation>文件名缺失或不是单纯的文件名。</translation>
+    </message>
+    <message>
+        <source>%1 already exists; ask again with overwrite to replace it.</source>
+        <translation>%1 已存在；如需替换，请在请求中明确覆盖。</translation>
+    </message>
+    <message>
+        <source>Cannot create the download folder in %1.</source>
+        <translation>无法在 %1 中创建下载文件夹。</translation>
+    </message>
+    <message>
+        <source>aria2 could not be started.</source>
+        <translation>无法启动 aria2。</translation>
+    </message>
+    <message>
+        <source>aria2 exited with code %1. %2</source>
+        <translation>aria2 退出码 %1。%2</translation>
+    </message>
+    <message>
+        <source>Cannot move the download to %1.</source>
+        <translation>无法将下载文件移动到 %1。</translation>
+    </message>
+    <message>
+        <source>replaces a file with the same name</source>
+        <translation>覆盖同名文件</translation>
+    </message>
+    <message>
+        <source>keeps an existing file with the same name</source>
+        <translation>不覆盖同名文件</translation>
+    </message>
+    <message>
+        <source>Asset downloads are turned off in the Agent settings.</source>
+        <translation>Agent 设置中已关闭素材下载。</translation>
+    </message>
+    <message>
+        <source>aria2 was not found at %1. Check the tools in the Agent settings.</source>
+        <translation>在 %1 未找到 aria2，请在 Agent 设置中检查工具。</translation>
+    </message>
+    <message>
+        <source>7-Zip could not be started.</source>
+        <translation>无法启动 7-Zip。</translation>
+    </message>
+    <message>
+        <source>Downloaded to %1, but it was not extracted: %2</source>
+        <translation>已下载到 %1，但未解压：%2</translation>
+    </message>
+    <message>
+        <source>7-Zip cannot read it as an archive.</source>
+        <translation>7-Zip 无法将其识别为压缩包。</translation>
+    </message>
+    <message>
+        <source>the archive contains a link: %1</source>
+        <translation>压缩包包含链接：%1</translation>
+    </message>
+    <message>
+        <source>the archive member leaves the extraction folder: %1</source>
+        <translation>压缩包成员会越出解压目录：%1</translation>
+    </message>
+    <message>
+        <source>the archive is empty.</source>
+        <translation>压缩包为空。</translation>
+    </message>
+    <message>
+        <source>%1 is not empty; ask again with overwrite to merge into it.</source>
+        <translation>%1 不为空；如需合并，请在请求中明确覆盖。</translation>
+    </message>
+    <message>
+        <source>Cannot create the extraction folder in %1.</source>
+        <translation>无法在 %1 中创建解压文件夹。</translation>
+    </message>
+    <message>
+        <source>7-Zip exited with code %1.</source>
+        <translation>7-Zip 退出码 %1。</translation>
+    </message>
+    <message>
+        <source>an extracted entry is a link or outside the folder.</source>
+        <translation>解压出的条目是链接或位于目录之外。</translation>
+    </message>
+    <message>
+        <source>%1 already exists.</source>
+        <translation>%1 已存在。</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 into place.</source>
+        <translation>无法将 %1 移动到位。</translation>
+    </message>
+    <message>
+        <source>extract to %1</source>
+        <translation>解压到 %1</translation>
+    </message>
+    <message>
+        <source>7-Zip was not found at %1. Check the tools in the Agent settings.</source>
+        <translation>在 %1 未找到 7-Zip，请在 Agent 设置中检查工具。</translation>
+    </message>
+    <message>
+        <source>Start a new music conversation.</source>
+        <translation>开始新的音乐创作会话。</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>请求失败：%1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>已停止</translation>
+    </message>
 </context>
 <context>
     <name>lmms::agent::chat::ChatDock</name>
@@ -18629,6 +19077,186 @@ Latency: %2 ms</source>
     <message>
         <source>Awaiting tool approval</source>
         <translation>等待工具批准</translation>
+    </message>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent 设置</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>你</translation>
+    </message>
+    <message>
+        <source>Agent</source>
+        <translation>Agent</translation>
+    </message>
+    <message>
+        <source>Configure a model</source>
+        <translation>配置模型</translation>
+    </message>
+    <message>
+        <source>API and model settings</source>
+        <translation>API 与模型设置</translation>
+    </message>
+    <message>
+        <source>Stop current request</source>
+        <translation>停止当前请求</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>发送</translation>
+    </message>
+    <message>
+        <source>Model reasoning</source>
+        <translation>模型思考</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>请求失败：%1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>已停止</translation>
+    </message>
+    <message>
+        <source>Add attachments</source>
+        <translation>添加附件</translation>
+    </message>
+    <message>
+        <source> +%1</source>
+        <translation> +%1</translation>
+    </message>
+    <message>
+        <source>Enter to send · Shift+Enter for a new line</source>
+        <translation>Enter 发送 · Shift+Enter 换行</translation>
+    </message>
+    <message>
+        <source>Reading and encoding selected attachments…</source>
+        <translation>正在读取并编码所选附件…</translation>
+    </message>
+    <message>
+        <source>Request upload: %1 / %2 bytes</source>
+        <translation>请求上传：%1 / %2 字节</translation>
+    </message>
+    <message>
+        <source>Attachment: %1 (%2)</source>
+        <translation>附件：%1（%2）</translation>
+    </message>
+    <message>
+        <source>Export session (includes sent attachment content)</source>
+        <translation>导出会话（包含已发送的附件内容）</translation>
+    </message>
+    <message>
+        <source>Export JSON (includes sent attachment content)</source>
+        <translation>导出 JSON（包含已发送的附件内容）</translation>
+    </message>
+    <message>
+        <source>Remove attachment: %1</source>
+        <translation>移除附件：%1</translation>
+    </message>
+    <message>
+        <source>Expand Agent</source>
+        <translation>展开 Agent</translation>
+    </message>
+    <message>
+        <source>Collapse Agent</source>
+        <translation>收起 Agent</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <source>Toggle Pin</source>
+        <translation>切换置顶</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>取消归档</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>归档</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>删除会话</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
+        <translation>删除所选 %1 个会话？原始附件和工程素材不会被删除。</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>重命名会话</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>无需批准</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>请求批准</translation>
+    </message>
+    <message>
+        <source>Close Chat Window</source>
+        <translation>关闭聊天窗口</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>当前工程</translation>
+    </message>
+    <message>
+        <source>Dock on the Right</source>
+        <translation>吸附回右侧</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>会话</translation>
+    </message>
+    <message>
+        <source>Expand Chat Window</source>
+        <translation>展开聊天窗口</translation>
+    </message>
+    <message>
+        <source>Undock or Redock</source>
+        <translation>分离 / 回接</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>新建会话</translation>
+    </message>
+    <message>
+        <source>Search Sessions</source>
+        <translation>搜索会话</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>会话管理</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>会话操作</translation>
+    </message>
+    <message>
+        <source>Describe the arrangement you want…</source>
+        <translation>继续描述你想要的编配…</translation>
+    </message>
+    <message>
+        <source>Reasoning · Auto</source>
+        <translation>推理 · 自动</translation>
+    </message>
+    <message>
+        <source>Agent Chat</source>
+        <translation>Agent 聊天</translation>
     </message>
 </context>
 <context>
@@ -18672,6 +19300,379 @@ Latency: %2 ms</source>
     <message>
         <source>Delete Node</source>
         <translation>删除节点</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSettingsDialog</name>
+    <message>
+        <source>Close Settings</source>
+        <translation>关闭设置</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>工作区</translation>
+    </message>
+    <message>
+        <source>API and Model</source>
+        <translation>API 与模型</translation>
+    </message>
+    <message>
+        <source>Generation Parameters</source>
+        <translation>生成参数</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>全局设置</translation>
+    </message>
+    <message>
+        <source>Approval Mode</source>
+        <translation>批准模式</translation>
+    </message>
+    <message>
+        <source>Asset Downloads</source>
+        <translation>素材下载</translation>
+    </message>
+    <message>
+        <source>Back to Chat</source>
+        <translation>返回聊天</translation>
+    </message>
+    <message>
+        <source>Save local settings only. No test request is sent.</source>
+        <translation>仅保存本地设置；不会发送测试请求</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Save Settings</source>
+        <translation>保存设置</translation>
+    </message>
+    <message>
+        <source>Load the system prompt from a file and manage web search and asset downloads.</source>
+        <translation>从外置文件读取 System Prompt；管理联网搜索与素材下载能力。</translation>
+    </message>
+    <message>
+        <source>The prompt is stored in a text file. Set its path here.</source>
+        <translation>内容保存在文本文件中，设置页只指定路径。</translation>
+    </message>
+    <message>
+        <source>File Path</source>
+        <translation>文件路径</translation>
+    </message>
+    <message>
+        <source>Choose File…</source>
+        <translation>选择文件…</translation>
+    </message>
+    <message>
+        <source>Choose System Prompt</source>
+        <translation>选择 System Prompt</translation>
+    </message>
+    <message>
+        <source>Relative paths start from the LMMS program directory. You can select another .txt file.</source>
+        <translation>相对路径以 LMMS 程序目录为基准，支持选择其他 .txt 文件。</translation>
+    </message>
+    <message>
+        <source>Default Source</source>
+        <translation>默认来源</translation>
+    </message>
+    <message>
+        <source>Custom Source</source>
+        <translation>自定义来源</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>打开文件</translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation>重新读取</translation>
+    </message>
+    <message>
+        <source>Restore Default Path</source>
+        <translation>恢复默认路径</translation>
+    </message>
+    <message>
+        <source>Default Prompt Scope</source>
+        <translation>默认提示词职责</translation>
+    </message>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent 设置</translation>
+    </message>
+    <message>
+        <source>System Prompt File</source>
+        <translation>System Prompt 文件</translation>
+    </message>
+    <message>
+        <source>UTF-8 text · External file</source>
+        <translation>UTF-8 文本  ·  外部维护</translation>
+    </message>
+    <message>
+        <source>Web and External Assets</source>
+        <translation>联网与外部素材</translation>
+    </message>
+    <message>
+        <source>Allow Asset Downloads</source>
+        <translation>允许下载素材</translation>
+    </message>
+    <message>
+        <source>Use Current Approval Mode</source>
+        <translation>沿用批准模式</translation>
+    </message>
+    <message>
+        <source>Allow Web Search</source>
+        <translation>允许联网搜索</translation>
+    </message>
+    <message>
+        <source>Search Provider</source>
+        <translation>搜索来源</translation>
+    </message>
+    <message>
+        <source>Model-provided search</source>
+        <translation>模型自带</translation>
+    </message>
+    <message>
+        <source>Brave Search API URL</source>
+        <translation>Brave Search API 地址</translation>
+    </message>
+    <message>
+        <source>Web Search</source>
+        <translation>联网搜索</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>请求批准</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>无需批准</translation>
+    </message>
+    <message>
+        <source>Current Mode</source>
+        <translation>当前模式</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>默认</translation>
+    </message>
+    <message>
+        <source>Project Tools</source>
+        <translation>工程内部工具</translation>
+    </message>
+    <message>
+        <source>External Asset Downloads</source>
+        <translation>外部素材下载</translation>
+    </message>
+    <message>
+        <source>Download Tools</source>
+        <translation>工具位置</translation>
+    </message>
+    <message>
+        <source>Prefer Portable Tools</source>
+        <translation>优先便携版</translation>
+    </message>
+    <message>
+        <source>Choose Tool</source>
+        <translation>选择工具</translation>
+    </message>
+    <message>
+        <source>aria2 Download Tool</source>
+        <translation>aria2 下载工具</translation>
+    </message>
+    <message>
+        <source>Archive Extraction Tool</source>
+        <translation>压缩包解压工具</translation>
+    </message>
+    <message>
+        <source>Asset Destination</source>
+        <translation>素材保存位置</translation>
+    </message>
+    <message>
+        <source>Extract archives after download</source>
+        <translation>压缩包下载完成后解压</translation>
+    </message>
+    <message>
+        <source>Download Workflow</source>
+        <translation>下载流程</translation>
+    </message>
+    <message>
+        <source>Check Tools</source>
+        <translation>检查工具</translation>
+    </message>
+    <message>
+        <source>Not yet checked</source>
+        <translation>尚未检查</translation>
+    </message>
+    <message>
+        <source>Save audio, MIDI and other assets to the requested location.</source>
+        <translation>按请求保存音频、MIDI 等素材到指定位置。</translation>
+    </message>
+    <message>
+        <source>Find references, read pages and locate asset sources.</source>
+        <translation>查找资料、读取网页和搜索素材来源。</translation>
+    </message>
+    <message>
+        <source>SearXNG instance URL, e.g. http://192.168.1.20:8080</source>
+        <translation>SearXNG 实例 URL，如 http://192.168.1.20:8080</translation>
+    </message>
+    <message>
+        <source>Credentials saved. Leave blank to keep them.</source>
+        <translation>已保存认证信息；留空保持不变</translation>
+    </message>
+    <message>
+        <source>Credentials (optional, if required by the instance)</source>
+        <translation>认证信息（实例需要时填写，可留空）</translation>
+    </message>
+    <message>
+        <source>API key saved. Leave blank to keep it.</source>
+        <translation>已保存 API Key；留空保持不变</translation>
+    </message>
+    <message>
+        <source>The model provider runs the search after separate approval.</source>
+        <translation>由当前模型厂商执行，发送前单独批准</translation>
+    </message>
+    <message>
+        <source>The model does not declare support for hosted search (capabilities.hostedWebSearch).</source>
+        <translation>当前模型未声明支持模型自带搜索（capabilities.hostedWebSearch）</translation>
+    </message>
+    <message>
+        <source>Select SearXNG, Brave or a model with hosted search support.</source>
+        <translation>当前模型不支持模型自带搜索，请选择 SearXNG 或 Brave，或换用支持的模型。</translation>
+    </message>
+    <message>
+        <source>Enter a valid SearXNG instance URL (http or https).</source>
+        <translation>请填写有效的 SearXNG 实例 URL（http 或 https）。</translation>
+    </message>
+    <message>
+        <source>Enter a valid Brave Search API URL (http or https).</source>
+        <translation>请填写有效的 Brave Search API 地址（http 或 https）。</translation>
+    </message>
+    <message>
+        <source>Brave Search requires an API key.</source>
+        <translation>使用 Brave 搜索需要填写 API Key。</translation>
+    </message>
+    <message>
+        <source>Use the download tool to fetch external assets and extract archives after downloading.</source>
+        <translation>通过下载工具获取外部素材，压缩包下载完成后解压。</translation>
+    </message>
+    <message>
+        <source>Tools are stored in subfolders of the tools directory beside lmms.exe. You can change their paths.</source>
+        <translation>工具按文件夹放在 lmms.exe 旁的 tools 目录，路径可调整。</translation>
+    </message>
+    <message>
+        <source>Keep the files required by 7-Zip in tools/7zip/.</source>
+        <translation>7zip 所需的配套文件保留在 tools/7zip/ 内。</translation>
+    </message>
+    <message>
+        <source>Choose the destination in the download request. You can use the project assets folder.</source>
+        <translation>由当前下载请求指定，可选择工程素材目录</translation>
+    </message>
+    <message>
+        <source>The file destination and extraction folder are shown before downloading.</source>
+        <translation>下载前同时展示文件保存位置与解压目录。</translation>
+    </message>
+    <message>
+        <source>Tools available: </source>
+        <translation>工具可用：</translation>
+    </message>
+    <message>
+        <source>Tools unavailable: </source>
+        <translation>工具不可用：</translation>
+    </message>
+    <message>
+        <source>Choose whether project operations, web searches and asset downloads require confirmation.</source>
+        <translation>控制工程操作、联网搜索和素材下载在执行前是否需要你确认。</translation>
+    </message>
+    <message>
+        <source>Review the purpose and scope before approving the tool action.</source>
+        <translation>工具执行前，先展示目的和影响范围，等待你批准。</translation>
+    </message>
+    <message>
+        <source>Tools requested by the model run immediately without an approval prompt.</source>
+        <translation>模型请求的工具直接执行，不再弹出批准请求。</translation>
+    </message>
+    <message>
+        <source>The activity log remains visible. You can stop at any time. Changes may apply immediately to the current project.</source>
+        <translation>执行记录持续显示，可随时停止。修改可能立即写入当前工程。</translation>
+    </message>
+    <message>
+        <source>Applies to</source>
+        <translation>适用于</translation>
+    </message>
+    <message>
+        <source>Approval requests appear in the chat transcript.</source>
+        <translation>批准会出现在聊天记录中</translation>
+    </message>
+    <message>
+        <source>The composer always shows the current approval mode.</source>
+        <translation>聊天输入区始终显示当前模式，方便随时识别。</translation>
+    </message>
+    <message>
+        <source>Current mode: </source>
+        <translation>当前：</translation>
+    </message>
+    <message>
+        <source>Loaded %1 characters. Save the settings to use this prompt for future requests.</source>
+        <translation>读取成功，%1 个字符；保存设置后用于后续请求。</translation>
+    </message>
+    <message>
+        <source>Reload after editing the file. Later messages use the updated prompt.</source>
+        <translation>修改文件后重新读取，后续消息使用更新后的提示词。</translation>
+    </message>
+    <message>
+        <source>Confirm source and destination</source>
+        <translation>确认来源与目标</translation>
+    </message>
+    <message>
+        <source>Review the URL, file name and destination folder.</source>
+        <translation>显示 URL、文件名和保存目录</translation>
+    </message>
+    <message>
+        <source>Download the asset</source>
+        <translation>下载素材</translation>
+    </message>
+    <message>
+        <source>aria2 shows progress, speed and remaining time.</source>
+        <translation>aria2 进度、速度和剩余时间</translation>
+    </message>
+    <message>
+        <source>Detect and extract archives</source>
+        <translation>识别压缩包并解压</translation>
+    </message>
+    <message>
+        <source>Review the extraction location and result.</source>
+        <translation>显示解压位置和处理结果</translation>
+    </message>
+    <message>
+        <source>Add to the current session</source>
+        <translation>加入当前会话</translation>
+    </message>
+    <message>
+        <source>Import into the project or keep the file.</source>
+        <translation>可选择导入工程或保留文件</translation>
+    </message>
+    <message>
+        <source>Approve once, review the changes, or decline. The project and download destination stay unchanged until approval.</source>
+        <translation>可以批准本次、查看变更或拒绝。批准之前保持当前工程和下载目标不变。</translation>
+    </message>
+    <message>
+        <source>Create and edit music, use built-in tools, and follow the active approval mode.
+Check tool results and find or download assets on request.</source>
+        <translation>音乐创作与编辑；调用已有内部工具；遵守当前批准模式；
+核对工具结果；按请求搜索与下载素材。</translation>
+    </message>
+    <message>
+        <source>Request approval: Confirm before searching or downloading.
+No approval required: Run immediately and show the activity log.</source>
+        <translation>请求批准：搜索和下载前先确认。
+无需批准：直接执行并显示记录。</translation>
+    </message>
+    <message>
+        <source>Project edits: Review affected tracks, clips and notes.
+Web search: Review the query. Downloads: Review the source and destination.</source>
+        <translation>工程编辑：显示将改动的轨道、片段和音符。
+联网搜索：显示查询内容。素材下载：显示来源和保存位置。</translation>
     </message>
 </context>
 </TS>

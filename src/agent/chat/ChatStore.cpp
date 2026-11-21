@@ -158,7 +158,7 @@ QJsonObject ChatStore::newSession()
 {
 	return {{"version", 1},
 			{"id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
-			{"title", QStringLiteral("新会话")},
+			{"title", QCoreApplication::translate("lmms::agent::chat::ChatDock", "New Session")},
 			{"createdAt", QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)},
 			{"pinned", false},
 			{"archived", false},

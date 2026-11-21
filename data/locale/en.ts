@@ -17373,4 +17373,794 @@ Latency: %2 ms</source>
         <translation>Delete Node</translation>
     </message>
 </context>
+<context>
+    <name>lmms::agent::chat::ChatDock</name>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent Settings</translation>
+    </message>
+    <message>
+        <source>Expand Agent</source>
+        <translation>Expand Agent</translation>
+    </message>
+    <message>
+        <source>Collapse Agent</source>
+        <translation>Collapse Agent</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Rename</translation>
+    </message>
+    <message>
+        <source>Toggle Pin</source>
+        <translation>Toggle Pin</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>Unarchive</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Archive</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>Delete Sessions</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
+        <translation>Delete %1 selected sessions? Original attachments and project assets will be kept.</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>Rename Session</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>No approval required</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>Request approval</translation>
+    </message>
+    <message>
+        <source>Tool call details</source>
+        <translation>Tool call details</translation>
+    </message>
+    <message>
+        <source>Reading and encoding selected attachments…</source>
+        <translation>Reading and encoding selected attachments…</translation>
+    </message>
+    <message>
+        <source>Request upload: %1 / %2 bytes</source>
+        <translation>Request upload: %1 / %2 bytes</translation>
+    </message>
+    <message>
+        <source>Awaiting tool approval</source>
+        <translation>Awaiting tool approval</translation>
+    </message>
+    <message>
+        <source>Export JSON (includes sent attachment content)</source>
+        <translation>Export JSON (includes sent attachment content)</translation>
+    </message>
+    <message>
+        <source>Export session (includes sent attachment content)</source>
+        <translation>Export session (includes sent attachment content)</translation>
+    </message>
+    <message>
+        <source>Configure a model</source>
+        <translation>Configure a model</translation>
+    </message>
+    <message>
+        <source>API and model settings</source>
+        <translation>API and model settings</translation>
+    </message>
+    <message>
+        <source>Add attachments</source>
+        <translation>Add attachments</translation>
+    </message>
+    <message>
+        <source>Remove attachment: %1</source>
+        <translation>Remove attachment: %1</translation>
+    </message>
+    <message>
+        <source>Request failed · Click Send to retry</source>
+        <translation>Request failed · Click Send to retry</translation>
+    </message>
+    <message>
+        <source>Enter to send · Shift+Enter for a new line</source>
+        <translation>Enter to send · Shift+Enter for a new line</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Low</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Medium</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>High</translation>
+    </message>
+    <message>
+        <source>Extra high</source>
+        <translation>Extra high</translation>
+    </message>
+    <message>
+        <source>Reasoning · %1</source>
+        <translation>Reasoning · %1</translation>
+    </message>
+    <message>
+        <source>Stop current request</source>
+        <translation>Stop current request</translation>
+    </message>
+    <message>
+        <source>Retry last failed request</source>
+        <translation>Retry last failed request</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Send</translation>
+    </message>
+    <message>
+        <source>Reasoning level</source>
+        <translation>Reasoning level</translation>
+    </message>
+    <message>
+        <source>Not supported</source>
+        <translation>Not supported</translation>
+    </message>
+    <message>
+        <source>Close Chat Window</source>
+        <translation>Close Chat Window</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>Current Project</translation>
+    </message>
+    <message>
+        <source>Dock on the Right</source>
+        <translation>Dock on the Right</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>Sessions</translation>
+    </message>
+    <message>
+        <source>Expand Chat Window</source>
+        <translation>Expand Chat Window</translation>
+    </message>
+    <message>
+        <source>Undock or Redock</source>
+        <translation>Undock or Redock</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>New Session</translation>
+    </message>
+    <message>
+        <source>Search Sessions</source>
+        <translation>Search Sessions</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>Session Management</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>Session Actions</translation>
+    </message>
+    <message>
+        <source>Describe the arrangement you want…</source>
+        <translation>Describe the arrangement you want…</translation>
+    </message>
+    <message>
+        <source>Reasoning · Auto</source>
+        <translation>Reasoning · Auto</translation>
+    </message>
+    <message>
+        <source>Agent Chat</source>
+        <translation>Agent Chat</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSessionsDialog</name>
+    <message>
+        <source>Back to Chat</source>
+        <translation>Back to Chat</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>Session Management</translation>
+    </message>
+    <message>
+        <source>Sessions are stored separately from projects. Switching sessions keeps the current project open.</source>
+        <translation>Sessions are stored separately from projects. Switching sessions keeps the current project open.</translation>
+    </message>
+    <message>
+        <source>Search titles, messages, or project names</source>
+        <translation>Search titles, messages, or project names</translation>
+    </message>
+    <message>
+        <source>All Projects</source>
+        <translation>All Projects</translation>
+    </message>
+    <message>
+        <source>Import Session</source>
+        <translation>Import Session</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>New Session</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>All</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>Pinned</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>Archived</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Export</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Archive</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <source>Session</source>
+        <translation>Session</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>Project</translation>
+    </message>
+    <message>
+        <source>Model Connection</source>
+        <translation>Model Connection</translation>
+    </message>
+    <message>
+        <source>Last Updated</source>
+        <translation>Last Updated</translation>
+    </message>
+    <message>
+        <source>Deleting or archiving a session keeps LMMS project files and downloaded assets.</source>
+        <translation>Deleting or archiving a session keeps LMMS project files and downloaded assets.</translation>
+    </message>
+    <message>
+        <source>Select %1</source>
+        <translation>Select %1</translation>
+    </message>
+    <message>
+        <source>No linked project</source>
+        <translation>No linked project</translation>
+    </message>
+    <message>
+        <source>Not configured</source>
+        <translation>Not configured</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>Session Actions</translation>
+    </message>
+    <message>
+        <source>Manage %1</source>
+        <translation>Manage %1</translation>
+    </message>
+    <message>
+        <source>%1 sessions selected</source>
+        <translation>%1 sessions selected</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Rename</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>Unpin</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>Unarchive</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>Rename Session</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>Delete Sessions</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Project files and assets will be kept.</source>
+        <translation>Delete %1 selected sessions? Project files and assets will be kept.</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::agent::chat::ChatSettingsDialog</name>
+    <message>
+        <source>Close Settings</source>
+        <translation>Close Settings</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>Workspace</translation>
+    </message>
+    <message>
+        <source>API and Model</source>
+        <translation>API and Model</translation>
+    </message>
+    <message>
+        <source>Generation Parameters</source>
+        <translation>Generation Parameters</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>Global Settings</translation>
+    </message>
+    <message>
+        <source>Approval Mode</source>
+        <translation>Approval Mode</translation>
+    </message>
+    <message>
+        <source>Asset Downloads</source>
+        <translation>Asset Downloads</translation>
+    </message>
+    <message>
+        <source>Back to Chat</source>
+        <translation>Back to Chat</translation>
+    </message>
+    <message>
+        <source>Save local settings only. No test request is sent.</source>
+        <translation>Save local settings only. No test request is sent.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Save Settings</source>
+        <translation>Save Settings</translation>
+    </message>
+    <message>
+        <source>Load the system prompt from a file and manage web search and asset downloads.</source>
+        <translation>Load the system prompt from a file and manage web search and asset downloads.</translation>
+    </message>
+    <message>
+        <source>The prompt is stored in a text file. Set its path here.</source>
+        <translation>The prompt is stored in a text file. Set its path here.</translation>
+    </message>
+    <message>
+        <source>File Path</source>
+        <translation>File Path</translation>
+    </message>
+    <message>
+        <source>Choose File…</source>
+        <translation>Choose File…</translation>
+    </message>
+    <message>
+        <source>Choose System Prompt</source>
+        <translation>Choose System Prompt</translation>
+    </message>
+    <message>
+        <source>Relative paths start from the LMMS program directory. You can select another .txt file.</source>
+        <translation>Relative paths start from the LMMS program directory. You can select another .txt file.</translation>
+    </message>
+    <message>
+        <source>Default Source</source>
+        <translation>Default Source</translation>
+    </message>
+    <message>
+        <source>Custom Source</source>
+        <translation>Custom Source</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>Open File</translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation>Reload</translation>
+    </message>
+    <message>
+        <source>Restore Default Path</source>
+        <translation>Restore Default Path</translation>
+    </message>
+    <message>
+        <source>Default Prompt Scope</source>
+        <translation>Default Prompt Scope</translation>
+    </message>
+    <message>
+        <source>Agent Settings</source>
+        <translation>Agent Settings</translation>
+    </message>
+    <message>
+        <source>System Prompt File</source>
+        <translation>System Prompt File</translation>
+    </message>
+    <message>
+        <source>UTF-8 text · External file</source>
+        <translation>UTF-8 text · External file</translation>
+    </message>
+    <message>
+        <source>Web and External Assets</source>
+        <translation>Web and External Assets</translation>
+    </message>
+    <message>
+        <source>Allow Asset Downloads</source>
+        <translation>Allow Asset Downloads</translation>
+    </message>
+    <message>
+        <source>Use Current Approval Mode</source>
+        <translation>Use Current Approval Mode</translation>
+    </message>
+    <message>
+        <source>Allow Web Search</source>
+        <translation>Allow Web Search</translation>
+    </message>
+    <message>
+        <source>Search Provider</source>
+        <translation>Search Provider</translation>
+    </message>
+    <message>
+        <source>Model-provided search</source>
+        <translation>Model-provided search</translation>
+    </message>
+    <message>
+        <source>Brave Search API URL</source>
+        <translation>Brave Search API URL</translation>
+    </message>
+    <message>
+        <source>Web Search</source>
+        <translation>Web Search</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>Request approval</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>No approval required</translation>
+    </message>
+    <message>
+        <source>Current Mode</source>
+        <translation>Current Mode</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>Project Tools</source>
+        <translation>Project Tools</translation>
+    </message>
+    <message>
+        <source>External Asset Downloads</source>
+        <translation>External Asset Downloads</translation>
+    </message>
+    <message>
+        <source>Download Tools</source>
+        <translation>Download Tools</translation>
+    </message>
+    <message>
+        <source>Prefer Portable Tools</source>
+        <translation>Prefer Portable Tools</translation>
+    </message>
+    <message>
+        <source>Choose Tool</source>
+        <translation>Choose Tool</translation>
+    </message>
+    <message>
+        <source>aria2 Download Tool</source>
+        <translation>aria2 Download Tool</translation>
+    </message>
+    <message>
+        <source>Archive Extraction Tool</source>
+        <translation>Archive Extraction Tool</translation>
+    </message>
+    <message>
+        <source>Asset Destination</source>
+        <translation>Asset Destination</translation>
+    </message>
+    <message>
+        <source>Extract archives after download</source>
+        <translation>Extract archives after download</translation>
+    </message>
+    <message>
+        <source>Download Workflow</source>
+        <translation>Download Workflow</translation>
+    </message>
+    <message>
+        <source>Check Tools</source>
+        <translation>Check Tools</translation>
+    </message>
+    <message>
+        <source>Not yet checked</source>
+        <translation>Not yet checked</translation>
+    </message>
+    <message>
+        <source>Save audio, MIDI and other assets to the requested location.</source>
+        <translation>Save audio, MIDI and other assets to the requested location.</translation>
+    </message>
+    <message>
+        <source>Find references, read pages and locate asset sources.</source>
+        <translation>Find references, read pages and locate asset sources.</translation>
+    </message>
+    <message>
+        <source>SearXNG instance URL, e.g. http://192.168.1.20:8080</source>
+        <translation>SearXNG instance URL, e.g. http://192.168.1.20:8080</translation>
+    </message>
+    <message>
+        <source>Credentials saved. Leave blank to keep them.</source>
+        <translation>Credentials saved. Leave blank to keep them.</translation>
+    </message>
+    <message>
+        <source>Credentials (optional, if required by the instance)</source>
+        <translation>Credentials (optional, if required by the instance)</translation>
+    </message>
+    <message>
+        <source>API key saved. Leave blank to keep it.</source>
+        <translation>API key saved. Leave blank to keep it.</translation>
+    </message>
+    <message>
+        <source>The model provider runs the search after separate approval.</source>
+        <translation>The model provider runs the search after separate approval.</translation>
+    </message>
+    <message>
+        <source>The model does not declare support for hosted search (capabilities.hostedWebSearch).</source>
+        <translation>The model does not declare support for hosted search (capabilities.hostedWebSearch).</translation>
+    </message>
+    <message>
+        <source>Select SearXNG, Brave or a model with hosted search support.</source>
+        <translation>Select SearXNG, Brave or a model with hosted search support.</translation>
+    </message>
+    <message>
+        <source>Enter a valid SearXNG instance URL (http or https).</source>
+        <translation>Enter a valid SearXNG instance URL (http or https).</translation>
+    </message>
+    <message>
+        <source>Enter a valid Brave Search API URL (http or https).</source>
+        <translation>Enter a valid Brave Search API URL (http or https).</translation>
+    </message>
+    <message>
+        <source>Brave Search requires an API key.</source>
+        <translation>Brave Search requires an API key.</translation>
+    </message>
+    <message>
+        <source>Use the download tool to fetch external assets and extract archives after downloading.</source>
+        <translation>Use the download tool to fetch external assets and extract archives after downloading.</translation>
+    </message>
+    <message>
+        <source>Tools are stored in subfolders of the tools directory beside lmms.exe. You can change their paths.</source>
+        <translation>Tools are stored in subfolders of the tools directory beside lmms.exe. You can change their paths.</translation>
+    </message>
+    <message>
+        <source>Keep the files required by 7-Zip in tools/7zip/.</source>
+        <translation>Keep the files required by 7-Zip in tools/7zip/.</translation>
+    </message>
+    <message>
+        <source>Choose the destination in the download request. You can use the project assets folder.</source>
+        <translation>Choose the destination in the download request. You can use the project assets folder.</translation>
+    </message>
+    <message>
+        <source>The file destination and extraction folder are shown before downloading.</source>
+        <translation>The file destination and extraction folder are shown before downloading.</translation>
+    </message>
+    <message>
+        <source>Tools available: </source>
+        <translation>Tools available: </translation>
+    </message>
+    <message>
+        <source>Tools unavailable: </source>
+        <translation>Tools unavailable: </translation>
+    </message>
+    <message>
+        <source>Choose whether project operations, web searches and asset downloads require confirmation.</source>
+        <translation>Choose whether project operations, web searches and asset downloads require confirmation.</translation>
+    </message>
+    <message>
+        <source>Review the purpose and scope before approving the tool action.</source>
+        <translation>Review the purpose and scope before approving the tool action.</translation>
+    </message>
+    <message>
+        <source>Tools requested by the model run immediately without an approval prompt.</source>
+        <translation>Tools requested by the model run immediately without an approval prompt.</translation>
+    </message>
+    <message>
+        <source>The activity log remains visible. You can stop at any time. Changes may apply immediately to the current project.</source>
+        <translation>The activity log remains visible. You can stop at any time. Changes may apply immediately to the current project.</translation>
+    </message>
+    <message>
+        <source>Applies to</source>
+        <translation>Applies to</translation>
+    </message>
+    <message>
+        <source>Approval requests appear in the chat transcript.</source>
+        <translation>Approval requests appear in the chat transcript.</translation>
+    </message>
+    <message>
+        <source>The composer always shows the current approval mode.</source>
+        <translation>The composer always shows the current approval mode.</translation>
+    </message>
+    <message>
+        <source>Current mode: </source>
+        <translation>Current mode: </translation>
+    </message>
+    <message>
+        <source>Loaded %1 characters. Save the settings to use this prompt for future requests.</source>
+        <translation>Loaded %1 characters. Save the settings to use this prompt for future requests.</translation>
+    </message>
+    <message>
+        <source>Reload after editing the file. Later messages use the updated prompt.</source>
+        <translation>Reload after editing the file. Later messages use the updated prompt.</translation>
+    </message>
+    <message>
+        <source>Confirm source and destination</source>
+        <translation>Confirm source and destination</translation>
+    </message>
+    <message>
+        <source>Review the URL, file name and destination folder.</source>
+        <translation>Review the URL, file name and destination folder.</translation>
+    </message>
+    <message>
+        <source>Download the asset</source>
+        <translation>Download the asset</translation>
+    </message>
+    <message>
+        <source>aria2 shows progress, speed and remaining time.</source>
+        <translation>aria2 shows progress, speed and remaining time.</translation>
+    </message>
+    <message>
+        <source>Detect and extract archives</source>
+        <translation>Detect and extract archives</translation>
+    </message>
+    <message>
+        <source>Review the extraction location and result.</source>
+        <translation>Review the extraction location and result.</translation>
+    </message>
+    <message>
+        <source>Add to the current session</source>
+        <translation>Add to the current session</translation>
+    </message>
+    <message>
+        <source>Import into the project or keep the file.</source>
+        <translation>Import into the project or keep the file.</translation>
+    </message>
+    <message>
+        <source>Approve once, review the changes, or decline. The project and download destination stay unchanged until approval.</source>
+        <translation>Approve once, review the changes, or decline. The project and download destination stay unchanged until approval.</translation>
+    </message>
+    <message>
+        <source>Create and edit music, use built-in tools, and follow the active approval mode.
+Check tool results and find or download assets on request.</source>
+        <translation>Create and edit music, use built-in tools, and follow the active approval mode.
+Check tool results and find or download assets on request.</translation>
+    </message>
+    <message>
+        <source>Request approval: Confirm before searching or downloading.
+No approval required: Run immediately and show the activity log.</source>
+        <translation>Request approval: Confirm before searching or downloading.
+No approval required: Run immediately and show the activity log.</translation>
+    </message>
+    <message>
+        <source>Project edits: Review affected tracks, clips and notes.
+Web search: Review the query. Downloads: Review the source and destination.</source>
+        <translation>Project edits: Review affected tracks, clips and notes.
+Web search: Review the query. Downloads: Review the source and destination.</translation>
+    </message>
+</context>
+<context>
+    <name>AgentChat</name>
+    <message>
+        <source>Approve once</source>
+        <translation>Approve once</translation>
+    </message>
+    <message>
+        <source>Approve to execute the internal project tool</source>
+        <translation>Approve to execute the internal project tool</translation>
+    </message>
+    <message>
+        <source>Approved · %1</source>
+        <translation>Approved · %1</translation>
+    </message>
+    <message>
+        <source>Awaiting approval: %1</source>
+        <translation>Awaiting approval: %1</translation>
+    </message>
+    <message>
+        <source>Canceled · %1</source>
+        <translation>Canceled · %1</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>Completed</translation>
+    </message>
+    <message>
+        <source>Denied · %1</source>
+        <translation>Denied · %1</translation>
+    </message>
+    <message>
+        <source>Deny</source>
+        <translation>Deny</translation>
+    </message>
+    <message>
+        <source>Failed · %1</source>
+        <translation>Failed · %1</translation>
+    </message>
+    <message>
+        <source>Not executed · %1</source>
+        <translation>Not executed · %1</translation>
+    </message>
+    <message>
+        <source>Not executed; project unchanged</source>
+        <translation>Not executed; project unchanged</translation>
+    </message>
+    <message>
+        <source>Ran automatically · %1</source>
+        <translation>Ran automatically · %1</translation>
+    </message>
+    <message>
+        <source>Request failed: %1</source>
+        <translation>Request failed: %1</translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation>Stopped</translation>
+    </message>
+    <message>
+        <source>Thought · Summary</source>
+        <translation>Thought · Summary</translation>
+    </message>
+    <message>
+        <source>Tool result</source>
+        <translation>Tool result</translation>
+    </message>
+    <message>
+        <source>View changes</source>
+        <translation>View changes</translation>
+    </message>
+    <message>
+        <source>Web sources:</source>
+        <translation>Web sources:</translation>
+    </message>
+    <message>
+        <source>Start a new music conversation.</source>
+        <translation>Start a new music conversation.</translation>
+    </message>
+</context>
 </TS>
