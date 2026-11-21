@@ -687,3 +687,9 @@
 - **其他未跟踪文件**：不属于本任务，不能清理或归入提交。
 
 相关文档：`AGENTS.md`、`AGENT_SUPPORT_PLAN.md`、`MCP_IMPLEMENTATION_ANALYSIS.md`、`MCP工具补充计划书.md`、`data/agent/MCP.md`、`data/agent/README.md`、`data/agent/command-reference.md`。交接以本手册为当前有效版本，后续更新保留仍有效信息，不自动删除。
+
+## 多轨路由源码分析（2026-11-21）
+已完成 doc/agent/lmms-routing-analysis.md，基于 master 的 50b746b99，核对播放调度、MIDI、采样、人声、自动化、插件及混音发送。源码链接已核验。仅文档改动，未编译、试听、提交或推送。此次分析无剩余实施项。
+
+## 节点工作流工程计划（2026-11-21）
+计划见 doc/agent/node-workflow-plan.md。当前只交付计划，等待用户决定开始实施。master 上已有此前未提交的 Song、DataFile、ConfigManager、MainWindow、FileBrowser 格式入口草稿，尚未编译或验证。本轮仅写文档，未提交、推送。
