@@ -144,7 +144,7 @@ public:
 		update();
 	}
 
-	void setXOffset(const int x);
+	void setXOffset(int x, int viewportStart = -1);
 
 	void addToolButtons(QToolBar* _tool_bar );
 
@@ -223,6 +223,7 @@ private:
 
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
+	int m_viewportStart;
 	float m_ppb;
 	float m_snapSize = 1.f;
 	Timeline* m_timeline;

@@ -39,15 +39,16 @@
 namespace lmms
 {
 
-Clip::Clip( Track * track ) :
+Clip::Clip( Track * track, bool registerWithTrack ) :
 	Model( track ),
+	m_registeredWithTrack( registerWithTrack ),
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
-	if( getTrack() )
+	if( getTrack() && m_registeredWithTrack )
 	{
 		getTrack()->addClip( this );
 	}
@@ -85,7 +86,7 @@ Clip::~Clip()
 	}
 	emit destroyedClip();
 
-	if( getTrack() )
+	if( getTrack() && m_registeredWithTrack )
 	{
 		getTrack()->removeClip( this );
 	}

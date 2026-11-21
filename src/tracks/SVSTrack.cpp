@@ -123,7 +123,7 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 			m_capabilityDiagnostics = next.id.isEmpty() ? QStringList{QCoreApplication::translate("NativeSVS",
 															  "Voicebank is missing; project data is retained")}
 														: QStringList{};
-			for (auto* base : getClips())
+			for (auto* base : synthesisClips())
 				static_cast<SVSClip*>(base)->invalidate();
 			if (!next.id.isEmpty())
 				refreshCapabilities();
@@ -133,12 +133,13 @@ SVSTrack::SVSTrack(TrackContainer* tc)
 	connect(&svs::Registry::instance(), &svs::Registry::catalogScanFinished, this,
 		[this](const QString& plugin, const QString&) {
 			if (plugin == m_pluginId && m_voice.id.isEmpty())
-				for (auto* base : getClips())
+				for (auto* base : synthesisClips())
 					static_cast<SVSClip*>(base)->synthesize();
 		});
 }
 SVSTrack::~SVSTrack()
 {
+	clearNodeVoiceSources();
 	const auto* preview = Engine::getSong()->previewClip();
 	if (preview && preview->getTrack() == this) { Engine::getSong()->stopPreviewOf(preview); }
 	Engine::audioEngine()->removePlayHandlesOfTypes(this, PlayHandle::Type::SVSPlayHandle);
@@ -188,7 +189,7 @@ void SVSTrack::bindVoice(const QString& plugin, const QString& voice)
 			{
 				++track->m_capabilityRequest;
 				track->refreshCapabilities();
-				for (auto* base : track->getClips())
+				for (auto* base : track->synthesisClips())
 				{
 					auto* clip = static_cast<SVSClip*>(base);
 					clip->invalidate();
@@ -232,7 +233,7 @@ void SVSTrack::bindVoice(const QString& plugin, const QString& voice)
 	m_bus.setName(name());
 	if (!incremental)
 	{
-		for (auto* clip : getClips())
+		for (auto* clip : synthesisClips())
 		{
 			auto* c = static_cast<SVSClip*>(clip);
 			c->invalidate();
@@ -247,6 +248,60 @@ Clip* SVSTrack::createClip(const TimePos& pos)
 	auto* clip = new SVSClip(this);
 	clip->movePosition(pos);
 	return clip;
+}
+
+Track::clipVector SVSTrack::synthesisClips() const
+{
+	auto clips = getClips();
+	for (const auto& source : m_nodeVoiceSources)
+	{
+		clips.push_back(source.clip);
+	}
+	return clips;
+}
+
+void SVSTrack::setNodeVoiceSource(const QString& id, const QDomElement& state)
+{
+	if (state.isNull())
+	{
+		const auto source = m_nodeVoiceSources.find(id);
+		if (source != m_nodeVoiceSources.end())
+		{
+			delete source->clip;
+			m_nodeVoiceSources.erase(source);
+		}
+		return;
+	}
+
+	QDomDocument document;
+	auto snapshot = document.importNode(state, true).toElement();
+	for (const auto* key : {"cacheKey", "cacheInputHash", "cacheSampleRate", "cacheComputePolicy"})
+	{
+		snapshot.removeAttribute(QString::fromLatin1(key));
+	}
+	document.appendChild(snapshot);
+	const auto serialized = document.toString(-1);
+	auto& source = m_nodeVoiceSources[id];
+	if (source.state == serialized)
+	{
+		return;
+	}
+	if (!source.clip)
+	{
+		source.clip = new SVSClip(this, false);
+		source.clip->setJournalling(false);
+	}
+	source.state = serialized;
+	source.clip->loadSettings(snapshot);
+}
+
+void SVSTrack::clearNodeVoiceSources()
+{
+	for (const auto& source : m_nodeVoiceSources)
+	{
+		delete source.clip;
+	}
+	m_nodeVoiceSources.clear();
 }
 bool SVSTrack::setParameter(const QString& id, const QJsonValue& value)
 {
@@ -271,7 +326,7 @@ bool SVSTrack::setParameter(const QString& id, const QJsonValue& value)
 				if (track)
 				{
 					track->refreshCapabilities();
-					for (auto* base : track->getClips())
+					for (auto* base : track->synthesisClips())
 					{
 						auto* clip = static_cast<SVSClip*>(base);
 						clip->invalidate();
@@ -286,7 +341,7 @@ bool SVSTrack::setParameter(const QString& id, const QJsonValue& value)
 	}
 	m_parameters[id] = value;
 	refreshCapabilities();
-	for (auto* clip : getClips())
+	for (auto* clip : synthesisClips())
 	{
 		auto* c = static_cast<SVSClip*>(clip);
 		c->invalidate();
@@ -307,7 +362,7 @@ bool SVSTrack::setLanguage(const QString& value)
 	addJournalCheckPoint();
 	m_language = value;
 	refreshCapabilities();
-	for (auto* clip : getClips())
+	for (auto* clip : synthesisClips())
 	{
 		auto* c = static_cast<SVSClip*>(clip);
 		c->invalidate();
@@ -374,7 +429,7 @@ void SVSTrack::refreshCapabilities(const QJsonObject& editorContext)
 					target->m_capabilitiesReady = false;
 					target->m_capabilityDiagnostics = {error};
 					emit target->dataChanged();
-					for (auto* base : target->getClips())
+					for (auto* base : target->synthesisClips())
 						static_cast<SVSClip*>(base)->synthesize();
 					return;
 				}
@@ -389,7 +444,7 @@ void SVSTrack::refreshCapabilities(const QJsonObject& editorContext)
 				emit target->dataChanged();
 				if (!changed)
 					return;
-				for (auto* clip : target->getClips())
+				for (auto* clip : target->synthesisClips())
 				{
 					auto* current = static_cast<SVSClip*>(clip);
 					if (current->status() == "Cancelled")
@@ -428,10 +483,14 @@ void SVSTrack::clearNoteActivity()
 }
 bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
-	if (isMuted() || !tryLock()) return false;
+	if (isMuted() || !tryLock())
+	{
+		return false;
+	}
 	bool played = false;
 	QSet<QPair<quintptr, int>> activeNotes;
 	double playTick = int(start);
+	const bool eventConnected = nodeSourceEventConnected();
 	if (m_lastActivityTick >= 0 && (int(start) < m_lastActivityTick || int(start) > m_lastActivityTick + 1))
 	{
 		for (int i = 0; i < m_activeNotes.size(); ++i)
@@ -465,10 +524,8 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 	}
 	else
 	{
-		for (auto* base : getClips())
-		{
-			auto* clip = static_cast<SVSClip*>(base);
-			if (clipNum >= 0 && getClipNum(clip) != clipNum) { continue; }
+		auto playClip = [&](SVSClip* clip) {
+			if (clipNum >= 0 && getClipNum(clip) != clipNum) { return; }
 			playTick = int(start) + (clipNum >= 0 ? int(clip->startPosition()) + int(clip->startTimeOffset()) : 0);
 			const double tick = playTick + Engine::getSong()->getTimeline().frameOffset() / Engine::framesPerTick();
 			if (!clip->isMuted() && tick >= int(clip->startPosition()) && tick < int(clip->endPosition()))
@@ -490,6 +547,20 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 				played = playRegion(clip->audio(), clip->volumeAutomation(), int(clip->startPosition()),
 							 int(clip->endPosition()), -int(clip->startTimeOffset()))
 					|| played;
+		};
+		if (eventConnected)
+		{
+			for (auto* base : getClips())
+			{
+				playClip(static_cast<SVSClip*>(base));
+			}
+		}
+		if (clipNum < 0)
+		{
+			for (const auto& source : m_nodeVoiceSources)
+			{
+				playClip(source.clip);
+			}
 		}
 	}
 	for (const auto& note : m_activeNotes)
@@ -502,6 +573,10 @@ bool SVSTrack::play(const TimePos& start, f_cnt_t frames, f_cnt_t offset, int cl
 	}
 	m_activeNotes = std::move(activeNotes);
 	unlock();
+	if (played)
+	{
+		audioBusHandle()->markNodeEvent(2);
+	}
 	return played;
 }
 void SVSTrack::setPortraitSettings(const QJsonObject& input)
@@ -568,7 +643,7 @@ void SVSTrack::loadTrackSpecificSettings(const QDomElement& node)
 		m_capabilitiesReady = false;
 		m_dictionaries.clear();
 		m_capabilityDiagnostics = {m_migrationDiagnostic};
-		for (auto* base : getClips())
+		for (auto* base : synthesisClips())
 			static_cast<SVSClip*>(base)->invalidate();
 		emit dataChanged();
 		return;

@@ -397,6 +397,8 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 	QFileInfo recentFile(file);
 	if(recentFile.suffix().toLower() == "mmp" ||
 		recentFile.suffix().toLower() == "mmpz" ||
+		recentFile.suffix().toLower() == "mmpn" ||
+		recentFile.suffix().toLower() == "mmpnz" ||
 		recentFile.suffix().toLower() == "mpt")
 	{
 		m_recentlyOpenedProjects.removeAll(file);

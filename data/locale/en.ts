@@ -6137,6 +6137,50 @@ Reason: &quot;%2&quot;</source>
         <source>The following errors occurred while loading: </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Custom node positions will be omitted.</source>
+        <translation>Custom node positions will be omitted.</translation>
+    </message>
+    <message>
+        <source>Logical inputs and their connections will be omitted.</source>
+        <translation>Logical inputs and their connections will be omitted.</translation>
+    </message>
+    <message>
+        <source>Standalone step patterns will be omitted.</source>
+        <translation>Standalone step patterns will be omitted.</translation>
+    </message>
+    <message>
+        <source>Standalone piano rolls will be omitted.</source>
+        <translation>Standalone piano rolls will be omitted.</translation>
+    </message>
+    <message>
+        <source>Both Master output channels will be enabled.</source>
+        <translation>Both Master output channels will be enabled.</translation>
+    </message>
+    <message>
+        <source>Mixer send %1 → %2 will become stereo.</source>
+        <translation>Mixer send %1 → %2 will become stereo.</translation>
+    </message>
+    <message>
+        <source>Effect node %1 will be represented as a mixer channel.</source>
+        <translation>Effect node %1 will be represented as a mixer channel.</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic stereo mixer assignment.</source>
+        <translation>Track %1 will use its classic stereo mixer assignment.</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic event and audio connections.</source>
+        <translation>Track %1 will use its classic event and audio connections.</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>Empty SVS Piano Roll</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>Empty MIDI Piano Roll</translation>
+    </message>
 </context>
 <context>
     <name>lmms::StereoEnhancerControls</name>
@@ -8556,6 +8600,10 @@ Please make sure you have write permission to the file and the directory contain
         <source>--- Factory files ---</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Import as Node Project</source>
+        <translation>Import as Node Project</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::FileDialog</name>
@@ -10761,6 +10809,765 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>My Favorites</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Classic Project Unavailable</source>
+        <translation>Classic Project Unavailable</translation>
+    </message>
+    <message>
+        <source>Node Project Only</source>
+        <translation>Node Project Only</translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation>Do not show again</translation>
+    </message>
+    <message>
+        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</translation>
+    </message>
+    <message>
+        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</translation>
+    </message>
+    <message>
+        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
+        <translation>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</translation>
+    </message>
+    <message>
+        <source>Aggregation Settings</source>
+        <translation>Aggregation Settings</translation>
+    </message>
+    <message>
+        <source>Merge Connections Sharing a Port</source>
+        <translation>Merge Connections Sharing a Port</translation>
+    </message>
+    <message>
+        <source>Connections Greater Than</source>
+        <translation>Connections Greater Than</translation>
+    </message>
+    <message>
+        <source>Aggregate Bus</source>
+        <translation>Aggregate Bus</translation>
+    </message>
+    <message>
+        <source>Play Song</source>
+        <translation>Play Song</translation>
+    </message>
+    <message>
+        <source>Pause Song</source>
+        <translation>Pause Song</translation>
+    </message>
+    <message>
+        <source>Stop Song</source>
+        <translation>Stop Song</translation>
+    </message>
+    <message>
+        <source>Input Port</source>
+        <translation>Input Port</translation>
+    </message>
+    <message>
+        <source>Output Port</source>
+        <translation>Output Port</translation>
+    </message>
+    <message>
+        <source>Instrument Track</source>
+        <translation>Instrument Track</translation>
+    </message>
+    <message>
+        <source>Sample Track</source>
+        <translation>Sample Track</translation>
+    </message>
+    <message>
+        <source>SVS Voice Track</source>
+        <translation>SVS Voice Track</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation>Channels</translation>
+    </message>
+    <message>
+        <source>Open SVS Piano Roll</source>
+        <translation>Open SVS Piano Roll</translation>
+    </message>
+    <message>
+        <source>Logical input for graph routing</source>
+        <translation>Logical input for graph routing</translation>
+    </message>
+    <message>
+        <source>Signal Type</source>
+        <translation>Signal Type</translation>
+    </message>
+    <message>
+        <source>Connected Targets</source>
+        <translation>Connected Targets</translation>
+    </message>
+    <message>
+        <source>Device Binding</source>
+        <translation>Device Binding</translation>
+    </message>
+    <message>
+        <source>Master connects to the configured audio output</source>
+        <translation>Master connects to the configured audio output</translation>
+    </message>
+    <message>
+        <source>Independent Pattern step data</source>
+        <translation>Independent Pattern step data</translation>
+    </message>
+    <message>
+        <source>Active Steps</source>
+        <translation>Active Steps</translation>
+    </message>
+    <message>
+        <source>Connected Tracks</source>
+        <translation>Connected Tracks</translation>
+    </message>
+    <message>
+        <source>Open Step Sequencer</source>
+        <translation>Open Step Sequencer</translation>
+    </message>
+    <message>
+        <source>Supports notes, lyrics, and voice curves</source>
+        <translation>Supports notes, lyrics, and voice curves</translation>
+    </message>
+    <message>
+        <source>The same clip can be edited from the graph or track</source>
+        <translation>The same clip can be edited from the graph or track</translation>
+    </message>
+    <message>
+        <source>Voice Notes</source>
+        <translation>Voice Notes</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>Notes</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Placement</translation>
+    </message>
+    <message>
+        <source>Standalone Node</source>
+        <translation>Standalone Node</translation>
+    </message>
+    <message>
+        <source>SVC Voice Track</source>
+        <translation>SVC Voice Track</translation>
+    </message>
+    <message>
+        <source>Plays converted audio from its clips</source>
+        <translation>Plays converted audio from its clips</translation>
+    </message>
+    <message>
+        <source>Audio Source</source>
+        <translation>Audio Source</translation>
+    </message>
+    <message>
+        <source>Clip conversion result</source>
+        <translation>Clip conversion result</translation>
+    </message>
+    <message>
+        <source>Open Conversion Settings</source>
+        <translation>Open Conversion Settings</translation>
+    </message>
+    <message>
+        <source>Automation curves control bound parameters</source>
+        <translation>Automation curves control bound parameters</translation>
+    </message>
+    <message>
+        <source>Bound Parameters</source>
+        <translation>Bound Parameters</translation>
+    </message>
+    <message>
+        <source>Automation Clips</source>
+        <translation>Automation Clips</translation>
+    </message>
+    <message>
+        <source>SVS Plugin</source>
+        <translation>SVS Plugin</translation>
+    </message>
+    <message>
+        <source>Input preserves lyrics, curves, and clip timing</source>
+        <translation>Input preserves lyrics, curves, and clip timing</translation>
+    </message>
+    <message>
+        <source>Input Type</source>
+        <translation>Input Type</translation>
+    </message>
+    <message>
+        <source>Audio Output</source>
+        <translation>Audio Output</translation>
+    </message>
+    <message>
+        <source>Open Voice Settings</source>
+        <translation>Open Voice Settings</translation>
+    </message>
+    <message>
+        <source>Instrument Plugin</source>
+        <translation>Instrument Plugin</translation>
+    </message>
+    <message>
+        <source>Managed by the LMMS plugin host</source>
+        <translation>Managed by the LMMS plugin host</translation>
+    </message>
+    <message>
+        <source>Plugin Identifier</source>
+        <translation>Plugin Identifier</translation>
+    </message>
+    <message>
+        <source>Instance Name</source>
+        <translation>Instance Name</translation>
+    </message>
+    <message>
+        <source>Open Plugin</source>
+        <translation>Open Plugin</translation>
+    </message>
+    <message>
+        <source>Open Mixer</source>
+        <translation>Open Mixer</translation>
+    </message>
+    <message>
+        <source>Add Mixer Channel</source>
+        <translation>Add Mixer Channel</translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation>Remove %1</translation>
+    </message>
+    <message>
+        <source>Dynamic channels and sends</source>
+        <translation>Dynamic channels and sends</translation>
+    </message>
+    <message>
+        <source>Selected Channel</source>
+        <translation>Selected Channel</translation>
+    </message>
+    <message>
+        <source>Send Target</source>
+        <translation>Send Target</translation>
+    </message>
+    <message>
+        <source>Send Amount</source>
+        <translation>Send Amount</translation>
+    </message>
+    <message>
+        <source>Audio Effect</source>
+        <translation>Audio Effect</translation>
+    </message>
+    <message>
+        <source>Input / Output</source>
+        <translation>Input / Output</translation>
+    </message>
+    <message>
+        <source>2 inputs / 2 outputs</source>
+        <translation>2 inputs / 2 outputs</translation>
+    </message>
+    <message>
+        <source>Bypass</source>
+        <translation>Bypass</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Open Effect Rack</source>
+        <translation>Open Effect Rack</translation>
+    </message>
+    <message>
+        <source>Toggle Bypass</source>
+        <translation>Toggle Bypass</translation>
+    </message>
+    <message>
+        <source>Default Project Layout</source>
+        <translation>Default Project Layout</translation>
+    </message>
+    <message>
+        <source>LMMS default template tracks</source>
+        <translation>LMMS default template tracks</translation>
+    </message>
+    <message>
+        <source>Tempo and Meter</source>
+        <translation>Tempo and Meter</translation>
+    </message>
+    <message>
+        <source>%1 BPM · %2/%3</source>
+        <translation>%1 BPM · %2/%3</translation>
+    </message>
+    <message>
+        <source>Other Tracks</source>
+        <translation>Other Tracks</translation>
+    </message>
+    <message>
+        <source>Pattern Member</source>
+        <translation>Pattern Member</translation>
+    </message>
+    <message>
+        <source>Open Song Editor</source>
+        <translation>Open Song Editor</translation>
+    </message>
+    <message>
+        <source>Inspector</source>
+        <translation>Inspector</translation>
+    </message>
+    <message>
+        <source>Uses the sample track clips and audio bus</source>
+        <translation>Uses the sample track clips and audio bus</translation>
+    </message>
+    <message>
+        <source>Mixer Target</source>
+        <translation>Mixer Target</translation>
+    </message>
+    <message>
+        <source>2 × mono (L / R)</source>
+        <translation>2 × mono (L / R)</translation>
+    </message>
+    <message>
+        <source>Open Sample Clip</source>
+        <translation>Open Sample Clip</translation>
+    </message>
+    <message>
+        <source>MIDI is only for note entry from an external device</source>
+        <translation>MIDI is only for note entry from an external device</translation>
+    </message>
+    <message>
+        <source>Default sound source signal chain</source>
+        <translation>Default sound source signal chain</translation>
+    </message>
+    <message>
+        <source>Independent L / R ports</source>
+        <translation>Independent L / R ports</translation>
+    </message>
+    <message>
+        <source>Back to Parent</source>
+        <translation>Back to Parent</translation>
+    </message>
+    <message>
+        <source>Multiple MIDI and per-channel audio inputs</source>
+        <translation>Multiple MIDI and per-channel audio inputs</translation>
+    </message>
+    <message>
+        <source>MIDI Inputs</source>
+        <translation>MIDI Inputs</translation>
+    </message>
+    <message>
+        <source>Audio Inputs</source>
+        <translation>Audio Inputs</translation>
+    </message>
+    <message>
+        <source>Open Sample Track</source>
+        <translation>Open Sample Track</translation>
+    </message>
+    <message>
+        <source>Back to Root Graph</source>
+        <translation>Back to Root Graph</translation>
+    </message>
+    <message>
+        <source>Pattern columns follow the arrangement timeline</source>
+        <translation>Pattern columns follow the arrangement timeline</translation>
+    </message>
+    <message>
+        <source>Pattern Column</source>
+        <translation>Pattern Column</translation>
+    </message>
+    <message>
+        <source>Trigger Source</source>
+        <translation>Trigger Source</translation>
+    </message>
+    <message>
+        <source>Pattern clips in the arrangement</source>
+        <translation>Pattern clips in the arrangement</translation>
+    </message>
+    <message>
+        <source>Open Pattern Editor</source>
+        <translation>Open Pattern Editor</translation>
+    </message>
+    <message>
+        <source>Project audio, MIDI, and logical device connections</source>
+        <translation>Project audio, MIDI, and logical device connections</translation>
+    </message>
+    <message>
+        <source>Logical Inputs</source>
+        <translation>Logical Inputs</translation>
+    </message>
+    <message>
+        <source>Open Multitrack Graph</source>
+        <translation>Open Multitrack Graph</translation>
+    </message>
+    <message>
+        <source>Open Audio Settings</source>
+        <translation>Open Audio Settings</translation>
+    </message>
+    <message>
+        <source>New Node Workflow Project</source>
+        <translation>New Node Workflow Project</translation>
+    </message>
+    <message>
+        <source>Node Editor</source>
+        <translation>Node Editor</translation>
+    </message>
+    <message>
+        <source>Workspace Mode</source>
+        <translation>Workspace Mode</translation>
+    </message>
+    <message>
+        <source>Classic Workspace</source>
+        <translation>Classic Workspace</translation>
+    </message>
+    <message>
+        <source>Node Workspace</source>
+        <translation>Node Workspace</translation>
+    </message>
+    <message>
+        <source>Save Node Project</source>
+        <translation>Save Node Project</translation>
+    </message>
+    <message>
+        <source>Save Classic Project</source>
+        <translation>Save Classic Project</translation>
+    </message>
+    <message>
+        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
+        <translation>LMMS Node Workflow Project (*.mmpnz *.mmpn)</translation>
+    </message>
+    <message>
+        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
+        <translation>LMMS Classic Projects (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Convert to Classic Project</source>
+        <translation>Convert to Classic Project</translation>
+    </message>
+    <message>
+        <source>The classic copy will use these settings:</source>
+        <translation>The classic copy will use these settings:</translation>
+    </message>
+    <message>
+        <source>Import Classic Project as Node Project…</source>
+        <translation>Import Classic Project as Node Project…</translation>
+    </message>
+    <message>
+        <source>Import Classic Project</source>
+        <translation>Import Classic Project</translation>
+    </message>
+    <message>
+        <source>Root Graph</source>
+        <translation>Root Graph</translation>
+    </message>
+    <message>
+        <source>Fit Canvas</source>
+        <translation>Fit Canvas</translation>
+    </message>
+    <message>
+        <source>Add Node</source>
+        <translation>Add Node</translation>
+    </message>
+    <message>
+        <source>Signal Flow</source>
+        <translation>Signal Flow</translation>
+    </message>
+    <message>
+        <source>Canvas Zoom</source>
+        <translation>Canvas Zoom</translation>
+    </message>
+    <message>
+        <source>Workspace  /  Root Graph</source>
+        <translation>Workspace  /  Root Graph</translation>
+    </message>
+    <message>
+        <source>Step Events</source>
+        <translation>Step Events</translation>
+    </message>
+    <message>
+        <source>SVS Voice</source>
+        <translation>SVS Voice</translation>
+    </message>
+    <message>
+        <source>Voice Events</source>
+        <translation>Voice Events</translation>
+    </message>
+    <message>
+        <source>External MIDI Input</source>
+        <translation>External MIDI Input</translation>
+    </message>
+    <message>
+        <source>SVS Piano Roll</source>
+        <translation>SVS Piano Roll</translation>
+    </message>
+    <message>
+        <source>SVS Instrument</source>
+        <translation>SVS Instrument</translation>
+    </message>
+    <message>
+        <source>Track Output</source>
+        <translation>Track Output</translation>
+    </message>
+    <message>
+        <source>Audio ports connect one channel at a time</source>
+        <translation>Audio ports connect one channel at a time</translation>
+    </message>
+    <message>
+        <source>Empty Step Sequencer</source>
+        <translation>Empty Step Sequencer</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>Empty MIDI Piano Roll</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>Empty SVS Piano Roll</translation>
+    </message>
+    <message>
+        <source>Add Sample Subgraph</source>
+        <translation>Add Sample Subgraph</translation>
+    </message>
+    <message>
+        <source>Add Instrument Subgraph</source>
+        <translation>Add Instrument Subgraph</translation>
+    </message>
+    <message>
+        <source>Add SVS Subgraph</source>
+        <translation>Add SVS Subgraph</translation>
+    </message>
+    <message>
+        <source>Add Step Subgraph</source>
+        <translation>Add Step Subgraph</translation>
+    </message>
+    <message>
+        <source>Add Note Subgraph</source>
+        <translation>Add Note Subgraph</translation>
+    </message>
+    <message>
+        <source>Add Audio Subgraph</source>
+        <translation>Add Audio Subgraph</translation>
+    </message>
+    <message>
+        <source>Hide Node Editor</source>
+        <translation>Hide Node Editor</translation>
+    </message>
+    <message>
+        <source>Show Node Editor</source>
+        <translation>Show Node Editor</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>Delete Node</translation>
+    </message>
+    <message>
+        <source>Delete %1?</source>
+        <translation>Delete %1?</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its clips?</source>
+        <translation>Delete %1 and its clips?</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>Open Piano Roll</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>Audio</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>Automation</source>
+        <translation>Automation</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>Offline</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>Project</translation>
+    </message>
+    <message>
+        <source>Pattern</source>
+        <translation>Pattern</translation>
+    </message>
+    <message>
+        <source>Multitrack</source>
+        <translation>Multitrack</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>Audio L</source>
+        <translation>Audio L</translation>
+    </message>
+    <message>
+        <source>Audio R</source>
+        <translation>Audio R</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Disconnect</translation>
+    </message>
+    <message>
+        <source>MIDI Input</source>
+        <translation>MIDI Input</translation>
+    </message>
+    <message>
+        <source>Step Sequencer</source>
+        <translation>Step Sequencer</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>Connect</translation>
+    </message>
+    <message>
+        <source>Connect to L</source>
+        <translation>Connect to L</translation>
+    </message>
+    <message>
+        <source>Connect to R</source>
+        <translation>Connect to R</translation>
+    </message>
+    <message>
+        <source>Pattern %1</source>
+        <translation>Pattern %1</translation>
+    </message>
+    <message>
+        <source>Logical nodes · External device integration is planned separately</source>
+        <translation>Logical nodes · External device integration is planned separately</translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation>Send to %1</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 %2</source>
+        <translation>Disconnect %1 %2</translation>
+    </message>
+    <message>
+        <source>Parameter Control</source>
+        <translation>Parameter Control</translation>
+    </message>
+    <message>
+        <source>Open Automation Editor</source>
+        <translation>Open Automation Editor</translation>
+    </message>
+    <message>
+        <source>Portless Modules</source>
+        <translation>Portless Modules</translation>
+    </message>
+    <message>
+        <source>Trigger Sources</source>
+        <translation>Trigger Sources</translation>
+    </message>
+    <message>
+        <source>Waiting for trigger</source>
+        <translation>Waiting for trigger</translation>
+    </message>
+    <message>
+        <source>Audio Silence Threshold</source>
+        <translation>Audio Silence Threshold</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>Step</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Note</translation>
+    </message>
+    <message>
+        <source> etc.</source>
+        <comment>truncated notes in trigger LCD</comment>
+        <translation> etc.</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>Move Up</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>Move Down</translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation>Settings…</translation>
+    </message>
+    <message>
+        <source>Disconnect %1</source>
+        <translation>Disconnect %1</translation>
+    </message>
+    <message>
+        <source>Bind %1</source>
+        <translation>Bind %1</translation>
+    </message>
+    <message>
+        <source>MIDI Input %1</source>
+        <translation>MIDI Input %1</translation>
+    </message>
+    <message>
+        <source>Audio Input %1</source>
+        <translation>Audio Input %1</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>Mono</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 · %2</source>
+        <translation>Disconnect %1 · %2</translation>
+    </message>
+    <message>
+        <source>Master Output</source>
+        <translation>Master Output</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message>
+        <source>%1 · MIDI</source>
+        <translation>%1 · MIDI</translation>
+    </message>
+    <message>
+        <source>%1 · Voice Events</source>
+        <translation>%1 · Voice Events</translation>
+    </message>
+    <message>
+        <source>%1 · Step Events</source>
+        <translation>%1 · Step Events</translation>
+    </message>
+    <message>
+        <source>Step %1</source>
+        <translation>Step %1</translation>
+    </message>
+    <message>
+        <source>Mono Audio Input</source>
+        <translation>Mono Audio Input</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>Instrument Plugins</translation>
+    </message>
+    <message>
+        <source>Effect Plugin…</source>
+        <translation>Effect Plugin…</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <comment>node title</comment>
+        <translation>Song Editor</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <comment>node title</comment>
+        <translation>Pattern Editor</translation>
     </message>
 </context>
 <context>
@@ -16521,6 +17328,49 @@ Latency: %2 ms</source>
     <message>
         <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
         <translation>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::NodeWorkflowCanvas</name>
+    <message>
+        <source>Connection Relationships</source>
+        <translation>Connection Relationships</translation>
+    </message>
+    <message>
+        <source>Source Port</source>
+        <translation>Source Port</translation>
+    </message>
+    <message>
+        <source>Destination Port</source>
+        <translation>Destination Port</translation>
+    </message>
+    <message>
+        <source>Add Connection</source>
+        <translation>Add Connection</translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
+        <translation>Reconnect</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Disconnect</translation>
+    </message>
+    <message>
+        <source>Copy Node</source>
+        <translation>Copy Node</translation>
+    </message>
+    <message>
+        <source>Paste Node</source>
+        <translation>Paste Node</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>Open Piano Roll</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>Delete Node</translation>
     </message>
 </context>
 </TS>

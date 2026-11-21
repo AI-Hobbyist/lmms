@@ -87,6 +87,10 @@ public:
 	//! @param firstCall Defaults to true, and indicates to this recursive method whether this is the first call. If it is
 	//! it will use the root element as the parent.
 	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
+	bool isNodeWorkflow() const;
+	static bool isNodeWorkflow(const QDomDocument& document);
+	QDomElement nodeWorkflow() const;
+	void setNodeWorkflow(const QDomElement& workflow = {});
 
 	QDomElement& content()
 	{

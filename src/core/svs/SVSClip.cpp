@@ -57,8 +57,8 @@ QString SVSClip::migrationDiagnostic() const
 	return m_migrationDiagnostic.isEmpty() ? static_cast<SVSTrack*>(getTrack())->migrationDiagnostic()
 										   : m_migrationDiagnostic;
 }
-SVSClip::SVSClip(Track* track)
-	: Clip(track)
+SVSClip::SVSClip(Track* track, bool registerWithTrack)
+	: Clip(track, registerWithTrack)
 	, m_id(QUuid::createUuid().toString(QUuid::WithoutBraces))
 {
 	m_seed = QString::fromLatin1(QCryptographicHash::hash(m_id.toUtf8(), QCryptographicHash::Sha256).toHex().left(8))
@@ -643,8 +643,13 @@ bool SVSClip::captureCachedInput(svs::Input& input) const
 }
 svs::Input SVSClip::captureInput(uint32_t rate) const
 {
+	return captureInput(rate, *static_cast<const SVSTrack*>(getTrack()));
+}
+
+svs::Input SVSClip::captureInput(uint32_t rate, const SVSTrack& destination) const
+{
 	const auto tempo = svs::TempoSource::forSong(*Engine::getSong()).snapshot();
-	const auto* track = static_cast<const SVSTrack*>(getTrack());
+	const auto* track = &destination;
 	svs::Input input;
 	input.clipId = m_id;
 	input.voiceId = track->voiceId();

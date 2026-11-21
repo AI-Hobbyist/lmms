@@ -24,6 +24,7 @@
 
 
 #include "PatternStore.h"
+#include "NodePatternTriggers.h"
 
 #include "Clip.h"
 #include "Engine.h"
@@ -39,6 +40,7 @@ PatternStore::PatternStore() :
 	m_patternComboBoxModel(this)
 {
 	setType(Type::Pattern);
+	connect(&m_patternComboBoxModel, &ComboBoxModel::dataChanged, this, &PatternStore::currentPatternChanged);
 }
 
 
@@ -64,6 +66,7 @@ bool PatternStore::play(TimePos start, f_cnt_t frames, f_cnt_t offset, int clipN
 		}
 	}
 
+	NodePatternTriggers::advancePlayback(clipNum, start.getTicks());
 	return notePlayed;
 }
 

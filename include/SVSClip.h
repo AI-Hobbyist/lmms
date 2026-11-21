@@ -11,11 +11,13 @@
 #include "SVSSegmentedSynthesis.h"
 #include "SVSVolume.h"
 namespace lmms {
+class SVSTrack;
+
 class SVSClip : public Clip
 {
 	Q_OBJECT
 public:
-	explicit SVSClip(Track*);
+	explicit SVSClip(Track*, bool registerWithTrack = true);
 	~SVSClip() override;
 	QString nodeName() const override { return "svsclip"; }
 	gui::ClipView* createView(gui::TrackView*) override;
@@ -40,6 +42,7 @@ public:
 	void selectPitchRecording(int recording);
 	bool supportsPitchRecording() const;
 	svs::Input captureInput(uint32_t sampleRate) const;
+	svs::Input captureInput(uint32_t sampleRate, const SVSTrack& destination) const;
 	bool captureCachedInput(svs::Input&) const;
 	void invalidate();
 	void cancelSynthesis();

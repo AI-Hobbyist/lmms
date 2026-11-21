@@ -25,7 +25,9 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QEvent>
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 #include "ClipView.h"
 #include "ComboBox.h"
@@ -40,6 +42,7 @@
 #include "TrackView.h"
 
 #include "MidiClip.h"
+#include "MidiClipView.h"
 
 
 namespace lmms::gui
@@ -61,7 +64,15 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 		m_currentPosition, this
 	);
 	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PatternEditor::updatePosition);
-	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
+	contentWidget()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_patternScroll = new QScrollBar(Qt::Horizontal, this);
+	m_patternScroll->setObjectName("patternContentHorizontalScroll");
+	m_patternScroll->hide();
+	connect(m_patternScroll, &QScrollBar::valueChanged, this, &PatternEditor::applyPatternScroll);
+	auto* editorLayout = static_cast<QVBoxLayout*>(layout());
+	editorLayout->insertWidget(0, m_timeLine);
+	editorLayout->addWidget(m_patternScroll);
+	contentWidget()->viewport()->installEventFilter(this);
 
 	connect(m_ps, &PatternStore::trackUpdated,
 		this, &PatternEditor::updateMaxSteps);
@@ -203,10 +214,45 @@ void PatternEditor::updatePosition()
 
 void PatternEditor::updatePixelsPerBar()
 {
-	setPixelsPerBar(m_maxClipLength != 0
-		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
-		: (width() - m_trackHeadWidth));
+	setPixelsPerBar(TimePos::stepsPerBar() * PatternStepRow::StepWidth);
 	m_timeLine->setPixelsPerBar(pixelsPerBar());
+	updatePatternScroll();
+}
+
+bool PatternEditor::eventFilter(QObject* observed, QEvent* event)
+{
+	if (observed == contentWidget()->viewport() && event->type() == QEvent::Resize)
+	{
+		updatePatternScroll();
+	}
+	return TrackContainerView::eventFilter(observed, event);
+}
+
+void PatternEditor::updatePatternScroll()
+{
+	if (!m_patternScroll)
+	{
+		return;
+	}
+	const int contentWidth = 2 * ClipView::BORDER_WIDTH + m_maxClipLength * pixelsPerBar() / TimePos::ticksPerBar();
+	const int viewportWidth = std::max(0, contentWidget()->viewport()->width() - m_trackHeadWidth);
+	m_patternScroll->setPageStep(viewportWidth);
+	m_patternScroll->setSingleStep(PatternStepRow::StepWidth);
+	m_patternScroll->setRange(0, std::max(0, contentWidth - viewportWidth));
+	m_patternScroll->setVisible(m_patternScroll->maximum() > 0);
+	applyPatternScroll();
+}
+
+void PatternEditor::applyPatternScroll()
+{
+	const int contentWidth = 2 * ClipView::BORDER_WIDTH + m_maxClipLength * pixelsPerBar() / TimePos::ticksPerBar();
+	const auto offset = m_patternScroll->value();
+	m_timeLine->setXOffset(m_trackHeadWidth - offset, m_trackHeadWidth);
+	m_timeLine->update();
+	for (auto* track : trackViews())
+	{
+		track->getTrackContentWidget()->setPatternScroll(offset, contentWidth);
+	}
 }
 
 void PatternEditor::updateMaxSteps()

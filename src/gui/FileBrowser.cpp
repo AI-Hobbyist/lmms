@@ -646,6 +646,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			[file] { FileRevealer::reveal(file->fullName()); });
 
 		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
+		const auto extension = QFileInfo(path).suffix().toLower();
+		if (Engine::getSong()->isNodeProject() && (extension == "mmp" || extension == "mmpz"))
+		{
+			auto* window = getGUI()->mainWindow();
+			contextMenu.addAction(tr("Import as Node Project"), window,
+				[window, path] { window->importClassicProjectAsNode(path); });
+		}
 
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
@@ -945,13 +952,20 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
+	auto* song = Engine::getSong();
+	auto* window = getGUI()->mainWindow();
+	if (f->handling() == FileItem::FileHandling::LoadAsProject && !song->isNodeProject()
+		&& !window->canImportAsClassicProject(f->fullName()))
+	{
+		return;
+	}
 	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::FileHandling::LoadAsProject:
-			if( getGUI()->mainWindow()->mayChangeProject(true) )
+			if( window->mayChangeProject(true) )
 			{
-				Engine::getSong()->loadProject( f->fullName() );
+				song->loadProject( f->fullName() );
 			}
 			break;
 
@@ -1239,7 +1253,7 @@ void FileItem::determineFileType()
 	m_handling = FileHandling::NotSupported;
 
 	const QString ext = extension();
-	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
+	if( ext == "mmp" || ext == "mmpn" || ext == "mmpnz" || ext == "mpt" || ext == "mmpz" )
 	{
 		m_type = FileType::Project;
 		m_handling = FileHandling::LoadAsProject;
@@ -1323,7 +1337,7 @@ QString FileItem::extension(const QString & file )
 
 QString FileItem::defaultFilters()
 {
-	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
+	const auto projectFilters = QStringList{"*.mmp", "*.mmpn", "*.mmpnz", "*.mpt", "*.mmpz"};
 	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2"};
 	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
 	const auto patchFilters = QStringList{"*.pat"};

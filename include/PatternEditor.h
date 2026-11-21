@@ -28,6 +28,8 @@
 #include "Editor.h"
 #include "TrackContainerView.h"
 
+class QScrollBar;
+
 namespace lmms
 {
 
@@ -70,10 +72,14 @@ protected slots:
 	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
 	void updatePixelsPerBar();
+	bool eventFilter(QObject* observed, QEvent* event) override;
 
 private:
+	void updatePatternScroll();
+	void applyPatternScroll();
 	PatternStore* m_ps;
 	TimeLineWidget* m_timeLine;
+	QScrollBar* m_patternScroll = nullptr;
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );

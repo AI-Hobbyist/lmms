@@ -28,7 +28,11 @@
 #include <array>
 #include <memory>
 
+#include <QDomDocument>
+#include <QPointF>
+#include <optional>
 #include <QString>
+#include <QStringList>
 #include <QHash>  // IWYU pragma: keep
 
 #include "AudioEngine.h"
@@ -45,10 +49,13 @@
 namespace lmms
 {
 
+class InstrumentTrack;
+
 class AutomationTrack;
 class AutomationClip;
 class Clip;
 class DataFile;
+class MidiEvent;
 class Keymap;
 class MidiClip;
 class SVSClip;
@@ -270,6 +277,116 @@ public:
 
 	// file management
 	void createNewProject();
+	void createNodeProject();
+	bool isNodeProject() const { return m_nodeProject; }
+	void setNodeMasterOutputConnected(unsigned side, bool connected);
+	std::optional<QPointF> nodeTrackPosition(Track& track) const;
+	std::optional<QPointF> nodeLayoutPosition(const QString& key) const;
+	void setNodeLayoutPosition(const QString& key, const QPointF& position);
+	void setNodeTrackPosition(Track& track, const QPointF& position);
+	struct NodeMixerEndpoint
+	{
+		mix_ch_t channel;
+		ch_cnt_t side;
+	};
+	std::optional<NodeMixerEndpoint> nodeTrackMixerEndpoint(Track& track, ch_cnt_t sourceSide) const;
+	bool nodeTrackBoundaryConnected(Track& track, ch_cnt_t side) const;
+	bool setNodeTrackBoundaryConnected(Track& track, ch_cnt_t side, bool connected);
+	bool setNodeTrackAudioRoute(Track& track, ch_cnt_t sourceSide,
+		std::optional<mix_ch_t> mixerChannel, ch_cnt_t destinationSide);
+	bool setNodeSourceMidiInputConnection(Track& track, bool connected);
+	struct NodeSourceConnections
+	{
+		bool midiInput;
+		bool events;
+		bool stepEvents;
+		std::array<std::optional<unsigned>, 2> audioOutputs;
+	};
+	NodeSourceConnections nodeSourceConnections(Track& track) const;
+	struct NodeInstrumentLayer
+	{
+		QString id;
+		InstrumentTrack* instrument;
+		bool notes;
+		bool steps;
+		std::array<std::optional<ch_cnt_t>, 2> outputs;
+	};
+	const QList<NodeInstrumentLayer>& nodeInstrumentLayers(const Track& owner) const;
+	InstrumentTrack* addNodeInstrumentLayer(Track& owner, const QString& plugin, bool fromDrop);
+	bool setNodeInstrumentLayerEvent(Track& owner, const QString& id, bool step, bool connected);
+	bool setNodeInstrumentLayerOutput(Track& owner, const QString& id, ch_cnt_t source,
+		std::optional<ch_cnt_t> target);
+	void removeNodeInstrumentLayer(Track& owner, const QString& id);
+	bool setNodeSourceEventConnection(Track& track, bool connected);
+	bool setNodeSourceStepConnection(Track& track, bool connected);
+	bool convertToNodeProject(const QString& fileName);
+	QStringList classicConversionChanges();
+	bool convertToClassicProject(const QString& fileName);
+	bool setNodeSourceAudioOutput(Track& track, ch_cnt_t sourceSide, std::optional<ch_cnt_t> outputSide);
+	int dispatchNodeMidiInput(const QString& inputId, const MidiEvent& event,
+		const TimePos& time, f_cnt_t offset);
+	bool setNodeLogicalInputTarget(const QString& inputId, const QString& signalType,
+		Track& track, const QString& port, bool connected);
+	struct NodeLogicalInput
+	{
+		QString id;
+		QString signalType;
+		QList<QPair<QString, QString>> destinations;
+	};
+	QList<NodeLogicalInput> nodeLogicalInputs() const;
+	void addNodeLogicalInput(const QString& signalType);
+	struct NodeBoundaryPort
+	{
+		QString id;
+		QString signal;
+		bool output;
+		QString track;
+		unsigned channel;
+		QList<QPair<QString, QString>> destinations;
+	};
+	QList<NodeBoundaryPort> nodeBoundaryPorts(const QString& graph) const;
+	void addNodeBoundaryPort(const QString& graph, const QString& signal, bool output);
+	std::optional<QPair<bool, int>> nodeConnectionAggregation() const;
+	void setNodeConnectionAggregation(bool enabled, int threshold);
+	bool setNodeBoundaryAudioSource(const QString& graph, const QString& port, Track& track,
+		ch_cnt_t channel, bool connected);
+	bool setNodeSourceMidiBoundary(const QString& port, Track& track);
+	bool hasExtendedSourceGraphs() const;
+	static bool hasExtendedSourceGraphs(const QDomElement& workflow, const QDomElement& content);
+	QList<int> sourceGraphEffectSlots(Track& track) const;
+	bool nodeEffectInPattern(const QUuid& effect) const;
+	void setNodeEffectInPattern(const QUuid& effect, bool pattern);
+	struct NodeStepPattern
+	{
+		static constexpr int StepCount = 16;
+		QString id;
+		unsigned activeSteps;
+		QStringList targets;
+		QStringList boundaryTargets;
+	};
+	QList<NodeStepPattern> nodeStepPatterns() const;
+	void addNodeStepPattern();
+	bool setNodeStep(const QString& id, int step, bool enabled);
+	bool setNodeStepTarget(const QString& id, Track& track, bool connected);
+	bool setNodeStepBoundaryTarget(const QString& id, const QString& boundary, bool connected);
+	bool nodeStepActiveForTrack(Track& track, const TimePos& position) const;
+	struct NodePianoRoll
+	{
+		QString id;
+		bool singingVoice;
+		QStringList targets;
+		QStringList boundaryTargets;
+	};
+	QList<NodePianoRoll> nodePianoRolls() const;
+	void addNodePianoRoll(bool singingVoice);
+	Clip* nodePianoRollClip(const QString& id);
+	bool setNodePianoRollTarget(const QString& id, Track& track, bool connected);
+	bool setNodePianoRollBoundaryTarget(const QString& id, const QString& boundary, bool connected);
+	QDomElement copyStandaloneNode(const QString& kind, const QString& id) const;
+	bool pasteStandaloneNode(const QDomElement& state);
+	bool removeStandaloneNode(const QString& kind, const QString& id);
+	QList<Clip*> nodePianoRollSources(Track& track) const;
+	bool isEmpty() const;
 	void createNewProjectFromTemplate( const QString & templ );
 	void loadProject( const QString & filename );
 	bool guiSaveProject();
@@ -398,6 +515,7 @@ private slots:
 
 
 private:
+	bool saveProjectFile(const QString& fileName, bool withResources, bool nodeFormat);
 	friend class ProjectJournal;
 
 	Song();
@@ -421,6 +539,15 @@ private:
 	}
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
+	void restoreNodeAudioRoutes();
+	void restoreNodeInstrumentLayers();
+	void saveNodeInstrumentLayers();
+	QDomElement nodeInstrumentLayerElement(const QString& id) const;
+	InstrumentTrack* createNodeInstrumentLayer(Track& owner, const QDomElement& element);
+	void restoreNodeVoiceSource(const QDomElement& roll);
+	void restoreNodeWorkflow(DataFile& dataFile);
+	QDomElement ensureNodeWorkflow();
+	QDomElement ensureNodeSourceSubgraph(Track& track);
 	void restoreControllerStates( const QDomElement & element );
 
 	void removeAllControllers();
@@ -449,6 +576,10 @@ private:
 
 	int m_nLoadingTrack;
 
+	bool m_nodeProject = false;
+	QDomDocument m_nodeWorkflow;
+	std::unique_ptr<TrackContainer> m_nodePianoRollTracks;
+	QHash<QString, Clip*> m_nodePianoRollClips;
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
@@ -495,11 +626,16 @@ private:
 
 	Metronome m_metronome;
 
+	// Keep existing Song fields at their original offsets for native plugins.
+	std::unique_ptr<TrackContainer> m_nodeInstrumentTracks;
+	QHash<const Track*, QList<NodeInstrumentLayer>> m_nodeInstrumentLayers;
+
 	friend class Engine;
 	friend class gui::SongEditor;
 	friend class gui::ControllerRackView;
 
 signals:
+	void nodeTrackRoutingChanged();
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionJumped();

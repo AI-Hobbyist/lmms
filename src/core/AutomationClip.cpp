@@ -136,6 +136,26 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 	return true;
 }
 
+bool AutomationClip::removeObject(AutomatableModel* target)
+{
+	if (!target)
+	{
+		return false;
+	}
+	{
+		QMutexLocker lock(&m_clipMutex);
+		const auto firstRemoved = std::remove(m_objects.begin(), m_objects.end(), target);
+		if (firstRemoved == m_objects.end())
+		{
+			return false;
+		}
+		m_objects.erase(firstRemoved, m_objects.end());
+		disconnect(target, SIGNAL(destroyed(lmms::jo_id_t)), this, SLOT(objectDestroyed(lmms::jo_id_t)));
+	}
+	emit dataChanged();
+	return true;
+}
+
 void AutomationClip::appendTarget(AutomatableModel* target)
 {
 	m_objects.push_back(target);

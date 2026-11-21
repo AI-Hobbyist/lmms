@@ -31,6 +31,7 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
+#include <QPointer>
 #include <set>
 
 #include "AutomationEditor.h"
@@ -49,6 +50,100 @@ namespace lmms::gui
 {
 
 constexpr int BeatStepButtonOffset = 4;
+
+void PatternStepRow::paint(QPainter& p, MidiClip& clip, const QRect& bounds, bool fixedWidth) const
+{
+	const int steps = std::max(1, clip.steps());
+	const int width = fixedWidth ? steps * StepWidth : bounds.width();
+	const int cellWidth = fixedWidth ? StepWidth - 3 : width / steps;
+	if (cellWidth <= 0)
+	{
+		return;
+	}
+	const auto* song = Engine::getSong();
+	const int playStep = song->playMode() == Song::PlayMode::Pattern
+		? song->getPlayPos(Song::PlayMode::Pattern) * TimePos::stepsPerBar() / TimePos::ticksPerBar()
+		: -1;
+
+	for (int step = 0; step < steps; ++step)
+	{
+		const QRect cell(bounds.x() + step * width / steps, bounds.y(), cellWidth, height());
+		p.drawPixmap(cell, step % 4 == 0 ? m_stepAccent : m_stepInactive);
+		if (const auto* note = clip.noteAtStep(step))
+		{
+			p.save();
+			p.setOpacity(std::sqrt(note->getVolume() / 200.0));
+			p.drawPixmap(cell, m_stepActive);
+			p.restore();
+		}
+		if (step == playStep)
+		{
+			p.drawPixmap(cell, m_stepPlayhead);
+		}
+	}
+}
+
+void PatternStepRow::toggle(MidiClip& clip, int step) const
+{
+	if (step < 0 || step >= clip.steps())
+	{
+		return;
+	}
+	if (clip.noteAtStep(step))
+	{
+		clip.addJournalCheckPoint();
+		clip.setStep(step, false);
+	}
+	else
+	{
+		clip.addStepNote(step);
+	}
+	Engine::getSong()->setModified();
+}
+
+QWidget* MidiClipView::createPatternStepWidget(MidiClip* clip, QWidget* parent)
+{
+	class StepWidget final : public QWidget
+	{
+	public:
+		StepWidget(MidiClip* clip, QWidget* parent) : QWidget(parent), m_clip(clip)
+		{
+			setObjectName("nodeWorkflowPatternSteps");
+			setFixedSize(clip->steps() * PatternStepRow::StepWidth, m_steps.height());
+			connect(clip, &MidiClip::dataChanged, this, [this] {
+				if (m_clip)
+				{
+					setFixedWidth(m_clip->steps() * PatternStepRow::StepWidth);
+					update();
+				}
+			});
+		}
+
+	protected:
+		void paintEvent(QPaintEvent*) override
+		{
+			if (m_clip)
+			{
+				QPainter painter(this);
+				m_steps.paint(painter, *m_clip, rect(), true);
+			}
+		}
+
+		void mousePressEvent(QMouseEvent* event) override
+		{
+			if (m_clip && event->button() == Qt::LeftButton)
+			{
+				m_steps.toggle(*m_clip, static_cast<int>(event->position().x()) / PatternStepRow::StepWidth);
+				update();
+			}
+		}
+
+	private:
+		QPointer<MidiClip> m_clip;
+		PatternStepRow m_steps;
+	};
+	return new StepWidget(clip, parent);
+}
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
@@ -425,7 +520,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& pos.y() > BeatStepButtonOffset && pos.y() < BeatStepButtonOffset + m_stepBtnOff.height())
+		&& pos.y() > BeatStepButtonOffset && pos.y() < BeatStepButtonOffset + m_steps.height())
 
 	// when mouse button is pressed in pattern mode
 
@@ -435,7 +530,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 		float tmp = ((static_cast<float>(pos.x()) - BORDER_WIDTH)
 			* static_cast<float>(m_clip->m_steps)) / static_cast<float>(width() - BORDER_WIDTH * 2);
 
-		int step = int( tmp );
+		int step = fixedClips() ? (pos.x() - BORDER_WIDTH) / PatternStepRow::StepWidth : int(tmp);
 
 //	debugging to ensure we get the correct step...
 //		qDebug( "Step (%f) %d", tmp, step );
@@ -446,19 +541,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 			return;
 		}
 
-		Note * n = m_clip->noteAtStep( step );
-
-		if( n == nullptr )
-		{
-			m_clip->addStepNote( step );
-		}
-		else // note at step found
-		{
-			m_clip->addJournalCheckPoint();
-			m_clip->setStep( step, false );
-		}
-
-		Engine::getSong()->setModified();
+		m_steps.toggle(*m_clip, step);
 		update();
 
 		if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
@@ -498,14 +581,14 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				pos.y() > height() - m_stepBtnOff.height())
+				pos.y() > height() - m_steps.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
 		float tmp = ((float(pos.x()) - BORDER_WIDTH) *
 				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
 
-		int step = int( tmp );
+		int step = fixedClips() ? (pos.x() - BORDER_WIDTH) / PatternStepRow::StepWidth : int(tmp);
 
 		if( step >= m_clip->m_steps )
 		{
@@ -548,6 +631,59 @@ static int computeNoteRange(int minKey, int maxKey)
 {
 	return (maxKey - minKey) + 1;
 }
+
+QList<QRectF> MidiClipView::notePreviewGeometry(const MidiClip& clip)
+{
+	const auto& noteCollection = clip.notes();
+	QList<QRectF> geometry;
+	if (noteCollection.empty())
+	{
+		return geometry;
+	}
+
+	// Compute the minimum and maximum key in the clip
+	// so that we know how much there is to draw.
+	int maxKey = std::numeric_limits<int>::min();
+	int minKey = std::numeric_limits<int>::max();
+
+	for (Note const * note : noteCollection)
+	{
+		int const key = note->key();
+		maxKey = qMax( maxKey, key );
+		minKey = qMin( minKey, key );
+	}
+
+	// If needed adjust the note range so that we always have paint a certain interval
+	int const minimalNoteRange = 12; // Always paint at least one octave
+	int const actualNoteRange = computeNoteRange(minKey, maxKey);
+
+	if (actualNoteRange < minimalNoteRange)
+	{
+		int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
+		minKey = std::max(0, minKey - missingNumberOfNotes / 2);
+		maxKey = maxKey + missingNumberOfNotes / 2;
+		if (missingNumberOfNotes % 2 == 1)
+		{
+			// Put more range at the top to bias drawing towards the bottom
+			++maxKey;
+		}
+	}
+
+	int const adjustedNoteRange = computeNoteRange(minKey, maxKey);
+
+	const float tickLength = 1.0f / clip.length();
+	const float noteHeight = 1.0f / adjustedNoteRange;
+	const auto offset = clip.startTimeOffset();
+	geometry.reserve(noteCollection.size());
+	for (const auto* note : noteCollection)
+	{
+		const float x = (note->pos() + offset) * tickLength;
+		const float y = (adjustedNoteRange - (note->key() - minKey) - 1) * noteHeight;
+		geometry.append(QRectF(x, y, note->length() * tickLength, noteHeight));
+	}
+	return geometry;
+}
+
 
 void MidiClipView::paintEvent( QPaintEvent * )
 {
@@ -631,9 +767,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	const int offset = m_clip->startTimeOffset();
 
-	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
-	const float tickLength = 1.0f / m_clip->length();
-
 	const int x_base = BORDER_WIDTH;
 
 	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
@@ -642,59 +775,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
 	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
-		QPixmap stephighlight;
-		const int steps = std::max(1, m_clip->m_steps);
-		const int w = width() - 2 * BORDER_WIDTH;
-
-		// scale step graphics to fit the beat clip length
-		stepon0
-			= m_stepBtnOn0.scaled(w / steps, m_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepon200 = m_stepBtnOn200.scaled(
-			w / steps, m_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoff
-			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoffl = m_stepBtnOffLight.scaled(
-			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stephighlight = m_stepBtnHighlight.scaled(
-			w / steps, m_stepBtnHighlight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
-		{
-			Note* n = m_clip->noteAtStep(it);
-
-			// figure out x and y coordinates for step graphic
-			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
-			const int y = BeatStepButtonOffset;
-
-			const bool isAtPlayPos = Engine::getSong()->getPlayPos(Song::PlayMode::Pattern) * TimePos::stepsPerBar() / TimePos::ticksPerBar() == it
-				&& Engine::getSong()->playMode() == Song::PlayMode::Pattern;
-
-			if (n)
-			{
-				const int vol = n->getVolume();
-				p.drawPixmap(x, y, stepoffl);
-				p.drawPixmap(x, y, stepon0);
-				p.setOpacity(std::sqrt(vol / 200.0));
-				p.drawPixmap(x, y, stepon200);
-				p.setOpacity(1);
-			}
-			else if ((it / 4) % 2)
-			{
-				p.drawPixmap(x, y, stepoffl);
-			}
-			else
-			{
-				p.drawPixmap(x, y, stepoff);
-			}
-			if (isAtPlayPos)
-			{
-				p.drawPixmap(x, y, stephighlight);
-			}
-		} // end for loop
+		m_steps.paint(p, *m_clip, QRect(BORDER_WIDTH, BeatStepButtonOffset, width() - 2 * BORDER_WIDTH, m_steps.height()), fixedClips());
 
 		// draw a transparent rectangle over muted clips
 		if (muted)
@@ -712,36 +793,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			m_clip->m_clipType == MidiClip::Type::BeatClip)
 	)
 	{
-		// Compute the minimum and maximum key in the clip
-		// so that we know how much there is to draw.
-		int maxKey = std::numeric_limits<int>::min();
-		int minKey = std::numeric_limits<int>::max();
-
-		for (Note const * note : noteCollection)
-		{
-			int const key = note->key();
-			maxKey = qMax( maxKey, key );
-			minKey = qMin( minKey, key );
-		}
-
-		// If needed adjust the note range so that we always have paint a certain interval
-		int const minimalNoteRange = 12; // Always paint at least one octave
-		int const actualNoteRange = computeNoteRange(minKey, maxKey);
-
-		if (actualNoteRange < minimalNoteRange)
-		{
-			int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
-			minKey = std::max(0, minKey - missingNumberOfNotes / 2);
-			maxKey = maxKey + missingNumberOfNotes / 2;
-			if (missingNumberOfNotes % 2 == 1)
-			{
-				// Put more range at the top to bias drawing towards the bottom
-				++maxKey;
-			}
-		}
-
-		int const adjustedNoteRange = computeNoteRange(minKey, maxKey);
-
 		// Transform such that [0, 1] x [0, 1] paints in the correct area
 		float distanceToTop = textBoxHeight;
 
@@ -795,30 +846,17 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		pen.setWidth(0);
 		p.setPen(pen);
 
-		float const noteHeight = 1. / adjustedNoteRange;
-
-		// scan through all the notes and draw them on the clip
-		for (Note const * currentNote : noteCollection)
+		for (const auto& note : notePreviewGeometry(*m_clip))
 		{
-			// Map to 0, 1, 2, ...
-			int mappedNoteKey = currentNote->key() - minKey;
-			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
-
-			float const noteStartX = (currentNote->pos() + offset) * tickLength;
-			float const noteLength = currentNote->length() * tickLength;
-
-			float const noteStartY = invertedMappedNoteKey * noteHeight;
-
-			QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
 			if (drawAsLines)
 			{
-				p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
-					   QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
+				p.drawLine(QPointF(note.left(), note.center().y()),
+					QPointF(note.right(), note.center().y()));
 			}
 			else
 			{
-				p.fillRect( noteRectF, noteFillColor );
-				p.drawRect( noteRectF );
+				p.fillRect(note, noteFillColor);
+				p.drawRect(note);
 			}
 		}
 

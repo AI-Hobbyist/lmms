@@ -30,6 +30,7 @@ SET(LMMS_SRCS
 	gui/MidiSetupWidget.cpp
 	gui/MixerChannelView.cpp
 	gui/MixerView.cpp
+	gui/NodeWorkflowCanvas.cpp
 	gui/ModelView.cpp
 	gui/NoteLabelDisplay.cpp
 	gui/PeakControllerDialog.cpp

@@ -23,6 +23,7 @@
  */
 
 #include "InstrumentTrackView.h"
+#include "NodeWorkflowMixerSelection.h"
 
 #include <ranges>
 
@@ -241,7 +242,7 @@ void InstrumentTrackView::createMixerLine()
 
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
-	model()->mixerChannelModel()->setValue( channelIndex );
+	assignTrackMixerChannel(*model(), *model()->mixerChannelModel(), channelIndex);
 
 	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
 }

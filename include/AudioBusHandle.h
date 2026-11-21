@@ -26,11 +26,15 @@
 #ifndef LMMS_AUDIO_BUS_HANDLE_H
 #define LMMS_AUDIO_BUS_HANDLE_H
 
+#include <array>
 #include <memory>
+#include <optional>
 #include <QString>
 #include <QMutex>
+#include <QPointer>
 
 #include "AudioBuffer.h"
+#include "NodeSignalActivity.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -39,6 +43,8 @@ namespace lmms
 class EffectChain;
 class FloatModel;
 class BoolModel;
+class Mixer;
+class MixerChannel;
 
 /**
 	@brief Job between @ref PlayHandle and @ref MixerChannel
@@ -66,7 +72,28 @@ public:
 	// next mixer-channel after this audio-bus-handle
 	// (-1 = none  0 = master)
 	mix_ch_t nextMixerChannel() const { return m_nextMixerChannel; }
+	bool nodeSignalActive(unsigned side) const { return m_nodeSignalActivity.active(side); }
+	void markNodeEvent(unsigned mask)
+	{
+		if (NodeSignalActivity::monitoring())
+		{
+			m_nodeEventActivity.mark(mask);
+		}
+	}
+	bool nodeEventActive(unsigned edge) const { return m_nodeEventActivity.active(edge); }
 	void setNextMixerChannel(const mix_ch_t chnl) { m_nextMixerChannel = chnl; }
+
+	struct MixerInput
+	{
+		MixerChannel* target;
+		QPointer<FloatModel> lifetime;
+		ch_cnt_t side;
+
+		std::optional<mix_ch_t> resolveChannel(Mixer& mixer, mix_ch_t fallback) const;
+	};
+	using MixerInputs = std::array<std::optional<MixerInput>, 2>;
+	// An absent override uses the track's stereo route. An empty entry disconnects one side.
+	void setMixerInputs(std::optional<MixerInputs> inputs);
 
 	const QString& name() const { return m_name; }
 	void setName(const QString& newName);
@@ -88,9 +115,12 @@ private:
 	volatile bool m_bufferUsage;
 
 	AudioBuffer m_buffer;
+	NodeSignalActivity m_nodeSignalActivity;
+	NodeSignalActivity m_nodeEventActivity;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;
+	std::optional<MixerInputs> m_mixerInputs;
 
 	QString m_name;
 

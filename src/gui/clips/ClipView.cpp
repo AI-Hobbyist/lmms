@@ -241,7 +241,7 @@ void ClipView::updateLength()
 {
 	if( fixedClips() )
 	{
-		setFixedWidth( parentWidget()->width() );
+		setFixedWidth(m_trackView->getTrackContentWidget()->fixedClipWidth());
 	}
 	else
 	{

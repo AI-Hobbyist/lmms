@@ -32,6 +32,7 @@
 #include "panning.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "NodePatternTriggers.h"
 #include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
@@ -163,7 +164,10 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			}
 			handle->setOffset( _offset );
 			// send it to the audio engine
-			Engine::audioEngine()->addPlayHandle( handle );
+			if (Engine::audioEngine()->addPlayHandle(handle) && pattern_track && !st->isRecord())
+			{
+				NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Audio, _start);
+			}
 			played_a_note = true;
 		}
 	}

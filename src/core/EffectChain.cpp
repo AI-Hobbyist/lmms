@@ -67,12 +67,22 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	for( Effect* effect : m_effects)
 	{
-		if (auto dummy = dynamic_cast<DummyEffect*>(effect)) { _this.appendChild(dummy->originalPluginData()); }
+		QDomElement ef;
+		if (auto dummy = dynamic_cast<DummyEffect*>(effect))
+		{
+			ef = _doc.importNode(dummy->originalPluginData(), true).toElement();
+			_this.appendChild(ef);
+		}
 		else
 		{
-			QDomElement ef = effect->saveState( _doc, _this );
+			ef = effect->saveState( _doc, _this );
 			ef.setAttribute( "name", QString::fromUtf8( effect->descriptor()->name ) );
 			ef.appendChild( effect->key().saveXML( _doc ) );
+		}
+		const auto graphId = effect->property("nodeWorkflowSourceEffect").toString();
+		if (!graphId.isEmpty())
+		{
+			ef.setAttribute("nodeWorkflowSourceEffect", graphId);
 		}
 	}
 }
@@ -123,6 +133,10 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			{
 				delete e;
 				e = new DummyEffect( parentModel(), effectData );
+			}
+			if (effectData.hasAttribute("nodeWorkflowSourceEffect"))
+			{
+				e->setProperty("nodeWorkflowSourceEffect", effectData.attribute("nodeWorkflowSourceEffect"));
 			}
 
 			if (incremental)

@@ -693,3 +693,10 @@
 
 ## 节点工作流工程计划（2026-11-21）
 计划见 doc/agent/node-workflow-plan.md。当前只交付计划，等待用户决定开始实施。master 上已有此前未提交的 Song、DataFile、ConfigManager、MainWindow、FileBrowser 格式入口草稿，尚未编译或验证。本轮仅写文档，未提交、推送。
+
+## 当前交接：固定 LCD 高度与聚合总线改接（2026-11-22）
+
+- dev（d31a5eddc）。本轮已完成实施，提交及推送按用户验收授权执行。生产目录未覆盖，保留现有修改。用户已确认人工验收通过。
+- LCD 固定为原始 148 px，步进、采样、音符、空闲高度一致，六行可视。聚合编辑器用当前单元格确定编辑行，底栏为源 → 目标、断开、改接。移除新增入口，画布连线自动聚合。改接暂存，保存应用，取消放弃。
+- Windows Release 编译通过。实际弹出源/目标下拉、选中第二行、改接暂存、取消和保存的业务断言通过。LCD 148 px 与六行滚动的业务断言通过。两次测试宿主均在业务 PASS 后未正常结束。未做生命周期测试。日志 build/node-aggregate-reconnect-ui.log、build/node-lcd-fixed-height-ui.log。
+- 增量包 build/packages/lmms-node-workflow-20261122-012044-win64.zip，基于当前生产安装（已含上一版节点资源），只含新版 lmms.exe，VerifyOnly 通过。SHA256 E4395A4DFDB349A03B3B4D9867B926CB4DDF9C5C4F67CAE498D1B4EFB2C26114。

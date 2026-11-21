@@ -100,6 +100,7 @@ public slots:
 	void updateComboBox();
 
 signals:
+	void currentPatternChanged();
 	void trackUpdated();
 
 private:

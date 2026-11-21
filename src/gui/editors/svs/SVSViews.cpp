@@ -1,4 +1,5 @@
 #include "SVSViews.h"
+#include "NodeWorkflowMixerSelection.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -506,7 +507,7 @@ QMenu* SVSTrackView::createMixerMenu(QString title, QString newMixerLabel)
 	if (title.contains("%2")) { title = title.arg(channelIndex).arg(channel->m_name); }
 	auto* menu = new QMenu(title, this);
 	auto assign = [this, track](int index) {
-		track->mixerChannelModel()->setValue(index);
+		assignTrackMixerChannel(*track, *track->mixerChannelModel(), index);
 		getGUI()->mixerView()->setCurrentMixerChannel(index);
 	};
 	menu->addAction(newMixerLabel, this, [track, assign] {

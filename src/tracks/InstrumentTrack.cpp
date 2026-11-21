@@ -41,6 +41,7 @@
 #include "MixHelpers.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "NodePatternTriggers.h"
 #include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
@@ -50,7 +51,7 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
+InstrumentTrack::InstrumentTrack(TrackContainer* tc, bool assignMidiDevice) :
 	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
 	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
@@ -114,7 +115,10 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
 
-	autoAssignMidiDevice(true);
+	if (assignMidiDevice)
+	{
+		autoAssignMidiDevice(true);
+	}
 }
 
 
@@ -319,6 +323,10 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
+	if (!m_instrument)
+	{
+		return;
+	}
 	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
 	{
 		return;
@@ -698,7 +706,8 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 							const f_cnt_t _offset, int _clip_num )
 {
-	if( ! m_instrument || ! tryLock() )
+	const auto& layers = Engine::getSong()->nodeInstrumentLayers(*this);
+	if ((!m_instrument && layers.isEmpty()) || !tryLock())
 	{
 		return false;
 	}
@@ -719,6 +728,13 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 	{
 		getClipsInRange( clips, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
+		for (auto* source : Engine::getSong()->nodePianoRollSources(*this))
+		{
+			if (source->startPosition() <= _start && _start < source->startPosition() + source->length())
+			{
+				clips.push_back(source);
+			}
+		}
 	}
 
 	// Handle automation: detuning
@@ -735,6 +751,37 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 	}
 
 	bool played_a_note = false;	// will be return variable
+	const auto playLayers = [&](bool step, f_cnt_t frames, const Note& note, const TimePos& songOffset) {
+		if (isMuted())
+		{
+			return false;
+		}
+		bool played = false;
+		for (const auto& layer : layers)
+		{
+			if (!(step ? layer.steps : layer.notes) || !layer.instrument->tryLock())
+			{
+				continue;
+			}
+			if (layer.instrument->instrument())
+			{
+				auto* handle = NotePlayHandleManager::acquire(layer.instrument, _offset, frames, note);
+				handle->setPatternTrack(pattern_track);
+				handle->setSongGlobalParentOffset(songOffset);
+				if (Engine::audioEngine()->addPlayHandle(handle))
+				{
+					layer.instrument->audioBusHandle()->markNodeEvent(2);
+					played = true;
+				}
+			}
+			layer.instrument->unlock();
+		}
+		return played;
+	};
+	const bool monitorTriggers = pattern_track && NodePatternTriggers::watches(this);
+	bool stepTriggered = false;
+	bool atStepBoundary = false;
+	NodePatternTriggers::Notes triggeredNotes;
 
 	for (const auto& clip : clips)
 	{
@@ -742,6 +789,49 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
 		if (c == nullptr || (Engine::getSong()->playMode() != Song::PlayMode::MidiClip && clip->isMuted()))
+		{
+			continue;
+		}
+		const bool stepPattern = pattern_track && c->type() == MidiClip::Type::BeatClip;
+		if (monitorTriggers && stepPattern)
+		{
+			const auto step = NodePatternTriggers::stepIndex(_start.getTicks());
+			atStepBoundary = step < c->steps() && TimePos::stepPosition(step) == _start;
+		}
+		if (stepPattern && Engine::getSong()->nodeStepActiveForTrack(*this, _start))
+		{
+			Note step(TimePos(DefaultTicksPerBar / 16), _start);
+			step.setType(Note::Type::Step);
+			stepTriggered |= playLayers(true, 0, step, TimePos{});
+			played_a_note |= stepTriggered;
+			if (m_instrument)
+			{
+				auto* handle = NotePlayHandleManager::acquire(this, _offset, 0, step);
+				handle->setPatternTrack(pattern_track);
+				if (Engine::audioEngine()->addPlayHandle(handle))
+				{
+					stepTriggered = true;
+					m_audioBusHandle.markNodeEvent(1);
+					m_audioBusHandle.markNodeEvent(2);
+					played_a_note = true;
+				}
+			}
+		}
+		const bool standalone = c->getTrack() != this;
+		auto* sourceTrack = standalone ? c->instrumentTrack() : nullptr;
+		if (sourceTrack && !sourceTrack->tryLock())
+		{
+			continue;
+		}
+		const auto sourceLock = qScopeGuard([sourceTrack] {
+			if (sourceTrack)
+			{
+				sourceTrack->unlock();
+			}
+		});
+		const bool playOwner = m_instrument
+			&& (standalone || (stepPattern ? nodeSourceStepConnected() : nodeSourceEventConnected()));
+		if (!playOwner && layers.isEmpty())
 		{
 			continue;
 		}
@@ -786,6 +876,27 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
 				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
+			const TimePos songOffset = _clip_num < 0
+				? TimePos(c->startPosition() + c->startTimeOffset()) : TimePos{};
+			const bool layerPlayed = !standalone && !layers.isEmpty()
+				&& playLayers(stepPattern, noteFrames, *currentNote, songOffset);
+			played_a_note |= layerPlayed;
+			if (!playOwner)
+			{
+				if (monitorTriggers && layerPlayed)
+				{
+					if (stepPattern)
+					{
+						stepTriggered = true;
+					}
+					else if (const auto key = currentNote->key(); key >= 0 && key < NumKeys)
+					{
+						triggeredNotes.set(key);
+					}
+				}
+				++nit;
+				continue;
+			}
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
@@ -797,10 +908,33 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
 			}
 
-			Engine::audioEngine()->addPlayHandle( notePlayHandle );
+			if (Engine::audioEngine()->addPlayHandle(notePlayHandle))
+			{
+				m_audioBusHandle.markNodeEvent(2);
+				if (monitorTriggers)
+				{
+					if (stepPattern)
+					{
+						stepTriggered = true;
+					}
+					else if (const auto key = currentNote->key(); key >= 0 && key < NumKeys)
+					{
+						triggeredNotes.set(key);
+					}
+				}
+			}
 			played_a_note = true;
 			++nit;
 		}
+	}
+	if (monitorTriggers && (atStepBoundary || stepTriggered))
+	{
+		NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Step, _start,
+			NodePatternTriggers::Notes{stepTriggered ? 1u : 0u});
+	}
+	if (monitorTriggers && triggeredNotes.any())
+	{
+		NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Note, _start, triggeredNotes);
 	}
 	unlock();
 	return played_a_note;

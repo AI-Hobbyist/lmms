@@ -25,6 +25,8 @@
 #ifndef LMMS_GUI_TRACK_CONTENT_WIDGET_H
 #define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
+#include <algorithm>
+
 #include <QWidget>
 
 #include "JournallingObject.h"
@@ -207,6 +209,8 @@ public slots:
 	//!
 	//! @param newPos The MIDI time to move to.
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
+	void setPatternScroll(int offset, int contentWidth);
+	int fixedClipWidth() const { return std::max(width(), m_patternContentWidth); }
 
 	//! @brief Updates the background tile pixmap.
 	void updateBackground();
@@ -269,6 +273,8 @@ private:
 	TimePos getPosition(int mouseX);
 
 	TrackView * m_trackView;
+	int m_patternScrollOffset = 0;
+	int m_patternContentWidth = 0;
 
 	using clipViewVector = QVector<ClipView*>;
 	clipViewVector m_clipViews;

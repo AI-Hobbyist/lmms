@@ -29,6 +29,7 @@
 #include "embed.h"
 #include "PluginFactory.h"
 #include "Engine.h"
+#include "StringPairDrag.h"
 #ifdef LMMS_BUILD_WIN32
 #include "vsthost/CatalogJobs.h"
 #include <QTimer>
@@ -37,12 +38,14 @@
 
 #include <QApplication>
 #include <QDialogButtonBox>
+#include <QDomDocument>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
@@ -256,6 +259,25 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 }
 
 
+void EffectSelectDialog::enableNodeDrag()
+{
+	m_nodeDrag = true;
+	m_pluginList->viewport()->installEventFilter(this);
+}
+
+QString EffectSelectDialog::nodeEffectKey() const
+{
+	if (!m_currentSelection.isValid())
+	{
+		return {};
+	}
+	QDomDocument document;
+	auto key = m_currentSelection.saveXML(document);
+	key.setAttribute("plugin", QString::fromUtf8(m_currentSelection.desc->name));
+	document.appendChild(key);
+	return document.toString(-1);
+}
+
 Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* parent)
 {
 	Effect* result = nullptr;
@@ -379,6 +401,27 @@ void EffectSelectDialog::updateSelection()
 
 bool EffectSelectDialog::eventFilter(QObject *obj, QEvent *event)
 {
+	if (m_nodeDrag && obj == m_pluginList->viewport())
+	{
+		if (event->type() == QEvent::MouseButtonPress)
+		{
+			m_dragStart = static_cast<QMouseEvent*>(event)->pos();
+		}
+		else if (event->type() == QEvent::MouseMove)
+		{
+			const auto* mouse = static_cast<QMouseEvent*>(event);
+			if (mouse->buttons().testFlag(Qt::LeftButton)
+				&& (mouse->pos() - m_dragStart).manhattanLength() >= QApplication::startDragDistance())
+			{
+				const auto key = nodeEffectKey();
+				if (!key.isEmpty())
+				{
+					new StringPairDrag("nodeeffect", key, embed::getIconPixmap("setup_audio"), m_pluginList);
+					return true;
+				}
+			}
+		}
+	}
 	if (obj == this && event->type() == QEvent::KeyPress)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);

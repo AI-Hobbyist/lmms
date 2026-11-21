@@ -54,7 +54,7 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 public:
 	//! @brief Creates a new clip for the given track @p track.
 	//! @param track The track that will contain the new object
-	Clip(Track* track);
+	Clip(Track* track, bool registerWithTrack = true);
 	~Clip() override; //!< Destroys the given clip.
 
 	inline Track * getTrack() const
@@ -169,6 +169,7 @@ protected:
 	//! @brief Creates a duplicate clip of the one provided.
 	//! @param other The clip object which will be copied.
 	Clip(const Clip& other);
+	bool m_registeredWithTrack = true;
 
 private:
 	Track * m_track;

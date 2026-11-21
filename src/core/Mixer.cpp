@@ -29,12 +29,16 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
+#include "DataFile.h"
 #include "Mixer.h"
 #include "Song.h"
+
+#include <cmath>
 #include "agent/IncrementalUndo.h"
 
 #include "InstrumentTrack.h"
 #include "MixHelpers.h"
+#include "NodeAudioSilenceThreshold.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "SVSTrack.h"
@@ -168,6 +172,7 @@ void MixerChannel::unmuteReceiverForSolo()
 void MixerChannel::doProcessing()
 {
 	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
+	const bool monitorSignal = NodeSignalActivity::monitoring();
 
 	if( m_muted == false )
 	{
@@ -177,6 +182,7 @@ void MixerChannel::doProcessing()
 			FloatModel * sendModel = senderRoute->amount();
 			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
 
+			const bool monitorRoute = monitorSignal && sender->m_nodeEffect;
 			if (sender->m_buffer.hasAnySignal() || sender->m_stillRunning)
 			{
 				auto buffer = m_buffer.interleavedBuffer().asSampleFrames();
@@ -187,6 +193,62 @@ void MixerChannel::doProcessing()
 
 				// mix it's output with this one's output
 				auto ch_buf = sender->m_buffer.interleavedBuffer().asSampleFrames();
+
+				auto pairs = senderRoute->channelPairs();
+				if (sender->m_nodeEffect && (!m_nodeEffect || sender->m_nodePatternEffect != m_nodePatternEffect))
+				{
+					if (!sender->nodeBoundaryOutputConnected(0)) { pairs &= ~0b0011u; }
+					if (!sender->nodeBoundaryOutputConnected(1)) { pairs &= ~0b1100u; }
+				}
+				if (monitorRoute)
+				{
+					const float volume = sender->m_volumeModel.value();
+					const float send = sendModel->value();
+					const auto threshold = nodeAudioSilenceAmplitude.load(std::memory_order_relaxed);
+					for (unsigned source = 0; source < 2; ++source)
+					{
+						const unsigned targets = (pairs >> (source * 2)) & 0b11;
+						unsigned activeTargets = 0;
+						for (f_cnt_t frame = 0; targets != 0 && frame < fpp; ++frame)
+						{
+							const float gain = (volBuf ? volBuf->values()[frame] : volume)
+								* (sendBuf ? sendBuf->values()[frame] : send);
+							if (std::abs(ch_buf[frame][source] * gain) >= threshold)
+							{
+								activeTargets = targets;
+								break;
+							}
+						}
+						senderRoute->updateNodeAudioSignal(source, activeTargets);
+					}
+				}
+				if (pairs == 0)
+				{
+					continue;
+				}
+				if (pairs != MixerRoute::StereoChannels)
+				{
+					const float volume = sender->m_volumeModel.value();
+					const float send = sendModel->value();
+					for (f_cnt_t frame = 0; frame < fpp; ++frame)
+					{
+						const float gain = (volBuf ? volBuf->values()[frame] : volume)
+							* (sendBuf ? sendBuf->values()[frame] : send);
+						for (unsigned source = 0; source < 2; ++source)
+						{
+							for (unsigned target = 0; target < 2; ++target)
+							{
+								if ((pairs & (1u << (source * 2 + target))) != 0)
+								{
+									buffer[frame][target] += ch_buf[frame][source] * gain;
+								}
+							}
+						}
+					}
+					toPlanar(m_buffer.interleavedBuffer(), m_buffer.groupBuffers(0));
+					m_buffer.updateAllSilenceFlags();
+					continue;
+				}
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -210,6 +272,11 @@ void MixerChannel::doProcessing()
 				}
 				toPlanar(m_buffer.interleavedBuffer(), m_buffer.groupBuffers(0));
 				m_buffer.mixSilenceFlags(sender->m_buffer);
+			}
+			else if (monitorRoute)
+			{
+				senderRoute->updateNodeAudioSignal(0, 0);
+				senderRoute->updateNodeAudioSignal(1, 0);
 			}
 		}
 
@@ -318,6 +385,7 @@ int Mixer::createChannel()
 		m_mixerChannels[index]->m_muteModel.setValue(true);
 	}
 
+	emit channelTopologyChanged();
 	return index;
 }
 
@@ -488,6 +556,7 @@ void Mixer::deleteChannel( int index )
 			{
 				route->updateName();
 			}
+			emit owner->channelTopologyChanged();
 		};
 		const auto attach = [owner, parked, names, index, soloBefore, parented, refreshIndices] {
 			auto* restored = parked->release();
@@ -561,13 +630,14 @@ void Mixer::deleteChannel( int index )
 			r->updateName();
 		}
 	}
-
+	emit channelTopologyChanged();
 }
 
 
 
 void Mixer::moveChannelLeft( int index )
 {
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	// can't move master or first channel
 	if (index <= 1 || static_cast<std::size_t>(index) >= m_mixerChannels.size())
 	{
@@ -637,6 +707,7 @@ void Mixer::moveChannelLeft( int index )
 		left->setIndex(a);
 		right->setIndex(b);
 		mixer->m_lastSoloed = solo;
+		emit mixer->channelTopologyChanged();
 	};
 	const QPointer<FloatModel> firstIdentity(&first->m_volumeModel);
 	const QPointer<FloatModel> secondIdentity(&second->m_volumeModel);
@@ -817,6 +888,76 @@ void Mixer::deleteChannelSend( MixerRoute * route )
 }
 
 
+bool Mixer::setNodeEffectBoundaryOutput(mix_ch_t channel, ch_cnt_t side, bool connected)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	if (!Engine::getSong()->isNodeProject() || channel >= numChannels() || side >= 2
+		|| !m_mixerChannels[channel]->m_nodeEffect)
+	{
+		return false;
+	}
+	auto& outputs = m_mixerChannels[channel]->m_nodeBoundaryOutputs;
+	const unsigned bit = 1u << side;
+	const unsigned updated = connected ? outputs | bit : outputs & ~bit;
+	if (outputs != updated)
+	{
+		outputs = updated;
+		Engine::getSong()->setModified();
+		emit channelTopologyChanged();
+	}
+	return true;
+}
+
+bool Mixer::setNodeChannelSend(mix_ch_t from, ch_cnt_t source, mix_ch_t to, ch_cnt_t destination, bool connected)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	if (!Engine::getSong()->isNodeProject() || from == 0 || from >= numChannels() || to >= numChannels()
+		|| source >= 2 || destination >= 2)
+	{
+		return false;
+	}
+
+	MixerRoute* route = nullptr;
+	for (auto* candidate : m_mixerChannels[from]->m_sends)
+	{
+		if (candidate->receiverIndex() == to)
+		{
+			route = candidate;
+			break;
+		}
+	}
+	const unsigned bit = 1u << (source * 2 + destination);
+	const unsigned current = route ? route->channelPairs() : 0;
+	const unsigned updated = connected ? current | bit : current & ~bit;
+	if (current == updated)
+	{
+		return true;
+	}
+	if (!route)
+	{
+		if (isInfiniteLoop(from, to))
+		{
+			return false;
+		}
+		route = createChannelSend(from, to, 1);
+	}
+	if (!route)
+	{
+		return false;
+	}
+	if (updated == 0)
+	{
+		deleteChannelSend(route);
+	}
+	else
+	{
+		route->setChannelPairs(updated);
+	}
+	Engine::getSong()->setModified();
+	emit channelTopologyChanged();
+	return true;
+}
+
 bool Mixer::isInfiniteLoop( mix_ch_t sendFrom, mix_ch_t sendTo )
 {
 	if( sendFrom == sendTo ) return true;
@@ -894,6 +1035,34 @@ void Mixer::mixToChannel(const AudioBuffer& buffer, mix_ch_t dest)
 	}
 }
 
+void Mixer::mixMonoToChannel(const AudioBuffer& buffer, ch_cnt_t sourceSide, mix_ch_t dest, ch_cnt_t destSide)
+{
+	const auto source = buffer.groupBuffers(0);
+	if (dest >= m_mixerChannels.size() || sourceSide >= source.channels() || destSide >= 2
+		|| buffer.silenceFlags()[sourceSide])
+	{
+		return;
+	}
+
+	auto* channel = m_mixerChannels[dest];
+	if (channel->m_muteModel.value())
+	{
+		return;
+	}
+
+	QMutexLocker lock(&channel->m_lock);
+	auto target = channel->m_buffer.groupBuffers(0);
+	auto interleaved = channel->m_buffer.interleavedBuffer();
+	const auto frames = std::min(source.frames(), target.frames());
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		auto& sample = target.sample(destSide, frame);
+		sample += source.sample(sourceSide, frame);
+		interleaved[frame][destSide] = sample;
+	}
+	channel->m_buffer.assumeNonSilent(destSide);
+}
+
 
 
 
@@ -907,6 +1076,7 @@ void Mixer::prepareMasterMix()
 void Mixer::masterMix( SampleFrame* _buf )
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
+	const bool monitorSignal = NodeSignalActivity::monitoring();
 
 	// add the channels that have no dependencies (no incoming senders, ie.
 	// no receives) to the jobqueue. The channels that have receives get
@@ -921,6 +1091,17 @@ void Mixer::masterMix( SampleFrame* _buf )
 		ch->m_muted = ch->m_muteModel.value();
 		if( ch->m_muted ) // instantly "process" muted channels
 		{
+			if (monitorSignal)
+			{
+				for (auto* route : ch->m_receives)
+				{
+					if (route->sender()->m_nodeEffect)
+					{
+						route->updateNodeAudioSignal(0, 0);
+						route->updateNodeAudioSignal(1, 0);
+					}
+				}
+			}
 			ch->processed();
 			ch->done();
 		}
@@ -967,7 +1148,36 @@ void Mixer::masterMix( SampleFrame* _buf )
 	const float v = volBuf
 		? 1.0f
 		: m_mixerChannels[0]->m_volumeModel.value();
+	const auto outputMask = nodeMasterOutputMask();
+	if (outputMask != 3)
+	{
+		for (int frame = 0; frame < fpp; ++frame)
+		{
+			if ((outputMask & 1) == 0)
+			{
+				buffer[frame][0] = 0;
+			}
+			if ((outputMask & 2) == 0)
+			{
+				buffer[frame][1] = 0;
+			}
+		}
+	}
 	MixHelpers::addMultiplied(_buf, buffer.data(), v, fpp);
+	if (monitorSignal)
+	{
+		unsigned mask = 0;
+		if (v != 0 && !m_mixerChannels[0]->m_muted)
+		{
+			const auto threshold = nodeAudioSilenceAmplitude.load(std::memory_order_relaxed);
+			for (int frame = 0; frame < fpp && mask != 3; ++frame)
+			{
+				mask |= std::abs(buffer[frame][0] * v) >= threshold ? 1 : 0;
+				mask |= std::abs(buffer[frame][1] * v) >= threshold ? 2 : 0;
+			}
+		}
+		m_nodeMasterSignalActivity.updateAudio(mask);
+	}
 
 	// clear all channel buffers and
 	// reset channel process state
@@ -1054,8 +1264,19 @@ void Mixer::clearChannel(mix_ch_t index)
 	}
 }
 
+QUuid MixerChannel::nodeWorkflowId()
+{
+	if (m_nodeWorkflowId.isNull())
+	{
+		m_nodeWorkflowId = QUuid::createUuid();
+	}
+	return m_nodeWorkflowId;
+}
+
+
 void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	const bool nodeWorkflow = DataFile::isNodeWorkflow(_doc);
 	// save channels
 	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
@@ -1063,6 +1284,23 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 		QDomElement mixch = _doc.createElement( QString( "mixerchannel" ) );
 		_this.appendChild( mixch );
+		if (nodeWorkflow)
+		{
+			mixch.setAttribute("nodeid", ch->nodeWorkflowId().toString(QUuid::WithoutBraces));
+			if (ch->m_nodeEffect)
+			{
+				mixch.setAttribute("nodeEffect", 1);
+				if (ch->m_nodeBoundaryOutputs != 3)
+				{
+					mixch.setAttribute("nodeEffectOutputs", ch->m_nodeBoundaryOutputs);
+				}
+				if (const auto position = ch->m_nodeEffectPosition)
+				{
+					mixch.setAttribute("nodeEffectX", position->x());
+					mixch.setAttribute("nodeEffectY", position->y());
+				}
+			}
+		}
 
 		ch->m_fxChain.saveState( _doc, mixch );
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
@@ -1079,6 +1317,10 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			mixch.appendChild( sendsDom );
 
 			sendsDom.setAttribute("channel", send->receiverIndex());
+			if (nodeWorkflow && send->channelPairs() != MixerRoute::StereoChannels)
+			{
+				sendsDom.setAttribute("nodeChannelPairs", send->channelPairs());
+			}
 			send->amount()->saveSettings(_doc, sendsDom, "amount");
 		}
 	}
@@ -1100,6 +1342,7 @@ void Mixer::allocateChannelsTo(int num)
 
 void Mixer::loadSettings( const QDomElement & _this )
 {
+	const bool nodeWorkflow = DataFile::isNodeWorkflow(_this.ownerDocument());
 	clear();
 	QDomNode node = _this.firstChild();
 
@@ -1112,6 +1355,20 @@ void Mixer::loadSettings( const QDomElement & _this )
 
 		// allocate enough channels
 		allocateChannelsTo( num );
+		if (nodeWorkflow)
+		{
+			m_mixerChannels[num]->m_nodeWorkflowId = QUuid(mixch.attribute("nodeid"));
+		}
+		m_mixerChannels[num]->m_nodeEffect = nodeWorkflow && num > 0 && mixch.attribute("nodeEffect") == "1";
+		m_mixerChannels[num]->m_nodeBoundaryOutputs = m_mixerChannels[num]->m_nodeEffect
+			? mixch.attribute("nodeEffectOutputs", "3").toUInt() & 3u : 3u;
+		bool validX = false;
+		bool validY = false;
+		const auto x = mixch.attribute("nodeEffectX").toDouble(&validX);
+		const auto y = mixch.attribute("nodeEffectY").toDouble(&validY);
+		m_mixerChannels[num]->m_nodeEffectPosition =
+			m_mixerChannels[num]->m_nodeEffect && validX && validY && std::isfinite(x) && std::isfinite(y)
+			? std::optional<QPointF>(QPointF(x, y)) : std::nullopt;
 
 		m_mixerChannels[num]->m_volumeModel.loadSettings( mixch, "volume" );
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
@@ -1135,7 +1392,13 @@ void Mixer::loadSettings( const QDomElement & _this )
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
 				allocateChannelsTo( sendTo ) ;
 				MixerRoute * mxr = createChannelSend( num, sendTo, 1.0f );
-				if( mxr ) mxr->amount()->loadSettings( chDataItem, "amount" );
+				if (mxr)
+				{
+					mxr->amount()->loadSettings(chDataItem, "amount");
+					const auto pairs = chDataItem.attribute("nodeChannelPairs").toUInt();
+					mxr->setChannelPairs(nodeWorkflow && pairs > 0 && pairs < 16
+						? pairs : MixerRoute::StereoChannels);
+				}
 			}
 		}
 

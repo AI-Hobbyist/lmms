@@ -36,8 +36,10 @@
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "NodeWorkflowSourceGraph.h"
 #include "SVSTrack.h"
 #include "SVCTrack.h"
 #include "PatternStore.h"
@@ -169,11 +171,32 @@ Track* Track::clone()
 }
 
 
+QUuid Track::nodeWorkflowId()
+{
+	if (m_nodeWorkflowId.isNull())
+	{
+		m_nodeWorkflowId = QUuid::createUuid();
+	}
+	return m_nodeWorkflowId;
+}
+
+
 void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 {
 	if (!presetMode)
 	{
 		element.setTagName( "track" );
+		if (DataFile::isNodeWorkflow(doc))
+		{
+			const auto nodeId = nodeWorkflowId().toString(QUuid::WithoutBraces);
+			element.setAttribute("nodeid", nodeId);
+			auto workflow = doc.documentElement().firstChildElement("head").firstChildElement("nodeworkflow");
+			if (!workflow.isNull() && (type() == Type::Instrument || type() == Type::SVS))
+			{
+				saveDefaultSourceSubgraph(workflow, nodeId, type() == Type::SVS
+					? NodeWorkflowSourceKind::SingingVoice : NodeWorkflowSourceKind::Instrument);
+			}
+		}
 	}
 	element.setAttribute( "type", static_cast<int>(type()) );
 	element.setAttribute( "name", name() );
@@ -212,6 +235,11 @@ void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 
 void Track::loadTrack(const QDomElement& element, bool presetMode)
 {
+	if (!presetMode && DataFile::isNodeWorkflow(element.ownerDocument()))
+	{
+		m_nodeWorkflowId = QUuid(element.attribute("nodeid"));
+	}
+
 	if( static_cast<Type>(element.attribute( "type" ).toInt()) != type() )
 	{
 		qWarning( "Current track-type does not match track-type of "
@@ -344,6 +372,7 @@ void Track::removeClip( Clip * clip )
 		}
 	}
 }
+
 
 
 void Track::deleteClips()

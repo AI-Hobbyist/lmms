@@ -39,7 +39,15 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song, uint32_t rat
 		if (base->type() == Track::Type::SVS && !base->isMuted())
 		{
 			auto* track = static_cast<SVSTrack*>(base);
-			for (auto* item : track->getClips())
+			auto clips = song.nodePianoRollSources(*track);
+			if (base->nodeSourceEventConnected())
+			{
+				for (auto* clip : track->getClips())
+				{
+					clips.append(clip);
+				}
+			}
+			for (auto* item : clips)
 			{
 				auto* clip = static_cast<SVSClip*>(item);
 				if (clip->isMuted())
@@ -51,13 +59,14 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song, uint32_t rat
 				region.position = int(clip->startPosition());
 				region.length = int(clip->length());
 				region.contentOffset = -int(clip->startTimeOffset());
-				region.input = clip->captureInput(rate);
+				const bool nativeClip = clip->getTrack() == track;
+				region.input = clip->captureInput(rate, *track);
 				region.volume = clip->volumeAutomation();
 				region.plugin = Registry::instance().plugin(track->pluginId());
 				region.mixContext = mixContext(*track);
 				region.catalogPending
 					= region.plugin && track->voice().id.isEmpty() && Registry::instance().scanning(track->pluginId());
-				if (region.catalogPending)
+				if (region.catalogPending && nativeClip)
 					clip->captureCachedInput(region.input);
 				if (track->voice().id.isEmpty() && !region.catalogPending)
 					region.plugin.reset();
@@ -66,7 +75,7 @@ QVector<ExportSnapshot::Region> ExportSnapshot::capture(Song& song, uint32_t rat
 				}
 				else if (clip->readOnly())
 					region.diagnostic = clip->migrationDiagnostic();
-				else if (!region.plugin && !clip->captureCachedInput(region.input))
+				else if (!region.plugin && (!nativeClip || !clip->captureCachedInput(region.input)))
 					region.diagnostic = QCoreApplication::translate("NativeSVS", "Missing voice/plugin");
 				else if (region.plugin && !track->capabilitiesReady())
 				{

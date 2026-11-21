@@ -1,8 +1,10 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDomDocument>
+#include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFile>
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QHelpEvent>
 #include <QJsonArray>
@@ -10,9 +12,13 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLibraryInfo>
+#include <QMap>
 #include <QMdiArea>
+#include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QAbstractButton>
 #include <QProcess>
 #include <QPlainTextEdit>
 #include <QProcessEnvironment>
@@ -49,6 +55,7 @@
 #include "ConfigManager.h"
 #include "Controller.h"
 #include "ControllerRackView.h"
+#include "DataFile.h"
 #include "DummyEffect.h"
 #include "Effect.h"
 #include "EffectControlDialog.h"
@@ -63,13 +70,22 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
+#include "MidiDummy.h"
+#include "NotePlayHandle.h"
+
+#include <QAction>
 #include "MidiClip.h"
+#include "MidiClipView.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "NativePluginTranslation.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
+#include <QContextMenuEvent>
+
+#include "FileBrowser.h"
 #include "PatternTrack.h"
+#include "NodeWorkflowCanvas.h"
 #include "PianoRoll.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
@@ -356,8 +372,9 @@ private slots:
 			QCoreApplication::installTranslator(&m_startupTranslator);
 			if (startupLanguage != "en")
 			{
-				QVERIFY(m_qtStartupTranslator.load(
-					QString("%1/locale/qt_%2.qm").arg(qEnvironmentVariable("LMMS_DATA_DIR"), startupLanguage)));
+				const auto catalog = QStringLiteral("qt_%1.qm").arg(startupLanguage);
+				QVERIFY(m_qtStartupTranslator.load(QDir(qEnvironmentVariable("LMMS_DATA_DIR") + "/locale").filePath(catalog))
+					|| m_qtStartupTranslator.load(QDir(QLibraryInfo::path(QLibraryInfo::TranslationsPath)).filePath(catalog)));
 				QCoreApplication::installTranslator(&m_qtStartupTranslator);
 			}
 		}
@@ -385,6 +402,23 @@ private slots:
 		config->setValue("app", "configured", "1");
 		if (!startupLanguage.isEmpty()) { config->setValue("app", "language", startupLanguage); }
 		config->setValue("audioengine", "audiodev", AudioDummy::name());
+		const auto arguments = QCoreApplication::arguments();
+		if (arguments.contains(QStringLiteral("nodeWorkflowRoot"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowRootRouteEditing"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowImportedPatternAndAutomation"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowTriggerLcd"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowDnBTriggerLcd"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowInstrumentLayers"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowAudioSignalThreshold"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowSongClipPreviews"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowLocalizedMenus"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowStandaloneStep"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowStandalonePianoRolls"))
+			|| arguments.contains(QStringLiteral("nodeWorkflowTrackRename")))
+		{
+			config->setValue("audioengine", "mididev", MidiDummy::name());
+			NotePlayHandleManager::init();
+		}
 		m_gui = std::make_unique<GuiApplication>();
 		auto* window = m_gui->mainWindow();
 		const auto available = window->screen()->availableGeometry();
@@ -400,6 +434,1962 @@ private slots:
 		QVERIFY(metadata.open(QIODevice::WriteOnly));
 		metadata.write(QJsonDocument(environment).toJson());
 	}
+	void nodeWorkflowLocalizedMenus()
+	{
+		const auto language = qEnvironmentVariable("LMMS_UI_TRANSLATION");
+		const QHash<QString, QStringList> expected{
+			{"en", {"New Node Workflow Project", "Root Graph", "Search Sessions", "Copy Node"}},
+			{"zh_CN", {"新建节点工程", "根图", "搜索会话", "复制节点"}},
+			{"ja", {"新規ノードプロジェクト", "ルートグラフ", "セッションを検索", "ノードをコピー"}},
+			{"ko", {"새 노드 프로젝트", "루트 그래프", "세션 검색", "노드 복사"}},
+		};
+		QVERIFY(expected.contains(language));
+		const auto strings = expected.value(language);
+		auto* window = m_gui->mainWindow();
+		const auto actions = window->findChildren<QAction*>();
+		const auto create = std::find_if(actions.cbegin(), actions.cend(), [&strings](const auto* action) {
+			return action->text() == strings.at(0);
+		});
+		QVERIFY(create != actions.cend());
+		Engine::getSong()->setModified(false);
+		(*create)->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible());
+		const auto tools = canvas->window()->findChild<QWidget*>("nodeWorkflowContent")->findChildren<QToolButton*>();
+		QVERIFY(std::any_of(tools.cbegin(), tools.cend(), [&strings](const auto* button) {
+			return button->accessibleName() == strings.at(1);
+		}));
+		QCOMPARE(QCoreApplication::translate("lmms::gui::NodeWorkflowCanvas", "Copy Node"), strings.at(3));
+		capture(window, "node-workflow-localized-" + language);
+
+		auto* inspector = window->findChild<QWidget*>("nodeWorkflowInspector");
+		QVERIFY(inspector && inspector->isVisible());
+		auto* inspectorTitle = inspector->findChild<QLabel*>("nodeWorkflowInspectorTitle");
+		QVERIFY(inspectorTitle);
+		QCOMPARE(inspectorTitle->text(), QCoreApplication::translate("lmms::gui::MainWindow", "Default Project Layout"));
+		const auto inspectorActions = inspector->findChildren<QPushButton*>("nodeWorkflowInspectorAction");
+		QCOMPARE(inspectorActions.size(), 2);
+		QTest::mouseClick(inspectorActions.front(), Qt::LeftButton);
+		QCOMPARE(inspectorTitle->text(), QCoreApplication::translate("lmms::gui::MainWindow", "Multitrack"));
+		capture(window, "node-workflow-inspector-multitrack-" + language);
+		const auto multitrackActions = inspector->findChildren<QPushButton*>("nodeWorkflowInspectorAction");
+		const auto backToRoot = QCoreApplication::translate("lmms::gui::MainWindow", "Back to Root Graph");
+		const auto back = std::find_if(multitrackActions.cbegin(), multitrackActions.cend(),
+			[&backToRoot](const auto* button) { return button->isVisible() && button->text() == backToRoot; });
+		QVERIFY(back != multitrackActions.cend());
+		QTest::mouseClick(*back, Qt::LeftButton);
+		QCOMPARE(inspectorTitle->text(), QCoreApplication::translate("lmms::gui::MainWindow", "Default Project Layout"));
+
+		auto* dock = window->findChild<QWidget*>("agentChatDock");
+		QVERIFY(dock);
+		auto* showAgent = dock->findChild<QAction*>("showAgentChat");
+		QVERIFY(showAgent);
+		showAgent->trigger();
+		auto* search = dock->findChild<QLineEdit*>("agentSessionSearch");
+		QVERIFY(search);
+		QCOMPARE(search->placeholderText(), strings.at(2));
+		QTRY_VERIFY(dock->width() > 300);
+		capture(window, "node-workflow-agent-localized-" + language);
+	}
+
+	void nodeWorkspaceConversion()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		const QString source = QDir::fromNativeSeparators(qEnvironmentVariable("LMMS_NODE_CONVERSION_SOURCE"));
+		if (source.isEmpty())
+		{
+			QSKIP("Set LMMS_NODE_CONVERSION_SOURCE to the classic conversion fixture.");
+		}
+		QFile sourceFile(source);
+		QVERIFY(sourceFile.open(QIODevice::ReadOnly));
+		const auto originalBytes = sourceFile.readAll();
+		sourceFile.close();
+
+		QMenu* workspaceMode = nullptr;
+		for (auto* menu : window->findChildren<QMenu*>())
+		{
+			if (menu->title() == QStringLiteral("Workspace Mode"))
+			{
+				workspaceMode = menu;
+				break;
+			}
+		}
+		QVERIFY(workspaceMode);
+		QCOMPARE(workspaceMode->actions().size(), 2);
+		auto* classicMode = workspaceMode->actions().at(0);
+		auto* nodeMode = workspaceMode->actions().at(1);
+		QVERIFY(classicMode->isChecked());
+
+		FileBrowserTreeWidget browser(nullptr);
+		browser.resize(420, 220);
+		const QFileInfo sourceInfo(source);
+		auto* sourceItem = new FileItem(&browser, sourceInfo.fileName(), sourceInfo.absolutePath());
+		auto* compressedItem = new FileItem(&browser, "other.MMPZ", sourceInfo.absolutePath());
+		auto* nodeItem = new FileItem(&browser, "other.mmpn", sourceInfo.absolutePath());
+		browser.show();
+		auto sidebarHasImport = [&browser](FileItem* item, bool activate = false) {
+			bool found = false;
+			QTimer popupTimer;
+			popupTimer.setSingleShot(true);
+			connect(&popupTimer, &QTimer::timeout, &browser, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu)
+				{
+					return;
+				}
+				for (auto* action : menu->actions())
+				{
+					if (action->text() == QStringLiteral("Import as Node Project"))
+					{
+						found = true;
+						if (activate)
+						{
+							menu->close();
+							action->trigger();
+						}
+						break;
+					}
+				}
+				menu->close();
+			});
+			const auto point = browser.visualItemRect(item).center();
+			QContextMenuEvent event(QContextMenuEvent::Mouse, point, browser.viewport()->mapToGlobal(point));
+			popupTimer.start(0);
+			QApplication::sendEvent(browser.viewport(), &event);
+			return found;
+		};
+		QVERIFY(!sidebarHasImport(sourceItem));
+
+		song->loadProject(source);
+		QCOMPARE(song->projectFileName(), source);
+		QVERIFY(!song->isNodeProject());
+		const bool wasModified = song->isModified();
+		auto changeMode = [](QAction* action, const QString& destination) {
+			bool foundDialog = false;
+			QTimer timer;
+			timer.setSingleShot(true);
+			connect(&timer, &QTimer::timeout, [&] {
+				auto* dialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget());
+				if (!dialog)
+				{
+					if (auto* unexpected = qobject_cast<QDialog*>(QApplication::activeModalWidget()))
+					{
+						unexpected->reject();
+					}
+					return;
+				}
+				foundDialog = true;
+				if (destination.isEmpty())
+				{
+					dialog->reject();
+				}
+				else
+				{
+					dialog->selectFile(destination);
+					static_cast<QDialog*>(dialog)->accept();
+				}
+			});
+			timer.start(0);
+			action->trigger();
+			return foundDialog;
+		};
+		QVERIFY(changeMode(nodeMode, {}));
+		QCOMPARE(song->projectFileName(), source);
+		QCOMPARE(song->isModified(), wasModified);
+		QVERIFY(!song->isNodeProject());
+
+		QTemporaryDir copies(m_output + "/node-workspace-conversion-XXXXXX");
+		QVERIFY(copies.isValid());
+		const auto nodePath = copies.filePath("converted.mmpnz");
+		const auto classicPath = copies.filePath("converted.mmp");
+		QVERIFY(changeMode(nodeMode, nodePath));
+		QCOMPARE(song->projectFileName(), nodePath);
+		QVERIFY(song->isNodeProject());
+		QVERIFY(QFile::exists(nodePath));
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible());
+		capture(window, "node-workspace-converted-node");
+
+		song->setNodeMasterOutputConnected(0, false);
+		bool warnedAboutMaster = false;
+		QTimer::singleShot(0, window, [&] {
+			if (auto* warning = qobject_cast<QMessageBox*>(QApplication::activeModalWidget()))
+			{
+				warnedAboutMaster = warning->text().contains(QStringLiteral("Both Master output channels"));
+				warning->done(QMessageBox::Cancel);
+			}
+		});
+		classicMode->trigger();
+		QVERIFY(warnedAboutMaster);
+		QVERIFY(song->isNodeProject() && canvas->isVisible());
+		QCOMPARE(song->projectFileName(), nodePath);
+		QCOMPARE(Engine::mixer()->nodeMasterOutputMask(), 2u);
+		song->setNodeMasterOutputConnected(0, true);
+
+		const auto blockedPath = copies.filePath("blocked.mmp");
+		QVERIFY(QDir().mkdir(blockedPath));
+		bool reportedWriteFailure = false;
+		QTimer::singleShot(0, window, [&] {
+			if (auto* error = qobject_cast<QMessageBox*>(QApplication::activeModalWidget()))
+			{
+				reportedWriteFailure = error->windowTitle() == QStringLiteral("Could not write file");
+				error->done(QMessageBox::Ok);
+			}
+		});
+		QVERIFY(!song->convertToClassicProject(blockedPath));
+		QVERIFY(reportedWriteFailure);
+		QVERIFY(QFileInfo(blockedPath).isDir());
+		QVERIFY(song->isNodeProject() && canvas->isVisible());
+		QCOMPARE(song->projectFileName(), nodePath);
+
+		QVERIFY(changeMode(classicMode, classicPath));
+		QCOMPARE(song->projectFileName(), classicPath);
+		QVERIFY(!song->isNodeProject());
+		QVERIFY(QFile::exists(classicPath));
+		QVERIFY(!canvas->isVisible());
+		QVERIFY(sourceFile.open(QIODevice::ReadOnly));
+		QCOMPARE(sourceFile.readAll(), originalBytes);
+		sourceFile.close();
+		capture(window, "node-workspace-converted-classic");
+
+		QAction* importAction = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == QStringLiteral("Import Classic Project as Node Project…"))
+			{
+				importAction = action;
+				break;
+			}
+		}
+		QVERIFY(importAction);
+		const auto importedPath = copies.filePath("imported.mmpn");
+		int acceptedDialogs = 0;
+		QPointer<QFileDialog> lastDialog;
+		QTimer importTimer;
+		connect(&importTimer, &QTimer::timeout, [&] {
+			auto* dialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget());
+			if (!dialog)
+			{
+				if (auto* unexpected = qobject_cast<QDialog*>(QApplication::activeModalWidget()))
+				{
+					unexpected->reject();
+				}
+				return;
+			}
+			if (lastDialog == dialog)
+			{
+				dialog->reject();
+				return;
+			}
+			lastDialog = dialog;
+			const bool selectingSource = dialog->acceptMode() == QFileDialog::AcceptOpen;
+			const QFileInfo path(selectingSource ? source : importedPath);
+			dialog->setDirectory(path.absolutePath());
+			if (auto* fileName = dialog->findChild<QLineEdit*>("fileNameEdit"))
+			{
+				fileName->setText(path.fileName());
+			}
+			connect(dialog, &QDialog::accepted, &importTimer, [&] { ++acceptedDialogs; });
+			static_cast<QDialog*>(dialog)->accept();
+		});
+		importTimer.start(25);
+		importAction->trigger();
+		importTimer.stop();
+		QCOMPARE(acceptedDialogs, 2);
+		QVERIFY(song->isNodeProject());
+		QCOMPARE(song->projectFileName(), importedPath);
+		QVERIFY(QFile::exists(importedPath));
+		QVERIFY(sourceFile.open(QIODevice::ReadOnly));
+		QCOMPARE(sourceFile.readAll(), originalBytes);
+		sourceFile.close();
+
+		QVERIFY(sidebarHasImport(compressedItem));
+		QVERIFY(!sidebarHasImport(nodeItem));
+		acceptedDialogs = 0;
+		lastDialog.clear();
+		const auto sidebarPath = copies.filePath("sidebar-imported.mmpn");
+		QTimer sidebarTimer;
+		connect(&sidebarTimer, &QTimer::timeout, [&] {
+			if (auto* dialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget()))
+			{
+				if (dialog->acceptMode() != QFileDialog::AcceptSave)
+				{
+					dialog->reject();
+					return;
+				}
+				const QFileInfo path(sidebarPath);
+				dialog->setDirectory(path.absolutePath());
+				if (auto* fileName = dialog->findChild<QLineEdit*>("fileNameEdit"))
+				{
+					fileName->setText(path.fileName());
+				}
+				++acceptedDialogs;
+				static_cast<QDialog*>(dialog)->accept();
+			}
+			else if (auto* unexpected = qobject_cast<QDialog*>(QApplication::activeModalWidget()))
+			{
+				unexpected->reject();
+			}
+		});
+		sidebarTimer.start(25);
+		const bool sidebarActionFound = sidebarHasImport(sourceItem, true);
+		sidebarTimer.stop();
+		QVERIFY(sidebarActionFound);
+		QCOMPARE(acceptedDialogs, 1);
+		QVERIFY(song->isNodeProject());
+		QCOMPARE(song->projectFileName(), sidebarPath);
+		QVERIFY(QFile::exists(sidebarPath));
+		QVERIFY(sourceFile.open(QIODevice::ReadOnly));
+		QCOMPARE(sourceFile.readAll(), originalBytes);
+		sourceFile.close();
+		const auto extendedScope = QStringLiteral("source/")
+			+ song->tracks().front()->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
+		song->addNodeBoundaryPort(extendedScope, QStringLiteral("audio"), false);
+		const auto extendedPath = copies.filePath("extended.mmpn");
+		QVERIFY(song->saveProjectFile(extendedPath));
+		const auto rejectedPath = copies.filePath("extended-classic.mmp");
+		QVERIFY(!song->convertToClassicProject(rejectedPath));
+		QVERIFY(!QFile::exists(rejectedPath));
+		bool explainedImport = false;
+		QTimer::singleShot(0, window, [&] {
+			if (auto* warning = qobject_cast<QMessageBox*>(QApplication::activeModalWidget()))
+			{
+				explainedImport = warning->text().contains(QStringLiteral("cannot store nodes and routing"));
+				warning->accept();
+			}
+		});
+		QVERIFY(!window->canImportAsClassicProject(extendedPath));
+		QVERIFY(explainedImport);
+		QCOMPARE(song->projectFileName(), sidebarPath);
+		copies.setAutoRemove(false);
+		qInfo().noquote() << "Workspace conversion copies:" << nodePath << classicPath;
+		qInfo().noquote() << "Imported classic project copy:" << importedPath;
+	}
+
+	void nodeWorkflowImportedPatternAndAutomation()
+	{
+		const auto fixture = qEnvironmentVariable("LMMS_NODE_PATTERN_AUTOMATION_SOURCE");
+		if (fixture.isEmpty())
+		{
+			QSKIP("Set LMMS_NODE_PATTERN_AUTOMATION_SOURCE to the classic project.");
+		}
+		auto* song = Engine::getSong();
+		song->loadProject(fixture);
+		QCOMPARE(song->projectFileName(), fixture);
+		QTemporaryDir copies(m_output + "/node-pattern-automation-XXXXXX");
+		QVERIFY(copies.isValid());
+		QVERIFY(song->convertToNodeProject(copies.filePath("converted.mmpn")));
+
+		bool foundPattern = false;
+		int automationCount = 0;
+		for (auto* track : song->tracks())
+		{
+			if (track->name() != QStringLiteral("LB 302"))
+			{
+				continue;
+			}
+			if (track->type() == Track::Type::Automation)
+			{
+				++automationCount;
+				QVERIFY(!track->getClips().empty());
+			}
+			else if (track->type() == Track::Type::Pattern)
+			{
+				foundPattern = true;
+				QVERIFY(!song->nodeTrackMixerEndpoint(*track, 0));
+				QVERIFY(!song->nodeTrackMixerEndpoint(*track, 1));
+			}
+		}
+		QVERIFY(foundPattern);
+		QCOMPARE(automationCount, 2);
+
+		auto* window = m_gui->mainWindow();
+		window->showNodeWorkflow();
+		auto* play = window->findChild<QToolButton*>("nodeWorkflowPlay");
+		auto* stop = window->findChild<QToolButton*>("nodeWorkflowStop");
+		QVERIFY(play && stop);
+		QTest::mouseClick(play, Qt::LeftButton);
+		QVERIFY(song->isPlaying());
+		QCOMPARE(song->playMode(), Song::PlayMode::Song);
+		QVERIFY(stop->isEnabled());
+		QTest::mouseClick(play, Qt::LeftButton);
+		QVERIFY(song->isPaused());
+		QTest::mouseClick(stop, Qt::LeftButton);
+		QVERIFY(song->isStopped());
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		QVERIFY(breadcrumb);
+		breadcrumb->linkActivated(QStringLiteral("song"));
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible() && !canvas->visibleRegion().isEmpty());
+		capture(window, "node-workflow-imported-pattern-automation");
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		capture(window, "node-workflow-pattern-audio-boundary");
+	}
+
+	void nodeWorkflowTrackRename()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		QAction* newNodeProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == QStringLiteral("New Node Workflow Project"))
+			{
+				newNodeProject = action;
+				break;
+			}
+		}
+		QVERIFY(newNodeProject);
+		song->setModified(false);
+		newNodeProject->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible() && !canvas->visibleRegion().isEmpty());
+		QVERIFY(!song->tracks().empty());
+		auto* track = song->tracks().front();
+		QCOMPARE(track->type(), Track::Type::Instrument);
+		const auto id = track->nodeWorkflowId();
+		const auto left = song->nodeTrackMixerEndpoint(*track, 0);
+		const auto right = song->nodeTrackMixerEndpoint(*track, 1);
+		QVERIFY(left && right);
+		capture(window, "node-workflow-track-rename-before");
+		track->setName("Lead");
+		capture(window, "node-workflow-track-rename-after");
+		QCOMPARE(track->nodeWorkflowId(), id);
+		const auto renamedLeft = song->nodeTrackMixerEndpoint(*track, 0);
+		const auto renamedRight = song->nodeTrackMixerEndpoint(*track, 1);
+		QVERIFY(renamedLeft && renamedRight);
+		QCOMPARE(renamedLeft->channel, left->channel);
+		QCOMPARE(renamedLeft->side, left->side);
+		QCOMPARE(renamedRight->channel, right->channel);
+		QCOMPARE(renamedRight->side, right->side);
+		const auto audioPortColor = canvas->property("audioPortColor").value<QColor>();
+		track->setColor(QColor("#F57C58"));
+		capture(window, "node-workflow-track-color-root");
+		QCOMPARE(canvas->property("audioPortColor").value<QColor>(), audioPortColor);
+
+		QMenu* viewMenu = nullptr;
+		for (auto* action : window->menuBar()->actions())
+		{
+			if (action->text() == QStringLiteral("&View"))
+			{
+				viewMenu = action->menu();
+				break;
+			}
+		}
+		QVERIFY(viewMenu);
+		const auto visibilityAction = [viewMenu](const QString& label) -> QAction* {
+			QMetaObject::invokeMethod(viewMenu, "aboutToShow");
+			for (auto* action : viewMenu->actions())
+			{
+				if (action->text() == label)
+				{
+					return action;
+				}
+			}
+			return nullptr;
+		};
+		auto* hide = visibilityAction("Hide Node Editor");
+		QVERIFY(hide && hide->isEnabled());
+		auto* toggleNodeEditor = window->findChild<QToolButton*>("nodeWorkflowToggleButton");
+		QVERIFY(toggleNodeEditor && !toggleNodeEditor->icon().isNull());
+		QCOMPARE(toggleNodeEditor->defaultAction(), hide);
+		QTest::mouseClick(toggleNodeEditor, Qt::LeftButton);
+		QVERIFY(!canvas->isVisible());
+		auto* show = visibilityAction("Show Node Editor");
+		QVERIFY(show && show->isEnabled());
+		QCOMPARE(show, hide);
+		show->trigger();
+		QTRY_VERIFY(canvas->isVisible());
+		QCOMPARE(window->findChild<QWidget*>("nodeWorkflowCanvas"), canvas);
+
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		auto* panel = window->findChild<QWidget*>("nodeWorkflowPatternPanel");
+		QVERIFY(breadcrumb && panel);
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.67));
+		QTRY_VERIFY(breadcrumb->text().contains(QStringLiteral(">Root Graph</a>")));
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		QTRY_VERIFY(panel->isVisible());
+		QVERIFY(breadcrumb->text().contains(QStringLiteral("href=\"pattern\"")));
+		auto* patternTrack = Engine::patternStore()->tracks().front();
+		patternTrack->setName("Kick Lead");
+		patternTrack->setColor(QColor("#F57C58"));
+		QTRY_VERIFY(breadcrumb->text().endsWith(QStringLiteral("Kick Lead")));
+		capture(window, "node-workflow-breadcrumb-pattern-member");
+		auto* clip = static_cast<MidiClip*>(patternTrack->getClip(0));
+		QVERIFY(clip);
+		clip->setStep(0, true);
+		for (auto* button : canvas->window()->findChild<QWidget*>("nodeWorkflowContent")->findChildren<QToolButton*>())
+		{
+			if (button->accessibleName() == QStringLiteral("Signal Flow"))
+			{
+				QTest::mouseClick(button, Qt::LeftButton);
+				QVERIFY(button->isChecked());
+				break;
+			}
+		}
+		{
+			auto* engine = Engine::audioEngine();
+			bool available = false;
+			engine->storeAudioDevice();
+			engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+			const auto restoreAudio = qScopeGuard([engine] { engine->restoreAudioDevice(); });
+			QVERIFY(available);
+			QTest::qWait(230);
+			song->playPattern();
+			const auto stop = qScopeGuard([song] { song->stop(); });
+			for (int period = 0; period < 16 && !Engine::mixer()->nodeMasterSignalActive(0); ++period)
+			{
+				engine->renderNextPeriod();
+			}
+			QVERIFY(Engine::mixer()->nodeMasterSignalActive(0));
+			canvas->repaint();
+			const auto screenshot = window->screen()->grabWindow(window->winId());
+			QVERIFY(!screenshot.isNull());
+			QVERIFY(screenshot.save(m_output + "/node-workflow-track-color-signal.png"));
+		}
+
+		const auto font = breadcrumb->fontMetrics();
+		const auto patternLinkX = font.horizontalAdvance(QStringLiteral("Project  ›  "))
+			+ font.horizontalAdvance(QStringLiteral("Pattern")) / 2;
+		QTest::mouseClick(breadcrumb, Qt::LeftButton, Qt::NoModifier,
+			QPoint(patternLinkX, breadcrumb->height() / 2));
+		QTRY_VERIFY(!panel->isVisible());
+		QVERIFY(breadcrumb->text().contains(QStringLiteral(">Root Graph</a>")));
+		QTest::mouseClick(breadcrumb, Qt::LeftButton, Qt::NoModifier,
+			QPoint(font.horizontalAdvance(QStringLiteral("Project")) / 2, breadcrumb->height() / 2));
+		QTRY_VERIFY(breadcrumb->text().endsWith(QStringLiteral("Root Graph")));
+	}
+
+	void nodeWorkflowStandaloneStep()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		QAction* createProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == QStringLiteral("New Node Workflow Project"))
+			{
+				createProject = action;
+				break;
+			}
+		}
+		QVERIFY(createProject);
+		song->setModified(false);
+		createProject->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible());
+		QToolButton* add = nullptr;
+		for (auto* button : canvas->window()->findChild<QWidget*>("nodeWorkflowContent")->findChildren<QToolButton*>())
+		{
+			if (button->accessibleName() == QStringLiteral("Add Node"))
+			{
+				add = button;
+				break;
+			}
+		}
+		QVERIFY(add);
+		const auto songTracks = song->tracks().size();
+		auto* patterns = Engine::patternStore();
+		const auto patternTracks = patterns->tracks().size();
+
+		QTimer::singleShot(0, canvas, [] {
+			if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+			{
+				for (auto* action : menu->actions())
+				{
+					if (action->text() == QStringLiteral("Empty Step Sequencer"))
+					{
+						menu->setActiveAction(action);
+						QTest::keyClick(menu, Qt::Key_Return);
+						return;
+					}
+				}
+				menu->close();
+			}
+		});
+		QTest::mouseClick(add, Qt::LeftButton);
+		QCOMPARE(song->nodeStepPatterns().size(), 1);
+		QCOMPARE(song->tracks().size(), songTracks);
+		QCOMPARE(patterns->tracks().size(), patternTracks);
+		QCOMPARE(song->nodeStepPatterns().front().activeSteps, 0u);
+		QVERIFY(song->nodeStepPatterns().front().targets.isEmpty());
+		capture(window, "node-workflow-standalone-step-empty");
+
+		const QRectF graph(-260, 30, 1160, 297);
+		const auto scale = std::min({(canvas->width() - 80) / graph.width(),
+			(canvas->height() - 80) / graph.height(), qreal{1.5}});
+		const auto canvasPoint = [canvas, graph, scale](const QPointF& world) {
+			return (QPointF(canvas->width(), canvas->height()) / 2 + (world - graph.center()) * scale).toPoint();
+		};
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, canvasPoint(QPointF(-156, 54)));
+		auto* inspectorTitle = window->findChild<QLabel*>("nodeWorkflowInspectorTitle");
+		QVERIFY(inspectorTitle);
+		QCOMPARE(inspectorTitle->text(), QStringLiteral("Step Sequencer"));
+		auto* inspector = inspectorTitle->parentWidget();
+		const auto values = inspector->findChildren<QLabel*>("nodeWorkflowInspectorValue");
+		QTRY_VERIFY(std::any_of(values.cbegin(), values.cend(), [](const auto* label) {
+			return label->isVisible() && label->text() == QStringLiteral("0 / 16");
+		}));
+		bool edited = false;
+		QTimer::singleShot(0, canvas, [&] {
+			if (auto* editor = qobject_cast<QDialog*>(QApplication::activeModalWidget()))
+			{
+				const auto buttons = editor->findChildren<QToolButton*>();
+				if (buttons.size() == Song::NodeStepPattern::StepCount
+					&& std::none_of(buttons.cbegin(), buttons.cend(), [](const auto* button) { return button->isChecked(); }))
+				{
+					QTest::mouseClick(buttons.front(), Qt::LeftButton);
+					edited = buttons.front()->isChecked();
+				}
+				editor->accept();
+			}
+		});
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, canvasPoint(QPointF(-156, 54)));
+		QVERIFY(edited);
+		QCOMPARE(song->nodeStepPatterns().front().activeSteps, 1u);
+
+		const auto output = canvasPoint(QPointF(-55, 80));
+		const auto input = canvasPoint(QPointF(20, 271));
+		QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, output);
+		QTest::mouseMove(canvas, input);
+		QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, input);
+		QVERIFY(!patterns->tracks().empty());
+		const auto target = patterns->tracks().front()->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		QCOMPARE(song->nodeStepPatterns().front().targets, QStringList{target});
+		capture(window, "node-workflow-standalone-step-connected");
+
+		QTemporaryDir copies;
+		QVERIFY(copies.isValid());
+		for (const auto& suffix : {QStringLiteral(".mmpn"), QStringLiteral(".mmpnz")})
+		{
+			const auto path = copies.filePath("standalone" + suffix);
+			QVERIFY(song->saveProjectFile(path));
+			const DataFile copy(path);
+			const auto step = copy.nodeWorkflow().firstChildElement("step-pattern");
+			QCOMPARE(step.attribute("activeSteps"), QStringLiteral("1"));
+			QCOMPARE(step.firstChildElement("target").attribute("track"), target);
+		}
+	}
+
+	void nodeWorkflowStandalonePianoRolls()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		const auto actions = window->findChildren<QAction*>();
+		const auto create = std::find_if(actions.cbegin(), actions.cend(), [](const auto* action) {
+			return action->text() == QStringLiteral("New Node Workflow Project");
+		});
+		QVERIFY(create != actions.cend());
+		song->setModified(false);
+		(*create)->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible());
+		const auto buttons = canvas->window()->findChild<QWidget*>("nodeWorkflowContent")->findChildren<QToolButton*>();
+		const auto add = std::find_if(buttons.cbegin(), buttons.cend(), [](const auto* button) {
+			return button->accessibleName() == QStringLiteral("Add Node");
+		});
+		QVERIFY(add != buttons.cend());
+		const auto trackCount = song->tracks().size();
+		const auto patternTrackCount = Engine::patternStore()->tracks().size();
+		for (const auto& name : {QStringLiteral("Empty MIDI Piano Roll"), QStringLiteral("Empty SVS Piano Roll")})
+		{
+			QTimer::singleShot(0, canvas, [name] {
+				if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+				{
+					const auto entries = menu->actions();
+					const auto entry = std::find_if(entries.cbegin(), entries.cend(), [&name](const auto* action) {
+						return action->text() == name;
+					});
+					if (entry != entries.cend())
+					{
+						menu->setActiveAction(*entry);
+						QTest::keyClick(menu, Qt::Key_Return);
+					}
+					else
+					{
+						menu->close();
+					}
+				}
+			});
+			QTest::mouseClick(*add, Qt::LeftButton);
+		}
+		const auto rolls = song->nodePianoRolls();
+		QCOMPARE(rolls.size(), 2);
+		QVERIFY(!rolls.front().singingVoice && rolls.back().singingVoice);
+		QCOMPARE(song->tracks().size(), trackCount);
+		QCOMPARE(Engine::patternStore()->tracks().size(), patternTrackCount);
+		capture(window, "node-workflow-standalone-piano-rolls");
+
+		const QFontMetricsF portMetrics(canvas->font());
+		const auto trackName = song->tracks().front()->name();
+		const auto trackWidth = std::ceil(portMetrics.horizontalAdvance(trackName + QStringLiteral(" · MIDI")))
+			+ std::ceil(portMetrics.horizontalAdvance(trackName + QStringLiteral(" L"))) + 46;
+		const QRectF graph(-260, 30, 1160 + std::max(qreal{0}, trackWidth - 205), 297);
+		const auto scale = std::min({(canvas->width() - 80) / graph.width(),
+			(canvas->height() - 80) / graph.height(), qreal{1.5}});
+		const auto canvasPoint = [canvas, graph, scale](const QPointF& world) {
+			return (QPointF(canvas->width(), canvas->height()) / 2 + (world - graph.center()) * scale).toPoint();
+		};
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, canvasPoint(QPointF(-160, 54)));
+		auto* midi = dynamic_cast<MidiClip*>(song->nodePianoRollClip(rolls.front().id));
+		QVERIFY(midi && midi->notes().empty());
+		QVERIFY(!midi->instrumentTrack()->instrument());
+		QCOMPARE(m_gui->pianoRoll()->currentMidiClip(), midi);
+		QVERIFY(m_gui->pianoRoll()->isVisible());
+		midi->addNote(Note(TimePos(24), TimePos(0)));
+		m_gui->pianoRoll()->parentWidget()->hide();
+		const auto midiOutput = canvasPoint(QPointF(-55, 80));
+		const auto instrumentInput = canvasPoint(QPointF(20, 78));
+		QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, midiOutput);
+		QTest::mouseMove(canvas, instrumentInput);
+		QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, instrumentInput);
+		const auto instrumentId = song->tracks().front()->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		QCOMPARE(song->nodePianoRolls().front().targets, QStringList{instrumentId});
+
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, canvasPoint(QPointF(-160, 176)));
+		auto* voice = dynamic_cast<SVSClip*>(song->nodePianoRollClip(rolls.back().id));
+		QVERIFY(voice && voice->notes().isEmpty());
+		const auto* voiceTrack = static_cast<SVSTrack*>(voice->getTrack());
+		QVERIFY(voiceTrack->pluginId().isEmpty() && voiceTrack->voiceId().isEmpty());
+		const auto voiceEditors = window->findChildren<SVSPianoRoll*>();
+		QVERIFY(std::any_of(voiceEditors.cbegin(), voiceEditors.cend(), [](const auto* editor) {
+			return editor->isVisible();
+		}));
+		svs::Note voiceNote;
+		voiceNote.id = QStringLiteral("standalone-voice-note");
+		voiceNote.duration = 48;
+		voiceNote.pitch = 60;
+		voiceNote.lyric = QStringLiteral("啦");
+		voice->setNotes({voiceNote});
+		QCOMPARE(song->tracks().size(), trackCount);
+		QCOMPARE(Engine::patternStore()->tracks().size(), patternTrackCount);
+		for (auto* editor : voiceEditors)
+		{
+			if (editor->isVisible())
+			{
+				editor->parentWidget()->hide();
+			}
+		}
+		auto* destination = new SVSTrack(song);
+		destination->setName(QStringLiteral("Voice target"));
+		QCoreApplication::processEvents();
+		const auto voiceOutput = canvasPoint(QPointF(-55, 202));
+		qreal voiceRow = 78;
+		for (auto* track : song->tracks())
+		{
+			if (track == destination)
+			{
+				break;
+			}
+			if (track->type() == Track::Type::Instrument || track->type() == Track::Type::Sample
+				|| track->type() == Track::Type::SVS || track->type() == Track::Type::SVC)
+			{
+				voiceRow += 44;
+			}
+		}
+		const auto voiceInput = canvasPoint(QPointF(20, voiceRow));
+		const auto drag = [canvas](const QPoint& source, const QPoint& target) {
+			QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, source);
+			QTest::mouseMove(canvas, target);
+			QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, target);
+		};
+		drag(voiceOutput, instrumentInput);
+		QVERIFY(song->nodePianoRolls().back().targets.isEmpty());
+		drag(voiceOutput, voiceInput);
+		const auto voiceTrackId = destination->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		QCOMPARE(song->nodePianoRolls().back().targets, QStringList{voiceTrackId});
+		QCOMPARE(destination->numOfClips(), 0);
+		capture(window, "node-workflow-standalone-svs-connected");
+		QTemporaryDir copies;
+		QVERIFY(copies.isValid());
+		for (const auto& suffix : {QStringLiteral(".mmpn"), QStringLiteral(".mmpnz")})
+		{
+			const auto path = copies.filePath("piano-rolls" + suffix);
+			QVERIFY(song->saveProjectFile(path));
+			const DataFile copy(path);
+			const auto savedMidi = copy.nodeWorkflow().firstChildElement("piano-roll");
+			QVERIFY(!savedMidi.firstChildElement("midiclip").firstChildElement("note").isNull());
+			QCOMPARE(savedMidi.firstChildElement("target").attribute("track"), instrumentId);
+			const auto savedSvs = savedMidi.nextSiblingElement("piano-roll");
+			QCOMPARE(savedSvs.attribute("kind"), QStringLiteral("svs"));
+			QCOMPARE(savedSvs.firstChildElement("target").attribute("track"), voiceTrackId);
+			QVERIFY(!savedSvs.firstChildElement("svsclip").firstChildElement("notes")
+				.firstChildElement("note").isNull());
+		}
+		QTimer::singleShot(0, canvas, [] {
+			if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+			{
+				if (menu->actions().size() == 1)
+				{
+					menu->setActiveAction(menu->actions().front());
+					QTest::keyClick(menu, Qt::Key_Return);
+				}
+				else
+				{
+					menu->close();
+				}
+			}
+		});
+		QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier, voiceOutput);
+		QVERIFY(song->nodePianoRolls().back().targets.isEmpty());
+		QCOMPARE(song->nodePianoRolls().front().targets, QStringList{instrumentId});
+
+		const auto selectNodeAction = [canvas](const QPoint& point, const QString& label, bool confirm = false) {
+			const auto selected = std::make_shared<bool>(false);
+			QTimer::singleShot(0, canvas, [canvas, label, confirm, selected] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu)
+				{
+					return;
+				}
+				for (auto* action : menu->actions())
+				{
+					if (action->text() != label || !action->isEnabled())
+					{
+						continue;
+					}
+					if (confirm)
+					{
+						QTimer::singleShot(0, canvas, [] {
+							if (auto* dialog = qobject_cast<QMessageBox*>(QApplication::activeModalWidget()))
+							{
+								if (auto* yes = dialog->button(QMessageBox::Yes))
+								{
+									yes->click();
+								}
+							}
+						});
+					}
+					menu->setActiveAction(action);
+					*selected = true;
+					QTest::keyClick(menu, Qt::Key_Return);
+					return;
+				}
+				menu->close();
+			});
+			QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier, point);
+			return *selected;
+		};
+		const auto midiNode = canvasPoint(QPointF(-160, 54));
+		QVERIFY(selectNodeAction(midiNode, QStringLiteral("Open Piano Roll")));
+		QVERIFY(m_gui->pianoRoll()->isVisible());
+		QCOMPARE(m_gui->pianoRoll()->currentMidiClip(), midi);
+		m_gui->pianoRoll()->parentWidget()->hide();
+		QVERIFY(!song->copyStandaloneNode(QStringLiteral("piano-roll"), rolls.front().id).isNull());
+		QVERIFY(selectNodeAction(midiNode, QStringLiteral("Copy Node")));
+		QVERIFY(selectNodeAction(midiNode, QStringLiteral("Paste Node")));
+		const auto withCopy = song->nodePianoRolls();
+		QCOMPARE(withCopy.size(), 3);
+		QVERIFY(withCopy.back().id != rolls.front().id && !withCopy.back().singingVoice);
+		QVERIFY(withCopy.back().targets.isEmpty());
+		auto* midiCopy = dynamic_cast<MidiClip*>(song->nodePianoRollClip(withCopy.back().id));
+		QVERIFY(midiCopy && midiCopy->notes().size() == midi->notes().size());
+		QVERIFY(midiCopy->id() != midi->id());
+		QVERIFY(selectNodeAction(midiNode, QStringLiteral("Delete Node"), true));
+		const auto afterDelete = song->nodePianoRolls();
+		QCOMPARE(afterDelete.size(), 2);
+		QCOMPARE(afterDelete.back().id, withCopy.back().id);
+		QVERIFY(afterDelete.front().singingVoice);
+	}
+
+	void nodeWorkflowSongClipPreviews()
+	{
+		auto* window = m_gui->mainWindow();
+		const auto actions = window->findChildren<QAction*>();
+		const auto create = std::find_if(actions.cbegin(), actions.cend(), [this](const auto* action) {
+			return action->text() == tr("New Node Workflow Project");
+		});
+		QVERIFY(create != actions.cend());
+		auto* song = Engine::getSong();
+		song->setModified(false);
+		(*create)->trigger();
+
+		auto* midi = static_cast<MidiClip*>(song->tracks().front()->createClip(TimePos{}));
+		auto* voiceTrack = Track::create(Track::Type::SVS, song);
+		QVERIFY(voiceTrack);
+		auto* voice = static_cast<SVSClip*>(voiceTrack->createClip(TimePos{}));
+		auto* editor = m_gui->songEditor();
+		auto* frame = qobject_cast<QMdiSubWindow*>(editor->parentWidget());
+		QVERIFY(frame);
+		frame->show();
+		window->workspace()->setActiveSubWindow(frame);
+		const auto findMidiView = [editor, midi]() -> MidiClipView* {
+			for (auto* view : editor->findChildren<MidiClipView*>())
+			{
+				if (view->getMidiClip() == midi) { return view; }
+			}
+			return nullptr;
+		};
+		const auto findVoiceView = [editor, voice]() -> SVSClipView* {
+			for (auto* view : editor->findChildren<SVSClipView*>())
+			{
+				if (view->getClip() == voice) { return view; }
+			}
+			return nullptr;
+		};
+		QTRY_VERIFY(findMidiView());
+		QTRY_VERIFY(findVoiceView());
+		auto* midiView = findMidiView();
+		auto* voiceView = findVoiceView();
+		QTRY_VERIFY(!midiView->visibleRegion().isEmpty() && !voiceView->visibleRegion().isEmpty());
+		const auto renderedClip = [window](QWidget* clipView) {
+			const auto rect = clipView->visibleRegion().boundingRect();
+			const auto origin = clipView->mapTo(window, rect.topLeft());
+			return window->screen()->grabWindow(window->winId(), origin.x(), origin.y(),
+				rect.width(), rect.height()).toImage();
+		};
+		const auto emptyMidi = renderedClip(midiView);
+		const auto emptyVoice = renderedClip(voiceView);
+		QVERIFY(!emptyMidi.isNull() && !emptyVoice.isNull());
+
+		midi->addNote(Note(TimePos(48), TimePos(0)));
+		svs::Note voiceNote;
+		voiceNote.id = QStringLiteral("song-preview-note");
+		voiceNote.duration = 48;
+		voiceNote.pitch = 60;
+		voiceNote.lyric = QStringLiteral("啦");
+		voice->setNotes({voiceNote});
+		QTRY_VERIFY(renderedClip(midiView) != emptyMidi);
+		QTRY_VERIFY(renderedClip(voiceView) != emptyVoice);
+		capture(window, "node-workflow-song-clip-previews");
+
+		QTest::mouseDClick(midiView, Qt::LeftButton, Qt::NoModifier, midiView->rect().center());
+		QCOMPARE(m_gui->pianoRoll()->currentMidiClip(), midi);
+		m_gui->pianoRoll()->parentWidget()->hide();
+		window->workspace()->setActiveSubWindow(frame);
+		QTest::mouseDClick(voiceView, Qt::LeftButton, Qt::NoModifier, voiceView->rect().center());
+		const auto voiceEditors = window->findChildren<SVSPianoRoll*>();
+		QVERIFY(std::any_of(voiceEditors.cbegin(), voiceEditors.cend(),
+			[](const auto* roll) { return roll->isVisible(); }));
+	}
+
+	void nodeWorkflowRootRouteEditing()
+	{
+		auto* window = m_gui->mainWindow();
+		const auto label = tr("New Node Workflow Project");
+		QAction* newNodeProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == label)
+			{
+				newNodeProject = action;
+				break;
+			}
+		}
+		QVERIFY(newNodeProject);
+		// Startup can mark the isolated, disposable project dirty.
+		Engine::getSong()->setModified(false);
+		newNodeProject->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible() && !canvas->visibleRegion().isEmpty());
+		auto* rootTrack = Engine::getSong()->tracks().front();
+		const QRectF rootBounds(20, 30, 880, 297);
+		const auto rootScale = std::min({(canvas->width() - 80) / rootBounds.width(),
+			(canvas->height() - 80) / rootBounds.height(), qreal{1.5}});
+		const auto rootPoint = [canvas, rootBounds, rootScale](const QPointF& point) {
+			return (QPointF(canvas->width(), canvas->height()) / 2
+				+ (point - rootBounds.center()) * rootScale).toPoint();
+		};
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, rootPoint(QPointF(85, 55)));
+		auto* inspectorTitle = window->findChild<QLabel*>("nodeWorkflowInspectorTitle");
+		QVERIFY(inspectorTitle);
+		QCOMPARE(inspectorTitle->text(), QStringLiteral("Multitrack"));
+		capture(window, "node-workflow-root-selected");
+		QTimer::singleShot(0, canvas, [] {
+			if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+			{
+				menu->setActiveAction(menu->actions().front());
+				QTest::keyClick(menu, Qt::Key_Return);
+			}
+		});
+		const auto rootOutput = rootPoint(QPointF(225, 78));
+		QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier, rootOutput);
+		QVERIFY(!Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 0));
+		QVERIFY(Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 1));
+		capture(window, "node-workflow-root-left-disconnected");
+		const auto rootInput = rootPoint(QPointF(395, 132));
+		QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, rootOutput);
+		QTest::mouseMove(canvas, rootInput);
+		QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, rootInput);
+		const auto leftRoute = Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 0);
+		QVERIFY(leftRoute && leftRoute->channel == 0 && leftRoute->side == 0);
+		QVERIFY(Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 1));
+		capture(window, "node-workflow-root-left-reconnected");
+		const auto dragWire = [canvas](const QPoint& from, const QPoint& to) {
+			QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, from);
+			QTest::mouseMove(canvas, to);
+			QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, to);
+		};
+		const auto wireMiddle = (rootOutput + rootInput) / 2;
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, wireMiddle);
+		QVERIFY(Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 0));
+		dragWire(wireMiddle, rootPoint(QPointF(310, 30)));
+		QVERIFY(!Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 0));
+		QVERIFY(Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 1));
+		dragWire(rootOutput, rootInput);
+		QVERIFY(Engine::getSong()->nodeTrackMixerEndpoint(*rootTrack, 0));
+		const auto masterSource = rootPoint(QPointF(600, 133));
+		const auto masterTarget = rootPoint(QPointF(750, 133));
+		dragWire(masterTarget, rootPoint(QPointF(675, 75)));
+		QCOMPARE(Engine::mixer()->nodeMasterOutputMask(), 2u);
+		dragWire(masterSource, masterTarget);
+		QCOMPARE(Engine::mixer()->nodeMasterOutputMask(), 3u);
+		const auto nodeBody = rootPoint(QPointF(85, 55));
+		const QPoint dragOffset(45, -32);
+		QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, nodeBody);
+		QTest::mouseMove(canvas, nodeBody + dragOffset);
+		QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, nodeBody + dragOffset);
+		capture(window, "node-workflow-root-node-dragged");
+		bool movedPortHit = false;
+		QTimer::singleShot(0, canvas, [&] {
+			if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+			{
+				movedPortHit = menu->actions().size() == 1
+					&& menu->actions().front()->text() == QStringLiteral("Disconnect");
+				menu->close();
+			}
+		});
+		QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier, rootOutput + dragOffset);
+		QVERIFY(movedPortHit);
+		auto* song = Engine::getSong();
+		const auto moved = song->nodeLayoutPosition(QStringLiteral("root/song"));
+		QVERIFY(moved);
+		QVERIFY(song->classicConversionChanges().contains(
+			tr("Custom node positions will be omitted.")));
+		QVERIFY(QLineF(*moved, QPointF(20, 30) + QPointF(dragOffset) / rootScale).length() < 1);
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		QVERIFY(breadcrumb);
+		breadcrumb->linkActivated(QStringLiteral("song"));
+		QCOMPARE(inspectorTitle->text(), QStringLiteral("Multitrack"));
+		QVERIFY(song->nodeTrackBoundaryConnected(*rootTrack, 0));
+		QVERIFY(song->setNodeTrackBoundaryConnected(*rootTrack, 0, false));
+		QVERIFY(!song->nodeTrackBoundaryConnected(*rootTrack, 0));
+		QVERIFY(song->nodeTrackBoundaryConnected(*rootTrack, 1));
+		const auto parentRoute = song->nodeTrackMixerEndpoint(*rootTrack, 0);
+		QVERIFY(parentRoute);
+		QCOMPARE(parentRoute->channel, leftRoute->channel);
+		QCOMPARE(parentRoute->side, leftRoute->side);
+		QVERIFY(song->setNodeTrackBoundaryConnected(*rootTrack, 0, true));
+		const auto trackKey = QStringLiteral("song/track/") + rootTrack->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		const QRectF subgraphBounds(QPointF(35, 40), QPointF(990, 263));
+		const auto subgraphScale = std::min({(canvas->width() - 80) / subgraphBounds.width(),
+			(canvas->height() - 80) / subgraphBounds.height(), qreal{1.5}});
+		const auto trackBody = (QPointF(canvas->width(), canvas->height()) / 2
+			+ (QPointF(75, 57) - subgraphBounds.center()) * subgraphScale).toPoint();
+		const auto movedTrackBody = trackBody + QPoint(56, 34);
+		QTest::mousePress(canvas, Qt::LeftButton, Qt::NoModifier, trackBody);
+		QTest::mouseMove(canvas, movedTrackBody);
+		QTest::mouseRelease(canvas, Qt::LeftButton, Qt::NoModifier, movedTrackBody);
+		const auto movedTrack = song->nodeLayoutPosition(trackKey);
+		QVERIFY(movedTrack);
+		breadcrumb->linkActivated(QStringLiteral("root"));
+		QCOMPARE(song->nodeLayoutPosition(QStringLiteral("root/song")), moved);
+		const auto restoredBounds = rootBounds.united(QRectF(*moved, QSizeF(205, 100)));
+		const auto restoredScale = std::min({(canvas->width() - 80) / restoredBounds.width(),
+			(canvas->height() - 80) / restoredBounds.height(), qreal{1.5}});
+		const auto restoredNode = (QPointF(canvas->width(), canvas->height()) / 2
+			+ (*moved + QPointF(65, 25) - restoredBounds.center()) * restoredScale).toPoint();
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, restoredNode);
+		QCOMPARE(inspectorTitle->text(), QStringLiteral("Multitrack"));
+		capture(window, "node-workflow-root-layout-restored");
+		breadcrumb->linkActivated(QStringLiteral("song"));
+		QCOMPARE(song->nodeLayoutPosition(trackKey), movedTrack);
+		capture(window, "node-workflow-song-layout-restored");
+		auto* aggregate = window->findChild<QToolButton*>("nodeWorkflowAggregation");
+		QVERIFY(aggregate && aggregate->menu());
+		auto* merge = aggregate->menu()->findChild<QAction*>("nodeWorkflowAggregationEnabled");
+		auto* threshold = aggregate->menu()->findChild<QSpinBox*>("nodeWorkflowAggregationThreshold");
+		QVERIFY(merge && threshold);
+		merge->setChecked(true);
+		threshold->setValue(7);
+		QTemporaryDir copies;
+		QVERIFY(copies.isValid());
+		for (const auto& extension : {QStringLiteral(".mmpn"), QStringLiteral(".mmpnz")})
+		{
+			const auto path = copies.filePath(QStringLiteral("layout") + extension);
+			QVERIFY(song->saveProjectFile(path));
+			const DataFile data(path);
+			QCOMPARE(data.nodeWorkflow().attribute("aggregationEnabled"), QStringLiteral("1"));
+			QCOMPARE(data.nodeWorkflow().attribute("aggregationThreshold"), QStringLiteral("7"));
+			const auto position = data.nodeWorkflow().firstChildElement("node-position");
+			QCOMPARE(position.attribute("key"), QStringLiteral("root/song"));
+			QCOMPARE(QPointF(position.attribute("x").toDouble(), position.attribute("y").toDouble()), *moved);
+		}
+		const auto saved = copies.filePath(QStringLiteral("layout.mmpnz"));
+		song->loadProject(saved);
+		QVERIFY(song->isNodeProject());
+		const auto aggregation = song->nodeConnectionAggregation();
+		QVERIFY(aggregation);
+		QVERIFY(aggregation->first);
+		QCOMPARE(aggregation->second, 7);
+		QCOMPARE(song->nodeLayoutPosition(QStringLiteral("root/song")), moved);
+		QCOMPARE(song->nodeLayoutPosition(trackKey), movedTrack);
+	}
+
+	void nodeWorkflowInstrumentLayers()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		QAction* newProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == QStringLiteral("New Node Workflow Project"))
+			{
+				newProject = action;
+				break;
+			}
+		}
+		QVERIFY(newProject);
+		song->setModified(false);
+		newProject->trigger();
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(breadcrumb && canvas);
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		auto* owner = static_cast<InstrumentTrack*>(Engine::patternStore()->tracks().front());
+		QTRY_VERIFY(breadcrumb->text().contains(owner->name()));
+		ConfigManager::inst()->setValue("ui", "hideextendedsourcewarning", "1");
+		auto* add = canvas->window()->findChild<QToolButton*>("nodeWorkflowAdd");
+		if (!add)
+		{
+			for (auto* button : canvas->window()->findChildren<QToolButton*>())
+			{
+				if (button->accessibleName() == QStringLiteral("Add Node"))
+				{
+					add = button;
+					break;
+				}
+			}
+		}
+		QVERIFY(add);
+		QTimer::singleShot(0, add, [] {
+			auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+			if (!menu)
+			{
+				return;
+			}
+			for (auto* action : menu->actions())
+			{
+				if (action->text() == QStringLiteral("Instrument Plugins") && action->menu())
+				{
+					for (auto* plugin : action->menu()->actions())
+					{
+						if (plugin->text() == QStringLiteral("Kicker"))
+						{
+							menu->close();
+							plugin->trigger();
+							return;
+						}
+					}
+				}
+			}
+			menu->close();
+		});
+		QTest::mouseClick(add, Qt::LeftButton);
+		QCOMPARE(song->nodeInstrumentLayers(*owner).size(), 1);
+		auto* first = song->nodeInstrumentLayers(*owner).front().instrument;
+		auto* second = song->addNodeInstrumentLayer(*owner, QStringLiteral("kicker"), false);
+		QVERIFY(first && second && first != second);
+		first->setVolume(75);
+		second->setVolume(45);
+		const auto firstId = song->nodeInstrumentLayers(*owner).front().id;
+		const auto secondId = song->nodeInstrumentLayers(*owner).back().id;
+		QVERIFY(song->setNodeInstrumentLayerEvent(*owner, firstId, true, true));
+		QVERIFY(song->setNodeInstrumentLayerEvent(*owner, secondId, true, true));
+		QVERIFY(song->setNodeInstrumentLayerOutput(*owner, firstId, 0, 0));
+		QVERIFY(song->setNodeInstrumentLayerOutput(*owner, secondId, 1, 1));
+		QVERIFY(song->setNodeSourceAudioOutput(*owner, 0, std::nullopt));
+		QVERIFY(song->setNodeSourceAudioOutput(*owner, 1, std::nullopt));
+		static_cast<MidiClip*>(owner->getClip(0))->setStep(0, true);
+
+		auto* engine = Engine::audioEngine();
+		bool available = false;
+		engine->storeAudioDevice();
+		engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+		auto* signalFlow = window->findChild<QToolButton*>("nodeWorkflowSignalFlow");
+		QVERIFY(signalFlow && signalFlow->isChecked() && NodeSignalActivity::monitoring());
+		const auto cleanup = qScopeGuard([song, engine] {
+			song->stop();
+			engine->restoreAudioDevice();
+		});
+		QVERIFY(available);
+		song->playPattern();
+		for (int period = 0; period < 16 && !Engine::mixer()->nodeMasterSignalActive(0); ++period)
+		{
+			engine->renderNextPeriod();
+		}
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(1));
+		QVERIFY(song->setNodeInstrumentLayerOutput(*owner, secondId, 1, std::nullopt));
+		engine->renderNextPeriod();
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(!Engine::mixer()->nodeMasterSignalActive(1));
+		QVERIFY(song->setNodeInstrumentLayerOutput(*owner, secondId, 1, 1));
+
+		QTemporaryDir fixture(m_output + "/node-layers-XXXXXX");
+		QVERIFY(fixture.isValid());
+		const auto fileName = fixture.filePath("layers.mmpn");
+		QVERIFY(song->saveProjectFile(fileName));
+		const DataFile saved(fileName);
+		const auto firstElement = saved.nodeWorkflow().firstChildElement("instrument-layer");
+		const auto secondElement = firstElement.nextSiblingElement("instrument-layer");
+		QCOMPARE(firstElement.attribute("id"), firstId);
+		QCOMPARE(secondElement.attribute("id"), secondId);
+		QCOMPARE(firstElement.attribute("steps"), QStringLiteral("1"));
+		QCOMPARE(secondElement.attribute("steps"), QStringLiteral("1"));
+		QCOMPARE(firstElement.attribute("left"), QStringLiteral("0"));
+		QCOMPARE(secondElement.attribute("right"), QStringLiteral("1"));
+		QCOMPARE(firstElement.firstChildElement("track").firstChildElement("instrumenttrack").attribute("vol"),
+			QStringLiteral("75"));
+		QCOMPARE(secondElement.firstChildElement("track").firstChildElement("instrumenttrack").attribute("vol"),
+			QStringLiteral("45"));
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		capture(window, "node-workflow-instrument-layers");
+	}
+
+	void nodeWorkflowTriggerLcd()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		const auto newProjectLabel = QCoreApplication::translate("lmms::gui::MainWindow", "New Node Workflow Project");
+		QAction* newProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == newProjectLabel)
+			{
+				newProject = action;
+				break;
+			}
+		}
+		QVERIFY(newProject);
+		song->setModified(false);
+		newProject->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		auto* lcd = window->findChild<QScrollArea*>("nodeWorkflowTriggerLcd");
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		QVERIFY(canvas && lcd && breadcrumb);
+		QVERIFY(!lcd->isVisible());
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QVERIFY(!lcd->isVisible());
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		auto* stepPanel = window->findChild<QWidget*>("nodeWorkflowPatternPanel");
+		QTRY_VERIFY(stepPanel && stepPanel->isVisible());
+		QVERIFY(lcd->isVisible());
+		QCOMPARE(lcd->height(), 148);
+
+		auto* patterns = Engine::patternStore();
+		auto* instrument = patterns->tracks().front();
+		auto* stepClip = static_cast<MidiClip*>(instrument->getClip(0));
+		stepClip->setSteps(48);
+		stepClip->setStep(4, true);
+		stepClip->setStep(36, true);
+		const auto rows = [lcd] {
+			QList<QLabel*> labels;
+			for (auto* label : lcd->findChildren<QLabel*>())
+			{
+				if (label->property("nodeWorkflowTriggerLcdRow").toBool())
+				{
+					labels.append(label);
+				}
+			}
+			return labels;
+		};
+		const auto selectCable = [canvas, lcd](qreal xBegin, qreal xEnd, qreal yBegin, qreal yEnd) {
+			for (qreal y = yBegin; y <= yEnd; y += 0.01)
+			{
+				for (qreal x = xBegin; x <= xEnd; x += 0.01)
+				{
+					QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier,
+						QPoint(qRound(canvas->width() * x), qRound(canvas->height() * y)));
+					if (lcd->property("wireSelected").toBool())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		};
+
+		auto* engine = Engine::audioEngine();
+		bool available = false;
+		engine->storeAudioDevice();
+		engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+		const auto restoreAudio = qScopeGuard([song, engine] {
+			if (!song->isStopped())
+			{
+				song->stop();
+			}
+			engine->restoreAudioDevice();
+		});
+		QVERIFY(available);
+		song->playPattern();
+		QVERIFY(selectCable(0.29, 0.35, 0.47, 0.51));
+		QVERIFY(lcd->widget());
+		QCOMPARE(lcd->widget()->objectName(), QStringLiteral("nodeWorkflowTriggerLcdIdle"));
+		(void) patterns->play(TimePos::stepPosition(3), engine->framesPerPeriod(), 0, 0);
+		QTest::qWait(100);
+		QVERIFY(rows().isEmpty());
+		QVERIFY(patterns->play(TimePos::stepPosition(4), engine->framesPerPeriod(), 0, 0));
+		QTRY_COMPARE(rows().size(), 1);
+		auto* stepScroll = lcd->findChild<QScrollArea*>("nodeWorkflowTriggerStepScroll");
+		QVERIFY(stepScroll && stepScroll->widget());
+		QCOMPARE(stepScroll->width(), 157);
+		auto* strip = stepScroll->widget();
+		QVERIFY(rows().front()->isVisible());
+		QVERIFY(rows().front()->width() > 0);
+		QTRY_COMPARE(strip->property("stepIndex").toInt(), 4);
+		QTest::qWait(2100);
+		QCOMPARE(strip->property("stepIndex").toInt(), 4);
+		capture(window, "node-trigger-lcd-step");
+
+		(void) patterns->play(TimePos::stepPosition(35), engine->framesPerPeriod(), 0, 0);
+		QTRY_COMPARE(strip->property("stepIndex").toInt(), 35);
+		QTRY_VERIFY(stepScroll->horizontalScrollBar()->value() > 0);
+		QVERIFY(patterns->play(TimePos::stepPosition(36), engine->framesPerPeriod(), 0, 0));
+		QTRY_COMPARE(strip->property("stepIndex").toInt(), 36);
+		QCOMPARE(lcd->height(), 148);
+		capture(window, "node-trigger-lcd-step-scrolled");
+
+		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(10, 10));
+		QTRY_VERIFY(!lcd->property("wireSelected").toBool());
+		QTRY_COMPARE(lcd->widget()->objectName(), QStringLiteral("nodeWorkflowTriggerLcdIdle"));
+		QCOMPARE(lcd->height(), 148);
+		capture(window, "node-trigger-lcd-idle");
+
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QVERIFY(!lcd->isVisible());
+		QList<PatternTrack*> columns;
+		for (int index = 0; index < 8; ++index)
+		{
+			auto* column = static_cast<PatternTrack*>(Track::create(Track::Type::Pattern, song));
+			column->setName(QStringLiteral("Chord %1 – long Pattern name").arg(index + 1));
+			columns.append(column);
+			auto* notes = static_cast<MidiClip*>(instrument->getClip(column->patternIndex()));
+			notes->setClipType(MidiClip::Type::MelodyClip);
+			for (int key = 48; key <= 72; key += 2)
+			{
+				notes->addNote(Note(TimePos(24), TimePos(0), key));
+			}
+		}
+		auto* sampleTrack = Track::create(Track::Type::Sample, patterns);
+		sampleTrack->setName(QStringLiteral("LCD sample"));
+		const auto samplePath = qEnvironmentVariable("LMMS_DATA_DIR")
+			+ QStringLiteral("/samples/beats/rave_kick01 - 180 BPM.ogg");
+		QVERIFY(QFile::exists(samplePath));
+		static_cast<SampleClip*>(sampleTrack->getClip(columns.front()->patternIndex()))->setSampleFile(samplePath);
+		patterns->setCurrentPattern(columns.front()->patternIndex());
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		const auto memberPoint = [canvas](int y) {
+			const QRectF bounds(QPointF(35, 40), QPointF(990, 263));
+			const auto scale = std::min({(canvas->width() - 80) / bounds.width(),
+				(canvas->height() - 80) / bounds.height(), qreal{1.5}});
+			return (QPointF(canvas->width(), canvas->height()) / 2
+				+ (QPointF(75, y) - bounds.center()) * scale).toPoint();
+		};
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, memberPoint(58));
+		QTRY_VERIFY(breadcrumb->text().contains(instrument->name()));
+		QCoreApplication::processEvents();
+		QVERIFY(selectCable(0.46, 0.55, 0.46, 0.51));
+		for (auto* column : columns)
+		{
+			QVERIFY(patterns->play(TimePos(0), engine->framesPerPeriod(), 0, column->patternIndex()));
+		}
+		QTRY_COMPARE(rows().size(), columns.size());
+		auto* chordRow = rows().front();
+		auto* noteField = chordRow->parentWidget()->findChild<QLabel*>("nodeWorkflowTriggerLcdDetail");
+		QVERIFY(noteField);
+		QVERIFY(noteField->text().startsWith(QStringLiteral("C3 / ")));
+		QVERIFY(noteField->text().endsWith(QStringLiteral("C5")));
+		QCOMPARE(noteField->text().split(QStringLiteral(" / ")).size(), 13);
+		QCOMPARE(noteField->width(), 53);
+		QTRY_VERIFY(noteField->property("lcdScrollOffset").toInt() > 0);
+		QVERIFY(noteField->toolTip().isEmpty());
+		QTRY_VERIFY(chordRow->property("lcdScrollOffset").toInt() > 0);
+		QCOMPARE(lcd->findChildren<QWidget*>("nodeWorkflowTriggerNotePreview").size(), columns.size());
+		auto* preview = chordRow->parentWidget()->findChild<QWidget*>("nodeWorkflowTriggerNotePreview");
+		QVERIFY(preview);
+		(void) patterns->play(TimePos(96), engine->framesPerPeriod(), 0, columns.front()->patternIndex());
+		QTRY_COMPARE(preview->property("playheadPosition").toDouble(), 0.5);
+		QVERIFY(lcd->verticalScrollBar()->isVisible() && lcd->verticalScrollBar()->maximum() > 0);
+		const auto lcdRows = rows();
+		const auto rowPosition = [lcd](const QLabel* label, const QPoint& point) {
+			return lcd->viewport()->mapFromGlobal(label->mapToGlobal(point));
+		};
+		QVERIFY(lcd->viewport()->rect().contains(rowPosition(lcdRows.at(5), lcdRows.at(5)->rect().bottomLeft())));
+		QVERIFY(!lcd->viewport()->rect().contains(rowPosition(lcdRows.at(6), QPoint{})));
+		lcd->verticalScrollBar()->setValue(lcd->verticalScrollBar()->maximum());
+		QVERIFY(lcd->viewport()->rect().contains(rowPosition(lcdRows.back(), lcdRows.back()->rect().bottomLeft())));
+		lcd->verticalScrollBar()->setValue(0);
+		QCOMPARE(lcd->height(), 148);
+		capture(window, "node-trigger-lcd-notes");
+
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, memberPoint(178));
+		QTRY_VERIFY(breadcrumb->text().contains(sampleTrack->name()));
+		QVERIFY(selectCable(0.61, 0.70, 0.46, 0.61));
+		auto* sampleClip = static_cast<SampleClip*>(sampleTrack->getClip(columns.front()->patternIndex()));
+		sampleClip->setIsPlaying(false);
+		QVERIFY(patterns->play(TimePos(0), engine->framesPerPeriod(), 0, columns.front()->patternIndex()));
+		QTRY_COMPARE(rows().size(), 1);
+		auto* sampleField = rows().front()->parentWidget()->findChild<QLabel*>("nodeWorkflowTriggerLcdDetail");
+		QVERIFY(sampleField);
+		QCOMPARE(sampleField->text(), QFileInfo(samplePath).fileName());
+		QCOMPARE(sampleField->width(), 157);
+		QVERIFY(sampleField->toolTip().isEmpty());
+		QCOMPARE(lcd->height(), 148);
+		capture(window, "node-trigger-lcd-sample");
+		breadcrumb->linkActivated(QStringLiteral("root"));
+		QVERIFY(!lcd->isVisible());
+	}
+
+	void nodeWorkflowDnBTriggerLcd()
+	{
+		auto* song = Engine::getSong();
+		const auto fixture = QDir::fromNativeSeparators(qEnvironmentVariable("LMMS_DATA_DIR"))
+			+ QStringLiteral("/projects/demos/DnB.mmpz");
+		QVERIFY(QFile::exists(fixture));
+		song->loadProject(fixture);
+		QCOMPARE(song->projectFileName(), fixture);
+		QTemporaryDir converted(m_output + "/node-lcd-dnb-XXXXXX");
+		QVERIFY(converted.isValid());
+		QVERIFY(song->convertToNodeProject(converted.filePath("DnB.mmpn")));
+
+		auto* patterns = Engine::patternStore();
+		patterns->setCurrentPattern(12);
+		const auto& members = patterns->tracks();
+		const auto source = std::find_if(members.cbegin(), members.cend(), [](const auto* track) {
+			return track->name() == QStringLiteral("Fisa_Cym.ds");
+		});
+		QVERIFY(source != members.cend());
+		const auto index = std::distance(members.cbegin(), source);
+		auto* window = m_gui->mainWindow();
+		window->showNodeWorkflow();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		auto* lcd = window->findChild<QScrollArea*>("nodeWorkflowTriggerLcd");
+		QVERIFY(canvas && breadcrumb && lcd);
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		const QRectF bounds(QPointF(35, 40), QPointF(990, 143 + 120.0 * (members.size() - 1)));
+		const auto scale = std::min({(canvas->width() - 80) / bounds.width(),
+			(canvas->height() - 80) / bounds.height(), qreal{1.5}});
+		const auto point = (QPointF(canvas->width(), canvas->height()) / 2
+			+ (QPointF(75, 58 + 120.0 * index) - bounds.center()) * scale).toPoint();
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier, point);
+		QTRY_VERIFY(breadcrumb->text().contains(QStringLiteral("Fisa_Cym.ds")));
+		QVERIFY(lcd->isVisible());
+
+		for (int y = 40; y < canvas->height() - 40 && !lcd->property("wireSelected").toBool(); y += 3)
+		{
+			QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(canvas->width() / 3, y));
+		}
+		QVERIFY(lcd->property("wireSelected").toBool());
+
+		auto* engine = Engine::audioEngine();
+		bool available = false;
+		engine->storeAudioDevice();
+		engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+		const auto cleanup = qScopeGuard([song, engine] {
+			song->stop();
+			engine->restoreAudioDevice();
+		});
+		QVERIFY(available);
+		song->setPlayPos(6528, Song::PlayMode::Song);
+		song->playSong();
+		for (int period = 0; period < 4; ++period)
+		{
+			engine->renderNextPeriod();
+		}
+		const auto showsPlayingPattern = [lcd] {
+			for (auto* row : lcd->findChildren<QLabel*>())
+			{
+				if (row->property("nodeWorkflowTriggerLcdRow").toBool()
+					&& row->text() == QStringLiteral("domdom"))
+				{
+					return true;
+				}
+			}
+			return false;
+		};
+		QTRY_VERIFY(showsPlayingPattern());
+		QTest::qWait(2100);
+		QVERIFY(showsPlayingPattern());
+		QCOMPARE(patterns->currentPattern(), 12);
+		capture(window, "node-workflow-dnb-trigger-lcd");
+	}
+
+
+	void nodeWorkflowAudioSignalThreshold()
+	{
+		auto* window = m_gui->mainWindow();
+		auto* song = Engine::getSong();
+		if (!song->isNodeProject())
+		{
+			const auto actions = window->findChildren<QAction*>();
+			const auto create = std::find_if(actions.cbegin(), actions.cend(), [](const auto* action) {
+				return action->text() == QStringLiteral("New Node Workflow Project");
+			});
+			QVERIFY(create != actions.cend());
+			song->setModified(false);
+			(*create)->trigger();
+		}
+		auto* threshold = window->findChild<QDoubleSpinBox*>("nodeWorkflowAudioSilenceThreshold");
+		QVERIFY(threshold);
+		QCOMPARE(threshold->value(), -70.0);
+		auto* engine = Engine::audioEngine();
+		bool available = false;
+		engine->storeAudioDevice();
+		engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+		const bool wasMonitoring = NodeSignalActivity::monitoring();
+		const auto cleanup = qScopeGuard([engine, wasMonitoring] {
+			NodeSignalActivity::setMonitoring(wasMonitoring);
+			engine->restoreAudioDevice();
+		});
+		QVERIFY(available);
+		NodeSignalActivity::setMonitoring(true);
+		const auto frames = engine->framesPerPeriod();
+		AudioBuffer signal(frames, 2);
+		std::ranges::fill(signal.buffer(0), 0.00031f);
+		std::ranges::fill(signal.buffer(1), -0.00032f);
+		signal.updateAllSilenceFlags();
+		auto* mixer = Engine::mixer();
+		const auto mix = [&] {
+			mixer->mixMonoToChannel(signal, 0, 0, 0);
+			mixer->mixMonoToChannel(signal, 1, 0, 1);
+			std::vector<SampleFrame> output(frames);
+			mixer->masterMix(output.data());
+			return output;
+		};
+		const auto output = mix();
+		QVERIFY(!mixer->nodeMasterSignalActive(0));
+		QVERIFY(mixer->nodeMasterSignalActive(1));
+		QVERIFY(output.front()[0] > 0.0f);
+		QVERIFY(output.front()[1] < 0.0f);
+		threshold->setValue(-60.0);
+		const auto quieterDisplay = mix();
+		QVERIFY(!mixer->nodeMasterSignalActive(0));
+		QVERIFY(!mixer->nodeMasterSignalActive(1));
+		QCOMPARE(quieterDisplay.front()[0], output.front()[0]);
+		QCOMPARE(quieterDisplay.front()[1], output.front()[1]);
+		QCOMPARE(ConfigManager::inst()->value("ui", "nodeaudiosilencedb"), QStringLiteral("-60"));
+		threshold->setValue(-70.0);
+	}
+
+	void nodeWorkflowAggregateEdits()
+	{
+		NodeWorkflowCanvas canvas;
+		canvas.resize(960, 600);
+		canvas.setConnectionAggregation(true, 1);
+		const QColor color("#77C795");
+		const QList<NodeWorkflowCanvas::Node> nodes{
+			{QRectF(20, 40, 130, 300), QStringLiteral("Sources"), {}},
+			{QRectF(650, 40, 130, 300), QStringLiteral("Targets"), {}}
+		};
+		const QList<QPointF> outputs{{150, 110}, {150, 185}, {150, 260}};
+		const QList<QPointF> inputs{{650, 110}, {650, 260}};
+		QMap<int, int> links{{0, 0}, {1, 0}};
+		const auto initial = links;
+		std::function<void()> render;
+		render = [&] {
+			QList<NodeWorkflowCanvas::Port> ports;
+			QList<NodeWorkflowCanvas::Connection> wires;
+			for (int index = 0; index < outputs.size(); ++index)
+			{
+				ports.append({outputs.at(index), color, QStringLiteral("Output %1").arg(index),
+					true, {}, "audio", static_cast<unsigned>(index), [&, index](unsigned target) {
+						links[index] = static_cast<int>(target);
+						render();
+					}});
+			}
+			for (int index = 0; index < inputs.size(); ++index)
+			{
+				ports.append({inputs.at(index), color, QStringLiteral("Input %1").arg(index),
+					false, {}, "audio", static_cast<unsigned>(index), {}});
+			}
+			for (auto it = links.cbegin(); it != links.cend(); ++it)
+			{
+				wires.append({outputs.at(it.key()), inputs.at(it.value()), color, {}, [&, source = it.key()] {
+					links.remove(source);
+					render();
+				}});
+			}
+			canvas.setGraph(nodes, std::move(wires), std::move(ports));
+		};
+		render();
+		canvas.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&canvas));
+		canvas.fitGraph();
+		const auto scale = (canvas.width() - 80) / 760.0;
+		const auto point = (QPointF(canvas.width(), canvas.height()) / 2
+			+ (QPointF(580, 110) - QPointF(400, 190)) * scale).toPoint();
+		for (const bool save : {false, true})
+		{
+			bool staged = false;
+			QTimer::singleShot(0, &canvas, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu || menu->actions().isEmpty())
+				{
+					return;
+				}
+				QTimer::singleShot(0, &canvas, [&] {
+					auto* dialog = qobject_cast<QDialog*>(QApplication::activeModalWidget());
+					if (!dialog)
+					{
+						return;
+					}
+					auto* sources = dialog->findChild<QComboBox*>("nodeWorkflowConnectionEditSource");
+					auto* destinations = dialog->findChild<QComboBox*>("nodeWorkflowConnectionEditDestination");
+					auto* buttons = dialog->findChild<QDialogButtonBox*>();
+					auto* reconnect = dialog->findChild<QPushButton*>("nodeWorkflowConnectionReconnect");
+					auto* rows = dialog->findChild<QTableWidget*>("nodeWorkflowConnectionRows");
+					if (!sources || !destinations || !buttons || !reconnect || dialog->findChildren<QComboBox*>().size() != 2 || !rows || rows->rowCount() < 2)
+					{
+						dialog->reject();
+						return;
+					}
+					QTest::mouseClick(rows->viewport(), Qt::LeftButton, Qt::NoModifier,
+						rows->visualItemRect(rows->item(1, 1)).center());
+					const auto chooseNext = [](QComboBox* combo) {
+						combo->showPopup();
+						auto* view = combo->view();
+						const auto choice = combo->model()->index(1, combo->modelColumn());
+						view->scrollTo(choice);
+						QTest::mouseClick(view->viewport(), Qt::LeftButton, Qt::NoModifier,
+							view->visualRect(choice).center());
+						QCoreApplication::processEvents();
+					};
+					if (rows->currentRow() != 1 || !sources->currentText().endsWith(QStringLiteral("Output 1"))
+						|| sources->count() < 2 || destinations->count() < 2)
+					{
+						dialog->reject();
+						return;
+					}
+					chooseNext(sources);
+					chooseNext(destinations);
+					if (!reconnect->isEnabled() || !rows->item(1, 0)->text().endsWith(QStringLiteral("Output 1")))
+					{
+						dialog->reject();
+						return;
+					}
+					QTest::mouseClick(reconnect, Qt::LeftButton);
+					staged = links == initial && rows->item(1, 0)->text().endsWith(QStringLiteral("Output 2"))
+						&& rows->item(1, 1)->text().endsWith(QStringLiteral("Input 1"));
+					QTest::mouseClick(buttons->button(save ? QDialogButtonBox::Save : QDialogButtonBox::Cancel),
+						Qt::LeftButton);
+				});
+				menu->setActiveAction(menu->actions().first());
+				QTest::keyClick(menu, Qt::Key_Return);
+			});
+			QTest::mouseClick(&canvas, Qt::RightButton, Qt::NoModifier, point);
+			QVERIFY(staged);
+			if (!save)
+			{
+				QCOMPARE(links, initial);
+			}
+		}
+		QCOMPARE(links.size(), 2);
+		QCOMPARE(links.value(2, -1), 1);
+		QVERIFY(links.contains(0) && !links.contains(1));
+	}
+
+	void nodeWorkflowAggregatePorts()
+	{
+		NodeWorkflowCanvas canvas;
+		canvas.resize(960, 600);
+		const QColor typeColor("#77C795");
+		QList<NodeWorkflowCanvas::Node> nodes{
+			{QRectF(20, 40, 130, 430), QStringLiteral("Sources"), {}},
+			{QRectF(650, 40, 130, 430), QStringLiteral("Targets"), {}},
+		};
+		QList<NodeWorkflowCanvas::Port> ports;
+		QList<NodeWorkflowCanvas::Connection> wires;
+		for (int index = 0; index < 6; ++index)
+		{
+			const qreal y = 110 + 55 * index;
+			ports.append({QPointF(150, y), typeColor, QStringLiteral("Source %1 L").arg(index + 1), true, {}});
+			ports.append({QPointF(650, y), typeColor, QStringLiteral("Target %1 L").arg(index + 1), false, {}});
+		}
+		ports.append({QPointF(150, 453), typeColor, QStringLiteral("Source R"), true, {}});
+		ports.append({QPointF(650, 453), typeColor, QStringLiteral("Target R"), false, {}});
+		for (int source = 0; source < 6; ++source)
+		{
+			for (int destination = 0; destination < 6; ++destination)
+			{
+				wires.append({QPointF(150, 110 + 55 * source), QPointF(650, 110 + 55 * destination),
+					QColor("#D76D6D")});
+			}
+		}
+		wires.append({QPointF(150, 453), QPointF(650, 453), typeColor});
+		canvas.setGraph(std::move(nodes), std::move(wires), std::move(ports));
+		canvas.setConnectionAggregation(true, 4);
+		canvas.show();
+		QVERIFY(QTest::qWaitForWindowExposed(&canvas));
+		canvas.fitGraph();
+		const auto scale = std::min({(canvas.width() - 80) / 760.0, (canvas.height() - 80) / 430.0, 1.5});
+		const auto screen = [&canvas, scale](QPointF point) {
+			return (QPointF(canvas.width(), canvas.height()) / 2 + (point - QPointF(400, 255)) * scale).toPoint();
+		};
+		const auto checkBundle = [&](QPointF point, int sharedColumn, const QString& sharedLabel) {
+			bool correct = false;
+			QTimer::singleShot(0, &canvas, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu || menu->actions().isEmpty())
+				{
+					return;
+				}
+				QTimer::singleShot(0, &canvas, [&] {
+					auto* dialog = qobject_cast<QDialog*>(QApplication::activeModalWidget());
+					if (!dialog)
+					{
+						return;
+					}
+					auto* table = dialog->findChild<QTableWidget*>("nodeWorkflowConnectionRows");
+					correct = table && table->rowCount() == 6;
+					for (int row = 0; correct && row < table->rowCount(); ++row)
+					{
+						correct = table->item(row, sharedColumn)->text().endsWith(sharedLabel);
+					}
+					dialog->reject();
+				});
+				menu->setActiveAction(menu->actions().first());
+				QTest::keyClick(menu, Qt::Key_Return);
+			});
+			QTest::mouseClick(&canvas, Qt::RightButton, Qt::NoModifier, screen(point));
+			return correct;
+		};
+		QVERIFY(checkBundle(QPointF(220, 110), 0, QStringLiteral("Source 1 L")));
+		QVERIFY(checkBundle(QPointF(580, 110), 1, QStringLiteral("Target 1 L")));
+		capture(&canvas, "node-workflow-aggregate-input-output");
+	}
+
+	void nodeWorkflowRoot()
+	{
+		auto* window = m_gui->mainWindow();
+		const auto label = tr("New Node Workflow Project");
+		QAction* newNodeProject = nullptr;
+		for (auto* action : window->findChildren<QAction*>())
+		{
+			if (action->text() == label)
+			{
+				newNodeProject = action;
+				break;
+			}
+		}
+		QVERIFY(newNodeProject);
+		// Startup can mark the isolated, disposable project dirty.
+		Engine::getSong()->setModified(false);
+		newNodeProject->trigger();
+		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(canvas);
+		QTRY_VERIFY(canvas->isVisible() && !canvas->visibleRegion().isEmpty());
+		QCOMPARE(canvas->property("audioPortColor").value<QColor>(), QColor("#77C795"));
+		QCOMPARE(canvas->property("midiPortColor").value<QColor>(), QColor("#82BFFF"));
+		QCOMPARE(canvas->property("voicePortColor").value<QColor>(), QColor("#CBABFA"));
+		capture(window, "node-workflow-root");
+		auto* panel = window->findChild<QWidget*>("nodeWorkflowPatternPanel");
+		QVERIFY(panel);
+		QVERIFY(!panel->isVisible());
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.67));
+		QVERIFY(!panel->isVisible());
+		capture(window, "node-workflow-pattern-graph");
+
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		QTRY_VERIFY(panel->isVisible());
+		QVERIFY(panel->mapToGlobal(panel->rect().topLeft()).y()
+			>= canvas->mapToGlobal(canvas->rect().bottomLeft()).y());
+		QCOMPARE(panel->height(), 31);
+		auto* steps = panel->findChild<QWidget*>("nodeWorkflowPatternSteps");
+		QVERIFY(steps);
+		QTRY_VERIFY(steps->isVisible());
+		auto* patterns = Engine::patternStore();
+		QCOMPARE(patterns->currentPattern(), 0);
+		QVERIFY(!patterns->tracks().empty());
+		auto* clip = dynamic_cast<MidiClip*>(patterns->tracks().front()->getClip(0));
+		QVERIFY(clip);
+		QCOMPARE(clip->steps(), 16);
+		for (int step = 0; step < clip->steps(); ++step)
+		{
+			QVERIFY(!clip->noteAtStep(step));
+		}
+		capture(window, "node-workflow-pattern-kicker");
+		const QPoint firstStep(steps->width() / (2 * clip->steps()), steps->height() / 2);
+		QTest::mouseClick(steps, Qt::LeftButton, Qt::NoModifier, firstStep);
+		QVERIFY(clip->noteAtStep(0));
+
+		QToolButton* signalFlow = nullptr;
+		QToolButton* rootGraph = nullptr;
+		for (auto* button : canvas->window()->findChild<QWidget*>("nodeWorkflowContent")->findChildren<QToolButton*>())
+		{
+			if (!button->property("nodeWorkflowTool").toBool())
+			{
+				continue;
+			}
+			if (button->accessibleName() == QStringLiteral("Signal Flow"))
+			{
+				signalFlow = button;
+			}
+			else if (button->accessibleName() == QStringLiteral("Root Graph"))
+			{
+				rootGraph = button;
+			}
+		}
+		QVERIFY(signalFlow && rootGraph);
+		QVERIFY(signalFlow->isChecked());
+		auto* engine = Engine::audioEngine();
+		bool available = false;
+		engine->storeAudioDevice();
+		engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+		const auto restoreAudio = qScopeGuard([engine] { engine->restoreAudioDevice(); });
+		QVERIFY(available);
+		auto* song = Engine::getSong();
+		// Capture after the animation has advanced past the source port.
+		QTest::qWait(250);
+		song->playPattern();
+		const auto stopPlayback = qScopeGuard([song] { song->stop(); });
+		for (int period = 0; period < 16 && !Engine::mixer()->nodeMasterSignalActive(0); ++period)
+		{
+			engine->renderNextPeriod();
+		}
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(1));
+		canvas->repaint();
+		const auto subgraphSignal = window->screen()->grabWindow(window->winId());
+		QVERIFY(!subgraphSignal.isNull());
+		QVERIFY(subgraphSignal.save(m_output + "/node-workflow-pattern-signal.png"));
+		QTest::qWait(230);
+		for (int period = 0; period < 4; ++period)
+		{
+			engine->renderNextPeriod();
+		}
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(1));
+		canvas->repaint();
+		const auto advancedSignal = window->screen()->grabWindow(window->winId());
+		QVERIFY(!advancedSignal.isNull());
+		QVERIFY(advancedSignal.save(m_output + "/node-workflow-pattern-signal-advanced.png"));
+
+		song->setNodeMasterOutputConnected(0, false);
+		engine->renderNextPeriod();
+		QVERIFY(!Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(Engine::mixer()->nodeMasterSignalActive(1));
+		song->setNodeMasterOutputConnected(1, false);
+		engine->renderNextPeriod();
+		QVERIFY(!Engine::mixer()->nodeMasterSignalActive(0));
+		QVERIFY(!Engine::mixer()->nodeMasterSignalActive(1));
+		song->setNodeMasterOutputConnected(0, true);
+		song->setNodeMasterOutputConnected(1, true);
+
+		QTest::mouseClick(steps, Qt::LeftButton, Qt::NoModifier, firstStep);
+		QVERIFY(!clip->noteAtStep(0));
+		QTest::mouseClick(rootGraph, Qt::LeftButton);
+		QVERIFY(!panel->isVisible());
+		QVERIFY(signalFlow->isChecked());
+		QTest::mouseClick(signalFlow, Qt::LeftButton);
+		QVERIFY(!signalFlow->isChecked());
+
+		song->stop();
+		clip->setClipType(MidiClip::Type::MelodyClip);
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.67));
+		bool matchedPatternMenu = false;
+		bool capturedPatternMenu = false;
+		QTimer::singleShot(300, canvas, [&] {
+			auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+			if (!menu)
+			{
+				return;
+			}
+			const auto actions = menu->actions();
+			const QStringList expected{"Copy Node", "Paste Node", "Open Piano Roll", "Delete Node"};
+			QStringList labels;
+			for (const auto* action : actions)
+			{
+				labels.append(action->text());
+			}
+			matchedPatternMenu = labels == expected && actions[0]->isEnabled()
+				&& !actions[1]->isEnabled() && actions[2]->isEnabled() && actions[3]->isEnabled();
+			if (matchedPatternMenu)
+			{
+				auto* screen = menu->screen();
+				const QRect area = menu->frameGeometry().translated(-screen->geometry().topLeft());
+				const auto popup = screen->grabWindow(0, area.x(), area.y(), area.width(), area.height());
+				capturedPatternMenu = popup.save(m_output + "/node-workflow-pattern-note-menu.png");
+				menu->setActiveAction(actions[2]);
+				QTest::keyClick(menu, Qt::Key_Return);
+			}
+			else
+			{
+				menu->close();
+			}
+		});
+		QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier,
+			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
+		QVERIFY(matchedPatternMenu);
+		QVERIFY(capturedPatternMenu);
+		QCOMPARE(m_gui->pianoRoll()->currentMidiClip(), clip);
+		m_gui->pianoRoll()->parentWidget()->hide();
+		clip->setClipType(MidiClip::Type::BeatClip);
+		auto* nativePattern = m_gui->patternEditor();
+		auto* patternEditor = nativePattern->m_editor;
+		auto* patternWindow = qobject_cast<QMdiSubWindow*>(nativePattern->parentWidget());
+		QVERIFY(patternWindow);
+		patternWindow->setGeometry(QRect(QPoint(0, 0),
+			QSize(1000, 600).boundedTo(window->workspace()->viewport()->size())));
+		nativePattern->show();
+		patternWindow->show();
+		patternWindow->raise();
+		QTRY_VERIFY(patternEditor->isVisible());
+		const auto pixelsPerBar = patternEditor->pixelsPerBar();
+		QCOMPARE(pixelsPerBar, TimePos::stepsPerBar() * PatternStepRow::StepWidth);
+		patternEditor->cloneSteps();
+		patternEditor->cloneSteps();
+		QCOMPARE(clip->steps(), 64);
+		QCOMPARE(patternEditor->pixelsPerBar(), pixelsPerBar);
+		auto* scroll = patternEditor->findChild<QScrollBar*>("patternContentHorizontalScroll");
+		QVERIFY(scroll);
+		QTRY_VERIFY(scroll->isVisible() && scroll->maximum() > 0);
+		MidiClipView* clipView = nullptr;
+		for (auto* view : patternEditor->findChildren<MidiClipView*>())
+		{
+			if (view->getMidiClip() == clip && view->isVisible())
+			{
+				clipView = view;
+				break;
+			}
+		}
+		QVERIFY(clipView);
+		auto* trackRow = clipView->parentWidget()->parentWidget();
+		const auto headerOrigin = trackRow->mapToGlobal(QPoint(0, 0));
+		scroll->setValue(scroll->maximum());
+		QCOMPARE(trackRow->mapToGlobal(QPoint(0, 0)), headerOrigin);
+		const int last = clip->steps() - 1;
+		const QPoint lastStep(lmms::gui::ClipView::BORDER_WIDTH + last * PatternStepRow::StepWidth
+				+ PatternStepRow::StepWidth / 2, 12);
+		QTRY_VERIFY2(clipView->visibleRegion().contains(lastStep),
+			qPrintable(QStringLiteral("Step=(%1,%2) clipWidth=%3 trackWidth=%4 visibleRight=%5 scroll=%6/%7")
+				.arg(lastStep.x()).arg(lastStep.y()).arg(clipView->width()).arg(clipView->parentWidget()->width())
+				.arg(clipView->visibleRegion().boundingRect().right()).arg(scroll->value()).arg(scroll->maximum())));
+		QTest::mouseClick(clipView, Qt::LeftButton, Qt::NoModifier, lastStep);
+		QVERIFY(clip->noteAtStep(last));
+		capture(window, "node-workflow-native-pattern-scroll");
+	}
+
 	void aiCacheManagement()
 	{
 		QStandardPaths::setTestModeEnabled(true);

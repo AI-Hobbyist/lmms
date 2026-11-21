@@ -705,7 +705,10 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		m_steps = TimePos::stepsPerBar();
 	}
 
-	checkType();
+	if (!m_notes.empty() || m_clipType != Type::MelodyClip)
+	{
+		checkType();
+	}
 
 	int len = _this.attribute("len").toInt();
 	if (len <= 0)

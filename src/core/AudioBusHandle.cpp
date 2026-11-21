@@ -33,6 +33,7 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
+#include "NodeAudioSilenceThreshold.h"
 
 namespace lmms
 {
@@ -96,6 +97,31 @@ void AudioBusHandle::setName(const QString& newName)
 
 
 
+std::optional<mix_ch_t> AudioBusHandle::MixerInput::resolveChannel(Mixer& mixer, mix_ch_t fallback) const
+{
+	if (!target)
+	{
+		return fallback;
+	}
+	if (!lifetime)
+	{
+		return std::nullopt;
+	}
+
+	const auto index = target->index();
+	if (index < 0 || index >= mixer.numChannels() || mixer.mixerChannel(index) != target)
+	{
+		return std::nullopt;
+	}
+	return static_cast<mix_ch_t>(index);
+}
+
+void AudioBusHandle::setMixerInputs(std::optional<MixerInputs> inputs)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	m_mixerInputs = inputs;
+}
+
 bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
@@ -109,8 +135,13 @@ bool AudioBusHandle::processEffects()
 
 void AudioBusHandle::doProcessing()
 {
+	const bool monitorSignal = NodeSignalActivity::monitoring();
 	if (m_mutedModel && m_mutedModel->value())
 	{
+		if (monitorSignal)
+		{
+			m_nodeSignalActivity.updateAudio(0);
+		}
 		return;
 	}
 
@@ -241,10 +272,40 @@ void AudioBusHandle::doProcessing()
 
 	// handle effects
 	const bool anyOutputAfterEffects = processEffects();
-	if (anyOutputAfterEffects || m_bufferUsage)
+	const bool hasOutput = anyOutputAfterEffects || m_bufferUsage;
+	if (monitorSignal)
 	{
-		// TODO: improve the flow here - convert to pull model
-		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel); // send output to mixer
+		unsigned mask = 0;
+		if (hasOutput)
+		{
+			m_buffer.updateAllSilenceFlags();
+			const auto threshold = nodeAudioSilenceAmplitude.load(std::memory_order_relaxed);
+			const unsigned left = m_buffer.absPeakValue(0) >= threshold ? 1 : 0;
+			const unsigned right = m_buffer.absPeakValue(1) >= threshold ? 2 : 0;
+			mask = left | right;
+		}
+		m_nodeSignalActivity.updateAudio(mask);
+	}
+	if (hasOutput)
+	{
+		auto* mixer = Engine::mixer();
+		if (m_mixerInputs)
+		{
+			for (ch_cnt_t side = 0; side < m_mixerInputs->size(); ++side)
+			{
+				if (const auto& input = (*m_mixerInputs)[side])
+				{
+					if (const auto channel = input->resolveChannel(*mixer, m_nextMixerChannel))
+					{
+						mixer->mixMonoToChannel(m_buffer, side, *channel, input->side);
+					}
+				}
+			}
+		}
+		else
+		{
+			mixer->mixToChannel(m_buffer, m_nextMixerChannel);
+		}
 		m_bufferUsage = false;
 	}
 }

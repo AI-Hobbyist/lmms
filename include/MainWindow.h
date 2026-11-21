@@ -88,6 +88,8 @@ public:
 	///         cancel the action.
 	///
 	bool mayChangeProject(bool stopPlayback);
+	void importClassicProjectAsNode(const QString& path = {});
+	bool canImportAsClassicProject(const QString& path);
 
 	// Auto save timer intervals. The slider in SetupDialog.cpp wants
 	// minutes and the rest milliseconds.
@@ -159,6 +161,7 @@ public slots:
 	void toggleAutomationEditorWin();
 	void togglePatternEditorWin(bool forceShow = false);
 	void toggleSongEditorWin();
+	void showNodeWorkflow();
 	void toggleProjectNotesWin();
 	void toggleMicrotunerWin();
 	void toggleMixerWin();
@@ -185,6 +188,7 @@ protected:
 
 
 private:
+	bool saveWorkspaceCopy(bool nodeFormat);
 	MainWindow();
 	MainWindow( const MainWindow & );
 	~MainWindow() override;
@@ -243,6 +247,7 @@ private:
 	friend class GuiApplication;
 
 	QMenu * m_viewMenu;
+	QAction* m_nodeEditorAction = nullptr;
 
 	ToolButton * m_metronomeToggle;
 
@@ -254,6 +259,7 @@ private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
 	void updateViewMenu();
+	void updateNodeEditorAction();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();

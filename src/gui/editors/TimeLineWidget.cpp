@@ -50,6 +50,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 		const TimePos& begin, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
+	m_viewportStart{xoff},
 	m_ppb{ppb},
 	m_timeline{&timeline},
 	m_begin{begin}
@@ -73,9 +74,10 @@ TimeLineWidget::~TimeLineWidget()
 
 
 
-void TimeLineWidget::setXOffset(const int x)
+void TimeLineWidget::setXOffset(int x, int viewportStart)
 {
 	m_xOffset = x;
+	m_viewportStart = viewportStart < 0 ? x : viewportStart;
 }
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
@@ -138,7 +140,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), p.background() );
 
 	// Clip so that we only draw everything starting from the offset
-	p.setClipRect(m_xOffset, 0, width() - m_xOffset, height());
+	p.setClipRect(m_viewportStart, 0, width() - m_viewportStart, height());
 
 	// Variables for the loop rectangle
 	int const loopRectMargin = getLoopRectangleVerticalPadding();
@@ -235,7 +237,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
 
 	// Only draw the position marker if the position line is in view
-	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - marker.width() / 2)
+	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_viewportStart
+		&& markerX(m_timeline->pos()) < width() - marker.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
@@ -275,7 +278,7 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 	if (mode == "handles")
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
-		const auto leftMost = std::max(markerX(m_timeline->loopBegin()), m_xOffset);
+		const auto leftMost = std::max(markerX(m_timeline->loopBegin()), m_viewportStart);
 		const auto rightMost = std::min(markerX(m_timeline->loopEnd()), width());
 		// Distance from click to handle, positive aimed towards center of loop
 		const auto deltaLeft = xPos - leftMost;
@@ -314,7 +317,7 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
 	const auto pos = position(event);
 
-	if (pos.x() < m_xOffset) { return; }
+	if (pos.x() < m_viewportStart) { return; }
 
 	const auto shift = event->modifiers() & Qt::ShiftModifier;
 	const auto ctrl = event->modifiers() & Qt::ControlModifier;
@@ -443,7 +446,7 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 
 void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-	if (event->x() < m_xOffset) { return; }
+	if (event->x() < m_viewportStart) { return; }
 
 	auto menu = QMenu{};
 

@@ -7,7 +7,10 @@
 #include <QDomElement>
 #include <optional>
 #include <QSet>
+#include <QMap>
 namespace lmms {
+class SVSClip;
+
 class SVSTrack : public Track
 {
 	Q_OBJECT
@@ -23,6 +26,8 @@ public:
 	std::optional<bar_t> frozenExportLength() const;
 	gui::TrackView* createView(gui::TrackContainerView*) override;
 	Clip* createClip(const TimePos&) override;
+	void setNodeVoiceSource(const QString& id, const QDomElement& state);
+	void clearNodeVoiceSources();
 	void saveTrackSpecificSettings(QDomDocument&, QDomElement&, bool) override;
 	void loadTrackSpecificSettings(const QDomElement&) override;
 	void setName(const QString&) override;
@@ -56,6 +61,13 @@ signals:
 	void noteEnded();
 
 private:
+	clipVector synthesisClips() const;
+	struct NodeVoiceSource
+	{
+		SVSClip* clip = nullptr;
+		QString state;
+	};
+	QMap<QString, NodeVoiceSource> m_nodeVoiceSources;
 	void clearNoteActivity();
 	QSet<QPair<quintptr, int>> m_activeNotes;
 	int m_lastActivityTick = -1;

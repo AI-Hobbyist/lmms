@@ -219,7 +219,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		{
 			if (clipView->getClip()->startPosition().getBar() == curPattern)
 			{
-				clipView->move(0, clipView->y());
+				clipView->move(-m_patternScrollOffset, clipView->y());
 				clipView->raise();
 				clipView->show();
 			}
@@ -575,10 +575,28 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
+	if (m_trackView->trackContainerView()->fixedClips())
+	{
+		for (auto* clipView : m_clipViews)
+		{
+			clipView->setFixedWidth(fixedClipWidth());
+		}
+	}
 	// Update background
 	updateBackground();
 	// Force redraw
 	QWidget::resizeEvent( resizeEvent );
+}
+
+void TrackContentWidget::setPatternScroll(int offset, int contentWidth)
+{
+	m_patternScrollOffset = offset;
+	m_patternContentWidth = contentWidth;
+	for (auto* clipView : m_clipViews)
+	{
+		clipView->setFixedWidth(fixedClipWidth());
+		clipView->move(-offset, clipView->y());
+	}
 }
 
 

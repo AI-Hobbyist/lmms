@@ -23,6 +23,7 @@
  */
 
 #include "SampleTrackView.h"
+#include "NodeWorkflowMixerSelection.h"
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -240,7 +241,7 @@ void SampleTrackView::createMixerLine()
 
 void SampleTrackView::assignMixerLine(int channelIndex)
 {
-	model()->mixerChannelModel()->setValue(channelIndex);
+	assignTrackMixerChannel(*model(), *model()->mixerChannelModel(), channelIndex);
 
 	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
 }

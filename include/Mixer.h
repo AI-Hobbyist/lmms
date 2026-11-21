@@ -26,6 +26,7 @@
 #define LMMS_MIXER_H
 
 #include "AudioBuffer.h"
+#include "NodeSignalActivity.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "Model.h"
@@ -34,6 +35,8 @@
 #include <atomic>
 #include <optional>
 #include <QColor>
+#include <QPointF>
+#include <QUuid>
 
 namespace lmms
 {
@@ -49,6 +52,8 @@ public:
 	virtual ~MixerChannel();
 
 	EffectChain m_fxChain;
+	bool m_nodeEffect = false;
+	std::optional<QPointF> m_nodeEffectPosition;
 
 	// set to true if any effect in the channel is enabled and running
 	bool m_stillRunning;
@@ -72,6 +77,7 @@ public:
 	MixerRouteVector m_receives;
 
 	int index() const { return m_channelIndex; }
+	QUuid nodeWorkflowId();
 	void setIndex(int index) { m_channelIndex = index; }
 
 	bool isMaster() { return m_channelIndex == 0; }
@@ -87,11 +93,21 @@ public:
 	std::atomic_size_t m_dependenciesMet;
 	void incrementDeps();
 	void processed();
+	bool nodeBoundaryOutputConnected(ch_cnt_t side) const
+	{
+		return (m_nodeBoundaryOutputs & (1u << side)) != 0;
+	}
+	void setNodePatternEffect(bool pattern) { m_nodePatternEffect = pattern; }
 
 private:
+	friend class Mixer;
+
+	QUuid m_nodeWorkflowId;
 	void doProcessing() override;
 	int m_channelIndex;
 	std::optional<QColor> m_color;
+	unsigned m_nodeBoundaryOutputs = 3;
+	bool m_nodePatternEffect = false;
 };
 
 class MixerRoute : public QObject
@@ -127,11 +143,24 @@ public:
 	}
 
 	void updateName();
+	static constexpr unsigned StereoChannels = 0b1001;
+	unsigned channelPairs() const { return m_channelPairs; }
+	void setChannelPairs(unsigned pairs) { m_channelPairs = pairs; }
+	void updateNodeAudioSignal(unsigned source, unsigned targets)
+	{
+		m_nodeSignalActivity.at(source).updateAudio(targets);
+	}
+	bool nodeSignalActive(unsigned source, unsigned target) const
+	{
+		return m_nodeSignalActivity.at(source).active(target);
+	}
 
 	private:
 		MixerChannel * m_from;
 		MixerChannel * m_to;
 		FloatModel m_amount;
+		unsigned m_channelPairs = StereoChannels;
+		std::array<NodeSignalActivity, 2> m_nodeSignalActivity;
 };
 
 
@@ -143,6 +172,7 @@ public:
 	~Mixer() override;
 
 	void mixToChannel(const AudioBuffer& buffer, mix_ch_t dest);
+	void mixMonoToChannel(const AudioBuffer& buffer, ch_cnt_t sourceSide, mix_ch_t dest, ch_cnt_t destSide);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );
@@ -173,6 +203,8 @@ public:
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
 	bool isInfiniteLoop(mix_ch_t fromChannel, mix_ch_t toChannel);
+	bool setNodeChannelSend(mix_ch_t from, ch_cnt_t source, mix_ch_t to, ch_cnt_t destination, bool connected);
+	bool setNodeEffectBoundaryOutput(mix_ch_t channel, ch_cnt_t side, bool connected);
 	bool checkInfiniteLoop( MixerChannel * from, MixerChannel * to );
 
 	// return the FloatModel of fromChannel sending its output to the input of
@@ -211,10 +243,18 @@ public:
 	{
 		return m_mixerChannels.size();
 	}
+	bool nodeMasterSignalActive(unsigned side) const { return m_nodeMasterSignalActivity.active(side); }
+	unsigned nodeMasterOutputMask() const { return m_nodeMasterOutputMask.load(std::memory_order_relaxed); }
+	void setNodeMasterOutputMask(unsigned mask) { m_nodeMasterOutputMask.store(mask, std::memory_order_relaxed); }
 
 	MixerRouteVector m_mixerRoutes;
 
+signals:
+	void channelTopologyChanged();
+
 private:
+	NodeSignalActivity m_nodeMasterSignalActivity;
+	std::atomic_uint m_nodeMasterOutputMask{3};
 	void recordRouteMembership(MixerRoute* route, bool removing);
 	// the mixer channels in the mixer. index 0 is always master.
 	std::vector<MixerChannel*> m_mixerChannels;

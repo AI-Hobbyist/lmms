@@ -202,7 +202,7 @@ bool DataFile::validate( QString extension )
 	switch( m_type )
 	{
 	case Type::SongProject:
-		if( extension == "mmp" || extension == "mmpz" )
+		if( extension == "mmp" || extension == "mmpn" || extension == "mmpnz" || extension == "mmpz" )
 		{
 			return true;
 		}
@@ -226,7 +226,7 @@ bool DataFile::validate( QString extension )
 		}
 		break;
 	case Type::Unknown:
-		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
+		if (! ( extension == "mmp" || extension == "mmpn" || extension == "mmpnz" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
@@ -259,23 +259,61 @@ bool DataFile::validate( QString extension )
 
 
 
+bool DataFile::isNodeWorkflow() const
+{
+	return isNodeWorkflow(*this);
+}
+
+bool DataFile::isNodeWorkflow(const QDomDocument& document)
+{
+	const auto head = document.documentElement().firstChildElement("head");
+	return !head.firstChildElement("nodeworkflow").isNull() || head.attribute("nodeWorkflow") == "1";
+}
+
+QDomElement DataFile::nodeWorkflow() const
+{
+	return m_head.firstChildElement("nodeworkflow");
+}
+
+void DataFile::setNodeWorkflow(const QDomElement& workflow)
+{
+	auto replacement = workflow.isNull()
+		? createElement("nodeworkflow")
+		: importNode(workflow, true).toElement();
+	if (workflow.isNull())
+	{
+		replacement.setAttribute("version", 1);
+	}
+
+	const auto previous = nodeWorkflow();
+	if (!previous.isNull())
+	{
+		m_head.replaceChild(replacement, previous);
+	}
+	else
+	{
+		m_head.appendChild(replacement);
+	}
+	m_head.removeAttribute("nodeWorkflow");
+}
+
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
-	const QString extension = _fn.section( '.', -1 );
+	const QString extension = QFileInfo(_fn).suffix().toLower();
 
 	switch( type() )
 	{
 		case Type::SongProject:
-			if( extension != "mmp" &&
+			if( extension != "mmp" && extension != "mmpn" && extension != "mmpnz" &&
 					extension != "mpt" &&
 					extension != "mmpz" )
 			{
 				if( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
 				{
-					return _fn + ".mmpz";
+					return _fn + (isNodeWorkflow() ? ".mmpnz" : ".mmpz");
 				}
-				return _fn + ".mmp";
+				return _fn + (isNodeWorkflow() ? ".mmpn" : ".mmp");
 			}
 			break;
 		case Type::SongProjectTemplate:
@@ -343,7 +381,6 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	const QString fullName = withResources
 		? nameWithExtension(bundleDir + "/" + fInfo.fileName())
 		: nameWithExtension(filename);
-	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 
 	using gui::SongEditor;
@@ -389,7 +426,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QSaveFile outfile(fullNameTemp);
+	QSaveFile outfile(fullName);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
@@ -401,8 +438,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	const QString extension = fullName.section('.', -1);
-	if (extension == "mmpz" || extension == "xptz")
+	const QString extension = QFileInfo(fullName).suffix().toLower();
+	if (extension == "mmpz" || extension == "mmpnz" || extension == "xptz")
 	{
 		QString xml;
 		QTextStream ts( &xml );
@@ -415,27 +452,21 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		write( ts );
 	}
 
+	if (!ConfigManager::inst()->value("app", "disablebackup").toInt() && QFileInfo(fullName).isFile())
+	{
+		if ((QFile::exists(fullNameBak) && !QFile::remove(fullNameBak)) || !QFile::copy(fullName, fullNameBak))
+		{
+			showError(SongEditor::tr("Could not write file"),
+				SongEditor::tr("Could not create a backup of %1.").arg(fullName));
+			return false;
+		}
+	}
 	if (!outfile.commit())
 	{
 		showError(SongEditor::tr("Could not write file"),
 			SongEditor::tr("An unknown error has occurred and the file could not be saved."));
 		return false;
 	}
-
-	if (ConfigManager::inst()->value("app", "disablebackup").toInt())
-	{
-		// remove current file
-		QFile::remove(fullName);
-	}
-	else
-	{
-		// remove old backup file
-		QFile::remove(fullNameBak);
-		// move current file to backup file
-		QFile::rename(fullName, fullNameBak);
-	}
-	// move temporary file to current file
-	QFile::rename(fullNameTemp, fullName);
 
 	return true;
 }

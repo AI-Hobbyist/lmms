@@ -6153,6 +6153,50 @@ Reason: &quot;%2&quot;</source>
         <source>The following errors occurred while loading: </source>
         <translation>载入时发生以下错误：</translation>
     </message>
+    <message>
+        <source>Custom node positions will be omitted.</source>
+        <translation>经典工程将省略自定义节点位置。</translation>
+    </message>
+    <message>
+        <source>Logical inputs and their connections will be omitted.</source>
+        <translation>经典工程将省略逻辑输入及其连线。</translation>
+    </message>
+    <message>
+        <source>Both Master output channels will be enabled.</source>
+        <translation>主输出的左右声道都将启用。</translation>
+    </message>
+    <message>
+        <source>Mixer send %1 → %2 will become stereo.</source>
+        <translation>混音发送 %1 → %2 将改为立体声。</translation>
+    </message>
+    <message>
+        <source>Effect node %1 will be represented as a mixer channel.</source>
+        <translation>效果节点 %1 将作为混音通道保留。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic stereo mixer assignment.</source>
+        <translation>轨道 %1 将使用其经典立体声混音分配。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic event and audio connections.</source>
+        <translation>轨道 %1 将使用其经典事件和音频连接。</translation>
+    </message>
+    <message>
+        <source>Standalone step patterns will be omitted.</source>
+        <translation>独立步进序列将被省略。</translation>
+    </message>
+    <message>
+        <source>Standalone piano rolls will be omitted.</source>
+        <translation>独立钢琴窗将被省略。</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>空白 SVS 钢琴窗</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>空白 MIDI 钢琴窗</translation>
+    </message>
 </context>
 <context>
     <name>lmms::StereoEnhancerControls</name>
@@ -8576,6 +8620,10 @@ Please make sure you have write permission to the file and the directory contain
         <source>--- Factory files ---</source>
         <translation>---软件自带文件---</translation>
     </message>
+    <message>
+        <source>Import as Node Project</source>
+        <translation>导入为节点工程</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::FileDialog</name>
@@ -10784,6 +10832,765 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>My Favorites</source>
         <translation>我的收藏</translation>
+    </message>
+    <message>
+        <source>Classic Project Unavailable</source>
+        <translation>无法使用经典工程</translation>
+    </message>
+    <message>
+        <source>Node Project Only</source>
+        <translation>仅支持节点工程</translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation>不再提示</translation>
+    </message>
+    <message>
+        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>已拒绝转换。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
+    </message>
+    <message>
+        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>已拒绝导入。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
+    </message>
+    <message>
+        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
+        <translation>经典工程格式无法保存轨道子图中新添加的节点和路由。添加此节点后，该工程将无法转为经典工程。</translation>
+    </message>
+    <message>
+        <source>Aggregation Settings</source>
+        <translation>聚合设置</translation>
+    </message>
+    <message>
+        <source>Merge Connections Sharing a Port</source>
+        <translation>合并共享同一端口的连线</translation>
+    </message>
+    <message>
+        <source>Connections Greater Than</source>
+        <translation>同端口连接数大于</translation>
+    </message>
+    <message>
+        <source>Aggregate Bus</source>
+        <translation>聚合总线</translation>
+    </message>
+    <message>
+        <source>Play Song</source>
+        <translation>播放歌曲</translation>
+    </message>
+    <message>
+        <source>Pause Song</source>
+        <translation>暂停歌曲</translation>
+    </message>
+    <message>
+        <source>Stop Song</source>
+        <translation>停止歌曲</translation>
+    </message>
+    <message>
+        <source>Input Port</source>
+        <translation>入口端口</translation>
+    </message>
+    <message>
+        <source>Output Port</source>
+        <translation>出口端口</translation>
+    </message>
+    <message>
+        <source>Instrument Track</source>
+        <translation>乐器轨</translation>
+    </message>
+    <message>
+        <source>Sample Track</source>
+        <translation>采样轨</translation>
+    </message>
+    <message>
+        <source>SVS Voice Track</source>
+        <translation>SVS 人声轨</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation>声道</translation>
+    </message>
+    <message>
+        <source>Open SVS Piano Roll</source>
+        <translation>打开 SVS 钢琴窗</translation>
+    </message>
+    <message>
+        <source>Logical input for graph routing</source>
+        <translation>图内路由逻辑入口</translation>
+    </message>
+    <message>
+        <source>Signal Type</source>
+        <translation>信号类型</translation>
+    </message>
+    <message>
+        <source>Connected Targets</source>
+        <translation>已连接目标</translation>
+    </message>
+    <message>
+        <source>Device Binding</source>
+        <translation>设备绑定</translation>
+    </message>
+    <message>
+        <source>Master connects to the configured audio output</source>
+        <translation>Master 连接到配置的主输出</translation>
+    </message>
+    <message>
+        <source>Independent Pattern step data</source>
+        <translation>独立 Pattern 步进数据</translation>
+    </message>
+    <message>
+        <source>Active Steps</source>
+        <translation>已激活步进</translation>
+    </message>
+    <message>
+        <source>Connected Tracks</source>
+        <translation>已连接轨道</translation>
+    </message>
+    <message>
+        <source>Open Step Sequencer</source>
+        <translation>打开步进音序器</translation>
+    </message>
+    <message>
+        <source>Supports notes, lyrics, and voice curves</source>
+        <translation>支持音符、歌词和歌声曲线</translation>
+    </message>
+    <message>
+        <source>The same clip can be edited from the graph or track</source>
+        <translation>同一片段可从节点图或轨道编辑</translation>
+    </message>
+    <message>
+        <source>Voice Notes</source>
+        <translation>歌声音符</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>音符</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>添加位置</translation>
+    </message>
+    <message>
+        <source>Standalone Node</source>
+        <translation>独立节点</translation>
+    </message>
+    <message>
+        <source>SVC Voice Track</source>
+        <translation>SVC 人声轨</translation>
+    </message>
+    <message>
+        <source>Plays converted audio from its clips</source>
+        <translation>播放当前片段的转换音频</translation>
+    </message>
+    <message>
+        <source>Audio Source</source>
+        <translation>音频来源</translation>
+    </message>
+    <message>
+        <source>Clip conversion result</source>
+        <translation>片段转换结果</translation>
+    </message>
+    <message>
+        <source>Open Conversion Settings</source>
+        <translation>打开转换设置</translation>
+    </message>
+    <message>
+        <source>Automation curves control bound parameters</source>
+        <translation>自动化曲线控制已绑定的参数</translation>
+    </message>
+    <message>
+        <source>Bound Parameters</source>
+        <translation>绑定参数</translation>
+    </message>
+    <message>
+        <source>Automation Clips</source>
+        <translation>自动化片段</translation>
+    </message>
+    <message>
+        <source>SVS Plugin</source>
+        <translation>SVS 插件</translation>
+    </message>
+    <message>
+        <source>Input preserves lyrics, curves, and clip timing</source>
+        <translation>输入保留歌词、曲线与片段时序</translation>
+    </message>
+    <message>
+        <source>Input Type</source>
+        <translation>输入类型</translation>
+    </message>
+    <message>
+        <source>Audio Output</source>
+        <translation>音频输出</translation>
+    </message>
+    <message>
+        <source>Open Voice Settings</source>
+        <translation>打开声库设置</translation>
+    </message>
+    <message>
+        <source>Instrument Plugin</source>
+        <translation>乐器插件</translation>
+    </message>
+    <message>
+        <source>Managed by the LMMS plugin host</source>
+        <translation>由现有 LMMS 宿主管理实例</translation>
+    </message>
+    <message>
+        <source>Plugin Identifier</source>
+        <translation>插件标识</translation>
+    </message>
+    <message>
+        <source>Instance Name</source>
+        <translation>实例名称</translation>
+    </message>
+    <message>
+        <source>Open Plugin</source>
+        <translation>打开插件</translation>
+    </message>
+    <message>
+        <source>Open Mixer</source>
+        <translation>打开调音台</translation>
+    </message>
+    <message>
+        <source>Add Mixer Channel</source>
+        <translation>添加通道</translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation>移除 %1</translation>
+    </message>
+    <message>
+        <source>Dynamic channels and sends</source>
+        <translation>动态通道与发送</translation>
+    </message>
+    <message>
+        <source>Selected Channel</source>
+        <translation>选中通道</translation>
+    </message>
+    <message>
+        <source>Send Target</source>
+        <translation>发送目标</translation>
+    </message>
+    <message>
+        <source>Send Amount</source>
+        <translation>发送量</translation>
+    </message>
+    <message>
+        <source>Audio Effect</source>
+        <translation>音频效果器</translation>
+    </message>
+    <message>
+        <source>Input / Output</source>
+        <translation>输入 / 输出</translation>
+    </message>
+    <message>
+        <source>2 inputs / 2 outputs</source>
+        <translation>2 输入 / 2 输出</translation>
+    </message>
+    <message>
+        <source>Bypass</source>
+        <translation>旁路</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>开启</translation>
+    </message>
+    <message>
+        <source>Open Effect Rack</source>
+        <translation>打开效果器机架</translation>
+    </message>
+    <message>
+        <source>Toggle Bypass</source>
+        <translation>切换旁路</translation>
+    </message>
+    <message>
+        <source>Default Project Layout</source>
+        <translation>默认节点工程</translation>
+    </message>
+    <message>
+        <source>LMMS default template tracks</source>
+        <translation>使用 LMMS 默认模板</translation>
+    </message>
+    <message>
+        <source>Tempo and Meter</source>
+        <translation>起始设置</translation>
+    </message>
+    <message>
+        <source>%1 BPM · %2/%3</source>
+        <translation>%1 BPM · %2/%3</translation>
+    </message>
+    <message>
+        <source>Other Tracks</source>
+        <translation>其他轨道</translation>
+    </message>
+    <message>
+        <source>Pattern Member</source>
+        <translation>节拍成员</translation>
+    </message>
+    <message>
+        <source>Open Song Editor</source>
+        <translation>打开歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Inspector</source>
+        <translation>检查器</translation>
+    </message>
+    <message>
+        <source>Uses the sample track clips and audio bus</source>
+        <translation>沿用采样轨的片段和音频总线</translation>
+    </message>
+    <message>
+        <source>Mixer Target</source>
+        <translation>混音目标</translation>
+    </message>
+    <message>
+        <source>2 × mono (L / R)</source>
+        <translation>2 × 单声道（L / R）</translation>
+    </message>
+    <message>
+        <source>Open Sample Clip</source>
+        <translation>打开采样片段</translation>
+    </message>
+    <message>
+        <source>MIDI is only for note entry from an external device</source>
+        <translation>MIDI 仅供外部设备录入音符</translation>
+    </message>
+    <message>
+        <source>Default sound source signal chain</source>
+        <translation>音源轨子图 · 默认信号链</translation>
+    </message>
+    <message>
+        <source>Independent L / R ports</source>
+        <translation>L / R 独立端口</translation>
+    </message>
+    <message>
+        <source>Back to Parent</source>
+        <translation>返回上层</translation>
+    </message>
+    <message>
+        <source>Multiple MIDI and per-channel audio inputs</source>
+        <translation>多个 MIDI 和逐声道音频入口</translation>
+    </message>
+    <message>
+        <source>MIDI Inputs</source>
+        <translation>MIDI 入口</translation>
+    </message>
+    <message>
+        <source>Audio Inputs</source>
+        <translation>音频入口</translation>
+    </message>
+    <message>
+        <source>Open Sample Track</source>
+        <translation>打开采样轨</translation>
+    </message>
+    <message>
+        <source>Back to Root Graph</source>
+        <translation>返回根图</translation>
+    </message>
+    <message>
+        <source>Pattern columns follow the arrangement timeline</source>
+        <translation>Pattern 列沿用现有编排时序</translation>
+    </message>
+    <message>
+        <source>Pattern Column</source>
+        <translation>Pattern 列</translation>
+    </message>
+    <message>
+        <source>Trigger Source</source>
+        <translation>触发来源</translation>
+    </message>
+    <message>
+        <source>Pattern clips in the arrangement</source>
+        <translation>编排中的 Pattern 片段</translation>
+    </message>
+    <message>
+        <source>Open Pattern Editor</source>
+        <translation>打开节拍编辑器</translation>
+    </message>
+    <message>
+        <source>Project audio, MIDI, and logical device connections</source>
+        <translation>工程的音频、MIDI 与逻辑设备连接</translation>
+    </message>
+    <message>
+        <source>Logical Inputs</source>
+        <translation>逻辑入口</translation>
+    </message>
+    <message>
+        <source>Open Multitrack Graph</source>
+        <translation>打开多轨子图</translation>
+    </message>
+    <message>
+        <source>Open Audio Settings</source>
+        <translation>打开音频设置</translation>
+    </message>
+    <message>
+        <source>Import Classic Project as Node Project…</source>
+        <translation>导入经典工程为节点工程…</translation>
+    </message>
+    <message>
+        <source>Import Classic Project</source>
+        <translation>导入经典工程</translation>
+    </message>
+    <message>
+        <source>Save Node Project</source>
+        <translation>保存节点工程</translation>
+    </message>
+    <message>
+        <source>Save Classic Project</source>
+        <translation>保存经典工程</translation>
+    </message>
+    <message>
+        <source>Add Step Subgraph</source>
+        <translation>添加步进子图</translation>
+    </message>
+    <message>
+        <source>Add Note Subgraph</source>
+        <translation>添加音符子图</translation>
+    </message>
+    <message>
+        <source>Add Audio Subgraph</source>
+        <translation>添加音频子图</translation>
+    </message>
+    <message>
+        <source>Convert to Classic Project</source>
+        <translation>转换为经典工程</translation>
+    </message>
+    <message>
+        <source>The classic copy will use these settings:</source>
+        <translation>经典工程副本将应用以下设置：</translation>
+    </message>
+    <message>
+        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
+        <translation>LMMS 节点工程 (*.mmpnz *.mmpn)</translation>
+    </message>
+    <message>
+        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
+        <translation>LMMS 经典工程 (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Workspace Mode</source>
+        <translation>工作区模式</translation>
+    </message>
+    <message>
+        <source>Classic Workspace</source>
+        <translation>经典工作区</translation>
+    </message>
+    <message>
+        <source>Node Workspace</source>
+        <translation>节点工作区</translation>
+    </message>
+    <message>
+        <source>Node Editor</source>
+        <translation>节点编辑器</translation>
+    </message>
+    <message>
+        <source>Show Node Editor</source>
+        <translation>显示节点编辑器</translation>
+    </message>
+    <message>
+        <source>Hide Node Editor</source>
+        <translation>隐藏节点编辑器</translation>
+    </message>
+    <message>
+        <source>New Node Workflow Project</source>
+        <translation>新建节点工程</translation>
+    </message>
+    <message>
+        <source>Root Graph</source>
+        <translation>根图</translation>
+    </message>
+    <message>
+        <source>Fit Canvas</source>
+        <translation>适应画布</translation>
+    </message>
+    <message>
+        <source>Add Node</source>
+        <translation>添加节点</translation>
+    </message>
+    <message>
+        <source>Signal Flow</source>
+        <translation>信号流向</translation>
+    </message>
+    <message>
+        <source>Canvas Zoom</source>
+        <translation>画布缩放</translation>
+    </message>
+    <message>
+        <source>Workspace  /  Root Graph</source>
+        <translation>工作区  /  根图</translation>
+    </message>
+    <message>
+        <source>Step Events</source>
+        <translation>步进事件</translation>
+    </message>
+    <message>
+        <source>SVS Voice</source>
+        <translation>SVS 歌声</translation>
+    </message>
+    <message>
+        <source>Voice Events</source>
+        <translation>歌声事件</translation>
+    </message>
+    <message>
+        <source>External MIDI Input</source>
+        <translation>外部 MIDI 输入</translation>
+    </message>
+    <message>
+        <source>SVS Piano Roll</source>
+        <translation>SVS 钢琴窗</translation>
+    </message>
+    <message>
+        <source>SVS Instrument</source>
+        <translation>SVS 音源插件</translation>
+    </message>
+    <message>
+        <source>Track Output</source>
+        <translation>轨道输出</translation>
+    </message>
+    <message>
+        <source>Audio ports connect one channel at a time</source>
+        <translation>音频端口按单声道连接</translation>
+    </message>
+    <message>
+        <source>Empty Step Sequencer</source>
+        <translation>空白步进音序器</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>空白 MIDI 钢琴窗</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>空白 SVS 钢琴窗</translation>
+    </message>
+    <message>
+        <source>Add Sample Subgraph</source>
+        <translation>添加采样子图</translation>
+    </message>
+    <message>
+        <source>Add Instrument Subgraph</source>
+        <translation>添加乐器子图</translation>
+    </message>
+    <message>
+        <source>Add SVS Subgraph</source>
+        <translation>添加 SVS 子图</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>删除节点</translation>
+    </message>
+    <message>
+        <source>Delete %1?</source>
+        <translation>删除 %1？</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its clips?</source>
+        <translation>删除 %1 及其片段？</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>打开钢琴窗</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>音频</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>Automation</source>
+        <translation>自动化</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>离线</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>工程</translation>
+    </message>
+    <message>
+        <source>Pattern</source>
+        <translation>Pattern</translation>
+    </message>
+    <message>
+        <source>Multitrack</source>
+        <translation>多轨</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>Audio L</source>
+        <translation>音频 L</translation>
+    </message>
+    <message>
+        <source>Audio R</source>
+        <translation>音频 R</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>断开</translation>
+    </message>
+    <message>
+        <source>MIDI Input</source>
+        <translation>MIDI 输入</translation>
+    </message>
+    <message>
+        <source>Step Sequencer</source>
+        <translation>步进音序器</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>连接</translation>
+    </message>
+    <message>
+        <source>Connect to L</source>
+        <translation>连接到 L</translation>
+    </message>
+    <message>
+        <source>Connect to R</source>
+        <translation>连接到 R</translation>
+    </message>
+    <message>
+        <source>Pattern %1</source>
+        <translation>Pattern %1</translation>
+    </message>
+    <message>
+        <source>Logical nodes · External device integration is planned separately</source>
+        <translation>逻辑节点 · 外部设备接入另立计划</translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation>发送至 %1</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 %2</source>
+        <translation>断开 %1 %2</translation>
+    </message>
+    <message>
+        <source>Parameter Control</source>
+        <translation>参数控制</translation>
+    </message>
+    <message>
+        <source>Open Automation Editor</source>
+        <translation>打开自动化编辑器</translation>
+    </message>
+    <message>
+        <source>Portless Modules</source>
+        <translation>无端口模块</translation>
+    </message>
+    <message>
+        <source>Trigger Sources</source>
+        <translation>触发来源</translation>
+    </message>
+    <message>
+        <source>Waiting for trigger</source>
+        <translation>等待触发</translation>
+    </message>
+    <message>
+        <source>Audio Silence Threshold</source>
+        <translation>音频静音阈值</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>步进</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>音符</translation>
+    </message>
+    <message>
+        <source> etc.</source>
+        <comment>truncated notes in trigger LCD</comment>
+        <translation> 等</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>上移</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>下移</translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation>设置…</translation>
+    </message>
+    <message>
+        <source>Disconnect %1</source>
+        <translation>断开 %1</translation>
+    </message>
+    <message>
+        <source>Bind %1</source>
+        <translation>绑定 %1</translation>
+    </message>
+    <message>
+        <source>MIDI Input %1</source>
+        <translation>MIDI 输入 %1</translation>
+    </message>
+    <message>
+        <source>Audio Input %1</source>
+        <translation>音频输入 %1</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>单声道</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 · %2</source>
+        <translation>断开 %1 · %2</translation>
+    </message>
+    <message>
+        <source>Master Output</source>
+        <translation>主输出</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message>
+        <source>%1 · MIDI</source>
+        <translation>%1 · MIDI</translation>
+    </message>
+    <message>
+        <source>%1 · Voice Events</source>
+        <translation>%1 · 歌声事件</translation>
+    </message>
+    <message>
+        <source>%1 · Step Events</source>
+        <translation>%1 · 步进事件</translation>
+    </message>
+    <message>
+        <source>Step %1</source>
+        <translation>第 %1 步</translation>
+    </message>
+    <message>
+        <source>Mono Audio Input</source>
+        <translation>单声道音频输入</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>乐器插件</translation>
+    </message>
+    <message>
+        <source>Effect Plugin…</source>
+        <translation>效果器插件…</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <comment>node title</comment>
+        <translation>歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <comment>node title</comment>
+        <translation>节拍编辑器</translation>
     </message>
 </context>
 <context>
@@ -17822,6 +18629,49 @@ Latency: %2 ms</source>
     <message>
         <source>Awaiting tool approval</source>
         <translation>等待工具批准</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::NodeWorkflowCanvas</name>
+    <message>
+        <source>Connection Relationships</source>
+        <translation>连接关系</translation>
+    </message>
+    <message>
+        <source>Source Port</source>
+        <translation>源端口</translation>
+    </message>
+    <message>
+        <source>Destination Port</source>
+        <translation>目标端口</translation>
+    </message>
+    <message>
+        <source>Add Connection</source>
+        <translation>新增连接</translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
+        <translation>改接</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>断开</translation>
+    </message>
+    <message>
+        <source>Copy Node</source>
+        <translation>复制节点</translation>
+    </message>
+    <message>
+        <source>Paste Node</source>
+        <translation>粘贴节点</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>打开钢琴窗</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>删除节点</translation>
     </message>
 </context>
 </TS>

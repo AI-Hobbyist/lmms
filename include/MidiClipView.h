@@ -38,6 +38,21 @@ namespace gui
 {
 
 
+class PatternStepRow
+{
+public:
+	static constexpr int StepWidth = 22;
+	int height() const { return 24; }
+	void paint(QPainter& painter, MidiClip& clip, const QRect& bounds, bool fixedWidth) const;
+	void toggle(MidiClip& clip, int step) const;
+
+private:
+	QPixmap m_stepInactive = embed::getIconPixmap("pattern_step_inactive", 19, 24);
+	QPixmap m_stepAccent = embed::getIconPixmap("pattern_step_accent", 19, 24);
+	QPixmap m_stepActive = embed::getIconPixmap("pattern_step_active", 19, 24);
+	QPixmap m_stepPlayhead = embed::getIconPixmap("pattern_step_playhead", 19, 24);
+};
+
 class MidiClipView : public ClipView
 {
 	Q_OBJECT
@@ -45,6 +60,8 @@ class MidiClipView : public ClipView
 public:
 	MidiClipView( MidiClip* clip, TrackView* parent );
 	~MidiClipView() override = default;
+	static QWidget* createPatternStepWidget(MidiClip* clip, QWidget* parent);
+	static QList<QRectF> notePreviewGeometry(const MidiClip& clip);
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -93,11 +110,7 @@ protected:
 
 
 private:
-	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
-	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
-	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");
-	QPixmap m_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light");
-	QPixmap m_stepBtnHighlight = embed::getIconPixmap("step_btn_highlight");
+	PatternStepRow m_steps;
 
 	MidiClip* m_clip;
 	QPixmap m_paintPixmap;

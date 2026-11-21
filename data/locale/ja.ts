@@ -6153,6 +6153,50 @@ Reason: &quot;%2&quot;</source>
         <source>The following errors occurred while loading: </source>
         <translation>読み込み中に以下のエラーが発生しました： </translation>
     </message>
+    <message>
+        <source>Custom node positions will be omitted.</source>
+        <translation>ノードのカスタム位置は省略されます。</translation>
+    </message>
+    <message>
+        <source>Logical inputs and their connections will be omitted.</source>
+        <translation>論理入力とその接続は省略されます。</translation>
+    </message>
+    <message>
+        <source>Standalone step patterns will be omitted.</source>
+        <translation>独立したステップパターンは省略されます。</translation>
+    </message>
+    <message>
+        <source>Standalone piano rolls will be omitted.</source>
+        <translation>独立したピアノロールは省略されます。</translation>
+    </message>
+    <message>
+        <source>Both Master output channels will be enabled.</source>
+        <translation>マスター出力の両チャンネルが有効になります。</translation>
+    </message>
+    <message>
+        <source>Mixer send %1 → %2 will become stereo.</source>
+        <translation>ミキサーセンド %1 → %2 はステレオになります。</translation>
+    </message>
+    <message>
+        <source>Effect node %1 will be represented as a mixer channel.</source>
+        <translation>エフェクトノード %1 はミキサーチャンネルとして表示されます。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic stereo mixer assignment.</source>
+        <translation>トラック %1 はクラシック形式のステレオミキサー割り当てを使用します。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic event and audio connections.</source>
+        <translation>トラック %1 はクラシック形式のイベント接続とオーディオ接続を使用します。</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>空の SVS ピアノロール</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>空の MIDI ピアノロール</translation>
+    </message>
 </context>
 <context>
     <name>lmms::StereoEnhancerControls</name>
@@ -8576,6 +8620,10 @@ Please make sure you have write permission to the file and the directory contain
         <source>--- Factory files ---</source>
         <translation>--- ファクトリーファイル ---</translation>
     </message>
+    <message>
+        <source>Import as Node Project</source>
+        <translation>ノードプロジェクトとしてインポート</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::FileDialog</name>
@@ -10784,6 +10832,765 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>My Favorites</source>
         <translation>お気に入り</translation>
+    </message>
+    <message>
+        <source>Classic Project Unavailable</source>
+        <translation>クラシックプロジェクトに変換できません</translation>
+    </message>
+    <message>
+        <source>Node Project Only</source>
+        <translation>ノードプロジェクト専用</translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation>今後表示しない</translation>
+    </message>
+    <message>
+        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>クラシック形式ではトラックのサブグラフに追加されたノードとルーティングを保存できないため、変換を拒否しました。</translation>
+    </message>
+    <message>
+        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>クラシック形式ではトラックのサブグラフに追加されたノードとルーティングを保存できないため、インポートを拒否しました。</translation>
+    </message>
+    <message>
+        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
+        <translation>クラシック形式ではトラックのサブグラフに追加されたノードとルーティングを保存できません。このノードを追加すると変換できなくなります。</translation>
+    </message>
+    <message>
+        <source>Aggregation Settings</source>
+        <translation>集約設定</translation>
+    </message>
+    <message>
+        <source>Merge Connections Sharing a Port</source>
+        <translation>同じポートを共有する接続を集約</translation>
+    </message>
+    <message>
+        <source>Connections Greater Than</source>
+        <translation>同じポートへの接続数が次の値を超える場合</translation>
+    </message>
+    <message>
+        <source>Aggregate Bus</source>
+        <translation>集約バス</translation>
+    </message>
+    <message>
+        <source>Play Song</source>
+        <translation>曲を再生</translation>
+    </message>
+    <message>
+        <source>Pause Song</source>
+        <translation>曲を一時停止</translation>
+    </message>
+    <message>
+        <source>Stop Song</source>
+        <translation>曲を停止</translation>
+    </message>
+    <message>
+        <source>Input Port</source>
+        <translation>入力ポート</translation>
+    </message>
+    <message>
+        <source>Output Port</source>
+        <translation>出力ポート</translation>
+    </message>
+    <message>
+        <source>Instrument Track</source>
+        <translation>音源トラック</translation>
+    </message>
+    <message>
+        <source>Sample Track</source>
+        <translation>サンプルトラック</translation>
+    </message>
+    <message>
+        <source>SVS Voice Track</source>
+        <translation>SVS ボーカルトラック</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation>チャンネル</translation>
+    </message>
+    <message>
+        <source>Open SVS Piano Roll</source>
+        <translation>SVS ピアノロールを開く</translation>
+    </message>
+    <message>
+        <source>Logical input for graph routing</source>
+        <translation>グラフ内ルーティング用の論理入力</translation>
+    </message>
+    <message>
+        <source>Signal Type</source>
+        <translation>信号タイプ</translation>
+    </message>
+    <message>
+        <source>Connected Targets</source>
+        <translation>接続先の数</translation>
+    </message>
+    <message>
+        <source>Device Binding</source>
+        <translation>機器の割り当て</translation>
+    </message>
+    <message>
+        <source>Master connects to the configured audio output</source>
+        <translation>マスターは設定済みのオーディオ出力に接続します</translation>
+    </message>
+    <message>
+        <source>Independent Pattern step data</source>
+        <translation>独立したパターンのステップデータ</translation>
+    </message>
+    <message>
+        <source>Active Steps</source>
+        <translation>有効なステップ</translation>
+    </message>
+    <message>
+        <source>Connected Tracks</source>
+        <translation>接続先トラック</translation>
+    </message>
+    <message>
+        <source>Open Step Sequencer</source>
+        <translation>ステップシーケンサーを開く</translation>
+    </message>
+    <message>
+        <source>Supports notes, lyrics, and voice curves</source>
+        <translation>ノート、歌詞、歌声カーブに対応</translation>
+    </message>
+    <message>
+        <source>The same clip can be edited from the graph or track</source>
+        <translation>同じクリップをグラフまたはトラックから編集できます</translation>
+    </message>
+    <message>
+        <source>Voice Notes</source>
+        <translation>歌声ノート</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>ノート</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>配置場所</translation>
+    </message>
+    <message>
+        <source>Standalone Node</source>
+        <translation>独立ノード</translation>
+    </message>
+    <message>
+        <source>SVC Voice Track</source>
+        <translation>SVC ボーカルトラック</translation>
+    </message>
+    <message>
+        <source>Plays converted audio from its clips</source>
+        <translation>クリップの変換済みオーディオを再生します</translation>
+    </message>
+    <message>
+        <source>Audio Source</source>
+        <translation>オーディオソース</translation>
+    </message>
+    <message>
+        <source>Clip conversion result</source>
+        <translation>クリップの変換結果</translation>
+    </message>
+    <message>
+        <source>Open Conversion Settings</source>
+        <translation>変換設定を開く</translation>
+    </message>
+    <message>
+        <source>Automation curves control bound parameters</source>
+        <translation>オートメーションカーブが割り当て済みパラメーターを制御します</translation>
+    </message>
+    <message>
+        <source>Bound Parameters</source>
+        <translation>割り当て済みパラメーター</translation>
+    </message>
+    <message>
+        <source>Automation Clips</source>
+        <translation>オートメーションクリップ</translation>
+    </message>
+    <message>
+        <source>SVS Plugin</source>
+        <translation>SVS プラグイン</translation>
+    </message>
+    <message>
+        <source>Input preserves lyrics, curves, and clip timing</source>
+        <translation>入力は歌詞、カーブ、クリップのタイミングを保持します</translation>
+    </message>
+    <message>
+        <source>Input Type</source>
+        <translation>入力タイプ</translation>
+    </message>
+    <message>
+        <source>Audio Output</source>
+        <translation>オーディオ出力</translation>
+    </message>
+    <message>
+        <source>Open Voice Settings</source>
+        <translation>音源設定を開く</translation>
+    </message>
+    <message>
+        <source>Instrument Plugin</source>
+        <translation>音源プラグイン</translation>
+    </message>
+    <message>
+        <source>Managed by the LMMS plugin host</source>
+        <translation>LMMS のプラグインホストで管理</translation>
+    </message>
+    <message>
+        <source>Plugin Identifier</source>
+        <translation>プラグイン識別子</translation>
+    </message>
+    <message>
+        <source>Instance Name</source>
+        <translation>インスタンス名</translation>
+    </message>
+    <message>
+        <source>Open Plugin</source>
+        <translation>プラグインを開く</translation>
+    </message>
+    <message>
+        <source>Open Mixer</source>
+        <translation>ミキサーを開く</translation>
+    </message>
+    <message>
+        <source>Add Mixer Channel</source>
+        <translation>チャンネルを追加</translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation>%1 を削除</translation>
+    </message>
+    <message>
+        <source>Dynamic channels and sends</source>
+        <translation>動的チャンネルとセンド</translation>
+    </message>
+    <message>
+        <source>Selected Channel</source>
+        <translation>選択チャンネル</translation>
+    </message>
+    <message>
+        <source>Send Target</source>
+        <translation>センド先</translation>
+    </message>
+    <message>
+        <source>Send Amount</source>
+        <translation>センド量</translation>
+    </message>
+    <message>
+        <source>Audio Effect</source>
+        <translation>オーディオエフェクト</translation>
+    </message>
+    <message>
+        <source>Input / Output</source>
+        <translation>入力 / 出力</translation>
+    </message>
+    <message>
+        <source>2 inputs / 2 outputs</source>
+        <translation>2 入力 / 2 出力</translation>
+    </message>
+    <message>
+        <source>Bypass</source>
+        <translation>バイパス</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>オフ</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>オン</translation>
+    </message>
+    <message>
+        <source>Open Effect Rack</source>
+        <translation>エフェクトラックを開く</translation>
+    </message>
+    <message>
+        <source>Toggle Bypass</source>
+        <translation>バイパスを切り替え</translation>
+    </message>
+    <message>
+        <source>Default Project Layout</source>
+        <translation>既定のプロジェクトレイアウト</translation>
+    </message>
+    <message>
+        <source>LMMS default template tracks</source>
+        <translation>LMMS の既定テンプレートトラック</translation>
+    </message>
+    <message>
+        <source>Tempo and Meter</source>
+        <translation>テンポと拍子</translation>
+    </message>
+    <message>
+        <source>%1 BPM · %2/%3</source>
+        <translation>%1 BPM · %2/%3</translation>
+    </message>
+    <message>
+        <source>Other Tracks</source>
+        <translation>その他のトラック</translation>
+    </message>
+    <message>
+        <source>Pattern Member</source>
+        <translation>パターンメンバー</translation>
+    </message>
+    <message>
+        <source>Open Song Editor</source>
+        <translation>ソングエディターを開く</translation>
+    </message>
+    <message>
+        <source>Inspector</source>
+        <translation>インスペクター</translation>
+    </message>
+    <message>
+        <source>Uses the sample track clips and audio bus</source>
+        <translation>サンプルトラックのクリップとオーディオバスを使用</translation>
+    </message>
+    <message>
+        <source>Mixer Target</source>
+        <translation>ミキサーの出力先</translation>
+    </message>
+    <message>
+        <source>2 × mono (L / R)</source>
+        <translation>モノラル 2 系統（L / R）</translation>
+    </message>
+    <message>
+        <source>Open Sample Clip</source>
+        <translation>サンプルクリップを開く</translation>
+    </message>
+    <message>
+        <source>MIDI is only for note entry from an external device</source>
+        <translation>MIDI は外部機器からのノート入力専用</translation>
+    </message>
+    <message>
+        <source>Default sound source signal chain</source>
+        <translation>音源トラックの既定の信号経路</translation>
+    </message>
+    <message>
+        <source>Independent L / R ports</source>
+        <translation>独立した L / R ポート</translation>
+    </message>
+    <message>
+        <source>Back to Parent</source>
+        <translation>上のグラフに戻る</translation>
+    </message>
+    <message>
+        <source>Multiple MIDI and per-channel audio inputs</source>
+        <translation>複数の MIDI 入力とチャンネル別オーディオ入力</translation>
+    </message>
+    <message>
+        <source>MIDI Inputs</source>
+        <translation>MIDI 入力</translation>
+    </message>
+    <message>
+        <source>Audio Inputs</source>
+        <translation>オーディオ入力</translation>
+    </message>
+    <message>
+        <source>Open Sample Track</source>
+        <translation>サンプルトラックを開く</translation>
+    </message>
+    <message>
+        <source>Back to Root Graph</source>
+        <translation>ルートグラフに戻る</translation>
+    </message>
+    <message>
+        <source>Pattern columns follow the arrangement timeline</source>
+        <translation>パターン列はアレンジのタイムラインに従います</translation>
+    </message>
+    <message>
+        <source>Pattern Column</source>
+        <translation>パターン列</translation>
+    </message>
+    <message>
+        <source>Trigger Source</source>
+        <translation>トリガー元</translation>
+    </message>
+    <message>
+        <source>Pattern clips in the arrangement</source>
+        <translation>アレンジ内のパターンクリップ</translation>
+    </message>
+    <message>
+        <source>Open Pattern Editor</source>
+        <translation>パターンエディターを開く</translation>
+    </message>
+    <message>
+        <source>Project audio, MIDI, and logical device connections</source>
+        <translation>プロジェクトのオーディオ、MIDI、論理デバイス接続</translation>
+    </message>
+    <message>
+        <source>Logical Inputs</source>
+        <translation>論理入力</translation>
+    </message>
+    <message>
+        <source>Open Multitrack Graph</source>
+        <translation>マルチトラックグラフを開く</translation>
+    </message>
+    <message>
+        <source>Open Audio Settings</source>
+        <translation>オーディオ設定を開く</translation>
+    </message>
+    <message>
+        <source>New Node Workflow Project</source>
+        <translation>新規ノードプロジェクト</translation>
+    </message>
+    <message>
+        <source>Node Editor</source>
+        <translation>ノードエディター</translation>
+    </message>
+    <message>
+        <source>Workspace Mode</source>
+        <translation>ワークスペースモード</translation>
+    </message>
+    <message>
+        <source>Classic Workspace</source>
+        <translation>クラシックワークスペース</translation>
+    </message>
+    <message>
+        <source>Node Workspace</source>
+        <translation>ノードワークスペース</translation>
+    </message>
+    <message>
+        <source>Save Node Project</source>
+        <translation>ノードプロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>Save Classic Project</source>
+        <translation>クラシックプロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
+        <translation>LMMS ノードプロジェクト (*.mmpnz *.mmpn)</translation>
+    </message>
+    <message>
+        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
+        <translation>LMMS クラシックプロジェクト (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Convert to Classic Project</source>
+        <translation>クラシックプロジェクトに変換</translation>
+    </message>
+    <message>
+        <source>The classic copy will use these settings:</source>
+        <translation>クラシック形式のコピーには次の設定が適用されます。</translation>
+    </message>
+    <message>
+        <source>Import Classic Project as Node Project…</source>
+        <translation>クラシックプロジェクトをノード形式でインポート…</translation>
+    </message>
+    <message>
+        <source>Import Classic Project</source>
+        <translation>クラシックプロジェクトをインポート</translation>
+    </message>
+    <message>
+        <source>Root Graph</source>
+        <translation>ルートグラフ</translation>
+    </message>
+    <message>
+        <source>Fit Canvas</source>
+        <translation>キャンバスに合わせる</translation>
+    </message>
+    <message>
+        <source>Add Node</source>
+        <translation>ノードを追加</translation>
+    </message>
+    <message>
+        <source>Signal Flow</source>
+        <translation>信号の流れ</translation>
+    </message>
+    <message>
+        <source>Canvas Zoom</source>
+        <translation>キャンバスの拡大率</translation>
+    </message>
+    <message>
+        <source>Workspace  /  Root Graph</source>
+        <translation>ワークスペース  /  ルートグラフ</translation>
+    </message>
+    <message>
+        <source>Step Events</source>
+        <translation>ステップイベント</translation>
+    </message>
+    <message>
+        <source>SVS Voice</source>
+        <translation>SVS 歌声</translation>
+    </message>
+    <message>
+        <source>Voice Events</source>
+        <translation>歌声イベント</translation>
+    </message>
+    <message>
+        <source>External MIDI Input</source>
+        <translation>外部 MIDI 入力</translation>
+    </message>
+    <message>
+        <source>SVS Piano Roll</source>
+        <translation>SVS ピアノロール</translation>
+    </message>
+    <message>
+        <source>SVS Instrument</source>
+        <translation>SVS 音源</translation>
+    </message>
+    <message>
+        <source>Track Output</source>
+        <translation>トラック出力</translation>
+    </message>
+    <message>
+        <source>Audio ports connect one channel at a time</source>
+        <translation>オーディオポートはチャンネルごとに接続します</translation>
+    </message>
+    <message>
+        <source>Empty Step Sequencer</source>
+        <translation>空のステップシーケンサー</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>空の MIDI ピアノロール</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>空の SVS ピアノロール</translation>
+    </message>
+    <message>
+        <source>Add Sample Subgraph</source>
+        <translation>サンプルのサブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Add Instrument Subgraph</source>
+        <translation>楽器のサブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Add SVS Subgraph</source>
+        <translation>SVS サブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Add Step Subgraph</source>
+        <translation>ステップのサブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Add Note Subgraph</source>
+        <translation>ノートのサブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Add Audio Subgraph</source>
+        <translation>オーディオのサブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Hide Node Editor</source>
+        <translation>ノードエディターを隠す</translation>
+    </message>
+    <message>
+        <source>Show Node Editor</source>
+        <translation>ノードエディターを表示</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>ノードを削除</translation>
+    </message>
+    <message>
+        <source>Delete %1?</source>
+        <translation>%1 を削除しますか？</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its clips?</source>
+        <translation>%1 とそのクリップを削除しますか？</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>ピアノロールを開く</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>オーディオ</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>Automation</source>
+        <translation>オートメーション</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>オフライン</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>プロジェクト</translation>
+    </message>
+    <message>
+        <source>Pattern</source>
+        <translation>パターン</translation>
+    </message>
+    <message>
+        <source>Multitrack</source>
+        <translation>マルチトラック</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>Audio L</source>
+        <translation>オーディオ L</translation>
+    </message>
+    <message>
+        <source>Audio R</source>
+        <translation>オーディオ R</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>切断</translation>
+    </message>
+    <message>
+        <source>MIDI Input</source>
+        <translation>MIDI 入力</translation>
+    </message>
+    <message>
+        <source>Step Sequencer</source>
+        <translation>ステップシーケンサー</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>接続</translation>
+    </message>
+    <message>
+        <source>Connect to L</source>
+        <translation>L に接続</translation>
+    </message>
+    <message>
+        <source>Connect to R</source>
+        <translation>R に接続</translation>
+    </message>
+    <message>
+        <source>Pattern %1</source>
+        <translation>パターン %1</translation>
+    </message>
+    <message>
+        <source>Logical nodes · External device integration is planned separately</source>
+        <translation>論理ノード · 外部機器との連携は別途予定</translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation>%1 に送信</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 %2</source>
+        <translation>%1 %2 を切断</translation>
+    </message>
+    <message>
+        <source>Parameter Control</source>
+        <translation>パラメーター制御</translation>
+    </message>
+    <message>
+        <source>Open Automation Editor</source>
+        <translation>オートメーションエディターを開く</translation>
+    </message>
+    <message>
+        <source>Portless Modules</source>
+        <translation>ポートのないモジュール</translation>
+    </message>
+    <message>
+        <source>Trigger Sources</source>
+        <translation>トリガー元</translation>
+    </message>
+    <message>
+        <source>Waiting for trigger</source>
+        <translation>トリガー待機中</translation>
+    </message>
+    <message>
+        <source>Audio Silence Threshold</source>
+        <translation>オーディオ無音しきい値</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>ステップ</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>音符</translation>
+    </message>
+    <message>
+        <source> etc.</source>
+        <comment>truncated notes in trigger LCD</comment>
+        <translation> など</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>上へ移動</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>下へ移動</translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation>設定…</translation>
+    </message>
+    <message>
+        <source>Disconnect %1</source>
+        <translation>%1 を切断</translation>
+    </message>
+    <message>
+        <source>Bind %1</source>
+        <translation>%1 を割り当て</translation>
+    </message>
+    <message>
+        <source>MIDI Input %1</source>
+        <translation>MIDI 入力 %1</translation>
+    </message>
+    <message>
+        <source>Audio Input %1</source>
+        <translation>オーディオ入力 %1</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>モノラル</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 · %2</source>
+        <translation>%1 · %2 を切断</translation>
+    </message>
+    <message>
+        <source>Master Output</source>
+        <translation>マスター出力</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message>
+        <source>%1 · MIDI</source>
+        <translation>%1 · MIDI</translation>
+    </message>
+    <message>
+        <source>%1 · Voice Events</source>
+        <translation>%1 · 歌声イベント</translation>
+    </message>
+    <message>
+        <source>%1 · Step Events</source>
+        <translation>%1 · ステップイベント</translation>
+    </message>
+    <message>
+        <source>Step %1</source>
+        <translation>ステップ %1</translation>
+    </message>
+    <message>
+        <source>Mono Audio Input</source>
+        <translation>モノラルオーディオ入力</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>楽器プラグイン</translation>
+    </message>
+    <message>
+        <source>Effect Plugin…</source>
+        <translation>エフェクトプラグイン…</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <comment>node title</comment>
+        <translation>ソングエディター</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <comment>node title</comment>
+        <translation>パターンエディター</translation>
     </message>
 </context>
 <context>
@@ -16565,6 +17372,49 @@ Latency: %2 ms</source>
     <message>
         <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
         <translation>SVC と SVS は共通のキャッシュ容量上限を使用します。既定値は合計 2 GiB です。上限を超えると、両方のキャッシュから古いファイルを先に削除します。SVS の容量には合成音声と AI の中間キャッシュが含まれます。実行中の SVC 処理で使用しているファイルは保持します。削除した結果は、保存済みプロジェクトを再度開くときに再レンダリングが必要になる場合があります。</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::NodeWorkflowCanvas</name>
+    <message>
+        <source>Connection Relationships</source>
+        <translation>接続一覧</translation>
+    </message>
+    <message>
+        <source>Source Port</source>
+        <translation>送信元ポート</translation>
+    </message>
+    <message>
+        <source>Destination Port</source>
+        <translation>宛先ポート</translation>
+    </message>
+    <message>
+        <source>Add Connection</source>
+        <translation>接続を追加</translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
+        <translation>接続先を変更</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>切断</translation>
+    </message>
+    <message>
+        <source>Copy Node</source>
+        <translation>ノードをコピー</translation>
+    </message>
+    <message>
+        <source>Paste Node</source>
+        <translation>ノードを貼り付け</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>ピアノロールを開く</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>ノードを削除</translation>
     </message>
 </context>
 </TS>

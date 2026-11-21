@@ -243,7 +243,7 @@ namespace lmms::PathUtil
 			if (base == Base::LocalDir && !allowLocal) { continue; }
 
 			QString otherPath = relativeOrAbsolute(absolutePath, base);
-			if (otherPath.length() < shortestPath.length())
+			if (QDir::isRelativePath(otherPath) && otherPath.length() < shortestPath.length())
 			{
 				shortestBase = base;
 				shortestPath = otherPath;

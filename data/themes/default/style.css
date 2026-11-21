@@ -1884,3 +1884,168 @@ QLineEdit#agentManagerSearch {
     font-size: 13px;
     padding-left: 10px;
 }
+
+/* Node workflow */
+QToolButton#nodeWorkflowZoom {
+	min-width: 70px;
+	min-height: 26px;
+}
+
+QToolButton[nodeWorkflowTool="true"] {
+	min-width: 26px;
+	min-height: 26px;
+}
+
+QToolButton[nodeWorkflowTool="true"]:checked {
+	background-color: #315443;
+	border-color: #77C795;
+}
+
+QWidget#nodeWorkflowContent {
+	background-color: #20262D;
+	color: #E5EAF0;
+}
+
+QWidget#nodeWorkflowCanvas {
+	qproperty-canvasColor: #171D24;
+	qproperty-gridColor: #29323B;
+	qproperty-nodeColor: #20262D;
+	qproperty-nodeBorderColor: #40505D;
+	qproperty-navigatorNodeColor: #415663;
+	qproperty-navigatorViewportColor: #77C795;
+	qproperty-audioPortColor: #77C795;
+	qproperty-midiPortColor: #82BFFF;
+	qproperty-voicePortColor: #CBABFA;
+	qproperty-stepPortColor: #5ED4CF;
+	qproperty-portLabelBackground: #29323B;
+	color: #E5EAF0;
+}
+
+QLabel#nodeWorkflowBreadcrumb {
+	color: #E5EAF0;
+}
+
+QWidget#nodeWorkflowFooter {
+	background-color: #29323B;
+	color: #A8B4C0;
+}
+
+QWidget#nodeWorkflowFooter QLabel {
+	color: #A8B4C0;
+}
+
+QWidget#nodeWorkflowFooter QLabel[nodeWorkflowLegend="audio"] { color: #77C795; }
+QWidget#nodeWorkflowFooter QLabel[nodeWorkflowLegend="midi"] { color: #82BFFF; }
+QWidget#nodeWorkflowFooter QLabel[nodeWorkflowLegend="step"] { color: #5ED4CF; }
+QWidget#nodeWorkflowFooter QLabel[nodeWorkflowLegend="voice"] { color: #CBABFA; }
+QWidget#nodeWorkflowFooter QLabel[nodeWorkflowLegend="offline"] { color: #6F7B87; }
+
+QScrollArea#nodeWorkflowTriggerLcd {
+	background: #0C1410;
+	border: 1px solid #526F5C;
+	padding: 4px;
+}
+
+QWidget#nodeWorkflowTriggerLcdRows {
+	background: #13261A;
+}
+
+QWidget#nodeWorkflowTriggerLcdIdle {
+	background: #17251B;
+}
+
+QWidget#nodeWorkflowTriggerStepRow {
+	border-bottom: 1px solid #36533B;
+}
+
+QScrollArea#nodeWorkflowTriggerStepScroll {
+	background: #102017;
+	border: none;
+	padding: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar:horizontal {
+	background: #203C2B;
+	height: 5px;
+	margin: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::handle:horizontal {
+	background: #709677;
+	border-radius: 2px;
+	min-width: 15px;
+}
+
+QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::add-line:horizontal,
+QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::sub-line:horizontal {
+	width: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar:vertical {
+	background: #203C2B;
+	width: 7px;
+	margin: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::handle:vertical {
+	background: #709677;
+	min-height: 18px;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::add-line:vertical,
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::sub-line:vertical {
+	height: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::add-page:vertical,
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::sub-page:vertical {
+	background: none;
+}
+
+QWidget#nodeWorkflowInspector {
+	background-color: #1F252B;
+	border-left: 1px solid #39444E;
+}
+
+
+QLabel#nodeWorkflowInspectorHeading {
+	color: #E5EBF0;
+	font-weight: bold;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #39444E;
+}
+
+QLabel#nodeWorkflowInspectorTitle {
+	color: #E5EBF0;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+QLabel#nodeWorkflowInspectorDescription,
+QLabel#nodeWorkflowInspectorField {
+	color: #A8B5C2;
+}
+
+QLabel#nodeWorkflowInspectorValue {
+	color: #E5EBF0;
+	background-color: #151A1F;
+	border: 1px solid #39444E;
+	border-radius: 3px;
+	padding: 5px 8px;
+}
+
+QPushButton#nodeWorkflowInspectorAction {
+	min-width: 142px;
+	padding: 4px 8px;
+	text-align: left;
+}
+
+QWidget#nodeWorkflowPatternPanel {
+	background-color: #20262D;
+	border-top: 1px solid #40505D;
+}
+
+QLabel#nodeWorkflowPatternPreview {
+	background-color: #171D24;
+	border: 1px solid #40505D;
+}

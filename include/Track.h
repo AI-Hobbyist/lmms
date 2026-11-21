@@ -28,6 +28,7 @@
 #include <vector>
 
 #include <QColor>
+#include <QUuid>
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
@@ -135,6 +136,11 @@ public:
 
 	// Saving and loading of full tracks
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
+	QUuid nodeWorkflowId();
+	bool nodeSourceEventConnected() const { return m_nodeSourceEventConnected; }
+	void setNodeSourceEventConnected(bool connected) { m_nodeSourceEventConnected = connected; }
+	bool nodeSourceStepConnected() const { return m_nodeSourceStepConnected; }
+	void setNodeSourceStepConnected(bool connected) { m_nodeSourceStepConnected = connected; }
 	void loadSettings( const QDomElement & element ) override;
 
 	// -- for usage by Clip only ---------------
@@ -315,6 +321,9 @@ private:
 private:
 	TrackContainer* m_trackContainer;
 	Type m_type;
+	QUuid m_nodeWorkflowId;
+	bool m_nodeSourceEventConnected = true;
+	bool m_nodeSourceStepConnected = true;
 	QString m_name;
 	int m_height;
 

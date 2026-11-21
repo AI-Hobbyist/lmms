@@ -6153,6 +6153,50 @@ Reason: &quot;%2&quot;</source>
         <source>The following errors occurred while loading: </source>
         <translation>불러오는 동안 다음 오류가 발생했습니다: </translation>
     </message>
+    <message>
+        <source>Custom node positions will be omitted.</source>
+        <translation>사용자 지정 노드 위치가 생략됩니다.</translation>
+    </message>
+    <message>
+        <source>Logical inputs and their connections will be omitted.</source>
+        <translation>논리 입력과 연결이 생략됩니다.</translation>
+    </message>
+    <message>
+        <source>Standalone step patterns will be omitted.</source>
+        <translation>독립 스텝 패턴이 생략됩니다.</translation>
+    </message>
+    <message>
+        <source>Standalone piano rolls will be omitted.</source>
+        <translation>독립 피아노 롤이 생략됩니다.</translation>
+    </message>
+    <message>
+        <source>Both Master output channels will be enabled.</source>
+        <translation>마스터 출력의 두 채널이 모두 활성화됩니다.</translation>
+    </message>
+    <message>
+        <source>Mixer send %1 → %2 will become stereo.</source>
+        <translation>믹서 센드 %1 → %2가 스테레오로 바뀝니다.</translation>
+    </message>
+    <message>
+        <source>Effect node %1 will be represented as a mixer channel.</source>
+        <translation>이펙트 노드 %1은 믹서 채널로 표시됩니다.</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic stereo mixer assignment.</source>
+        <translation>트랙 %1은 클래식 스테레오 믹서 할당을 사용합니다.</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic event and audio connections.</source>
+        <translation>트랙 %1은 클래식 이벤트 및 오디오 연결을 사용합니다.</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>빈 SVS 피아노 롤</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>빈 MIDI 피아노 롤</translation>
+    </message>
 </context>
 <context>
     <name>lmms::StereoEnhancerControls</name>
@@ -8576,6 +8620,10 @@ Please make sure you have write permission to the file and the directory contain
         <source>--- Factory files ---</source>
         <translation>--- 팩토리 파일 ---</translation>
     </message>
+    <message>
+        <source>Import as Node Project</source>
+        <translation>노드 프로젝트로 가져오기</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::FileDialog</name>
@@ -10784,6 +10832,765 @@ LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translatio
     <message>
         <source>My Favorites</source>
         <translation>즐겨찾기</translation>
+    </message>
+    <message>
+        <source>Classic Project Unavailable</source>
+        <translation>클래식 프로젝트를 사용할 수 없음</translation>
+    </message>
+    <message>
+        <source>Node Project Only</source>
+        <translation>노드 프로젝트 전용</translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation>다시 표시하지 않음</translation>
+    </message>
+    <message>
+        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>클래식 형식은 트랙 하위 그래프에 추가된 노드와 라우팅을 저장할 수 없어 변환이 거부되었습니다.</translation>
+    </message>
+    <message>
+        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>클래식 형식은 트랙 하위 그래프에 추가된 노드와 라우팅을 저장할 수 없어 가져오기가 거부되었습니다.</translation>
+    </message>
+    <message>
+        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
+        <translation>클래식 형식은 트랙 하위 그래프에 추가된 노드와 라우팅을 저장할 수 없습니다. 이 노드를 추가하면 클래식 프로젝트로 변환할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Aggregation Settings</source>
+        <translation>연결 집계 설정</translation>
+    </message>
+    <message>
+        <source>Merge Connections Sharing a Port</source>
+        <translation>같은 포트를 공유하는 연결 합치기</translation>
+    </message>
+    <message>
+        <source>Connections Greater Than</source>
+        <translation>같은 포트 연결 수 초과 기준</translation>
+    </message>
+    <message>
+        <source>Aggregate Bus</source>
+        <translation>집계 버스</translation>
+    </message>
+    <message>
+        <source>Play Song</source>
+        <translation>곡 재생</translation>
+    </message>
+    <message>
+        <source>Pause Song</source>
+        <translation>곡 일시 정지</translation>
+    </message>
+    <message>
+        <source>Stop Song</source>
+        <translation>곡 정지</translation>
+    </message>
+    <message>
+        <source>Input Port</source>
+        <translation>입력 포트</translation>
+    </message>
+    <message>
+        <source>Output Port</source>
+        <translation>출력 포트</translation>
+    </message>
+    <message>
+        <source>Instrument Track</source>
+        <translation>악기 트랙</translation>
+    </message>
+    <message>
+        <source>Sample Track</source>
+        <translation>샘플 트랙</translation>
+    </message>
+    <message>
+        <source>SVS Voice Track</source>
+        <translation>SVS 보컬 트랙</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation>채널</translation>
+    </message>
+    <message>
+        <source>Open SVS Piano Roll</source>
+        <translation>SVS 피아노 롤 열기</translation>
+    </message>
+    <message>
+        <source>Logical input for graph routing</source>
+        <translation>그래프 라우팅용 논리 입력</translation>
+    </message>
+    <message>
+        <source>Signal Type</source>
+        <translation>신호 유형</translation>
+    </message>
+    <message>
+        <source>Connected Targets</source>
+        <translation>연결된 대상</translation>
+    </message>
+    <message>
+        <source>Device Binding</source>
+        <translation>장치 연결</translation>
+    </message>
+    <message>
+        <source>Master connects to the configured audio output</source>
+        <translation>마스터를 설정된 오디오 출력에 연결합니다</translation>
+    </message>
+    <message>
+        <source>Independent Pattern step data</source>
+        <translation>독립 패턴 스텝 데이터</translation>
+    </message>
+    <message>
+        <source>Active Steps</source>
+        <translation>활성 스텝</translation>
+    </message>
+    <message>
+        <source>Connected Tracks</source>
+        <translation>연결된 트랙</translation>
+    </message>
+    <message>
+        <source>Open Step Sequencer</source>
+        <translation>스텝 시퀀서 열기</translation>
+    </message>
+    <message>
+        <source>Supports notes, lyrics, and voice curves</source>
+        <translation>음표, 가사 및 보컬 곡선 지원</translation>
+    </message>
+    <message>
+        <source>The same clip can be edited from the graph or track</source>
+        <translation>그래프나 트랙에서 같은 클립을 편집할 수 있습니다</translation>
+    </message>
+    <message>
+        <source>Voice Notes</source>
+        <translation>보컬 음표</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>음표</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>배치 위치</translation>
+    </message>
+    <message>
+        <source>Standalone Node</source>
+        <translation>독립 노드</translation>
+    </message>
+    <message>
+        <source>SVC Voice Track</source>
+        <translation>SVC 보컬 트랙</translation>
+    </message>
+    <message>
+        <source>Plays converted audio from its clips</source>
+        <translation>클립의 변환된 오디오를 재생합니다</translation>
+    </message>
+    <message>
+        <source>Audio Source</source>
+        <translation>오디오 소스</translation>
+    </message>
+    <message>
+        <source>Clip conversion result</source>
+        <translation>클립 변환 결과</translation>
+    </message>
+    <message>
+        <source>Open Conversion Settings</source>
+        <translation>변환 설정 열기</translation>
+    </message>
+    <message>
+        <source>Automation curves control bound parameters</source>
+        <translation>자동화 곡선은 연결된 매개변수를 제어합니다</translation>
+    </message>
+    <message>
+        <source>Bound Parameters</source>
+        <translation>연결된 매개변수</translation>
+    </message>
+    <message>
+        <source>Automation Clips</source>
+        <translation>자동화 클립</translation>
+    </message>
+    <message>
+        <source>SVS Plugin</source>
+        <translation>SVS 플러그인</translation>
+    </message>
+    <message>
+        <source>Input preserves lyrics, curves, and clip timing</source>
+        <translation>입력은 가사, 곡선 및 클립 타이밍을 유지합니다</translation>
+    </message>
+    <message>
+        <source>Input Type</source>
+        <translation>입력 유형</translation>
+    </message>
+    <message>
+        <source>Audio Output</source>
+        <translation>오디오 출력</translation>
+    </message>
+    <message>
+        <source>Open Voice Settings</source>
+        <translation>음원 설정 열기</translation>
+    </message>
+    <message>
+        <source>Instrument Plugin</source>
+        <translation>악기 플러그인</translation>
+    </message>
+    <message>
+        <source>Managed by the LMMS plugin host</source>
+        <translation>LMMS 플러그인 호스트에서 관리</translation>
+    </message>
+    <message>
+        <source>Plugin Identifier</source>
+        <translation>플러그인 식별자</translation>
+    </message>
+    <message>
+        <source>Instance Name</source>
+        <translation>인스턴스 이름</translation>
+    </message>
+    <message>
+        <source>Open Plugin</source>
+        <translation>플러그인 열기</translation>
+    </message>
+    <message>
+        <source>Open Mixer</source>
+        <translation>믹서 열기</translation>
+    </message>
+    <message>
+        <source>Add Mixer Channel</source>
+        <translation>채널 추가</translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation>%1 제거</translation>
+    </message>
+    <message>
+        <source>Dynamic channels and sends</source>
+        <translation>동적 채널과 센드</translation>
+    </message>
+    <message>
+        <source>Selected Channel</source>
+        <translation>선택한 채널</translation>
+    </message>
+    <message>
+        <source>Send Target</source>
+        <translation>센드 대상</translation>
+    </message>
+    <message>
+        <source>Send Amount</source>
+        <translation>센드 양</translation>
+    </message>
+    <message>
+        <source>Audio Effect</source>
+        <translation>오디오 효과</translation>
+    </message>
+    <message>
+        <source>Input / Output</source>
+        <translation>입력 / 출력</translation>
+    </message>
+    <message>
+        <source>2 inputs / 2 outputs</source>
+        <translation>입력 2개 / 출력 2개</translation>
+    </message>
+    <message>
+        <source>Bypass</source>
+        <translation>바이패스</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>끄기</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>켜기</translation>
+    </message>
+    <message>
+        <source>Open Effect Rack</source>
+        <translation>효과 랙 열기</translation>
+    </message>
+    <message>
+        <source>Toggle Bypass</source>
+        <translation>바이패스 전환</translation>
+    </message>
+    <message>
+        <source>Default Project Layout</source>
+        <translation>기본 프로젝트 레이아웃</translation>
+    </message>
+    <message>
+        <source>LMMS default template tracks</source>
+        <translation>LMMS 기본 템플릿 트랙</translation>
+    </message>
+    <message>
+        <source>Tempo and Meter</source>
+        <translation>템포 및 박자</translation>
+    </message>
+    <message>
+        <source>%1 BPM · %2/%3</source>
+        <translation>%1 BPM · %2/%3</translation>
+    </message>
+    <message>
+        <source>Other Tracks</source>
+        <translation>기타 트랙</translation>
+    </message>
+    <message>
+        <source>Pattern Member</source>
+        <translation>패턴 구성원</translation>
+    </message>
+    <message>
+        <source>Open Song Editor</source>
+        <translation>곡 편집기 열기</translation>
+    </message>
+    <message>
+        <source>Inspector</source>
+        <translation>검사기</translation>
+    </message>
+    <message>
+        <source>Uses the sample track clips and audio bus</source>
+        <translation>샘플 트랙의 클립과 오디오 버스 사용</translation>
+    </message>
+    <message>
+        <source>Mixer Target</source>
+        <translation>믹서 대상</translation>
+    </message>
+    <message>
+        <source>2 × mono (L / R)</source>
+        <translation>모노 2개(L / R)</translation>
+    </message>
+    <message>
+        <source>Open Sample Clip</source>
+        <translation>샘플 클립 열기</translation>
+    </message>
+    <message>
+        <source>MIDI is only for note entry from an external device</source>
+        <translation>MIDI는 외부 장치의 음표 입력 전용</translation>
+    </message>
+    <message>
+        <source>Default sound source signal chain</source>
+        <translation>음원 트랙의 기본 신호 경로</translation>
+    </message>
+    <message>
+        <source>Independent L / R ports</source>
+        <translation>독립 L / R 포트</translation>
+    </message>
+    <message>
+        <source>Back to Parent</source>
+        <translation>상위 그래프로 돌아가기</translation>
+    </message>
+    <message>
+        <source>Multiple MIDI and per-channel audio inputs</source>
+        <translation>다중 MIDI 및 채널별 오디오 입력</translation>
+    </message>
+    <message>
+        <source>MIDI Inputs</source>
+        <translation>MIDI 입력</translation>
+    </message>
+    <message>
+        <source>Audio Inputs</source>
+        <translation>오디오 입력</translation>
+    </message>
+    <message>
+        <source>Open Sample Track</source>
+        <translation>샘플 트랙 열기</translation>
+    </message>
+    <message>
+        <source>Back to Root Graph</source>
+        <translation>루트 그래프로 돌아가기</translation>
+    </message>
+    <message>
+        <source>Pattern columns follow the arrangement timeline</source>
+        <translation>패턴 열은 편곡 타임라인을 따릅니다</translation>
+    </message>
+    <message>
+        <source>Pattern Column</source>
+        <translation>패턴 열</translation>
+    </message>
+    <message>
+        <source>Trigger Source</source>
+        <translation>트리거 소스</translation>
+    </message>
+    <message>
+        <source>Pattern clips in the arrangement</source>
+        <translation>편곡의 패턴 클립</translation>
+    </message>
+    <message>
+        <source>Open Pattern Editor</source>
+        <translation>패턴 편집기 열기</translation>
+    </message>
+    <message>
+        <source>Project audio, MIDI, and logical device connections</source>
+        <translation>프로젝트 오디오, MIDI 및 논리 장치 연결</translation>
+    </message>
+    <message>
+        <source>Logical Inputs</source>
+        <translation>논리 입력</translation>
+    </message>
+    <message>
+        <source>Open Multitrack Graph</source>
+        <translation>멀티트랙 그래프 열기</translation>
+    </message>
+    <message>
+        <source>Open Audio Settings</source>
+        <translation>오디오 설정 열기</translation>
+    </message>
+    <message>
+        <source>New Node Workflow Project</source>
+        <translation>새 노드 프로젝트</translation>
+    </message>
+    <message>
+        <source>Node Editor</source>
+        <translation>노드 편집기</translation>
+    </message>
+    <message>
+        <source>Workspace Mode</source>
+        <translation>작업 공간 모드</translation>
+    </message>
+    <message>
+        <source>Classic Workspace</source>
+        <translation>클래식 작업 공간</translation>
+    </message>
+    <message>
+        <source>Node Workspace</source>
+        <translation>노드 작업 공간</translation>
+    </message>
+    <message>
+        <source>Save Node Project</source>
+        <translation>노드 프로젝트 저장</translation>
+    </message>
+    <message>
+        <source>Save Classic Project</source>
+        <translation>클래식 프로젝트 저장</translation>
+    </message>
+    <message>
+        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
+        <translation>LMMS 노드 프로젝트 (*.mmpnz *.mmpn)</translation>
+    </message>
+    <message>
+        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
+        <translation>LMMS 클래식 프로젝트 (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Convert to Classic Project</source>
+        <translation>클래식 프로젝트로 변환</translation>
+    </message>
+    <message>
+        <source>The classic copy will use these settings:</source>
+        <translation>클래식 사본에 다음 설정이 적용됩니다.</translation>
+    </message>
+    <message>
+        <source>Import Classic Project as Node Project…</source>
+        <translation>클래식 프로젝트를 노드 프로젝트로 가져오기…</translation>
+    </message>
+    <message>
+        <source>Import Classic Project</source>
+        <translation>클래식 프로젝트 가져오기</translation>
+    </message>
+    <message>
+        <source>Root Graph</source>
+        <translation>루트 그래프</translation>
+    </message>
+    <message>
+        <source>Fit Canvas</source>
+        <translation>캔버스에 맞추기</translation>
+    </message>
+    <message>
+        <source>Add Node</source>
+        <translation>노드 추가</translation>
+    </message>
+    <message>
+        <source>Signal Flow</source>
+        <translation>신호 흐름</translation>
+    </message>
+    <message>
+        <source>Canvas Zoom</source>
+        <translation>캔버스 확대/축소</translation>
+    </message>
+    <message>
+        <source>Workspace  /  Root Graph</source>
+        <translation>작업 공간  /  루트 그래프</translation>
+    </message>
+    <message>
+        <source>Step Events</source>
+        <translation>스텝 이벤트</translation>
+    </message>
+    <message>
+        <source>SVS Voice</source>
+        <translation>SVS 가창</translation>
+    </message>
+    <message>
+        <source>Voice Events</source>
+        <translation>가창 이벤트</translation>
+    </message>
+    <message>
+        <source>External MIDI Input</source>
+        <translation>외부 MIDI 입력</translation>
+    </message>
+    <message>
+        <source>SVS Piano Roll</source>
+        <translation>SVS 피아노 롤</translation>
+    </message>
+    <message>
+        <source>SVS Instrument</source>
+        <translation>SVS 음원</translation>
+    </message>
+    <message>
+        <source>Track Output</source>
+        <translation>트랙 출력</translation>
+    </message>
+    <message>
+        <source>Audio ports connect one channel at a time</source>
+        <translation>오디오 포트는 채널별로 연결합니다</translation>
+    </message>
+    <message>
+        <source>Empty Step Sequencer</source>
+        <translation>빈 스텝 시퀀서</translation>
+    </message>
+    <message>
+        <source>Empty MIDI Piano Roll</source>
+        <translation>빈 MIDI 피아노 롤</translation>
+    </message>
+    <message>
+        <source>Empty SVS Piano Roll</source>
+        <translation>빈 SVS 피아노 롤</translation>
+    </message>
+    <message>
+        <source>Add Sample Subgraph</source>
+        <translation>샘플 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Add Instrument Subgraph</source>
+        <translation>악기 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Add SVS Subgraph</source>
+        <translation>SVS 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Add Step Subgraph</source>
+        <translation>스텝 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Add Note Subgraph</source>
+        <translation>음표 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Add Audio Subgraph</source>
+        <translation>오디오 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Hide Node Editor</source>
+        <translation>노드 편집기 숨기기</translation>
+    </message>
+    <message>
+        <source>Show Node Editor</source>
+        <translation>노드 편집기 표시</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>노드 삭제</translation>
+    </message>
+    <message>
+        <source>Delete %1?</source>
+        <translation>%1을 삭제할까요?</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its clips?</source>
+        <translation>%1 및 해당 클립을 삭제할까요?</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>피아노 롤 열기</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>오디오</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>Automation</source>
+        <translation>자동화</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>오프라인</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>프로젝트</translation>
+    </message>
+    <message>
+        <source>Pattern</source>
+        <translation>패턴</translation>
+    </message>
+    <message>
+        <source>Multitrack</source>
+        <translation>멀티트랙</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>Audio L</source>
+        <translation>오디오 L</translation>
+    </message>
+    <message>
+        <source>Audio R</source>
+        <translation>오디오 R</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>연결 해제</translation>
+    </message>
+    <message>
+        <source>MIDI Input</source>
+        <translation>MIDI 입력</translation>
+    </message>
+    <message>
+        <source>Step Sequencer</source>
+        <translation>스텝 시퀀서</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>연결</translation>
+    </message>
+    <message>
+        <source>Connect to L</source>
+        <translation>L에 연결</translation>
+    </message>
+    <message>
+        <source>Connect to R</source>
+        <translation>R에 연결</translation>
+    </message>
+    <message>
+        <source>Pattern %1</source>
+        <translation>패턴 %1</translation>
+    </message>
+    <message>
+        <source>Logical nodes · External device integration is planned separately</source>
+        <translation>논리 노드 · 외부 장치 연동은 별도 계획</translation>
+    </message>
+    <message>
+        <source>Send to %1</source>
+        <translation>%1(으)로 보내기</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 %2</source>
+        <translation>%1 %2 연결 해제</translation>
+    </message>
+    <message>
+        <source>Parameter Control</source>
+        <translation>매개변수 제어</translation>
+    </message>
+    <message>
+        <source>Open Automation Editor</source>
+        <translation>자동화 편집기 열기</translation>
+    </message>
+    <message>
+        <source>Portless Modules</source>
+        <translation>포트 없는 모듈</translation>
+    </message>
+    <message>
+        <source>Trigger Sources</source>
+        <translation>트리거 소스</translation>
+    </message>
+    <message>
+        <source>Waiting for trigger</source>
+        <translation>트리거 대기 중</translation>
+    </message>
+    <message>
+        <source>Audio Silence Threshold</source>
+        <translation>오디오 무음 임계값</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>스텝</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>음표</translation>
+    </message>
+    <message>
+        <source> etc.</source>
+        <comment>truncated notes in trigger LCD</comment>
+        <translation> 등</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>위로 이동</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>아래로 이동</translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation>설정…</translation>
+    </message>
+    <message>
+        <source>Disconnect %1</source>
+        <translation>%1 연결 해제</translation>
+    </message>
+    <message>
+        <source>Bind %1</source>
+        <translation>%1 바인딩</translation>
+    </message>
+    <message>
+        <source>MIDI Input %1</source>
+        <translation>MIDI 입력 %1</translation>
+    </message>
+    <message>
+        <source>Audio Input %1</source>
+        <translation>오디오 입력 %1</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>모노</translation>
+    </message>
+    <message>
+        <source>Disconnect %1 · %2</source>
+        <translation>%1 · %2 연결 해제</translation>
+    </message>
+    <message>
+        <source>Master Output</source>
+        <translation>마스터 출력</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message>
+        <source>%1 · MIDI</source>
+        <translation>%1 · MIDI</translation>
+    </message>
+    <message>
+        <source>%1 · Voice Events</source>
+        <translation>%1 · 가창 이벤트</translation>
+    </message>
+    <message>
+        <source>%1 · Step Events</source>
+        <translation>%1 · 스텝 이벤트</translation>
+    </message>
+    <message>
+        <source>Step %1</source>
+        <translation>스텝 %1</translation>
+    </message>
+    <message>
+        <source>Mono Audio Input</source>
+        <translation>모노 오디오 입력</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>악기 플러그인</translation>
+    </message>
+    <message>
+        <source>Effect Plugin…</source>
+        <translation>이펙트 플러그인…</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <comment>node title</comment>
+        <translation>곡 편집기</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <comment>node title</comment>
+        <translation>패턴 편집기</translation>
     </message>
 </context>
 <context>
@@ -16565,6 +17372,49 @@ Latency: %2 ms</source>
     <message>
         <source>SVC and SVS share a total cache limit of 2 GiB by default. When the limit is exceeded, the oldest files across both caches are removed first. SVS usage includes synthesis audio and AI intermediate caches. Files used by running SVC jobs are kept. Cleared or evicted results may need to be rendered again when reopening a saved project.</source>
         <translation>SVC와 SVS는 기본 2 GiB의 전체 캐시 한도를 공유합니다. 한도를 초과하면 두 캐시에서 가장 오래된 파일부터 삭제합니다. SVS 크기에는 합성 오디오와 AI 중간 캐시가 포함됩니다. 실행 중인 SVC 작업에서 사용하는 파일은 유지됩니다. 캐시를 삭제하면 저장된 프로젝트를 다시 열 때 재렌더링이 필요할 수 있습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::NodeWorkflowCanvas</name>
+    <message>
+        <source>Connection Relationships</source>
+        <translation>연결 목록</translation>
+    </message>
+    <message>
+        <source>Source Port</source>
+        <translation>출발 포트</translation>
+    </message>
+    <message>
+        <source>Destination Port</source>
+        <translation>대상 포트</translation>
+    </message>
+    <message>
+        <source>Add Connection</source>
+        <translation>연결 추가</translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
+        <translation>다시 연결</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>연결 해제</translation>
+    </message>
+    <message>
+        <source>Copy Node</source>
+        <translation>노드 복사</translation>
+    </message>
+    <message>
+        <source>Paste Node</source>
+        <translation>노드 붙여넣기</translation>
+    </message>
+    <message>
+        <source>Open Piano Roll</source>
+        <translation>피아노 롤 열기</translation>
+    </message>
+    <message>
+        <source>Delete Node</source>
+        <translation>노드 삭제</translation>
     </message>
 </context>
 </TS>

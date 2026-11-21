@@ -29,6 +29,7 @@
 #include "Effect.h"
 
 #include <QDialog>
+#include <QPoint>
 #include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
@@ -85,6 +86,8 @@ public:
 	EffectSelectDialog(QWidget* parent);
 
 	Effect* instantiateSelectedPlugin(EffectChain* parent);
+	void enableNodeDrag();
+	QString nodeEffectKey() const;
 
 protected slots:
 	void acceptSelection();
@@ -105,6 +108,8 @@ private:
 	QTableView* m_pluginList;
 	QScrollArea* m_scrollArea;
 	QLineEdit* m_filterEdit;
+	bool m_nodeDrag = false;
+	QPoint m_dragStart;
 };
 
 } // namespace lmms::gui
