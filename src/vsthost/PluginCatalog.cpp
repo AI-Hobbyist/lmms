@@ -2,6 +2,8 @@
 #include "vsthost/Vst2Scanner.h"
 #include "vsthost/Vst3Scanner.h"
 #include "vsthost/CatalogIo.h"
+#include "vsthost/NativeVstPreset.h"
+#include "vsthost/Vst3HostProxy.h"
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -24,13 +26,319 @@ struct Module
 	QString key() const { return QString::number(static_cast<unsigned>(format)) + ":" + scanPathKey(binary); }
 };
 
+void recordPresetResult(CatalogReport& report, PresetWriteResult result)
+{
+	switch (result)
+	{
+	case PresetWriteResult::Written: ++report.presetsWritten; break;
+	case PresetWriteResult::AlreadyExists: ++report.presetsExisting; break;
+	case PresetWriteResult::Failed: ++report.presetFailures; break;
+	}
+}
+
+void recordVst3Layout(CatalogEntry& entry, const Vst3Metadata& metadata)
+{
+	static const QRegularExpression layoutSuffix(
+		QStringLiteral(R"((?:\s+(?:[-–]\s*)?|\s*\()(Mono(?:\s*(?:to|→|[-/])\s*Stereo)?|Stereo|Multi[- ]?Out)\)?$)"),
+		QRegularExpression::CaseInsensitiveOption);
+	const auto moduleName = QFileInfo(entry.locator.modulePath).completeBaseName();
+	const auto match = layoutSuffix.match(entry.name);
+	const auto base = match.hasMatch() ? entry.name.left(match.capturedStart()).trimmed() : entry.name.trimmed();
+	std::array<int, 2> channels{};
+	for (const auto& bus : metadata.buses)
+	{
+		if (bus.media == 0 && bus.type == 0 && bus.active)
+		{
+			channels[bus.direction] += static_cast<int>(bus.channels);
+		}
+	}
+	if (channels[1] > 0)
+	{
+		const auto declared = match.captured(1).toCaseFolded();
+		const bool matchesLayout = (declared == "mono" && channels[0] <= 1 && channels[1] == 1)
+			|| (declared == "stereo" && channels[0] != 1 && channels[1] == 2)
+			|| (declared.startsWith("mono") && declared.endsWith("stereo") && channels[0] == 1 && channels[1] == 2)
+			|| (declared.startsWith("multi") && channels[1] > 2);
+		if (!base.isEmpty() && (base.compare(moduleName, Qt::CaseInsensitive) == 0 || matchesLayout))
+		{
+			entry.product = base;
+		}
+		entry.layoutInputs = channels[0];
+		entry.layoutOutputs = channels[1];
+	}
+}
+
+void probeVst3Layouts(CatalogEntry& entry, const HostSession::Configuration& configuration,
+	Vst3Create create, std::stop_token stop)
+{
+	if (entry.layoutInputs < 0 || entry.layoutOutputs <= 0 || entry.supportedMainLayouts != 0)
+	{
+		return;
+	}
+	for (const auto layout : {Vst3MainLayout::Mono, Vst3MainLayout::Stereo, Vst3MainLayout::MonoToStereo})
+	{
+		if (stop.stop_requested())
+		{
+			return;
+		}
+		const auto input = entry.layoutInputs == 0 ? 0 : layout == Vst3MainLayout::Stereo ? 2 : 1;
+		const auto output = layout == Vst3MainLayout::Mono ? 1 : 2;
+		if ((input == entry.layoutInputs && output == entry.layoutOutputs)
+			|| (input == 0 && layout == Vst3MainLayout::MonoToStereo))
+		{
+			continue;
+		}
+		create.layout = layout;
+		auto probe = std::make_unique<Vst3HostProxy>();
+		if (probe->open(configuration, create))
+		{
+			entry.supportedMainLayouts |= 1u << static_cast<unsigned>(layout);
+		}
+	}
+	if (entry.supportedMainLayouts && entry.product.isEmpty())
+	{
+		entry.product = entry.name;
+	}
+}
+
+void exportVst3Presets(CatalogEntry& entry, const QString& helper, const PluginCatalog::Options& options,
+	std::stop_token stop, CatalogReport& report, bool cached)
+{
+	const auto directory = nativeVstPresetDirectory(options.presetDirectory, entry.identity.format,
+		isVstInstrument(entry), entry.name, entry.locator.modulePath);
+	const auto classId = QString::fromLatin1(QByteArray(
+		reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex());
+	const auto destination = QDir(directory).filePath(QStringLiteral("Default-%1.xpf").arg(classId));
+	Vst3Create create;
+	create.path = entry.locator.modulePath.toUtf8().toStdString();
+	create.cid = entry.identity.cid;
+	const HostSession::Configuration configuration{helper.toStdWString(), {}, options.timeoutMs};
+	auto host = std::make_unique<Vst3HostProxy>();
+	if (!host->open(configuration, create))
+	{
+		++report.presetFailures;
+		return;
+	}
+	if (!cached)
+	{
+		recordVst3Layout(entry, host->metadata());
+		probeVst3Layouts(entry, configuration, create, stop);
+	}
+	const auto snapshot = host->state();
+	if (snapshot.error != Error::None || !validVst3State(snapshot.payload))
+	{
+		++report.presetFailures;
+		return;
+	}
+	QDomDocument document;
+	auto state = document.createElement("state");
+	const auto key = vstCatalogKey(nullptr, entry);
+	for (auto attribute = key.attributes.cbegin(); attribute != key.attributes.cend(); ++attribute)
+	{
+		state.setAttribute(attribute.key(), attribute.value());
+	}
+	state.setAttribute("modulepath", entry.locator.modulePath);
+	state.setAttribute("pluginname", entry.name);
+	const auto write = [&](const QString& path, std::span<const std::uint8_t> bytes) {
+		state.setAttribute("vst3state", QString::fromLatin1(QByteArray(
+			reinterpret_cast<const char*>(bytes.data()), static_cast<qsizetype>(bytes.size())).toBase64()));
+		recordPresetResult(report, writeScannedVstPreset(path, entry, state));
+	};
+	write(destination, snapshot.payload);
+	for (const auto& program : host->programs())
+	{
+		if (stop.stop_requested())
+		{
+			break;
+		}
+		if (!program.selectable())
+		{
+			continue;
+		}
+		const auto name = nativeVstPresetPathComponent(QString::fromUtf8(program.name), QStringLiteral("Program"));
+		const auto path = QDir(directory).filePath(QStringLiteral("%1-%2-%3-%4.xpf")
+			.arg(name, classId).arg(program.listId).arg(program.index + 1));
+		if (QFileInfo::exists(path))
+		{
+			++report.presetsExisting;
+			continue;
+		}
+		if (host->restoreState(snapshot.payload) != Error::None
+			|| host->setParameter(program.parameterId, static_cast<double>(program.index) / program.steps).error
+				!= Error::None)
+		{
+			++report.presetFailures;
+			break;
+		}
+		const auto selected = host->state();
+		if (selected.error != Error::None || !validVst3State(selected.payload))
+		{
+			++report.presetFailures;
+			break;
+		}
+		write(path, selected.payload);
+	}
+}
+
+void exportVst2Presets(const CatalogEntry& entry, const QString& helper,
+	const PluginCatalog::Options& options, std::stop_token stop, CatalogReport& report)
+{
+	const auto directory = nativeVstPresetDirectory(options.presetDirectory, entry.identity.format,
+		isVstInstrument(entry), entry.name, entry.locator.modulePath);
+	const auto destination = QDir(directory).filePath(
+		QStringLiteral("Default-%1.xpf").arg(entry.identity.vst2Id, 8, 16, QLatin1Char('0')));
+
+	HostSession session;
+	std::stop_callback cancel(stop, [&session] { session.cancel(); });
+	if (session.open({helper.toStdWString(), {L"headless"}, options.timeoutMs}).get().error != Error::None)
+	{
+		++report.presetFailures;
+		return;
+	}
+	const auto request = [&](std::span<const LegacyCommand> commands, std::vector<LegacyCommand>& response) {
+		std::vector<std::uint8_t> bytes;
+		if (encodeLegacy(commands, bytes) != Error::None)
+		{
+			return false;
+		}
+		const auto reply = session.request(MessageType::Parameter, std::move(bytes), options.timeoutMs).get();
+		return reply.error == Error::None && decodeLegacy(reply.payload, response) == Error::None;
+	};
+	std::array<LegacyCommand, 3> start{{
+		{IdSampleRateInformation, {"44100"}},
+		{IdBufferSizeInformation, {"512"}},
+		{IdVstLoadPlugin, {entry.locator.modulePath.toUtf8().toStdString()}}
+	}};
+	if (entry.shell)
+	{
+		start.back().arguments.push_back(std::to_string(entry.identity.vst2Id));
+	}
+	std::vector<LegacyCommand> response;
+	if (!request(start, response))
+	{
+		++report.presetFailures;
+		return;
+	}
+
+	const auto capture = [&](const QString& path, int program) {
+		QDomDocument document;
+		auto state = document.createElement("state");
+		QTemporaryFile chunk;
+		if (chunk.open())
+		{
+			chunk.close();
+			const auto chunkPath = QDir::toNativeSeparators(chunk.fileName()).toUtf8().toStdString();
+			const std::array<LegacyCommand, 1> save{{{IdSaveSettingsToFile, {chunkPath}}}};
+			if (!request(save, response))
+			{
+				return PresetWriteResult::Failed;
+			}
+			QFile file(chunk.fileName());
+			if (file.open(QIODevice::ReadOnly) && file.size() > 0 && file.size() <= MaxControlBytes)
+			{
+				const auto payload = file.readAll();
+				if (payload.size() == file.size())
+				{
+					state.setAttribute("chunk", QString::fromLatin1(payload.toBase64()));
+				}
+			}
+		}
+		if (!state.hasAttribute("chunk"))
+		{
+			const std::array<LegacyCommand, 1> dump{{{IdVstGetParameterDump, {}}}};
+			if (!request(dump, response))
+			{
+				return PresetWriteResult::Failed;
+			}
+			const auto found = std::find_if(response.begin(), response.end(),
+				[](const auto& reply) { return reply.id == IdVstParameterDump; });
+			if (found == response.end() || found->arguments.empty() || (found->arguments.size() - 1) % 3 != 0)
+			{
+				return PresetWriteResult::Failed;
+			}
+			const auto count = (found->arguments.size() - 1) / 3;
+			if (found->arguments.front() != std::to_string(count))
+			{
+				return PresetWriteResult::Failed;
+			}
+			state.setAttribute("numparams", static_cast<qulonglong>(count));
+			for (std::size_t index = 0; index < count; ++index)
+			{
+				const auto offset = 1 + index * 3;
+				const auto key = QString::number(index);
+				if (found->arguments[offset] != std::to_string(index))
+				{
+					return PresetWriteResult::Failed;
+				}
+				const auto value = QString::fromStdString(found->arguments[offset + 2]);
+				state.setAttribute("param" + key, key + "::" + value);
+			}
+		}
+		if (program >= 0)
+		{
+			state.setAttribute("program", program);
+		}
+		if (entry.shell)
+		{
+			state.setAttribute("shellid", QString::number(entry.identity.vst2Id));
+		}
+		return writeScannedVstPreset(path, entry, state);
+	};
+	if (QFileInfo::exists(destination))
+	{
+		++report.presetsExisting;
+	}
+	else
+	{
+		recordPresetResult(report, capture(destination, -1));
+	}
+
+	const std::array<LegacyCommand, 1> list{{{IdVstProgramNames, {}}}};
+	if (!request(list, response))
+	{
+		++report.presetFailures;
+		return;
+	}
+	const auto named = std::find_if(response.begin(), response.end(),
+		[](const auto& reply) { return reply.id == IdVstProgramNames && reply.arguments.size() == 1; });
+	if (named == response.end())
+	{
+		return;
+	}
+	const auto names = QString::fromStdString(named->arguments.front()).split('|');
+	if (names.size() <= 1)
+	{
+		return;
+	}
+	for (qsizetype program = 0; program < names.size() && !stop.stop_requested(); ++program)
+	{
+		const auto name = nativeVstPresetPathComponent(names[program], QStringLiteral("Program"));
+		const auto path = QDir(directory).filePath(QStringLiteral("%1-%2-%3.xpf")
+			.arg(name).arg(entry.identity.vst2Id, 8, 16, QLatin1Char('0')).arg(program + 1));
+		if (QFileInfo::exists(path))
+		{
+			++report.presetsExisting;
+			continue;
+		}
+		const std::array<LegacyCommand, 1> select{{{IdVstSetProgram, {std::to_string(program)}}}};
+		if (!request(select, response))
+		{
+			++report.presetFailures;
+			return;
+		}
+		recordPresetResult(report, capture(path, static_cast<int>(program)));
+	}
+}
+
 QJsonObject entryJson(const CatalogEntry& entry)
 {
 	const auto cid = QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex();
 	return {{"cid", QString::fromLatin1(cid)}, {"id", static_cast<double>(entry.identity.vst2Id)},
 		{"source", entry.identity.vst2Source}, {"version", entry.locator.version}, {"name", entry.name},
 		{"vendor", entry.vendor}, {"category", entry.category}, {"subcategories", entry.subcategories},
-		{"flags", static_cast<double>(entry.flags)}, {"shell", entry.shell}};
+		{"flags", static_cast<double>(entry.flags)}, {"shell", entry.shell}, {"product", entry.product},
+		{"layoutInputs", entry.layoutInputs}, {"layoutOutputs", entry.layoutOutputs},
+		{"supportedMainLayouts", static_cast<int>(entry.supportedMainLayouts)}};
 }
 
 bool hex(const QJsonValue& value, qsizetype count, QByteArray& decoded)
@@ -145,6 +453,12 @@ bool readCache(
 			}
 			std::copy_n(reinterpret_cast<const std::uint8_t*>(cid.constData()), 16, entry.identity.cid.begin());
 			entry.shell = row.value("shell").toBool();
+			entry.product = row.value("product").toString().left(63);
+			entry.layoutInputs = std::clamp(row.value("layoutInputs").toInt(-1), -1,
+				static_cast<int>(MaxAudioChannels));
+			entry.layoutOutputs = std::clamp(row.value("layoutOutputs").toInt(-1), -1,
+				static_cast<int>(MaxAudioChannels));
+			entry.supportedMainLayouts = static_cast<std::uint32_t>(row.value("supportedMainLayouts").toInt()) & 0x0e;
 			if ((module.format == Format::Vst3
 					&& (cid == QByteArray(16, '\0') || entry.shell || entry.identity.vst2Id
 						|| !entry.identity.vst2Source.isEmpty() || entry.category != "Audio Module Class"))
@@ -367,7 +681,7 @@ CatalogReport PluginCatalog::scan(
 	report.modules = discovered.size();
 	QMap<QString, Module> cache;
 	QMap<QString, CatalogFailure> quarantined;
-	if (!m_configuration.cacheFile.isEmpty() && !options.force)
+	if (!m_configuration.cacheFile.isEmpty() && options.skipVerified.value_or(!options.force))
 	{
 		if (!readCache(io, m_configuration.cacheFile, m_configuration.hostVersion, cache, report.cacheError))
 		{
@@ -377,6 +691,9 @@ CatalogReport PluginCatalog::scan(
 				report.cacheError = "Invalid catalog cache records";
 			}
 		}
+	}
+	if (!m_configuration.cacheFile.isEmpty() && !options.force)
+	{
 		quarantined = readFailures(io, m_configuration.cacheFile + ".failures.json", m_configuration.hostVersion);
 	}
 	std::vector<Module> successful;
@@ -404,10 +721,12 @@ CatalogReport PluginCatalog::scan(
 			continue;
 		}
 		const auto key = module.key();
-		if (cache.contains(key) && cache[key].fingerprint == module.fingerprint
-			&& cache[key].architecture == module.architecture && cache[key].path == module.path)
+		const auto cachedModule = cache.constFind(key);
+		const bool cached = cachedModule != cache.cend() && cachedModule->fingerprint == module.fingerprint
+			&& cachedModule->architecture == module.architecture && cachedModule->path == module.path;
+		if (cached)
 		{
-			module.entries = cache[key].entries;
+			module.entries = cachedModule->entries;
 			++report.cachedModules;
 		}
 		else
@@ -495,6 +814,9 @@ CatalogReport PluginCatalog::scan(
 					entry.shell = scan.shell;
 					entry.flags = info.flags;
 					entry.category = (info.flags & 256) ? "Instrument" : "Effect";
+					entry.product = QString::fromUtf8(info.product);
+					entry.layoutInputs = info.inputs;
+					entry.layoutOutputs = info.outputs;
 					entry.vendor = QString::fromUtf8(scan.vendor);
 					module.entries.push_back(std::move(entry));
 				}
@@ -527,7 +849,32 @@ CatalogReport PluginCatalog::scan(
 			report.failures.push_back({module.path, "capacity", Error::InvalidMessage});
 			continue;
 		}
-		report.entries.insert(report.entries.end(), module.entries.begin(), module.entries.end());
+		if (!options.presetDirectory.isEmpty())
+		{
+			const bool x86 = module.architecture == Architecture::X86;
+			const auto& helper = module.format == Format::Vst3
+				? (x86 ? m_configuration.vst3Helper32 : m_configuration.vst3Helper64)
+				: (x86 ? m_configuration.vst2Helper32 : m_configuration.vst2Helper64);
+			for (auto& entry : module.entries)
+			{
+				if (stop.stop_requested())
+				{
+					break;
+				}
+				if (module.format == Format::Vst3)
+				{
+					exportVst3Presets(entry, helper, options, stop, report, cached);
+				}
+				else
+				{
+					exportVst2Presets(entry, helper, options, stop, report);
+				}
+			}
+		}
+		for (const auto& entry : module.entries)
+		{
+			report.entries.push_back(entry);
+		}
 		successful.push_back(std::move(module));
 	}
 	report.cancelled = stop.stop_requested();

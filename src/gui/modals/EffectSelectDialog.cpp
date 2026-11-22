@@ -50,8 +50,12 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
+#include <QComboBox>
+#include <QSet>
 #include <QTableView>
 #include <QVBoxLayout>
+#include <QMap>
+#include <algorithm>
 
 
 namespace lmms::gui
@@ -61,11 +65,48 @@ void EffectSelectDialog::rebuildModel()
 {
 	m_sourceModel.clear();
 	m_sourceModel.setHorizontalHeaderLabels({tr("Name"), tr("Type")});
-	int row = 0;
+	m_effectRows.clear();
+	QMap<QString, EffectKeyList> families;
 	for (const auto& key : m_effectKeys)
 	{
+		const auto family = key.attributes.value("layoutfamily");
+		if (QString::fromUtf8(key.desc->name) == "native_vst_effect" && !family.isEmpty())
+		{
+			families[family].append(key);
+		}
+		else
+		{
+			m_effectRows.append(EffectKeyList{key});
+		}
+	}
+	for (const auto& keys : families)
+	{
+		QSet<QPair<int, int>> layouts;
+		for (const auto& key : keys)
+		{
+			layouts.insert({key.attributes.value("layoutinputs").toInt(),
+				key.attributes.value("layoutoutputs").toInt()});
+		}
+		if (layouts.size() > 1)
+		{
+			m_effectRows.append(keys);
+		}
+		else
+		{
+			for (const auto& key : keys)
+			{
+				m_effectRows.append(EffectKeyList{key});
+			}
+		}
+	}
+	int row = 0;
+	for (const auto& keys : m_effectRows)
+	{
+		const auto& key = keys.front();
 		const bool subPlugin = key.desc->subPluginFeatures;
-		m_sourceModel.setItem(row, 0, new QStandardItem(subPlugin ? key.displayName() : key.desc->displayName));
+		const auto display = keys.size() > 1 ? key.attributes.value("layoutproduct")
+			: subPlugin ? key.displayName() : QString::fromUtf8(key.desc->displayName);
+		m_sourceModel.setItem(row, 0, new QStandardItem(display));
 		m_sourceModel.setItem(row, 1, new QStandardItem(subPlugin ? key.desc->displayName : "LMMS"));
 		++row;
 	}
@@ -99,10 +140,12 @@ void EffectSelectDialog::refreshVstKeys()
 	m_currentSelection = {};
 	rebuildModel();
 	QModelIndex next = m_model.index(0, 0);
-	for (int row = 0; row < m_effectKeys.size(); ++row)
+	for (int row = 0; row < m_effectRows.size(); ++row)
 	{
-		const auto& key = m_effectKeys[row];
-		if (key.desc == selected.desc && key.name == selected.name && key.attributes == selected.attributes)
+		const auto& keys = m_effectRows[row];
+		if (std::any_of(keys.cbegin(), keys.cend(), [&selected](const auto& key) {
+			return key.desc == selected.desc && key.name == selected.name && key.attributes == selected.attributes;
+		}))
 		{
 			const auto candidate = m_model.mapFromSource(m_sourceModel.index(row, 0));
 			if (candidate.isValid())
@@ -314,14 +357,15 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 	delete m_descriptionWidget;
 	m_descriptionWidget = nullptr;
 
-	if (m_model.mapToSource(idx).row() < 0)
+	const auto row = m_model.mapToSource(idx).row();
+	if (row < 0 || row >= m_effectRows.size())
 	{
 		// Invalidate current selection
 		m_currentSelection = Plugin::Descriptor::SubPluginFeatures::Key();
 	}
 	else
 	{
-		m_currentSelection = m_effectKeys[m_model.mapToSource(idx).row()];
+		m_currentSelection = m_effectRows[row].front();
 	}
 	if (m_currentSelection.desc)
 	{
@@ -350,6 +394,24 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		auto textWidgetLayout = new QVBoxLayout(textualInfoWidget);
 		textWidgetLayout->setContentsMargins(4, 4, 4, 4);
 		textWidgetLayout->setSpacing(8);
+		const auto& variants = m_effectRows[row];
+		if (variants.size() > 1)
+		{
+			auto* layoutSelector = new QComboBox(textualInfoWidget);
+			layoutSelector->setAccessibleName(tr("VST channel layout"));
+			for (const auto& variant : variants)
+			{
+				layoutSelector->addItem(tr("%1 — %2 in / %3 out").arg(variant.name,
+					variant.attributes.value("layoutinputs"), variant.attributes.value("layoutoutputs")));
+			}
+			connect(layoutSelector, &QComboBox::currentIndexChanged, this, [this, variants](int selection) {
+				if (selection >= 0 && selection < variants.size())
+				{
+					m_currentSelection = variants[selection];
+				}
+			});
+			textWidgetLayout->addWidget(layoutSelector);
+		}
 
 		if (m_currentSelection.desc->subPluginFeatures)
 		{

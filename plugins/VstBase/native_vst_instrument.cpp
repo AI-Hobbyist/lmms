@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "AudioEngine.h"
+#include "DataFile.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "InstrumentView.h"
@@ -98,6 +99,18 @@ public:
 		if (m_plugin) { QObject::connect(open, &QPushButton::clicked, m_plugin.get(), &VstPlugin::toggleUI); }
 		layout->addWidget(open);
 		m_parameters.addControls(layout);
+		if (m_plugin)
+		{
+			m_parameters.addPresetControls(layout, *m_plugin, true, [this](const QString& path) {
+				DataFile preset(DataFile::Type::InstrumentTrackSettings);
+				auto& content = preset.content();
+				instrumentTrack()->savePreset(preset, content);
+				content.setAttribute("muted", 0);
+				content.setAttribute("solo", 0);
+				content.setAttribute("mutedBeforeSolo", 0);
+				return preset.writeFile(path);
+			});
+		}
 		layout->addStretch();
 		return view;
 	}

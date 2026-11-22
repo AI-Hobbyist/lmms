@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <QObject>
+#include <optional>
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
@@ -63,7 +64,8 @@ public:
 	// GUI/control-thread access. Owned until Engine::destroy; no audio instance
 	// depends on this service or its published catalog.
 	static vsthost::CatalogJobs* vstCatalog();
-	static bool refreshVstCatalog(QString* error = nullptr, bool force = false);
+	static bool refreshVstCatalog(
+		QString* error = nullptr, bool force = false, std::optional<bool> skipVerified = std::nullopt);
 #endif
 
 	// core

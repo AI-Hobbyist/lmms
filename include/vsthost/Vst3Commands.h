@@ -46,6 +46,14 @@ inline bool decodeVst3Setup(std::span<const std::uint8_t> bytes, Vst3Setup& setu
 	setup = parsed;
 	return true;
 }
+enum class Vst3MainLayout : std::uint32_t
+{
+	Default,
+	Mono,
+	Stereo,
+	MonoToStereo
+};
+
 struct Vst3Create
 {
 	std::array<std::uint8_t, 16> cid{};
@@ -53,6 +61,7 @@ struct Vst3Create
 	std::uint32_t maxFrames = 512;
 	bool offline = false;
 	std::string path;
+	Vst3MainLayout layout = Vst3MainLayout::Default;
 };
 // v1, raw CID, IEEE754 rate, maximum frames, mode, then non-NUL UTF-8 path.
 inline bool encodeVst3Create(const Vst3Create& command, std::vector<std::uint8_t>& bytes)
@@ -60,22 +69,34 @@ inline bool encodeVst3Create(const Vst3Create& command, std::vector<std::uint8_t
 	bytes.clear();
 	if (command.path.empty() || command.path.size() > 4 * 32767 || command.path.find('\0') != std::string::npos
 		|| !std::isfinite(command.sampleRate) || command.sampleRate < 8000 || command.sampleRate > 768000
-		|| !command.maxFrames || command.maxFrames > 4096)
+		|| !command.maxFrames || command.maxFrames > 4096 || command.layout > Vst3MainLayout::MonoToStereo)
 	{
 		return false;
 	}
-	bytes.resize(36 + command.path.size());
-	put(bytes, 0, 1, 4);
+	const bool explicitLayout = command.layout != Vst3MainLayout::Default;
+	const auto headerSize = explicitLayout ? 40 : 36;
+	bytes.resize(headerSize + command.path.size());
+	put(bytes, 0, explicitLayout ? 2 : 1, 4);
 	std::copy(command.cid.begin(), command.cid.end(), bytes.begin() + 4);
 	put(bytes, 20, std::bit_cast<std::uint64_t>(command.sampleRate), 8);
 	put(bytes, 28, command.maxFrames, 4);
 	put(bytes, 32, command.offline ? 1 : 0, 4);
-	std::copy(command.path.begin(), command.path.end(), bytes.begin() + 36);
+	if (explicitLayout)
+	{
+		put(bytes, 36, static_cast<std::uint32_t>(command.layout), 4);
+	}
+	std::copy(command.path.begin(), command.path.end(), bytes.begin() + headerSize);
 	return true;
 }
 inline bool decodeVst3Create(std::span<const std::uint8_t> bytes, Vst3Create& command)
 {
-	if (bytes.size() <= 36 || bytes.size() > 36 + 4 * 32767 || get(bytes, 0, 4) != 1 || get(bytes, 32, 4) > 1)
+	if (bytes.size() <= 36 || get(bytes, 32, 4) > 1)
+	{
+		return false;
+	}
+	const auto version = get(bytes, 0, 4);
+	const auto headerSize = version == 2 ? 40u : 36u;
+	if ((version != 1 && version != 2) || bytes.size() <= headerSize || bytes.size() > headerSize + 4 * 32767)
 	{
 		return false;
 	}
@@ -84,7 +105,15 @@ inline bool decodeVst3Create(std::span<const std::uint8_t> bytes, Vst3Create& co
 	parsed.sampleRate = std::bit_cast<double>(get(bytes, 20, 8));
 	parsed.maxFrames = static_cast<std::uint32_t>(get(bytes, 28, 4));
 	parsed.offline = get(bytes, 32, 4) != 0;
-	parsed.path.assign(reinterpret_cast<const char*>(bytes.data() + 36), bytes.size() - 36);
+	if (version == 2)
+	{
+		parsed.layout = static_cast<Vst3MainLayout>(get(bytes, 36, 4));
+		if (parsed.layout == Vst3MainLayout::Default)
+		{
+			return false;
+		}
+	}
+	parsed.path.assign(reinterpret_cast<const char*>(bytes.data() + headerSize), bytes.size() - headerSize);
 	std::vector<std::uint8_t> checked;
 	if (!encodeVst3Create(parsed, checked))
 	{

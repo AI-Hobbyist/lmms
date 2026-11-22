@@ -38,6 +38,7 @@
 #include "Piano.h"
 #include "Plugin.h"
 #include "Track.h"
+#include <memory>
 
 
 namespace lmms
@@ -253,7 +254,7 @@ public:
 		return m_previewMode;
 	}
 	
-	void replaceInstrument(DataFile dataFile);
+	bool replaceInstrument(DataFile dataFile);
 
 	//! @brief Automatically assign a midi controller to this track, based on the midiautoassign setting
 	//! @param assign Set to true to connect the midi device, set to false to disconnect
@@ -323,6 +324,7 @@ private:
 	BoolModel m_useMasterPitchModel;
 
 	Instrument * m_instrument;
+	std::unique_ptr<Instrument> m_preparedPresetInstrument;
 	InstrumentSoundShaping m_soundShaping;
 	InstrumentFunctionArpeggio m_arpeggio;
 	InstrumentFunctionNoteStacking m_noteStacking;

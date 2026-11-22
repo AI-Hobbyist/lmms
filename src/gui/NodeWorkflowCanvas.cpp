@@ -229,7 +229,7 @@ void NodeWorkflowCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
 	const auto kind = StringPairDrag::decodeKey(event);
 	if (m_pluginDrop && (kind == "instrument" || kind == "svsvoice" || kind == "svcselection"
-		|| kind == "vstpluginfile" || kind == "nodeeffect"))
+		|| kind == "vstpluginfile" || kind == "nodeeffect" || kind == "presetfile"))
 	{
 		event->acceptProposedAction();
 	}

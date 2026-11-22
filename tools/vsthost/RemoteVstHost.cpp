@@ -265,6 +265,7 @@ int wmain(int argc, wchar_t** argv)
 						lmms::windowsCrashReport::setPlugin(path);
 						instance = std::make_unique<Vst3Instance>();
 						instance->open(path, command.cid);
+						instance->setInitialLayout(command.layout);
 						instance->setup(command.sampleRate, command.maxFrames, command.offline);
 						payload.resize(20 + instance->parameters().size() * 4);
 						put(payload, 0, instance->inputChannels(), 4);

@@ -320,7 +320,8 @@ public:
 		std::array<std::optional<ch_cnt_t>, 2> outputs;
 	};
 	const QList<NodeInstrumentLayer>& nodeInstrumentLayers(const Track& owner) const;
-	InstrumentTrack* addNodeInstrumentLayer(Track& owner, const QString& plugin, bool fromDrop);
+	InstrumentTrack* addNodeInstrumentLayer(Track& owner, const QString& plugin, bool fromDrop,
+		const QDomElement& preset = {});
 	bool setNodeInstrumentLayerEvent(Track& owner, const QString& id, bool step, bool connected);
 	bool setNodeInstrumentLayerOutput(Track& owner, const QString& id, ch_cnt_t source,
 		std::optional<ch_cnt_t> target);
@@ -384,7 +385,8 @@ public:
 	QString nodeCustomEffectScope(const QUuid& id) const;
 	void setNodeCustomEffectScope(const QUuid& id, const QString& scope);
 	QList<QPair<QString, InstrumentTrack*>> nodeCustomInstruments(const QString& scope) const;
-	QString addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file = {}, bool fromDrop = false);
+	QString addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file = {},
+		bool fromDrop = false, const QDomElement& preset = {});
 	QString pasteNodeCustomInstrument(const QString& scope, const QDomElement& state);
 	void removeNodeCustomInstrument(const QString& scope, const QString& id);
 	std::optional<QPair<bool, int>> nodeConnectionAggregation() const;

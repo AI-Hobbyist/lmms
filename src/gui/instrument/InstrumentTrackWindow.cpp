@@ -36,6 +36,8 @@
 #include "AutomatableButton.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
+#include "vsthost/NativeVstPreset.h"
+#include "vsthost/NativeVstPresetDrop.h"
 #include "DataFile.h"
 #include "EffectRackView.h"
 #include "embed.h"
@@ -407,18 +409,20 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
 	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"));
 
-	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if(!QDir(presetRoot).exists())
+	const auto userPresets = ConfigManager::inst()->userPresetsDir();
+	const auto instrumentName = m_track->instrumentName();
+	auto directory = QDir(userPresets).filePath(instrumentName);
+	if (const auto* instrument = m_track->instrument(); instrument && instrumentName == "native_vst_instrument")
 	{
-		QDir().mkdir(presetRoot);
+		const auto& attributes = instrument->key().attributes;
+		const auto format = attributes.value("format") == "vst3" ? vsthost::Format::Vst3 : vsthost::Format::Vst2;
+		directory = vsthost::nativeVstPresetDirectory(
+			userPresets, format, true, attributes.value("pluginname"), attributes.value("file"));
 	}
-	if(!QDir(presetRoot + m_track->instrumentName()).exists())
-	{
-		QDir(presetRoot).mkdir(m_track->instrumentName());
-	}
+	QDir().mkpath(directory);
 
 	sfd.setAcceptMode(FileDialog::AcceptSave);
-	sfd.setDirectory(presetRoot + m_track->instrumentName());
+	sfd.setDirectory(directory);
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
 	sfd.selectFile(fname.remove(QRegularExpression(FILENAME_FILTER)));
@@ -599,7 +603,24 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile(value);
-		m_track->replaceInstrument(dataFile);
+		if (dataFile.type() != DataFile::Type::InstrumentTrackSettings)
+		{
+			event->ignore();
+			return;
+		}
+		if (vsthost::isNativeVstInstrumentPreset(dataFile)
+			&& !vsthost::readNativeVstPresetDrop(dataFile).hasAvailableIdentity())
+		{
+			Engine::getSong()->collectError(tr("The VST preset or the selected plug-in could not be loaded."));
+			event->ignore();
+			return;
+		}
+		if (!m_track->replaceInstrument(dataFile))
+		{
+			Engine::getSong()->collectError(tr("The VST preset or the selected plug-in could not be loaded."));
+			event->ignore();
+			return;
+		}
 		event->accept();
 		setFocus();
 	}

@@ -11,6 +11,7 @@
 #include "Vst3OutputEvents.h"
 #include "Vst3ParameterFeedback.h"
 #include "Vst3Preset.h"
+#include "vsthost/Vst3Programs.h"
 #include <functional>
 
 namespace lmms::vsthost {
@@ -200,6 +201,18 @@ public:
 			return {Error::InvalidMessage, {}};
 		}
 		return {Error::None, std::move(bytes)};
+	}
+	std::vector<Vst3Program> programs()
+	{
+		std::vector<std::uint8_t> command(4);
+		put(command, 0, Vst3ProgramListCommand, 4);
+		const auto reply = m_session.request(MessageType::Parameter, std::move(command), 15000).get();
+		std::vector<Vst3Program> programs;
+		if (reply.error == Error::None)
+		{
+			decodeVst3Programs(reply.payload, programs);
+		}
+		return programs;
 	}
 	Error restorePreset(std::span<const std::uint8_t> bytes)
 	{

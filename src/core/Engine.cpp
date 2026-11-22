@@ -76,7 +76,7 @@ vsthost::CatalogJobs* Engine::vstCatalog()
 {
 	return catalogJobs.get();
 }
-bool Engine::refreshVstCatalog(QString* error, bool force)
+bool Engine::refreshVstCatalog(QString* error, bool force, std::optional<bool> skipVerified)
 {
 	if (error)
 	{
@@ -100,7 +100,14 @@ bool Engine::refreshVstCatalog(QString* error, bool force)
 		}
 		return false;
 	}
-	catalogJobs->refresh(std::move(roots), {force});
+	vsthost::PluginCatalog::Options options;
+	options.force = force;
+	options.skipVerified = skipVerified;
+	if (skipVerified.has_value())
+	{
+		options.presetDirectory = ConfigManager::inst()->userPresetsDir();
+	}
+	catalogJobs->refresh(std::move(roots), options);
 	return true;
 }
 #endif

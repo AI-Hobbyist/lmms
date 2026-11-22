@@ -28,6 +28,17 @@ inline Plugin::Descriptor::SubPluginFeatures::Key vstCatalogKey(
 	attributes["identity"] = entry.identity.key();
 	attributes["version"] = entry.locator.version;
 	attributes["vendor"] = entry.vendor;
+	const bool verifiedProduct = !entry.product.trimmed().isEmpty() && !entry.vendor.trimmed().isEmpty();
+	if ((verifiedProduct || entry.supportedMainLayouts) && entry.layoutInputs >= 0 && entry.layoutOutputs > 0)
+	{
+		attributes["layoutfamily"] = verifiedProduct
+			? QStringList{entry.vendor.trimmed().toCaseFolded(), entry.product.trimmed().toCaseFolded(),
+				scanPathKey(entry.locator.modulePath), attributes["format"], attributes["architecture"]}.join(QChar(0x241f))
+			: entry.identity.key();
+		attributes["layoutproduct"] = entry.product.isEmpty() ? entry.name : entry.product.trimmed();
+		attributes["layoutinputs"] = QString::number(entry.layoutInputs);
+		attributes["layoutoutputs"] = QString::number(entry.layoutOutputs);
+	}
 	if (entry.shell)
 	{
 		attributes["shellid"] = QString::number(entry.identity.vst2Id);

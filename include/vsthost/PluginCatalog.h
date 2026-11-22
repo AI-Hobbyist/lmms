@@ -5,6 +5,7 @@
 #include "vsthost/Protocol.h"
 #include "vsthost/ScanRoots.h"
 #include <functional>
+#include <optional>
 #include <stop_token>
 
 namespace lmms::vsthost {
@@ -35,6 +36,10 @@ struct CatalogEntry
 	QString name, vendor, category, subcategories;
 	std::uint32_t flags = 0;
 	bool shell = false;
+	QString product;
+	int layoutInputs = -1, layoutOutputs = -1;
+	std::uint32_t supportedMainLayouts = 0;
+	std::uint32_t selectedMainLayout = 0;
 	bool operator==(const CatalogEntry&) const = default;
 };
 
@@ -53,6 +58,7 @@ struct LMMS_EXPORT CatalogReport
 	std::vector<CatalogFailure> failures;
 	QString cacheError;
 	std::size_t modules = 0, cachedModules = 0;
+	std::size_t presetsWritten = 0, presetsExisting = 0, presetFailures = 0;
 	bool cancelled = false;
 	std::vector<CatalogEntry> candidates(const PluginIdentity& identity) const;
 };
@@ -71,6 +77,8 @@ public:
 		bool force = false;
 		std::uint32_t timeoutMs = 30000;
 		std::uint32_t ioTimeoutMs = 30000;
+		std::optional<bool> skipVerified;
+		QString presetDirectory;
 	};
 	using Progress = std::function<void(const QString&, std::size_t, std::size_t)>;
 	explicit PluginCatalog(Configuration configuration);

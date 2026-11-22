@@ -1,6 +1,8 @@
 #include "Vst3Instance.h"
 #include "WindowsCrashReport.h"
 #include "vsthost/Vst3Commands.h"
+#include "vsthost/Vst3Programs.h"
+#include "pluginterfaces/vst/ivstunits.h"
 #include "Vst3StateStream.h"
 #include "vsthost/AudioQueue.h"
 #include "pluginterfaces/base/funknownimpl.h"
@@ -396,9 +398,45 @@ void Vst3Instance::setup(double rate, std::uint32_t frames, bool offline)
 	{
 		require(m_processor->getBusArrangement(kOutput, index, outputs[index]), "Output arrangement");
 	}
+	const auto mainBus = [this](BusDirection direction, std::size_t count) {
+		for (int32 index = 0; index < static_cast<int32>(count); ++index)
+		{
+			BusInfo bus{};
+			if (m_component->getBusInfo(kAudio, direction, index, bus) == kResultOk && bus.busType == kMain)
+			{
+				return index;
+			}
+		}
+		return int32{-1};
+	};
+	const bool explicitLayout = m_initialLayout != Vst3MainLayout::Default;
+	const auto inputBus = explicitLayout ? mainBus(kInput, inputs.size()) : -1;
+	const auto outputBus = explicitLayout ? mainBus(kOutput, outputs.size()) : -1;
+	if (explicitLayout)
+	{
+		if (outputBus < 0 || (m_initialLayout == Vst3MainLayout::MonoToStereo && inputBus < 0))
+		{
+			throw std::runtime_error("Selected VST3 layout has no matching main audio bus");
+		}
+		if (inputBus >= 0)
+		{
+			inputs[inputBus] = m_initialLayout == Vst3MainLayout::Stereo ? SpeakerArr::kStereo : SpeakerArr::kMono;
+		}
+		outputs[outputBus] = m_initialLayout == Vst3MainLayout::Mono ? SpeakerArr::kMono : SpeakerArr::kStereo;
+	}
 	require(m_processor->setBusArrangements(
 				inputs.data(), static_cast<int32>(inputs.size()), outputs.data(), static_cast<int32>(outputs.size())),
 		"Set bus arrangements");
+	if (explicitLayout)
+	{
+		SpeakerArrangement actual = 0;
+		if ((inputBus >= 0 && (m_processor->getBusArrangement(kInput, inputBus, actual) != kResultOk
+				|| actual != inputs[inputBus]))
+			|| m_processor->getBusArrangement(kOutput, outputBus, actual) != kResultOk || actual != outputs[outputBus])
+		{
+			throw std::runtime_error("VST3 plug-in did not apply the selected audio layout");
+		}
+	}
 	// Arrangements can change channel counts even when accepted. Revalidate and
 	// allocate all native planar storage before activating the component.
 	prepareBuses(kInput, m_inputs);
@@ -1209,6 +1247,58 @@ bool Vst3Instance::collectEdits()
 
 std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::uint8_t> command)
 {
+	if (command.size() == 4 && get(command, 0, 4) == Vst3ProgramListCommand)
+	{
+		std::vector<Vst3Program> programs;
+		const FUnknownPtr<IUnitInfo> units(m_controller.get());
+		if (units)
+		{
+			std::unordered_map<ProgramListID, UnitID> unitByList;
+			const auto unitCount = std::clamp(units->getUnitCount(), 0, static_cast<int>(MaxVst3Programs));
+			for (int index = 0; index < unitCount; ++index)
+			{
+				UnitInfo unit{};
+				if (units->getUnitInfo(index, unit) == kResultOk && unit.programListId != kNoProgramListId)
+				{
+					unitByList.try_emplace(unit.programListId, unit.id);
+				}
+			}
+			const auto listCount = std::clamp(units->getProgramListCount(), 0, static_cast<int>(MaxVst3Programs));
+			for (int list = 0; list < listCount && programs.size() < MaxVst3Programs; ++list)
+			{
+				ProgramListInfo info{};
+				if (units->getProgramListInfo(list, info) != kResultOk)
+				{
+					continue;
+				}
+				const auto count = std::clamp(info.programCount, 0,
+					static_cast<int>(MaxVst3Programs - programs.size()));
+				const auto unit = unitByList.find(info.id);
+				const auto parameter = std::find_if(m_parameters.cbegin(), m_parameters.cend(), [&](const auto& candidate) {
+					return unit != unitByList.end() && candidate.unitId == unit->second
+						&& (candidate.flags & ParameterInfo::kIsProgramChange)
+						&& !(candidate.flags & ParameterInfo::kIsReadOnly)
+						&& candidate.stepCount > 0 && candidate.stepCount == info.programCount - 1;
+				});
+				for (int index = 0; index < count; ++index)
+				{
+					String128 name{};
+					if (units->getProgramName(info.id, index, name) == kResultOk)
+					{
+						Vst3Program program{static_cast<std::uint32_t>(info.id),
+							static_cast<std::uint32_t>(index), utf8(name)};
+						if (parameter != m_parameters.cend())
+						{
+							program.parameterId = parameter->id;
+							program.steps = static_cast<std::uint32_t>(parameter->stepCount);
+						}
+						programs.push_back(std::move(program));
+					}
+				}
+			}
+		}
+		return encodeVst3Programs(programs);
+	}
 	// Reconfiguration runs behind the session's audio pause/drain barrier.
 	if (command.size() == 20 && get(command, 0, 4) == 2)
 	{
@@ -1260,10 +1350,20 @@ std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::ui
 			throw std::runtime_error("Invalid VST3 parameter setter");
 		}
 		Vst3ComponentHandler::HostSetter hostSetter(m_handler);
-		require(m_controller->setParamNormalized(id, value), "Set controller parameter");
-		discardRestartParameters(id);
-		m_pendingParameters[found->second] = {value, true};
-		m_controllerParameters[found->second].dirty = false;
+		const auto status = m_controller->setParamNormalized(id, value);
+		if (status == kResultFalse)
+		{
+			// The controller declined the write. Restore the host control to
+			// the value that the plug-in actually reports.
+			m_feedback.push_back({.phase = 1, .id = id, .value = m_controller->getParamNormalized(id)});
+		}
+		else
+		{
+			require(status, "Set controller parameter");
+			discardRestartParameters(id);
+			m_pendingParameters[found->second] = {value, true};
+			m_controllerParameters[found->second].dirty = false;
+		}
 	}
 	// Serialize GUI gestures separately from DSP output and its audio block ID.
 	std::vector<std::uint8_t> reply;

@@ -184,6 +184,7 @@ private:
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QComboBox* m_vstLoadingMode = nullptr;
+	QComboBox* m_defaultWorkspace = nullptr;
 	QString m_vstEmbedMethod;
 	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;

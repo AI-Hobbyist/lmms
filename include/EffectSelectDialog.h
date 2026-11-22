@@ -100,6 +100,7 @@ private:
 	void rebuildModel();
 	void refreshVstKeys();
 	EffectKeyList m_effectKeys;
+	QList<EffectKeyList> m_effectRows;
 	EffectKey m_currentSelection;
 
 	QStandardItemModel m_sourceModel;

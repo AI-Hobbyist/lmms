@@ -37,6 +37,19 @@ public:
 				auto key = vstCatalogKey(descriptor, entry);
 				key.attributes["pluginname"] = entry.name;
 				keys.push_back(key);
+				for (unsigned layout = 1; layout <= 3; ++layout)
+				{
+					if ((entry.supportedMainLayouts & (1u << layout)) == 0)
+					{
+						continue;
+					}
+					auto variant = key;
+					variant.attributes["mainlayout"] = QString::number(layout);
+					variant.attributes["layoutinputs"] = QString::number(
+						entry.layoutInputs == 0 ? 0 : layout == 2 ? 2 : 1);
+					variant.attributes["layoutoutputs"] = QString::number(layout == 1 ? 1 : 2);
+					keys.push_back(std::move(variant));
+				}
 			}
 		}
 	}
@@ -78,6 +91,12 @@ inline std::unique_ptr<VstPlugin> openNativeVst(const NativeVstKey& key)
 		entry.locator = {path, attributes.value("binarypath"), attributes.value("version"), fingerprint};
 		entry.name = attributes.value("pluginname", key.name);
 		entry.vendor = attributes.value("vendor");
+		bool validLayout = true;
+		entry.selectedMainLayout = attributes.value("mainlayout", "0").toUInt(&validLayout);
+		if (!validLayout || entry.selectedMainLayout > 3)
+		{
+			return {};
+		}
 	}
 
 	auto plugin = std::make_unique<VstPlugin>(

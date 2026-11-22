@@ -8,6 +8,7 @@
 #include "vsthost/Vst3BlockEvents.h"
 #include "vsthost/Vst3OutputEvents.h"
 #include "vsthost/Vst3ParameterFeedback.h"
+#include "vsthost/Vst3Commands.h"
 #include "vsthost/Vst3Metadata.h"
 #include "pluginterfaces/vst/ivstaudioprocessor.h"
 #include "pluginterfaces/vst/ivsteditcontroller.h"
@@ -34,6 +35,7 @@ public:
 		Steinberg::Vst::IComponentHandler* handler = nullptr);
 	void close();
 	void setup(double rate, std::uint32_t frames, bool offline = false);
+	void setInitialLayout(Vst3MainLayout layout) { m_initialLayout = layout; }
 	bool process(std::uint32_t frames, std::span<const float> input, std::span<float> output,
 		std::span<const std::uint8_t> events = {}, std::uint64_t sequence = 0, bool collectOutput = false);
 	std::vector<std::uint8_t> midiOutput();
@@ -114,6 +116,7 @@ private:
 	Steinberg::Vst::ProcessContext m_context{};
 	Steinberg::int32 m_sampleSize = Steinberg::Vst::kSample32;
 	std::uint32_t m_maxFrames = 0, m_latency = 0;
+	Vst3MainLayout m_initialLayout = Vst3MainLayout::Default;
 	std::uint32_t m_restartFlags = 0, m_pendingRestart = 0;
 	bool m_componentInitialized = false, m_controllerInitialized = false;
 	bool m_handlerInstalled = false, m_active = false, m_processing = false;

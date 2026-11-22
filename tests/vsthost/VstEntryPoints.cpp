@@ -1,10 +1,14 @@
 #include <chrono>
+#include <atomic>
 #include <thread>
 #include "Mixer.h"
 #include "AudioBuffer.h"
 #include <QtTest>
 #include <QDir>
+#include <QDirIterator>
 #include <QDomDocument>
+#include <QDragEnterEvent>
+#include <QMimeData>
 #include <QTemporaryDir>
 #include <QJsonArray>
 #include <QElapsedTimer>
@@ -24,7 +28,12 @@
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "SongEditor.h"
+#include "PatternEditor.h"
+#include "Clipboard.h"
 #include "EffectChain.h"
+#include "EffectRackView.h"
+#include "MixerView.h"
 #include "Effect.h"
 #include "EffectControls.h"
 #include "AutomationClip.h"
@@ -45,6 +54,7 @@
 // Native LMMS DLLs import lmms.exe. This test's output name is lmms.exe so
 // imports resolve to the same Engine/CommandBus as the test, not a second copy.
 #include "vsthost/CatalogJobs.h"
+#include "vsthost/NativeVstPresetDrop.h"
 #include "EffectSelectDialog.h"
 #include "PluginBrowser.h"
 #include <QTreeWidget>
@@ -52,10 +62,12 @@
 #include "vsthost/VstNodePorts.h"
 #include <QTableView>
 #include <QLineEdit>
+#include <QLabel>
 #include <QStandardPaths>
 #include <QDialogButtonBox>
 #include <QComboBox>
 #include <QPushButton>
+#include <QScreen>
 #include <QFileSystemModel>
 #include "DummyEffect.h"
 #include <QSignalSpy>
@@ -135,6 +147,79 @@ class VstEntryPoints : public QObject
 	{
 		return dynamic_cast<lmms::InstrumentTrack*>(lmms::Engine::getSong()->tracks().at(0));
 	}
+	static bool dropStringPair(QWidget* destination, const QByteArray& payload)
+	{
+		QMimeData mime;
+		mime.setData(lmms::Clipboard::mimeType(lmms::Clipboard::MimeType::StringPair), payload);
+		QDragEnterEvent enter(QPoint(8, 8), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+		QApplication::sendEvent(destination, &enter);
+		if (!enter.isAccepted())
+		{
+			return false;
+		}
+		QDropEvent drop(QPointF(8, 8), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+		QApplication::sendEvent(destination, &drop);
+		return drop.isAccepted();
+	}
+
+	static bool dragEditorControl(HWND editor, const QPointF& start, const QPointF& change)
+	{
+		RECT bounds{};
+		POINT origin{};
+		if (!GetClientRect(editor, &bounds) || !ClientToScreen(editor, &origin))
+		{
+			return false;
+		}
+		const auto point = [&bounds, origin](const QPointF& fraction) {
+			return POINT{origin.x + std::lround(fraction.x() * bounds.right),
+				origin.y + std::lround(fraction.y() * bounds.bottom)};
+		};
+		const bool wasTopmost = (GetWindowLongPtrW(editor, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
+		if (!SetWindowPos(editor, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE))
+		{
+			return false;
+		}
+		const auto restoreOrder = qScopeGuard([editor, wasTopmost] {
+			if (!wasTopmost)
+			{
+				SetWindowPos(editor, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+			}
+		});
+		SetForegroundWindow(editor);
+		QTest::qWait(100);
+		const auto first = point(start);
+		const auto hit = WindowFromPoint(first);
+		if (hit != editor && !IsChild(editor, hit))
+		{
+			return false;
+		}
+		if (!SetCursorPos(first.x, first.y))
+		{
+			return false;
+		}
+		INPUT input{};
+		input.type = INPUT_MOUSE;
+		input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+		if (SendInput(1, &input, sizeof(input)) != 1)
+		{
+			return false;
+		}
+		const auto release = qScopeGuard([&input] {
+			input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+			SendInput(1, &input, sizeof(input));
+		});
+		for (int step = 1; step <= 5; ++step)
+		{
+			QTest::qWait(25);
+			const auto next = point(start + change * (step / 5.0));
+			if (!SetCursorPos(next.x, next.y))
+			{
+				return false;
+			}
+		}
+		QTest::qWait(25);
+		return true;
+	}
 private slots:
 	void init() { m_caseTimer.start(); }
 	void cleanup()
@@ -190,6 +275,180 @@ private slots:
 		QCOMPARE(report->entries.size(), std::size_t{6});
 		QVERIFY(report->failures.empty());
 	}
+	// Exercise the catalog worker's real preset output with the installed helpers.
+	void scanExportsNativePresets()
+	{
+		auto* config = lmms::ConfigManager::inst();
+		config->setWorkingDir(m_fixtureRoot + '/');
+		const auto nativeFixture = QDir(qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT"))
+			.absoluteFilePath("../vst-host/x64/Release/Vst3Native.vst3");
+		QVERIFY(QFile::copy(nativeFixture, m_fixtureRoot + "/Vst3Native.vst3"));
+		QVERIFY(config->setVstScanRoots({{m_fixtureRoot, {"vst2", "vst3"}}}));
+		const auto root = config->userPresetsDir();
+		QVERIFY(lmms::Engine::refreshVstCatalog(nullptr, false, true));
+		auto* jobs = lmms::Engine::vstCatalog();
+		QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 60000);
+		const auto report = jobs->snapshot().report;
+		QVERIFY(report);
+		QVERIFY(report->cachedModules > 0);
+		QVERIFY(report->presetsWritten > 0);
+		QDirIterator files(root, {"*.xpf"}, QDir::Files, QDirIterator::Subdirectories);
+		qsizetype instruments = 0;
+		qsizetype effects = 0;
+		QSet<QString> formats;
+		QString instrumentPath;
+		QString effectPath;
+		while (files.hasNext())
+		{
+			const auto path = files.next();
+			const auto normalized = QDir::fromNativeSeparators(path);
+			lmms::DataFile file(path);
+			const auto preset = lmms::vsthost::readNativeVstPresetDrop(file);
+			QVERIFY2(preset.hasAvailableIdentity(), qPrintable(path));
+			const auto format = preset.key.attributes.value("format").toUpper();
+			formats.insert(format);
+			const auto role = preset.instrument ? QStringLiteral("乐器") : QStringLiteral("效果");
+			QVERIFY2(normalized.contains(QStringLiteral("/VST/") + format + '/' + role + '/'), qPrintable(path));
+			if (preset.instrument)
+			{
+				++instruments;
+				if (format == "VST3") { instrumentPath = path; }
+			}
+			else
+			{
+				++effects;
+				if (format == "VST2" && preset.state.hasAttribute("chunk")) { effectPath = path; }
+			}
+		}
+		QCOMPARE(formats, (QSet<QString>{"VST2", "VST3"}));
+		QVERIFY(instruments > 0);
+		QVERIFY(effects > 0);
+
+		if (m_liveGui)
+		{
+			const auto configurable = std::find_if(report->entries.cbegin(), report->entries.cend(), [](const auto& entry) {
+				return entry.identity.format == lmms::vsthost::Format::Vst3 && !lmms::vsthost::isVstInstrument(entry)
+					&& entry.layoutOutputs == 2 && (entry.supportedMainLayouts & (1u << 1));
+			});
+			QVERIFY(configurable != report->entries.cend());
+			config->setValue("ui", "vstloadingmode", "native");
+			lmms::gui::EffectSelectDialog selector(m_liveGui->mainWindow());
+			selector.show();
+			auto* search = selector.findChild<QLineEdit*>();
+			auto* table = selector.findChild<QTableView*>();
+			QVERIFY(search && table);
+			search->setText(QRegularExpression::escape(configurable->name));
+			QTRY_COMPARE_WITH_TIMEOUT(table->model()->rowCount(), 1, 3000);
+			table->setCurrentIndex(table->model()->index(0, 0));
+			const auto combos = selector.findChildren<QComboBox*>();
+			auto combo = std::find_if(combos.cbegin(), combos.cend(), [](const auto* candidate) {
+				return candidate->accessibleName() == "VST channel layout";
+			});
+			QVERIFY(combo != combos.cend());
+			const int mono = (*combo)->findText("1 in / 1 out", Qt::MatchContains);
+			QVERIFY(mono > 0);
+			(*combo)->setCurrentIndex(mono);
+			auto* mixerChain = &lmms::Engine::mixer()->mixerChannel(0)->m_fxChain;
+			std::unique_ptr<lmms::Effect> selected(selector.instantiateSelectedPlugin(mixerChain));
+			QVERIFY(selected && selected->isOkay());
+			QCOMPARE(selected->key().attributes.value("mainlayout"), QStringLiteral("1"));
+			auto* owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(selected.get());
+			QVERIFY(owner && owner->vstNodeProcessor());
+			using lmms::vsthost::NodePortDirection;
+			QCOMPARE(owner->vstNodeProcessor()->nodeAudioIndex(0, NodePortDirection::Output), 0u);
+			QCOMPARE(owner->vstNodeProcessor()->nodeAudioIndex(1, NodePortDirection::Output), UINT32_MAX);
+		}
+
+		QVERIFY(!effectPath.isEmpty());
+		lmms::DataFile effectFile(effectPath);
+		const auto effectPreset = lmms::vsthost::readNativeVstPresetDrop(effectFile);
+		auto* chain = &lmms::Engine::mixer()->mixerChannel(0)->m_fxChain;
+		const auto oldCount = chain->effectCount();
+		if (m_liveGui)
+		{
+			m_editorFunctionOnly = true;
+			auto* mixer = m_liveGui->mixerView();
+			mixer->setCurrentMixerChannel(0);
+			mixer->show();
+			lmms::gui::EffectRackView* destination = nullptr;
+			for (auto* rack : mixer->findChildren<lmms::gui::EffectRackView*>())
+			{
+				if (rack->model() == chain)
+				{
+					destination = rack;
+					break;
+				}
+			}
+			QVERIFY(destination);
+			QVERIFY(dropStringPair(destination, "presetfile:" + effectPath.toUtf8()));
+		}
+		else
+		{
+			auto effect = lmms::vsthost::createNativeVstPresetEffect(effectPreset, chain);
+			QVERIFY(effect);
+			QCOMPARE(chain->effectCount(), oldCount);
+			chain->appendEffect(effect.release());
+		}
+		QCOMPARE(chain->effectCount(), oldCount + 1);
+		auto* effect = chain->effectAt(oldCount);
+		QVERIFY(effect);
+		QDomDocument effectDocument;
+		auto parent = effectDocument.createElement("effects");
+		const auto savedEffect = effect->saveState(effectDocument, parent)
+			.firstChildElement("native_vst_effect_controls");
+		QCOMPARE(savedEffect.attribute("chunk"), effectPreset.state.attribute("chunk"));
+		if (m_liveGui)
+		{
+			auto* target = static_cast<lmms::InstrumentTrack*>(
+				lmms::Track::create(lmms::Track::Type::Instrument, lmms::Engine::getSong()));
+			QVERIFY(target->loadInstrument("tripleoscillator"));
+			target->mixerChannelModel()->setValue(0);
+			auto* owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(effect);
+			QVERIFY(owner && owner->vstNodeProcessor());
+			auto* processor = owner->vstNodeProcessor();
+			std::atomic_bool heardSignal{false};
+			{
+				const auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
+				processor->setNodeAudioReceiver([&heardSignal](std::span<const float> audio, unsigned) {
+					if (std::any_of(audio.begin(), audio.end(), [](float sample) { return std::abs(sample) > 0.001f; }))
+					{
+						heardSignal.store(true, std::memory_order_relaxed);
+					}
+				});
+			}
+			const auto detachMeter = qScopeGuard([processor] {
+				const auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
+				processor->setNodeAudioReceiver({});
+			});
+			target->processInEvent(lmms::MidiEvent(lmms::MidiNoteOn, 0, 57, 100));
+			const auto noteOff = qScopeGuard([target] {
+				target->processInEvent(lmms::MidiEvent(lmms::MidiNoteOff, 0, 57, 0));
+			});
+			QTRY_VERIFY_WITH_TIMEOUT(heardSignal.load(std::memory_order_relaxed), 3000);
+		}
+
+		QVERIFY(!instrumentPath.isEmpty());
+		lmms::DataFile instrumentFile(instrumentPath);
+		auto* song = lmms::Engine::getSong();
+		lmms::InstrumentTrack* track = nullptr;
+		if (m_liveGui)
+		{
+			const auto before = song->tracks().size();
+			QVERIFY(dropStringPair(m_liveGui->songEditor()->m_editor, "presetfile:" + instrumentPath.toUtf8()));
+			QCOMPARE(song->tracks().size(), before + 1);
+			track = dynamic_cast<lmms::InstrumentTrack*>(song->tracks().back());
+		}
+		else
+		{
+			track = static_cast<lmms::InstrumentTrack*>(lmms::Track::create(lmms::Track::Type::Instrument, song));
+			QVERIFY(track->replaceInstrument(instrumentFile));
+		}
+		QVERIFY(track);
+		QVERIFY(lmms::vsthost::nativeVstPresetRestored(track->instrument()));
+		const auto expected = lmms::vsthost::readNativeVstPresetDrop(instrumentFile);
+		QCOMPARE(track->instrument()->key().attributes.value("classid"), expected.key.attributes.value("classid"));
+	}
+
 	void catalogPublicationAndSelector()
 	{
 		auto* jobs = lmms::Engine::vstCatalog();
@@ -295,6 +554,266 @@ private slots:
 			}
 		}
 	}
+
+	void installedNativeEditors_data()
+	{
+		QTest::addColumn<QString>("path");
+		QTest::addColumn<QString>("classId");
+		QTest::addColumn<bool>("instrument");
+
+		QFile samples(qEnvironmentVariable("LMMS_VST_ACCEPTANCE_SAMPLES"));
+		if (!samples.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			return;
+		}
+		while (!samples.atEnd())
+		{
+			const auto fields = QString::fromUtf8(samples.readLine()).trimmed().split('\t');
+			QCOMPARE(fields.size(), 4);
+			QTest::newRow(fields[0].toUtf8().constData()) << fields[1] << fields[2] << (fields[3] == "instrument");
+		}
+	}
+
+	void installedNativeEditors()
+	{
+		if (!m_liveGui || !qEnvironmentVariableIsSet("LMMS_VST_ACCEPTANCE_SAMPLES"))
+		{
+			QSKIP("Requires native Windows GUI and an installed plug-in manifest");
+		}
+		m_editorFunctionOnly = true;
+		QFETCH(QString, path);
+		QFETCH(QString, classId);
+		QFETCH(bool, instrument);
+		const bool vst3 = classId.size() == 32;
+		lmms::Plugin::Descriptor::SubPluginFeatures::Key key;
+		key.attributes["file"] = path;
+		key.attributes["format"] = vst3 ? "vst3" : "vst2";
+		key.attributes["architecture"] = vst3 ? "64" : "32";
+		if (vst3)
+		{
+			key.attributes["classid"] = classId;
+		}
+		qInfo() << "acceptance identity" << path << classId << instrument << key.attributes;
+
+		const auto module = QFileInfo(path).fileName().toStdWString();
+		const auto previousHelpers = fixtureProcesses("before native add", module.c_str());
+		lmms::InstrumentTrack* target = nullptr;
+		std::unique_ptr<QWidget> view;
+		lmms::vsthost::VstNodeOwner* owner = nullptr;
+		QMap<QString, lmms::AutomatableModel*> models;
+		if (instrument)
+		{
+			const QByteArray name(QTest::currentDataTag());
+			const bool pattern = name == "DSK-Ethereal-PadZ-2";
+			const bool node = name == "Waves-CODEX-Stereo";
+			auto* song = lmms::Engine::getSong();
+			QWidget* destination = nullptr;
+			lmms::TrackContainer* tracks = song;
+			const char* entry = "song editor drop";
+			if (node)
+			{
+				song->setModified(false);
+				song->createNodeProject();
+				m_liveGui->mainWindow()->showNodeWorkflow();
+				auto* breadcrumb = m_liveGui->mainWindow()->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+				QVERIFY(breadcrumb);
+				QVERIFY(QMetaObject::invokeMethod(breadcrumb, "linkActivated", Q_ARG(QString, QStringLiteral("song"))));
+				destination = m_liveGui->mainWindow()->findChild<QWidget*>("nodeWorkflowCanvas");
+				entry = "node editor drop";
+			}
+			else
+			{
+				lmms::gui::TrackContainerView* editor = pattern
+					? static_cast<lmms::gui::TrackContainerView*>(m_liveGui->patternEditor()->m_editor)
+					: static_cast<lmms::gui::TrackContainerView*>(m_liveGui->songEditor()->m_editor);
+				destination = editor;
+				tracks = editor->model();
+				entry = pattern ? "pattern editor drop" : "song editor drop";
+			}
+			QVERIFY(destination);
+			const auto before = tracks->tracks().size();
+			const auto info = lmms::PluginFactory::instance()->pluginInfo("native_vst_instrument");
+			QVERIFY(!info.isNull());
+			key.desc = info.descriptor;
+			lmms::Engine::setDndPluginKey(&key);
+			const auto clearDragKey = qScopeGuard([] { lmms::Engine::setDndPluginKey(nullptr); });
+			QVERIFY(dropStringPair(destination, "instrument:native_vst_instrument"));
+			QCOMPARE(tracks->tracks().size(), before + 1);
+			target = dynamic_cast<lmms::InstrumentTrack*>(tracks->tracks().back());
+			QVERIFY(target && target->instrument());
+			auto* plugin = target->instrument();
+			QCOMPARE(QString::fromUtf8(plugin->descriptor()->name), QStringLiteral("native_vst_instrument"));
+			qInfo() << "acceptance entry" << entry;
+			models = plugin->parameterModels();
+			owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(plugin);
+			view.reset(plugin->createView(m_liveGui->mainWindow()));
+		}
+		else
+		{
+			auto* song = lmms::Engine::getSong();
+			QVERIFY(command("track.create", {{"type", "instrument"}}).ok);
+			target = dynamic_cast<lmms::InstrumentTrack*>(song->tracks().back());
+			QVERIFY(target);
+			QVERIFY(target->loadInstrument("tripleoscillator"));
+			const bool mixerEffect = QByteArray(QTest::currentDataTag()) == "ModernEqualizer";
+			auto* chain = mixerEffect ? &lmms::Engine::mixer()->mixerChannel(0)->m_fxChain
+				: target->audioBusHandle()->effects();
+			if (mixerEffect)
+			{
+				auto* mixer = m_liveGui->mixerView();
+				mixer->setCurrentMixerChannel(0);
+				mixer->show();
+				target->mixerChannelModel()->setValue(0);
+			}
+			qInfo() << "acceptance entry" << (mixerEffect ? "mixer master insert" : "instrument effect rack insert");
+			std::unique_ptr<lmms::Effect> effect(lmms::Effect::instantiate("native_vst_effect", chain, &key));
+			QVERIFY(effect && effect->isOkay());
+			models = effect->controls()->parameterModels();
+			owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(effect.get());
+			view.reset(effect->controls()->createView());
+			chain->appendEffect(effect.release());
+		}
+		QVERIFY(owner);
+		auto* processor = owner->vstNodeProcessor();
+		QVERIFY(processor);
+		QVERIFY(view);
+		view->setWindowFlag(Qt::Window);
+		view->show();
+		auto* editorButton = view->findChild<QPushButton*>();
+		QVERIFY(editorButton && editorButton->isEnabled());
+
+		const auto newlyLoadedHelpers = [&] {
+			auto helpers = fixtureProcesses("before native editor request", module.c_str());
+			for (const auto pid : previousHelpers) { helpers.erase(pid); }
+			return helpers;
+		};
+		std::set<DWORD> helpers;
+		QTRY_COMPARE_WITH_TIMEOUT((helpers = newlyLoadedHelpers()).size(), std::size_t{1}, 3000);
+		const DWORD helper = *helpers.begin();
+		editorButton->click();
+		struct EditorSearch
+		{
+			DWORD helper;
+			HWND window = nullptr;
+		};
+		const auto editorWindow = [helper] {
+			EditorSearch search{helper};
+			const auto inspect = [](HWND window, LPARAM context) -> BOOL {
+				auto& search = *reinterpret_cast<EditorSearch*>(context);
+				DWORD pid = 0;
+				GetWindowThreadProcessId(window, &pid);
+				if (pid == search.helper && IsWindowVisible(window))
+				{
+					search.window = window;
+					return FALSE;
+				}
+				return TRUE;
+			};
+			std::pair<WNDENUMPROC, EditorSearch*> enumeration{inspect, &search};
+			EnumWindows([](HWND window, LPARAM context) -> BOOL {
+				const auto& [inspect, search]
+					= *reinterpret_cast<std::pair<WNDENUMPROC, EditorSearch*>*>(context);
+				const auto query = reinterpret_cast<LPARAM>(search);
+				if (!inspect(window, query)) { return FALSE; }
+				EnumChildWindows(window, inspect, query);
+				return search->window == nullptr;
+			}, reinterpret_cast<LPARAM>(&enumeration));
+			return search.window;
+		};
+		HWND editor = nullptr;
+		QTRY_VERIFY_WITH_TIMEOUT((editor = editorWindow()) != nullptr, 5000);
+		qInfo() << "acceptance editor" << reinterpret_cast<quintptr>(editor) << "helper" << helper;
+		QTest::qWait(400);
+		const auto captureDirectory = qEnvironmentVariable("LMMS_VST_ACCEPTANCE_CAPTURES");
+		if (!captureDirectory.isEmpty())
+		{
+			RECT window{};
+			QVERIFY(GetWindowRect(editor, &window));
+			auto* screen = QGuiApplication::screenAt(QPoint(window.left, window.top));
+			QVERIFY(screen);
+			const auto screenshot = screen->grabWindow(reinterpret_cast<WId>(editor));
+			const auto destination = QDir(captureDirectory).filePath(QString::fromUtf8(QTest::currentDataTag()) + ".png");
+			QVERIFY2(!screenshot.isNull() && screenshot.save(destination), qPrintable(destination));
+		}
+		const auto controlsPath = qEnvironmentVariable("LMMS_VST_ACCEPTANCE_CONTROLS");
+		QFile controls(controlsPath);
+		if (!controlsPath.isEmpty())
+		{
+			QVERIFY2(controls.open(QIODevice::ReadOnly | QIODevice::Text), qPrintable(controlsPath));
+			while (!controls.atEnd())
+			{
+				const auto fields = controls.readLine().trimmed().split('\t');
+				QCOMPARE(fields.size(), 5);
+				if (fields[0] != QTest::currentDataTag())
+				{
+					continue;
+				}
+				QMap<QString, float> before;
+				for (auto it = models.cbegin(); it != models.cend(); ++it)
+				{
+					before.insert(it.key(), it.value()->value<float>());
+				}
+				QVERIFY(dragEditorControl(editor, {fields[1].toDouble(), fields[2].toDouble()},
+					{fields[3].toDouble(), fields[4].toDouble()}));
+				QTest::qWait(700);
+				bool changed = false;
+				for (auto it = models.cbegin(); it != models.cend(); ++it)
+				{
+					const auto actual = it.value()->value<float>();
+					if (actual != before.value(it.key()))
+					{
+						qInfo() << "acceptance editor parameter" << it.key() << before.value(it.key()) << actual;
+						changed = true;
+					}
+				}
+				QVERIFY2(changed, "Native editor input did not produce a host parameter update");
+				QVERIFY(IsWindowVisible(editor));
+				break;
+			}
+		}
+
+		std::atomic_uint blocks{0};
+		std::atomic<float> peak{0};
+		{
+			const auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
+			processor->setNodeAudioReceiver([&](std::span<const float> audio, unsigned) {
+				float largest = peak.load(std::memory_order_relaxed);
+				for (const float sample : audio)
+				{
+					largest = std::max(largest, std::abs(sample));
+				}
+				peak.store(largest, std::memory_order_relaxed);
+				blocks.fetch_add(1, std::memory_order_relaxed);
+			});
+		}
+		const auto detachMeter = qScopeGuard([processor] {
+			const auto guard = lmms::Engine::audioEngine()->requestChangesGuard();
+			processor->setNodeAudioReceiver({});
+		});
+		target->processInEvent(lmms::MidiEvent(lmms::MidiNoteOn, 0, 57, 100));
+		QTest::qWait(650);
+		target->processInEvent(lmms::MidiEvent(lmms::MidiNoteOff, 0, 57, 0));
+		const auto measuredPeak = peak.load(std::memory_order_relaxed);
+		const auto processedBlocks = blocks.load(std::memory_order_relaxed);
+		qInfo() << "acceptance realtime output" << "blocks" << processedBlocks << "peak" << measuredPeak;
+		QVERIFY2(processedBlocks != 0, "The plug-in did not process any realtime audio blocks");
+		QVERIFY2(IsWindowVisible(editor), "Editor disappeared during realtime audio");
+
+		QVERIFY2(!models.isEmpty(), "Editor opened, but no writable host parameter was exposed");
+		const auto parameter = models.constBegin();
+		const auto before = parameter.value()->value<float>();
+		const auto requested = before < 0.5f ? 0.75f : 0.25f;
+		parameter.value()->setValue(requested, true);
+		QTest::qWait(600);
+		qInfo() << "acceptance host parameter" << parameter.key() << before << requested
+			<< parameter.value()->value<float>();
+		QVERIFY2(IsWindow(editor) && IsWindowVisible(editor), "Editor disappeared after host parameter input");
+		QVERIFY2(fixtureProcesses("after host parameter", module.c_str()).contains(helper),
+			"The sandbox process disappeared after host parameter input");
+		QVERIFY2(parameter.value()->value<float>() != before, "The plug-in did not accept the requested parameter value");
+		QVERIFY2(measuredPeak > 0.001f, "No signal at the plug-in output with the loaded plug-in state");
+	}
+
 	void nativeEditorParameterAndLayout()
 	{
 		if (!m_liveGui) { QSKIP("Requires the native Windows GUI"); }
@@ -1011,6 +1530,11 @@ private slots:
 	{
 		if (m_liveGui)
 		{
+			if (m_editorFunctionOnly)
+			{
+				lmms::Engine::audioEngine()->audioDev()->stopProcessing();
+				lmms::Engine::getSong()->setModified(false);
+			}
 			delete static_cast<QWidget*>(m_liveGui->mainWindow());
 			m_liveGui.reset();
 		}

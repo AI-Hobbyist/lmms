@@ -32,6 +32,7 @@
 #include <QString>
 #include <QTimer>
 #include <cstdint>
+#include <functional>
 #include <memory>
 
 #include "Knob.h"
@@ -57,6 +58,7 @@ public:
 	VstPlugin(const QString& plugin, std::uint32_t shellId = 0, const QString& embedMethod = {},
 		const vsthost::CatalogEntry* selection = nullptr);
 	bool failed() const;
+	bool presetStateRestored() const override;
 	bool isRunning();
 	bool process(const SampleFrame* input, SampleFrame* output);
 	bool process(const SampleFrame* input, SampleFrame* output, f_cnt_t frames);
@@ -189,12 +191,25 @@ public slots:
 	void savePreset();
 	void setParam( int i, float f );
 	void idleUpdate();
-
 	void showUI() override;
 	void hideUI() override;
 	void toggleUI() override;
-
 	void handleClientEmbed();
+
+public:
+	struct PresetProgram
+	{
+		QString name;
+		int index = 0;
+		std::uint32_t parameterId = 0;
+		std::uint32_t steps = 0;
+		bool selectable = false;
+	};
+	QList<PresetProgram> presetPrograms();
+	bool selectPresetProgram(const PresetProgram& program);
+	void exportNativePreset(bool instrument, const std::function<bool(const QString&)>& saveLmmsPreset);
+	bool exportPreset(const QString& path);
+	bool importPreset(const QString& path);
 
 private:
 	struct Native;

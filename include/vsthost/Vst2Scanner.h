@@ -13,6 +13,8 @@ struct Vst2ScanEntry
 	std::uint32_t id;
 	std::string name;
 	std::uint32_t flags = 0;
+	int inputs = -1, outputs = -1;
+	std::string product;
 };
 struct Vst2ScanResult
 {
@@ -75,7 +77,7 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config, const s
 				&& (!entries || entries->arguments.size() < 2 || !parse(entries->arguments[0], count) || !count
 					|| count > 4096
 					|| (entries->arguments.size() != 2 + 2 * count && entries->arguments.size() != 4 + 2 * count
-						&& entries->arguments.size() != 4 + 3 * count)
+					&& entries->arguments.size() != 4 + 3 * count && entries->arguments.size() != 4 + 6 * count)
 					|| (entries->arguments[1] != "0" && entries->arguments[1] != "1")))
 			{
 				result.error = Error::InvalidMessage;
@@ -83,7 +85,8 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config, const s
 			if (result.error == Error::None)
 			{
 				result.shell = entries->arguments[1] == "1";
-				const auto stride = entries->arguments.size() == 4 + 3 * count ? 3u : 2u;
+				const auto stride = entries->arguments.size() == 4 + 6 * count ? 6u
+					: entries->arguments.size() == 4 + 3 * count ? 3u : 2u;
 				if (entries->arguments.size() == 4 + stride * count)
 				{
 					const auto& vendor = entries->arguments[2 + stride * count];
@@ -122,12 +125,29 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config, const s
 						break;
 					}
 					std::uint32_t flags = 0;
-					if (stride == 3 && !parse(entries->arguments[4 + stride * i], flags))
+					if (stride >= 3 && !parse(entries->arguments[4 + stride * i], flags))
 					{
 						result.error = Error::InvalidMessage;
 						break;
 					}
-					result.entries.push_back({id, entries->arguments[3 + stride * i], flags});
+					Vst2ScanEntry entry{id, name, flags};
+					if (stride == 6)
+					{
+						std::uint32_t inputs = 0, outputs = 0;
+						const auto offset = 5 + stride * i;
+						const auto& product = entries->arguments[offset + 2];
+						if (!parse(entries->arguments[offset], inputs) || inputs > MaxAudioChannels
+							|| !parse(entries->arguments[offset + 1], outputs) || outputs > MaxAudioChannels
+							|| product.size() > 63 || product.find('\0') != std::string::npos)
+						{
+							result.error = Error::InvalidMessage;
+							break;
+						}
+						entry.inputs = static_cast<int>(inputs);
+						entry.outputs = static_cast<int>(outputs);
+						entry.product = product;
+					}
+					result.entries.push_back(std::move(entry));
 				}
 			}
 		}

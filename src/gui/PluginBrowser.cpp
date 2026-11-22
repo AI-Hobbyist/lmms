@@ -247,7 +247,47 @@ void PluginBrowser::addPlugins()
 			{
 				root->setExpanded(true);
 			}
-			for (const auto& key : subPluginKeys) { addPlugin(key, root); }
+			if (!nativeVst)
+			{
+				for (const auto& key : subPluginKeys) { addPlugin(key, root); }
+				continue;
+			}
+			using Key = Plugin::Descriptor::SubPluginFeatures::Key;
+			QMap<QString, QList<Key>> families;
+			for (const auto& key : subPluginKeys)
+			{
+				const auto family = key.attributes.value("layoutfamily");
+				if (family.isEmpty())
+				{
+					addPlugin(key, root);
+				}
+				else
+				{
+					families[family].append(key);
+				}
+			}
+			for (const auto& keys : families)
+			{
+				QSet<QPair<int, int>> layouts;
+				for (const auto& key : keys)
+				{
+					layouts.insert({key.attributes.value("layoutinputs").toInt(),
+						key.attributes.value("layoutoutputs").toInt()});
+				}
+				if (layouts.size() < 2)
+				{
+					for (const auto& key : keys) { addPlugin(key, root); }
+					continue;
+				}
+				auto* family = new QTreeWidgetItem(root);
+				family->setText(0, keys.front().attributes.value("layoutproduct"));
+				for (auto key : keys)
+				{
+					key.name = tr("%1 — %2 in / %3 out").arg(key.name, key.attributes.value("layoutinputs"),
+						key.attributes.value("layoutoutputs"));
+					addPlugin(key, family);
+				}
+			}
 		}
 		else
 		{

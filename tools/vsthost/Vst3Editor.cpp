@@ -9,6 +9,15 @@ bool valid(const ViewRect& rectangle)
 	return rectangle.left == 0 && rectangle.top == 0 && rectangle.right > 0 && rectangle.bottom > 0
 		&& rectangle.right <= 16384 && rectangle.bottom <= 16384;
 }
+
+bool sizeEditorWindow(HWND window, const ViewRect& rectangle)
+{
+	RECT outer{0, 0, rectangle.right, rectangle.bottom};
+	return AdjustWindowRectEx(&outer, static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE)), FALSE, 0)
+		&& SetWindowPos(window, nullptr, 0, 0, outer.right - outer.left, outer.bottom - outer.top,
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
 void require(tresult result, const char* operation)
 {
 	if (result != kResultOk)
@@ -69,10 +78,7 @@ void Vst3Editor::open(Vst::IEditController& controller)
 		throw std::runtime_error("Could not create VST3 editor window");
 	}
 	require(m_view->setFrame(this), "VST3 editor setFrame failed");
-	RECT outer{0, 0, rectangle.right, rectangle.bottom};
-	if (!AdjustWindowRectEx(&outer, static_cast<DWORD>(GetWindowLongPtrW(m_window, GWL_STYLE)), FALSE, 0)
-		|| !SetWindowPos(m_window, nullptr, 0, 0, outer.right - outer.left, outer.bottom - outer.top,
-			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE))
+	if (!sizeEditorWindow(m_window, rectangle))
 	{
 		throw std::runtime_error("VST3 editor initial window sizing failed");
 	}
@@ -83,7 +89,12 @@ void Vst3Editor::open(Vst::IEditController& controller)
 	{
 		throw std::runtime_error("VST3 attached editor has invalid dimensions");
 	}
-	require(resizeView(m_view, &rectangle), "VST3 attached editor sizing failed");
+	// The view already reports this size. Match its parent to the view without
+	// requesting a resize of the plug-in itself.
+	if (!sizeEditorWindow(m_window, rectangle))
+	{
+		throw std::runtime_error("VST3 attached editor sizing failed");
+	}
 	ShowWindow(m_window, SW_SHOW);
 }
 void Vst3Editor::close()
@@ -129,10 +140,7 @@ tresult PLUGIN_API Vst3Editor::resizeView(IPlugView* view, ViewRect* rectangle)
 		bool& value;
 		~Reset() { value = false; }
 	} reset{m_resizing};
-	RECT outer{0, 0, rectangle->right, rectangle->bottom};
-	if (!AdjustWindowRectEx(&outer, static_cast<DWORD>(GetWindowLongPtrW(m_window, GWL_STYLE)), FALSE, 0)
-		|| !SetWindowPos(m_window, nullptr, 0, 0, outer.right - outer.left, outer.bottom - outer.top,
-			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE))
+	if (!sizeEditorWindow(m_window, *rectangle))
 	{
 		return kResultFalse;
 	}

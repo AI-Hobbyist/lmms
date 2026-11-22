@@ -860,6 +860,17 @@ int main( int argc, char * * argv )
 			fileToLoad = queuedFile;
 		}
 
+		const auto createStartupProject = [] {
+			auto* song = Engine::getSong();
+			if (ConfigManager::inst()->value("app", "defaultworkspace") == "node")
+			{
+				song->createNodeProject();
+				gui::getGUI()->mainWindow()->showNodeWorkflow();
+				return;
+			}
+			song->createNewProject();
+		};
+
 		if( !fileToLoad.isEmpty() )
 		{
 			if( fileToLoad == recoveryFile )
@@ -898,12 +909,12 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				Engine::getSong()->createNewProject();
+				createStartupProject();
 			}
 		}
 		else
 		{
-			Engine::getSong()->createNewProject();
+			createStartupProject();
 		}
 
 		// Finally we start the auto save timer and also trigger the

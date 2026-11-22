@@ -77,6 +77,7 @@
 #include "Effect.h"
 #include "EffectChain.h"
 #include "vsthost/VstNodePorts.h"
+#include "vsthost/NativeVstPresetDrop.h"
 #include "EffectSelectDialog.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
@@ -4469,14 +4470,25 @@ void MainWindow::showNodeWorkflow()
 	});
 	connect(fit, &QToolButton::clicked, canvas, &NodeWorkflowCanvas::fitGraph);
 	const auto addSource = [song, showTracks, activeTracks](const QString& type, const QString& value,
-		std::optional<QPointF> position) {
+		std::optional<QPointF> position, const QDomElement& preset = {}) {
 		if (*activeTracks != song)
 		{
 			return false;
 		}
 		auto* container = static_cast<TrackContainer*>(song);
 		Track* track = nullptr;
-		if (type == "svsvoice")
+		if (type == "presetfile" && !preset.isNull())
+		{
+			auto* instrument = static_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, container));
+			instrument->loadPreset(preset);
+			if (!vsthost::nativeVstPresetRestored(instrument->instrument()))
+			{
+				delete instrument;
+				return false;
+			}
+			track = instrument;
+		}
+		else if (type == "svsvoice")
 		{
 			const auto split = value.lastIndexOf('/');
 			if (split <= 0 || split + 1 == value.size())
@@ -4535,7 +4547,7 @@ void MainWindow::showNodeWorkflow()
 	};
 	const auto addEffectNode = [song, showTracks, showSource, activeTracks, activeSource,
 		confirmSourceGraphExtension, customPath, activeGraphScope, showCustom](
-		const QString& payload, std::optional<QPointF> point) {
+		const QString& payload, std::optional<QPointF> point, const vsthost::NativeVstPresetDrop* preset = nullptr) {
 		QDomDocument document;
 		if (!document.setContent(payload))
 		{
@@ -4565,7 +4577,8 @@ void MainWindow::showNodeWorkflow()
 			{
 				return false;
 			}
-			auto* effect = Effect::instantiate(descriptorName, chain, &key);
+			auto* effect = preset ? vsthost::createNativeVstPresetEffect(*preset, chain).release()
+				: Effect::instantiate(descriptorName, chain, &key);
 			if (!effect || !effect->isOkay())
 			{
 				delete effect;
@@ -4581,7 +4594,8 @@ void MainWindow::showNodeWorkflow()
 		auto* mixer = Engine::mixer();
 		const auto index = mixer->createChannel();
 		auto* channel = mixer->mixerChannel(index);
-		auto* effect = Effect::instantiate(descriptorName, &channel->m_fxChain, &key);
+		auto* effect = preset ? vsthost::createNativeVstPresetEffect(*preset, &channel->m_fxChain).release()
+			: Effect::instantiate(descriptorName, &channel->m_fxChain, &key);
 		if (!effect || !effect->isOkay())
 		{
 			delete effect;
@@ -4615,14 +4629,14 @@ void MainWindow::showNodeWorkflow()
 		return true;
 	};
 	const auto addInstrumentLayer = [song, activeSource, showSource, confirmSourceGraphExtension]
-		(const QString& plugin, std::optional<QPointF> point, const QString& file = {}) {
+		(const QString& plugin, std::optional<QPointF> point, const QString& file = {}, const QDomElement& preset = {}) {
 		const auto owner = *activeSource;
 		if (!owner || owner->type() != Track::Type::Instrument
 			|| !confirmSourceGraphExtension() || !owner)
 		{
 			return false;
 		}
-		auto* layer = song->addNodeInstrumentLayer(*owner, plugin, point.has_value());
+		auto* layer = song->addNodeInstrumentLayer(*owner, plugin, point.has_value(), preset);
 		if (!layer)
 		{
 			return false;
@@ -4645,13 +4659,13 @@ void MainWindow::showNodeWorkflow()
 		return !source || source->type() == Track::Type::Instrument;
 	};
 	const auto addCustomInstrument = [song, customPath, activeGraphScope, showCustom, customInstrumentsAllowed](
-		const QString& plugin, const QString& file, std::optional<QPointF> point) {
+		const QString& plugin, const QString& file, std::optional<QPointF> point, const QDomElement& preset = {}) {
 		if (customPath->isEmpty() || !customInstrumentsAllowed())
 		{
 			return false;
 		}
 		const auto scope = *activeGraphScope;
-		const auto id = song->addNodeCustomInstrument(scope, plugin, file, point.has_value() && file.isEmpty());
+		const auto id = song->addNodeCustomInstrument(scope, plugin, file, point.has_value() && file.isEmpty(), preset);
 		if (id.isEmpty())
 		{
 			return false;
@@ -4663,8 +4677,35 @@ void MainWindow::showNodeWorkflow()
 		showCustom(showCustom, !point.has_value());
 		return true;
 	};
-	canvas->setPluginDropHandler([activeSource, addSource, addEffectNode, addInstrumentLayer, addCustomInstrument, customPath]
+	canvas->setPluginDropHandler([song, activeSource, addSource, addEffectNode, addInstrumentLayer, addCustomInstrument, customPath]
 		(const QString& type, const QString& value, const QPointF& point) {
+		if (type == "presetfile")
+		{
+			DataFile file(value);
+			const auto preset = vsthost::readNativeVstPresetDrop(file);
+			if (!preset.hasAvailableIdentity())
+			{
+				song->collectError(tr("The VST preset or the selected plug-in could not be loaded."));
+				return false;
+			}
+			if (preset.instrument)
+			{
+				if (!customPath->isEmpty())
+				{
+					return addCustomInstrument("native_vst_instrument", {}, point, file.content());
+				}
+				if (*activeSource)
+				{
+					return addInstrumentLayer("native_vst_instrument", point, {}, file.content());
+				}
+				return addSource(type, value, point, file.content());
+			}
+			QDomDocument keyDocument;
+			auto key = preset.key.saveXML(keyDocument);
+			key.setAttribute("plugin", "native_vst_effect");
+			keyDocument.appendChild(key);
+			return addEffectNode(keyDocument.toString(), point, &preset);
+		}
 		if (!customPath->isEmpty() && type != "nodeeffect")
 		{
 			if (type == "vstpluginfile")

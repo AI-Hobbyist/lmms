@@ -2944,7 +2944,8 @@ InstrumentTrack* Song::createNodeInstrumentLayer(Track& owner, const QDomElement
 	return instrument;
 }
 
-InstrumentTrack* Song::addNodeInstrumentLayer(Track& owner, const QString& plugin, bool fromDrop)
+InstrumentTrack* Song::addNodeInstrumentLayer(
+	Track& owner, const QString& plugin, bool fromDrop, const QDomElement& preset)
 {
 	if (!m_nodeProject || owner.type() != Track::Type::Instrument || plugin.isEmpty())
 	{
@@ -2956,7 +2957,26 @@ InstrumentTrack* Song::addNodeInstrumentLayer(Track& owner, const QString& plugi
 	element.setAttribute("id", QUuid::createUuid().toString(QUuid::WithoutBraces));
 	element.setAttribute("owner", owner.nodeWorkflowId().toString(QUuid::WithoutBraces));
 	auto* instrument = createNodeInstrumentLayer(owner, element);
-	instrument->loadInstrument(plugin, nullptr, fromDrop);
+	if (preset.isNull())
+	{
+		instrument->loadInstrument(plugin, nullptr, fromDrop);
+	}
+	else
+	{
+		instrument->loadPreset(preset);
+		auto* vst = dynamic_cast<vsthost::VstNodeOwner*>(instrument->instrument());
+		if (!vst || !vst->vstNodeProcessor() || !vst->vstNodeProcessor()->presetStateRestored())
+		{
+			auto& layers = m_nodeInstrumentLayers[&owner];
+			layers.removeLast();
+			if (layers.isEmpty())
+			{
+				m_nodeInstrumentLayers.remove(&owner);
+			}
+			delete instrument;
+			return nullptr;
+		}
+	}
 	const auto baseName = instrument->name();
 	auto name = baseName;
 	const auto& layers = nodeInstrumentLayers(owner);
@@ -3110,7 +3130,8 @@ QList<QPair<QString, InstrumentTrack*>> Song::nodeCustomInstruments(const QStrin
 	return result;
 }
 
-QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file, bool fromDrop)
+QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file, bool fromDrop,
+	const QDomElement& preset)
 {
 	if (!m_nodeProject || !scope.startsWith("custom/") || plugin.isEmpty()
 		|| !allowsCustomInstruments(*this, m_nodeWorkflow.documentElement(), scope))
@@ -3119,7 +3140,20 @@ QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugi
 	}
 	auto* track = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
 	track->audioBusHandle()->setMixerInputs(AudioBusHandle::MixerInputs{});
-	auto* instance = track->loadInstrument(plugin, nullptr, fromDrop);
+	Instrument* instance = nullptr;
+	if (preset.isNull())
+	{
+		instance = track->loadInstrument(plugin, nullptr, fromDrop);
+	}
+	else
+	{
+		track->loadPreset(preset);
+		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(track->instrument());
+		if (owner && owner->vstNodeProcessor() && owner->vstNodeProcessor()->presetStateRestored())
+		{
+			instance = track->instrument();
+		}
+	}
 	if (!instance)
 	{
 		delete track;

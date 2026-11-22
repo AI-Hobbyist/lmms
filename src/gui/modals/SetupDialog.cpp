@@ -400,6 +400,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_disableBackup, SLOT(toggleDisableBackup(bool)), false);
 	addCheckBox(tr("Reopen last project on startup"), projectsGroupBox, projectsGroupLayout,
 		m_openLastProject, SLOT(toggleOpenLastProject(bool)), false);
+	auto* workspaceLabel = new QLabel(tr("Default workspace"), projectsGroupBox);
+	m_defaultWorkspace = new QComboBox(projectsGroupBox);
+	m_defaultWorkspace->setObjectName("defaultWorkspace");
+	m_defaultWorkspace->addItem(tr("Classic Workspace"), "classic");
+	m_defaultWorkspace->addItem(tr("Node Workspace"), "node");
+	m_defaultWorkspace->setCurrentIndex(ConfigManager::inst()->value("app", "defaultworkspace") == "node" ? 1 : 0);
+	workspaceLabel->setBuddy(m_defaultWorkspace);
+	projectsGroupLayout->addWidget(workspaceLabel);
+	projectsGroupLayout->addWidget(m_defaultWorkspace);
 
 	generalControlsLayout->addWidget(projectsGroupBox);
 
@@ -1033,6 +1042,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		scanLayout->addWidget(m_vstScanRoots);
 		vstControlsLayout->addWidget(scanBox);
 #ifdef LMMS_BUILD_WIN32
+		auto* skipVerified = new QCheckBox(tr("Skip scanning verified plug-ins"), scanBox);
+		skipVerified->setObjectName("vstCatalogSkipVerified");
+		skipVerified->setChecked(true);
+		scanLayout->addWidget(skipVerified);
 		auto* actions = new QHBoxLayout;
 		auto* refresh = new QPushButton(tr("Refresh saved directories"), scanBox);
 		auto* force = new QPushButton(tr("Rescan including failed plugins"), scanBox);
@@ -1074,11 +1087,18 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			{
 				const auto instruments = std::count_if(
 					state.report->entries.begin(), state.report->entries.end(), vsthost::isVstInstrument);
-				status->setText(tr("Instrument: %1; Effect: %2; scan failures: %3.%4")
+				auto summary = tr("Instrument: %1; Effect: %2; scan failures: %3.%4")
 						.arg(instruments)
 						.arg(state.report->entries.size() - instruments)
 						.arg(state.report->failures.size())
-						.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : ""));
+						.arg(state.cancelled ? tr(" Scan cancelled; previous results retained.") : "");
+				const auto& report = *state.report;
+				if (report.presetsWritten || report.presetsExisting || report.presetFailures)
+				{
+					summary += tr(" Presets saved: %1; already present: %2; export failures: %3.")
+						.arg(report.presetsWritten).arg(report.presetsExisting).arg(report.presetFailures);
+				}
+				status->setText(summary);
 				if (published != state.published)
 				{
 					published = state.published;
@@ -1122,9 +1142,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 				status->setText(state.cancelled ? tr("Scan cancelled.") : tr("No scan completed."));
 			}
 		};
-		auto start = [this, update](bool forced) mutable {
+		auto start = [this, update, skipVerified](bool forced) mutable {
 			QString error;
-			if (!Engine::refreshVstCatalog(&error, forced))
+			if (!Engine::refreshVstCatalog(&error, forced, skipVerified->isChecked()))
 			{
 				m_vstScanRoots->showError(error);
 			}
@@ -1351,6 +1371,7 @@ void SetupDialog::accept()
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
+	ConfigManager::inst()->setValue("app", "defaultworkspace", m_defaultWorkspace->currentData().toString());
 	ConfigManager::inst()->setValue("ui", "detachbehavior", m_detachBehavior);
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);

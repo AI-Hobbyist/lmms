@@ -986,7 +986,10 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 
 		case FileItem::FileHandling::LoadAsPreset: {
 			DataFile dataFile(f->fullName());
-			it->replaceInstrument(dataFile);
+			if (dataFile.type() == DataFile::Type::InstrumentTrackSettings && !it->replaceInstrument(dataFile))
+			{
+				Engine::getSong()->collectError(tr("The VST preset or the selected plug-in could not be loaded."));
+			}
 			break;
 		}
 		case FileItem::FileHandling::ImportAsProject:

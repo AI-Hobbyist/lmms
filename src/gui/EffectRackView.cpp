@@ -27,6 +27,8 @@
 
 #include <QApplication>
 #include <QAction>
+#include <QDragEnterEvent>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
@@ -35,6 +37,8 @@
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
+#include "StringPairDrag.h"
+#include "vsthost/NativeVstPresetDrop.h"
 
 
 namespace lmms::gui
@@ -75,9 +79,38 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	m_lastY = 0;
 
 	setModel( model );
+	setAcceptDrops(true);
 }
 
+void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
+{
+	StringPairDrag::processDragEnterEvent(event, "presetfile");
+}
 
+void EffectRackView::dropEvent(QDropEvent* event)
+{
+	if (StringPairDrag::decodeKey(event) != "presetfile" || !fxChain())
+	{
+		event->ignore();
+		return;
+	}
+	DataFile file(StringPairDrag::decodeValue(event));
+	if (file.type() != DataFile::Type::EffectSettings)
+	{
+		event->ignore();
+		return;
+	}
+	auto effect = vsthost::createNativeVstPresetEffect(vsthost::readNativeVstPresetDrop(file), fxChain());
+	if (!effect)
+	{
+		QMessageBox::warning(this, tr("VST preset"), tr("The preset or the selected plug-in could not be loaded."));
+		event->ignore();
+		return;
+	}
+	fxChain()->appendEffect(effect.release());
+	update();
+	event->acceptProposedAction();
+}
 
 EffectRackView::~EffectRackView()
 {

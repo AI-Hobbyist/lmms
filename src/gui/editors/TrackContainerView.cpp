@@ -36,6 +36,8 @@
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
+#include "vsthost/NativeVstPresetDrop.h"
+#include "vsthost/VstNodePorts.h"
 #include "MainWindow.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
@@ -501,8 +503,29 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
+		if (dataFile.type() != DataFile::Type::InstrumentTrackSettings)
+		{
+			_de->ignore();
+			return;
+		}
+		const bool nativeVst = vsthost::isNativeVstInstrumentPreset(dataFile);
+		if (nativeVst && !vsthost::readNativeVstPresetDrop(dataFile).hasAvailableIdentity())
+		{
+			Engine::getSong()->collectError(tr("The VST preset or the selected plug-in could not be loaded."));
+			_de->ignore();
+			return;
+		}
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		it->loadPreset(dataFile.content().toElement());
+		if (nativeVst)
+		{
+			if (!vsthost::nativeVstPresetRestored(it->instrument()))
+			{
+				delete it;
+				_de->ignore();
+				return;
+			}
+		}
 
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();

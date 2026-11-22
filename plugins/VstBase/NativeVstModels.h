@@ -4,6 +4,8 @@
 #include <QComboBox>
 #include <QDomDocument>
 #include <QMap>
+#include <QMenu>
+#include <QPushButton>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
@@ -35,6 +37,36 @@ public:
 	}
 
 	QMap<QString, AutomatableModel*> models() const { return m_models; }
+
+	void addPresetControls(QVBoxLayout* layout, VstPlugin& plugin, bool instrument,
+		std::function<bool(const QString&)> saveLmmsPreset) const
+	{
+		auto* import = new QPushButton(VstPlugin::tr("Import VST Preset"), layout->parentWidget());
+		auto* exportButton = new QPushButton(VstPlugin::tr("Export VST Preset"), layout->parentWidget());
+		auto* programs = new QPushButton(VstPlugin::tr("Plug-in Programs"), layout->parentWidget());
+		QObject::connect(import, &QPushButton::clicked, &plugin, &VstPlugin::openPreset);
+		QObject::connect(exportButton, &QPushButton::clicked, &plugin,
+			[&plugin, instrument, saveLmmsPreset = std::move(saveLmmsPreset)] {
+				plugin.exportNativePreset(instrument, saveLmmsPreset);
+			});
+		layout->addWidget(import);
+		layout->addWidget(exportButton);
+		QObject::connect(programs, &QPushButton::clicked, &plugin, [&plugin, programs] {
+			QMenu menu(programs);
+			const auto entries = plugin.presetPrograms();
+			if (entries.isEmpty())
+			{
+				menu.addAction(VstPlugin::tr("No programs exposed"))->setEnabled(false);
+			}
+			for (const auto& entry : entries)
+			{
+				auto* action = menu.addAction(entry.name, &plugin, [&plugin, entry] { plugin.selectPresetProgram(entry); });
+				action->setEnabled(entry.selectable);
+			}
+			menu.exec(programs->mapToGlobal(QPoint(0, programs->height())));
+		});
+		layout->addWidget(programs);
+	}
 
 	void addControls(QVBoxLayout* layout) const
 	{

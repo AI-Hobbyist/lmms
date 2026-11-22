@@ -5,6 +5,8 @@
 #include <array>
 
 #include "Effect.h"
+#include "DataFile.h"
+#include "vsthost/NativeVstPreset.h"
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
 #include "NativeVstModels.h"
@@ -66,6 +68,16 @@ public:
 		if (m_plugin) { QObject::connect(open, &QPushButton::clicked, m_plugin, &VstPlugin::toggleUI); }
 		layout->addWidget(open);
 		m_parameters.addControls(layout);
+		if (m_plugin)
+		{
+			m_parameters.addPresetControls(layout, *m_plugin, false, [this](const QString& path) {
+				DataFile preset(DataFile::Type::EffectSettings);
+				auto item = effect()->saveState(preset, preset.content());
+				item.setAttribute("name", "native_vst_effect");
+				item.appendChild(vsthost::nativeVstPresetKey(preset, effect()->key()));
+				return preset.writeFile(path);
+			});
+		}
 		return dialog;
 	}
 

@@ -68,6 +68,7 @@ public:
 	virtual void setNodeAudioReceiver(VstNodeAudioReceiver receiver) = 0;
 	virtual void setNodeRouting(VstNodeRouting routing) = 0;
 	virtual bool hasNodeInput() const noexcept = 0;
+	virtual bool presetStateRestored() const = 0;
 	virtual bool processNodeBlock(f_cnt_t frames, std::span<const float> input, std::span<float> output,
 		std::span<const VstNodeMidiEvent> events, VstNodeMidiReceiver receiver, void* context) = 0;
 };

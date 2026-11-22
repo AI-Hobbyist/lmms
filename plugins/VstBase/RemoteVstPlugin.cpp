@@ -323,7 +323,7 @@ public:
 	void loadChunkFromFile(const std::string& _file, std::size_t _len);
 
 	// restore settings chunk of plugin from file
-	void loadPresetFile( const std::string & _file );
+	bool loadPresetFile(const std::string& path);
 
 	// sets given program index
 	void setProgram( int index );
@@ -335,7 +335,7 @@ public:
 	void getProgramNames();
 
 	// Save presets/programs
-	void savePreset( const std::string & _file );
+	bool savePreset( const std::string & _file );
 
 	// number of inputs
 	virtual int inputCount() const
@@ -766,8 +766,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdLoadPresetFile:
-			loadPresetFile( _m.getString( 0 ) );
-			sendMessage( IdLoadPresetFile );
+			sendMessage(message(IdLoadPresetFile).addInt(loadPresetFile(_m.getString(0))));
 			break;
 
 		case IdVstSetProgram:
@@ -789,8 +788,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdSavePresetFile:
-			savePreset( _m.getString( 0 ) );
-			sendMessage( IdSavePresetFile );
+			sendMessage(message(IdSavePresetFile).addInt(savePreset(_m.getString(0))));
 			break;
 
 			case IdVstSetParameter: {
@@ -1287,6 +1285,7 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 		}
 		const auto flags = static_cast<std::uint32_t>(m_plugin->flags);
 		result.addString(std::to_string(id)).addString(name).addString(std::to_string(flags));
+		result.addInt(m_plugin->numInputs).addInt(m_plugin->numOutputs).addString(pluginProductString());
 		if (shell)
 		{
 			pluginDispatch(effClose);
@@ -1744,7 +1743,7 @@ struct Bank
 	char prgName[28];
 };
 
-void RemoteVstPlugin::savePreset( const std::string & _file )
+bool RemoteVstPlugin::savePreset( const std::string & _file )
 {
 	unsigned int chunk_size = 0;
 	auto bank = Bank{};
@@ -1765,7 +1764,12 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 
 	if (chunky)
 	{
-		chunk_size = pluginDispatch(effGetChunk, isPreset, 0, &data);
+		const auto size = pluginDispatch(effGetChunk, isPreset, 0, &data);
+		if (size <= 0 || !data || static_cast<std::uint64_t>(size) > UINT32_MAX - 152)
+		{
+			return false;
+		}
+		chunk_size = static_cast<unsigned int>(size);
 	}
 	else
 	{
@@ -1809,7 +1813,11 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	{
 		fprintf( stderr,
 			"Error opening file for saving preset.\n" );
-		return;
+		if (!chunky)
+		{
+			delete[] data;
+		}
+		return false;
 	}
 	fwrite(&bank, 1, 28, stream);
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
@@ -1851,144 +1859,127 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 		}
 		pluginDispatch( effSetProgram, 0, currProgram );
 	}
-	fclose( stream );
+	const bool writeFailed = std::ferror(stream) != 0;
+	const bool closeFailed = std::fclose(stream) != 0;
 
 	if (!chunky)
 	{
 		delete[] data;
 	}
+	return !writeFailed && !closeFailed;
 }
 
 
 
 
-void RemoteVstPlugin::loadPresetFile( const std::string & _file )
+bool RemoteVstPlugin::loadPresetFile(const std::string& path)
 {
-	std::unique_ptr<char[]> chunk;
-	unsigned int pLen = 0;
-	unsigned int len = 0;
-	auto bank = Bank{};
-	FILE* stream = fopenUtf8(_file, "rb");
-	if (!stream)
-	{
-		fprintf( stderr,
-			"Error opening file for loading preset.\n" );
-		return;
-	}
+	constexpr std::uint32_t containerMagic = 0x43636e4b; // CcnK
+	constexpr std::uint32_t parameterProgram = 0x4678436b; // FxCk
+	constexpr std::uint32_t parameterBank = 0x4678426b; // FxBk
+	constexpr std::uint32_t chunkProgram = 0x46504368; // FPCh
+	constexpr std::uint32_t chunkBank = 0x46424368; // FBCh
+	constexpr std::size_t programHeader = 56;
+	constexpr std::size_t bankHeader = 156;
+	constexpr long maximumPresetBytes = 256 * 1024 * 1024;
+	constexpr int programChunksFlag = 1 << 5;
 
-	if (fread(&bank, 1, 56, stream) != 56)
+	const std::unique_ptr<FILE, decltype(&std::fclose)> file(fopenUtf8(path, "rb"), &std::fclose);
+	if (!file || std::fseek(file.get(), 0, SEEK_END) != 0)
 	{
-		fprintf( stderr, "Error loading preset file.\n" );
+		return false;
 	}
-	bank.fxID = endian_swap(bank.fxID);
-	bank.numPrograms = endian_swap(bank.numPrograms);
-	unsigned int toUInt;
-	float * pFloat;
-
-	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != bank.fxID)
+	const auto size = std::ftell(file.get());
+	if (size < static_cast<long>(programHeader) || size > maximumPresetBytes
+		|| std::fseek(file.get(), 0, SEEK_SET) != 0)
 	{
-		sendMessage( message( IdVstCurrentProgramName ).
-					addString( "Error: Plugin UniqID not match" ) );
-		fclose( stream );
-		return;
+		return false;
 	}
-
-	if (_file.substr(_file.find_last_of('.') + 1) != "fxp")
+	std::vector<std::uint8_t> bytes(static_cast<std::size_t>(size));
+	if (std::fread(bytes.data(), 1, bytes.size(), file.get()) != bytes.size())
 	{
-		fseek(stream, 156, SEEK_SET);
+		return false;
 	}
-
-	if (bank.fxMagic != 0x6B427846)
+	const auto readWord = [&bytes](std::size_t offset)
 	{
-		if (bank.fxMagic != 0x6B437846)
+		return (std::uint32_t(bytes[offset]) << 24) | (std::uint32_t(bytes[offset + 1]) << 16)
+			| (std::uint32_t(bytes[offset + 2]) << 8) | std::uint32_t(bytes[offset + 3]);
+	};
+	const auto pluginId = static_cast<std::uint32_t>(m_plugin->uniqueID);
+	if (readWord(0) != containerMagic || readWord(4) != bytes.size() - 8 || readWord(16) != pluginId)
+	{
+		return false;
+	}
+	const auto type = readWord(8);
+	const auto count = readWord(24);
+	const auto parameters = static_cast<std::uint32_t>(m_plugin->numParams);
+	const auto programBytes = programHeader + std::uint64_t(parameters) * sizeof(float);
+	const auto applyProgram = [&](std::size_t offset)
+	{
+		char name[28]{};
+		std::memcpy(name, bytes.data() + offset + 28, sizeof(name) - 1);
+		pluginDispatch(effSetProgramName, 0, 0, name);
+		for (std::uint32_t parameter = 0; parameter < parameters; ++parameter)
 		{
-			if ( fread (&pLen, 1, 4, stream) != 4 )
+			const auto value = readWord(offset + programHeader + std::size_t(parameter) * sizeof(float));
+			m_plugin->setParameter(m_plugin, parameter, std::bit_cast<float>(value));
+		}
+	};
+
+	switch (type)
+	{
+	case chunkBank:
+	case chunkProgram:
+	{
+		const auto header = type == chunkBank ? bankHeader : programHeader;
+		if (bytes.size() < header + 4 || readWord(header) != bytes.size() - header - 4
+			|| (m_plugin->flags & programChunksFlag) == 0)
+		{
+			return false;
+		}
+		pluginDispatch(effSetChunk, type == chunkProgram, readWord(header), bytes.data() + header + 4);
+		break;
+	}
+	case parameterProgram:
+		if (count != parameters || bytes.size() != programBytes)
+		{
+			return false;
+		}
+		applyProgram(0);
+		break;
+	case parameterBank:
+	{
+		if (count > static_cast<std::uint32_t>(m_plugin->numPrograms) || bytes.size() < bankHeader
+			|| count > (bytes.size() - bankHeader) / programBytes
+			|| bytes.size() != bankHeader + count * programBytes)
+		{
+			return false;
+		}
+		for (std::size_t offset = bankHeader; offset < bytes.size(); offset += programBytes)
+		{
+			if (readWord(offset) != containerMagic || readWord(offset + 4) != programBytes - 8
+				|| readWord(offset + 8) != parameterProgram || readWord(offset + 16) != pluginId
+				|| readWord(offset + 24) != parameters)
 			{
-				fprintf( stderr,
-					"Error loading preset file.\n" );
-			}
-			len = endian_swap(pLen);
-		}
-		else
-		{
-			len = static_cast<unsigned int>(sizeof(float) * bank.numPrograms);
-		}
-
-		chunk = std::make_unique_for_overwrite<char[]>(len);
-		if (fread(chunk.get(), len, 1, stream) != 1)
-		{
-			fprintf( stderr, "Error loading preset file.\n" );
-		}
-		fclose( stream );
-	}
-
-	if (_file.substr(_file.find_last_of(".") + 1) == "fxp")
-	{
-		// TODO: Could this crash if chunk is null?
-		bank.prgName[23] = '\0';
-		pluginDispatch(effSetProgramName, 0, 0, bank.prgName);
-		if (bank.fxMagic != 0x6B437846)
-		{
-			pluginDispatch(effSetChunk, 1, len, chunk.get());
-		}
-		else
-		{
-			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk.get());
-			for (auto i = 0u; i < bank.numPrograms; i++)
-			{
-				toUInt = endian_swap( toUIntArray[ i ] );
-				pFloat = reinterpret_cast<float*>(&toUInt);
-				m_plugin->setParameter( m_plugin, i, *pFloat );
+				return false;
 			}
 		}
-	}
-	else
-	{
-		if (bank.fxMagic != 0x6B427846)
+
+		const auto current = pluginDispatch(effGetProgram);
+		for (std::uint32_t index = 0; index < count; ++index)
 		{
-			// TODO: Could this crash if chunk is null?
-			pluginDispatch(effSetChunk, 0, len, chunk.get());
+			pluginDispatch(effSetProgram, 0, index);
+			applyProgram(bankHeader + index * programBytes);
 		}
-		else
-		{
-			int numPrograms = static_cast<int>(bank.numPrograms);
-			unsigned int * toUIntArray;
-			int currProgram = pluginDispatch( effGetProgram );
-
-			len = static_cast<unsigned int>(sizeof(float) * m_plugin->numParams);
-			chunk = std::make_unique_for_overwrite<char[]>(len);
-			toUIntArray = reinterpret_cast<unsigned int*>(chunk.get());
-
-			for (int i = 0; i < numPrograms; i++)
-			{
-				if (fread(&bank, 1, 56, stream) != 56)
-				{
-					fprintf( stderr,
-					"Error loading preset file.\n" );
-				}
-				if (fread(chunk.get(), len, 1, stream) != 1)
-				{
-					fprintf( stderr,
-					"Error loading preset file.\n" );
-				}
-				pluginDispatch( effSetProgram, 0, i );
-				bank.prgName[23] = '\0';
-				pluginDispatch(effSetProgramName, 0, 0, bank.prgName);
-				for (int j = 0; j < m_plugin->numParams; j++)
-				{
-					toUInt = endian_swap( toUIntArray[ j ] );
-					pFloat = reinterpret_cast<float*>(&toUInt);
-					m_plugin->setParameter( m_plugin, j, *pFloat );
-				}
-			}
-			pluginDispatch( effSetProgram, 0, currProgram );
-			fclose( stream );
-		}
+		pluginDispatch(effSetProgram, 0, current);
+		break;
 	}
-
+	default:
+		return false;
+	}
 	sendCurrentProgramName();
+	return true;
 }
-
 void RemoteVstPlugin::loadChunkFromFile(const std::string& _file, std::size_t _len)
 {
 	FILE* fp = fopenUtf8(_file, "rb");

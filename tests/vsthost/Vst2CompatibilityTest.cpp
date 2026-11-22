@@ -26,6 +26,7 @@
 #include <QScopeGuard>
 #include "vsthost/CatalogIo.h"
 #include <vector>
+#include <QTemporaryDir>
 #include <thread>
 
 class EditorProxy : public lmms::RemotePlugin
@@ -49,6 +50,29 @@ class Vst2CompatibilityTest : public QObject
 private slots:
 	void initTestCase() { lmms::Engine::init(true); }
 	void cleanupTestCase() { lmms::Engine::destroy(); }
+	void vst2BankRoundTrip()
+	{
+		const auto root = qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT");
+		const auto path = QDir(root).absoluteFilePath("x64/fixtures/Release/Vst2Baseline.dll");
+		lmms::VstPlugin plugin(path, 0, "headless");
+		QVERIFY(!plugin.failed());
+		plugin.setParam(0, 0.375f);
+		QTemporaryDir files;
+		QVERIFY(files.isValid());
+		const auto bankPath = files.filePath("roundtrip.fxb");
+		QVERIFY(plugin.exportPreset(bankPath));
+		QFile bank(bankPath);
+		QVERIFY(bank.open(QIODevice::ReadOnly));
+		const auto bytes = bank.readAll();
+		QVERIFY(bytes.size() > 160);
+		QCOMPARE(bytes.first(4), QByteArray("CcnK"));
+		QCOMPARE(bytes.sliced(8, 4), QByteArray("FBCh"));
+		plugin.setParam(0, 0.75f);
+		QVERIFY(plugin.importPreset(bankPath));
+		const auto restored = plugin.automationParameters();
+		QVERIFY(!restored.empty());
+		QCOMPARE(restored.front().value, 0.375f);
+	}
 	void vst3Facade_data()
 	{
 		QTest::addColumn<QString>("architecture");

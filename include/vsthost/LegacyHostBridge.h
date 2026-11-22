@@ -61,8 +61,9 @@ public:
 		{
 			command.arguments.push_back(message.getString(static_cast<int>(i)));
 		}
-		const bool pause = message.id != IdVstIdleUpdate && message.id != IdShowUI && message.id != IdHideUI
-			&& message.id != IdToggleUI && message.id != IdIsUIVisible;
+		// Showing or hiding a Win32 editor can call into the plug-in synchronously.
+		// Drain the audio queue before changing editor visibility.
+		const bool pause = message.id != IdVstIdleUpdate && message.id != IdIsUIVisible;
 		auto reply = m_session
 						 .requestPrepared(
 							 MessageType::Parameter,

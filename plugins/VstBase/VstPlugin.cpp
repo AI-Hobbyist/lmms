@@ -32,6 +32,7 @@
 #include <QLocale>
 #include <QPointer>
 #include <QSaveFile>
+#include "vsthost/NativeVstPreset.h"
 #include <QScopedValueRollback>
 #include <QTemporaryFile>
 #include <QTimer>
@@ -318,7 +319,7 @@ VstPlugin::VstPlugin(
 		const auto frames = Engine::audioEngine()->framesPerPeriod();
 		const vsthost::Vst3Create instance{selection->identity.cid, double(Engine::audioEngine()->outputSampleRate()),
 			static_cast<std::uint32_t>(frames), Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting(),
-			m_plugin.toUtf8().toStdString()};
+			m_plugin.toUtf8().toStdString(), static_cast<vsthost::Vst3MainLayout>(selection->selectedMainLayout)};
 		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 100}, instance);
 		if (m_failed)
 		{
@@ -1074,7 +1075,8 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 	{
 		const auto& identity = m_native->entry.identity;
 		const QByteArray cid(reinterpret_cast<const char*>(identity.cid.data()), identity.cid.size());
-		if (_this.attribute("format") != "vst3" || _this.attribute("classid").toLatin1().toLower() != cid.toHex())
+		if (_this.attribute("format") != "vst3" || _this.attribute("classid").toLatin1().toLower() != cid.toHex()
+			|| _this.attribute("mainlayout", "0") != QString::number(m_native->entry.selectedMainLayout))
 		{
 			Engine::getSong()->collectError(tr("VST3 state identity does not match the selected class."));
 			return;
@@ -1138,6 +1140,21 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 
 
+bool VstPlugin::presetStateRestored() const
+{
+	if (failed())
+	{
+		return false;
+	}
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		return !m_native->preserveState;
+	}
+#endif
+	return true;
+}
+
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 #ifdef LMMS_BUILD_WIN32
@@ -1151,6 +1168,10 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("classid",
 			QString::fromLatin1(QByteArray(reinterpret_cast<const char*>(entry.identity.cid.data()), 16).toHex()));
 		_this.setAttribute("architecture", entry.identity.architecture == vsthost::Architecture::X86 ? "32" : "64");
+		if (entry.selectedMainLayout)
+		{
+			_this.setAttribute("mainlayout", entry.selectedMainLayout);
+		}
 		_this.setAttribute("modulepath", entry.locator.modulePath);
 		_this.setAttribute("binarypath", entry.locator.binaryPath);
 		_this.setAttribute("version", entry.locator.version);
@@ -1559,17 +1580,9 @@ void VstPlugin::openPreset()
 		dialog.setFileMode(gui::FileDialog::ExistingFile);
 		if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty())
 		{
-			QFile file(dialog.selectedFiles().front());
-			if (file.open(QIODevice::ReadOnly) && file.size() <= vsthost::MaxControlBytes + 65536)
+			if (!importPreset(dialog.selectedFiles().front()))
 			{
-				const auto bytes = file.readAll();
-				if (m_native->proxy.restorePreset(
-						std::span(reinterpret_cast<const std::uint8_t*>(bytes.constData()), std::size_t(bytes.size())))
-					!= vsthost::Error::None)
-				{
-					Engine::getSong()->collectError(tr("Invalid VST3 preset or class identity."));
-				}
-				refreshNativeParameters();
+				Engine::getSong()->collectError(tr("Invalid VST3 preset or class identity."));
 			}
 		}
 		return;
@@ -1579,12 +1592,43 @@ void VstPlugin::openPreset()
 	ofd.setFileMode(gui::FileDialog::ExistingFiles);
 	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
-		lock();
-		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
-			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
-		waitForMessage(IdLoadPresetFile, true);
-		unlock();
+		if (!importPreset(ofd.selectedFiles().front()))
+		{
+			Engine::getSong()->collectError(tr("Invalid VST2 preset or plug-in identity."));
+		}
 	}
+}
+
+bool VstPlugin::importPreset(const QString& path)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		QFile file(path);
+		if (!file.open(QIODevice::ReadOnly) || file.size() > vsthost::MaxControlBytes + 65536)
+		{
+			return false;
+		}
+		const auto bytes = file.readAll();
+		const auto data = std::span(reinterpret_cast<const std::uint8_t*>(bytes.constData()),
+			static_cast<std::size_t>(bytes.size()));
+		if (m_native->proxy.restorePreset(data) != vsthost::Error::None)
+		{
+			return false;
+		}
+		refreshNativeParameters();
+		return true;
+	}
+#endif
+	if (m_failed)
+	{
+		return false;
+	}
+	lock();
+	sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(path))));
+	const auto reply = waitForMessage(IdLoadPresetFile, true);
+	unlock();
+	return reply.id == IdLoadPresetFile && reply.argumentCount() == 1 && reply.getInt(0) == 1;
 }
 
 
@@ -1724,12 +1768,7 @@ void VstPlugin::savePreset()
 		dialog.setDefaultSuffix("vstpreset");
 		if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty())
 		{
-			const auto preset = m_native->proxy.preset();
-			QSaveFile file(dialog.selectedFiles().front());
-			if (preset.error != vsthost::Error::None || !file.open(QIODevice::WriteOnly)
-				|| file.write(reinterpret_cast<const char*>(preset.payload.data()), preset.payload.size())
-					!= qint64(preset.payload.size())
-				|| !file.commit())
+			if (!exportPreset(dialog.selectedFiles().front()))
 			{
 				Engine::getSong()->collectError(tr("Could not save VST3 preset."));
 			}
@@ -1768,6 +1807,145 @@ void VstPlugin::savePreset()
 		waitForMessage(IdSavePresetFile, true);
 		unlock();
 	}
+}
+
+QList<VstPlugin::PresetProgram> VstPlugin::presetPrograms()
+{
+	QList<PresetProgram> result;
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		for (const auto& program : m_native->proxy.programs())
+		{
+			result.append({QString::fromUtf8(program.name), static_cast<int>(program.index),
+				program.parameterId, program.steps, program.selectable()});
+		}
+		return result;
+	}
+#endif
+	loadProgramNames();
+	const auto names = m_allProgramNames.split('|');
+	for (qsizetype index = 0; index < names.size(); ++index)
+	{
+		if (!names[index].isEmpty())
+		{
+			result.append({names[index], static_cast<int>(index), 0, 0, true});
+		}
+	}
+	return result;
+}
+
+bool VstPlugin::selectPresetProgram(const PresetProgram& program)
+{
+	if (!program.selectable || program.index < 0 || failed())
+	{
+		return false;
+	}
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		if (!program.steps || static_cast<std::uint32_t>(program.index) > program.steps)
+		{
+			return false;
+		}
+		const auto feedback = m_native->proxy.setParameter(program.parameterId,
+			static_cast<double>(program.index) / program.steps);
+		m_native->applyFeedback(*this, feedback);
+		return feedback.error == vsthost::Error::None;
+	}
+#endif
+	setProgram(program.index);
+	return !failed();
+}
+
+void VstPlugin::exportNativePreset(bool instrument, const std::function<bool(const QString&)>& saveLmmsPreset)
+{
+	bool vst3 = false;
+#ifdef LMMS_BUILD_WIN32
+	vst3 = static_cast<bool>(m_native);
+#endif
+	const auto format = vst3 ? vsthost::Format::Vst3 : vsthost::Format::Vst2;
+	const auto directory = vsthost::nativeVstPresetDirectory(
+		ConfigManager::inst()->userPresetsDir(), format, instrument, m_name, m_plugin);
+	if (!QDir().mkpath(directory))
+	{
+		Engine::getSong()->collectError(tr("Could not create the user presets directory."));
+		return;
+	}
+
+	const auto suffix = vst3 ? QStringLiteral("vstpreset") : QStringLiteral("fxb");
+	const auto nativeFilter = vst3 ? tr("VST3 Plug-in Preset (*.vstpreset)") : tr("VST2 Plug-in Bank (*.fxb)");
+	const auto lmmsFilter = tr("LMMS Preset (*.xpf)");
+	gui::FileDialog dialog(nullptr, tr("Export VST Preset"), directory);
+	dialog.setNameFilters({nativeFilter, lmmsFilter});
+	dialog.setAcceptMode(gui::FileDialog::AcceptSave);
+	dialog.setFileMode(gui::FileDialog::AnyFile);
+	dialog.setDefaultSuffix(suffix);
+	connect(&dialog, &QFileDialog::filterSelected, &dialog, [&dialog, lmmsFilter, suffix](const QString& filter) {
+		dialog.setDefaultSuffix(filter == lmmsFilter ? QStringLiteral("xpf") : suffix);
+	});
+	if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty())
+	{
+		return;
+	}
+	const auto path = dialog.selectedFiles().front();
+	const auto extension = QFileInfo(path).suffix();
+	const bool successful = extension.compare("xpf", Qt::CaseInsensitive) == 0
+		? saveLmmsPreset(path)
+		: extension.compare(suffix, Qt::CaseInsensitive) == 0 && exportPreset(path);
+	if (!successful)
+	{
+		Engine::getSong()->collectError(tr("Could not export VST preset."));
+	}
+}
+
+bool VstPlugin::exportPreset(const QString& path)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const auto preset = m_native->proxy.preset();
+		QSaveFile file(path);
+		return preset.error == vsthost::Error::None && file.open(QIODevice::WriteOnly)
+			&& file.write(reinterpret_cast<const char*>(preset.payload.data()), preset.payload.size())
+				== static_cast<qint64>(preset.payload.size())
+			&& file.commit();
+	}
+#endif
+	if (m_failed || QFileInfo(path).suffix().compare("fxb", Qt::CaseInsensitive) != 0)
+	{
+		return false;
+	}
+	QTemporaryFile temporary(QDir::temp().filePath("lmms-vst-bank-XXXXXX.fxb"));
+	if (!temporary.open())
+	{
+		return false;
+	}
+	temporary.close();
+	lock();
+	sendMessage(message(IdSavePresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(temporary.fileName()))));
+	const auto reply = waitForMessage(IdSavePresetFile, true);
+	unlock();
+	if (reply.id != IdSavePresetFile || reply.argumentCount() != 1 || reply.getInt(0) != 1)
+	{
+		return false;
+	}
+
+	QFile source(temporary.fileName());
+	QSaveFile file(path);
+	if (!source.open(QIODevice::ReadOnly) || !file.open(QIODevice::WriteOnly))
+	{
+		return false;
+	}
+	while (!source.atEnd())
+	{
+		const auto block = source.read(64 * 1024);
+		if (block.isEmpty() || file.write(block) != block.size())
+		{
+			return false;
+		}
+	}
+	return source.size() > 0 && file.commit();
 }
 
 

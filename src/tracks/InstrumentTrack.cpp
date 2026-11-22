@@ -35,6 +35,7 @@
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentPlayHandle.h"
+#include "vsthost/NativeVstPresetDrop.h"
 #include "Keymap.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
@@ -1090,7 +1091,17 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 				using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				if (incremental)
+				if (m_preparedPresetInstrument)
+				{
+					delete m_instrument;
+					m_instrument = m_preparedPresetInstrument.release();
+					if (m_instrument->isSingleStreamed())
+					{
+						Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(m_instrument, this));
+					}
+					emit instrumentChanged();
+				}
+				else if (incremental)
 				{
 					loadInstrumentState(node.toElement().attribute("name"), &key, node.firstChildElement(), false);
 				}
@@ -1158,8 +1169,33 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-void InstrumentTrack::replaceInstrument(DataFile dataFile)
+bool InstrumentTrack::replaceInstrument(DataFile dataFile)
 {
+	if (vsthost::isNativeVstInstrumentPreset(dataFile))
+	{
+		const auto preset = vsthost::readNativeVstPresetDrop(dataFile);
+		if (!preset.hasAvailableIdentity())
+		{
+			return false;
+		}
+		const auto audioGuard = Engine::audioEngine()->requestChangesGuard();
+		const auto previousName = name();
+		std::unique_ptr<Instrument> candidate(Instrument::instantiate("native_vst_instrument", this, &preset.key));
+		setName(previousName);
+		if (!candidate)
+		{
+			return false;
+		}
+		Engine::audioEngine()->removeInstrumentPlayHandles(candidate.get());
+		candidate->restoreState(preset.state);
+		if (!vsthost::nativeVstPresetRestored(candidate.get()))
+		{
+			return false;
+		}
+		m_preparedPresetInstrument = std::move(candidate);
+	}
+	const auto clearPrepared = qScopeGuard([this] { m_preparedPresetInstrument.reset(); });
+
 	// loadSettings clears the mixer channel, so we save it here and set it back later
 	int mixerChannel = mixerChannelModel()->value();
 
@@ -1178,6 +1214,7 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	
 	m_mixerChannelModel.setValue(mixerChannel);
 	Engine::getSong()->setModified();
+	return true;
 }
 
 
