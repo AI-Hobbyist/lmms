@@ -1946,8 +1946,24 @@ QScrollArea#nodeWorkflowTriggerLcd {
 	padding: 4px;
 }
 
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar:vertical {
+	background: #101C14;
+	width: 8px;
+	margin: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::handle:vertical {
+	background: #729E7B;
+	border-radius: 0;
+}
+
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::add-line:vertical,
+QScrollArea#nodeWorkflowTriggerLcd QScrollBar::sub-line:vertical {
+	height: 0;
+}
+
 QWidget#nodeWorkflowTriggerLcdRows {
-	background: #13261A;
+	background: #1B3223;
 }
 
 QWidget#nodeWorkflowTriggerLcdIdle {
@@ -1956,50 +1972,6 @@ QWidget#nodeWorkflowTriggerLcdIdle {
 
 QWidget#nodeWorkflowTriggerStepRow {
 	border-bottom: 1px solid #36533B;
-}
-
-QScrollArea#nodeWorkflowTriggerStepScroll {
-	background: #102017;
-	border: none;
-	padding: 0;
-}
-
-QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar:horizontal {
-	background: #203C2B;
-	height: 5px;
-	margin: 0;
-}
-
-QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::handle:horizontal {
-	background: #709677;
-	border-radius: 2px;
-	min-width: 15px;
-}
-
-QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::add-line:horizontal,
-QScrollArea#nodeWorkflowTriggerStepScroll QScrollBar::sub-line:horizontal {
-	width: 0;
-}
-
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar:vertical {
-	background: #203C2B;
-	width: 7px;
-	margin: 0;
-}
-
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar::handle:vertical {
-	background: #709677;
-	min-height: 18px;
-}
-
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar::add-line:vertical,
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar::sub-line:vertical {
-	height: 0;
-}
-
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar::add-page:vertical,
-QScrollArea#nodeWorkflowTriggerLcd QScrollBar::sub-page:vertical {
-	background: none;
 }
 
 QWidget#nodeWorkflowInspector {
