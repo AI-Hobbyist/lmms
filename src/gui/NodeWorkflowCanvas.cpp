@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <utility>
 
@@ -42,7 +43,41 @@ namespace
 constexpr qreal PortLabelPadding = 5;
 constexpr qreal PortLabelGap = 9;
 constexpr qreal PairedLabelGap = 8;
+constexpr qreal PcbBusLaneSpacing = 20;
+constexpr qreal PcbBridgeRadius = 8;
 int signalFlowCanvasCount = 0;
+
+struct PcbTrunk
+{
+	qreal x;
+	qreal top;
+	qreal bottom;
+	QList<qreal> taps;
+};
+
+struct PcbBridge
+{
+	QPainterPath path;
+	QPen pen;
+};
+
+bool canConnectGraphPorts(const NodeWorkflowCanvas::Port& source, const NodeWorkflowCanvas::Port& target)
+{
+	return source.graphConnectTo && !target.graphEndpoint.isEmpty() && source.graphSignal == target.graphSignal;
+}
+
+bool canConnectPorts(const NodeWorkflowCanvas::Port& source, const NodeWorkflowCanvas::Port& target)
+{
+	return (source.connectTo && !source.connectionGroup.isEmpty() && source.connectionGroup == target.connectionGroup)
+		|| canConnectGraphPorts(source, target);
+}
+
+void connectPorts(const NodeWorkflowCanvas::Port& source, const NodeWorkflowCanvas::Port& target)
+{
+	const bool legacy = source.connectTo && source.connectionGroup == target.connectionGroup;
+	const auto connect = legacy ? source.connectTo : source.graphConnectTo;
+	connect(legacy ? target.channel : target.graphChannel);
+}
 
 QPainterPath wirePath(const QPointF& source, const QPointF& destination)
 {
@@ -50,6 +85,104 @@ QPainterPath wirePath(const QPointF& source, const QPointF& destination)
 	QPainterPath path(source);
 	path.cubicTo(source + QPointF(span, 0), destination - QPointF(span, 0), destination);
 	return path;
+}
+
+QPainterPath pcbBranchPath(const QPointF& source, const QPointF& destination)
+{
+	const qreal dx = destination.x() - source.x();
+	const qreal dy = destination.y() - source.y();
+	const qreal diagonal = std::min(std::abs(dx), std::abs(dy));
+	const qreal inset = (std::abs(dx) - diagonal) / 2;
+	const qreal direction = dx < 0 ? -1 : 1;
+	QPainterPath path(source);
+	path.lineTo(source + QPointF(direction * inset, 0));
+	path.lineTo(destination - QPointF(direction * inset, 0));
+	path.lineTo(destination);
+	return path;
+}
+
+QPainterPath pcbBridgePath(const QPainterPath& trace, const QList<PcbTrunk>& trunks,
+	QList<PcbBridge>& bridges, const QPen& pen)
+{
+	QPainterPath path;
+	QPointF previous;
+	for (int index = 0; index < trace.elementCount(); ++index)
+	{
+		const auto element = trace.elementAt(index);
+		const QPointF point(element.x, element.y);
+		if (element.isMoveTo())
+		{
+			path.moveTo(point);
+		}
+		else if (point.y() == previous.y())
+		{
+			const qreal y = point.y();
+			const qreal direction = point.x() > previous.x() ? 1 : -1;
+			const qreal low = std::min(point.x(), previous.x()) + PcbBridgeRadius;
+			const qreal high = std::max(point.x(), previous.x()) - PcbBridgeRadius;
+			QList<qreal> crossings;
+			for (const auto& trunk : trunks)
+			{
+				if (trunk.x <= low || trunk.x >= high || y <= trunk.top + PcbBridgeRadius * 1.5
+					|| y >= trunk.bottom - PcbBridgeRadius)
+				{
+					continue;
+				}
+				if (std::none_of(trunk.taps.cbegin(), trunk.taps.cend(), [y](qreal tap) {
+					return tap >= y - PcbBridgeRadius * 1.5 && tap <= y + PcbBridgeRadius;
+				}))
+				{
+					crossings.append(direction * trunk.x);
+				}
+			}
+			std::sort(crossings.begin(), crossings.end());
+			qreal last = direction * previous.x() - PcbBridgeRadius;
+			for (const auto crossing : crossings)
+			{
+				if (crossing - last < 2 * PcbBridgeRadius)
+				{
+					continue;
+				}
+				const qreal x = direction * crossing;
+				const QPointF arcStart(x - direction * PcbBridgeRadius, y);
+				const QPointF arcEnd(x + direction * PcbBridgeRadius, y);
+				const QPointF control(x, y - 2 * PcbBridgeRadius);
+				path.lineTo(arcStart);
+				path.quadTo(control, arcEnd);
+				QPainterPath bridge(arcStart);
+				bridge.quadTo(control, arcEnd);
+				bridges.append({std::move(bridge), pen});
+				last = crossing;
+			}
+			path.lineTo(point);
+		}
+		else
+		{
+			path.lineTo(point);
+		}
+		previous = point;
+	}
+	return path;
+}
+
+qreal trunkDistance(const QPainterPath& trunk, const QPointF& point)
+{
+	qreal closest = std::numeric_limits<qreal>::infinity();
+	QPointF previous;
+	for (int index = 0; index < trunk.elementCount(); ++index)
+	{
+		const auto element = trunk.elementAt(index);
+		const QPointF current(element.x, element.y);
+		if (element.isLineTo())
+		{
+			const QPointF projected(
+				std::clamp(point.x(), std::min(previous.x(), current.x()), std::max(previous.x(), current.x())),
+				std::clamp(point.y(), std::min(previous.y(), current.y()), std::max(previous.y(), current.y())));
+			closest = std::min(closest, QLineF(projected, point).length());
+		}
+		previous = current;
+	}
+	return closest;
 }
 
 QColor portLabelTextColor(const QColor& background)
@@ -95,7 +228,8 @@ void NodeWorkflowCanvas::setPluginDropHandler(
 void NodeWorkflowCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
 	const auto kind = StringPairDrag::decodeKey(event);
-	if (m_pluginDrop && (kind == "instrument" || kind == "svsvoice" || kind == "nodeeffect"))
+	if (m_pluginDrop && (kind == "instrument" || kind == "svsvoice" || kind == "svcselection"
+		|| kind == "vstpluginfile" || kind == "nodeeffect"))
 	{
 		event->acceptProposedAction();
 	}
@@ -143,6 +277,12 @@ void NodeWorkflowCanvas::setConnectionAggregation(bool enabled, int threshold)
 	update();
 }
 
+void NodeWorkflowCanvas::setPcbBusRouting(bool enabled)
+{
+	m_pcbBusRouting = enabled;
+	update();
+}
+
 QList<NodeWorkflowCanvas::ConnectionBundle> NodeWorkflowCanvas::connectionBundles() const
 {
 	QList<ConnectionBundle> result;
@@ -152,7 +292,9 @@ QList<NodeWorkflowCanvas::ConnectionBundle> NodeWorkflowCanvas::connectionBundle
 	}
 	for (const bool output : {false, true})
 	{
+		const auto firstBundle = result.size();
 		QMap<QString, QMap<QPair<qreal, qreal>, QList<qsizetype>>> byEndpoint;
+		QHash<qreal, qreal> spans;
 		for (qsizetype index = 0; index < m_connections.size(); ++index)
 		{
 			if (index != m_draggedConnection)
@@ -169,8 +311,29 @@ QList<NodeWorkflowCanvas::ConnectionBundle> NodeWorkflowCanvas::connectionBundle
 			{
 				if (point->size() > m_aggregationThreshold)
 				{
-					result.append({point.value(), QPointF(point.key().first, point.key().second), node.key(), output});
+					const auto x = point.key().first;
+					result.append({point.value(), QPointF(x, point.key().second), node.key(), output});
+					if (m_pcbBusRouting)
+					{
+						auto& span = spans[x];
+						for (const auto index : point.value())
+						{
+							const auto& wire = m_connections.at(index);
+							span = std::max(span, wire.destination.x() - wire.source.x());
+						}
+					}
 				}
+			}
+		}
+		if (m_pcbBusRouting)
+		{
+			QHash<qreal, int> lanes;
+			for (auto index = firstBundle; index < result.size(); ++index)
+			{
+				auto& bundle = result[index];
+				const auto x = bundle.endpoint.x();
+				bundle.pcbOffset = std::clamp(spans.value(x) / 3, 36.0, 140.0)
+					+ lanes[x]++ * PcbBusLaneSpacing;
 			}
 		}
 	}
@@ -179,6 +342,10 @@ QList<NodeWorkflowCanvas::ConnectionBundle> NodeWorkflowCanvas::connectionBundle
 
 QPointF NodeWorkflowCanvas::bundleJunction(const ConnectionBundle& bundle) const
 {
+	if (m_pcbBusRouting)
+	{
+		return bundle.endpoint + QPointF(bundle.output ? bundle.pcbOffset : -bundle.pcbOffset, 0);
+	}
 	qreal distance = 0;
 	for (const auto index : bundle.indices)
 	{
@@ -187,6 +354,40 @@ QPointF NodeWorkflowCanvas::bundleJunction(const ConnectionBundle& bundle) const
 	}
 	const qreal offset = std::clamp(distance / 3, 36.0, 140.0);
 	return bundle.endpoint + QPointF(bundle.output ? offset : -offset, 0);
+}
+
+QPointF NodeWorkflowCanvas::bundleTap(const ConnectionBundle& bundle, const QPointF& junction, qsizetype index) const
+{
+	if (!m_pcbBusRouting)
+	{
+		return junction;
+	}
+	const auto& wire = m_connections.at(index);
+	const auto farEnd = bundle.output ? wire.destination : wire.source;
+	const qreal delta = junction.y() - farEnd.y();
+	const qreal inset = std::min(qreal{14}, std::abs(junction.x() - farEnd.x()) / 2);
+	return {junction.x(), farEnd.y() + std::clamp(delta, -inset, inset)};
+}
+
+QPainterPath NodeWorkflowCanvas::bundleTrunk(const ConnectionBundle& bundle) const
+{
+	const auto junction = bundleJunction(bundle);
+	QPainterPath trunk(bundle.endpoint);
+	trunk.lineTo(junction);
+	if (m_pcbBusRouting)
+	{
+		qreal top = junction.y();
+		qreal bottom = junction.y();
+		for (const auto index : bundle.indices)
+		{
+			const auto y = bundleTap(bundle, junction, index).y();
+			top = std::min(top, y);
+			bottom = std::max(bottom, y);
+		}
+		trunk.moveTo(junction.x(), top);
+		trunk.lineTo(junction.x(), bottom);
+	}
+	return trunk;
 }
 
 void NodeWorkflowCanvas::showConnectionTable(const ConnectionBundle& bundle)
@@ -267,7 +468,7 @@ void NodeWorkflowCanvas::showConnectionTable(const ConnectionBundle& bundle)
 		return found == m_ports.cend() ? nullptr : &*found;
 	};
 	const auto available = [&](const Port& source, const Port& target, int editing) {
-		if (!source.connectTo || source.connectionGroup.isEmpty() || source.connectionGroup != target.connectionGroup)
+		if (!canConnectPorts(source, target))
 		{
 			return false;
 		}
@@ -416,12 +617,11 @@ void NodeWorkflowCanvas::showConnectionTable(const ConnectionBundle& bundle)
 		{
 			const auto* source = portAt(draft.source, true);
 			const auto* destination = portAt(draft.destination, false);
-			if (!source || !destination || !source->connectTo || source->connectionGroup != destination->connectionGroup)
+			if (!source || !destination || !canConnectPorts(*source, *destination))
 			{
 				continue;
 			}
-			const auto connectTo = source->connectTo;
-			connectTo(destination->channel);
+			connectPorts(*source, *destination);
 			QCoreApplication::sendPostedEvents(this, QEvent::MetaCall);
 			if (findWire(draft.source, draft.destination) == m_connections.cend())
 			{
@@ -661,13 +861,27 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 	const auto bundles = connectionBundles();
 	QHash<qsizetype, QPointF> starts;
 	QHash<qsizetype, QPointF> ends;
+	QList<PcbTrunk> pcbTrunks;
+	QList<PcbBridge> pcbBridges;
 	for (const auto& bundle : bundles)
 	{
 		const auto junction = bundleJunction(bundle);
 		auto& junctions = bundle.output ? starts : ends;
+		PcbTrunk trunk{junction.x(), junction.y(), junction.y(), {junction.y()}};
 		for (const auto index : bundle.indices)
 		{
-			junctions.insert(index, junction);
+			const auto tap = bundleTap(bundle, junction, index);
+			junctions.insert(index, tap);
+			if (m_pcbBusRouting)
+			{
+				trunk.top = std::min(trunk.top, tap.y());
+				trunk.bottom = std::max(trunk.bottom, tap.y());
+				trunk.taps.append(tap.y());
+			}
+		}
+		if (m_pcbBusRouting)
+		{
+			pcbTrunks.append(std::move(trunk));
 		}
 	}
 	for (qsizetype index = 0; index < m_connections.size(); ++index)
@@ -681,7 +895,11 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 			painter.drawPath(wirePath(connection.source, m_wireEnd));
 			continue;
 		}
-		const auto path = wirePath(starts.value(index, connection.source), ends.value(index, connection.destination));
+		const auto start = starts.value(index, connection.source);
+		const auto end = ends.value(index, connection.destination);
+		const auto path = m_pcbBusRouting && (starts.contains(index) || ends.contains(index))
+			? pcbBridgePath(pcbBranchPath(start, end), pcbTrunks, pcbBridges, painter.pen())
+			: wirePath(start, end);
 		painter.drawPath(path);
 		if (animateSignals && connection.active && connection.active())
 		{
@@ -690,8 +908,9 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 			painter.drawEllipse(path.pointAtPercent(beatPhase), 3.5, 3.5);
 		}
 	}
-	for (const auto& bundle : bundles)
+	for (qsizetype index = 0; index < bundles.size(); ++index)
 	{
+		const auto& bundle = bundles.at(index);
 		const auto junction = bundleJunction(bundle);
 		const auto& first = m_connections.at(bundle.indices.front());
 		const auto port = std::find_if(m_ports.cbegin(), m_ports.cend(), [&bundle](const Port& endpoint) {
@@ -699,10 +918,24 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 		});
 		const auto color = port == m_ports.cend() ? first.color : port->color;
 		painter.setBrush(Qt::NoBrush);
-		painter.setPen(QPen(color, 5, Qt::SolidLine, Qt::RoundCap));
+		painter.setPen(QPen(color, m_pcbBusRouting ? 7 : 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 		const auto start = bundle.output ? bundle.endpoint : junction;
 		const auto end = bundle.output ? junction : bundle.endpoint;
-		painter.drawLine(start, end);
+		if (m_pcbBusRouting)
+		{
+			const auto& trunk = pcbTrunks.at(index);
+			QPainterPath header(bundle.endpoint);
+			header.lineTo(junction);
+			painter.drawPath(pcbBridgePath(header, pcbTrunks, pcbBridges, painter.pen()));
+			if (trunk.top < trunk.bottom)
+			{
+				painter.drawLine(QPointF(trunk.x, trunk.top), QPointF(trunk.x, trunk.bottom));
+			}
+		}
+		else
+		{
+			painter.drawPath(bundleTrunk(bundle));
+		}
 		painter.setPen(color);
 		painter.drawText((start + end) / 2 + QPointF(-10, -9),
 			QStringLiteral("×%1").arg(bundle.indices.size()));
@@ -715,6 +948,27 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 			painter.setBrush(color);
 			painter.drawEllipse(start + (end - start) * beatPhase, 3.5, 3.5);
 		}
+	}
+	for (const auto& bridge : pcbBridges)
+	{
+		auto shadow = bridge.pen;
+		auto shadowColor = m_canvasColor.darker(170);
+		shadowColor.setAlpha(160);
+		shadow.setColor(shadowColor);
+		shadow.setWidthF(bridge.pen.widthF() + 2);
+		shadow.setCapStyle(Qt::FlatCap);
+		painter.setBrush(Qt::NoBrush);
+		painter.setPen(shadow);
+		painter.drawPath(QTransform::fromTranslate(0, 2).map(bridge.path));
+
+		auto outline = bridge.pen;
+		outline.setColor(m_canvasColor);
+		outline.setWidthF(bridge.pen.widthF() + 3);
+		outline.setCapStyle(Qt::FlatCap);
+		painter.setPen(outline);
+		painter.drawPath(bridge.path);
+		painter.setPen(bridge.pen);
+		painter.drawPath(bridge.path);
 	}
 	for (qsizetype index = 0; index < m_nodes.size(); ++index)
 	{
@@ -803,30 +1057,35 @@ void NodeWorkflowCanvas::mousePressEvent(QMouseEvent* event)
 	if (event->button() == Qt::RightButton && !navigatorRect().contains(position))
 	{
 		const auto world = m_center + (position - QPointF(width(), height()) / 2) / m_scale;
-		for (const auto& bundle : connectionBundles())
+		const auto bundles = connectionBundles();
+		const ConnectionBundle* nearest = nullptr;
+		qreal distance = 8 / m_scale;
+		for (const auto& bundle : bundles)
 		{
-			const auto junction = bundleJunction(bundle);
-			const auto tolerance = 8 / m_scale;
-			if (std::abs(world.y() - junction.y()) <= tolerance
-				&& world.x() >= std::min(junction.x(), bundle.endpoint.x()) - tolerance
-				&& world.x() <= std::max(junction.x(), bundle.endpoint.x()) + tolerance)
+			const auto candidate = trunkDistance(bundleTrunk(bundle), world);
+			if (candidate < distance)
 			{
-				QMenu menu(this);
-				auto* relationships = menu.addAction(tr("Connection Relationships"));
-				if (menu.exec(mapToGlobal(position.toPoint())) == relationships)
+				nearest = &bundle;
+				distance = candidate;
+			}
+		}
+		if (nearest)
+		{
+			QMenu menu(this);
+			auto* relationships = menu.addAction(tr("Connection Relationships"));
+			if (menu.exec(mapToGlobal(position.toPoint())) == relationships)
+			{
+				for (const auto& current : connectionBundles())
 				{
-					for (const auto& current : connectionBundles())
+					if (current.endpoint == nearest->endpoint && current.node == nearest->node
+						&& current.output == nearest->output)
 					{
-						if (current.endpoint == bundle.endpoint && current.node == bundle.node
-							&& current.output == bundle.output)
-						{
-							showConnectionTable(current);
-							break;
-						}
+						showConnectionTable(current);
+						break;
 					}
 				}
-				return;
 			}
+			return;
 		}
 		const bool canPaste = m_pasteNode && m_clipboardScope != ClipboardScope::None
 			&& m_clipboardScope == m_pasteScope;
@@ -854,6 +1113,10 @@ void NodeWorkflowCanvas::mousePressEvent(QMouseEvent* event)
 			if (actions.openPianoRoll)
 			{
 				menu.addAction(tr("Open Piano Roll"), this, actions.openPianoRoll);
+			}
+			if (actions.rename)
+			{
+				menu.addAction(tr("Rename Node"), this, actions.rename);
 			}
 			auto* remove = menu.addAction(tr("Delete Node"));
 			remove->setEnabled(bool(actions.remove));
@@ -903,7 +1166,8 @@ void NodeWorkflowCanvas::mousePressEvent(QMouseEvent* event)
 			for (qsizetype index = 0; index < m_ports.size(); ++index)
 			{
 				const auto& port = m_ports.at(index);
-				if (port.output && port.connectTo && QLineF(port.position, world).length() * m_scale <= 9)
+				if (port.output && (port.connectTo || port.graphConnectTo)
+					&& QLineF(port.position, world).length() * m_scale <= 9)
 				{
 					m_sourcePort = index;
 					m_wireEnd = world;
@@ -953,14 +1217,17 @@ void NodeWorkflowCanvas::mousePressEvent(QMouseEvent* event)
 					{
 						auto start = connection.source;
 						auto end = connection.destination;
+						bool bundled = false;
 						for (const auto& bundle : bundles)
 						{
 							if (bundle.indices.contains(index - 1))
 							{
-								(bundle.output ? start : end) = bundleJunction(bundle);
+								(bundle.output ? start : end) = bundleTap(bundle, bundleJunction(bundle), index - 1);
+								bundled = true;
 							}
 						}
-						if (overNode || !hitArea.createStroke(wirePath(start, end)).contains(world))
+						const auto path = m_pcbBusRouting && bundled ? pcbBranchPath(start, end) : wirePath(start, end);
+						if (overNode || !hitArea.createStroke(path).contains(world))
 						{
 							continue;
 						}
@@ -1084,11 +1351,14 @@ void NodeWorkflowCanvas::mouseReleaseEvent(QMouseEvent* event)
 			continue;
 		}
 		overPort = true;
-		if (sourceIndex >= 0 && !target.output
-			&& target.connectionGroup == m_ports.at(sourceIndex).connectionGroup)
+		if (sourceIndex < 0 || target.output)
 		{
-			const auto connectTo = m_ports.at(sourceIndex).connectTo;
-			connectTo(target.channel);
+			continue;
+		}
+		const auto& source = m_ports.at(sourceIndex);
+		if (canConnectPorts(source, target))
+		{
+			connectPorts(source, target);
 			return;
 		}
 	}

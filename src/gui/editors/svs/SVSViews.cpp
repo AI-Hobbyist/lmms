@@ -334,6 +334,11 @@ protected:
 
 QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent)
 {
+	return createSVSPluginSettings(track, parent, false);
+}
+
+QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent, bool replaceOnly)
+{
 	auto* dialog = new QDialog(parent);
 	dialog->setObjectName("svsPluginSettings");
 	dialog->setWindowTitle(QObject::tr("SVS plugin settings"));
@@ -346,20 +351,25 @@ QDialog* createSVSPluginSettings(SVSTrack* track, QWidget* parent)
 	tabs->addTab(page, QObject::tr("Voice"));
 	auto* speakers = new QComboBox(page);
 	speakers->setObjectName("svsPluginSpeaker");
-	auto refreshSpeakers = [track, speakers] {
+	speakers->setPlaceholderText(QObject::tr("Not selected"));
+	auto refreshSpeakers = [track, speakers, replaceOnly] {
 		QSignalBlocker block(speakers);
 		speakers->clear();
-		speakers->addItem(QObject::tr("Not selected"), QString{});
+		if (!replaceOnly)
+		{
+			speakers->addItem(QObject::tr("Not selected"), QString{});
+		}
 		for (const auto& voice : svs::Registry::instance().voices())
 			speakers->addItem(voice.name, voice.pluginId + "\n" + voice.id);
-		speakers->setCurrentIndex(std::max(0, speakers->findData(track->pluginId() + "\n" + track->voiceId())));
+		const auto selected = speakers->findData(track->pluginId() + "\n" + track->voiceId());
+		speakers->setCurrentIndex(replaceOnly ? selected : std::max(0, selected));
 	};
 	refreshSpeakers();
 	QObject::connect(&svs::Registry::instance(), &svs::Registry::catalogChanged, dialog, refreshSpeakers);
 	QObject::connect(track, &Track::dataChanged, dialog, refreshSpeakers);
 	form->addRow(QObject::tr("Speaker"), speakers);
-	QObject::connect(speakers, qOverload<int>(&QComboBox::activated), dialog, [track, speakers](int index) {
-		if (index == 0)
+	QObject::connect(speakers, qOverload<int>(&QComboBox::activated), dialog, [track, speakers, replaceOnly](int index) {
+		if (!replaceOnly && index == 0)
 		{
 			track->bindVoice({}, {});
 			return;

@@ -3,6 +3,7 @@
 
 #include <QColor>
 #include <QList>
+#include <QPainterPath>
 #include <QRectF>
 #include <QString>
 #include <QTimer>
@@ -32,7 +33,7 @@ class NodeWorkflowCanvas : public QWidget
 	Q_PROPERTY(QColor portLabelBackground MEMBER m_portLabelBackground)
 
 public:
-	enum class ClipboardScope { None, Root, Song, Pattern };
+	enum class ClipboardScope { None, Root, Song, Pattern, Source, Custom };
 	struct Node
 	{
 		QRectF bounds;
@@ -48,6 +49,7 @@ public:
 		QList<qsizetype> portIndices;
 		QList<qsizetype> sourceIndices;
 		QList<qsizetype> destinationIndices;
+		std::function<void()> rename;
 	};
 
 	struct Connection
@@ -74,6 +76,10 @@ public:
 		std::function<void(unsigned)> connectTo;
 		QColor labelBackground;
 		qreal labelWidth = 0;
+		QString graphEndpoint;
+		unsigned graphChannel = 0;
+		QString graphSignal;
+		std::function<void(unsigned)> graphConnectTo;
 	};
 
 	explicit NodeWorkflowCanvas(QWidget* parent = nullptr);
@@ -85,6 +91,7 @@ public:
 	void setZoom(qreal scale);
 	void setSignalFlowVisible(bool visible);
 	void setConnectionAggregation(bool enabled, int threshold);
+	void setPcbBusRouting(bool enabled);
 	void setPluginDropHandler(std::function<bool(const QString&, const QString&, const QPointF&)> handler);
 	void setClipboardScope(ClipboardScope scope) { m_clipboardScope = scope; }
 	QColor audioPortColor() const { return m_audioPortColor; }
@@ -118,9 +125,12 @@ private:
 		QPointF endpoint;
 		QString node;
 		bool output;
+		qreal pcbOffset = 0;
 	};
 	QList<ConnectionBundle> connectionBundles() const;
 	QPointF bundleJunction(const ConnectionBundle& bundle) const;
+	QPointF bundleTap(const ConnectionBundle& bundle, const QPointF& junction, qsizetype index) const;
+	QPainterPath bundleTrunk(const ConnectionBundle& bundle) const;
 	void showConnectionTable(const ConnectionBundle& bundle);
 
 	QList<Node> m_nodes;
@@ -146,6 +156,7 @@ private:
 	QTimer m_signalTimer;
 	bool m_aggregateConnections = false;
 	int m_aggregationThreshold = 4;
+	bool m_pcbBusRouting = false;
 	QElapsedTimer m_signalClock;
 	enum class Drag { None, Canvas, Navigator, Wire, Node };
 	Drag m_drag = Drag::None;

@@ -143,6 +143,7 @@ public:
 	Instrument * loadInstrument(const QString & _instrument_name,
 				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 				bool keyFromDnd = false);
+	void clearInstrument();
 
 	AudioBusHandle* audioBusHandle()
 	{

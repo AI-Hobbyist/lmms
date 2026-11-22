@@ -57,6 +57,7 @@
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
+#include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Keymap.h"
 #include "NotePlayHandle.h"
@@ -165,11 +166,24 @@ Song::~Song()
 		disconnect(owner.key(), nullptr, this, nullptr);
 	}
 	m_nodeInstrumentLayers.clear();
+	m_nodeCustomInstruments.clear();
 	m_nodeInstrumentTracks.reset();
 	delete m_globalAutomationTrack;
 }
 
 
+
+
+auto Song::getTimeline(PlayMode mode) -> Timeline&
+{
+	return m_timelines[static_cast<std::size_t>(mode)];
+}
+
+
+auto Song::getTimeline(PlayMode mode) const -> const Timeline&
+{
+	return m_timelines[static_cast<std::size_t>(mode)];
+}
 
 
 void Song::masterVolumeChanged()
@@ -1051,6 +1065,7 @@ void Song::clearProject()
 	m_nodePianoRollClips.clear();
 	m_nodePianoRollTracks.reset();
 	m_nodeInstrumentLayers.clear();
+	m_nodeCustomInstruments.clear();
 	m_nodeInstrumentTracks.reset();
 	if( getGUI() != nullptr && getGUI()->patternEditor() )
 	{
@@ -1435,7 +1450,8 @@ bool Song::hasExtendedSourceGraphs() const
 
 bool Song::hasExtendedSourceGraphs(const QDomElement& workflow, const QDomElement& content)
 {
-	if (!workflow.firstChildElement("instrument-layer").isNull())
+	if (!workflow.firstChildElement("instrument-layer").isNull()
+		|| !workflow.firstChildElement("custom-graph").isNull())
 	{
 		return true;
 	}
@@ -1703,6 +1719,9 @@ QList<Song::NodeBoundaryPort> Song::nodeBoundaryPorts(const QString& graph) cons
 		{
 			NodeBoundaryPort boundary{port.attribute("id"), port.attribute("signal"),
 				port.attribute("direction") == "out", port.attribute("track"), port.attribute("channel").toUInt(), {}};
+			boundary.stereoGroup = port.attribute("stereo");
+			boundary.stereoSide = port.attribute("side", "-1").toInt();
+			boundary.name = port.attribute("name");
 			if (!boundary.output)
 			{
 				for (const auto& edge : nodeInputDestinations(workflow, boundary.id, boundary.signal))
@@ -1718,20 +1737,783 @@ QList<Song::NodeBoundaryPort> Song::nodeBoundaryPorts(const QString& graph) cons
 
 void Song::addNodeBoundaryPort(const QString& graph, const QString& signal, bool output)
 {
+	createNodeBoundaryPort(graph, signal, output, false);
+}
+
+QString Song::createNodeBoundaryPort(const QString& graph, const QString& signal, bool output, bool stereo)
+{
 	static const QStringList signalTypes{"audio", "midi", "step", "voice"};
-	if (!m_nodeProject || graph.isEmpty() || !signalTypes.contains(signal))
+	if (!m_nodeProject || graph.isEmpty() || !signalTypes.contains(signal) || (stereo && signal != "audio"))
+	{
+		return {};
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto workflow = ensureNodeWorkflow();
+	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	for (int side = 0; side < (stereo ? 2 : 1); ++side)
+	{
+		auto port = m_nodeWorkflow.createElement("boundary-port");
+		port.setAttribute("id", side == 0 ? id : QUuid::createUuid().toString(QUuid::WithoutBraces));
+		port.setAttribute("graph", graph);
+		port.setAttribute("signal", signal);
+		port.setAttribute("direction", output ? "out" : "in");
+		if (stereo)
+		{
+			port.setAttribute("stereo", id);
+			port.setAttribute("side", side);
+		}
+		workflow.appendChild(port);
+	}
+	setModified();
+	return id;
+}
+
+void Song::removeNodeBoundaryPort(const QString& graph, const QString& id)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto workflow = m_nodeWorkflow.documentElement();
+	QStringList removed;
+	for (auto port = workflow.firstChildElement("boundary-port"); !port.isNull();)
+	{
+		const auto next = port.nextSiblingElement("boundary-port");
+		if (port.attribute("graph") == graph
+			&& (port.attribute("id") == id || port.attribute("stereo") == id))
+		{
+			removed.append(port.attribute("id"));
+			workflow.removeChild(port);
+		}
+		port = next;
+	}
+	if (removed.isEmpty())
+	{
+		return;
+	}
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();)
+	{
+		const auto next = edge.nextSiblingElement("custom-edge");
+		if (removed.contains(edge.attribute("source")) || removed.contains(edge.attribute("destination")))
+		{
+			workflow.removeChild(edge);
+		}
+		edge = next;
+	}
+	for (auto input = workflow.firstChildElement("aggregate-input"); !input.isNull();)
+	{
+		const auto next = input.nextSiblingElement("aggregate-input");
+		if (removed.contains(input.attribute("id")))
+		{
+			workflow.removeChild(input);
+		}
+		else
+		{
+			for (auto destination = input.firstChildElement("destination"); !destination.isNull();)
+			{
+				const auto nextDestination = destination.nextSiblingElement("destination");
+				const auto port = destination.attribute("port");
+				if (port.startsWith("midi-in/") && removed.contains(port.mid(8)))
+				{
+					input.removeChild(destination);
+				}
+				destination = nextDestination;
+			}
+		}
+		input = next;
+	}
+	for (const auto& tag : {QStringLiteral("piano-roll"), QStringLiteral("step-pattern")})
+	{
+		for (auto item = workflow.firstChildElement(tag); !item.isNull(); item = item.nextSiblingElement(tag))
+		{
+			for (auto target = item.firstChildElement("target"); !target.isNull();)
+			{
+				const auto next = target.nextSiblingElement("target");
+				if (removed.contains(target.attribute("port")))
+				{
+					item.removeChild(target);
+				}
+				target = next;
+			}
+		}
+	}
+	restoreNodeAudioRoutes();
+	setModified();
+}
+
+bool Song::renameNodeBoundaryPort(const QString& graph, const QString& id, const QString& name)
+{
+	const auto title = name.trimmed();
+	if (!m_nodeProject || graph.isEmpty() || id.isEmpty() || title.isEmpty())
+	{
+		return false;
+	}
+	bool found = false;
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto port = workflow.firstChildElement("boundary-port"); !port.isNull();
+		port = port.nextSiblingElement("boundary-port"))
+	{
+		if (port.attribute("graph") == graph && (port.attribute("id") == id || port.attribute("stereo") == id))
+		{
+			port.setAttribute("name", title);
+			found = true;
+		}
+	}
+	if (found)
+	{
+		setModified();
+	}
+	return found;
+}
+
+QList<Song::NodeCustomGraph> Song::nodeCustomGraphs(const QString& parent) const
+{
+	QList<NodeCustomGraph> result;
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto graph = workflow.firstChildElement("custom-graph"); !graph.isNull();
+		graph = graph.nextSiblingElement("custom-graph"))
+	{
+		if (graph.attribute("parent") == parent)
+		{
+			result.append({graph.attribute("id"), graph.attribute("name")});
+		}
+	}
+	return result;
+}
+
+QString Song::addNodeCustomGraph(const QString& parent, const QString& name)
+{
+	const auto title = name.trimmed();
+	if (!m_nodeProject || parent.isEmpty() || title.isEmpty())
+	{
+		return {};
+	}
+	if (parent.startsWith("source/"))
+	{
+		for (auto* track : tracks())
+		{
+			if (track->type() == Track::Type::SVS
+				&& parent == QStringLiteral("source/") + track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/')
+			{
+				return {};
+			}
+		}
+	}
+	auto workflow = ensureNodeWorkflow();
+	auto graph = m_nodeWorkflow.createElement("custom-graph");
+	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	graph.setAttribute("id", id);
+	graph.setAttribute("parent", parent);
+	graph.setAttribute("name", title);
+	workflow.appendChild(graph);
+	setModified();
+	return id;
+}
+
+bool Song::renameNodeCustomGraph(const QString& id, const QString& name)
+{
+	const auto title = name.trimmed();
+	if (!m_nodeProject || id.isEmpty() || title.isEmpty())
+	{
+		return false;
+	}
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto graph = workflow.firstChildElement("custom-graph"); !graph.isNull();
+		graph = graph.nextSiblingElement("custom-graph"))
+	{
+		if (graph.attribute("id") == id)
+		{
+			graph.setAttribute("name", title);
+			setModified();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Song::removeNodeCustomGraph(const QString& id)
+{
+	if (!m_nodeProject || QUuid(id).isNull())
+	{
+		return false;
+	}
+	const auto scopeFor = [](const QString& key) { return QStringLiteral("custom/") + key + '/'; };
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto workflow = m_nodeWorkflow.documentElement();
+	QSet<QString> ids;
+	QSet<QString> scopes;
+	QStringList pending{id};
+	while (!pending.isEmpty())
+	{
+		const auto key = pending.takeLast();
+		if (ids.contains(key))
+		{
+			continue;
+		}
+		ids.insert(key);
+		const auto scope = scopeFor(key);
+		scopes.insert(scope);
+		for (const auto& child : nodeCustomGraphs(scope))
+		{
+			pending.append(child.id);
+		}
+	}
+	QSet<QString> boundaryIds;
+	QSet<QUuid> effects;
+	bool found = false;
+	for (auto item = workflow.firstChildElement(); !item.isNull();)
+	{
+		const auto next = item.nextSiblingElement();
+		const auto tag = item.tagName();
+		const auto key = item.attribute("id");
+		const bool inScope = scopes.contains(item.attribute("graph"));
+		if (tag == "custom-graph" && ids.contains(key))
+		{
+			found = true;
+			workflow.removeChild(item);
+		}
+		else if (inScope && tag == "boundary-port")
+		{
+			boundaryIds.insert(key);
+			workflow.removeChild(item);
+		}
+		else if (inScope && tag == "custom-effect")
+		{
+			effects.insert(QUuid(key));
+			workflow.removeChild(item);
+		}
+		else if (inScope && tag == "custom-instrument")
+		{
+			delete m_nodeCustomInstruments.take(key);
+			workflow.removeChild(item);
+		}
+		else if (tag == "node-position")
+		{
+			const auto layoutKey = item.attribute("key");
+			const auto parts = layoutKey.split('/');
+			if (parts.size() >= 2 && parts.front() == "custom" && ids.contains(parts.at(1)))
+			{
+				workflow.removeChild(item);
+			}
+		}
+		item = next;
+	}
+	if (!found)
+	{
+		return false;
+	}
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();)
+	{
+		const auto next = edge.nextSiblingElement("custom-edge");
+		if (scopes.contains(edge.attribute("graph")) || boundaryIds.contains(edge.attribute("source"))
+			|| boundaryIds.contains(edge.attribute("destination")))
+		{
+			workflow.removeChild(edge);
+		}
+		edge = next;
+	}
+	auto* mixer = Engine::mixer();
+	for (auto index = mixer->numChannels(); index > 1;)
+	{
+		--index;
+		if (effects.contains(mixer->mixerChannel(index)->nodeWorkflowId()))
+		{
+			mixer->deleteChannel(index);
+		}
+	}
+	restoreNodeAudioRoutes();
+	setModified();
+	return true;
+}
+
+QDomElement Song::copyNodeCustomGraph(const QString& id) const
+{
+	const auto workflow = m_nodeWorkflow.documentElement();
+	QDomDocument document;
+	auto snapshot = document.createElement("custom-graph-copy");
+	snapshot.setAttribute("root", id);
+	document.appendChild(snapshot);
+	QHash<QString, QDomElement> graphs;
+	for (auto item = workflow.firstChildElement("custom-graph"); !item.isNull();
+		item = item.nextSiblingElement("custom-graph"))
+	{
+		graphs.insert(item.attribute("id"), item);
+	}
+	if (!graphs.contains(id))
+	{
+		return {};
+	}
+	QSet<QString> scopes;
+	QStringList pending{id};
+	while (!pending.isEmpty())
+	{
+		const auto key = pending.takeFirst();
+		const auto scope = QStringLiteral("custom/") + key + '/';
+		if (scopes.contains(scope))
+		{
+			continue;
+		}
+		scopes.insert(scope);
+		snapshot.appendChild(document.importNode(graphs.value(key), true));
+		for (const auto& child : nodeCustomGraphs(scope))
+		{
+			pending.append(child.id);
+		}
+	}
+	for (auto item = workflow.firstChildElement(); !item.isNull(); item = item.nextSiblingElement())
+	{
+		const auto tag = item.tagName();
+		const auto key = item.attribute("id");
+		const auto scope = item.attribute("graph");
+		if (tag == "node-position")
+		{
+			const auto parts = item.attribute("key").split('/');
+			if (parts.size() >= 2 && scopes.contains(parts.first() + '/' + parts.at(1) + '/'))
+			{
+				snapshot.appendChild(document.importNode(item, true));
+			}
+		}
+		else if (scopes.contains(scope))
+		{
+			auto saved = document.importNode(item, false).toElement();
+			if (tag == "custom-instrument")
+			{
+				auto* instrument = m_nodeCustomInstruments.value(key);
+				if (!instrument)
+				{
+					continue;
+				}
+				saved.appendChild(document.importNode(copyNodeInstrumentLayer(*instrument, {}), true));
+			}
+			else if (tag == "custom-effect")
+			{
+				auto* mixer = Engine::mixer();
+				for (mix_ch_t index = 1; index < mixer->numChannels(); ++index)
+				{
+					auto* channel = mixer->mixerChannel(index);
+					if (channel->nodeWorkflowId() == QUuid(key))
+					{
+						saved.setAttribute("name", channel->m_name);
+						saved.setAttribute("volume", channel->m_volumeModel.value());
+						channel->m_fxChain.saveState(document, saved);
+						break;
+					}
+				}
+			}
+			snapshot.appendChild(saved);
+		}
+	}
+	return snapshot;
+}
+
+static bool allowsCustomInstruments(const Song& song, const QDomElement& workflow, QString scope)
+{
+	QSet<QString> visited;
+	while (scope.startsWith("custom/"))
+	{
+		if (visited.contains(scope))
+		{
+			return false;
+		}
+		visited.insert(scope);
+		const auto id = scope.section('/', 1, 1);
+		auto graph = workflow.firstChildElement("custom-graph");
+		while (!graph.isNull() && graph.attribute("id") != id)
+		{
+			graph = graph.nextSiblingElement("custom-graph");
+		}
+		if (graph.isNull())
+		{
+			return false;
+		}
+		scope = graph.attribute("parent");
+	}
+	if (!scope.startsWith("source/"))
+	{
+		return true;
+	}
+	const auto id = QUuid(scope.section('/', 1, 1));
+	const auto matches = [id](auto* track) {
+		return track->type() == Track::Type::Instrument && track->nodeWorkflowId() == id;
+	};
+	const auto& songTracks = song.tracks();
+	const auto& patternTracks = Engine::patternStore()->tracks();
+	return std::any_of(songTracks.begin(), songTracks.end(), matches)
+		|| std::any_of(patternTracks.begin(), patternTracks.end(), matches);
+}
+
+QString Song::pasteNodeCustomGraph(const QString& parent, const QDomElement& snapshot)
+{
+	if (!m_nodeProject || snapshot.tagName() != "custom-graph-copy")
+	{
+		return {};
+	}
+	if (!snapshot.firstChildElement("custom-instrument").isNull()
+		&& !allowsCustomInstruments(*this, m_nodeWorkflow.documentElement(), parent))
+	{
+		return {};
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto oldRoot = snapshot.attribute("root");
+	QHash<QString, QString> ids;
+	const auto remap = [&ids](const QString& endpoint) {
+		auto parts = endpoint.split('/');
+		for (auto& part : parts)
+		{
+			part = ids.value(part, part);
+		}
+		return parts.join('/');
+	};
+	for (auto graph = snapshot.firstChildElement("custom-graph"); !graph.isNull();
+		graph = graph.nextSiblingElement("custom-graph"))
+	{
+		const auto oldId = graph.attribute("id");
+		const auto newId = addNodeCustomGraph(oldId == oldRoot ? parent : remap(graph.attribute("parent")),
+			graph.attribute("name"));
+		if (newId.isEmpty())
+		{
+			if (ids.contains(oldRoot))
+			{
+				removeNodeCustomGraph(ids.value(oldRoot));
+			}
+			return {};
+		}
+		ids.insert(oldId, newId);
+	}
+	auto workflow = ensureNodeWorkflow();
+	for (auto item = snapshot.firstChildElement(); !item.isNull(); item = item.nextSiblingElement())
+	{
+		const auto tag = item.tagName();
+		const auto oldId = item.attribute("id");
+		const auto scope = remap(item.attribute("graph"));
+		if (tag == "boundary-port")
+		{
+			const auto newId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+			ids.insert(oldId, newId);
+			auto copy = m_nodeWorkflow.importNode(item, false).toElement();
+			copy.setAttribute("id", newId);
+			copy.setAttribute("graph", scope);
+			const auto stereo = item.attribute("stereo");
+			if (!stereo.isEmpty())
+			{
+				if (!ids.contains(stereo))
+				{
+					ids.insert(stereo, QUuid::createUuid().toString(QUuid::WithoutBraces));
+				}
+				copy.setAttribute("stereo", ids.value(stereo));
+			}
+			workflow.appendChild(copy);
+		}
+		else if (tag == "custom-instrument")
+		{
+			const auto newId = pasteNodeCustomInstrument(scope, item.firstChildElement("instrument-layer"));
+			if (!newId.isEmpty())
+			{
+				ids.insert(oldId, newId);
+			}
+		}
+		else if (tag == "custom-effect" && !item.firstChildElement().isNull())
+		{
+			auto* mixer = Engine::mixer();
+			const auto index = mixer->createChannel();
+			auto* channel = mixer->mixerChannel(index);
+			channel->m_name = item.attribute("name");
+			channel->m_volumeModel.setValue(item.attribute("volume").toFloat());
+			channel->m_fxChain.restoreState(item.firstChildElement());
+			channel->m_nodeEffect = true;
+			const auto id = channel->nodeWorkflowId();
+			setNodeCustomEffectScope(id, scope);
+			mixer->deleteChannelSend(index, 0);
+			ids.insert(oldId, id.toString(QUuid::WithoutBraces));
+		}
+	}
+	for (auto item = snapshot.firstChildElement(); !item.isNull(); item = item.nextSiblingElement())
+	{
+		if (item.tagName() == "custom-edge")
+		{
+			const auto source = item.attribute("source");
+			const auto dest = item.attribute("destination");
+			if (remap(source) != source && remap(dest) != dest)
+			{
+				setNodeCustomConnection(remap(item.attribute("graph")), remap(source), remap(dest), true);
+			}
+		}
+		else if (item.tagName() == "node-position")
+		{
+			setNodeLayoutPosition(remap(item.attribute("key")),
+				QPointF(item.attribute("x").toDouble(), item.attribute("y").toDouble()));
+		}
+	}
+	return ids.value(oldRoot);
+}
+
+QString Song::nodeCustomEffectScope(const QUuid& id) const
+{
+	const auto key = id.toString(QUuid::WithoutBraces);
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto plugin = workflow.firstChildElement("custom-effect"); !plugin.isNull();
+		plugin = plugin.nextSiblingElement("custom-effect"))
+	{
+		if (plugin.attribute("id") == key)
+		{
+			return plugin.attribute("graph");
+		}
+	}
+	return {};
+}
+
+void Song::setNodeCustomEffectScope(const QUuid& id, const QString& scope)
+{
+	if (!m_nodeProject || id.isNull())
 	{
 		return;
 	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto key = id.toString(QUuid::WithoutBraces);
 	auto workflow = ensureNodeWorkflow();
-	auto port = m_nodeWorkflow.createElement("boundary-port");
-	port.setAttribute("id", QUuid::createUuid().toString(QUuid::WithoutBraces));
-	port.setAttribute("graph", graph);
-	port.setAttribute("signal", signal);
-	port.setAttribute("direction", output ? "out" : "in");
-	workflow.appendChild(port);
+	for (auto plugin = workflow.firstChildElement("custom-effect"); !plugin.isNull();
+		plugin = plugin.nextSiblingElement("custom-effect"))
+	{
+		if (plugin.attribute("id") == key)
+		{
+			if (scope.isEmpty())
+			{
+				workflow.removeChild(plugin);
+				for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();)
+				{
+					const auto next = edge.nextSiblingElement("custom-edge");
+					const auto prefix = QStringLiteral("effect/") + key + '/';
+					if (edge.attribute("source").startsWith(prefix) || edge.attribute("destination").startsWith(prefix))
+					{
+						workflow.removeChild(edge);
+					}
+					edge = next;
+				}
+			}
+			else
+			{
+				plugin.setAttribute("graph", scope);
+			}
+			setModified();
+			return;
+		}
+	}
+	if (!scope.isEmpty())
+	{
+		auto plugin = m_nodeWorkflow.createElement("custom-effect");
+		plugin.setAttribute("id", key);
+		plugin.setAttribute("graph", scope);
+		workflow.appendChild(plugin);
+		setModified();
+	}
+}
+
+QList<Song::NodeCustomConnection> Song::nodeCustomConnections(const QString& scope) const
+{
+	QList<NodeCustomConnection> result;
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();
+		edge = edge.nextSiblingElement("custom-edge"))
+	{
+		if (edge.attribute("graph") == scope)
+		{
+			result.append({edge.attribute("source"), edge.attribute("destination")});
+		}
+	}
+	return result;
+}
+
+bool Song::setNodeCustomConnection(const QString& scope, const QString& source, const QString& destination,
+	bool connected)
+{
+	if (!m_nodeProject || scope.isEmpty() || source.isEmpty() || destination.isEmpty() || source == destination)
+	{
+		return false;
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto effectChannel = [](const QString& endpoint) -> mix_ch_t {
+		const auto parts = endpoint.split('/');
+		if (parts.size() != 3 || parts.front() != "effect")
+		{
+			return 0;
+		}
+		const auto id = QUuid(parts.at(1));
+		auto* mixer = Engine::mixer();
+		for (mix_ch_t index = 1; index < mixer->numChannels(); ++index)
+		{
+			if (mixer->mixerChannel(index)->nodeWorkflowId() == id)
+			{
+				return index;
+			}
+		}
+		return 0;
+	};
+	const auto updateEffectSend = [&](bool enabled) {
+		const auto from = effectChannel(source);
+		const auto to = effectChannel(destination);
+		return from == 0 || to == 0 || Engine::mixer()->setNodeChannelSend(from,
+			source.endsWith('R') ? 1 : 0, to, destination.endsWith('R') ? 1 : 0, enabled);
+	};
+	auto workflow = ensureNodeWorkflow();
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();
+		edge = edge.nextSiblingElement("custom-edge"))
+	{
+		if (edge.attribute("graph") == scope && edge.attribute("source") == source
+			&& edge.attribute("destination") == destination)
+		{
+			if (!connected)
+			{
+				if (!updateEffectSend(false))
+				{
+					return false;
+				}
+				workflow.removeChild(edge);
+				restoreCustomGraphAudioRoutes();
+				setModified();
+			}
+			return true;
+		}
+	}
+	if (!connected)
+	{
+		return false;
+	}
+	QSet<QString> childScopes;
+	for (const auto& child : nodeCustomGraphs(scope))
+	{
+		childScopes.insert(QStringLiteral("custom/") + child.id + '/');
+	}
+	if (scope == "root/")
+	{
+		childScopes.insert(QStringLiteral("song/"));
+		childScopes.insert(QStringLiteral("pattern/"));
+	}
+	else if (scope == "song/" || scope == "pattern/")
+	{
+		const auto* container = scope == "song/" ? static_cast<const TrackContainer*>(this)
+			: static_cast<const TrackContainer*>(Engine::patternStore());
+		for (auto* track : container->tracks())
+		{
+			childScopes.insert(QStringLiteral("source/")
+				+ track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/');
+		}
+	}
+	const auto endpoint = [&](const QString& id, bool output) {
+		if (!output && id.startsWith("track-output/"))
+		{
+			const auto parts = id.split('/');
+			if (parts.size() == 3 && scope == QStringLiteral("source/") + parts.at(1) + '/'
+				&& (parts.at(2) == "in-L" || parts.at(2) == "in-R"))
+			{
+				for (auto* container : {static_cast<TrackContainer*>(this),
+					static_cast<TrackContainer*>(Engine::patternStore())})
+				{
+					for (auto* track : container->tracks())
+					{
+						if (trackMixerChannelModel(*track) && track->nodeWorkflowId() == QUuid(parts.at(1)))
+						{
+							return QStringLiteral("audio");
+						}
+					}
+				}
+			}
+		}
+		if (output && scope == "root/" && id.startsWith("logical-midi/"))
+		{
+			for (const auto& input : nodeLogicalInputs())
+			{
+				if (id == QStringLiteral("logical-midi/") + input.id && input.signalType == "midi")
+				{
+					return QStringLiteral("midi");
+				}
+			}
+		}
+		if (!output && scope == "root/" && id.startsWith("mixer/"))
+		{
+			const auto parts = id.split('/');
+			if (parts.size() == 3 && (parts.at(2) == "in-L" || parts.at(2) == "in-R"))
+			{
+				const auto uuid = QUuid(parts.at(1));
+				auto* mixer = Engine::mixer();
+				for (mix_ch_t index = 0; index < mixer->numChannels(); ++index)
+				{
+					if (mixer->mixerChannel(index)->nodeWorkflowId() == uuid
+						&& nodeCustomEffectScope(uuid).isEmpty())
+					{
+						return QStringLiteral("audio");
+					}
+				}
+			}
+		}
+		if (id.startsWith("instrument/"))
+		{
+			const auto parts = id.split('/');
+			if (parts.size() == 3)
+			{
+				for (const auto& instrument : nodeCustomInstruments(scope))
+				{
+					if (instrument.first != parts.at(1))
+					{
+						continue;
+					}
+					if (output && (parts.at(2) == "out-L" || parts.at(2) == "out-R"))
+					{
+						return QStringLiteral("audio");
+					}
+					if (!output && parts.at(2) == "midi")
+					{
+						return QStringLiteral("midi");
+					}
+				}
+			}
+			return QString{};
+		}
+		if (id.startsWith("effect/"))
+		{
+			const auto parts = id.split('/');
+			if (parts.size() == 3 && nodeCustomEffectScope(QUuid(parts.at(1))) == scope
+				&& (output ? (parts.at(2) == "out-L" || parts.at(2) == "out-R")
+					: (parts.at(2) == "in-L" || parts.at(2) == "in-R")))
+			{
+				return QStringLiteral("audio");
+			}
+			return QString{};
+		}
+		for (auto port = workflow.firstChildElement("boundary-port"); !port.isNull();
+			port = port.nextSiblingElement("boundary-port"))
+		{
+			if (port.attribute("id") != id)
+			{
+				continue;
+			}
+			const auto graph = port.attribute("graph");
+			const bool boundaryOutput = port.attribute("direction") == "out";
+			if (graph == scope && boundaryOutput != output)
+			{
+				return port.attribute("signal");
+			}
+			if (childScopes.contains(graph) && boundaryOutput == output)
+			{
+				return port.attribute("signal");
+			}
+			break;
+		}
+		return QString{};
+	};
+	const auto signal = endpoint(source, true);
+	if (signal.isEmpty() || signal != endpoint(destination, false))
+	{
+		return false;
+	}
+	if (!updateEffectSend(true))
+	{
+		return false;
+	}
+	auto edge = m_nodeWorkflow.createElement("custom-edge");
+	edge.setAttribute("graph", scope);
+	edge.setAttribute("source", source);
+	edge.setAttribute("destination", destination);
+	workflow.appendChild(edge);
+	restoreCustomGraphAudioRoutes();
 	setModified();
+	return true;
 }
 
 std::optional<QPair<bool, int>> Song::nodeConnectionAggregation() const
@@ -1747,6 +2529,11 @@ std::optional<QPair<bool, int>> Song::nodeConnectionAggregation() const
 }
 
 bool Song::setNodeSourceMidiBoundary(const QString& id, Track& track)
+{
+	return setNodeSourceMidiBoundary(id, track, true);
+}
+
+bool Song::setNodeSourceMidiBoundary(const QString& id, Track& track, bool connected)
 {
 	if (!m_nodeProject || (track.type() != Track::Type::Instrument && track.type() != Track::Type::SVS))
 	{
@@ -1767,23 +2554,30 @@ bool Song::setNodeSourceMidiBoundary(const QString& id, Track& track)
 			break;
 		}
 	}
-	if ((!id.isEmpty() && selected.isNull()) || !setNodeSourceMidiInputConnection(track, true))
+	if (selected.isNull())
 	{
-		return false;
+		return id.isEmpty() && connected && setNodeSourceMidiInputConnection(track, true);
 	}
+	if (connected)
+	{
+		selected.setAttribute("track", trackId);
+		const auto updated = setNodeSourceMidiInputConnection(track, true);
+		setModified();
+		return updated;
+	}
+	selected.removeAttribute("track");
+	bool anotherInput = false;
 	for (auto port = workflow.firstChildElement("boundary-port"); !port.isNull();
 		port = port.nextSiblingElement("boundary-port"))
 	{
 		if (port.attribute("graph") == scope && port.attribute("signal") == "midi"
-			&& port.attribute("direction") == "in")
+			&& port.attribute("direction") == "in" && port.attribute("track") == trackId)
 		{
-			port.removeAttribute("track");
+			anotherInput = true;
+			break;
 		}
 	}
-	if (!selected.isNull())
-	{
-		selected.setAttribute("track", trackId);
-	}
+	setNodeSourceMidiInputConnection(track, anotherInput);
 	setModified();
 	return true;
 }
@@ -1798,6 +2592,26 @@ void Song::setNodeConnectionAggregation(bool enabled, int threshold)
 	auto workflow = ensureNodeWorkflow();
 	workflow.setAttribute("aggregationEnabled", enabled ? "1" : "0");
 	workflow.setAttribute("aggregationThreshold", threshold);
+	setModified();
+}
+
+std::optional<bool> Song::nodePcbBusRouting() const
+{
+	const auto workflow = m_nodeWorkflow.documentElement();
+	if (!workflow.hasAttribute("pcbBusRouting"))
+	{
+		return std::nullopt;
+	}
+	return workflow.attribute("pcbBusRouting") == "1";
+}
+
+void Song::setNodePcbBusRouting(bool enabled)
+{
+	if (!m_nodeProject || nodePcbBusRouting() == enabled)
+	{
+		return;
+	}
+	ensureNodeWorkflow().setAttribute("pcbBusRouting", enabled ? "1" : "0");
 	setModified();
 }
 
@@ -1874,13 +2688,13 @@ bool Song::setNodeBoundaryAudioSource(const QString& graph, const QString& id, T
 	}
 	target.setAttribute("track", trackId);
 	target.setAttribute("channel", static_cast<unsigned>(channel));
-	if (sourceGraph)
+	if (!sourceGraph)
 	{
-		setNodeSourceAudioOutput(track, channel, channel);
+		setNodeTrackBoundaryConnected(track, channel, true);
 	}
 	else
 	{
-		setNodeTrackBoundaryConnected(track, channel, true);
+		restoreCustomGraphAudioRoutes();
 	}
 	setModified();
 	return true;
@@ -1973,7 +2787,7 @@ QDomElement Song::nodeInstrumentLayerElement(const QString& id) const
 	return layer;
 }
 
-InstrumentTrack* Song::createNodeInstrumentLayer(Track& owner, const QDomElement& element)
+TrackContainer* Song::ensureNodeInstrumentTracks()
 {
 	if (!m_nodeInstrumentTracks)
 	{
@@ -1984,7 +2798,12 @@ InstrumentTrack* Song::createNodeInstrumentLayer(Track& owner, const QDomElement
 		m_nodeInstrumentTracks = std::make_unique<InstrumentLayerTracks>();
 		m_nodeInstrumentTracks->setType(TrackContainer::Type::Song);
 	}
-	auto* instrument = new InstrumentTrack(m_nodeInstrumentTracks.get(), false);
+	return m_nodeInstrumentTracks.get();
+}
+
+InstrumentTrack* Song::createNodeInstrumentLayer(Track& owner, const QDomElement& element)
+{
+	auto* instrument = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
 	const auto layerId = element.attribute("id");
 	const bool firstLayerForOwner = !m_nodeInstrumentLayers.contains(&owner);
 	auto& layers = m_nodeInstrumentLayers[&owner];
@@ -2117,6 +2936,155 @@ void Song::removeNodeInstrumentLayer(Track& owner, const QString& id)
 	}
 }
 
+QDomElement Song::copyNodeInstrumentLayer(Track& owner, const QString& id) const
+{
+	const auto& layers = nodeInstrumentLayers(owner);
+	const auto layer = std::find_if(layers.cbegin(), layers.cend(), [&id](const auto& entry) {
+		return entry.id == id;
+	});
+	auto* instrument = id.isEmpty() && owner.type() == Track::Type::Instrument
+		? static_cast<InstrumentTrack*>(&owner)
+		: (layer == layers.cend() ? nullptr : layer->instrument);
+	if (!instrument || !instrument->instrument())
+	{
+		return {};
+	}
+	QDomDocument document;
+	auto state = document.createElement("instrument-layer");
+	document.appendChild(state);
+	auto track = instrument->saveState(document, state);
+	track.removeAttribute("nodeid");
+	const auto children = track.elementsByTagName("journallingObject");
+	while (children.count() > 0)
+	{
+		auto child = children.item(0);
+		child.parentNode().removeChild(child);
+	}
+	return state;
+}
+
+QString Song::pasteNodeInstrumentLayer(Track& owner, const QDomElement& state)
+{
+	const auto track = state.firstChildElement("track");
+	if (!m_nodeProject || owner.type() != Track::Type::Instrument || state.tagName() != "instrument-layer"
+		|| track.isNull())
+	{
+		return {};
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto workflow = ensureNodeWorkflow();
+	auto element = m_nodeWorkflow.importNode(state, true).toElement();
+	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	element.setAttribute("id", id);
+	element.setAttribute("owner", owner.nodeWorkflowId().toString(QUuid::WithoutBraces));
+	auto* instrument = createNodeInstrumentLayer(owner, element);
+	instrument->restoreState(element.firstChildElement("track"));
+	workflow.appendChild(element);
+	restoreNodeAudioRoutes();
+	setModified();
+	return id;
+}
+
+QList<QPair<QString, InstrumentTrack*>> Song::nodeCustomInstruments(const QString& scope) const
+{
+	QList<QPair<QString, InstrumentTrack*>> result;
+	const auto workflow = m_nodeWorkflow.documentElement();
+	for (auto element = workflow.firstChildElement("custom-instrument"); !element.isNull();
+		element = element.nextSiblingElement("custom-instrument"))
+	{
+		const auto id = element.attribute("id");
+		if (element.attribute("graph") == scope)
+		{
+			if (auto* track = m_nodeCustomInstruments.value(id))
+			{
+				result.append(qMakePair(id, track));
+			}
+		}
+	}
+	return result;
+}
+
+QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file)
+{
+	if (!m_nodeProject || !scope.startsWith("custom/") || plugin.isEmpty()
+		|| !allowsCustomInstruments(*this, m_nodeWorkflow.documentElement(), scope))
+	{
+		return {};
+	}
+	auto* track = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
+	track->audioBusHandle()->setMixerInputs(AudioBusHandle::MixerInputs{});
+	auto* instance = track->loadInstrument(plugin);
+	if (!instance)
+	{
+		delete track;
+		return {};
+	}
+	if (!file.isEmpty())
+	{
+		instance->loadFile(file);
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	auto workflow = ensureNodeWorkflow();
+	auto element = m_nodeWorkflow.createElement("custom-instrument");
+	element.setAttribute("id", id);
+	element.setAttribute("graph", scope);
+	workflow.appendChild(element);
+	m_nodeCustomInstruments.insert(id, track);
+	setModified();
+	return id;
+}
+
+QString Song::pasteNodeCustomInstrument(const QString& scope, const QDomElement& state)
+{
+	const auto settings = state.firstChildElement("track");
+	if (!m_nodeProject || !scope.startsWith("custom/") || state.tagName() != "instrument-layer"
+		|| settings.isNull() || !allowsCustomInstruments(*this, m_nodeWorkflow.documentElement(), scope))
+	{
+		return {};
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto* track = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
+	track->restoreState(settings);
+	track->audioBusHandle()->setMixerInputs(AudioBusHandle::MixerInputs{});
+	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	auto workflow = ensureNodeWorkflow();
+	auto element = m_nodeWorkflow.createElement("custom-instrument");
+	element.setAttribute("id", id);
+	element.setAttribute("graph", scope);
+	workflow.appendChild(element);
+	m_nodeCustomInstruments.insert(id, track);
+	setModified();
+	return id;
+}
+
+void Song::removeNodeCustomInstrument(const QString& scope, const QString& id)
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto workflow = m_nodeWorkflow.documentElement();
+	for (auto element = workflow.firstChildElement("custom-instrument"); !element.isNull();
+		element = element.nextSiblingElement("custom-instrument"))
+	{
+		if (element.attribute("id") == id && element.attribute("graph") == scope)
+		{
+			workflow.removeChild(element);
+			const auto prefix = QStringLiteral("instrument/") + id + '/';
+			for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();)
+			{
+				const auto next = edge.nextSiblingElement("custom-edge");
+				if (edge.attribute("source").startsWith(prefix) || edge.attribute("destination").startsWith(prefix))
+				{
+					workflow.removeChild(edge);
+				}
+				edge = next;
+			}
+			delete m_nodeCustomInstruments.take(id);
+			setModified();
+			return;
+		}
+	}
+}
+
 void Song::saveNodeInstrumentLayers()
 {
 	for (const auto& layers : std::as_const(m_nodeInstrumentLayers))
@@ -2126,6 +3094,15 @@ void Song::saveNodeInstrumentLayers()
 			auto element = nodeInstrumentLayerElement(layer.id);
 			element.removeChild(element.firstChild());
 			layer.instrument->saveState(m_nodeWorkflow, element);
+		}
+	}
+	for (auto element = m_nodeWorkflow.documentElement().firstChildElement("custom-instrument");
+		!element.isNull(); element = element.nextSiblingElement("custom-instrument"))
+	{
+		if (auto* track = m_nodeCustomInstruments.value(element.attribute("id")))
+		{
+			element.removeChild(element.firstChildElement("track"));
+			track->saveState(m_nodeWorkflow, element);
 		}
 	}
 }
@@ -2153,6 +3130,20 @@ void Song::restoreNodeInstrumentLayers()
 				}
 			}
 		}
+	}
+	for (auto element = workflow.firstChildElement("custom-instrument"); !element.isNull();
+		element = element.nextSiblingElement("custom-instrument"))
+	{
+		const auto id = element.attribute("id");
+		const auto state = element.firstChildElement("track");
+		if (id.isEmpty() || state.isNull() || m_nodeCustomInstruments.contains(id))
+		{
+			continue;
+		}
+		auto* track = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
+		track->audioBusHandle()->setMixerInputs(AudioBusHandle::MixerInputs{});
+		track->restoreState(state);
+		m_nodeCustomInstruments.insert(id, track);
 	}
 }
 
@@ -2196,6 +3187,29 @@ bool Song::setNodeSourceMidiInputConnection(Track& track, bool connected)
 	return true;
 }
 
+bool Song::removeDefaultNodeSourceMidiInput(Track& track)
+{
+	if (track.type() != Track::Type::Instrument && track.type() != Track::Type::SVS)
+	{
+		return false;
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	auto graph = ensureNodeSourceSubgraph(track);
+	if (graph.isNull() || graph.attribute("defaultMidiInput") == "0")
+	{
+		return false;
+	}
+	const auto trackId = track.nodeWorkflowId().toString(QUuid::WithoutBraces);
+	const auto ports = nodeBoundaryPorts(QStringLiteral("source/") + trackId + '/');
+	const bool explicitInput = std::any_of(ports.cbegin(), ports.cend(), [&trackId](const auto& port) {
+		return !port.output && port.signal == "midi" && port.track == trackId;
+	});
+	graph.setAttribute("defaultMidiInput", 0);
+	setSourceMidiInputConnected(graph, explicitInput);
+	setModified();
+	return true;
+}
+
 Song::NodeSourceConnections Song::nodeSourceConnections(Track& track) const
 {
 	const auto trackId = track.nodeWorkflowId().toString(QUuid::WithoutBraces);
@@ -2208,10 +3222,11 @@ Song::NodeSourceConnections Song::nodeSourceConnections(Track& track) const
 			const auto kind = track.type() == Track::Type::SVS
 				? NodeWorkflowSourceKind::SingingVoice : NodeWorkflowSourceKind::Instrument;
 			return {sourceMidiInputConnected(graph), sourceEventConnected(graph, kind),
-				graph.attribute("stepEvents", "1") != "0", sourceAudioOutputs(graph)};
+				graph.attribute("stepEvents", "1") != "0", graph.attribute("defaultMidiInput", "1") != "0",
+				sourceAudioOutputs(graph)};
 		}
 	}
-	return {true, true, true, {0u, 1u}};
+	return {true, true, true, true, {0u, 1u}};
 }
 
 bool Song::setNodeSourceStepConnection(Track& track, bool connected)
@@ -2571,9 +3586,12 @@ static QSet<QString> resolvedPianoRollTargets(const QDomElement& workflow, const
 	{
 		for (const auto& destination : nodeInputDestinations(workflow, target.attribute("port"), signal))
 		{
-			if (destination.attribute("port") == inlet)
+			const auto id = destination.attribute("track");
+			const auto port = destination.attribute("port");
+			const auto boundary = singingVoice ? QDomElement{} : findNodeMidiBoundary(workflow, id, port);
+			if (port == inlet || (!boundary.isNull() && boundary.attribute("track") == id))
 			{
-				tracks.insert(destination.attribute("track"));
+				tracks.insert(id);
 			}
 		}
 	}
@@ -2901,7 +3919,9 @@ bool Song::setNodeLogicalInputTarget(const QString& inputId, const QString& sign
 {
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	const auto type = track.type();
-	const bool midi = signalType == "midi" && port == "midi-in"
+	const auto trackId = track.nodeWorkflowId().toString(QUuid::WithoutBraces);
+	const bool midi = signalType == "midi" && (port == "midi-in"
+		|| !findNodeMidiBoundary(m_nodeWorkflow.documentElement(), trackId, port).isNull())
 		&& (type == Track::Type::Instrument || type == Track::Type::SVS);
 	const bool audio = signalType == "audio" && (port == "audio-in:L" || port == "audio-in:R")
 		&& type == Track::Type::Sample;
@@ -2938,7 +3958,6 @@ bool Song::setNodeLogicalInputTarget(const QString& inputId, const QString& sign
 		return false;
 	}
 
-	const auto trackId = track.nodeWorkflowId().toString(QUuid::WithoutBraces);
 	if (!setNodeInputDestination(ensureNodeWorkflow(), inputId, signalType, trackId, port, connected))
 	{
 		return false;
@@ -2988,12 +4007,39 @@ int Song::dispatchNodeMidiInput(const QString& inputId, const MidiEvent& event,
 	const bool noteRelease = event.type() == MidiNoteOff
 		|| (event.type() == MidiNoteOn && event.velocity() == 0);
 	auto trackIds = nodeInstrumentMidiTargets(m_nodeWorkflow.documentElement(), inputId, noteRelease);
-	if (trackIds.isEmpty())
-	{
-		return 0;
-	}
-
 	int delivered = 0;
+	const auto workflow = m_nodeWorkflow.documentElement();
+	QMultiHash<QString, QString> outgoing;
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();
+		edge = edge.nextSiblingElement("custom-edge"))
+	{
+		outgoing.insert(edge.attribute("source"), edge.attribute("destination"));
+	}
+	QStringList pending{QStringLiteral("logical-midi/") + inputId};
+	QSet<QString> visited;
+	while (!pending.isEmpty())
+	{
+		const auto endpoint = pending.takeLast();
+		if (visited.contains(endpoint))
+		{
+			continue;
+		}
+		visited.insert(endpoint);
+		pending.append(outgoing.values(endpoint));
+		if (endpoint.startsWith("instrument/") && endpoint.endsWith("/midi"))
+		{
+			const auto parts = endpoint.split('/');
+			if (parts.size() == 3)
+			{
+				if (auto* instrument = m_nodeCustomInstruments.value(parts.at(1)))
+				{
+					instrument->processInEvent(event, time, offset);
+					instrument->audioBusHandle()->markNodeEvent(noteRelease ? 2 : 3);
+					++delivered;
+				}
+			}
+		}
+	}
 	for (auto* container : {static_cast<TrackContainer*>(this), static_cast<TrackContainer*>(Engine::patternStore())})
 	{
 		for (auto* track : container->tracks())
@@ -3035,6 +4081,7 @@ void Song::restoreNodeWorkflow(DataFile& dataFile)
 	m_nodePianoRollClips.clear();
 	m_nodePianoRollTracks.reset();
 	m_nodeInstrumentLayers.clear();
+	m_nodeCustomInstruments.clear();
 	m_nodeInstrumentTracks.reset();
 	m_nodeProject = dataFile.isNodeWorkflow();
 	m_nodeWorkflow = QDomDocument{};
@@ -3046,6 +4093,147 @@ void Song::restoreNodeWorkflow(DataFile& dataFile)
 	bool validMask = false;
 	const auto mask = saved.attribute("masterOutputMask").toUInt(&validMask);
 	Engine::mixer()->setNodeMasterOutputMask(validMask && mask <= 3 ? mask : 3);
+}
+
+void Song::restoreCustomGraphAudioRoutes()
+{
+	if (!m_nodeProject)
+	{
+		return;
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	const auto workflow = m_nodeWorkflow.documentElement();
+	QMultiHash<QString, QString> outgoing;
+	for (auto edge = workflow.firstChildElement("custom-edge"); !edge.isNull();
+		edge = edge.nextSiblingElement("custom-edge"))
+	{
+		outgoing.insert(edge.attribute("source"), edge.attribute("destination"));
+	}
+	auto* mixer = Engine::mixer();
+	QHash<QString, QPair<mix_ch_t, ch_cnt_t>> destinations;
+	QList<mix_ch_t> effects;
+	for (mix_ch_t index = 0; index < mixer->numChannels(); ++index)
+	{
+		const auto id = mixer->mixerChannel(index)->nodeWorkflowId();
+		const auto isCustomEffect = !nodeCustomEffectScope(id).isEmpty();
+		if (isCustomEffect && index != 0)
+		{
+			effects.append(index);
+		}
+		const auto prefix = (isCustomEffect ? QStringLiteral("effect/") : QStringLiteral("mixer/"))
+			+ id.toString(QUuid::WithoutBraces) + '/';
+		destinations.insert(prefix + QStringLiteral("in-L"), qMakePair(index, ch_cnt_t{0}));
+		destinations.insert(prefix + QStringLiteral("in-R"), qMakePair(index, ch_cnt_t{1}));
+	}
+	for (auto* container : {static_cast<TrackContainer*>(this), static_cast<TrackContainer*>(Engine::patternStore())})
+	{
+		for (auto* track : container->tracks())
+		{
+			if (!trackMixerChannelModel(*track))
+			{
+				continue;
+			}
+			const auto id = track->nodeWorkflowId().toString(QUuid::WithoutBraces);
+			for (ch_cnt_t side = 0; side < 2; ++side)
+			{
+				const auto target = nodeTrackMixerEndpoint(*track, side);
+				if (!target || !nodeTrackBoundaryConnected(*track, side))
+				{
+					continue;
+				}
+				const auto output = QStringLiteral("track-output/") + id
+					+ (side == 0 ? QStringLiteral("/in-L") : QStringLiteral("/in-R"));
+				destinations.insert(output, qMakePair(target->channel, target->side));
+				for (const auto& boundary : nodeBoundaryPorts(QStringLiteral("source/") + id + '/'))
+				{
+					if (boundary.output && boundary.signal == "audio" && boundary.track == id
+						&& boundary.channel == side && !outgoing.contains(boundary.id))
+					{
+						destinations.insert(boundary.id, qMakePair(target->channel, target->side));
+					}
+				}
+			}
+		}
+	}
+	const auto resolvedInputs = [&outgoing, &destinations](const QString& source) {
+		QList<QPair<mix_ch_t, ch_cnt_t>> result;
+		QStringList pending{source};
+		QSet<QString> examined;
+		while (!pending.isEmpty())
+		{
+			const auto endpoint = pending.takeLast();
+			if (examined.contains(endpoint))
+			{
+				continue;
+			}
+			examined.insert(endpoint);
+			const auto terminal = destinations.constFind(endpoint);
+			if (terminal != destinations.cend() && !result.contains(*terminal))
+			{
+				result.append(*terminal);
+			}
+			pending.append(outgoing.values(endpoint));
+		}
+		std::sort(result.begin(), result.end());
+		return result;
+	};
+	for (auto it = m_nodeCustomInstruments.cbegin(); it != m_nodeCustomInstruments.cend(); ++it)
+	{
+		AudioBusHandle::MixerFanout inputs;
+		for (ch_cnt_t side = 0; side < 2; ++side)
+		{
+			const auto endpoint = QStringLiteral("instrument/") + it.key()
+				+ (side == 0 ? QStringLiteral("/out-L") : QStringLiteral("/out-R"));
+			const auto targets = resolvedInputs(endpoint);
+			for (const auto& [index, channel] : targets)
+			{
+				auto* receiver = mixer->mixerChannel(index);
+				inputs[side].push_back({receiver, &receiver->m_volumeModel, channel});
+			}
+		}
+		it.value()->audioBusHandle()->setMixerFanout(std::move(inputs));
+	}
+
+	QHash<mix_ch_t, QSet<QPair<mix_ch_t, unsigned>>> desiredSends;
+	for (const auto index : effects)
+	{
+		const auto id = mixer->mixerChannel(index)->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		auto& desired = desiredSends[index];
+		for (const auto side : {0u, 1u})
+		{
+			const auto output = QStringLiteral("effect/") + id
+				+ (side == 0 ? QStringLiteral("/out-L") : QStringLiteral("/out-R"));
+			for (const auto& [target, channel] : resolvedInputs(output))
+			{
+				desired.insert(qMakePair(target, side * 2 + static_cast<unsigned>(channel)));
+			}
+		}
+		QList<QPair<mix_ch_t, unsigned>> stale;
+		for (const auto* send : mixer->mixerChannel(index)->m_sends)
+		{
+			for (unsigned pair = 0; pair < 4; ++pair)
+			{
+				const auto key = qMakePair(send->receiverIndex(), pair);
+				if ((send->channelPairs() & (1u << pair)) && !desired.contains(key))
+				{
+					stale.append(key);
+				}
+			}
+		}
+		for (const auto& [target, pair] : stale)
+		{
+			mixer->setNodeChannelSend(index, static_cast<ch_cnt_t>(pair / 2), target,
+				static_cast<ch_cnt_t>(pair % 2), false);
+		}
+	}
+	for (const auto index : effects)
+	{
+		for (const auto& [target, pair] : desiredSends.value(index))
+		{
+			mixer->setNodeChannelSend(index, static_cast<ch_cnt_t>(pair / 2), target,
+				static_cast<ch_cnt_t>(pair % 2), true);
+		}
+	}
 }
 
 void Song::restoreNodeAudioRoutes()
@@ -3262,6 +4450,7 @@ void Song::restoreNodeAudioRoutes()
 			bus->setMixerInputs(resolved);
 		}
 	}
+	restoreCustomGraphAudioRoutes();
 }
 
 void Song::saveProjectState(DataFile& dataFile)

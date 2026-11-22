@@ -253,8 +253,8 @@ public:
 		setPlayPos(ticks, m_playMode);
 	}
 
-	auto getTimeline(PlayMode mode) -> Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
-	auto getTimeline(PlayMode mode) const -> const Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
+	auto getTimeline(PlayMode mode) -> Timeline&;
+	auto getTimeline(PlayMode mode) const -> const Timeline&;
 	auto getTimeline() -> Timeline& { return getTimeline(m_playMode); }
 	auto getTimeline() const -> const Timeline& { return getTimeline(m_playMode); }
 
@@ -295,11 +295,13 @@ public:
 	bool setNodeTrackAudioRoute(Track& track, ch_cnt_t sourceSide,
 		std::optional<mix_ch_t> mixerChannel, ch_cnt_t destinationSide);
 	bool setNodeSourceMidiInputConnection(Track& track, bool connected);
+	bool removeDefaultNodeSourceMidiInput(Track& track);
 	struct NodeSourceConnections
 	{
 		bool midiInput;
 		bool events;
 		bool stepEvents;
+		bool defaultMidiInput;
 		std::array<std::optional<unsigned>, 2> audioOutputs;
 	};
 	NodeSourceConnections nodeSourceConnections(Track& track) const;
@@ -317,6 +319,8 @@ public:
 	bool setNodeInstrumentLayerOutput(Track& owner, const QString& id, ch_cnt_t source,
 		std::optional<ch_cnt_t> target);
 	void removeNodeInstrumentLayer(Track& owner, const QString& id);
+	QDomElement copyNodeInstrumentLayer(Track& owner, const QString& id) const;
+	QString pasteNodeInstrumentLayer(Track& owner, const QDomElement& state);
 	bool setNodeSourceEventConnection(Track& track, bool connected);
 	bool setNodeSourceStepConnection(Track& track, bool connected);
 	bool convertToNodeProject(const QString& fileName);
@@ -343,14 +347,48 @@ public:
 		QString track;
 		unsigned channel;
 		QList<QPair<QString, QString>> destinations;
+		QString stereoGroup;
+		int stereoSide = -1;
+		QString name;
 	};
 	QList<NodeBoundaryPort> nodeBoundaryPorts(const QString& graph) const;
 	void addNodeBoundaryPort(const QString& graph, const QString& signal, bool output);
+	QString createNodeBoundaryPort(const QString& graph, const QString& signal, bool output, bool stereo);
+	void removeNodeBoundaryPort(const QString& graph, const QString& id);
+	bool renameNodeBoundaryPort(const QString& graph, const QString& id, const QString& name);
+	struct NodeCustomGraph
+	{
+		QString id;
+		QString name;
+	};
+	QList<NodeCustomGraph> nodeCustomGraphs(const QString& parent) const;
+	QString addNodeCustomGraph(const QString& parent, const QString& name);
+	bool renameNodeCustomGraph(const QString& id, const QString& name);
+	bool removeNodeCustomGraph(const QString& id);
+	QDomElement copyNodeCustomGraph(const QString& id) const;
+	QString pasteNodeCustomGraph(const QString& parent, const QDomElement& snapshot);
+	struct NodeCustomConnection
+	{
+		QString source;
+		QString destination;
+	};
+	QList<NodeCustomConnection> nodeCustomConnections(const QString& scope) const;
+	bool setNodeCustomConnection(const QString& scope, const QString& source, const QString& destination,
+		bool connected);
+	QString nodeCustomEffectScope(const QUuid& id) const;
+	void setNodeCustomEffectScope(const QUuid& id, const QString& scope);
+	QList<QPair<QString, InstrumentTrack*>> nodeCustomInstruments(const QString& scope) const;
+	QString addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file = {});
+	QString pasteNodeCustomInstrument(const QString& scope, const QDomElement& state);
+	void removeNodeCustomInstrument(const QString& scope, const QString& id);
 	std::optional<QPair<bool, int>> nodeConnectionAggregation() const;
+	std::optional<bool> nodePcbBusRouting() const;
+	void setNodePcbBusRouting(bool enabled);
 	void setNodeConnectionAggregation(bool enabled, int threshold);
 	bool setNodeBoundaryAudioSource(const QString& graph, const QString& port, Track& track,
 		ch_cnt_t channel, bool connected);
 	bool setNodeSourceMidiBoundary(const QString& port, Track& track);
+	bool setNodeSourceMidiBoundary(const QString& port, Track& track, bool connected);
 	bool hasExtendedSourceGraphs() const;
 	static bool hasExtendedSourceGraphs(const QDomElement& workflow, const QDomElement& content);
 	QList<int> sourceGraphEffectSlots(Track& track) const;
@@ -540,7 +578,9 @@ private:
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreNodeAudioRoutes();
+	void restoreCustomGraphAudioRoutes();
 	void restoreNodeInstrumentLayers();
+	TrackContainer* ensureNodeInstrumentTracks();
 	void saveNodeInstrumentLayers();
 	QDomElement nodeInstrumentLayerElement(const QString& id) const;
 	InstrumentTrack* createNodeInstrumentLayer(Track& owner, const QDomElement& element);
@@ -628,6 +668,7 @@ private:
 
 	// Keep existing Song fields at their original offsets for native plugins.
 	std::unique_ptr<TrackContainer> m_nodeInstrumentTracks;
+	QHash<QString, InstrumentTrack*> m_nodeCustomInstruments;
 	QHash<const Track*, QList<NodeInstrumentLayer>> m_nodeInstrumentLayers;
 
 	friend class Engine;

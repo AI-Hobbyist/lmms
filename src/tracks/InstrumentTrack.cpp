@@ -751,6 +751,14 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 	}
 
 	bool played_a_note = false;	// will be return variable
+	const bool monitorTriggers = pattern_track && NodePatternTriggers::watches(this);
+	const auto recordTrigger = [&](const PlayHandle* handle, bool step, int key) {
+		if (monitorTriggers)
+		{
+			const auto kind = step ? NodePatternTriggers::Kind::Step : NodePatternTriggers::Kind::Note;
+			NodePatternTriggers::record(this, _clip_num, kind, _start, handle, key);
+		}
+	};
 	const auto playLayers = [&](bool step, f_cnt_t frames, const Note& note, const TimePos& songOffset) {
 		if (isMuted())
 		{
@@ -771,6 +779,7 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 				if (Engine::audioEngine()->addPlayHandle(handle))
 				{
 					layer.instrument->audioBusHandle()->markNodeEvent(2);
+					recordTrigger(handle, step, note.key());
 					played = true;
 				}
 			}
@@ -778,11 +787,6 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 		}
 		return played;
 	};
-	const bool monitorTriggers = pattern_track && NodePatternTriggers::watches(this);
-	bool stepTriggered = false;
-	bool atStepBoundary = false;
-	NodePatternTriggers::Notes triggeredNotes;
-
 	for (const auto& clip : clips)
 	{
 		auto c = dynamic_cast<MidiClip*>(clip);
@@ -793,24 +797,18 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			continue;
 		}
 		const bool stepPattern = pattern_track && c->type() == MidiClip::Type::BeatClip;
-		if (monitorTriggers && stepPattern)
-		{
-			const auto step = NodePatternTriggers::stepIndex(_start.getTicks());
-			atStepBoundary = step < c->steps() && TimePos::stepPosition(step) == _start;
-		}
 		if (stepPattern && Engine::getSong()->nodeStepActiveForTrack(*this, _start))
 		{
 			Note step(TimePos(DefaultTicksPerBar / 16), _start);
 			step.setType(Note::Type::Step);
-			stepTriggered |= playLayers(true, 0, step, TimePos{});
-			played_a_note |= stepTriggered;
+			played_a_note |= playLayers(true, 0, step, TimePos{});
 			if (m_instrument)
 			{
 				auto* handle = NotePlayHandleManager::acquire(this, _offset, 0, step);
 				handle->setPatternTrack(pattern_track);
 				if (Engine::audioEngine()->addPlayHandle(handle))
 				{
-					stepTriggered = true;
+					recordTrigger(handle, true, step.key());
 					m_audioBusHandle.markNodeEvent(1);
 					m_audioBusHandle.markNodeEvent(2);
 					played_a_note = true;
@@ -883,17 +881,6 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			played_a_note |= layerPlayed;
 			if (!playOwner)
 			{
-				if (monitorTriggers && layerPlayed)
-				{
-					if (stepPattern)
-					{
-						stepTriggered = true;
-					}
-					else if (const auto key = currentNote->key(); key >= 0 && key < NumKeys)
-					{
-						triggeredNotes.set(key);
-					}
-				}
 				++nit;
 				continue;
 			}
@@ -911,30 +898,11 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			if (Engine::audioEngine()->addPlayHandle(notePlayHandle))
 			{
 				m_audioBusHandle.markNodeEvent(2);
-				if (monitorTriggers)
-				{
-					if (stepPattern)
-					{
-						stepTriggered = true;
-					}
-					else if (const auto key = currentNote->key(); key >= 0 && key < NumKeys)
-					{
-						triggeredNotes.set(key);
-					}
-				}
+				recordTrigger(notePlayHandle, stepPattern, currentNote->key());
 			}
 			played_a_note = true;
 			++nit;
 		}
-	}
-	if (monitorTriggers && (atStepBoundary || stepTriggered))
-	{
-		NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Step, _start,
-			NodePatternTriggers::Notes{stepTriggered ? 1u : 0u});
-	}
-	if (monitorTriggers && triggeredNotes.any())
-	{
-		NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Note, _start, triggeredNotes);
 	}
 	unlock();
 	return played_a_note;
@@ -1291,6 +1259,18 @@ void InstrumentTrack::replaceInstrumentIncrementally(Instrument* replacement)
 	}
 	switchInstrument(before, after);
 }
+
+void InstrumentTrack::clearInstrument()
+{
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	silenceAllNotes(true);
+	lock();
+	delete m_instrument;
+	m_instrument = nullptr;
+	unlock();
+	emit instrumentChanged();
+}
+
 
 Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 	const Plugin::Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)

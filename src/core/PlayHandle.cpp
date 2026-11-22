@@ -26,6 +26,7 @@
 #include "AudioEngine.h"
 #include "BufferManager.h"
 #include "Engine.h"
+#include "NodePatternTriggers.h"
 
 #include <QThread>
 
@@ -46,6 +47,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 
 PlayHandle::~PlayHandle()
 {
+	NodePatternTriggers::finish(this);
 	BufferManager::release(m_playHandleBuffer);
 }
 

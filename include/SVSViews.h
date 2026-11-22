@@ -15,6 +15,7 @@ class MainWindow;
 class SubWindow;
 class SVSPianoRoll;
 QDialog* createSVSPluginSettings(SVSTrack*, QWidget* parent = nullptr);
+QDialog* createSVSPluginSettings(SVSTrack*, QWidget*, bool replaceOnly);
 class SVSTrackView : public TrackView
 {
 	Q_OBJECT

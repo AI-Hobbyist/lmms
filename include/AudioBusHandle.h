@@ -29,6 +29,8 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <variant>
+#include <vector>
 #include <QString>
 #include <QMutex>
 #include <QPointer>
@@ -92,8 +94,10 @@ public:
 		std::optional<mix_ch_t> resolveChannel(Mixer& mixer, mix_ch_t fallback) const;
 	};
 	using MixerInputs = std::array<std::optional<MixerInput>, 2>;
+	using MixerFanout = std::array<std::vector<MixerInput>, 2>;
 	// An absent override uses the track's stereo route. An empty entry disconnects one side.
 	void setMixerInputs(std::optional<MixerInputs> inputs);
+	void setMixerFanout(std::optional<MixerFanout> inputs);
 
 	const QString& name() const { return m_name; }
 	void setName(const QString& newName);
@@ -120,7 +124,12 @@ private:
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;
-	std::optional<MixerInputs> m_mixerInputs;
+	using MixerInputList = std::variant<std::monostate, MixerInput, std::unique_ptr<std::vector<MixerInput>>>;
+	using MixerInputOverride = std::optional<std::array<MixerInputList, 2>>;
+	// Track types embed this bus, so keep the original storage layout for native plugins.
+	static_assert(sizeof(MixerInputOverride) == sizeof(std::optional<MixerInputs>));
+	static_assert(alignof(MixerInputOverride) == alignof(std::optional<MixerInputs>));
+	MixerInputOverride m_mixerInputs;
 
 	QString m_name;
 

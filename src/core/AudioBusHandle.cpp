@@ -118,8 +118,43 @@ std::optional<mix_ch_t> AudioBusHandle::MixerInput::resolveChannel(Mixer& mixer,
 
 void AudioBusHandle::setMixerInputs(std::optional<MixerInputs> inputs)
 {
+	MixerInputOverride routes;
+	if (inputs)
+	{
+		routes.emplace();
+		for (std::size_t side = 0; side < inputs->size(); ++side)
+		{
+			if (auto& input = (*inputs)[side])
+			{
+				(*routes)[side] = std::move(*input);
+			}
+		}
+	}
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
-	m_mixerInputs = inputs;
+	m_mixerInputs = std::move(routes);
+}
+
+void AudioBusHandle::setMixerFanout(std::optional<MixerFanout> inputs)
+{
+	MixerInputOverride routes;
+	if (inputs)
+	{
+		routes.emplace();
+		for (std::size_t side = 0; side < inputs->size(); ++side)
+		{
+			auto& targets = (*inputs)[side];
+			if (targets.size() == 1)
+			{
+				(*routes)[side] = std::move(targets.front());
+			}
+			else if (!targets.empty())
+			{
+				(*routes)[side] = std::make_unique<std::vector<MixerInput>>(std::move(targets));
+			}
+		}
+	}
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
+	m_mixerInputs = std::move(routes);
 }
 
 bool AudioBusHandle::processEffects()
@@ -293,11 +328,22 @@ void AudioBusHandle::doProcessing()
 		{
 			for (ch_cnt_t side = 0; side < m_mixerInputs->size(); ++side)
 			{
-				if (const auto& input = (*m_mixerInputs)[side])
-				{
-					if (const auto channel = input->resolveChannel(*mixer, m_nextMixerChannel))
+				const auto send = [&](const MixerInput& input) {
+					if (const auto channel = input.resolveChannel(*mixer, m_nextMixerChannel))
 					{
-						mixer->mixMonoToChannel(m_buffer, side, *channel, input->side);
+						mixer->mixMonoToChannel(m_buffer, side, *channel, input.side);
+					}
+				};
+				const auto& route = (*m_mixerInputs)[side];
+				if (const auto* input = std::get_if<MixerInput>(&route))
+				{
+					send(*input);
+				}
+				else if (const auto* targets = std::get_if<std::unique_ptr<std::vector<MixerInput>>>(&route))
+				{
+					for (const auto& input : **targets)
+					{
+						send(input);
 					}
 				}
 			}

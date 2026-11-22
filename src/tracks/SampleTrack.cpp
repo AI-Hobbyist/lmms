@@ -164,9 +164,10 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			}
 			handle->setOffset( _offset );
 			// send it to the audio engine
-			if (Engine::audioEngine()->addPlayHandle(handle) && pattern_track && !st->isRecord())
+			if (Engine::audioEngine()->addPlayHandle(handle) && pattern_track && !st->isRecord()
+				&& st->sample().sampleSize() > 0)
 			{
-				NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Audio, _start);
+				NodePatternTriggers::record(this, _clip_num, NodePatternTriggers::Kind::Audio, _start, handle);
 			}
 			played_a_note = true;
 		}

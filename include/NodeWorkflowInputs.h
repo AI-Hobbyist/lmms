@@ -94,15 +94,39 @@ inline QList<QDomElement> nodeInputDestinations(const QDomElement& workflow,
 	return destinations;
 }
 
+inline QDomElement findNodeMidiBoundary(const QDomElement& workflow, const QString& trackId, const QString& port)
+{
+	if (!port.startsWith("midi-in/"))
+	{
+		return {};
+	}
+	const auto scope = QStringLiteral("source/") + trackId + '/';
+	const auto id = port.mid(8);
+	for (auto boundary = workflow.firstChildElement("boundary-port"); !boundary.isNull();
+		boundary = boundary.nextSiblingElement("boundary-port"))
+	{
+		if (boundary.attribute("id") == id && boundary.attribute("graph") == scope
+			&& boundary.attribute("direction") == "in" && boundary.attribute("signal") == "midi")
+		{
+			return boundary;
+		}
+	}
+	return {};
+}
+
 inline QSet<QString> nodeInstrumentMidiTargets(const QDomElement& workflow, const QString& inputId,
 	bool releasingNote)
 {
 	QSet<QString> targets;
 	for (const auto& destination : nodeInputDestinations(workflow, inputId, "midi"))
 	{
-		if (destination.attribute("port") == "midi-in")
+		const auto track = destination.attribute("track");
+		const auto port = destination.attribute("port");
+		const auto boundary = findNodeMidiBoundary(workflow, track, port);
+		if (port == "midi-in" || (releasingNote && port.startsWith("midi-in/"))
+			|| (!boundary.isNull() && boundary.attribute("track") == track))
 		{
-			targets.insert(destination.attribute("track"));
+			targets.insert(track);
 		}
 	}
 
