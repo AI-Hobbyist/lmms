@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <new>
+#include <string_view>
 
 using namespace lmms::vsthost;
 namespace {
@@ -42,6 +43,35 @@ void operator delete(void* value, std::size_t) noexcept
 int wmain(int argc, wchar_t** argv)
 {
 	CHECK(argc == 2);
+	if (std::wstring_view(argv[1]) == L"--bulk-parameters")
+	{
+		constexpr Steinberg::int32 parameterCount = 2623;
+		Vst3ParameterChanges changes(parameterCount);
+		changes.reset(256);
+		watchAllocations = true;
+		for (Steinberg::int32 i = 0; i < parameterCount; ++i)
+		{
+			Steinberg::int32 queueIndex = -1, pointIndex = -1;
+			auto* queue = changes.addParameterData(static_cast<Steinberg::Vst::ParamID>(i) * 1000, queueIndex);
+			CHECK(queue && queueIndex == i && queue->addPoint(0, .25, pointIndex) == Steinberg::kResultOk);
+		}
+		Steinberg::int32 queueIndex = -1, pointIndex = -1, offset = -1;
+		double value = 0;
+		auto* queue = changes.addParameterData(0, queueIndex);
+		CHECK(queue && queueIndex == 0);
+		CHECK(queue->addPoint(120, .75, pointIndex) == Steinberg::kResultOk && pointIndex == 1);
+		CHECK(queue->addPoint(60, .50, pointIndex) == Steinberg::kResultOk && pointIndex == 1);
+		CHECK(queue->addPoint(60, .60, pointIndex) == Steinberg::kResultOk && pointIndex == 1);
+		CHECK(queue->getPoint(1, offset, value) == Steinberg::kResultOk && offset == 60 && value == .60);
+		CHECK(queue->getPoint(2, offset, value) == Steinberg::kResultOk && offset == 120 && value == .75);
+		CHECK(changes.getParameterCount() == parameterCount && !changes.failed());
+		changes.reset(256);
+		CHECK(changes.getParameterCount() == 0 && changes.addParameterData(0, queueIndex) != nullptr);
+		watchAllocations = false;
+		CHECK(allocations == 0);
+		std::cout << "PASS: 2623 refreshed VST3 parameters with ordered automation and no allocations\n";
+		return 0;
+	}
 	try
 	{
 		std::vector<VST3::Hosting::ClassInfo> classes;

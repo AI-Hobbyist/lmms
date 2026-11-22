@@ -16,6 +16,57 @@ namespace lmms::windowsCrashReport
 {
 namespace detail
 {
+inline void reportFailure(const wchar_t* operation, DWORD code) noexcept
+{
+	std::array<wchar_t, 2048> path{};
+	const auto length = GetTempPathW(static_cast<DWORD>(path.size()), path.data());
+	std::array<wchar_t, 256> line{};
+	const auto count = std::swprintf(line.data(), line.size(), L"LMMS crash reporter: %ls, PID %lu, code %lu\r\n",
+		operation, GetCurrentProcessId(), code);
+	OutputDebugStringW(line.data());
+	constexpr wchar_t filename[] = L"lmms-crash-reporter-errors.log";
+	if (count <= 0 || !length || length >= path.size() - std::size(filename))
+	{
+		return;
+	}
+	std::copy_n(filename, std::size(filename), path.data() + length);
+	const auto file = CreateFileW(path.data(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (file != INVALID_HANDLE_VALUE)
+	{
+		std::array<char, 1024> utf8{};
+		const auto bytes = WideCharToMultiByte(CP_UTF8, 0, line.data(), count, utf8.data(),
+			static_cast<int>(utf8.size()), nullptr, nullptr);
+		DWORD written = 0;
+		if (bytes)
+		{
+			WriteFile(file, utf8.data(), static_cast<DWORD>(bytes), &written, nullptr);
+		}
+		CloseHandle(file);
+	}
+}
+
+inline void waitForReporter(HANDLE reporter, DWORD timeout) noexcept
+{
+	const auto result = WaitForSingleObject(reporter, timeout);
+	DWORD code = 0;
+	if (result == WAIT_OBJECT_0)
+	{
+		if (!GetExitCodeProcess(reporter, &code))
+		{
+			reportFailure(L"reading reporter exit code", GetLastError());
+		}
+		else if (code)
+		{
+			reportFailure(L"reporter exited unsuccessfully", code);
+		}
+	}
+	else
+	{
+		reportFailure(L"waiting for reporter", result == WAIT_FAILED ? GetLastError() : result);
+	}
+}
+
 struct PluginIdentity
 {
 	std::wstring path;
@@ -38,7 +89,7 @@ inline LONG forward(EXCEPTION_POINTERS* exception) noexcept
 template<std::size_t Size>
 void copyField(std::array<wchar_t, Size>& target, std::wstring_view source) noexcept
 {
-	std::copy_n(source.data(), std::min(source.size(), Size - 1), target.data());
+	std::copy_n(source.data(), (std::min)(source.size(), Size - 1), target.data());
 }
 
 inline LONG WINAPI report(EXCEPTION_POINTERS* exception) noexcept
@@ -76,10 +127,18 @@ inline LONG WINAPI report(EXCEPTION_POINTERS* exception) noexcept
 		{
 			// The reporter reads the exception pointers from this process.
 			// Bound the wait if it cannot finish, for example on a stalled disk.
-			WaitForSingleObject(reporter.hProcess, 15000);
+			waitForReporter(reporter.hProcess, 15000);
 			CloseHandle(reporter.hThread);
 			CloseHandle(reporter.hProcess);
 		}
+		else
+		{
+			reportFailure(L"starting exception reporter", GetLastError());
+		}
+	}
+	else
+	{
+		reportFailure(L"formatting exception report request", ERROR_INSUFFICIENT_BUFFER);
 	}
 	return forward(exception);
 }
@@ -120,8 +179,7 @@ inline void install(const wchar_t* processName, bool sandbox)
 	}
 
 	const auto directory = root / L"logs" / (sandbox ? L"VST" : L"lmms");
-	const auto reporter = root / L"plugins" / (sizeof(void*) == 8
-		? L"LmmsCrashReporter64.exe" : L"32/LmmsCrashReporter32.exe");
+	const auto reporter = root / (sizeof(void*) == 8 ? L"LmmsCrashReporter64.exe" : L"LmmsCrashReporter32.exe");
 	if (directory.native().size() >= Request{}.directory.size())
 	{
 		return;

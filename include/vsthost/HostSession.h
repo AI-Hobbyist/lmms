@@ -29,6 +29,7 @@ public:
 		// existing worker bridge opts into a bounded wait for the matching result.
 		// Standalone realtime callers retain the nonblocking deadline policy.
 		DWORD audioResultWaitMs = 0;
+		std::wstring pluginPath;
 	};
 	struct Reply
 	{
@@ -83,8 +84,13 @@ public:
 	}
 	~HostSession()
 	{
-		m_cancelled.store(true, std::memory_order_release);
-		m_audioAllowed.store(false, std::memory_order_release);
+		shutdown();
+	}
+	// Stop the dispatcher before its owner releases callback state. In-flight
+	// control waits observe cancellation, and closeImpl reaps the sandbox job.
+	void shutdown() noexcept
+	{
+		cancel();
 		m_dispatcher.request_stop();
 		m_tasksAvailable.notify_all();
 		if (m_dispatcher.joinable())
@@ -116,6 +122,17 @@ public:
 	{
 		return requestPrepared(
 			type, [payload = std::move(payload)]() mutable { return std::move(payload); }, timeoutMs, pauseAudio);
+	}
+	using ScanProgress = std::function<bool(std::span<const std::uint8_t>)>;
+	std::future<Reply> requestScan(std::vector<std::uint8_t> payload, DWORD timeoutMs, ScanProgress progress)
+	{
+		return enqueue([this, payload = std::move(payload), timeoutMs, progress = std::move(progress)] {
+			if (state() != SessionState::Ready)
+			{
+				return Reply{Error::InvalidState, {}};
+			}
+			return exchange(MessageType::Scan, payload, timeoutMs, ProcessSupervisor::Stage::Scan, progress);
+		});
 	}
 	template <class Prepare>
 	std::future<Reply> requestPrepared(
@@ -353,17 +370,33 @@ public:
 				received = m_audio->receive(
 					m_session, generation(), m_audioSequence - 1, output, outputEvents, outputEventBytes);
 			}
-			if (received != AudioQueue::Result::Ok)
+			if (received != AudioQueue::Result::Ok && received != AudioQueue::Result::Empty)
 			{
-				audioFault(Error::ProcessingFailed);
+				audioFault(Error::InvalidMessage, ProcessSupervisor::AudioFailure::InvalidResult, m_audioSequence - 1);
+				return false;
+			}
+			// A late result leaves this block silent. Keep submitting so the
+			// helper receives its inputs and events. receive() retires stale
+			// replies by sequence, and a full queue still faults a stalled helper.
+			if (m_cancelled.load(std::memory_order_acquire) || error() != Error::None)
+			{
 				return false;
 			}
 		}
 		const Header header{MessageType::Process, m_session, generation(), m_audioSequence, 0};
-		if (m_audio->submit(header, layout, input, prepare(), outputEventBytes != nullptr) != AudioQueue::Result::Ok)
+		AudioQueue::FullDiagnostic full;
+		const auto submitted = m_audio->submit(header, layout, input, prepare(), outputEventBytes != nullptr, &full);
+		if (submitted != AudioQueue::Result::Ok)
 		{
 			std::fill(output.begin(), output.end(), 0.0f);
-			audioFault(Error::ProcessingFailed);
+			if (submitted == AudioQueue::Result::Full)
+			{
+				audioFault(Error::ProcessingFailed, ProcessSupervisor::AudioFailure::QueueFull, m_audioSequence, &full);
+			}
+			else
+			{
+				audioFault(Error::InvalidMessage, ProcessSupervisor::AudioFailure::InvalidSubmission, m_audioSequence);
+			}
 			return false;
 		}
 		++m_audioSequence;
@@ -518,9 +551,19 @@ private:
 		}
 		return true;
 	}
-	void audioFault(Error error) noexcept
+	void audioFault(Error error, ProcessSupervisor::AudioFailure detail = ProcessSupervisor::AudioFailure::Unspecified,
+		std::uint64_t sequence = 0, const AudioQueue::FullDiagnostic* full = nullptr) noexcept
 	{
-		m_audioFault.store(error, std::memory_order_release);
+		if (!m_audioFault.claimed.test_and_set(std::memory_order_relaxed))
+		{
+			m_audioFault.detail = detail;
+			m_audioFault.sequence = sequence;
+			if (full)
+			{
+				m_audioFault.full = *full;
+			}
+			m_audioFault.error.store(error, std::memory_order_release);
+		}
 		m_audioAllowed.store(false, std::memory_order_release);
 	}
 	void observeFaults() noexcept
@@ -559,7 +602,8 @@ private:
 		return {error, {}};
 	}
 	Reply exchange(
-		MessageType type, std::span<const std::uint8_t> payload, DWORD timeoutMs, ProcessSupervisor::Stage stage)
+		MessageType type, std::span<const std::uint8_t> payload, DWORD timeoutMs, ProcessSupervisor::Stage stage,
+		const ScanProgress& progress = {})
 	{
 		if (!m_control || !m_supervisor || payload.size() > m_capacity || m_controlSequence == UINT64_MAX)
 		{
@@ -626,6 +670,18 @@ private:
 				}
 				return faultReply(static_cast<Error>(code));
 			}
+			if (type == MessageType::Scan && frame.header.type == MessageType::ScanProgress && progress)
+			{
+				if (!progress(frame.payload))
+				{
+					return faultReply(Error::InvalidMessage);
+				}
+				if (GetTickCount64() >= deadline)
+				{
+					return faultReply(Error::Timeout);
+				}
+				continue;
+			}
 			const auto expectedType = type == MessageType::Scan ? MessageType::ScanResult : type;
 			if (frame.header.type != expectedType)
 			{
@@ -667,7 +723,8 @@ private:
 		}
 		m_generation.fetch_add(1, std::memory_order_release);
 		m_error.store(Error::None);
-		m_audioFault.store(Error::None);
+		m_audioFault.error.store(Error::None, std::memory_order_relaxed);
+		m_audioFault.claimed.clear(std::memory_order_relaxed);
 		m_nativeCode.store(0);
 		m_faultStage.store(ProcessSupervisor::Stage::Startup);
 		m_state.store(SessionState::Starting, std::memory_order_release);
@@ -685,7 +742,7 @@ private:
 		arguments.insert(arguments.end(),
 			{L"--host-session", m_baseName + L"-control", m_baseName + L"-audio", std::to_wstring(m_session),
 				std::to_wstring(generation()), std::to_wstring(m_capacity)});
-		if (!m_supervisor->start(configuration.helper, arguments, configuration.startupMs))
+		if (!m_supervisor->start(configuration.helper, arguments, configuration.startupMs, configuration.pluginPath))
 		{
 			return faultReply(m_supervisor->fault().error);
 		}
@@ -744,7 +801,8 @@ private:
 	std::atomic<DWORD> m_nativeCode{0};
 	std::atomic<ProcessSupervisor::Stage> m_faultStage{ProcessSupervisor::Stage::Startup};
 	std::atomic<SessionState> m_state{SessionState::Stopped};
-	std::atomic<Error> m_error{Error::None}, m_audioFault{Error::None};
+	std::atomic<Error> m_error{Error::None};
+	ProcessSupervisor::AudioFaultRequest m_audioFault;
 	std::atomic<bool> m_audioAllowed{false}, m_cancelled{false};
 	std::atomic<unsigned> m_audioUsers{0};
 	std::mutex m_tasksMutex;

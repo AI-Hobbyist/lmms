@@ -41,6 +41,7 @@ set(export_variables
 		"LMMS_BUILD_LINUX"
 		"LMMS_BUILD_WIN32"
 		"PLUGIN_DIR"
+		"BIN_DIR"
 		"LMMS_HAVE_LIBRT"
 		"USE_WERROR"
 )

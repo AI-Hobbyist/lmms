@@ -22,8 +22,10 @@ public:
 		, m_output(AudioQueue::MaxSamples)
 	{
 	}
+	~LegacyHostBridge() override { m_session.shutdown(); }
 	bool open(HostSession::Configuration configuration)
 	{
+		m_editorFeedback = {};
 		m_loaded.store(false, std::memory_order_release);
 		m_invalid = false;
 		m_replies.clear();
@@ -45,6 +47,27 @@ public:
 	Error error() const noexcept { return m_session.error(); }
 	DWORD pid() const noexcept { return m_session.pid(); }
 	std::uint64_t generation() const noexcept { return m_session.generation(); }
+	void pollEditorFeedback()
+	{
+		if (m_editorFeedback.valid())
+		{
+			if (m_editorFeedback.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready)
+			{
+				return;
+			}
+			deliverReply(m_editorFeedback.get());
+		}
+		if (m_editorFeedback.valid() || !running())
+		{
+			return;
+		}
+		const std::array commands{LegacyCommand{IdVstIdleUpdate, {}}};
+		std::vector<std::uint8_t> payload;
+		if (encodeLegacy(commands, payload) == Error::None)
+		{
+			m_editorFeedback = m_session.request(MessageType::Parameter, std::move(payload));
+		}
+	}
 	int send(const Message& message) override
 	{
 		if (message.id == IdInitDone || message.id == IdChangeSharedMemoryKey)
@@ -53,6 +76,7 @@ public:
 		}
 		if (message.id == IdQuit)
 		{
+			m_editorFeedback = {};
 			m_loaded.store(false, std::memory_order_release);
 			return m_session.close().get().error == Error::None ? 1 : 0;
 		}
@@ -83,6 +107,17 @@ public:
 							 },
 							 15000, pause)
 						 .get();
+		if (m_editorFeedback.valid() && m_editorFeedback.wait_for(std::chrono::milliseconds(0))
+				== std::future_status::ready)
+		{
+			deliverReply(m_editorFeedback.get());
+		}
+		return deliverReply(std::move(reply));
+	}
+
+private:
+	int deliverReply(HostSession::Reply reply)
+	{
 		if (reply.error != Error::None)
 		{
 			return 0;
@@ -123,6 +158,8 @@ public:
 		}
 		return 1;
 	}
+
+public:
 	Message receive() override
 	{
 		if (m_replies.empty())
@@ -299,6 +336,7 @@ private:
 		return std::span(m_events).first(count);
 	}
 	HostSession m_session;
+	std::future<HostSession::Reply> m_editorFeedback;
 	std::function<void(const Message&)> m_receiver;
 	std::deque<Message> m_replies;
 	bool m_invalid = false;

@@ -8,16 +8,25 @@
 #include "vsthost/LegacyMessageCodec.h"
 #include "vsthost/SharedRegion.h"
 #include <charconv>
+#include <functional>
+#include <thread>
 #include <mmsystem.h>
 
 namespace lmms {
-// Only used in the child process. Native plugin calls, GUI dispatch and control
-// work are serialized here; the parent watchdog can kill even a stuck dispatcher.
+// Only used in the child process. Control replies can receive host callbacks
+// from either the editor or audio thread.
 class VstReplyCollector final : public RemotePluginBase::MessageTransport
 {
 public:
+	std::function<bool(const RemotePluginBase::message&)> scanProgress;
+
 	int send(const RemotePluginBase::message& message) override
 	{
+		if (message.id == IdVstShellScanProgress)
+		{
+			return scanProgress && scanProgress(message);
+		}
+		std::lock_guard lock(m_mutex);
 		vsthost::LegacyCommand command{static_cast<std::uint32_t>(message.id), {}};
 		if (messages.size() >= vsthost::MaxLegacyCommands || message.argumentCount() > vsthost::MaxLegacyArguments)
 		{
@@ -40,14 +49,31 @@ public:
 	}
 	RemotePluginBase::message receive() override { return {}; }
 	bool pending() const override { return false; }
-	bool invalid() const override { return failed; }
-	void invalidate() override { failed = true; }
+	bool invalid() const override
+	{
+		std::lock_guard lock(m_mutex);
+		return failed;
+	}
+	void invalidate() override
+	{
+		std::lock_guard lock(m_mutex);
+		failed = true;
+	}
 	void clear()
 	{
+		std::lock_guard lock(m_mutex);
 		messages.clear();
 		bytes = 0;
 		failed = false;
 	}
+	vsthost::Error encode(std::vector<std::uint8_t>& payload, std::uint32_t capacity) const
+	{
+		std::lock_guard lock(m_mutex);
+		return failed ? vsthost::Error::InvalidMessage : vsthost::encodeLegacy(messages, payload, capacity);
+	}
+
+private:
+	mutable std::mutex m_mutex;
 	std::vector<vsthost::LegacyCommand> messages;
 	std::uint32_t bytes = 0;
 	bool failed = false;
@@ -87,7 +113,8 @@ inline bool validVstCommand(const vsthost::LegacyCommand& command, bool initiali
 		return parsed.ec == std::errc{} && parsed.ptr == text.data() + text.size() && shellId != 0;
 	}
 	case IdVstScanPlugin:
-		return !initialized && count == 1 && !command.arguments[0].empty();
+		return !initialized && (count == 1 || (count == 2 && command.arguments[1] == "progress"))
+			&& !command.arguments[0].empty();
 	case IdSyncKey:
 	case IdSampleRateInformation:
 	case IdBufferSizeInformation:
@@ -168,6 +195,8 @@ inline int runVstSession(int argc, char** argv, int position)
 	}
 	ControlChannel control(controlRegion.bytes(), ControlChannel::Side::Helper, capacity);
 	AudioQueue audio(audioRegion.bytes());
+	using Activity = AudioQueue::HelperActivity;
+	audio.setHelperActivity(Activity::CheckingControl);
 	auto collector = std::make_unique<VstReplyCollector>();
 	auto* replies = collector.get();
 	auto plugin = std::make_unique<RemoteVstPlugin>(std::move(collector));
@@ -180,7 +209,10 @@ inline int runVstSession(int argc, char** argv, int position)
 	std::vector<std::uint8_t> events(AudioQueue::MaxEventBytes);
 	std::array<std::uint8_t, AudioQueue::MaxOutputEventBytes> outputEvents{};
 	bool paused = false;
+	bool pauseRequested = false;
 	auto process = [&] {
+		audio.setHelperActivity(Activity::ClaimingAudio, true);
+		auto layoutLock = plugin->lockSessionLayout();
 		AudioQueue::Claim claim{};
 		const auto result = audio.claim(claim, input, events);
 		if (result != AudioQueue::Result::Ok)
@@ -193,6 +225,7 @@ inline int runVstSession(int argc, char** argv, int position)
 		{
 			return AudioQueue::Result::Invalid;
 		}
+		audio.setHelperActivity(Activity::ProcessingAudio, true);
 		for (std::uint32_t offset = 0; offset < claim.eventBytes; offset += 20)
 		{
 			const auto type = get(events, offset, 4), channel = get(events, offset + 4, 4);
@@ -233,9 +266,11 @@ inline int runVstSession(int argc, char** argv, int position)
 			}
 		}
 		plugin->setShmIsValid(true);
+		audio.setHelperActivity(Activity::PluginAudioCall, true);
 		const auto generated = plugin->processWithMidiOutput(reinterpret_cast<const SampleFrame*>(planarInput.data()),
 			reinterpret_cast<SampleFrame*>(planarOutput.data()),
 			claim.collectOutput ? std::span<std::uint8_t>(outputEvents) : std::span<std::uint8_t>{});
+		audio.setHelperActivity(Activity::CompletingAudio, true);
 		for (std::uint32_t frame = 0; frame < claim.layout.frames; ++frame)
 		{
 			for (std::uint32_t channel = 0; channel < claim.layout.outputs; ++channel)
@@ -245,39 +280,94 @@ inline int runVstSession(int argc, char** argv, int position)
 		}
 		return audio.complete(claim, std::span(output).first(claim.layout.frames * claim.layout.outputs), generated);
 	};
+	// Keep the editor's Win32 message pump responsive to synchronous
+	// messages from the plugin. Only host control transactions exclude DSP.
+	std::mutex instanceMutex;
+	std::atomic<bool> audioFailed{false};
+	std::jthread audioThread([&](std::stop_token stop) {
+		__processingThreadId = GetCurrentThreadId();
+		while (!stop.stop_requested())
+		{
+			{
+				audio.setHelperActivity(Activity::WaitingForInstance, true);
+				std::lock_guard lock(instanceMutex);
+				if (pauseRequested)
+				{
+					for (unsigned slot = 0; slot < AudioQueue::Slots; ++slot)
+					{
+						const auto drained = process();
+						if (drained == AudioQueue::Result::Invalid)
+						{
+							audioFailed.store(true, std::memory_order_release);
+							return;
+						}
+						if (drained != AudioQueue::Result::Ok)
+						{
+							break;
+						}
+					}
+					paused = true;
+					pauseRequested = false;
+				}
+				else if (!paused && plugin && plugin->isInitialized() && process() == AudioQueue::Result::Invalid)
+				{
+					audioFailed.store(true, std::memory_order_release);
+					return;
+				}
+			}
+			audio.setHelperActivity(Activity::Idle, true);
+			Sleep(1);
+		}
+	});
+	ControlChannel::Frame frame;
+	bool controlPending = false;
 	while (true)
 	{
-		ControlChannel::Frame frame;
-		const auto received = control.receive(frame);
-		if (received != Error::None && received != Error::InvalidState)
+		if (audioFailed.load(std::memory_order_acquire))
 		{
-			return 4;
+			return 8;
 		}
-		if (received == Error::None)
+		audio.setHelperActivity(Activity::CheckingControl);
+		if (!controlPending)
 		{
-			if (!matches(frame.header, session, generation, frame.header.sequence))
+			const auto received = control.receive(frame);
+			if (received != Error::None && received != Error::InvalidState)
+			{
+				return 4;
+			}
+			controlPending = received == Error::None;
+			if (controlPending && !matches(frame.header, session, generation, frame.header.sequence))
 			{
 				return 5;
 			}
+		}
+		std::unique_lock instanceLock(instanceMutex, std::defer_lock);
+		if (controlPending && instanceLock.try_lock() && frame.header.type == MessageType::Pause && !paused)
+		{
+			pauseRequested = true;
+			instanceLock.unlock();
+		}
+		if (instanceLock.owns_lock())
+		{
+			controlPending = false;
+			audio.setHelperActivity(Activity::Control, false, static_cast<std::uint16_t>(frame.header.type));
 			std::vector<std::uint8_t> payload;
 			Error error = Error::None;
-			if (frame.header.type == MessageType::Pause)
-			{
-				for (unsigned i = 0; i < AudioQueue::Slots; ++i)
+			const bool scan = frame.header.type == MessageType::Scan;
+			const auto sendScanFrame = [&](Header header, std::span<const std::uint8_t> bytes) {
+				// Scan requests remain under the host watchdog while this single-slot channel drains.
+				Error result;
+				do
 				{
-					const auto drained = process();
-					if (drained == AudioQueue::Result::Invalid)
+					result = control.send(header, bytes);
+					if (result == Error::InvalidState)
 					{
-						return 6;
+						Sleep(1);
 					}
-					if (drained != AudioQueue::Result::Ok)
-					{
-						break;
-					}
-				}
-				paused = true;
-			}
-			else if (frame.header.type == MessageType::Resume)
+				} while (result == Error::InvalidState);
+				return result;
+			};
+			if (frame.header.type == MessageType::Resume)
 			{
 				paused = false;
 			}
@@ -286,11 +376,25 @@ inline int runVstSession(int argc, char** argv, int position)
 				plugin.reset();
 				__plugin = nullptr;
 			}
-			else if (frame.header.type != MessageType::Hello)
+			else if (frame.header.type != MessageType::Hello && frame.header.type != MessageType::Pause)
 			{
 				std::vector<LegacyCommand> commands;
 				error = decodeLegacy(frame.payload, commands, capacity);
 				replies->clear();
+				if (scan)
+				{
+					replies->scanProgress = [&](const RemotePluginBase::message& message) {
+						const auto name = message.getString(2);
+						std::vector<std::uint8_t> update(8 + name.size());
+						put(update, 0, message.getInt(0), 4);
+						put(update, 4, message.getInt(1), 4);
+						std::copy(name.begin(), name.end(), update.begin() + 8);
+						auto header = frame.header;
+						header.type = MessageType::ScanProgress;
+						header.payloadBytes = static_cast<std::uint32_t>(update.size());
+						return sendScanFrame(header, update) == Error::None;
+					};
+				}
 				if (error == Error::None)
 				{
 					for (const auto& command : commands)
@@ -305,6 +409,7 @@ inline int runVstSession(int argc, char** argv, int position)
 						{
 							message.addString(argument);
 						}
+						audio.setHelperActivity(Activity::Control, false, static_cast<std::uint16_t>(command.id));
 						if (!plugin->processMessage(message))
 						{
 							error = Error::LoadFailed;
@@ -319,12 +424,12 @@ inline int runVstSession(int argc, char** argv, int position)
 				}
 				if (error == Error::None)
 				{
-					error
-						= replies->failed ? Error::InvalidMessage : encodeLegacy(replies->messages, payload, capacity);
+					error = replies->encode(payload, capacity);
 				}
+				replies->scanProgress = {};
 			}
 			const bool close = frame.header.type == MessageType::Close;
-			if (frame.header.type == MessageType::Scan)
+			if (scan)
 			{
 				frame.header.type = MessageType::ScanResult;
 			}
@@ -335,7 +440,7 @@ inline int runVstSession(int argc, char** argv, int position)
 				put(payload, 0, static_cast<unsigned>(error), 4);
 			}
 			frame.header.payloadBytes = static_cast<std::uint32_t>(payload.size());
-			if (control.send(frame.header, payload) != Error::None)
+			if ((scan ? sendScanFrame(frame.header, payload) : control.send(frame.header, payload)) != Error::None)
 			{
 				return 7;
 			}
@@ -343,11 +448,9 @@ inline int runVstSession(int argc, char** argv, int position)
 			{
 				return 0;
 			}
+			instanceLock.unlock();
 		}
-		if (!paused && process() == AudioQueue::Result::Invalid)
-		{
-			return 8;
-		}
+		audio.setHelperActivity(Activity::PumpingMessages);
 		MSG message;
 		while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
 		{
@@ -355,9 +458,12 @@ inline int runVstSession(int argc, char** argv, int position)
 			{
 				return 0;
 			}
+			audio.setHelperActivity(Activity::DispatchingMessage, false, static_cast<std::uint16_t>(message.message));
 			TranslateMessage(&message);
 			DispatchMessage(&message);
+			audio.setHelperActivity(Activity::PumpingMessages);
 		}
+		audio.setHelperActivity(Activity::Idle);
 		Sleep(1);
 	}
 }

@@ -54,6 +54,11 @@ target_include_directories(
 target_link_libraries(LmmsVst3Module PUBLIC LmmsVst3Loader)
 
 add_executable(RemoteVstHost RemoteVstHost.cpp)
+if(MSVC)
+	target_compile_options(LmmsVst3Module PRIVATE "$<$<CONFIG:Release>:/Zi>")
+	target_compile_options(RemoteVstHost PRIVATE "$<$<CONFIG:Release>:/Zi>")
+	target_link_options(RemoteVstHost PRIVATE "$<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>")
+endif()
 target_include_directories(RemoteVstHost PRIVATE ../../include)
 target_compile_definitions(RemoteVstHost PRIVATE NOMINMAX)
 target_link_libraries(RemoteVstHost PRIVATE LmmsVst3Module)

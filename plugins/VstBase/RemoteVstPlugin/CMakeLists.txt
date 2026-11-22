@@ -69,6 +69,8 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 # Workaround for missing WinMain
 if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
+	target_compile_options(${EXE_NAME} PRIVATE "$<$<CONFIG:Release>:/Zi>")
+	target_link_options(${EXE_NAME} PRIVATE "$<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>")
 endif()
 
 # If we're building a Windows executable, add linker flags to disable ASLR
@@ -111,11 +113,21 @@ if(BITNESS EQUAL 32)
 	if(IS_WIN AND BUILD_WITH_EXTERNALPROJECT)
 		add_executable(LmmsCrashReporter32 "${LMMS_SOURCE_DIR}/tools/vsthost/LmmsCrashReporter.cpp")
 		target_include_directories(LmmsCrashReporter32 PRIVATE "${LMMS_SOURCE_DIR}/include")
-		if(IS_MINGW)
-			target_link_options(LmmsCrashReporter32 PRIVATE -municode)
+		set_target_properties(LmmsCrashReporter32 PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY "${LMMS_BINARY_DIR}/$<CONFIG>")
+		foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
+			string(TOUPPER "${config}" config_upper)
+			set_target_properties(LmmsCrashReporter32 PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${LMMS_BINARY_DIR}/${config}")
+		endforeach()
+		# This x86 executable sits next to x64 runtime DLLs in the application directory.
+		if(MSVC)
+			target_compile_options(LmmsCrashReporter32 PRIVATE "/MT$<$<CONFIG:Debug>:d>")
+		elseif(IS_MINGW)
+			target_link_options(LmmsCrashReporter32 PRIVATE -municode -static)
 		endif()
 		add_dependencies(${EXE_NAME} LmmsCrashReporter32)
-		install(TARGETS LmmsCrashReporter32 RUNTIME DESTINATION "${PLUGIN_DIR}/32")
+		install(TARGETS LmmsCrashReporter32 RUNTIME DESTINATION "${BIN_DIR}")
 	endif()
 else()
 	INSTALL(TARGETS ${EXE_NAME} RUNTIME DESTINATION "${PLUGIN_DIR}")

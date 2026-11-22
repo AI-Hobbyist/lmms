@@ -1,4 +1,5 @@
 #include "Vst3Editor.h"
+#include "vsthost/HelperTrace.h"
 #include <stdexcept>
 
 namespace lmms::vsthost {
@@ -42,7 +43,9 @@ void Vst3Editor::open(Vst::IEditController& controller)
 	{
 		throw std::logic_error("VST3 editor already open");
 	}
+	traceHelper("vst3.editor.createView.begin");
 	m_view = owned(controller.createView(Vst::ViewType::kEditor));
+	traceHelper("vst3.editor.createView.end");
 	if (!m_view)
 	{
 		throw std::runtime_error("VST3 controller has no native editor");
@@ -77,14 +80,20 @@ void Vst3Editor::open(Vst::IEditController& controller)
 	{
 		throw std::runtime_error("Could not create VST3 editor window");
 	}
+	traceHelper("vst3.editor.setFrame.begin");
 	require(m_view->setFrame(this), "VST3 editor setFrame failed");
+	traceHelper("vst3.editor.setFrame.end");
 	if (!sizeEditorWindow(m_window, rectangle))
 	{
 		throw std::runtime_error("VST3 editor initial window sizing failed");
 	}
+	traceHelper("vst3.editor.attached.begin");
 	require(m_view->attached(m_window, kPlatformTypeHWND), "VST3 editor attach failed");
+	traceHelper("vst3.editor.attached.end");
 	m_attached = true;
+	traceHelper("vst3.editor.getAttachedSize.begin");
 	require(m_view->getSize(&rectangle), "VST3 attached editor getSize failed");
+	traceHelper("vst3.editor.getAttachedSize.end");
 	if (!valid(rectangle))
 	{
 		throw std::runtime_error("VST3 attached editor has invalid dimensions");
@@ -95,7 +104,9 @@ void Vst3Editor::open(Vst::IEditController& controller)
 	{
 		throw std::runtime_error("VST3 attached editor sizing failed");
 	}
+	traceHelper("vst3.editor.showWindow.begin");
 	ShowWindow(m_window, SW_SHOW);
+	traceHelper("vst3.editor.showWindow.end");
 }
 void Vst3Editor::close()
 {
@@ -150,6 +161,7 @@ LRESULT CALLBACK Vst3Editor::windowProcedure(HWND window, UINT message, WPARAM w
 {
 	if (message == WM_CLOSE)
 	{
+		traceHelper("vst3.editor.WM_CLOSE");
 		ShowWindow(window, SW_HIDE);
 		return 0;
 	}

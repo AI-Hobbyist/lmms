@@ -211,7 +211,6 @@ RemotePlugin::~RemotePlugin()
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstBridge)
 	{
-		m_vstBridge->send(IdQuit);
 		m_vstBridge = nullptr;
 		return;
 	}
@@ -274,6 +273,12 @@ bool RemotePlugin::failed() const
 
 bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QString& embedMethod)
 {
+	return initSupervisedVst(pluginExecutable, embedMethod, {});
+}
+
+bool RemotePlugin::initSupervisedVst(
+	const QString& pluginExecutable, const QString& embedMethod, const QString& pluginPath)
+{
 #ifdef LMMS_BUILD_WIN32
 	QString executable = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
 	if (const auto* path = std::getenv("LMMS_PLUGIN_DIR"))
@@ -287,7 +292,8 @@ bool RemotePlugin::initSupervisedVst(const QString& pluginExecutable, const QStr
 	auto bridge = std::make_unique<vsthost::LegacyHostBridge>([this](const message& reply) { processMessage(reply); });
 	m_vstBridge = bridge.get();
 	setMessageTransport(std::move(bridge));
-	m_failed = !m_vstBridge->open({executable.toStdWString(), {embedMethod.toStdWString()}, 30000, 100});
+	m_failed = !m_vstBridge->open(
+		{executable.toStdWString(), {embedMethod.toStdWString()}, 30000, 100, pluginPath.toStdWString()});
 	if (!m_failed)
 	{
 		sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
@@ -430,6 +436,17 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 #ifdef LMMS_BUILD_WIN32
+bool RemotePlugin::pollVst2EditorFeedback()
+{
+	if (!m_vstBridge)
+	{
+		return false;
+	}
+	QMutexLocker lock(&m_commMutex);
+	m_vstBridge->pollEditorFeedback();
+	return true;
+}
+
 bool RemotePlugin::processVstStereo(const SampleFrame* input, SampleFrame* output,
 	const std::function<void(std::span<const float>, unsigned)>& receive)
 {

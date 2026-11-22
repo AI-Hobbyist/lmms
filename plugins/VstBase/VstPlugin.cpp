@@ -320,7 +320,7 @@ VstPlugin::VstPlugin(
 		const vsthost::Vst3Create instance{selection->identity.cid, double(Engine::audioEngine()->outputSampleRate()),
 			static_cast<std::uint32_t>(frames), Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting(),
 			m_plugin.toUtf8().toStdString(), static_cast<vsthost::Vst3MainLayout>(selection->selectedMainLayout)};
-		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 100}, instance);
+		m_failed = !m_native->proxy.open({executable.toStdWString(), {}, 15000, 100, m_plugin.toStdWString()}, instance);
 		if (m_failed)
 		{
 			const auto fault = m_native->proxy.fault();
@@ -1027,7 +1027,7 @@ void VstPlugin::applyParameterEdit(unsigned phase, int index, float value)
 void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 {
 #ifdef LMMS_BUILD_WIN32
-	initSupervisedVst(remoteVstPluginExecutable, m_embedMethod);
+	initSupervisedVst(remoteVstPluginExecutable, m_embedMethod, m_plugin);
 #else
 	init( remoteVstPluginExecutable, false, {m_embedMethod} );
 #endif
@@ -2000,6 +2000,10 @@ void VstPlugin::idleUpdate()
 			qWarning() << "VST3 session failed" << m_name << "error" << static_cast<unsigned>(fault.error) << "stage"
 					   << static_cast<unsigned>(fault.stage) << "native" << fault.nativeCode;
 		}
+		return;
+	}
+	if (pollVst2EditorFeedback())
+	{
 		return;
 	}
 #endif

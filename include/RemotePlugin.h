@@ -86,6 +86,7 @@ public:
 
 	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
 	bool initSupervisedVst(const QString& pluginExecutable, const QString& embedMethod);
+	bool initSupervisedVst(const QString& pluginExecutable, const QString& embedMethod, const QString& pluginPath);
 	bool postVstParameter(int index, float value) noexcept;
 	bool postVstTempo(unsigned value) noexcept;
 
@@ -156,6 +157,7 @@ protected:
 
 	bool m_failed;
 #ifdef LMMS_BUILD_WIN32
+	bool pollVst2EditorFeedback();
 	unsigned vstInputChannels() const noexcept { return static_cast<unsigned>(m_inputCount.load()); }
 	unsigned vstOutputChannels() const noexcept { return static_cast<unsigned>(m_outputCount.load()); }
 	bool processVstChannels(unsigned frames, std::span<const float> input, std::span<float> output,

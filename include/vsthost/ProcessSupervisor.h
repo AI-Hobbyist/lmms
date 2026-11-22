@@ -1,8 +1,10 @@
 #ifndef LMMS_VSTHOST_PROCESS_SUPERVISOR_H
 #define LMMS_VSTHOST_PROCESS_SUPERVISOR_H
 
-#include "vsthost/Protocol.h"
+#include "vsthost/AudioQueue.h"
+#include "WindowsCrashReport.h"
 #include <atomic>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -29,6 +31,21 @@ public:
 		Stage stage;
 		DWORD nativeCode;
 	};
+	enum class AudioFailure
+	{
+		Unspecified,
+		InvalidResult,
+		InvalidSubmission,
+		QueueFull
+	};
+	struct AudioFaultRequest
+	{
+		std::atomic_flag claimed = ATOMIC_FLAG_INIT;
+		std::atomic<Error> error{Error::None};
+		AudioFailure detail = AudioFailure::Unspecified;
+		std::uint64_t sequence = 0;
+		AudioQueue::FullDiagnostic full;
+	};
 	ProcessSupervisor()
 	{
 		m_job = CreateJobObjectW(nullptr, nullptr);
@@ -50,11 +67,19 @@ public:
 				const auto requested = m_requestedError.exchange(Error::None, std::memory_order_acq_rel);
 				const auto source = m_audioFaultSource.load(std::memory_order_acquire);
 				const auto audioRequested
-					= source ? source->exchange(Error::None, std::memory_order_acq_rel) : Error::None;
+					= source ? source->error.exchange(Error::None, std::memory_order_acq_rel) : Error::None;
 				if (requested != Error::None || audioRequested != Error::None)
 				{
 					m_stage.store(Stage::Audio, std::memory_order_relaxed);
-					terminate(requested != Error::None ? requested : audioRequested);
+					if (audioRequested != Error::None)
+					{
+						terminate(audioRequested, 0, source->detail, source->sequence,
+							source->detail == AudioFailure::QueueFull ? &source->full : nullptr);
+					}
+					else
+					{
+						terminate(requested);
+					}
 				}
 				auto deadline = m_deadline.load(std::memory_order_acquire);
 				if (deadline && GetTickCount64() >= deadline)
@@ -62,8 +87,7 @@ public:
 					// A cancelled/replaced deadline must not kill the next operation.
 					if (m_deadline.compare_exchange_strong(deadline, 0, std::memory_order_acq_rel))
 					{
-						fail(Error::Timeout, WAIT_TIMEOUT);
-						TerminateJobObject(m_job, static_cast<UINT>(Error::Timeout));
+						terminate(Error::Timeout, WAIT_TIMEOUT);
 					}
 				}
 				const auto process = m_process.load(std::memory_order_acquire);
@@ -71,11 +95,9 @@ public:
 				{
 					DWORD code = 0;
 					GetExitCodeProcess(process, &code);
-					if (!m_expectedExit.load(std::memory_order_acquire))
+					if (!m_expectedExit.load(std::memory_order_acquire) && fault().error == Error::None)
 					{
-						fail(code ? Error::ProcessCrashed : Error::Disconnected, code);
-						// Child exit also tears down any surviving descendants.
-						TerminateJobObject(m_job, code);
+						terminate(code ? Error::ProcessCrashed : Error::Disconnected, code);
 					}
 					m_deadline.store(0, std::memory_order_release);
 				}
@@ -104,11 +126,38 @@ public:
 	ProcessSupervisor& operator=(const ProcessSupervisor&) = delete;
 
 	bool start(
-		const std::wstring& executable, const std::vector<std::wstring>& arguments, DWORD startupTimeoutMs = 30000)
+		const std::wstring& executable, const std::vector<std::wstring>& arguments, DWORD startupTimeoutMs = 30000,
+		const std::wstring& pluginPath = {})
 	{
 		if (!m_job || m_process.load() || fault().error != Error::None)
 		{
 			return false;
+		}
+		const std::filesystem::path helper(executable);
+		const auto stem = helper.stem().wstring();
+		if (stem == L"RemoteVstPlugin32" || stem == L"RemoteVstPlugin64"
+			|| stem == L"RemoteVstHost32" || stem == L"RemoteVstHost64")
+		{
+			auto root = helper.parent_path();
+			std::error_code error;
+			while (!root.empty() && !std::filesystem::is_regular_file(root / L"lmms.exe", error))
+			{
+				const auto parent = root.parent_path();
+				if (parent == root)
+				{
+					root.clear();
+					break;
+				}
+				root = parent;
+			}
+			if (!root.empty())
+			{
+				m_reportDirectory = (root / L"logs" / L"VST").wstring();
+				// DbgHelp must run at the sandbox's bitness to write x86 thread contexts.
+				const bool x86 = stem == L"RemoteVstPlugin32" || stem == L"RemoteVstHost32";
+				m_reporter = (root / (x86 ? L"LmmsCrashReporter32.exe" : L"LmmsCrashReporter64.exe")).wstring();
+				m_pluginPath = pluginPath.empty() ? executable : pluginPath;
+			}
 		}
 		arm(Stage::Startup, startupTimeoutMs);
 		std::wstring command = quote(executable);
@@ -157,14 +206,45 @@ public:
 		m_deadline.store(GetTickCount64() + (timeoutMs ? timeoutMs : 1), std::memory_order_release);
 	}
 	void disarm() noexcept { m_deadline.store(0, std::memory_order_release); }
-	void terminate(Error reason, DWORD nativeCode = 0) noexcept
+	void terminate(Error reason, DWORD nativeCode = 0, AudioFailure detail = AudioFailure::Unspecified,
+		std::uint64_t sequence = 0, const AudioQueue::FullDiagnostic* full = nullptr) noexcept
 	{
+		std::lock_guard lock(m_terminationMutex);
+		const auto process = m_process.load(std::memory_order_acquire);
+		const bool exited = process && WaitForSingleObject(process, 0) == WAIT_OBJECT_0;
+		if (exited && (reason == Error::Disconnected || reason == Error::Timeout))
+		{
+			DWORD exitCode = 0;
+			if (GetExitCodeProcess(process, &exitCode))
+			{
+				nativeCode = exitCode;
+				reason = exitCode ? Error::ProcessCrashed : Error::Disconnected;
+			}
+		}
+		const bool first = fault().error == Error::None;
 		fail(reason, nativeCode);
+		disarm();
+		if (first && process && !m_expectedExit.load(std::memory_order_acquire))
+		{
+			if (exited || reason == Error::ProcessCrashed)
+			{
+				reportSandboxFault(L"unexpected exit", GetProcessId(process), nativeCode);
+			}
+			else if (reason == Error::Timeout)
+			{
+				reportSandboxFault(L"timeout", GetProcessId(process), nativeCode);
+			}
+			else if (reason == Error::ProcessingFailed || reason == Error::InvalidMessage
+				|| reason == Error::ProtocolMismatch || reason == Error::StaleSession)
+			{
+				reportSandboxFault(L"supervisor termination", GetProcessId(process), static_cast<DWORD>(reason),
+					detail, sequence, full);
+			}
+		}
 		if (m_job)
 		{
 			TerminateJobObject(m_job, static_cast<UINT>(reason));
 		}
-		disarm();
 	}
 	// Audio callbacks only publish a fault request. OS process termination and
 	// diagnostics run on the independent watcher, never on the audio thread.
@@ -175,7 +255,7 @@ public:
 	}
 	// Source must outlive the supervisor. It is read even while the control
 	// dispatcher is blocked awaiting a plugin's state or editor reply.
-	void setAudioFaultSource(std::atomic<Error>* source) noexcept
+	void setAudioFaultSource(AudioFaultRequest* source) noexcept
 	{
 		m_audioFaultSource.store(source, std::memory_order_release);
 	}
@@ -186,9 +266,18 @@ public:
 	}
 	void close(DWORD graceMs = 2000) noexcept
 	{
+		std::lock_guard lock(m_terminationMutex);
+		const auto process = m_process.load(std::memory_order_acquire);
+		if (process && !m_expectedExit.load(std::memory_order_acquire) && fault().error == Error::None
+			&& WaitForSingleObject(process, 0) == WAIT_OBJECT_0)
+		{
+			DWORD code = 0;
+			GetExitCodeProcess(process, &code);
+			fail(code ? Error::ProcessCrashed : Error::Disconnected, code);
+			reportSandboxFault(L"unexpected exit", GetProcessId(process), code);
+		}
 		expectExit();
 		disarm();
-		const auto process = m_process.load(std::memory_order_acquire);
 		if (process && WaitForSingleObject(process, graceMs) != WAIT_OBJECT_0)
 		{
 			TerminateJobObject(m_job, 0);
@@ -232,6 +321,84 @@ public:
 	}
 
 private:
+	static std::wstring formatFullDiagnostic(const AudioQueue::FullDiagnostic& full)
+	{
+		constexpr const wchar_t* states[] = {L"free", L"writing", L"submitted", L"processing", L"ready"};
+		constexpr const wchar_t* activities[] = {L"unavailable", L"idle", L"checking control", L"control",
+			L"claiming audio", L"processing audio", L"completing audio", L"pumping window messages",
+			L"dispatching window message", L"waiting for instance mutex", L"plug-in audio call", L"audio rejected"};
+		const auto stateName = [&](LONG state) {
+			return state >= 0 && state < ARRAYSIZE(states) ? states[state] : L"unknown";
+		};
+		std::wstring text = L"Queue snapshot QPC: " + std::to_wstring(full.ticks)
+			+ L" (ticks per second: " + std::to_wstring(full.frequency) + L")\n";
+		const auto appendActivity = [&](const wchar_t* label, std::uint64_t packed) {
+			const auto activity = packed & 0xFFFF;
+			text += std::wstring(label) + L": TID " + std::to_wstring(packed >> 32) + L", "
+				+ (activity < ARRAYSIZE(activities) ? activities[activity] : L"unknown")
+				+ L", operation code " + std::to_wstring((packed >> 16) & 0xFFFF) + L"\n";
+		};
+		appendActivity(L"Helper dispatcher", full.dispatcher);
+		appendActivity(L"Dedicated helper audio thread", full.audioThread);
+		text += L"Slot QPC values are sampled independently (0 = stage not reached).\n";
+		for (std::size_t i = 0; i < full.slotDiagnostics.size(); ++i)
+		{
+			const auto& slot = full.slotDiagnostics[i];
+			text += L"Slot " + std::to_wstring(i) + L": observed=" + stateName(slot.observed)
+				+ L" sampled=" + stateName(slot.sampled) + L" sequence=" + std::to_wstring(slot.sequence)
+				+ L" submit=" + std::to_wstring(slot.ticks[0]) + L" claim=" + std::to_wstring(slot.ticks[1])
+				+ L" complete=" + std::to_wstring(slot.ticks[2]) + L" reclaim=" + std::to_wstring(slot.ticks[3])
+				+ L" last_reclaimed_sequence=" + std::to_wstring(slot.lastReclaimedSequence)
+				+ L" last_reclaimed_at=" + std::to_wstring(slot.lastReclaimedTicks) + L"\n";
+		}
+		return text;
+	}
+	void reportSandboxFault(const wchar_t* reason, DWORD pid, DWORD code,
+		AudioFailure detail = AudioFailure::Unspecified, std::uint64_t sequence = 0,
+		const AudioQueue::FullDiagnostic* full = nullptr) noexcept
+	{
+		if (m_reporter.empty())
+		{
+			return;
+		}
+		using namespace windowsCrashReport::detail;
+		try
+		{
+			constexpr const wchar_t* stages[] = {L"startup", L"scan", L"initialize", L"control", L"audio", L"shutdown"};
+			auto command = quote(m_reporter) + L" --supervisor " + std::to_wstring(pid)
+				+ L" " + quote(reason) + L" " + stages[static_cast<unsigned>(m_faultStage.load())]
+				+ L" " + std::to_wstring(code)
+				+ L" " + quote(m_reportDirectory) + L" " + quote(m_pluginPath);
+			if (detail != AudioFailure::Unspecified)
+			{
+				constexpr const wchar_t* details[] = {L"", L"invalid result", L"invalid submission", L"queue full"};
+				command += L" " + quote(details[static_cast<unsigned>(detail)]) + L" " + std::to_wstring(sequence);
+			}
+			if (full)
+			{
+				command += L" " + quote(formatFullDiagnostic(*full));
+				const auto audioThread = full->audioThread ? full->audioThread : full->dispatcher;
+				command += L" " + std::to_wstring(audioThread >> 32);
+			}
+			STARTUPINFOW startup{};
+			startup.cb = sizeof(startup);
+			PROCESS_INFORMATION reporter{};
+			if (!CreateProcessW(m_reporter.c_str(), command.data(), nullptr, nullptr, FALSE,
+					CREATE_NO_WINDOW, nullptr, nullptr, &startup, &reporter))
+			{
+				reportFailure(L"starting sandbox reporter", GetLastError());
+				return;
+			}
+			waitForReporter(reporter.hProcess, 2000);
+			CloseHandle(reporter.hThread);
+			CloseHandle(reporter.hProcess);
+		}
+		catch (...)
+		{
+			reportFailure(L"preparing sandbox report", ERROR_NOT_ENOUGH_MEMORY);
+		}
+	}
+
 	void fail(Error error, DWORD nativeCode) noexcept
 	{
 		if (!m_faultClaimed.test_and_set(std::memory_order_acq_rel))
@@ -242,13 +409,15 @@ private:
 		}
 	}
 	HANDLE m_job = nullptr;
+	std::mutex m_terminationMutex;
+	std::wstring m_reporter, m_reportDirectory, m_pluginPath;
 	std::atomic<HANDLE> m_process{nullptr};
 	DWORD m_pid = 0;
 	std::atomic<ULONGLONG> m_deadline{0};
 	std::atomic<Stage> m_stage{Stage::Startup}, m_faultStage{Stage::Startup};
 	std::atomic<Error> m_error{Error::None};
 	std::atomic<Error> m_requestedError{Error::None};
-	std::atomic<std::atomic<Error>*> m_audioFaultSource{nullptr};
+	std::atomic<AudioFaultRequest*> m_audioFaultSource{nullptr};
 	std::atomic_flag m_faultClaimed = ATOMIC_FLAG_INIT;
 	std::atomic<DWORD> m_nativeCode{0};
 	std::atomic<bool> m_expectedExit{false};

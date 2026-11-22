@@ -3,6 +3,7 @@
 #include "WindowsCrashReport.h"
 #include "vsthost/AudioQueue.h"
 #include "vsthost/ControlChannel.h"
+#include "vsthost/HelperTrace.h"
 #include "vsthost/SharedRegion.h"
 #include "vsthost/Vst3CatalogCodec.h"
 #include "vsthost/Vst3Commands.h"
@@ -117,6 +118,7 @@ int wmain(int argc, wchar_t** argv)
 	}
 	ControlChannel channel(controlRegion.bytes(), ControlChannel::Side::Helper, static_cast<std::uint32_t>(capacity));
 	AudioQueue audio(audioRegion.bytes());
+	using Activity = AudioQueue::HelperActivity;
 	std::vector<float> input(AudioQueue::MaxSamples), output(AudioQueue::MaxSamples);
 	std::vector<std::uint8_t> events(AudioQueue::MaxEventBytes);
 	std::vector<std::uint8_t> outputEvents(AudioQueue::MaxOutputEventBytes);
@@ -124,9 +126,19 @@ int wmain(int argc, wchar_t** argv)
 	std::unique_ptr<Vst3Module> module;
 	std::uint64_t sequence = 0;
 	bool hello = false, paused = false;
-	auto processAudio = [&]() -> AudioQueue::Result {
+	using Rejection = AudioQueue::HelperAudioRejection;
+	const auto rejectAudio = [&](Rejection reason, bool dedicated) {
+		audio.setHelperActivity(Activity::AudioRejected, dedicated, static_cast<std::uint16_t>(reason));
+		return AudioQueue::Result::Invalid;
+	};
+	auto processAudio = [&](bool dedicated = false) -> AudioQueue::Result {
+		audio.setHelperActivity(Activity::ClaimingAudio, dedicated);
 		AudioQueue::Claim claim{};
 		const auto claimed = audio.claim(claim, input, events);
+		if (claimed == AudioQueue::Result::Invalid)
+		{
+			return rejectAudio(Rejection::Claim, dedicated);
+		}
 		if (claimed != AudioQueue::Result::Ok)
 		{
 			return claimed;
@@ -134,8 +146,9 @@ int wmain(int argc, wchar_t** argv)
 		if (!instance || claim.header.session != session || claim.header.generation != generation
 			|| claim.layout.inputs != instance->inputChannels() || claim.layout.outputs != instance->outputChannels())
 		{
-			return AudioQueue::Result::Invalid;
+			return rejectAudio(Rejection::Layout, dedicated);
 		}
+		audio.setHelperActivity(Activity::ProcessingAudio, dedicated);
 		const auto in = std::span(input).first(claim.layout.frames * claim.layout.inputs);
 		const auto out = std::span(output).first(claim.layout.frames * claim.layout.outputs);
 		// Keep the old queue layout until the host drains it and publishes the new
@@ -144,21 +157,23 @@ int wmain(int argc, wchar_t** argv)
 		{
 			if (!instance->deferRestartEvents(std::span(events).first(claim.eventBytes), claim.layout.frames))
 			{
-				return AudioQueue::Result::Invalid;
+				return rejectAudio(Rejection::RestartEvents, dedicated);
 			}
 			std::fill(out.begin(), out.end(), 0.f);
 		}
 		else if (!instance->process(claim.layout.frames, in, out, std::span(events).first(claim.eventBytes),
-					 claim.header.sequence, claim.collectOutput))
+					 claim.header.sequence, claim.collectOutput, &audio, dedicated))
 		{
 			return AudioQueue::Result::Invalid;
 		}
 		std::uint32_t written = 0;
 		if (claim.collectOutput && !instance->blockMidiOutput(outputEvents, written))
 		{
-			return AudioQueue::Result::Invalid;
+			return rejectAudio(Rejection::OutputEvents, dedicated);
 		}
-		return audio.complete(claim, out, std::span(outputEvents).first(written));
+		audio.setHelperActivity(Activity::CompletingAudio, dedicated);
+		const auto completed = audio.complete(claim, out, std::span(outputEvents).first(written));
+		return completed == AudioQueue::Result::Invalid ? rejectAudio(Rejection::Completion, dedicated) : completed;
 	};
 	// Native window dispatch can block on database/library work. Keep DSP on a
 	// dedicated thread within this same supervised instance; control mutations
@@ -170,11 +185,13 @@ int wmain(int argc, wchar_t** argv)
 		{
 			try
 			{
+				audio.setHelperActivity(Activity::WaitingForInstance, true);
 				std::lock_guard lock(instanceMutex);
 				if (!paused && instance)
 				{
+					audio.setHelperActivity(Activity::Control, true);
 					instance->serviceControl(false);
-					if (processAudio() == AudioQueue::Result::Invalid)
+					if (processAudio(true) == AudioQueue::Result::Invalid)
 					{
 						audioFailed.store(true);
 						return;
@@ -183,9 +200,11 @@ int wmain(int argc, wchar_t** argv)
 			}
 			catch (...)
 			{
+				rejectAudio(Rejection::Exception, true);
 				audioFailed.store(true);
 				return;
 			}
+			audio.setHelperActivity(Activity::Idle, true);
 			Sleep(1);
 		}
 	});
@@ -195,16 +214,21 @@ int wmain(int argc, wchar_t** argv)
 		{
 			return 8;
 		}
+		audio.setHelperActivity(Activity::CheckingControl);
 		ControlChannel::Frame frame;
 		const auto received = channel.receive(frame);
 		if (received == Error::InvalidState)
 		{
+			audio.setHelperActivity(Activity::PumpingMessages);
 			MSG message{};
 			while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE))
 			{
+				audio.setHelperActivity(Activity::DispatchingMessage, false, static_cast<std::uint16_t>(message.message));
 				TranslateMessage(&message);
 				DispatchMessageW(&message);
+				audio.setHelperActivity(Activity::PumpingMessages);
 			}
+			audio.setHelperActivity(Activity::Idle);
 			Sleep(1);
 			continue;
 		}
@@ -212,7 +236,10 @@ int wmain(int argc, wchar_t** argv)
 		{
 			return 4;
 		}
+		const auto operation = static_cast<std::uint16_t>(frame.header.type);
+		audio.setHelperActivity(Activity::WaitingForInstance, false, operation);
 		std::lock_guard lock(instanceMutex);
+		audio.setHelperActivity(Activity::Control, false, operation);
 		if (!matches(frame.header, session, generation, sequence + 1))
 		{
 			return 5;
@@ -264,9 +291,12 @@ int wmain(int argc, wchar_t** argv)
 							static_cast<int>(command.path.size()), path.data(), wideSize);
 						lmms::windowsCrashReport::setPlugin(path);
 						instance = std::make_unique<Vst3Instance>();
+							traceHelper("vst3.instance.open.begin");
 						instance->open(path, command.cid);
 						instance->setInitialLayout(command.layout);
+							traceHelper("vst3.instance.open.end");
 						instance->setup(command.sampleRate, command.maxFrames, command.offline);
+							traceHelper("vst3.instance.setup.end");
 						payload.resize(20 + instance->parameters().size() * 4);
 						put(payload, 0, instance->inputChannels(), 4);
 						put(payload, 4, instance->outputChannels(), 4);
@@ -331,8 +361,10 @@ int wmain(int argc, wchar_t** argv)
 			}
 			else if (frame.header.type == MessageType::ShowEditor && frame.payload.empty() && instance)
 			{
+				traceHelper("vst3.showEditor.begin");
 				payload.resize(8);
 				put(payload, 0, reinterpret_cast<std::uintptr_t>(instance->showEditor()), 8);
+				traceHelper("vst3.showEditor.end");
 			}
 			else if (frame.header.type == MessageType::HideEditor && frame.payload.empty() && instance)
 			{
@@ -354,6 +386,7 @@ int wmain(int argc, wchar_t** argv)
 		}
 		catch (...)
 		{
+			traceHelper("vst3.control.exception");
 			error = Error::LoadFailed;
 		}
 		const auto type = error != Error::None		 ? MessageType::Fault

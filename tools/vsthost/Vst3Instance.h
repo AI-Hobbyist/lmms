@@ -21,6 +21,8 @@
 #include <unordered_map>
 
 namespace lmms::vsthost {
+class AudioQueue;
+
 // Single native instance. The helper serializes DSP and control mutations;
 // native GUI dispatch stays on its main thread without blocking DSP. Destruction
 // occurs after DSP joins and before module unloading; native calls are bounded.
@@ -37,7 +39,8 @@ public:
 	void setup(double rate, std::uint32_t frames, bool offline = false);
 	void setInitialLayout(Vst3MainLayout layout) { m_initialLayout = layout; }
 	bool process(std::uint32_t frames, std::span<const float> input, std::span<float> output,
-		std::span<const std::uint8_t> events = {}, std::uint64_t sequence = 0, bool collectOutput = false);
+		std::span<const std::uint8_t> events = {}, std::uint64_t sequence = 0, bool collectOutput = false,
+		AudioQueue* diagnostics = nullptr, bool dedicatedAudioThread = false);
 	std::vector<std::uint8_t> midiOutput();
 	bool blockMidiOutput(std::span<std::uint8_t> storage, std::uint32_t& written) noexcept;
 	std::vector<std::uint8_t> state(std::span<const std::uint8_t> queuedParameters = {});

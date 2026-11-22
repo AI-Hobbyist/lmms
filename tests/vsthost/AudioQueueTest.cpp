@@ -141,7 +141,23 @@ int wmain(int argc, wchar_t** argv)
 		request.sequence = i;
 		check(queue.submit(request, {4, 2, 2}, input) == R::Ok, "fill queue");
 	}
-	check(queue.submit(request, {4, 2, 2}, input) == R::Full, "bounded full queue");
+	AudioQueue::FullDiagnostic full;
+	queue.setHelperActivity(AudioQueue::HelperActivity::PumpingMessages);
+	check(queue.submit(request, {4, 2, 2}, input, {}, false, &full) == R::Full, "bounded full queue");
+	check(full.ticks && full.frequency && (full.dispatcher >> 32) == GetCurrentThreadId()
+			&& (full.dispatcher & 0xffff) == static_cast<unsigned>(AudioQueue::HelperActivity::PumpingMessages),
+		"full queue captures helper activity and monotonic clock");
+	for (std::size_t i = 0; i < full.slotDiagnostics.size(); ++i)
+	{
+		const auto& slot = full.slotDiagnostics[i];
+		check(slot.observed == 2 && slot.sampled == 2 && slot.sequence == i + 1
+				&& slot.ticks[0] && slot.ticks[0] <= full.ticks
+				&& !slot.ticks[1] && !slot.ticks[2] && !slot.ticks[3],
+			"full queue describes each submitted slot");
+	}
+	check(full.slotDiagnostics[0].lastReclaimedSequence == 0 && full.slotDiagnostics[0].lastReclaimedTicks
+			&& full.slotDiagnostics[0].lastReclaimedTicks <= full.slotDiagnostics[0].ticks[0],
+		"full queue retains prior reclamation across slot reuse");
 	for (std::uint64_t i = 1; i <= AudioQueue::Slots; ++i)
 	{
 		check(queue.claim(claim, worker, events) == R::Ok && claim.header.sequence == i, "oldest claim order");

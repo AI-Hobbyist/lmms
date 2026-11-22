@@ -307,6 +307,17 @@ private slots:
 		QVERIFY(report);
 		QVERIFY(report->cachedModules > 0);
 		QVERIFY(report->presetsWritten > 0);
+		QVERIFY(report->cacheError.isEmpty());
+		lmms::vsthost::PluginCatalog::Options indexOptions;
+		indexOptions.preferIndex = true;
+		indexOptions.presetDirectory = root;
+		jobs->refresh(config->vstScanRoots(), indexOptions);
+		QTRY_VERIFY_WITH_TIMEOUT(!jobs->snapshot().busy, 60000);
+		const auto indexed = jobs->snapshot().report;
+		QVERIFY(indexed && indexed != report);
+		QVERIFY(indexed->entries == report->entries);
+		QCOMPARE(indexed->cachedModules, indexed->modules);
+		QCOMPARE(indexed->presetsWritten + indexed->presetsExisting + indexed->presetFailures, std::size_t{0});
 		QDirIterator files(root, {"*.xpf"}, QDir::Files, QDirIterator::Subdirectories);
 		qsizetype instruments = 0;
 		qsizetype effects = 0;

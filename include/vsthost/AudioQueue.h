@@ -3,13 +3,14 @@
 
 #include "vsthost/Protocol.h"
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <cstring>
 #include <windows.h>
 
 namespace lmms::vsthost {
 // Windows shared memory contains explicit wire bytes, not atomic<T> or native
-// C++ objects. Only its aligned 32-bit ownership word uses Interlocked operations.
+// C++ objects. Aligned ownership and diagnostic words use Interlocked operations.
 // A slot has one DAW producer, one helper consumer and one DAW result consumer.
 class AudioQueue
 {
@@ -24,7 +25,63 @@ public:
 	static constexpr std::uint32_t MaxOutputEventBytes = 32768;
 	static constexpr std::uint32_t MetadataBytes = 64;
 	static constexpr std::uint32_t SlotBytes = MetadataBytes + 8 * MaxSamples + MaxEventBytes + MaxOutputEventBytes;
-	static constexpr std::uint32_t StorageBytes = Slots * SlotBytes;
+	static constexpr std::uint32_t DiagnosticSlotBytes = 7 * 8;
+	static constexpr std::uint32_t DispatcherOffset = Slots * (SlotBytes + DiagnosticSlotBytes);
+	static constexpr std::uint32_t StorageBytes = DispatcherOffset + 2 * 8;
+	enum class HelperActivity : std::uint32_t
+	{
+		Idle = 1,
+		CheckingControl,
+		Control,
+		ClaimingAudio,
+		ProcessingAudio,
+		CompletingAudio,
+		PumpingMessages,
+		DispatchingMessage,
+		WaitingForInstance,
+		PluginAudioCall,
+		AudioRejected
+	};
+	enum class HelperAudioRejection : std::uint16_t
+	{
+		Claim = 1,
+		Layout,
+		RestartEvents,
+		Transport,
+		EditorFeedback,
+		PendingParameters,
+		InputEvents,
+		PluginOutput,
+		OutputEvents,
+		Completion,
+		Exception
+	};
+	struct SlotDiagnostic
+	{
+		LONG observed = 0;
+		LONG sampled = 0;
+		std::uint64_t sequence = 0;
+		std::array<std::uint64_t, 4> ticks{};
+		std::uint64_t lastReclaimedSequence = 0;
+		std::uint64_t lastReclaimedTicks = 0;
+	};
+	struct FullDiagnostic
+	{
+		std::uint64_t ticks = 0;
+		std::uint64_t frequency = 0;
+		std::uint64_t dispatcher = 0;
+		std::uint64_t audioThread = 0;
+		std::array<SlotDiagnostic, Slots> slotDiagnostics{};
+	};
+	void setHelperActivity(HelperActivity activity, bool audioThread = false, std::uint16_t detail = 0) noexcept
+	{
+		if (valid())
+		{
+			const auto value = (std::uint64_t(GetCurrentThreadId()) << 32)
+				| (std::uint32_t(detail) << 16) | static_cast<std::uint32_t>(activity);
+			storeDiagnostic(DispatcherOffset + (audioThread ? 8 : 0), value);
+		}
+	}
 	struct Layout
 	{
 		std::uint32_t frames, inputs, outputs;
@@ -49,7 +106,7 @@ public:
 	explicit AudioQueue(std::span<std::uint8_t> memory) noexcept
 		: m_memory(memory)
 	{
-		if (memory.size() != StorageBytes || reinterpret_cast<std::uintptr_t>(memory.data()) % 4 != 0)
+		if (memory.size() != StorageBytes || reinterpret_cast<std::uintptr_t>(memory.data()) % 8 != 0)
 		{
 			m_memory = {};
 		}
@@ -66,7 +123,7 @@ public:
 		return true;
 	}
 	Result submit(Header header, Layout layout, std::span<const float> input, std::span<const std::uint8_t> events = {},
-		bool collectOutput = false) noexcept
+		bool collectOutput = false, FullDiagnostic* full = nullptr) noexcept
 	{
 		if (!valid() || !validLayout(layout) || input.size() != layout.frames * layout.inputs
 			|| events.size() > MaxEventBytes || header.type != MessageType::Process)
@@ -75,8 +132,13 @@ public:
 		}
 		for (std::uint32_t i = 0; i < Slots; ++i)
 		{
-			if (InterlockedCompareExchange(owner(i), Writing, Free) != Free)
+			const auto observed = InterlockedCompareExchange(owner(i), Writing, Free);
+			if (observed != Free)
 			{
+				if (full)
+				{
+					full->slotDiagnostics[i].observed = observed;
+				}
 				continue;
 			}
 			auto bytes = slot(i);
@@ -90,8 +152,34 @@ public:
 			put(bytes, 60, collectOutput ? 1 : 0, 4);
 			writeSamples(bytes.subspan(MetadataBytes, input.size() * 4), input);
 			std::copy(events.begin(), events.end(), bytes.begin() + EventOffset);
+			storeDiagnostic(diagnosticOffset(i) + DiagnosticSequence, header.sequence);
+			storeDiagnostic(diagnosticOffset(i) + ClaimedAt, 0);
+			storeDiagnostic(diagnosticOffset(i) + CompletedAt, 0);
+			storeDiagnostic(diagnosticOffset(i) + ReclaimedAt, 0);
+			storeDiagnostic(diagnosticOffset(i) + SubmittedAt, clockTicks());
 			InterlockedExchange(owner(i), Submitted);
 			return Result::Ok;
+		}
+		if (full)
+		{
+			full->ticks = clockTicks();
+			full->dispatcher = loadDiagnostic(DispatcherOffset);
+			full->audioThread = loadDiagnostic(DispatcherOffset + 8);
+			LARGE_INTEGER frequency{};
+			QueryPerformanceFrequency(&frequency);
+			full->frequency = frequency.QuadPart;
+			for (std::uint32_t i = 0; i < Slots; ++i)
+			{
+				auto& diagnostic = full->slotDiagnostics[i];
+				diagnostic.sampled = InterlockedCompareExchange(owner(i), Free, Free);
+				diagnostic.sequence = loadDiagnostic(diagnosticOffset(i) + DiagnosticSequence);
+				diagnostic.lastReclaimedSequence = loadDiagnostic(diagnosticOffset(i) + LastReclaimedSequence);
+				diagnostic.lastReclaimedTicks = loadDiagnostic(diagnosticOffset(i) + LastReclaimedAt);
+				for (std::uint32_t phase = 0; phase < diagnostic.ticks.size(); ++phase)
+				{
+					diagnostic.ticks[phase] = loadDiagnostic(diagnosticOffset(i) + SubmittedAt + phase * 8);
+				}
+			}
 		}
 		return Result::Full;
 	}
@@ -125,11 +213,12 @@ public:
 		{
 			return Result::Empty;
 		}
+		storeDiagnostic(diagnosticOffset(selected) + ClaimedAt, clockTicks());
 		Claim parsed{};
 		if (!readClaim(selected, MessageType::Process, parsed)
 			|| input.size() < parsed.layout.frames * parsed.layout.inputs || events.size() < parsed.eventBytes)
 		{
-			InterlockedExchange(owner(selected), Free);
+			reclaim(selected);
 			return Result::Invalid;
 		}
 		const auto samples = parsed.layout.frames * parsed.layout.inputs;
@@ -165,6 +254,7 @@ public:
 		std::copy(outputEvents.begin(), outputEvents.end(), bytes.begin() + OutputEventOffset);
 		const auto encoded = encode(header);
 		std::copy(encoded.begin(), encoded.end(), bytes.begin() + 4);
+		storeDiagnostic(diagnosticOffset(claim.slot) + CompletedAt, clockTicks());
 		InterlockedExchange(owner(claim.slot), Ready);
 		return Result::Ok;
 	}
@@ -188,13 +278,13 @@ public:
 			Claim current{};
 			if (!readClaim(i, MessageType::ProcessDone, current))
 			{
-				InterlockedExchange(owner(i), Free);
+				reclaim(i);
 				return Result::Invalid;
 			}
 			if (current.header.session != session || current.header.generation != generation
 				|| current.header.sequence < sequence)
 			{
-				InterlockedExchange(owner(i), Free);
+				reclaim(i);
 				continue;
 			}
 			if (current.header.sequence != sequence)
@@ -204,7 +294,7 @@ public:
 			const auto samples = current.layout.frames * current.layout.outputs;
 			if (output.size() != samples || (outputEventBytes && outputEvents.size() < current.outputEventBytes))
 			{
-				InterlockedExchange(owner(i), Free);
+				reclaim(i);
 				return Result::Invalid;
 			}
 			readSamples(slot(i).subspan(OutputOffset, samples * 4), output);
@@ -213,7 +303,7 @@ public:
 				std::copy_n(slot(i).begin() + OutputEventOffset, current.outputEventBytes, outputEvents.begin());
 				*outputEventBytes = current.outputEventBytes;
 			}
-			InterlockedExchange(owner(i), Free);
+			reclaim(i);
 			return Result::Ok;
 		}
 		return Result::Empty;
@@ -241,7 +331,7 @@ public:
 			{
 				return false;
 			}
-			InterlockedExchange(owner(i), Free);
+			reclaim(i);
 		}
 		return true;
 	}
@@ -255,9 +345,47 @@ private:
 		Processing,
 		Ready
 	};
+	static constexpr std::uint32_t DiagnosticSequence = 0;
+	static constexpr std::uint32_t SubmittedAt = 8;
+	static constexpr std::uint32_t ClaimedAt = 16;
+	static constexpr std::uint32_t CompletedAt = 24;
+	static constexpr std::uint32_t ReclaimedAt = 32;
+	static constexpr std::uint32_t LastReclaimedSequence = 40;
+	static constexpr std::uint32_t LastReclaimedAt = 48;
+	static_assert(DiagnosticSlotBytes == LastReclaimedAt + 8 && SlotBytes % 8 == 0);
+	static constexpr std::uint32_t diagnosticOffset(std::uint32_t i) noexcept
+	{
+		return Slots * SlotBytes + i * DiagnosticSlotBytes;
+	}
 	static constexpr std::uint32_t OutputOffset = MetadataBytes + 4 * MaxSamples;
 	static constexpr std::uint32_t EventOffset = MetadataBytes + 8 * MaxSamples;
 	static constexpr std::uint32_t OutputEventOffset = EventOffset + MaxEventBytes;
+	static std::uint64_t clockTicks() noexcept
+	{
+		LARGE_INTEGER ticks{};
+		QueryPerformanceCounter(&ticks);
+		return ticks.QuadPart;
+	}
+	volatile LONG64* diagnosticWord(std::uint32_t offset) noexcept
+	{
+		return reinterpret_cast<volatile LONG64*>(m_memory.data() + offset);
+	}
+	void storeDiagnostic(std::uint32_t offset, std::uint64_t value) noexcept
+	{
+		InterlockedExchange64(diagnosticWord(offset), static_cast<LONG64>(value));
+	}
+	std::uint64_t loadDiagnostic(std::uint32_t offset) noexcept
+	{
+		return InterlockedCompareExchange64(diagnosticWord(offset), 0, 0);
+	}
+	void reclaim(std::uint32_t i) noexcept
+	{
+		const auto ticks = clockTicks();
+		storeDiagnostic(diagnosticOffset(i) + ReclaimedAt, ticks);
+		storeDiagnostic(diagnosticOffset(i) + LastReclaimedSequence, loadDiagnostic(diagnosticOffset(i) + DiagnosticSequence));
+		storeDiagnostic(diagnosticOffset(i) + LastReclaimedAt, ticks);
+		InterlockedExchange(owner(i), Free);
+	}
 	std::span<std::uint8_t> m_memory;
 	std::span<std::uint8_t> slot(std::uint32_t i) noexcept { return m_memory.subspan(i * SlotBytes, SlotBytes); }
 	volatile LONG* owner(std::uint32_t i) noexcept

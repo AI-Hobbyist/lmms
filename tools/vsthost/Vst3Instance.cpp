@@ -5,6 +5,7 @@
 #include "pluginterfaces/vst/ivstunits.h"
 #include "Vst3StateStream.h"
 #include "vsthost/AudioQueue.h"
+#include "vsthost/HelperTrace.h"
 #include "pluginterfaces/base/funknownimpl.h"
 #include "pluginterfaces/vst/vstspeaker.h"
 #include <cmath>
@@ -204,7 +205,7 @@ void Vst3Instance::open(
 	}
 	m_midiFeedback.reserve(512);
 	m_blockMidiFeedback.reserve(512);
-	m_inputChanges = std::make_unique<Vst3ParameterChanges>();
+	m_inputChanges = std::make_unique<Vst3ParameterChanges>(static_cast<int32>(m_parameters.size()));
 	m_outputChanges = std::make_unique<Vst3ParameterChanges>();
 }
 
@@ -683,6 +684,11 @@ void Vst3Instance::refreshParameters()
 	m_parameterIndices = std::move(indices);
 	m_pendingParameters = std::move(pending);
 	m_controllerParameters = std::move(controller);
+	if (m_inputChanges && count > m_inputChanges->bulkCapacity())
+	{
+		m_inputChanges = std::make_unique<Vst3ParameterChanges>(count);
+		m_processData.inputParameterChanges = m_inputChanges.get();
+	}
 	refreshMidiAssignments();
 }
 
@@ -742,27 +748,37 @@ std::vector<std::uint8_t> Vst3Instance::metadata()
 }
 
 bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, std::span<float> output,
-	std::span<const std::uint8_t> events, std::uint64_t sequence, bool collectOutput)
+	std::span<const std::uint8_t> events, std::uint64_t sequence, bool collectOutput,
+	AudioQueue* diagnostics, bool dedicatedAudioThread)
 {
+	using Rejection = AudioQueue::HelperAudioRejection;
+	const auto reject = [&](Rejection reason) {
+		if (diagnostics)
+		{
+			diagnostics->setHelperActivity(AudioQueue::HelperActivity::AudioRejected, dedicatedAudioThread,
+				static_cast<std::uint16_t>(reason));
+		}
+		return false;
+	};
 	m_blockMidiFeedback.clear();
 	auto& midiFeedback = collectOutput ? m_blockMidiFeedback : m_midiFeedback;
 	std::fill(output.begin(), output.end(), 0.0f);
 	if (!m_processing || frames > m_maxFrames || input.size() != static_cast<std::size_t>(frames) * m_inputs.channels
 		|| output.size() != static_cast<std::size_t>(frames) * m_outputs.channels)
 	{
-		return false;
+		return reject(Rejection::Layout);
 	}
 	// Validate the whole wire packet before changing queues or transport state.
 	if (!decodeVst3Events(events, frames, [](const auto&) { return true; }))
 	{
-		return false;
+		return reject(Rejection::InputEvents);
 	}
 	if (!events.empty() && get(events, 0, 4) == 2)
 	{
 		Vst3Transport transport;
 		if (!decodeVst3Transport(events, transport))
 		{
-			return false;
+			return reject(Rejection::Transport);
 		}
 		m_context.projectTimeSamples = transport.samples;
 		m_context.continousTimeSamples = transport.continuous;
@@ -791,11 +807,11 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 	if (m_context.projectTimeSamples > std::numeric_limits<int64>::max() - frames
 		|| m_context.continousTimeSamples > std::numeric_limits<int64>::max() - frames)
 	{
-		return false;
+		return reject(Rejection::Transport);
 	}
 	if (!collectEdits())
 	{
-		return false;
+		return reject(Rejection::EditorFeedback);
 	}
 	m_inputChanges->reset(static_cast<int32>(std::max(1u, frames)));
 	m_outputChanges->reset(static_cast<int32>(std::max(1u, frames)));
@@ -812,7 +828,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		auto* queue = m_inputChanges->addParameterData(m_parameters[index].id, queueIndex);
 		if (!queue || queue->addPoint(0, pending.value, pointIndex) != kResultOk)
 		{
-			return false;
+			return reject(Rejection::PendingParameters);
 		}
 		pending.dirty = false;
 	}
@@ -872,12 +888,12 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		const auto& event = m_restartEvents[index];
 		if ((frames || event.type == 0) && !applyEvent(event))
 		{
-			return false;
+			return reject(Rejection::RestartEvents);
 		}
 	}
 	if (!decodeVst3Events(events, frames, applyEvent))
 	{
-		return false;
+		return reject(Rejection::InputEvents);
 	}
 	m_context.systemTime
 		= std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch())
@@ -918,17 +934,25 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		}
 	}
 	m_processData.numSamples = static_cast<int32>(frames);
-	if (m_processor->process(m_processData) != kResultOk || m_inputChanges->failed() || m_outputChanges->failed()
-		|| m_outputEvents.failed())
+	if (diagnostics)
 	{
-		return false;
+		diagnostics->setHelperActivity(AudioQueue::HelperActivity::PluginAudioCall, dedicatedAudioThread);
+	}
+	const auto result = m_processor->process(m_processData);
+	if (diagnostics)
+	{
+		diagnostics->setHelperActivity(AudioQueue::HelperActivity::CompletingAudio, dedicatedAudioThread);
+	}
+	if (result != kResultOk || m_inputChanges->failed() || m_outputChanges->failed() || m_outputEvents.failed())
+	{
+		return reject(Rejection::PluginOutput);
 	}
 	for (int32 index = 0; index < m_outputEvents.getEventCount(); ++index)
 	{
 		Event event{};
 		if (m_outputEvents.getEvent(index, event) != kResultOk || midiFeedback.size() >= 512)
 		{
-			return false;
+			return reject(Rejection::OutputEvents);
 		}
 		Vst3BlockEvent wire;
 		wire.offset = event.sampleOffset;
@@ -956,7 +980,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		}
 		if (!validVst3Event(wire, frames))
 		{
-			return false;
+			return reject(Rejection::OutputEvents);
 		}
 		midiFeedback.push_back({sequence, frames, wire});
 	}
@@ -968,7 +992,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		const auto found = m_parameterIndices.find(queue->getParameterId());
 		if (found == m_parameterIndices.end())
 		{
-			return false;
+			return reject(Rejection::PendingParameters);
 		}
 		int32 offset = 0;
 		double value = 0;
@@ -982,7 +1006,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 		auto* queue = m_outputChanges->getParameterData(index);
 		if (!queue || !m_parameterIndices.contains(queue->getParameterId()))
 		{
-			return false;
+			return reject(Rejection::PluginOutput);
 		}
 		for (int32 point = 0; point < queue->getPointCount(); ++point)
 		{
@@ -991,7 +1015,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 			if (queue->getPoint(point, offset, value) != kResultOk
 				|| (frames && m_feedback.size() == RealtimeMidiQueue::Capacity))
 			{
-				return false;
+				return reject(Rejection::PluginOutput);
 			}
 			if (frames)
 			{
@@ -1017,7 +1041,7 @@ bool Vst3Instance::process(std::uint32_t frames, std::span<const float> input, s
 				if (!std::isfinite(sample) || std::abs(sample) > std::numeric_limits<float>::max())
 				{
 					std::fill(output.begin(), output.end(), 0.0f);
-					return false;
+					return reject(Rejection::PluginOutput);
 				}
 				output[static_cast<std::size_t>(frame) * m_outputs.channels + flatChannel] = static_cast<float>(sample);
 			}
@@ -1350,7 +1374,9 @@ std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::ui
 			throw std::runtime_error("Invalid VST3 parameter setter");
 		}
 		Vst3ComponentHandler::HostSetter hostSetter(m_handler);
+		traceHelper("vst3.setParamNormalized.begin");
 		const auto status = m_controller->setParamNormalized(id, value);
+		traceHelper("vst3.setParamNormalized.end");
 		if (status == kResultFalse)
 		{
 			// The controller declined the write. Restore the host control to
@@ -1371,6 +1397,10 @@ std::vector<std::uint8_t> Vst3Instance::parameterControl(std::span<const std::ui
 	{
 		throw std::runtime_error("Invalid VST3 parameter feedback");
 	}
+	if (!m_feedback.empty())
+	{
+		traceHelper("vst3.parameterFeedback");
+	}
 	m_feedback.clear();
 	m_restartFlags = 0;
 	return reply;
@@ -1386,7 +1416,9 @@ HWND Vst3Instance::showEditor()
 	{
 		throw std::runtime_error("VST3 editor callback barrier failed");
 	}
+	traceHelper("vst3.editor.synchronizeController.begin");
 	synchronizeController();
+	traceHelper("vst3.editor.synchronizeController.end");
 	if (!m_editor)
 	{
 		m_editor = owned(new Vst3Editor);

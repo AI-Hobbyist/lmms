@@ -2,7 +2,8 @@
 #define LMMS_VSTHOST_VST3_PARAMETER_CHANGES_H
 #include "pluginterfaces/base/funknownimpl.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
-#include <array>
+#include <algorithm>
+#include <bit>
 #include <cmath>
 #include <memory>
 
@@ -14,18 +15,28 @@ class Vst3ParameterChanges final
 {
 public:
 	static constexpr Steinberg::int32 Capacity = 512;
-	Vst3ParameterChanges()
-		: m_queues(std::make_unique<Queue[]>(Capacity))
+	explicit Vst3ParameterChanges(Steinberg::int32 bulkParameters = 0)
+		: m_capacity(Capacity + bulkParameters)
+		, m_queues(std::make_unique<Queue[]>(m_capacity))
+		, m_storage(std::make_unique<Point[]>(m_capacity))
+		, m_lookupSize(std::bit_ceil(static_cast<unsigned>(m_capacity) * 2))
+		, m_lookup(std::make_unique<Steinberg::int32[]>(m_lookupSize))
 	{
+		std::fill_n(m_lookup.get(), m_lookupSize, -1);
 	}
 	void reset(Steinberg::int32 frames) noexcept
 	{
+		for (Steinberg::int32 i = 0; i < m_count; ++i)
+		{
+			m_lookup[m_queues[i].lookupSlot] = -1;
+		}
 		m_count = 0;
 		m_points = 0;
 		m_failed = false;
 		m_frames = frames;
 	}
 	bool failed() const noexcept { return m_failed; }
+	Steinberg::int32 bulkCapacity() const noexcept { return m_capacity - Capacity; }
 	Steinberg::int32 PLUGIN_API getParameterCount() override { return m_count; }
 	Steinberg::Vst::IParamValueQueue* PLUGIN_API getParameterData(Steinberg::int32 index) override
 	{
@@ -34,14 +45,18 @@ public:
 	Steinberg::Vst::IParamValueQueue* PLUGIN_API addParameterData(
 		const Steinberg::Vst::ParamID& id, Steinberg::int32& index) override
 	{
-		for (index = 0; index < m_count; ++index)
+		const auto mask = m_lookupSize - 1;
+		auto slot = (id ^ (id >> 16)) & mask;
+		while (m_lookup[slot] >= 0)
 		{
+			index = m_lookup[slot];
 			if (m_queues[index].id == id)
 			{
 				return &m_queues[index];
 			}
+			slot = (slot + 1) & mask;
 		}
-		if (m_count == Capacity)
+		if (m_count == m_capacity)
 		{
 			m_failed = true;
 			index = -1;
@@ -50,8 +65,11 @@ public:
 		auto& queue = m_queues[m_count];
 		queue.id = id;
 		queue.count = 0;
+		queue.first = -1;
 		queue.owner = this;
+		queue.lookupSlot = slot;
 		index = m_count++;
+		m_lookup[slot] = index;
 		return &queue;
 	}
 
@@ -60,6 +78,7 @@ private:
 	{
 		Steinberg::int32 offset;
 		Steinberg::Vst::ParamValue value;
+		Steinberg::int32 next;
 	};
 	class Queue final
 		: public Steinberg::U::ImplementsNonDestroyable<Steinberg::U::Directly<Steinberg::Vst::IParamValueQueue>>
@@ -67,6 +86,8 @@ private:
 	public:
 		Steinberg::Vst::ParamID id = 0;
 		Steinberg::int32 count = 0;
+		Steinberg::int32 first = -1;
+		unsigned lookupSlot = 0;
 		Vst3ParameterChanges* owner = nullptr;
 		Steinberg::Vst::ParamID PLUGIN_API getParameterId() override { return id; }
 		Steinberg::int32 PLUGIN_API getPointCount() override { return count; }
@@ -77,8 +98,14 @@ private:
 			{
 				return Steinberg::kInvalidArgument;
 			}
-			offset = points[index].offset;
-			value = points[index].value;
+			auto position = first;
+			for (Steinberg::int32 i = 0; i < index; ++i)
+			{
+				position = owner->m_storage[position].next;
+			}
+			const auto& point = owner->m_storage[position];
+			offset = point.offset;
+			value = point.value;
 			return Steinberg::kResultOk;
 		}
 		Steinberg::tresult PLUGIN_API addPoint(
@@ -93,36 +120,41 @@ private:
 				}
 				return Steinberg::kInvalidArgument;
 			}
-			for (Steinberg::int32 position = 0; position < count; ++position)
+			auto* link = &first;
+			Steinberg::int32 position = 0;
+			while (*link >= 0)
 			{
-				if (points[position].offset == offset)
+				auto& point = owner->m_storage[*link];
+				if (point.offset == offset)
 				{
-					points[position].value = value;
+					point.value = value;
 					index = position;
 					return Steinberg::kResultOk;
 				}
+				if (point.offset > offset)
+				{
+					break;
+				}
+				link = &point.next;
+				++position;
 			}
-			if (owner->m_points == Capacity || count == Capacity)
+			if (owner->m_points == owner->m_capacity)
 			{
 				owner->m_failed = true;
 				return Steinberg::kResultFalse;
 			}
-			index = count;
-			while (index > 0 && points[index - 1].offset > offset)
-			{
-				points[index] = points[index - 1];
-				--index;
-			}
-			points[index] = {offset, value};
+			owner->m_storage[owner->m_points] = {offset, value, *link};
+			*link = owner->m_points++;
+			index = position;
 			++count;
-			++owner->m_points;
 			return Steinberg::kResultOk;
 		}
-
-	private:
-		std::array<Point, Capacity> points;
 	};
+	const Steinberg::int32 m_capacity;
 	std::unique_ptr<Queue[]> m_queues;
+	std::unique_ptr<Point[]> m_storage;
+	const unsigned m_lookupSize;
+	std::unique_ptr<Steinberg::int32[]> m_lookup;
 	Steinberg::int32 m_count = 0, m_points = 0, m_frames = 0;
 	bool m_failed = false;
 };

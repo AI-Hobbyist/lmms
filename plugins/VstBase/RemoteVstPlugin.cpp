@@ -102,6 +102,7 @@
 #include <charconv>
 #include <unordered_set>
 #include <bit>
+#include "vsthost/HelperTrace.h"
 #include "vsthost/RealtimeMidiQueue.h"
 
 #include <aeffectx.h>
@@ -146,7 +147,7 @@ lmms::RemoteVstPlugin * __plugin = nullptr;
 
 #ifndef NATIVE_LINUX_VST
 HWND __MessageHwnd = nullptr;
-DWORD __processingThreadId = 0;
+std::atomic<DWORD> __processingThreadId{0};
 #else
 pthread_t __processingThreadId = 0;
 #endif
@@ -190,7 +191,7 @@ public:
 	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
-	bool scanPlugin(const std::string& path);
+	bool scanPlugin(const std::string& path, bool reportProgress);
 	void initEditor();
 	void showEditor();
 	void hideEditor();
@@ -199,6 +200,11 @@ public:
 	virtual void process( const SampleFrame* _in, SampleFrame* _out );
 
 #ifdef LMMS_BUILD_WIN32
+	std::unique_lock<std::mutex> lockSessionLayout()
+	{
+		return std::unique_lock<std::mutex>(m_sessionLayoutMutex);
+	}
+
 	std::span<const std::uint8_t> processWithMidiOutput(
 		const SampleFrame* input, SampleFrame* output, std::span<std::uint8_t> buffer)
 	{
@@ -513,8 +519,8 @@ private:
 	bool m_x11WindowVisible = false;
 #endif
 	intptr_t m_windowID;
-	int m_windowWidth;
-	int m_windowHeight;
+	std::atomic<int> m_windowWidth;
+	std::atomic<int> m_windowHeight;
 
 	bool m_initialized;
 	bool m_resumed;
@@ -533,7 +539,10 @@ private:
 	float * * m_outputs;
 
 	std::mutex m_shmLock;
-	bool m_shmValid;
+#ifdef LMMS_BUILD_WIN32
+	std::mutex m_sessionLayoutMutex;
+#endif
+	std::atomic<bool> m_shmValid;
 
 	using VstMidiEventList = std::vector<VstMidiEvent>;
 	VstMidiEventList m_midiEvents;
@@ -542,8 +551,8 @@ private:
 	inline static thread_local std::size_t s_midiOutputBytes = 0;
 #endif
 
-	bpm_t m_bpm;
-	double m_currentSamplePos;
+	std::atomic<bpm_t> m_bpm;
+	std::atomic<double> m_currentSamplePos;
 	int m_currentProgram;
 
 	//! Host to plugin synchronisation data structure
@@ -554,6 +563,7 @@ private:
 		std::int32_t lastFlags = 0;
 	};
 
+	std::mutex m_syncMutex;
 	Sync m_sync;
 };
 
@@ -712,10 +722,12 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 				return false;
 			}
 		}
+		vsthost::traceHelper("vst2.instance.init.begin");
 		init(_m.getString());
+		vsthost::traceHelper(m_initialized ? "vst2.instance.init.end" : "vst2.instance.init.failed");
 		break;
 	case IdVstScanPlugin:
-		return scanPlugin(_m.getString());
+		return scanPlugin(_m.getString(), _m.argumentCount() == 2 && _m.getString(1) == "progress");
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -791,12 +803,11 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage(message(IdSavePresetFile).addInt(savePreset(_m.getString(0))));
 			break;
 
-			case IdVstSetParameter: {
-		HostParameterChange change;
-		m_plugin->setParameter(m_plugin, _m.getInt(0), _m.getFloat(1));
-		//sendMessage( IdVstSetParameter );
-		break;
-	}
+		case IdVstSetParameter:
+			vsthost::traceHelper("vst2.setParameter.begin");
+			m_plugin->setParameter(m_plugin, _m.getInt(0), _m.getFloat(1));
+			vsthost::traceHelper("vst2.setParameter.end");
+			break;
 
 		case IdVstLoadAllParameterDisplays:
 			loadAllParameterDisplays();
@@ -827,6 +838,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			}
 			if (!edits.empty())
 			{
+				vsthost::traceHelper("vst2.parameterFeedback");
 				message reply(IdVstParameterEdits);
 				reply.addInt(static_cast<int>(edits.size()));
 				for (const auto& edit : edits)
@@ -975,7 +987,9 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
+	vsthost::traceHelper("vst2.editor.effEditOpen.begin");
 	pluginDispatch( effEditOpen, 0, 0, m_window );
+	vsthost::traceHelper("vst2.editor.effEditOpen.end");
 
 	ERect* er = nullptr;
 	pluginDispatch(effEditGetRect, 0, 0, &er);
@@ -1058,7 +1072,9 @@ void RemoteVstPlugin::showEditor() {
 	if( !EMBED && !HEADLESS && m_window )
 	{
 #ifndef NATIVE_LINUX_VST
+		vsthost::traceHelper("vst2.editor.showWindow.begin");
 		ShowWindow( m_window, SW_SHOWNORMAL );
+		vsthost::traceHelper("vst2.editor.showWindow.end");
 #else
 		if (!m_x11WindowVisible)
 		{
@@ -1077,6 +1093,7 @@ void RemoteVstPlugin::hideEditor() {
 	if( !EMBED && !HEADLESS && m_window )
 	{
 #ifndef NATIVE_LINUX_VST
+		vsthost::traceHelper("vst2.editor.hideWindow");
 		ShowWindow( m_window, SW_HIDE );
 #else
 		if (m_x11WindowVisible)
@@ -1198,7 +1215,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	return true;
 }
 
-bool RemoteVstPlugin::scanPlugin(const std::string& path)
+bool RemoteVstPlugin::scanPlugin(const std::string& path, bool reportProgress)
 {
 	if (m_libInst || m_plugin || !load(path))
 	{
@@ -1271,10 +1288,17 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 		pluginDispatch(effClose);
 		m_plugin = nullptr;
 	}
+	int completed = 0;
 	for (const auto& [id, name] : entries)
 	{
 		if (shell)
 		{
+			if (reportProgress && !name.empty()
+				&& !sendMessage(message(IdVstShellScanProgress).addInt(completed)
+					.addInt(static_cast<int>(entries.size())).addString(name)))
+			{
+				return false;
+			}
 			m_shellId = id;
 			m_plugin = entryPoint(hostCallback);
 			if (!m_plugin || m_plugin->magic != kEffectMagic || static_cast<std::uint32_t>(m_plugin->uniqueID) != id)
@@ -1291,6 +1315,7 @@ bool RemoteVstPlugin::scanPlugin(const std::string& path)
 			pluginDispatch(effClose);
 			m_plugin = nullptr;
 		}
+		++completed;
 	}
 	result.addString(vendor).addString(std::to_string(vendorVersion));
 	sendMessage(result);
@@ -1378,7 +1403,7 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 
 	unlockShm();
 
-	m_currentSamplePos += bufferSize();
+	m_currentSamplePos.fetch_add(static_cast<double>(bufferSize()), std::memory_order_relaxed);
 }
 
 
@@ -2022,11 +2047,21 @@ int RemoteVstPlugin::updateInOutCount()
 		return 0;
 	}
 
-	lockShm();
-
-	setShmIsValid( false );
-
-	unlockShm();
+#ifdef LMMS_BUILD_WIN32
+	std::unique_lock sessionLayoutLock(m_sessionLayoutMutex, std::try_to_lock);
+	if (!sessionLayoutLock)
+	{
+		return 0;
+	}
+#endif
+	// A callback delivered to the editor can run while DSP is waiting for
+	// that same window. Leave the current layout intact if DSP owns it.
+	std::unique_lock layoutLock(m_shmLock, std::try_to_lock);
+	if (!layoutLock)
+	{
+		return 0;
+	}
+	setShmIsValid(false);
 
 	delete[] m_inputs;
 	delete[] m_outputs;
@@ -2067,7 +2102,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					int32_t _index, intptr_t _value,
 						void * _ptr, float _opt )
 {
-	static VstTimeInfo _timeInfo;
+	static thread_local VstTimeInfo _timeInfo;
 #ifdef DEBUG_CALLBACKS
 	char buf[64] = {};
 	std::snprintf(buf, sizeof(buf), "host-callback, opcode = %d\n", static_cast<int>(_opcode));
@@ -2129,6 +2164,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// fields are required (see valid masks above), as some
 			// items may require extensive conversions
 
+			std::lock_guard syncLock(__plugin->m_syncMutex);
 			const auto syncData = __plugin->getVstSyncData();
 			assert(syncData != nullptr);
 
@@ -2315,12 +2351,14 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			{
 				return 0;
 			}
-			__plugin->m_windowWidth = _index;
-			__plugin->m_windowHeight = _value;
+			const auto width = static_cast<int>(_index);
+			const auto height = static_cast<int>(_value);
+			__plugin->m_windowWidth = width;
+			__plugin->m_windowHeight = height;
 #ifndef NATIVE_LINUX_VST
 			HWND window = __plugin->m_window;
 			DWORD dwStyle = GetWindowLongPtr( window, GWL_STYLE );
-			RECT windowSize = { 0, 0, (int) _index, (int) _value };
+			RECT windowSize = { 0, 0, width, height };
 			AdjustWindowRect( &windowSize, dwStyle, false );
 			SetWindowPos( window, 0, 0, 0,
 					windowSize.right - windowSize.left,
@@ -2328,13 +2366,11 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					SWP_NOACTIVATE | SWP_NOMOVE |
 					SWP_NOOWNERZORDER | SWP_NOZORDER );
 #else
-			XResizeWindow(__plugin->m_display, __plugin->m_window, (int) _index, (int) _value);
+			XResizeWindow(__plugin->m_display, __plugin->m_window, width, height);
 			XFlush(__plugin->m_display);
 #endif
 			__plugin->sendMessage(
-				message( IdVstPluginEditorGeometry ).
-					addInt( __plugin->m_windowWidth ).
-					addInt( __plugin->m_windowHeight ) );
+				message( IdVstPluginEditorGeometry ).addInt(width).addInt(height) );
 			return 1;
 		}
 

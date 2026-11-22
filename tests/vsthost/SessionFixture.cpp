@@ -48,6 +48,10 @@ int wmain(int argc, wchar_t** argv)
 		{
 			Sleep(INFINITE);
 		}
+		if (mode == L"late-first-audio" && claim.header.sequence == 0)
+		{
+			Sleep(150);
+		}
 		if (mode == L"slow-audio")
 		{
 			Sleep(30);

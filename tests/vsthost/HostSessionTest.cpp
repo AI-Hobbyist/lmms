@@ -5,7 +5,9 @@
 using namespace lmms::vsthost;
 int wmain(int argc, wchar_t** argv)
 {
-	if (argc != 3 || std::wstring(argv[1]) != L"--helper")
+	const bool audioRecoveryOnly = argc == 4 && std::wstring_view(argv[3]) == L"--audio-recovery";
+	const bool audioStallOnly = argc == 4 && std::wstring_view(argv[3]) == L"--audio-stall";
+	if ((argc != 3 && !audioRecoveryOnly && !audioStallOnly) || std::wstring(argv[1]) != L"--helper")
 	{
 		return 2;
 	}
@@ -36,6 +38,50 @@ int wmain(int argc, wchar_t** argv)
 		return future.get();
 	};
 	std::array<float, 8> input{1, 2, 3, 4, 5, 6, 7, 8}, output{};
+	if (audioStallOnly)
+	{
+		HostSession session(1024);
+		check(reply(session.open(configuration(L"hang-audio"))).error == Error::None, "stalled audio fixture ready");
+		for (unsigned slot = 0; slot < AudioQueue::Slots; ++slot)
+		{
+			check(session.process({4, 2, 2}, input, output), "stalled helper uses only the available audio slots");
+		}
+		check(!session.process({4, 2, 2}, input, output), "full queue stops accepting audio blocks");
+		const auto deadline = GetTickCount64() + 2000;
+		while (session.state() != SessionState::Faulted && GetTickCount64() < deadline)
+		{
+			Sleep(1);
+		}
+		check(session.error() == Error::ProcessingFailed, "sustained stall still faults the session");
+		if (!failures)
+		{
+			std::cout << "PASS sustained realtime audio stall\n";
+		}
+		return failures != 0;
+	}
+	if (audioRecoveryOnly)
+	{
+		HostSession session(1024);
+		check(reply(session.open(configuration(L"late-first-audio"))).error == Error::None,
+			"late audio fixture ready");
+		check(session.process({4, 2, 2}, input, output), "first audio block submitted");
+		auto next = input;
+		next.fill(8.0f);
+		check(session.process({4, 2, 2}, next, output) && output == std::array<float, 8>{},
+			"missing result produces silence while the next block is submitted");
+		Sleep(300);
+		auto expected = next;
+		expected.fill(2.0f);
+		check(session.process({4, 2, 2}, input, output) && output == expected,
+			"late reply is retired and the matching block is returned");
+		check(session.error() == Error::None && session.state() == SessionState::Ready,
+			"audio session remains ready after a late result");
+		if (!failures)
+		{
+			std::cout << "PASS delayed realtime audio recovery\n";
+		}
+		return failures != 0;
+	}
 	{
 		HostSession session(1024);
 		const auto begin = GetTickCount64();
@@ -167,6 +213,10 @@ int wmain(int argc, wchar_t** argv)
 		check(reply(session.open(configuration(L"hang-audio"))).error == Error::None, "audio hang fixture ready");
 		check(session.process({4, 2, 2}, input, output), "audio hang submit");
 		Sleep(10);
+		for (unsigned slot = 1; slot < AudioQueue::Slots; ++slot)
+		{
+			check(session.process({4, 2, 2}, input, output), "pending audio remains within queue capacity");
+		}
 		const auto begin = GetTickCount64();
 		check(!session.process({4, 2, 2}, input, output) && GetTickCount64() - begin < 10,
 			"audio deadline never waits for hung helper");
@@ -257,6 +307,10 @@ int wmain(int argc, wchar_t** argv)
 		config.audioResultWaitMs = 1000;
 		check(reply(session.open(config)).error == Error::None, "bounded worker hang ready");
 		check(session.process({4, 2, 2}, input, output), "bounded worker hang submit");
+		for (unsigned slot = 1; slot < AudioQueue::Slots; ++slot)
+		{
+			check(session.process({4, 2, 2}, input, output), "pending worker audio remains within queue capacity");
+		}
 		const auto begin = GetTickCount64();
 		check(!session.process({4, 2, 2}, input, output) && GetTickCount64() - begin < 250,
 			"worker wait remains bounded for hung helper");
