@@ -55,6 +55,7 @@
 // imports resolve to the same Engine/CommandBus as the test, not a second copy.
 #include "vsthost/CatalogJobs.h"
 #include "vsthost/NativeVstPresetDrop.h"
+#include "vsthost/NativeVstPreset.h"
 #include "EffectSelectDialog.h"
 #include "PluginBrowser.h"
 #include <QTreeWidget>
@@ -164,18 +165,23 @@ class VstEntryPoints : public QObject
 
 	static bool dragEditorControl(HWND editor, const QPointF& start, const QPointF& change)
 	{
-		RECT bounds{};
-		POINT origin{};
-		if (!GetClientRect(editor, &bounds) || !ClientToScreen(editor, &origin))
+		RECT frame{};
+		MONITORINFO monitor{sizeof(MONITORINFO)};
+		if (!GetWindowRect(editor, &frame)
+			|| !GetMonitorInfoW(MonitorFromWindow(editor, MONITOR_DEFAULTTONEAREST), &monitor))
 		{
 			return false;
 		}
-		const auto point = [&bounds, origin](const QPointF& fraction) {
-			return POINT{origin.x + std::lround(fraction.x() * bounds.right),
-				origin.y + std::lround(fraction.y() * bounds.bottom)};
-		};
+		const auto work = monitor.rcWork;
+		const auto x = std::clamp(frame.left, work.left, std::max(work.left, work.right - (frame.right - frame.left)));
+		const auto y = std::clamp(frame.top, work.top, std::max(work.top, work.bottom - (frame.bottom - frame.top)));
+		RECT bounds{};
+		if (!GetClientRect(editor, &bounds))
+		{
+			return false;
+		}
 		const bool wasTopmost = (GetWindowLongPtrW(editor, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
-		if (!SetWindowPos(editor, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE))
+		if (!SetWindowPos(editor, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE))
 		{
 			return false;
 		}
@@ -187,6 +193,15 @@ class VstEntryPoints : public QObject
 		});
 		SetForegroundWindow(editor);
 		QTest::qWait(100);
+		POINT origin{};
+		if (!ClientToScreen(editor, &origin))
+		{
+			return false;
+		}
+		const auto point = [&bounds, origin](const QPointF& fraction) {
+			return POINT{origin.x + std::lround(fraction.x() * bounds.right),
+				origin.y + std::lround(fraction.y() * bounds.bottom)};
+		};
 		const auto first = point(start);
 		const auto hit = WindowFromPoint(first);
 		if (hit != editor && !IsChild(editor, hit))
@@ -449,6 +464,39 @@ private slots:
 		QCOMPARE(track->instrument()->key().attributes.value("classid"), expected.key.attributes.value("classid"));
 	}
 
+	void layoutFamilyAcrossModules()
+	{
+		using namespace lmms::vsthost;
+		CatalogEntry mono;
+		mono.identity.format = Format::Vst3;
+		mono.vendor = "Fixture Vendor";
+		mono.product = "Fixture Effect";
+		mono.name = "Fixture Effect Mono";
+		mono.locator.modulePath = "C:/fixtures/Fixture Effect Mono.vst3";
+		mono.layoutInputs = 1;
+		mono.layoutOutputs = 1;
+		auto stereo = mono;
+		stereo.name = "Fixture Effect Stereo";
+		stereo.locator.modulePath = "C:/fixtures/Fixture Effect Stereo.vst3";
+		stereo.layoutInputs = 2;
+		stereo.layoutOutputs = 2;
+		const auto monoKey = vstCatalogKey(nullptr, mono);
+		const auto stereoKey = vstCatalogKey(nullptr, stereo);
+		QVERIFY(!monoKey.attributes.value("layoutfamily").isEmpty());
+		QCOMPARE(monoKey.attributes.value("layoutfamily"), stereoKey.attributes.value("layoutfamily"));
+		QVERIFY(monoKey.attributes.value("file") != stereoKey.attributes.value("file"));
+
+		stereo.vendor = "A different vendor";
+		QVERIFY(monoKey.attributes.value("layoutfamily")
+			!= vstCatalogKey(nullptr, stereo).attributes.value("layoutfamily"));
+
+		mono.name = mono.product;
+		stereo.name = stereo.product;
+		stereo.vendor = mono.vendor;
+		QVERIFY(vstCatalogKey(nullptr, mono).attributes.value("layoutfamily")
+			!= vstCatalogKey(nullptr, stereo).attributes.value("layoutfamily"));
+	}
+
 	void catalogPublicationAndSelector()
 	{
 		auto* jobs = lmms::Engine::vstCatalog();
@@ -658,24 +706,71 @@ private slots:
 			const bool mixerEffect = QByteArray(QTest::currentDataTag()) == "ModernEqualizer";
 			auto* chain = mixerEffect ? &lmms::Engine::mixer()->mixerChannel(0)->m_fxChain
 				: target->audioBusHandle()->effects();
+			lmms::Effect* activeEffect = nullptr;
 			if (mixerEffect)
 			{
 				auto* mixer = m_liveGui->mixerView();
 				mixer->setCurrentMixerChannel(0);
 				mixer->show();
 				target->mixerChannelModel()->setValue(0);
+				lmms::gui::EffectRackView* rack = nullptr;
+				for (auto* candidate : mixer->findChildren<lmms::gui::EffectRackView*>())
+				{
+					if (candidate->model() == chain)
+					{
+						rack = candidate;
+						break;
+					}
+				}
+				QVERIFY(rack);
+				const auto directory = lmms::ConfigManager::inst()->userPresetsDir();
+				QVERIFY(QDir().mkpath(directory));
+				const auto presetPath = QDir(directory).filePath("ModernEqualizer-acceptance.xpf");
+				{
+					std::unique_ptr<lmms::Effect> source(lmms::Effect::instantiate("native_vst_effect", chain, &key));
+					QVERIFY(source && source->isOkay());
+					auto* parameter = source->controls()->parameterModels().value("param8");
+					QVERIFY(parameter);
+					parameter->setValue(0.625f);
+					lmms::DataFile preset(lmms::DataFile::Type::EffectSettings);
+					auto item = source->saveState(preset, preset.content());
+					item.setAttribute("name", "native_vst_effect");
+					item.appendChild(lmms::vsthost::nativeVstPresetKey(preset, source->key()));
+					QVERIFY(preset.writeFile(presetPath));
+				}
+				const auto count = chain->effectCount();
+				QVERIFY(dropStringPair(rack, "presetfile:" + presetPath.toUtf8()));
+				QCOMPARE(chain->effectCount(), count + 1);
+				activeEffect = chain->effectAt(count);
+				QVERIFY(activeEffect);
+				QCOMPARE(activeEffect->key().attributes.value("file"), path);
+				const auto* parameter = activeEffect->controls()->parameterModels().value("param8");
+				QVERIFY(parameter);
+				QCOMPARE(parameter->value<float>(), 0.625f);
+				qInfo() << "acceptance entry mixer xpf drop" << presetPath << "param8" << parameter->value<float>();
 			}
-			qInfo() << "acceptance entry" << (mixerEffect ? "mixer master insert" : "instrument effect rack insert");
-			std::unique_ptr<lmms::Effect> effect(lmms::Effect::instantiate("native_vst_effect", chain, &key));
-			QVERIFY(effect && effect->isOkay());
-			models = effect->controls()->parameterModels();
-			owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(effect.get());
-			view.reset(effect->controls()->createView());
-			chain->appendEffect(effect.release());
+			else
+			{
+				std::unique_ptr<lmms::Effect> effect(lmms::Effect::instantiate("native_vst_effect", chain, &key));
+				QVERIFY(effect && effect->isOkay());
+				activeEffect = effect.get();
+				chain->appendEffect(effect.release());
+				qInfo() << "acceptance entry instrument effect rack insert";
+			}
+			models = activeEffect->controls()->parameterModels();
+			owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(activeEffect);
+			view.reset(activeEffect->controls()->createView());
 		}
 		QVERIFY(owner);
 		auto* processor = owner->vstNodeProcessor();
 		QVERIFY(processor);
+		if (QByteArray(QTest::currentDataTag()) == "Magma-BB-Tubes-Mono")
+		{
+			using lmms::vsthost::NodePortDirection;
+			QCOMPARE(processor->nodeAudioIndex(0, NodePortDirection::Output), 0u);
+			QCOMPARE(processor->nodeAudioIndex(1, NodePortDirection::Output), UINT32_MAX);
+			qInfo() << "acceptance selected mono class" << classId;
+		}
 		QVERIFY(view);
 		view->setWindowFlag(Qt::Window);
 		view->show();

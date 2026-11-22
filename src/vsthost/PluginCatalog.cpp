@@ -59,7 +59,8 @@ void recordVst3Layout(CatalogEntry& entry, const Vst3Metadata& metadata)
 			|| (declared == "stereo" && channels[0] != 1 && channels[1] == 2)
 			|| (declared.startsWith("mono") && declared.endsWith("stereo") && channels[0] == 1 && channels[1] == 2)
 			|| (declared.startsWith("multi") && channels[1] > 2);
-		if (!base.isEmpty() && (base.compare(moduleName, Qt::CaseInsensitive) == 0 || matchesLayout))
+		if (!base.isEmpty() && (matchesLayout
+			|| (!match.hasMatch() && base.compare(moduleName, Qt::CaseInsensitive) == 0)))
 		{
 			entry.product = base;
 		}

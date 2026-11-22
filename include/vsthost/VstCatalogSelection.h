@@ -31,10 +31,24 @@ inline Plugin::Descriptor::SubPluginFeatures::Key vstCatalogKey(
 	const bool verifiedProduct = !entry.product.trimmed().isEmpty() && !entry.vendor.trimmed().isEmpty();
 	if ((verifiedProduct || entry.supportedMainLayouts) && entry.layoutInputs >= 0 && entry.layoutOutputs > 0)
 	{
-		attributes["layoutfamily"] = verifiedProduct
-			? QStringList{entry.vendor.trimmed().toCaseFolded(), entry.product.trimmed().toCaseFolded(),
-				scanPathKey(entry.locator.modulePath), attributes["format"], attributes["architecture"]}.join(QChar(0x241f))
-			: entry.identity.key();
+		if (verifiedProduct)
+		{
+			// VST2 supplies a product string. For VST3, a different product
+			// name means the scanner verified a layout suffix against the buses.
+			const bool declaredFamily = entry.identity.format == Format::Vst2
+				|| entry.product.trimmed().compare(entry.name.trimmed(), Qt::CaseInsensitive) != 0;
+			QStringList family{entry.vendor.trimmed().toCaseFolded(), entry.product.trimmed().toCaseFolded(),
+				attributes["format"], attributes["architecture"]};
+			if (!declaredFamily)
+			{
+				family.append(scanPathKey(entry.locator.modulePath));
+			}
+			attributes["layoutfamily"] = family.join(QChar(0x241f));
+		}
+		else
+		{
+			attributes["layoutfamily"] = entry.identity.key();
+		}
 		attributes["layoutproduct"] = entry.product.isEmpty() ? entry.name : entry.product.trimmed();
 		attributes["layoutinputs"] = QString::number(entry.layoutInputs);
 		attributes["layoutoutputs"] = QString::number(entry.layoutOutputs);
