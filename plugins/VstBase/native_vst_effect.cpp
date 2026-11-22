@@ -7,6 +7,7 @@
 #include "Effect.h"
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
+#include "NativeVstModels.h"
 #include "NativeVstSelection.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -28,19 +29,32 @@ public:
 		: EffectControls(effect)
 		, m_plugin(plugin)
 	{
+		if (m_plugin)
+		{
+			m_parameters.initialize(*m_plugin, this);
+		}
 	}
 
 	QString nodeName() const override { return "native_vst_effect_controls"; }
 	int controlCount() override { return m_plugin ? 1 : 0; }
+	QMap<QString, AutomatableModel*> parameterModels() override { return m_parameters.models(); }
 
 	void loadSettings(const QDomElement& state) override
 	{
-		if (m_plugin) { m_plugin->loadSettings(state); }
+		if (m_plugin)
+		{
+			m_plugin->loadSettings(state);
+			m_parameters.load(*m_plugin, state);
+		}
 	}
 
 	void saveSettings(QDomDocument& document, QDomElement& state) override
 	{
-		if (m_plugin) { m_plugin->saveSettings(document, state); }
+		if (m_plugin)
+		{
+			m_plugin->saveSettings(document, state);
+			m_parameters.save(document, state);
+		}
 	}
 
 	gui::EffectControlDialog* createView() override
@@ -51,14 +65,16 @@ public:
 		open->setEnabled(m_plugin && m_plugin->hasEditor());
 		if (m_plugin) { QObject::connect(open, &QPushButton::clicked, m_plugin, &VstPlugin::toggleUI); }
 		layout->addWidget(open);
+		m_parameters.addControls(layout);
 		return dialog;
 	}
 
 private:
 	VstPlugin* m_plugin;
+	NativeVstModels m_parameters;
 };
 
-class NativeVstEffect final : public Effect
+class NativeVstEffect final : public Effect, public vsthost::VstNodeOwner
 {
 public:
 	NativeVstEffect(Model* parent, const vsthost::NativeVstKey* key)
@@ -78,6 +94,7 @@ public:
 	}
 
 	EffectControls* controls() override { return &m_controls; }
+	vsthost::VstNodeProcessor* vstNodeProcessor() noexcept override { return m_plugin.get(); }
 
 protected:
 	ProcessStatus processImpl(SampleFrame* buffer, const f_cnt_t frames) override
@@ -85,7 +102,7 @@ protected:
 		static thread_local std::array<SampleFrame, MAXIMUM_BUFFER_SIZE> input;
 		std::copy_n(buffer, frames, input.begin());
 		m_plugin->processEffect(input.data(), buffer, frames, wetLevel(), dryLevel());
-		return m_vst3 ? ProcessStatus::Continue : ProcessStatus::ContinueIfNotQuiet;
+		return m_vst3 || m_plugin->hasNodeInput() ? ProcessStatus::Continue : ProcessStatus::ContinueIfNotQuiet;
 	}
 
 private:

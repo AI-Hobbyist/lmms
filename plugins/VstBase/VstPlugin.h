@@ -37,6 +37,7 @@
 #include "Knob.h"
 #include "JournallingObject.h"
 #include "RemotePlugin.h"
+#include "vsthost/VstNodePorts.h"
 
 #include "vstbase_export.h"
 
@@ -49,7 +50,7 @@ struct CatalogEntry;
 }
 
 
-class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
+class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject, public vsthost::VstNodeProcessor
 {
 	Q_OBJECT
 public:
@@ -77,6 +78,23 @@ public:
 	static ScanResult scanModule(const QString& path, unsigned timeoutMs = 15000);
 	void bindParameterModel(int index, FloatModel* model);
 	QString parameterStateKey(int index) const;
+	struct AutomationParameter
+	{
+		int index;
+		QString key;
+		QString name;
+		float value;
+		float step;
+		bool automatable;
+	};
+	std::vector<AutomationParameter> automationParameters();
+	std::vector<vsthost::VstNodePort> nodePorts() override;
+	unsigned nodeAudioIndex(std::uint32_t key, vsthost::NodePortDirection direction) const noexcept override;
+	void setNodeAudioReceiver(vsthost::VstNodeAudioReceiver receiver) override { m_nodeAudioReceiver = std::move(receiver); }
+	void setNodeRouting(vsthost::VstNodeRouting routing) override;
+	bool hasNodeInput() const noexcept override { return m_nodeRouting.audioInput || m_nodeRouting.midiInput; }
+	bool processNodeBlock(f_cnt_t frames, std::span<const float> input, std::span<float> output,
+		std::span<const vsthost::VstNodeMidiEvent> events, vsthost::VstNodeMidiReceiver receiver, void* context) override;
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
@@ -210,6 +228,12 @@ private:
 	QString p_name;
 
 	QMap<QString, QString> m_parameterDump;
+	QByteArray m_parameterAutomation;
+	int m_midiCapabilities = -1;
+	vsthost::VstNodeAudioReceiver m_nodeAudioReceiver;
+	vsthost::VstNodeRouting m_nodeRouting;
+	std::vector<float> m_nodeInput, m_nodeOutput;
+	std::vector<vsthost::VstNodeMidiEvent> m_nodeMidi;
 
 	int m_currentProgram;
 

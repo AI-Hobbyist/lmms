@@ -2,6 +2,8 @@
 #define LMMS_REMOTE_VST_SESSION_H
 
 #include "vsthost/AudioQueue.h"
+
+#include <array>
 #include "vsthost/ControlChannel.h"
 #include "vsthost/LegacyMessageCodec.h"
 #include "vsthost/SharedRegion.h"
@@ -103,6 +105,8 @@ inline bool validVstCommand(const vsthost::LegacyCommand& command, bool initiali
 	case IdVstSetParameter:
 		return count == 2;
 	case IdVstGetParameterDump:
+	case IdVstParameterAutomation:
+	case IdVstMidiCapabilities:
 	case IdVstCurrentProgram:
 	case IdVstIdleUpdate:
 	case IdVstProgramNames:
@@ -174,6 +178,7 @@ inline int runVstSession(int argc, char** argv, int position)
 	std::vector<float> input(AudioQueue::MaxSamples), output(AudioQueue::MaxSamples);
 	std::vector<float> planarInput(AudioQueue::MaxSamples), planarOutput(AudioQueue::MaxSamples);
 	std::vector<std::uint8_t> events(AudioQueue::MaxEventBytes);
+	std::array<std::uint8_t, AudioQueue::MaxOutputEventBytes> outputEvents{};
 	bool paused = false;
 	auto process = [&] {
 		AudioQueue::Claim claim{};
@@ -228,8 +233,9 @@ inline int runVstSession(int argc, char** argv, int position)
 			}
 		}
 		plugin->setShmIsValid(true);
-		plugin->process(reinterpret_cast<const SampleFrame*>(planarInput.data()),
-			reinterpret_cast<SampleFrame*>(planarOutput.data()));
+		const auto generated = plugin->processWithMidiOutput(reinterpret_cast<const SampleFrame*>(planarInput.data()),
+			reinterpret_cast<SampleFrame*>(planarOutput.data()),
+			claim.collectOutput ? std::span<std::uint8_t>(outputEvents) : std::span<std::uint8_t>{});
 		for (std::uint32_t frame = 0; frame < claim.layout.frames; ++frame)
 		{
 			for (std::uint32_t channel = 0; channel < claim.layout.outputs; ++channel)
@@ -237,7 +243,7 @@ inline int runVstSession(int argc, char** argv, int position)
 				output[frame * claim.layout.outputs + channel] = planarOutput[channel * claim.layout.frames + frame];
 			}
 		}
-		return audio.complete(claim, std::span(output).first(claim.layout.frames * claim.layout.outputs));
+		return audio.complete(claim, std::span(output).first(claim.layout.frames * claim.layout.outputs), generated);
 	};
 	while (true)
 	{

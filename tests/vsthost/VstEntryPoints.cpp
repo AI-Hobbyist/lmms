@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <set>
+#include <string_view>
 #include "agent/CommandBus.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -48,10 +49,12 @@
 #include "PluginBrowser.h"
 #include <QTreeWidget>
 #include "vsthost/VstCatalogSelection.h"
+#include "vsthost/VstNodePorts.h"
 #include <QTableView>
 #include <QLineEdit>
 #include <QStandardPaths>
 #include <QDialogButtonBox>
+#include <QComboBox>
 #include <QPushButton>
 #include <QFileSystemModel>
 #include "DummyEffect.h"
@@ -69,6 +72,7 @@ class VstEntryPoints : public QObject
 	QTemporaryDir m_fixtureDirectory;
 	QElapsedTimer m_caseTimer;
 	std::unique_ptr<lmms::gui::GuiApplication> m_liveGui;
+	bool m_editorFunctionOnly = false;
 	std::set<DWORD> fixtureProcesses(const char* entry, const wchar_t* moduleName = L"Vst2Baseline.dll")
 	{
 		std::set<DWORD> result;
@@ -165,6 +169,7 @@ private slots:
 			lmms::ConfigManager::inst()->loadConfigFile(m_fixtureRoot + "/test-config.xml");
 			lmms::ConfigManager::inst()->setWorkingDir(m_fixtureRoot + '/');
 			lmms::ConfigManager::inst()->setValue("audioengine", "audiodev", "SDL (Simple DirectMedia Layer)");
+			lmms::ConfigManager::inst()->setValue("audioengine", "mididev", "Dummy (no MIDI support)");
 			lmms::ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer", "256");
 			lmms::ConfigManager::inst()->setValue("ui", "vstembedmethod", "win32");
 			lmms::ConfigManager::inst()->setValue("app", "configured", "1");
@@ -290,6 +295,124 @@ private slots:
 			}
 		}
 	}
+	void nativeEditorParameterAndLayout()
+	{
+		if (!m_liveGui) { QSKIP("Requires the native Windows GUI"); }
+		m_editorFunctionOnly = true;
+		auto* song = lmms::Engine::getSong();
+		song->createNodeProject();
+		QVERIFY(command("track.create", {{"type", "instrument"}}).ok);
+		const auto path = QDir(qEnvironmentVariable("LMMS_VST_FIXTURE_ROOT"))
+			.absoluteFilePath("../vst-host/x64/Release/Vst3Native.vst3");
+		lmms::Plugin::Descriptor::SubPluginFeatures::Key key;
+		key.attributes["file"] = path;
+		key.attributes["format"] = "vst3";
+		key.attributes["architecture"] = "64";
+		key.attributes["classid"] = "0002000154761032fedcba9824681357";
+		auto* targetTrack = dynamic_cast<lmms::InstrumentTrack*>(lmms::Engine::getSong()->tracks().back());
+		QVERIFY(targetTrack);
+		const auto finishAudio = qScopeGuard([] {
+			lmms::Engine::audioEngine()->audioDev()->stopProcessing();
+			lmms::Engine::getSong()->setModified(false);
+		});
+		auto* plugin = targetTrack->loadInstrument("native_vst_instrument", &key);
+		QVERIFY(plugin);
+		auto* owner = dynamic_cast<lmms::vsthost::VstNodeOwner*>(plugin);
+		QVERIFY(owner);
+		auto* processor = owner->vstNodeProcessor();
+		QVERIFY(processor);
+		auto* gain = plugin->parameterModels().value("vst3param_f0000101");
+		QVERIFY(gain);
+		if (qEnvironmentVariableIsSet("LMMS_VST3_FIXTURE_PARAMETER_CAPABILITIES"))
+		{
+			const auto models = plugin->parameterModels();
+			QCOMPARE(models.size(), 2);
+			QVERIFY(models.contains("vst3param_0000002a"));
+			QCOMPARE(models.value("vst3param_0000002a")->step<float>(), 1.f);
+		}
+		using lmms::vsthost::NodePortDirection;
+		QCOMPARE(processor->nodeAudioIndex(0, NodePortDirection::Output), 0u);
+		QCOMPARE(processor->nodeAudioIndex(1, NodePortDirection::Output), 1u);
+		const auto trackId = targetTrack->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		const auto scope = QStringLiteral("source/") + trackId + '/';
+		const auto outputPort = QStringLiteral("source-plugin/") + trackId + "/audio-out:0:1";
+		const auto destination = QStringLiteral("track-output/") + trackId + "/in-R";
+		QVERIFY(song->setNodeCustomConnection(scope, outputPort, destination, true));
+
+		std::unique_ptr<QWidget> view(plugin->createView(m_liveGui->mainWindow()));
+		QVERIFY(view);
+		view->setWindowFlag(Qt::Window);
+		view->show();
+		if (qEnvironmentVariableIsSet("LMMS_VST3_FIXTURE_PARAMETER_CAPABILITIES"))
+		{
+			auto* parameters = view->findChild<QComboBox*>();
+			QVERIFY(parameters);
+			const auto trim = parameters->findText("Panel trim (plug-in editor only)");
+			QVERIFY(trim >= 0);
+			QVERIFY(!parameters->itemData(trim).isValid());
+			QCOMPARE(parameters->findText("Meter"), -1);
+		}
+		auto* editorButton = view->findChild<QPushButton*>();
+		QVERIFY(editorButton);
+		QVERIFY(editorButton->isEnabled());
+		editorButton->click();
+		const auto closeEditor = qScopeGuard([editorButton] { editorButton->click(); });
+		const auto helpers = fixtureProcesses("native editor parameter and layout", L"Vst3Native.vst3");
+		QCOMPARE(helpers.size(), std::size_t{1});
+		struct EditorSearch
+		{
+			DWORD helper;
+			HWND editor = nullptr;
+		};
+		const auto findEditor = [&] {
+			EditorSearch search{*helpers.begin()};
+			const auto inspect = [](HWND window, LPARAM context) -> BOOL {
+				auto& found = *reinterpret_cast<EditorSearch*>(context);
+				DWORD pid = 0;
+				GetWindowThreadProcessId(window, &pid);
+				if (pid != found.helper) { return TRUE; }
+				wchar_t text[64]{};
+				if (IsWindowVisible(window)
+					&& SendMessageTimeoutW(window, WM_GETTEXT, std::size(text), reinterpret_cast<LPARAM>(text),
+						SMTO_ABORTIFHUNG, 100, nullptr)
+					&& std::wstring_view(text) == L"LMMS VST3 fixture editor")
+				{
+					found.editor = window;
+					return FALSE;
+				}
+				return TRUE;
+			};
+			EnumChildWindows(reinterpret_cast<HWND>(m_liveGui->mainWindow()->winId()), inspect,
+				reinterpret_cast<LPARAM>(&search));
+			if (!search.editor)
+			{
+				std::pair<WNDENUMPROC, EditorSearch*> details{inspect, &search};
+				EnumWindows([](HWND window, LPARAM context) -> BOOL {
+					const auto details = reinterpret_cast<std::pair<WNDENUMPROC, EditorSearch*>*>(context);
+					EnumChildWindows(window, details->first, reinterpret_cast<LPARAM>(details->second));
+					return details->second->editor == nullptr;
+				}, reinterpret_cast<LPARAM>(&details));
+			}
+			return search.editor;
+		};
+		HWND editor = nullptr;
+		QTRY_VERIFY_WITH_TIMEOUT((editor = findEditor()) != nullptr, 5000);
+		DWORD_PTR result = 0;
+		QVERIFY(SendMessageTimeoutW(editor, WM_APP + 38, 0, 0, SMTO_ABORTIFHUNG, 3000, &result));
+		QCOMPARE(result, DWORD_PTR{1});
+		QTRY_COMPARE_WITH_TIMEOUT(gain->value<float>(), 0.625f, 5000);
+		QSignalSpy refreshed(song, &lmms::Song::nodeTrackRoutingChanged);
+		QVERIFY(SendMessageTimeoutW(editor, WM_APP + 39, 0, 0, SMTO_ABORTIFHUNG, 3000, &result));
+		QCOMPARE(result, DWORD_PTR{1});
+		QTRY_COMPARE_WITH_TIMEOUT(processor->nodeAudioIndex(1, NodePortDirection::Output), UINT32_MAX, 5000);
+		QCOMPARE(processor->nodeAudioIndex(0, NodePortDirection::Output), 0u);
+		QTRY_VERIFY_WITH_TIMEOUT(!refreshed.isEmpty(), 5000);
+		const auto connections = song->nodeCustomConnections(scope);
+		QVERIFY(std::any_of(connections.cbegin(), connections.cend(), [&](const auto& edge) {
+			return edge.source == outputPort && edge.destination == destination;
+		}));
+	}
+
 	void liveGuiAndAudio()
 	{
 		if (!m_liveGui)
@@ -895,8 +1018,11 @@ private slots:
 		{
 			lmms::Engine::destroy();
 		}
-		QVERIFY(lmms::Engine::vstCatalog() == nullptr);
-		QVERIFY(fixtureProcesses("DAW shutdown").empty());
+		if (!m_editorFunctionOnly)
+		{
+			QVERIFY(lmms::Engine::vstCatalog() == nullptr);
+			QVERIFY(fixtureProcesses("DAW shutdown").empty());
+		}
 		lmms::NotePlayHandleManager::free();
 	}
 	void entries_data()

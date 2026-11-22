@@ -26,6 +26,9 @@
 #include "AudioBusHandle.h"
 #include "Effect.h"
 #include "EffectChain.h"
+#include "Controller.h"
+#include "vsthost/RealtimeMidiQueue.h"
+#include "vsthost/VstNodePorts.h"
 #include "NodeWorkflowSourceGraph.h"
 #include "NodeWorkflowInputs.h"
 #ifdef WANT_AGENT
@@ -1039,6 +1042,8 @@ void Song::clearProject()
 	using gui::getGUI;
 	m_nodeProject = false;
 	m_nodeWorkflow = {};
+	m_deferredVstOutputs = {};
+	m_vstTrackAudio.clear();
 	Engine::mixer()->setNodeMasterOutputMask(3);
 	const bool wasLoading = m_loadingProject;
 	const QScopedValueRollback<bool> loadingGuard(m_loadingProject, true);
@@ -1474,17 +1479,21 @@ bool Song::hasExtendedSourceGraphs(const QDomElement& workflow, const QDomElemen
 	return false;
 }
 
-QList<int> Song::sourceGraphEffectSlots(Track& track) const
+static AudioBusHandle* sourceGraphAudioBus(Track& track)
 {
-	AudioBusHandle* bus = nullptr;
 	switch (track.type())
 	{
-	case Track::Type::Instrument: bus = static_cast<InstrumentTrack&>(track).audioBusHandle(); break;
-	case Track::Type::Sample: bus = static_cast<SampleTrack&>(track).audioBusHandle(); break;
-	case Track::Type::SVS: bus = static_cast<SVSTrack&>(track).audioBusHandle(); break;
-	case Track::Type::SVC: bus = static_cast<SVCTrack&>(track).audioBusHandle(); break;
-	default: break;
+	case Track::Type::Instrument: return static_cast<InstrumentTrack&>(track).audioBusHandle();
+	case Track::Type::Sample: return static_cast<SampleTrack&>(track).audioBusHandle();
+	case Track::Type::SVS: return static_cast<SVSTrack&>(track).audioBusHandle();
+	case Track::Type::SVC: return static_cast<SVCTrack&>(track).audioBusHandle();
+	default: return nullptr;
 	}
+}
+
+QList<int> Song::sourceGraphEffectSlots(Track& track) const
+{
+	auto* bus = sourceGraphAudioBus(track);
 	QList<int> indices;
 	auto* chain = bus ? bus->effects() : nullptr;
 	if (chain)
@@ -2346,6 +2355,11 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 		return 0;
 	};
 	const auto updateEffectSend = [&](bool enabled) {
+		if ((!source.endsWith("/out-L") && !source.endsWith("/out-R"))
+			|| (!destination.endsWith("/in-L") && !destination.endsWith("/in-R")))
+		{
+			return true;
+		}
 		const auto from = effectChannel(source);
 		const auto to = effectChannel(destination);
 		return from == 0 || to == 0 || Engine::mixer()->setNodeChannelSend(from,
@@ -2395,7 +2409,72 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 				+ track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/');
 		}
 	}
+	const auto vstSignal = [](auto* plugin, const QString& key, bool output) -> QString {
+		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(plugin);
+		auto* processor = owner ? owner->vstNodeProcessor() : nullptr;
+		if (!processor) { return {}; }
+		const auto direction = output ? vsthost::NodePortDirection::Output : vsthost::NodePortDirection::Input;
+		for (const auto& port : processor->nodePorts())
+		{
+			if (port.available && port.direction == direction && port.key() == key)
+			{
+				return port.media == vsthost::NodePortMedia::Audio ? QStringLiteral("audio") : QStringLiteral("midi");
+			}
+		}
+		return {};
+	};
 	const auto endpoint = [&](const QString& id, bool output) {
+		if (output && id.startsWith("track-signal/") && (scope == "song/" || scope == "pattern/"))
+		{
+			const auto parts = id.split('/');
+			if (parts.size() != 3 || (parts[2] != "out-L" && parts[2] != "out-R")) { return QString{}; }
+			const auto trackId = QUuid(parts[1]);
+			const auto* container = scope == "song/" ? static_cast<const TrackContainer*>(this)
+				: static_cast<const TrackContainer*>(Engine::patternStore());
+			for (auto* track : container->tracks())
+			{
+				if (track->nodeWorkflowId() == trackId && sourceGraphAudioBus(*track)) { return QStringLiteral("audio"); }
+			}
+			return QString{};
+		}
+		if (scope.startsWith("source/") && id.startsWith("source-"))
+		{
+			const auto trackId = QUuid(scope.section('/', 1, 1));
+			const auto parts = id.split('/');
+			for (auto* container : {static_cast<TrackContainer*>(this), static_cast<TrackContainer*>(Engine::patternStore())})
+			{
+				for (auto* track : container->tracks())
+				{
+					if (track->nodeWorkflowId() != trackId) { continue; }
+					if (parts.size() == 3 && parts[0] == "source-plugin" && QUuid(parts[1]) == trackId
+						&& track->type() == Track::Type::Instrument)
+					{
+						return vstSignal(static_cast<InstrumentTrack*>(track)->instrument(), parts[2], output);
+					}
+					if (parts.size() == 3 && parts[0] == "source-layer")
+					{
+						for (const auto& layer : nodeInstrumentLayers(*track))
+						{
+							if (layer.id == parts[1]) { return vstSignal(layer.instrument->instrument(), parts[2], output); }
+						}
+					}
+					if (parts.size() == 3 && parts[0] == "source-effect")
+					{
+						auto* bus = sourceGraphAudioBus(*track);
+						auto* chain = bus ? bus->effects() : nullptr;
+						for (int index = 0; chain && index < chain->effectCount(); ++index)
+						{
+							auto* effect = chain->effectAt(index);
+							if (effect->property("nodeWorkflowSourceEffect").toString() == parts[1])
+							{
+								return vstSignal(effect, parts[2], output);
+							}
+						}
+					}
+					return QString{};
+				}
+			}
+		}
 		if (!output && id.startsWith("track-output/"))
 		{
 			const auto parts = id.split('/');
@@ -2425,7 +2504,7 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 				}
 			}
 		}
-		if (!output && scope == "root/" && id.startsWith("mixer/"))
+		if (!output && (scope == "root/" || scope == "song/" || scope == "pattern/") && id.startsWith("mixer/"))
 		{
 			const auto parts = id.split('/');
 			if (parts.size() == 3 && (parts.at(2) == "in-L" || parts.at(2) == "in-R"))
@@ -2434,8 +2513,10 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 				auto* mixer = Engine::mixer();
 				for (mix_ch_t index = 0; index < mixer->numChannels(); ++index)
 				{
-					if (mixer->mixerChannel(index)->nodeWorkflowId() == uuid
-						&& nodeCustomEffectScope(uuid).isEmpty())
+					auto* channel = mixer->mixerChannel(index);
+					const bool local = channel->m_nodeEffect && nodeEffectInPattern(uuid) == (scope == "pattern/");
+					if (channel->nodeWorkflowId() == uuid && nodeCustomEffectScope(uuid).isEmpty()
+						&& (scope == "root/" || local))
 					{
 						return QStringLiteral("audio");
 					}
@@ -2461,6 +2542,7 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 					{
 						return QStringLiteral("midi");
 					}
+					return vstSignal(instrument.second->instrument(), parts.at(2), output);
 				}
 			}
 			return QString{};
@@ -2468,11 +2550,22 @@ bool Song::setNodeCustomConnection(const QString& scope, const QString& source, 
 		if (id.startsWith("effect/"))
 		{
 			const auto parts = id.split('/');
-			if (parts.size() == 3 && nodeCustomEffectScope(QUuid(parts.at(1))) == scope
-				&& (output ? (parts.at(2) == "out-L" || parts.at(2) == "out-R")
-					: (parts.at(2) == "in-L" || parts.at(2) == "in-R")))
+			if (parts.size() != 3) { return QString{}; }
+			const auto index = effectChannel(id);
+			if (index == 0) { return QString{}; }
+			auto* channel = Engine::mixer()->mixerChannel(index);
+			const auto uuid = QUuid(parts.at(1));
+			const auto customScope = nodeCustomEffectScope(uuid);
+			if (customScope == scope
+				|| (customScope.isEmpty() && channel->m_nodeEffect
+					&& scope == (nodeEffectInPattern(uuid) ? "pattern/" : "song/")))
 			{
-				return QStringLiteral("audio");
+				if (!customScope.isEmpty() && (output ? (parts[2] == "out-L" || parts[2] == "out-R")
+											  : (parts[2] == "in-L" || parts[2] == "in-R")))
+				{
+					return QStringLiteral("audio");
+				}
+				return vstSignal(channel->m_fxChain.effectAt(0), parts[2], output);
 			}
 			return QString{};
 		}
@@ -3004,7 +3097,7 @@ QList<QPair<QString, InstrumentTrack*>> Song::nodeCustomInstruments(const QStrin
 	return result;
 }
 
-QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file)
+QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file, bool fromDrop)
 {
 	if (!m_nodeProject || !scope.startsWith("custom/") || plugin.isEmpty()
 		|| !allowsCustomInstruments(*this, m_nodeWorkflow.documentElement(), scope))
@@ -3013,7 +3106,7 @@ QString Song::addNodeCustomInstrument(const QString& scope, const QString& plugi
 	}
 	auto* track = new InstrumentTrack(ensureNodeInstrumentTracks(), false);
 	track->audioBusHandle()->setMixerInputs(AudioBusHandle::MixerInputs{});
-	auto* instance = track->loadInstrument(plugin);
+	auto* instance = track->loadInstrument(plugin, nullptr, fromDrop);
 	if (!instance)
 	{
 		delete track;
@@ -4085,6 +4178,8 @@ void Song::restoreNodeWorkflow(DataFile& dataFile)
 	m_nodeInstrumentTracks.reset();
 	m_nodeProject = dataFile.isNodeWorkflow();
 	m_nodeWorkflow = QDomDocument{};
+	m_deferredVstOutputs = {};
+	m_vstTrackAudio.clear();
 	const auto saved = dataFile.nodeWorkflow();
 	if (!saved.isNull())
 	{
@@ -4093,6 +4188,25 @@ void Song::restoreNodeWorkflow(DataFile& dataFile)
 	bool validMask = false;
 	const auto mask = saved.attribute("masterOutputMask").toUInt(&validMask);
 	Engine::mixer()->setNodeMasterOutputMask(validMask && mask <= 3 ? mask : 3);
+}
+
+void Song::mixDeferredVstOutputs()
+{
+	if (m_nodeProject && m_deferredVstOutputs) { m_deferredVstOutputs(); }
+}
+
+void Song::publishVstTrackAudio(const AudioBusHandle* bus, const AudioBuffer& buffer) const
+{
+	if (!m_nodeProject) { return; }
+	const auto route = m_vstTrackAudio.constFind(bus);
+	if (route != m_vstTrackAudio.cend()) { (*route)(buffer); }
+}
+
+void Song::refreshVstNodePorts()
+{
+	if (!m_nodeProject) { return; }
+	restoreCustomGraphAudioRoutes();
+	emit nodeTrackRoutingChanged();
 }
 
 void Song::restoreCustomGraphAudioRoutes()
@@ -4177,6 +4291,309 @@ void Song::restoreCustomGraphAudioRoutes()
 		std::sort(result.begin(), result.end());
 		return result;
 	};
+	struct AudioEdge
+	{
+		std::array<std::vector<float>, 2> audio;
+		std::array<long, 2> periods{-1, -1};
+		std::array<std::size_t, 2> frames{};
+	};
+	struct MidiEdge
+	{
+		std::array<std::vector<vsthost::VstNodeMidiEvent>, 2> events;
+		std::array<long, 2> periods{-1, -1};
+	};
+	struct VstRoutes
+	{
+		vsthost::VstNodeProcessor* processor;
+		QString prefix;
+		std::vector<vsthost::VstNodePort> ports;
+		bool beforeMix;
+		std::vector<std::pair<unsigned, std::shared_ptr<AudioEdge>>> audioInput, audioOutput;
+		std::vector<std::pair<unsigned, std::shared_ptr<MidiEdge>>> midiInput, midiOutput;
+	};
+	std::vector<VstRoutes> vstNodes;
+	const auto addVstNode = [&vstNodes](auto* plugin, const QString& prefix, bool beforeMix) {
+		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(plugin);
+		auto* processor = owner ? owner->vstNodeProcessor() : nullptr;
+		if (processor) { vstNodes.push_back({processor, prefix, processor->nodePorts(), beforeMix}); }
+	};
+	for (auto* container : {static_cast<TrackContainer*>(this), static_cast<TrackContainer*>(Engine::patternStore())})
+	{
+		for (auto* track : container->tracks())
+		{
+			if (track->type() == Track::Type::Instrument)
+			{
+				const auto id = track->nodeWorkflowId().toString(QUuid::WithoutBraces);
+				addVstNode(static_cast<InstrumentTrack*>(track)->instrument(), QStringLiteral("source-plugin/") + id + '/', true);
+			}
+			for (const auto& layer : nodeInstrumentLayers(*track))
+			{
+				addVstNode(layer.instrument->instrument(), QStringLiteral("source-layer/") + layer.id + '/', true);
+			}
+			if (auto* bus = sourceGraphAudioBus(*track))
+			{
+				for (const auto index : sourceGraphEffectSlots(*track))
+				{
+					auto* effect = bus->effects()->effectAt(index);
+					const auto id = effect->property("nodeWorkflowSourceEffect").toString();
+					addVstNode(effect, QStringLiteral("source-effect/") + id + '/', true);
+				}
+			}
+		}
+	}
+	for (auto it = m_nodeCustomInstruments.cbegin(); it != m_nodeCustomInstruments.cend(); ++it)
+	{
+		addVstNode(it.value()->instrument(), QStringLiteral("instrument/") + it.key() + '/', true);
+	}
+	for (mix_ch_t index = 1; index < mixer->numChannels(); ++index)
+	{
+		auto* channel = mixer->mixerChannel(index);
+		if (!channel->m_nodeEffect) { continue; }
+		const auto id = channel->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		addVstNode(channel->m_fxChain.effectAt(0), QStringLiteral("effect/") + id + '/', false);
+	}
+	QHash<QString, std::pair<VstRoutes*, const vsthost::VstNodePort*>> vstInputs;
+	for (auto& node : vstNodes)
+	{
+		for (const auto& port : node.ports)
+		{
+			if (port.available && port.direction == vsthost::NodePortDirection::Input)
+			{
+				vstInputs.insert(node.prefix + port.key(), {&node, &port});
+			}
+		}
+	}
+	const auto visitVstInputs = [&outgoing, &vstInputs](const QStringList& sources,
+		vsthost::NodePortMedia media, auto consume) {
+		QStringList pending;
+		for (const auto& source : sources) { pending.append(outgoing.values(source)); }
+		QSet<QString> visited;
+		while (!pending.isEmpty())
+		{
+			const auto endpoint = pending.takeLast();
+			if (visited.contains(endpoint)) { continue; }
+			visited.insert(endpoint);
+			const auto target = vstInputs.constFind(endpoint);
+			if (target == vstInputs.cend())
+			{
+				pending.append(outgoing.values(endpoint));
+				continue;
+			}
+			const auto [receiver, input] = *target;
+			if (input->media == media) { consume(*receiver, *input); }
+		}
+	};
+	const auto makeAudioEdge = [] {
+		auto edge = std::make_shared<AudioEdge>();
+		for (auto& block : edge->audio) { block.resize(MAXIMUM_BUFFER_SIZE); }
+		return edge;
+	};
+	for (auto& node : vstNodes)
+	{
+		for (const auto& port : node.ports)
+		{
+			if (!port.available || port.direction != vsthost::NodePortDirection::Output) { continue; }
+			visitVstInputs({node.prefix + port.key()}, port.media, [&](VstRoutes& receiver, const auto& input) {
+				if (port.media == vsthost::NodePortMedia::Audio)
+				{
+					auto edge = makeAudioEdge();
+					node.audioOutput.emplace_back(port.audioKey(), edge);
+					receiver.audioInput.emplace_back(input.audioKey(), std::move(edge));
+				}
+				else
+				{
+					auto edge = std::make_shared<MidiEdge>();
+					for (auto& block : edge->events) { block.reserve(vsthost::RealtimeMidiQueue::Capacity); }
+					node.midiOutput.emplace_back(port.bus, edge);
+					receiver.midiInput.emplace_back(input.bus, std::move(edge));
+				}
+			});
+		}
+	}
+	m_vstTrackAudio.clear();
+	for (auto* container : {static_cast<TrackContainer*>(this), static_cast<TrackContainer*>(Engine::patternStore())})
+	{
+		for (auto* track : container->tracks())
+		{
+			auto* bus = sourceGraphAudioBus(*track);
+			if (!bus) { continue; }
+			const auto id = track->nodeWorkflowId().toString(QUuid::WithoutBraces);
+			const auto boundaries = nodeBoundaryPorts(QStringLiteral("source/") + id + '/');
+			std::vector<std::pair<ch_cnt_t, std::shared_ptr<AudioEdge>>> routes;
+			for (ch_cnt_t side = 0; side < 2; ++side)
+			{
+				QStringList sources{QStringLiteral("track-signal/") + id
+					+ (side == 0 ? QStringLiteral("/out-L") : QStringLiteral("/out-R"))};
+				for (const auto& boundary : boundaries)
+				{
+					if (boundary.output && boundary.signal == "audio" && boundary.track == id && boundary.channel == side)
+					{
+						sources.append(boundary.id);
+					}
+				}
+				visitVstInputs(sources, vsthost::NodePortMedia::Audio, [&](VstRoutes& receiver, const auto& input) {
+					auto edge = makeAudioEdge();
+					routes.emplace_back(side, edge);
+					receiver.audioInput.emplace_back(input.audioKey(), std::move(edge));
+				});
+			}
+			if (routes.empty()) { continue; }
+			m_vstTrackAudio.insert(bus, [routes = std::move(routes)](const AudioBuffer& buffer) {
+				const auto source = buffer.groupBuffers(0);
+				const auto period = Controller::runningPeriods();
+				const auto slot = period & 1;
+				for (const auto& [side, edge] : routes)
+				{
+					const auto frames = std::min<f_cnt_t>(source.frames(), edge->audio[slot].size());
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
+					{
+						edge->audio[slot][frame] = source.sample(side, frame);
+					}
+					edge->frames[slot] = frames;
+					edge->periods[slot] = period;
+				}
+			});
+		}
+	}
+	using DeferredOutput = std::pair<AudioBusHandle::MixerInput, std::shared_ptr<AudioEdge>>;
+	std::vector<DeferredOutput> deferredOutputs;
+	for (auto& node : vstNodes)
+	{
+		std::vector<std::pair<unsigned, AudioBusHandle::MixerInput>> routes;
+		for (const auto& port : node.ports)
+		{
+			if (!port.available || port.direction != vsthost::NodePortDirection::Output
+				|| port.media != vsthost::NodePortMedia::Audio)
+			{
+				continue;
+			}
+			for (const auto& [index, side] : resolvedInputs(node.prefix + port.key()))
+			{
+				auto* target = mixer->mixerChannel(index);
+				AudioBusHandle::MixerInput input{target, &target->m_volumeModel, side};
+				if (node.beforeMix)
+				{
+					routes.emplace_back(port.audioKey(), input);
+				}
+				else
+				{
+					auto edge = std::make_shared<AudioEdge>();
+					for (auto& block : edge->audio) { block.resize(MAXIMUM_BUFFER_SIZE); }
+					node.audioOutput.emplace_back(port.audioKey(), edge);
+					deferredOutputs.emplace_back(input, std::move(edge));
+				}
+			}
+		}
+		vsthost::VstNodeRouting routing;
+		if (!node.audioInput.empty())
+		{
+			routing.audioInput = [processor = node.processor, routes = std::move(node.audioInput)](
+				std::span<float> samples, unsigned stride) {
+				const auto period = Controller::runningPeriods() - 1;
+				if (period < 0 || !stride) { return; }
+				const auto slot = period & 1;
+				for (const auto& [key, edge] : routes)
+				{
+					const auto channel = processor->nodeAudioIndex(key, vsthost::NodePortDirection::Input);
+					if (channel >= stride || edge->periods[slot] != period) { continue; }
+					const auto frames = std::min(samples.size() / stride, edge->frames[slot]);
+					for (std::size_t frame = 0; frame < frames; ++frame)
+					{
+						samples[frame * stride + channel] += edge->audio[slot][frame];
+					}
+				}
+			};
+		}
+		if (!node.midiInput.empty())
+		{
+			routing.midiInput = [routes = std::move(node.midiInput)](std::span<vsthost::VstNodeMidiEvent> input) {
+				const auto period = Controller::runningPeriods() - 1;
+				if (period < 0) { return std::size_t{0}; }
+				const auto slot = period & 1;
+				std::size_t count = 0;
+				for (const auto& [bus, edge] : routes)
+				{
+					if (edge->periods[slot] != period) { continue; }
+					for (auto event : edge->events[slot])
+					{
+						if (count == input.size()) { return count; }
+						event.bus = bus;
+						input[count++] = event;
+					}
+				}
+				return count;
+			};
+		}
+		if (!node.midiOutput.empty())
+		{
+			routing.midiOutput = [routes = std::move(node.midiOutput)](const vsthost::VstNodeMidiEvent& event) {
+				const auto period = Controller::runningPeriods();
+				const auto slot = period & 1;
+				for (const auto& [bus, edge] : routes)
+				{
+					if (bus != event.bus) { continue; }
+					auto& events = edge->events[slot];
+					if (edge->periods[slot] != period)
+					{
+						events.clear();
+						edge->periods[slot] = period;
+					}
+					if (events.size() < events.capacity()) { events.push_back(event); }
+				}
+			};
+		}
+		node.processor->setNodeRouting(std::move(routing));
+		if (routes.empty() && node.audioOutput.empty())
+		{
+			node.processor->setNodeAudioReceiver({});
+			continue;
+		}
+		node.processor->setNodeAudioReceiver([mixer, processor = node.processor,
+			routes = std::move(routes), edges = std::move(node.audioOutput)](
+			std::span<const float> samples, unsigned stride) {
+			const auto period = Controller::runningPeriods();
+			const auto slot = period & 1;
+			for (const auto& [key, edge] : edges)
+			{
+				const auto channel = processor->nodeAudioIndex(key, vsthost::NodePortDirection::Output);
+				if (channel >= stride) { continue; }
+				auto& block = edge->audio[slot];
+				const auto frames = std::min(block.size(), samples.size() / stride);
+				for (std::size_t frame = 0; frame < frames; ++frame)
+				{
+					block[frame] = samples[frame * stride + channel];
+				}
+				edge->periods[slot] = period;
+				edge->frames[slot] = frames;
+			}
+			for (const auto& [key, target] : routes)
+			{
+				if (const auto index = target.resolveChannel(*mixer, 0))
+				{
+					const auto source = processor->nodeAudioIndex(key, vsthost::NodePortDirection::Output);
+					mixer->mixStridedMonoToChannel(samples, stride, source, *index, target.side);
+				}
+			}
+		});
+	}
+	m_deferredVstOutputs = {};
+	if (!deferredOutputs.empty())
+	{
+		m_deferredVstOutputs = [mixer, outputs = std::move(deferredOutputs)] {
+			const auto period = Controller::runningPeriods() - 1;
+			if (period < 0) { return; }
+			const auto slot = period & 1;
+			for (const auto& [target, edge] : outputs)
+			{
+				if (edge->periods[slot] != period) { continue; }
+				if (const auto index = target.resolveChannel(*mixer, 0))
+				{
+					mixer->mixStridedMonoToChannel(std::span(edge->audio[slot]).first(edge->frames[slot]),
+						1, 0, *index, target.side);
+				}
+			}
+		};
+	}
 	for (auto it = m_nodeCustomInstruments.cbegin(); it != m_nodeCustomInstruments.cend(); ++it)
 	{
 		AudioBusHandle::MixerFanout inputs;

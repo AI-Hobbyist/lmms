@@ -223,12 +223,33 @@ struct VstPlugin::Native
 	std::vector<float> input, output, dry;
 	std::atomic<std::uint32_t> audioLayout{0};
 	std::atomic<std::uint32_t> midiInputPort{UINT32_MAX};
+	std::array<std::atomic<unsigned>, 32> midiInputChannels{};
+	std::array<std::array<std::atomic<std::uint32_t>, vsthost::AudioQueue::MaxChannels>, 2> audioKeys{};
+	QMutex nodePortsMutex;
+	std::vector<vsthost::VstNodePort> nodePorts;
+	bool nodePortsPublished = false;
 
 	QByteArray lastState;
 	QString preservedState;
 	bool preserveState = false;
 	bool visible = false;
 	std::int64_t continuous = 0;
+	vsthost::Vst3Transport transport() const
+	{
+		auto* song = Engine::getSong();
+		vsthost::Vst3Transport position;
+		position.flags = (song->isPlaying() || song->isExporting() ? 1 : 0) | (song->isRecording() ? 2 : 0);
+		position.tempo = song->getTempo();
+		position.numerator = song->getTimeSigModel().getNumerator();
+		position.denominator = song->getTimeSigModel().getDenominator();
+		position.samples = song->getFrames();
+		position.music = double(song->getTicks()) / (DefaultTicksPerBar / 4);
+		const auto bar = double(position.numerator) * 4 / position.denominator;
+		position.bar = std::floor(position.music / bar) * bar;
+		position.continuous = continuous;
+		return position;
+	}
+
 	void applyFeedback(VstPlugin& plugin, const vsthost::Vst3HostProxy::Feedback& feedback)
 	{
 		for (const auto& edit : feedback.edits)
@@ -455,9 +476,47 @@ void VstPlugin::refreshNativeParameters()
 		return;
 	}
 	const auto& metadata = m_native->proxy.metadata();
+	bool portsChanged = false;
+	{
+		auto ports = vsthost::vst3NodePorts(metadata);
+		const QMutexLocker lock(&m_native->nodePortsMutex);
+		portsChanged = m_native->nodePortsPublished && m_native->nodePorts != ports;
+		m_native->nodePorts = std::move(ports);
+		m_native->nodePortsPublished = true;
+	}
+	if (portsChanged)
+	{
+		if (auto* song = Engine::getSong())
+		{
+			QMetaObject::invokeMethod(song, &Song::refreshVstNodePorts, Qt::QueuedConnection);
+		}
+	}
+	for (unsigned direction = 0; direction < m_native->audioKeys.size(); ++direction)
+	{
+		std::array<std::uint32_t, vsthost::AudioQueue::MaxChannels> keys;
+		keys.fill(UINT32_MAX);
+		for (const auto& bus : metadata.buses)
+		{
+			if (bus.media != 0 || bus.direction != direction || !bus.active || (bus.flags & 2)) { continue; }
+			for (unsigned channel = 0; channel < bus.channels && bus.channelOffset + channel < keys.size(); ++channel)
+			{
+				keys[bus.channelOffset + channel] = (bus.index << 16) | channel;
+			}
+		}
+		for (unsigned index = 0; index < keys.size(); ++index)
+		{
+			m_native->audioKeys[direction][index].store(keys[index], std::memory_order_release);
+		}
+	}
 	std::uint32_t midiInput = UINT32_MAX;
 	vsthost::resolveVst3EventPort(metadata, 0, vsthost::Vst3MidiPorts::Automatic, midiInput);
 	m_native->midiInputPort.store(midiInput, std::memory_order_release);
+	for (unsigned bus = 0; bus < m_native->midiInputChannels.size(); ++bus)
+	{
+		std::uint32_t port = UINT32_MAX;
+		vsthost::resolveVst3EventPort(metadata, 0, bus, port);
+		m_native->midiInputChannels[bus].store(port == UINT32_MAX ? 0 : port >> 5, std::memory_order_release);
+	}
 	vsthost::Vst3StereoPort inputPort, outputPort;
 	vsthost::resolveVst3Port(metadata, 0, vsthost::Vst3AudioPorts::Automatic, 0, inputPort);
 	vsthost::resolveVst3Port(metadata, 1, vsthost::Vst3AudioPorts::Automatic, 0, outputPort);
@@ -496,6 +555,40 @@ bool VstPlugin::process(const SampleFrame* input, SampleFrame* output, f_cnt_t f
 bool VstPlugin::processEffect(const SampleFrame* input, SampleFrame* output, f_cnt_t frames, float wet, float dry)
 {
 #ifdef LMMS_BUILD_WIN32
+	if (m_nodeRouting.audioInput || m_nodeRouting.midiInput || m_nodeRouting.midiOutput)
+	{
+		if (!output || !frames || frames > vsthost::AudioQueue::MaxFrames) { return false; }
+		const auto layout = m_native ? m_native->audioLayout.load(std::memory_order_acquire) : 0;
+		const auto inputs = m_native ? layout & 255 : vstInputChannels();
+		const auto outputs = m_native ? (layout >> 8) & 255 : vstOutputChannels();
+		if (inputs > vsthost::AudioQueue::MaxChannels || outputs > vsthost::AudioQueue::MaxChannels) { return false; }
+		const auto mainInput = m_native ? vsthost::decodeVst3Port((layout >> 16) & 255)
+			: vsthost::Vst3StereoPort{0, std::min(inputs, 2u)};
+		const auto mainOutput = m_native ? vsthost::decodeVst3Port(layout >> 24)
+			: vsthost::Vst3StereoPort{0, std::min(outputs, 2u)};
+		auto nodeInput = std::span(m_nodeInput).first(frames * inputs);
+		auto nodeOutput = std::span(m_nodeOutput).first(frames * outputs);
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			vsthost::writeVst3Port(nodeInput.subspan(frame * inputs, inputs), mainInput,
+				input ? input[frame][0] : 0.f, input ? input[frame][1] : 0.f);
+		}
+		if (m_nodeRouting.audioInput) { m_nodeRouting.audioInput(nodeInput, inputs); }
+		const auto eventCount = m_nodeRouting.midiInput ? m_nodeRouting.midiInput(m_nodeMidi) : 0;
+		const auto receive = +[](void* context, const vsthost::VstNodeMidiEvent& event) noexcept {
+			static_cast<VstPlugin*>(context)->m_nodeRouting.midiOutput(event);
+		};
+		const auto success = processNodeBlock(frames, nodeInput, nodeOutput, std::span(m_nodeMidi).first(eventCount),
+			m_nodeRouting.midiOutput ? receive : nullptr, this);
+		if (success && m_nodeAudioReceiver) { m_nodeAudioReceiver(nodeOutput, outputs); }
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			const auto samples = vsthost::readVst3Port(nodeOutput.subspan(frame * outputs, outputs), mainOutput);
+			const auto original = input ? input[frame] : SampleFrame{};
+			output[frame] = SampleFrame(samples[0], samples[1]) * wet + original * dry;
+		}
+		return success;
+	}
 	if (m_native)
 	{
 		if (!output)
@@ -531,22 +624,15 @@ bool VstPlugin::processEffect(const SampleFrame* input, SampleFrame* output, f_c
 				vsthost::writeVst3Port(
 					std::span(m_native->dry).subspan(frame * outputs, outputs), outputPort, left, right);
 			}
-			const auto* song = Engine::getSong();
-			vsthost::Vst3Transport transport;
-			transport.flags = (song->isPlaying() || song->isExporting() ? 1 : 0) | (song->isRecording() ? 2 : 0);
-			transport.tempo = Engine::getSong()->getTempo();
-			transport.numerator = Engine::getSong()->getTimeSigModel().getNumerator();
-			transport.denominator = Engine::getSong()->getTimeSigModel().getDenominator();
-			transport.samples = song->getFrames();
-			transport.music = double(song->getTicks()) / (DefaultTicksPerBar / 4);
-			const auto bar = double(transport.numerator) * 4 / transport.denominator;
-			transport.bar = std::floor(transport.music / bar) * bar;
-			transport.continuous = m_native->continuous;
 			const bool success = m_native->proxy.process({static_cast<std::uint32_t>(frames), inputs, outputs},
 				std::span(m_native->input).first(std::size_t(frames) * inputs),
-				std::span(m_native->output).first(std::size_t(frames) * outputs), transport, offline,
+				std::span(m_native->output).first(std::size_t(frames) * outputs), m_native->transport(), offline,
 				std::span(m_native->dry).first(std::size_t(frames) * outputs), wet, dry, offline ? &generated : nullptr,
 				offline ? nullptr : receive, nullptr);
+			if (success && m_nodeAudioReceiver)
+			{
+				m_nodeAudioReceiver(std::span(m_native->output).first(std::size_t(frames) * outputs), outputs);
+			}
 			for (unsigned frame = 0; frame < frames; ++frame)
 			{
 				const auto samples = success
@@ -579,12 +665,137 @@ bool VstPlugin::processEffect(const SampleFrame* input, SampleFrame* output, f_c
 	{
 		std::fill_n(original.begin(), frames, SampleFrame{});
 	}
+#ifdef LMMS_BUILD_WIN32
+	const auto processed = m_nodeAudioReceiver
+		? processVstStereo(input, output, m_nodeAudioReceiver) : RemotePlugin::process(input, output);
+#else
 	const auto processed = RemotePlugin::process(input, output);
+#endif
 	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
 		output[frame] = output[frame] * wet + original[frame] * dry;
 	}
 	return processed;
+}
+
+void VstPlugin::setNodeRouting(vsthost::VstNodeRouting routing)
+{
+#ifdef LMMS_BUILD_WIN32
+	if (routing.audioInput || routing.midiInput || routing.midiOutput)
+	{
+		m_nodeInput.resize(vsthost::AudioQueue::MaxSamples);
+		m_nodeOutput.resize(vsthost::AudioQueue::MaxSamples);
+		m_nodeMidi.resize(vsthost::RealtimeMidiQueue::Capacity);
+	}
+#endif
+	m_nodeRouting = std::move(routing);
+}
+
+bool VstPlugin::processNodeBlock(f_cnt_t frames, std::span<const float> input, std::span<float> output,
+	std::span<const vsthost::VstNodeMidiEvent> events, vsthost::VstNodeMidiReceiver receiver, void* context)
+{
+	std::fill(output.begin(), output.end(), 0.f);
+#ifdef LMMS_BUILD_WIN32
+	if (!frames || frames > vsthost::AudioQueue::MaxFrames) { return false; }
+	const auto validMidi = [frames](const auto& event) {
+		return event.offset < frames && event.status >= 0x80 && event.status < 0xf0
+			&& event.first < 0x80 && event.second < 0x80;
+	};
+	if (m_native)
+	{
+		const bool offline = Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting();
+		struct Destination
+		{
+			vsthost::VstNodeMidiReceiver receiver;
+			void* context;
+		} destination{receiver, context};
+		const auto receive = +[](void* data, const vsthost::Vst3OutputEvent& generated,
+			const vsthost::Vst3Transport&, std::uint32_t offset) noexcept {
+			const auto& target = *static_cast<Destination*>(data);
+			const auto& event = generated.event;
+			const auto status = event.type == 1 ? MidiNoteOn : event.type == 2 ? MidiNoteOff : MidiKeyPressure;
+			target.receiver(target.context, {event.bus, offset, static_cast<std::uint8_t>(status | event.channel),
+				static_cast<std::uint8_t>(event.id), static_cast<std::uint8_t>(std::lround(event.value * 127))});
+			return true;
+		};
+		const auto render = [&] {
+			const auto dimensions = m_native->audioLayout.load(std::memory_order_acquire);
+			const auto inputs = dimensions & 255;
+			const auto outputs = (dimensions >> 8) & 255;
+			if (input.size() != frames * inputs || output.size() != frames * outputs) { return false; }
+			for (const auto& event : events)
+			{
+				const unsigned channel = event.status & 15;
+				if (!validMidi(event) || event.bus >= m_native->midiInputChannels.size()
+					|| channel >= m_native->midiInputChannels[event.bus].load(std::memory_order_acquire))
+				{
+					continue;
+				}
+				vsthost::Vst3BlockEvent translated{0, event.offset, event.bus, channel, event.first,
+					event.second / 127.0};
+				switch (event.status & 0xf0)
+				{
+				case MidiNoteOn: translated.type = event.second ? 1 : 2; break;
+				case MidiNoteOff: translated.type = 2; break;
+				case MidiKeyPressure: translated.type = 3; break;
+				case MidiControlChange: translated.type = 4; break;
+				case MidiChannelPressure:
+					translated.type = 4;
+					translated.id = 128;
+					translated.value = event.first / 127.0;
+					break;
+				case MidiPitchBend:
+					translated.type = 4;
+					translated.id = 129;
+					translated.value = (event.first | (event.second << 7)) / 16383.0;
+					break;
+				default: continue;
+				}
+				m_native->proxy.postEvent(translated);
+			}
+			std::vector<vsthost::Vst3OutputEvent> generated;
+			const auto transport = m_native->transport();
+			const auto success = m_native->proxy.process({static_cast<std::uint32_t>(frames), inputs, outputs},
+				input, output, transport,
+				offline, {}, 1.f, 0.f, offline && receiver ? &generated : nullptr,
+				!offline && receiver ? receive : nullptr, &destination);
+			for (const auto& event : generated) { receive(&destination, event, transport, event.event.offset); }
+			return success;
+		};
+		const auto success = offline ? render() : m_native->proxy.withAudio(render);
+		m_native->continuous += frames;
+		return success;
+	}
+
+	if (frames != Engine::audioEngine()->framesPerPeriod()
+		|| input.size() != frames * vstInputChannels() || output.size() != frames * vstOutputChannels())
+	{
+		return false;
+	}
+	for (const auto& event : events)
+	{
+		if (!validMidi(event) || event.bus != 0) { continue; }
+		const auto type = static_cast<MidiEventTypes>(event.status & 0xf0);
+		const int first = type == MidiPitchBend ? event.first | (event.second << 7) : event.first;
+		RemotePlugin::processMidiEvent(MidiEvent(type, event.status & 15, first, event.second), event.offset);
+	}
+	std::array<std::uint8_t, vsthost::AudioQueue::MaxOutputEventBytes> generated;
+	std::uint32_t generatedBytes = 0;
+	const auto success = processVstChannels(static_cast<unsigned>(frames), input, output, generated,
+		receiver ? &generatedBytes : nullptr);
+	if (success && receiver)
+	{
+		for (std::uint32_t byte = 0; byte + 8 <= generatedBytes; byte += 8)
+		{
+			const auto offset = static_cast<std::uint32_t>(vsthost::get(generated, byte, 4));
+			const vsthost::VstNodeMidiEvent event{0, offset, generated[byte + 4], generated[byte + 5], generated[byte + 6]};
+			if (validMidi(event)) { receiver(context, event); }
+		}
+	}
+	return success;
+#else
+	return false;
+#endif
 }
 
 void VstPlugin::processMidiEvent(const MidiEvent& event, f_cnt_t offset)
@@ -654,6 +865,113 @@ QString VstPlugin::parameterStateKey(int index) const
 	}
 #endif
 	return QString("param%1").arg(index);
+}
+
+std::vector<VstPlugin::AutomationParameter> VstPlugin::automationParameters()
+{
+	std::vector<AutomationParameter> parameters;
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		constexpr std::uint32_t canAutomate = 1u;
+		constexpr std::uint32_t readOnly = 2u;
+		const auto& metadata = m_native->proxy.metadata().parameters;
+		for (std::size_t i = 0; i < m_native->ids.size(); ++i)
+		{
+			const auto id = m_native->ids[i];
+			const auto found = std::find_if(metadata.begin(), metadata.end(),
+				[id](const auto& item) { return item.id == id; });
+			if (found != metadata.end() && !(found->flags & readOnly))
+			{
+				const auto index = static_cast<int>(i);
+				const float step = found->steps ? 1.f / static_cast<float>(found->steps) : 0.f;
+				parameters.push_back({index, parameterStateKey(index), QString::fromUtf8(found->title),
+					static_cast<float>(found->value), step, (found->flags & canAutomate) != 0});
+			}
+		}
+		return parameters;
+	}
+#endif
+	const auto dump = parameterDump();
+	lock();
+	m_parameterAutomation.clear();
+	sendMessage(IdVstParameterAutomation);
+	waitForMessage(IdVstParameterAutomation, true);
+	const auto capabilities = m_parameterAutomation;
+	unlock();
+	for (auto it = dump.cbegin(); it != dump.cend(); ++it)
+	{
+		const auto& text = it.value();
+		const auto first = text.indexOf(':');
+		const auto last = text.lastIndexOf(':');
+		if (first < 1 || last <= first) { continue; }
+		bool validIndex = false;
+		const auto index = text.first(first).toInt(&validIndex);
+		if (!validIndex || index < 0 || index >= capabilities.size())
+		{
+			continue;
+		}
+		parameters.push_back({index, parameterStateKey(index), text.mid(first + 1, last - first - 1),
+			text.sliced(last + 1).toFloat(), 0.f, capabilities[index] == '1'});
+	}
+	return parameters;
+}
+
+std::vector<vsthost::VstNodePort> VstPlugin::nodePorts()
+{
+#ifdef LMMS_BUILD_WIN32
+	if (m_native)
+	{
+		const QMutexLocker lock(&m_native->nodePortsMutex);
+		return m_native->nodePorts;
+	}
+	if (m_midiCapabilities < 0)
+	{
+		lock();
+		sendMessage(IdVstMidiCapabilities);
+		const auto reply = waitForMessage(IdVstMidiCapabilities, true);
+		m_midiCapabilities = reply.id == IdVstMidiCapabilities && reply.argumentCount() == 1 ? reply.getInt() : 0;
+		unlock();
+	}
+	std::vector<vsthost::VstNodePort> ports;
+	for (const auto direction : {vsthost::NodePortDirection::Input, vsthost::NodePortDirection::Output})
+	{
+		const auto count = direction == vsthost::NodePortDirection::Input ? vstInputChannels() : vstOutputChannels();
+		for (unsigned pin = 0; pin < count; ++pin)
+		{
+			ports.push_back({vsthost::NodePortMedia::Audio, direction, pin, 0, pin,
+				tr("Audio %1").arg(pin + 1), true});
+		}
+		const auto midiCapability = direction == vsthost::NodePortDirection::Input ? 1 : 2;
+		if (m_midiCapabilities & midiCapability)
+		{
+			ports.push_back({vsthost::NodePortMedia::Midi, direction, 0, 0, 0, tr("MIDI"), true});
+		}
+	}
+	return ports;
+#else
+	return {};
+#endif
+}
+
+unsigned VstPlugin::nodeAudioIndex(std::uint32_t key, vsthost::NodePortDirection direction) const noexcept
+{
+#ifdef LMMS_BUILD_WIN32
+	const bool output = direction == vsthost::NodePortDirection::Output;
+	if (m_native)
+	{
+		const auto& keys = m_native->audioKeys[output ? 1 : 0];
+		for (unsigned index = 0; index < keys.size(); ++index)
+		{
+			if (keys[index].load(std::memory_order_acquire) == key) { return index; }
+		}
+	}
+	else if ((key & 0xffff) == 0 && (key >> 16) < (output ? vstOutputChannels() : vstInputChannels()))
+	{
+		return key >> 16;
+	}
+#endif
+	return UINT32_MAX;
 }
 
 void VstPlugin::bindParameterModel(int index, FloatModel* model)
@@ -1194,6 +1512,10 @@ bool VstPlugin::processMessage( const message & _m )
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
 			printf("unique ID: %s\n", _m.getString().c_str() );
+			break;
+
+		case IdVstParameterAutomation:
+			m_parameterAutomation = QByteArray::fromStdString(_m.getString());
 			break;
 
 		case IdVstParameterDump:

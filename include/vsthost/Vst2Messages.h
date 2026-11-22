@@ -84,7 +84,9 @@ enum VstRemoteMessageIDs
 	IdVstParameterDump,
 	IdVstScanPlugin,
 	IdVstShellEntries,
-	IdVstParameterEdits
+	IdVstParameterEdits,
+	IdVstParameterAutomation,
+	IdVstMidiCapabilities
 };
 
 } // namespace lmms

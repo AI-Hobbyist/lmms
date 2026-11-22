@@ -24,6 +24,7 @@
  */
 
 #include "AudioBusHandle.h"
+#include "Song.h"
 
 #include <QMutexLocker>
 
@@ -323,6 +324,7 @@ void AudioBusHandle::doProcessing()
 	}
 	if (hasOutput)
 	{
+		Engine::getSong()->publishVstTrackAudio(this, m_buffer);
 		auto* mixer = Engine::mixer();
 		if (m_mixerInputs)
 		{

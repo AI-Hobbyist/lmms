@@ -25,6 +25,8 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
+#include <span>
+
 #include "AudioBuffer.h"
 #include "NodeSignalActivity.h"
 #include "EffectChain.h"
@@ -173,6 +175,8 @@ public:
 
 	void mixToChannel(const AudioBuffer& buffer, mix_ch_t dest);
 	void mixMonoToChannel(const AudioBuffer& buffer, ch_cnt_t sourceSide, mix_ch_t dest, ch_cnt_t destSide);
+	void mixStridedMonoToChannel(std::span<const float> samples, unsigned stride, unsigned sourceChannel,
+		mix_ch_t dest, ch_cnt_t destSide);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );

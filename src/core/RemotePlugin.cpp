@@ -429,16 +429,33 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
+#ifdef LMMS_BUILD_WIN32
+bool RemotePlugin::processVstStereo(const SampleFrame* input, SampleFrame* output,
+	const std::function<void(std::span<const float>, unsigned)>& receive)
+{
+	const auto frames = Engine::audioEngine()->framesPerPeriod();
+	const bool offline = Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting();
+	return m_vstBridge && m_vstBridge->process(frames, vstInputChannels(), vstOutputChannels(),
+		reinterpret_cast<const float*>(input), reinterpret_cast<float*>(output), offline, receive);
+}
+
+bool RemotePlugin::processVstChannels(unsigned frames, std::span<const float> input, std::span<float> output,
+	std::span<std::uint8_t> generated, std::uint32_t* generatedBytes)
+{
+	if (!m_vstBridge) { return false; }
+	const vsthost::AudioQueue::Layout layout{frames, vstInputChannels(), vstOutputChannels()};
+	const bool offline = Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting();
+	return m_vstBridge->processChannels(layout, input, output, offline, generated, generatedBytes);
+}
+#endif
+
 bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 {
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstBridge)
 	{
-		return m_vstBridge->process(frames, static_cast<unsigned>(m_inputCount.load()),
-			static_cast<unsigned>(m_outputCount.load()), reinterpret_cast<const float*>(_in_buf),
-			reinterpret_cast<float*>(_out_buf),
-			Engine::audioEngine()->renderOnly() || Engine::getSong()->isExporting());
+		return processVstStereo(_in_buf, _out_buf);
 	}
 #endif
 

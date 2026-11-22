@@ -29,6 +29,10 @@
 #include <QProcess>
 #include <QRecursiveMutex>
 
+#include <cstdint>
+#include <functional>
+#include <span>
+
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
 #include "LmmsTypes.h"
@@ -151,6 +155,14 @@ protected:
 
 
 	bool m_failed;
+#ifdef LMMS_BUILD_WIN32
+	unsigned vstInputChannels() const noexcept { return static_cast<unsigned>(m_inputCount.load()); }
+	unsigned vstOutputChannels() const noexcept { return static_cast<unsigned>(m_outputCount.load()); }
+	bool processVstChannels(unsigned frames, std::span<const float> input, std::span<float> output,
+		std::span<std::uint8_t> generated, std::uint32_t* generatedBytes);
+	bool processVstStereo(const SampleFrame* input, SampleFrame* output,
+		const std::function<void(std::span<const float>, unsigned)>& receive = {});
+#endif
 private:
 	void resizeSharedProcessingMemory();
 

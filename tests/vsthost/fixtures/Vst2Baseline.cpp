@@ -10,6 +10,8 @@ namespace {
 struct Instance
 {
 	AEffect effect{};
+	audioMasterCallback host = nullptr;
+	bool echoMidi = false;
 	float gain = 0.5f;
 	int program = 0;
 	std::array<VstMidiEvent, 32> events{};
@@ -42,6 +44,20 @@ float VST_CALL_CONV getParameter(AEffect* effect, int32_t index)
 void VST_CALL_CONV process(AEffect* effect, float** inputs, float** outputs, int32_t frames)
 {
 	auto& plugin = instance(effect);
+	if (plugin.echoMidi && plugin.eventCount)
+	{
+		struct OutputEvents
+		{
+			int32_t numEvents;
+			void* reserved;
+			std::array<VstEvent*, 32> events;
+		} outgoing{plugin.eventCount, nullptr, {}};
+		for (int index = 0; index < plugin.eventCount; ++index)
+		{
+			outgoing.events[index] = reinterpret_cast<VstEvent*>(&plugin.events[index]);
+		}
+		plugin.host(effect, audioMasterProcessEvents, 0, 0, &outgoing, 0);
+	}
 	int event = 0;
 	for (int frame = 0; frame < frames; ++frame)
 	{
@@ -70,6 +86,15 @@ intptr_t VST_CALL_CONV dispatch(AEffect* effect, int32_t opcode, int32_t, intptr
 	auto& plugin = instance(effect);
 	switch (opcode)
 	{
+	case 26: // effCanBeAutomated
+		return 1;
+	case effCanDo:
+		if (pointer && std::strcmp(static_cast<const char*>(pointer), "receiveVstMidiEvent") == 0) { return 1; }
+		if (pointer && std::strcmp(static_cast<const char*>(pointer), "sendVstMidiEvent") == 0)
+		{
+			return plugin.echoMidi ? 1 : -1;
+		}
+		return 0;
 	case effProcessEvents: {
 		const auto* events = static_cast<VstEvents*>(pointer);
 		plugin.eventCount = std::clamp(events->numEvents, 0, 32);
@@ -150,6 +175,10 @@ extern "C" FIXTURE_EXPORT AEffect* VST_CALL_CONV VSTPluginMain(audioMasterCallba
 		return nullptr;
 	}
 	auto* plugin = new Instance;
+	plugin->host = host;
+#ifdef _WIN32
+	plugin->echoMidi = GetEnvironmentVariableW(L"LMMS_VST2_FIXTURE_MIDI_ECHO", nullptr, 0) != 0;
+#endif
 	auto& effect = plugin->effect;
 	effect.magic = kEffectMagic;
 	effect.dispatcher = dispatch;

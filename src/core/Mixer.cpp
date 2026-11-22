@@ -1063,6 +1063,28 @@ void Mixer::mixMonoToChannel(const AudioBuffer& buffer, ch_cnt_t sourceSide, mix
 	channel->m_buffer.assumeNonSilent(destSide);
 }
 
+void Mixer::mixStridedMonoToChannel(std::span<const float> samples, unsigned stride, unsigned sourceChannel,
+	mix_ch_t dest, ch_cnt_t destSide)
+{
+	if (sourceChannel >= stride || samples.empty() || dest >= m_mixerChannels.size() || destSide >= 2) { return; }
+	auto* channel = m_mixerChannels[dest];
+	if (channel->m_muteModel.value()) { return; }
+	const QMutexLocker lock(&channel->m_lock);
+	auto target = channel->m_buffer.groupBuffers(0);
+	auto interleaved = channel->m_buffer.interleavedBuffer();
+	const auto frames = std::min<f_cnt_t>(samples.size() / stride, target.frames());
+	bool audible = false;
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		const auto incoming = samples[frame * stride + sourceChannel];
+		audible = audible || incoming != 0.f;
+		auto& sample = target.sample(destSide, frame);
+		sample += incoming;
+		interleaved[frame][destSide] = sample;
+	}
+	if (audible) { channel->m_buffer.assumeNonSilent(destSide); }
+}
+
 
 
 

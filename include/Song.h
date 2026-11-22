@@ -26,6 +26,7 @@
 #define LMMS_SONG_H
 
 #include <array>
+#include <functional>
 #include <memory>
 
 #include <QDomDocument>
@@ -50,6 +51,8 @@ namespace lmms
 {
 
 class InstrumentTrack;
+class AudioBusHandle;
+class AudioBuffer;
 
 class AutomationTrack;
 class AutomationClip;
@@ -279,6 +282,9 @@ public:
 	void createNewProject();
 	void createNodeProject();
 	bool isNodeProject() const { return m_nodeProject; }
+	void mixDeferredVstOutputs();
+	void publishVstTrackAudio(const AudioBusHandle* bus, const AudioBuffer& buffer) const;
+	void refreshVstNodePorts();
 	void setNodeMasterOutputConnected(unsigned side, bool connected);
 	std::optional<QPointF> nodeTrackPosition(Track& track) const;
 	std::optional<QPointF> nodeLayoutPosition(const QString& key) const;
@@ -378,7 +384,7 @@ public:
 	QString nodeCustomEffectScope(const QUuid& id) const;
 	void setNodeCustomEffectScope(const QUuid& id, const QString& scope);
 	QList<QPair<QString, InstrumentTrack*>> nodeCustomInstruments(const QString& scope) const;
-	QString addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file = {});
+	QString addNodeCustomInstrument(const QString& scope, const QString& plugin, const QString& file = {}, bool fromDrop = false);
 	QString pasteNodeCustomInstrument(const QString& scope, const QDomElement& state);
 	void removeNodeCustomInstrument(const QString& scope, const QString& id);
 	std::optional<QPair<bool, int>> nodeConnectionAggregation() const;
@@ -618,6 +624,8 @@ private:
 
 	bool m_nodeProject = false;
 	QDomDocument m_nodeWorkflow;
+	std::function<void()> m_deferredVstOutputs;
+	QHash<const AudioBusHandle*, std::function<void(const AudioBuffer&)>> m_vstTrackAudio;
 	std::unique_ptr<TrackContainer> m_nodePianoRollTracks;
 	QHash<QString, Clip*> m_nodePianoRollClips;
 	QString m_fileName;

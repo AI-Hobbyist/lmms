@@ -267,6 +267,7 @@ void AudioEngine::renderStageEffects()
 	// STAGE 2: process effects of all instrument- and sampletracks
 	AudioEngineWorkerThread::fillJobQueue(m_audioBusHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
+	Engine::getSong()->mixDeferredVstOutputs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();

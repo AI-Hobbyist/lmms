@@ -114,7 +114,8 @@ public:
 					|| command.id == IdVstSetProgram || command.id == IdVstRotateProgram
 					|| command.id == IdVstLoadAllParameterDisplays || command.id == IdVstLoadAllParameterLabels
 					|| command.id == IdVstUpdateParameterDisplay || command.id == IdVstUpdateParameterLabel
-					|| command.id == IdVstParameterDump))
+					|| command.id == IdVstParameterDump || command.id == IdVstParameterAutomation
+					|| command.id == IdVstMidiCapabilities))
 			{
 				m_replies.push_back(std::move(decoded));
 			}
@@ -165,7 +166,8 @@ public:
 	}
 	void tempo(unsigned value) noexcept { m_tempo.store((UINT64_C(1) << 32) | value, std::memory_order_release); }
 	bool process(
-		std::uint32_t frames, unsigned inputs, unsigned outputs, const float* input, float* output, bool offline)
+		std::uint32_t frames, unsigned inputs, unsigned outputs, const float* input, float* output, bool offline,
+		const std::function<void(std::span<const float>, unsigned)>& receive = {})
 	{
 		if (!m_loaded.load(std::memory_order_acquire))
 		{
@@ -191,23 +193,8 @@ public:
 		const AudioQueue::Layout layout{frames, inputs, outputs};
 		const auto in = std::span(m_input).first(frames * inputs);
 		const auto out = std::span(m_output).first(frames * outputs);
-		bool success = false;
-		if (offline)
-		{
-			auto reply
-				= m_session
-					  .renderOffline(layout, std::vector<float>(in.begin(), in.end()), [this] { return audioEvents(); })
-					  .get();
-			success = reply.error == Error::None && reply.payload.size() == out.size_bytes();
-			if (success)
-			{
-				std::memcpy(out.data(), reply.payload.data(), out.size_bytes());
-			}
-		}
-		else
-		{
-			success = m_session.processPrepared(layout, in, out, [this] { return audioEvents(); });
-		}
+		const auto success = processChannels(layout, in, out, offline);
+		if (success && receive) { receive(out, outputs); }
 		if (output)
 		{
 			for (unsigned frame = 0; frame < frames; ++frame)
@@ -219,6 +206,34 @@ public:
 			}
 		}
 		return success;
+	}
+
+	bool processChannels(AudioQueue::Layout layout, std::span<const float> input, std::span<float> output,
+		bool offline, std::span<std::uint8_t> generated = {}, std::uint32_t* generatedBytes = nullptr)
+	{
+		if (generatedBytes) { *generatedBytes = 0; }
+		if (!m_loaded.load(std::memory_order_acquire)) { return false; }
+		const auto prepare = [this] { return audioEvents(); };
+		if (!offline)
+		{
+			return m_session.processPrepared(layout, input, output, prepare, generated, generatedBytes);
+		}
+
+		const auto followup = generatedBytes ? std::optional{MessageType::Midi} : std::nullopt;
+		const auto reply = m_session.renderOffline(layout, std::vector<float>(input.begin(), input.end()),
+			prepare, 5000, followup).get();
+		if (reply.error != Error::None || reply.payload.size() != output.size_bytes()
+			|| reply.followupPayload.size() > generated.size())
+		{
+			return false;
+		}
+		if (!output.empty()) { std::memcpy(output.data(), reply.payload.data(), output.size_bytes()); }
+		if (generatedBytes)
+		{
+			std::copy(reply.followupPayload.begin(), reply.followupPayload.end(), generated.begin());
+			*generatedBytes = static_cast<std::uint32_t>(reply.followupPayload.size());
+		}
+		return true;
 	}
 
 private:

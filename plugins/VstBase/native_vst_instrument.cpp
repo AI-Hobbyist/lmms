@@ -7,6 +7,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "InstrumentView.h"
+#include "NativeVstModels.h"
 #include "NativeVstSelection.h"
 #include "Song.h"
 #include "embed.h"
@@ -17,12 +18,12 @@ namespace lmms {
 extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT native_vst_instrument_plugin_descriptor{"native_vst_instrument", "VST Instruments",
 	QT_TRANSLATE_NOOP("PluginBrowser", "Native VST instruments"), "LMMS", 0x0100, Plugin::Type::Instrument,
-	new PixmapLoader("instrument_plugin"), nullptr, new vsthost::NativeVstFeatures(Plugin::Type::Instrument)};
+	new PixmapLoader("instrument_track"), nullptr, new vsthost::NativeVstFeatures(Plugin::Type::Instrument)};
 }
 
 namespace {
 
-class NativeVstInstrument final : public Instrument
+class NativeVstInstrument final : public Instrument, public vsthost::VstNodeOwner
 {
 public:
 	NativeVstInstrument(InstrumentTrack* track, const vsthost::NativeVstKey* key)
@@ -39,6 +40,7 @@ public:
 			else
 			{
 				setDisplayName(m_plugin->name());
+				m_parameters.initialize(*m_plugin, this);
 			}
 		}
 		Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(this, track));
@@ -63,15 +65,29 @@ public:
 
 	void loadSettings(const QDomElement& state) override
 	{
-		if (m_plugin) { m_plugin->loadSettings(state); }
+		if (m_plugin)
+		{
+			m_plugin->loadSettings(state);
+			m_parameters.load(*m_plugin, state);
+		}
 	}
 
 	void saveSettings(QDomDocument& document, QDomElement& state) override
 	{
-		if (m_plugin) { m_plugin->saveSettings(document, state); }
+		if (m_plugin)
+		{
+			m_plugin->saveSettings(document, state);
+			m_parameters.save(document, state);
+		}
 	}
 
 	QString nodeName() const override { return "native_vst_instrument"; }
+	vsthost::VstNodeProcessor* vstNodeProcessor() noexcept override { return m_plugin.get(); }
+	QMap<QString, AutomatableModel*> parameterModels() override { return m_parameters.models(); }
+	AutomatableModel* childModel(std::string_view name) override
+	{
+		return m_parameters.models().value(QString::fromUtf8(name.data(), static_cast<qsizetype>(name.size())));
+	}
 
 	gui::PluginView* instantiateView(QWidget* parent) override
 	{
@@ -81,12 +97,14 @@ public:
 		open->setEnabled(m_plugin && m_plugin->hasEditor());
 		if (m_plugin) { QObject::connect(open, &QPushButton::clicked, m_plugin.get(), &VstPlugin::toggleUI); }
 		layout->addWidget(open);
+		m_parameters.addControls(layout);
 		layout->addStretch();
 		return view;
 	}
 
 private:
 	std::unique_ptr<VstPlugin> m_plugin;
+	NativeVstModels m_parameters;
 };
 
 } // namespace

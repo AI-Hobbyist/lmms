@@ -24,6 +24,7 @@
  */
 
 #include "Effect.h"
+#include "vsthost/VstNodePorts.h"
 
 #include <QDomElement>
 
@@ -96,7 +97,9 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 {
 	if (!isAwake())
 	{
-		if (!inOut.hasSignal(0b11))
+		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(this);
+		auto* processor = owner ? owner->vstNodeProcessor() : nullptr;
+		if (!inOut.hasSignal(0b11) && !(processor && processor->hasNodeInput()))
 		{
 			// Sleeping plugins need to zero any track channels their output is routed to in order to
 			// prevent sudden track channel passthrough behavior when the plugin is put to sleep.

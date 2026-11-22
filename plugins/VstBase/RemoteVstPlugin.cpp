@@ -30,7 +30,8 @@
  *
  */
 
- #include <cmath>
+#include <cmath>
+#include <span>
 
 #include "lmmsconfig.h"
 
@@ -193,6 +194,18 @@ public:
 	void destroyEditor();
 
 	virtual void process( const SampleFrame* _in, SampleFrame* _out );
+
+#ifdef LMMS_BUILD_WIN32
+	std::span<const std::uint8_t> processWithMidiOutput(
+		const SampleFrame* input, SampleFrame* output, std::span<std::uint8_t> buffer)
+	{
+		s_midiOutput = buffer;
+		s_midiOutputBytes = 0;
+		process(input, output);
+		s_midiOutput = {};
+		return buffer.first(s_midiOutputBytes);
+	}
+#endif
 
 
 	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
@@ -521,6 +534,10 @@ private:
 
 	using VstMidiEventList = std::vector<VstMidiEvent>;
 	VstMidiEventList m_midiEvents;
+#ifdef LMMS_BUILD_WIN32
+	inline static thread_local std::span<std::uint8_t> s_midiOutput;
+	inline static thread_local std::size_t s_midiOutputBytes = 0;
+#endif
 
 	bpm_t m_bpm;
 	double m_currentSamplePos;
@@ -704,6 +721,28 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 		case IdVstSetLanguage:
 			hlang = static_cast<VstHostLanguage>( _m.getInt() );
 			break;
+
+		case IdVstMidiCapabilities:
+		{
+			char receive[] = "receiveVstMidiEvent";
+			char send[] = "sendVstMidiEvent";
+			const bool acceptsMidi = pluginDispatch(effCanDo, 0, 0, receive) > 0;
+			const bool sendsMidi = pluginDispatch(effCanDo, 0, 0, send) > 0;
+			sendMessage(message(IdVstMidiCapabilities).addInt((acceptsMidi ? 1 : 0) | (sendsMidi ? 2 : 0)));
+			break;
+		}
+
+		case IdVstParameterAutomation:
+		{
+			constexpr int canBeAutomated = 26; // VST2 effCanBeAutomated.
+			std::string capabilities;
+			for (int index = 0; index < m_plugin->numParams; ++index)
+			{
+				capabilities += pluginDispatch(canBeAutomated, index) > 0 ? '1' : '0';
+			}
+			sendMessage(message(IdVstParameterAutomation).addString(capabilities));
+			break;
+		}
 
 		case IdVstGetParameterDump:
 			getParameterDump();
@@ -2149,9 +2188,35 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 		}
 
 		case audioMasterProcessEvents:
+		{
 			SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
-			// VstEvents* in <ptr>
+#ifdef LMMS_BUILD_WIN32
+			const auto* events = static_cast<const VstEvents*>(_ptr);
+			if (s_midiOutput.empty() || !events || events->numEvents < 0) { return 0; }
+			const auto* entries = reinterpret_cast<VstEvent* const*>(events->events);
+			for (int32_t index = 0; index < events->numEvents; ++index)
+			{
+				if (s_midiOutputBytes + 8 > s_midiOutput.size()) { return 0; }
+				const auto* event = entries[index];
+				if (!event) { continue; }
+				int32_t type = 0;
+				std::memcpy(&type, event, sizeof(type));
+				if (type != kVstMidiType) { continue; }
+				const auto* midi = reinterpret_cast<const VstMidiEvent*>(event);
+				if (midi->deltaFrames < 0 || midi->deltaFrames >= __plugin->bufferSize()) { continue; }
+				const auto offset = static_cast<std::uint32_t>(midi->deltaFrames);
+				for (unsigned byte = 0; byte < 4; ++byte)
+				{
+					s_midiOutput[s_midiOutputBytes + byte] = static_cast<std::uint8_t>(offset >> (8 * byte));
+					s_midiOutput[s_midiOutputBytes + 4 + byte] = static_cast<std::uint8_t>(midi->midiData[byte]);
+				}
+				s_midiOutputBytes += 8;
+			}
+			return 1;
+#else
 			return 0;
+#endif
+		}
 
 		case audioMasterIOChanged:
 			SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );

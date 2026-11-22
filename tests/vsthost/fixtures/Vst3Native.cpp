@@ -541,6 +541,11 @@ public:
 		parameters.addParameter(new Parameter(u"Gain", 0xf0000101, nullptr, 0.25));
 		parameters.addParameter(
 			new Parameter(u"Bypass", 42, nullptr, 0, 1, ParameterInfo::kCanAutomate | ParameterInfo::kIsBypass));
+		if (GetEnvironmentVariableW(L"LMMS_VST3_FIXTURE_PARAMETER_CAPABILITIES", nullptr, 0))
+		{
+			parameters.addParameter(new Parameter(u"Panel trim", 43, nullptr, 0.5, 0, 0));
+			parameters.addParameter(new Parameter(u"Meter", 44, nullptr, 0, 0, ParameterInfo::kIsReadOnly));
+		}
 		return kResultOk;
 	}
 	tresult PLUGIN_API setComponentState(IBStream* stream) override
@@ -571,7 +576,7 @@ public:
 	}
 	tresult PLUGIN_API getParameterInfo(int32 index, ParameterInfo& info) override
 	{
-		const auto result = EditController::getParameterInfo((m_changed != m_reverse) ? 1 - index : index, info);
+		const auto result = EditController::getParameterInfo(index < 2 && (m_changed != m_reverse) ? 1 - index : index, info);
 		if (result == kResultOk && m_changed && info.id == 0xf0000101)
 		{
 			std::fill_n(info.title, 128, char16{});
