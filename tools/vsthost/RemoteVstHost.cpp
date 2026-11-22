@@ -11,6 +11,7 @@
 #include <mutex>
 #include <thread>
 #include <windows.h>
+#include <ole2.h>
 
 using namespace lmms::vsthost;
 namespace {
@@ -90,6 +91,17 @@ int wmain(int argc, wchar_t** argv)
 	{
 		return 2;
 	}
+	// This thread owns the plug-in editor and its Win32 message loop.
+	const auto oleResult = OleInitialize(nullptr);
+	if (FAILED(oleResult))
+	{
+		return 3;
+	}
+	struct OleApartment
+	{
+		~OleApartment() { OleUninitialize(); }
+	} oleApartment;
+
 	std::uint64_t session = 0, generation = 0, capacity = 0;
 	if (!number(argv[4], session) || !number(argv[5], generation) || !number(argv[6], capacity) || !session
 		|| !generation || capacity > MaxControlBytes
