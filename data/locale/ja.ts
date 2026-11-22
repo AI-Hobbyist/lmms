@@ -8533,6 +8533,10 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
+        <source>Import as Node Project</source>
+        <translation>ノードプロジェクトとしてインポート</translation>
+    </message>
+    <message>
         <source>Finder</source>
         <translation>Finder</translation>
     </message>
@@ -8619,10 +8623,6 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>--- Factory files ---</source>
         <translation>--- ファクトリーファイル ---</translation>
-    </message>
-    <message>
-        <source>Import as Node Project</source>
-        <translation>ノードプロジェクトとしてインポート</translation>
     </message>
 </context>
 <context>
@@ -10442,398 +10442,6 @@ Double click to pick a file.</source>
 <context>
     <name>lmms::gui::MainWindow</name>
     <message>
-        <source>Configuration file</source>
-        <translation>設定ファイル</translation>
-    </message>
-    <message>
-        <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation>設定ファイルの%1行目%2列目でパースエラー: %3</translation>
-    </message>
-    <message>
-        <source>Could not open file</source>
-        <translation>ファイルを開くことができませんでした</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation>ファイル %1 を開けません。
-書き込み権限があることを確認してからもう一度試してください。</translation>
-    </message>
-    <message>
-        <source>Project recovery</source>
-        <translation>プロジェクトの復元</translation>
-    </message>
-    <message>
-        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
-        <translation>復元用ファイルが見つかりました。前回のセッションが正常に終了しなかったか、LMMSの別のインスタンスが既に実行されているようです。このセッションのプロジェクトを復元しますか？</translation>
-    </message>
-    <message>
-        <source>Recover</source>
-        <translation>復元</translation>
-    </message>
-    <message>
-        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
-        <translation>ファイルを復元します。 LMMSを複数にわたり実行しないでください。</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>変更を破棄</translation>
-    </message>
-    <message>
-        <source>Launch a default session and delete the restored files. This is not reversible.</source>
-        <translation>初期状態のセッションを開始し、復元ファイルを削除します。この操作は元に戻せません。</translation>
-    </message>
-    <message>
-        <source>Version %1</source>
-        <translation>バージョン %1</translation>
-    </message>
-    <message>
-        <source>Preparing plugin browser</source>
-        <translation>プラグインブラウザを準備しています</translation>
-    </message>
-    <message>
-        <source>Preparing file browsers</source>
-        <translation>ファイルブラウザを準備しています</translation>
-    </message>
-    <message>
-        <source>My Projects</source>
-        <translation>マイ プロジェクト</translation>
-    </message>
-    <message>
-        <source>My Samples</source>
-        <translation>マイ サンプル</translation>
-    </message>
-    <message>
-        <source>My Presets</source>
-        <translation>マイ プリセット</translation>
-    </message>
-    <message>
-        <source>My Home</source>
-        <translation>マイ ホーム</translation>
-    </message>
-    <message>
-        <source>Root Directory</source>
-        <translation>ルートディレクトリ</translation>
-    </message>
-    <message>
-        <source>Volumes</source>
-        <translation>音量</translation>
-    </message>
-    <message>
-        <source>My Computer</source>
-        <translation>マイ コンピュータ</translation>
-    </message>
-    <message>
-        <source>Loading background picture</source>
-        <translation>背景画像を読み込み中</translation>
-    </message>
-    <message>
-        <source>&amp;File</source>
-        <translation>ファイル(&amp;F)</translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation>新規(&amp;N)</translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation>開く(&amp;O)...</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>保存(&amp;S)</translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation>名前を付けて保存(&amp;A)...</translation>
-    </message>
-    <message>
-        <source>Save as New &amp;Version</source>
-        <translation>新規保存 (&amp;V)</translation>
-    </message>
-    <message>
-        <source>Save as default template</source>
-        <translation>デフォルトのテンプレートとして保存</translation>
-    </message>
-    <message>
-        <source>Import...</source>
-        <translation>インポート....</translation>
-    </message>
-    <message>
-        <source>E&amp;xport...</source>
-        <translation>エクスポート(&amp;x)...</translation>
-    </message>
-    <message>
-        <source>Export &amp;Tracks...</source>
-        <translation>トラックをエクスポート(&amp;T)...</translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>&amp;MIDI 形式でエクスポート</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>終了(&amp;Q)</translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation>編集(&amp;E)</translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>元に戻す</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>やり直し</translation>
-    </message>
-    <message>
-        <source>Scales and keymaps</source>
-        <translation>音階とキーボードマッピング</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <source>&amp;View</source>
-        <translation>&amp;表示</translation>
-    </message>
-    <message>
-        <source>&amp;Tools</source>
-        <translation>ツール(&amp;T)</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>ヘルプ(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Online Help</source>
-        <translation>オンラインヘルプ</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>ヘルプ</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation>LMMS について</translation>
-    </message>
-    <message>
-        <source>Create new project</source>
-        <translation>新規プロジェクト作成</translation>
-    </message>
-    <message>
-        <source>Create new project from template</source>
-        <translation>テンプレートから新規プロジェクトを作成します</translation>
-    </message>
-    <message>
-        <source>Open existing project</source>
-        <translation>既存プロジェクトを開く</translation>
-    </message>
-    <message>
-        <source>Recently opened projects</source>
-        <translation>最近開いたプロジェクト</translation>
-    </message>
-    <message>
-        <source>Save current project</source>
-        <translation>現在のプロジェクトを保存</translation>
-    </message>
-    <message>
-        <source>Export current project</source>
-        <translation>現在のプロジェクトをエクスポート</translation>
-    </message>
-    <message>
-        <source>Metronome</source>
-        <translation>メトロノーム</translation>
-    </message>
-    <message>
-        <source>Song Editor</source>
-        <translation>ソング エディター</translation>
-    </message>
-    <message>
-        <source>Pattern Editor</source>
-        <translation>パターンエディタ</translation>
-    </message>
-    <message>
-        <source>Piano Roll</source>
-        <translation>ピアノロール</translation>
-    </message>
-    <message>
-        <source>Automation Editor</source>
-        <translation>オートメーション エディター</translation>
-    </message>
-    <message>
-        <source>Mixer</source>
-        <translation>ミキサー</translation>
-    </message>
-    <message>
-        <source>Show/hide controller rack</source>
-        <translation>コントローラー ラック の表示/非表示</translation>
-    </message>
-    <message>
-        <source>Show/hide project notes</source>
-        <translation>プロジェクトノートの表示/非表示</translation>
-    </message>
-    <message>
-        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
-        <translation>再生用オーディオデバイスを設定できませんでした。デバイス設定（サンプルレートなど）を調整し、LMMS を再起動してください。</translation>
-    </message>
-    <message>
-        <source>Untitled</source>
-        <translation>無題</translation>
-    </message>
-    <message>
-        <source>Recover session. Please save your work!</source>
-        <translation>復元されたファイルです。今すぐ保存してください！</translation>
-    </message>
-    <message>
-        <source>LMMS %1</source>
-        <translation>LMMS %1</translation>
-    </message>
-    <message>
-        <source>Recovered project not saved</source>
-        <translation>復元された未保存のプロジェクト</translation>
-    </message>
-    <message>
-        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
-        <translation>このプロジェクトは以前のセッションから復元されました。このプロジェクトは現在保存されておらず、保存しないと失われます。保存しますか？</translation>
-    </message>
-    <message>
-        <source>Project not saved</source>
-        <translation>プロジェクトは保存されていません</translation>
-    </message>
-    <message>
-        <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation>現在のプロジェクトは最後に保存してから変更されています。保存しますか？</translation>
-    </message>
-    <message>
-        <source>Open Project</source>
-        <translation>プロジェクトを開く</translation>
-    </message>
-    <message>
-        <source>LMMS (*.mmp *.mmpz)</source>
-        <translation>LMMS (*.mmp *.mmpz)</translation>
-    </message>
-    <message>
-        <source>Save Project</source>
-        <translation>プロジェクトを保存</translation>
-    </message>
-    <message>
-        <source>LMMS Project</source>
-        <translation>LMMSのプロジェクト</translation>
-    </message>
-    <message>
-        <source>LMMS Project Template</source>
-        <translation>LMMSのプロジェクトのテンプレート</translation>
-    </message>
-    <message>
-        <source>Save project template</source>
-        <translation>プロジェクトのテンプレートを保存</translation>
-    </message>
-    <message>
-        <source>Overwrite default template?</source>
-        <translation>デフォルトのテンプレートに上書きしますか？</translation>
-    </message>
-    <message>
-        <source>This will overwrite your current default template.</source>
-        <translation>現在のデフォルトのテンプレートに上書きします</translation>
-    </message>
-    <message>
-        <source>Help not available</source>
-        <translation>ヘルプはありません</translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
-        <translation>今のところ LMMSののヘルプはありません。
- http://lmms.sf.net/wiki にLMMSのドキュメントがあります。</translation>
-    </message>
-    <message>
-        <source>Controller Rack</source>
-        <translation>コントローラー ラック</translation>
-    </message>
-    <message>
-        <source>Project Notes</source>
-        <translation>プロジェクトノート</translation>
-    </message>
-    <message>
-        <source>Fullscreen</source>
-        <translation>全画面</translation>
-    </message>
-    <message>
-        <source>Detach all subwindows</source>
-        <translation>すべてのサブウィンドウを切り離す</translation>
-    </message>
-    <message>
-        <source>Attach all subwindows</source>
-        <translation>すべてのサブウィンドウを内部に戻す</translation>
-    </message>
-    <message>
-        <source>Smooth scroll</source>
-        <translation>滑らかにスクロール</translation>
-    </message>
-    <message>
-        <source>Enable note labels in piano roll</source>
-        <translation>ピアノロールに音階を表示</translation>
-    </message>
-    <message>
-        <source>MIDI File (*.mid)</source>
-        <translation>MIDIファイル (*.mid)</translation>
-    </message>
-    <message>
-        <source>untitled</source>
-        <translation>無題</translation>
-    </message>
-    <message>
-        <source>Select file for project-export...</source>
-        <translation>プロジェクトをエクスポートするファイルを選択してください...</translation>
-    </message>
-    <message>
-        <source>Select directory for writing exported tracks...</source>
-        <translation>エクスポートされたトラックの書き込み先のディレクトリを選択...</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation>プロジェクトを保存</translation>
-    </message>
-    <message>
-        <source>Project saved</source>
-        <translation>プロジェクトを保存しました</translation>
-    </message>
-    <message>
-        <source>The project %1 is now saved.</source>
-        <translation>プロジェクト %1 を保存しました。</translation>
-    </message>
-    <message>
-        <source>Project NOT saved.</source>
-        <translation>プロジェクトは保存されていません。</translation>
-    </message>
-    <message>
-        <source>The project %1 was not saved!</source>
-        <translation>プロジェクト %1 は保存されませんでした!</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation>ファイルをインポート</translation>
-    </message>
-    <message>
-        <source>MIDI sequences</source>
-        <translation>MIDIシーケンス</translation>
-    </message>
-    <message>
-        <source>Hydrogen projects</source>
-        <translation>Hydrogenプロジェクト</translation>
-    </message>
-    <message>
-        <source>All file types</source>
-        <translation>すべてのファイル</translation>
-    </message>
-    <message>
-        <source>My Favorites</source>
-        <translation>お気に入り</translation>
-    </message>
-    <message>
         <source>Classic Project Unavailable</source>
         <translation>クラシックプロジェクトに変換できません</translation>
     </message>
@@ -11224,6 +10832,398 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Open Audio Settings</source>
         <translation>オーディオ設定を開く</translation>
+    </message>
+    <message>
+        <source>Configuration file</source>
+        <translation>設定ファイル</translation>
+    </message>
+    <message>
+        <source>Error while parsing configuration file at line %1:%2: %3</source>
+        <translation>設定ファイルの%1行目%2列目でパースエラー: %3</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>ファイルを開くことができませんでした</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>ファイル %1 を開けません。
+書き込み権限があることを確認してからもう一度試してください。</translation>
+    </message>
+    <message>
+        <source>Project recovery</source>
+        <translation>プロジェクトの復元</translation>
+    </message>
+    <message>
+        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
+        <translation>復元用ファイルが見つかりました。前回のセッションが正常に終了しなかったか、LMMSの別のインスタンスが既に実行されているようです。このセッションのプロジェクトを復元しますか？</translation>
+    </message>
+    <message>
+        <source>Recover</source>
+        <translation>復元</translation>
+    </message>
+    <message>
+        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
+        <translation>ファイルを復元します。 LMMSを複数にわたり実行しないでください。</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>変更を破棄</translation>
+    </message>
+    <message>
+        <source>Launch a default session and delete the restored files. This is not reversible.</source>
+        <translation>初期状態のセッションを開始し、復元ファイルを削除します。この操作は元に戻せません。</translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation>バージョン %1</translation>
+    </message>
+    <message>
+        <source>Preparing plugin browser</source>
+        <translation>プラグインブラウザを準備しています</translation>
+    </message>
+    <message>
+        <source>Preparing file browsers</source>
+        <translation>ファイルブラウザを準備しています</translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation>マイ プロジェクト</translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation>マイ サンプル</translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation>マイ プリセット</translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation>マイ ホーム</translation>
+    </message>
+    <message>
+        <source>Root Directory</source>
+        <translation>ルートディレクトリ</translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation>音量</translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation>マイ コンピュータ</translation>
+    </message>
+    <message>
+        <source>Loading background picture</source>
+        <translation>背景画像を読み込み中</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>ファイル(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation>新規(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Open...</source>
+        <translation>開く(&amp;O)...</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>保存(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>名前を付けて保存(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation>新規保存 (&amp;V)</translation>
+    </message>
+    <message>
+        <source>Save as default template</source>
+        <translation>デフォルトのテンプレートとして保存</translation>
+    </message>
+    <message>
+        <source>Import...</source>
+        <translation>インポート....</translation>
+    </message>
+    <message>
+        <source>E&amp;xport...</source>
+        <translation>エクスポート(&amp;x)...</translation>
+    </message>
+    <message>
+        <source>Export &amp;Tracks...</source>
+        <translation>トラックをエクスポート(&amp;T)...</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>&amp;MIDI 形式でエクスポート</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>終了(&amp;Q)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>編集(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>元に戻す</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>やり直し</translation>
+    </message>
+    <message>
+        <source>Scales and keymaps</source>
+        <translation>音階とキーボードマッピング</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <source>&amp;View</source>
+        <translation>&amp;表示</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>ツール(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>ヘルプ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation>オンラインヘルプ</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>ヘルプ</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>LMMS について</translation>
+    </message>
+    <message>
+        <source>Create new project</source>
+        <translation>新規プロジェクト作成</translation>
+    </message>
+    <message>
+        <source>Create new project from template</source>
+        <translation>テンプレートから新規プロジェクトを作成します</translation>
+    </message>
+    <message>
+        <source>Open existing project</source>
+        <translation>既存プロジェクトを開く</translation>
+    </message>
+    <message>
+        <source>Recently opened projects</source>
+        <translation>最近開いたプロジェクト</translation>
+    </message>
+    <message>
+        <source>Save current project</source>
+        <translation>現在のプロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>Export current project</source>
+        <translation>現在のプロジェクトをエクスポート</translation>
+    </message>
+    <message>
+        <source>Metronome</source>
+        <translation>メトロノーム</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <translation>ソング エディター</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <translation>パターンエディタ</translation>
+    </message>
+    <message>
+        <source>Piano Roll</source>
+        <translation>ピアノロール</translation>
+    </message>
+    <message>
+        <source>Automation Editor</source>
+        <translation>オートメーション エディター</translation>
+    </message>
+    <message>
+        <source>Mixer</source>
+        <translation>ミキサー</translation>
+    </message>
+    <message>
+        <source>Show/hide controller rack</source>
+        <translation>コントローラー ラック の表示/非表示</translation>
+    </message>
+    <message>
+        <source>Show/hide project notes</source>
+        <translation>プロジェクトノートの表示/非表示</translation>
+    </message>
+    <message>
+        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
+        <translation>再生用オーディオデバイスを設定できませんでした。デバイス設定（サンプルレートなど）を調整し、LMMS を再起動してください。</translation>
+    </message>
+    <message>
+        <source>Untitled</source>
+        <translation>無題</translation>
+    </message>
+    <message>
+        <source>Recover session. Please save your work!</source>
+        <translation>復元されたファイルです。今すぐ保存してください！</translation>
+    </message>
+    <message>
+        <source>LMMS %1</source>
+        <translation>LMMS %1</translation>
+    </message>
+    <message>
+        <source>Recovered project not saved</source>
+        <translation>復元された未保存のプロジェクト</translation>
+    </message>
+    <message>
+        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
+        <translation>このプロジェクトは以前のセッションから復元されました。このプロジェクトは現在保存されておらず、保存しないと失われます。保存しますか？</translation>
+    </message>
+    <message>
+        <source>Project not saved</source>
+        <translation>プロジェクトは保存されていません</translation>
+    </message>
+    <message>
+        <source>The current project was modified since last saving. Do you want to save it now?</source>
+        <translation>現在のプロジェクトは最後に保存してから変更されています。保存しますか？</translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation>プロジェクトを開く</translation>
+    </message>
+    <message>
+        <source>LMMS (*.mmp *.mmpz)</source>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Save Project</source>
+        <translation>プロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>LMMS Project</source>
+        <translation>LMMSのプロジェクト</translation>
+    </message>
+    <message>
+        <source>LMMS Project Template</source>
+        <translation>LMMSのプロジェクトのテンプレート</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation>プロジェクトのテンプレートを保存</translation>
+    </message>
+    <message>
+        <source>Overwrite default template?</source>
+        <translation>デフォルトのテンプレートに上書きしますか？</translation>
+    </message>
+    <message>
+        <source>This will overwrite your current default template.</source>
+        <translation>現在のデフォルトのテンプレートに上書きします</translation>
+    </message>
+    <message>
+        <source>Help not available</source>
+        <translation>ヘルプはありません</translation>
+    </message>
+    <message>
+        <source>Currently there&apos;s no help available in LMMS.
+Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
+        <translation>今のところ LMMSののヘルプはありません。
+ http://lmms.sf.net/wiki にLMMSのドキュメントがあります。</translation>
+    </message>
+    <message>
+        <source>Controller Rack</source>
+        <translation>コントローラー ラック</translation>
+    </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>プロジェクトノート</translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation>全画面</translation>
+    </message>
+    <message>
+        <source>Detach all subwindows</source>
+        <translation>すべてのサブウィンドウを切り離す</translation>
+    </message>
+    <message>
+        <source>Attach all subwindows</source>
+        <translation>すべてのサブウィンドウを内部に戻す</translation>
+    </message>
+    <message>
+        <source>Smooth scroll</source>
+        <translation>滑らかにスクロール</translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation>ピアノロールに音階を表示</translation>
+    </message>
+    <message>
+        <source>MIDI File (*.mid)</source>
+        <translation>MIDIファイル (*.mid)</translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation>無題</translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation>プロジェクトをエクスポートするファイルを選択してください...</translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation>エクスポートされたトラックの書き込み先のディレクトリを選択...</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation>プロジェクトを保存</translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation>プロジェクトを保存しました</translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation>プロジェクト %1 を保存しました。</translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation>プロジェクトは保存されていません。</translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation>プロジェクト %1 は保存されませんでした!</translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation>ファイルをインポート</translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation>MIDIシーケンス</translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation>Hydrogenプロジェクト</translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation>すべてのファイル</translation>
+    </message>
+    <message>
+        <source>My Favorites</source>
+        <translation>お気に入り</translation>
     </message>
     <message>
         <source>New Node Workflow Project</source>

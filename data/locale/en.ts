@@ -8513,6 +8513,10 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
+        <source>Import as Node Project</source>
+        <translation>Import as Node Project</translation>
+    </message>
+    <message>
         <source>Finder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8599,10 +8603,6 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>--- Factory files ---</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import as Node Project</source>
-        <translation>Import as Node Project</translation>
     </message>
 </context>
 <context>
@@ -10421,396 +10421,6 @@ Double click to pick a file.</source>
 <context>
     <name>lmms::gui::MainWindow</name>
     <message>
-        <source>Configuration file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project recovery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recover</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Launch a default session and delete the restored files. This is not reversible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preparing plugin browser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preparing file browsers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Samples</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Presets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Root Directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Volumes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Computer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loading background picture</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save as New &amp;Version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save as default template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E&amp;xport...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export &amp;Tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scales and keymaps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Tools</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Online Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create new project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create new project from template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open existing project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recently opened projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save current project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export current project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Metronome</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Song Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pattern Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Piano Roll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automation Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mixer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show/hide controller rack</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show/hide project notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Untitled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recover session. Please save your work!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LMMS %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recovered project not saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project not saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LMMS (*.mmp *.mmpz)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LMMS Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LMMS Project Template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save project template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overwrite default template?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will overwrite your current default template.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Help not available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Controller Rack</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Detach all subwindows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Attach all subwindows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Smooth scroll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable note labels in piano roll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MIDI File (*.mid)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>untitled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select file for project-export...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The project %1 is now saved.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Project NOT saved.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The project %1 was not saved!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MIDI sequences</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hydrogen projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All file types</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Favorites</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Classic Project Unavailable</source>
         <translation>Classic Project Unavailable</translation>
     </message>
@@ -11201,6 +10811,396 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Open Audio Settings</source>
         <translation>Open Audio Settings</translation>
+    </message>
+    <message>
+        <source>Configuration file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while parsing configuration file at line %1:%2: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project recovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launch a default session and delete the restored files. This is not reversible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preparing plugin browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preparing file browsers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Root Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading background picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Open...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as default template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xport...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export &amp;Tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scales and keymaps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create new project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create new project from template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open existing project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recently opened projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export current project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Metronome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Piano Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show/hide controller rack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show/hide project notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Untitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recover session. Please save your work!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recovered project not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The current project was modified since last saving. Do you want to save it now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS (*.mmp *.mmpz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Project Template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite default template?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will overwrite your current default template.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently there&apos;s no help available in LMMS.
+Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Controller Rack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detach all subwindows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attach all subwindows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth scroll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIDI File (*.mid)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My Favorites</source>
+        <translation></translation>
     </message>
     <message>
         <source>New Node Workflow Project</source>

@@ -8533,6 +8533,10 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
+        <source>Import as Node Project</source>
+        <translation>노드 프로젝트로 가져오기</translation>
+    </message>
+    <message>
         <source>Finder</source>
         <translation>Finder</translation>
     </message>
@@ -8619,10 +8623,6 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>--- Factory files ---</source>
         <translation>--- 팩토리 파일 ---</translation>
-    </message>
-    <message>
-        <source>Import as Node Project</source>
-        <translation>노드 프로젝트로 가져오기</translation>
     </message>
 </context>
 <context>
@@ -10442,398 +10442,6 @@ Double click to pick a file.</source>
 <context>
     <name>lmms::gui::MainWindow</name>
     <message>
-        <source>Configuration file</source>
-        <translation>구성 파일</translation>
-    </message>
-    <message>
-        <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation>%1:%2 줄에서 구성 파일을 분석하는 동안 오류: %3</translation>
-    </message>
-    <message>
-        <source>Could not open file</source>
-        <translation>파일을 열 수 없음</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation>쓰기 위한 %1 파일을 열 수 없습니다.
-파일 및 파일이 포함된 디렉터리에 대한 쓰기 권한이 있는지 확인한 후 다시 시도하세요!</translation>
-    </message>
-    <message>
-        <source>Project recovery</source>
-        <translation>프로젝트 복구</translation>
-    </message>
-    <message>
-        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
-        <translation>복구 파일이 존재합니다. 이전에 LMMS가 비정상 종료되었거나 여러 개의 LMMS 인스턴스가 동시에 실행 중인 것 같습니다. 복구 파일로부터 프로젝트를 복구하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Recover</source>
-        <translation>복구하기</translation>
-    </message>
-    <message>
-        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
-        <translation>파일을 복구합니다. 이 작업을 수행할 때 LMMS의 여러 인스턴스를 실행하지 마세요.</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>폐기하기</translation>
-    </message>
-    <message>
-        <source>Launch a default session and delete the restored files. This is not reversible.</source>
-        <translation>기본 세션을 시작하고 복원된 파일을 삭제합니다. 이 작업은 되돌릴 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Version %1</source>
-        <translation>버전 %1</translation>
-    </message>
-    <message>
-        <source>Preparing plugin browser</source>
-        <translation>플러그인 탐색기 준비하는 중</translation>
-    </message>
-    <message>
-        <source>Preparing file browsers</source>
-        <translation>파일 탐색기 준비하는 중</translation>
-    </message>
-    <message>
-        <source>My Projects</source>
-        <translation>내 프로젝트</translation>
-    </message>
-    <message>
-        <source>My Samples</source>
-        <translation>내 샘플</translation>
-    </message>
-    <message>
-        <source>My Presets</source>
-        <translation>내 프리셋</translation>
-    </message>
-    <message>
-        <source>My Home</source>
-        <translation>내 홈</translation>
-    </message>
-    <message>
-        <source>Root Directory</source>
-        <translation>루트 디렉터리</translation>
-    </message>
-    <message>
-        <source>Volumes</source>
-        <translation>볼륨</translation>
-    </message>
-    <message>
-        <source>My Computer</source>
-        <translation>내 컴퓨터</translation>
-    </message>
-    <message>
-        <source>Loading background picture</source>
-        <translation>배경 사진 불러오는 중</translation>
-    </message>
-    <message>
-        <source>&amp;File</source>
-        <translation>파일(&amp;F)</translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation>새로 만들기(&amp;N)</translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation>열기(&amp;O)...</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>저장(&amp;S)</translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation>다른 이름으로 저장(&amp;A)...</translation>
-    </message>
-    <message>
-        <source>Save as New &amp;Version</source>
-        <translation>새 버전으로 저장(&amp;V)</translation>
-    </message>
-    <message>
-        <source>Save as default template</source>
-        <translation>기본 템플릿으로 저장하기</translation>
-    </message>
-    <message>
-        <source>Import...</source>
-        <translation>가져오기...</translation>
-    </message>
-    <message>
-        <source>E&amp;xport...</source>
-        <translation>내보내기(&amp;X)...</translation>
-    </message>
-    <message>
-        <source>Export &amp;Tracks...</source>
-        <translation>트랙 내보내기(&amp;T)...</translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>MIDI 내보내기(&amp;M)...</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>종료(&amp;Q)</translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation>편집(&amp;E)</translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>실행 취소</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>다시 실행</translation>
-    </message>
-    <message>
-        <source>Scales and keymaps</source>
-        <translation>스케일 및 키맵</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>설정</translation>
-    </message>
-    <message>
-        <source>&amp;View</source>
-        <translation>보기(&amp;V)</translation>
-    </message>
-    <message>
-        <source>&amp;Tools</source>
-        <translation>도구(&amp;T)</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>도움말(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Online Help</source>
-        <translation>온라인 도움말</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>도움말</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation>정보</translation>
-    </message>
-    <message>
-        <source>Create new project</source>
-        <translation>새 프로젝트 만들기</translation>
-    </message>
-    <message>
-        <source>Create new project from template</source>
-        <translation>템플릿에서 새 프로젝트 만들기</translation>
-    </message>
-    <message>
-        <source>Open existing project</source>
-        <translation>기존 프로젝트 열기</translation>
-    </message>
-    <message>
-        <source>Recently opened projects</source>
-        <translation>최근에 열린 프로젝트</translation>
-    </message>
-    <message>
-        <source>Save current project</source>
-        <translation>현재 프로젝트 저장하기</translation>
-    </message>
-    <message>
-        <source>Export current project</source>
-        <translation>현재 프로젝트 내보내기</translation>
-    </message>
-    <message>
-        <source>Metronome</source>
-        <translation>메트로놈</translation>
-    </message>
-    <message>
-        <source>Song Editor</source>
-        <translation>곡 편집기</translation>
-    </message>
-    <message>
-        <source>Pattern Editor</source>
-        <translation>패턴 편집기</translation>
-    </message>
-    <message>
-        <source>Piano Roll</source>
-        <translation>피아노 롤</translation>
-    </message>
-    <message>
-        <source>Automation Editor</source>
-        <translation>오토메이션 편집기</translation>
-    </message>
-    <message>
-        <source>Mixer</source>
-        <translation>믹서</translation>
-    </message>
-    <message>
-        <source>Show/hide controller rack</source>
-        <translation>컨트롤러 랙 표시하기/숨기기</translation>
-    </message>
-    <message>
-        <source>Show/hide project notes</source>
-        <translation>프로젝트 노트 표시하기/숨기기</translation>
-    </message>
-    <message>
-        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
-        <translation>재생용 오디오 장치를 설정하지 못했습니다. 오디오 장치 설정(예: 샘플레이트)을 조정한 후 LMMS를 다시 시작하세요.</translation>
-    </message>
-    <message>
-        <source>Untitled</source>
-        <translation>제목 없음</translation>
-    </message>
-    <message>
-        <source>Recover session. Please save your work!</source>
-        <translation>복구 세션입니다. 프로젝트 파일을 저장해 주세요!</translation>
-    </message>
-    <message>
-        <source>LMMS %1</source>
-        <translation>LMMS %1</translation>
-    </message>
-    <message>
-        <source>Recovered project not saved</source>
-        <translation>복구된 프로젝트가 저장되지 않음</translation>
-    </message>
-    <message>
-        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
-        <translation>이 프로젝트는 이전 세션에서 복구되었습니다. 현재 저장되지 않은 상태이며 저장하지 않으면 손실됩니다. 지금 저장하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Project not saved</source>
-        <translation>프로젝트 저장되지 않음</translation>
-    </message>
-    <message>
-        <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation>현재 프로젝트는 마지막 저장 이후 수정되었습니다. 지금 저장하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Open Project</source>
-        <translation>프로젝트 열기</translation>
-    </message>
-    <message>
-        <source>LMMS (*.mmp *.mmpz)</source>
-        <translation>LMMS (*.mmp *.mmpz)</translation>
-    </message>
-    <message>
-        <source>Save Project</source>
-        <translation>프로젝트 저장하기</translation>
-    </message>
-    <message>
-        <source>LMMS Project</source>
-        <translation>LMMS 프로젝트</translation>
-    </message>
-    <message>
-        <source>LMMS Project Template</source>
-        <translation>LMMS 프로젝트 템플릿</translation>
-    </message>
-    <message>
-        <source>Save project template</source>
-        <translation>프로젝트 템플릿 저장하기</translation>
-    </message>
-    <message>
-        <source>Overwrite default template?</source>
-        <translation>기본 템플릿을 덮어쓰시겠습니까?</translation>
-    </message>
-    <message>
-        <source>This will overwrite your current default template.</source>
-        <translation>이 작업은 현재의 기본 템플릿을 덮어씁니다.</translation>
-    </message>
-    <message>
-        <source>Help not available</source>
-        <translation>도움말 사용할 수 없음</translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
-        <translation>현재 LMMS에서 사용할 수 있는 도움말이 없습니다.
-LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
-    </message>
-    <message>
-        <source>Controller Rack</source>
-        <translation>컨트롤러 랙</translation>
-    </message>
-    <message>
-        <source>Project Notes</source>
-        <translation>프로젝트 노트</translation>
-    </message>
-    <message>
-        <source>Fullscreen</source>
-        <translation>전체화면</translation>
-    </message>
-    <message>
-        <source>Detach all subwindows</source>
-        <translation>모든 하위 창 분리</translation>
-    </message>
-    <message>
-        <source>Attach all subwindows</source>
-        <translation>모든 하위 창 붙이기</translation>
-    </message>
-    <message>
-        <source>Smooth scroll</source>
-        <translation>부드러운 스크롤</translation>
-    </message>
-    <message>
-        <source>Enable note labels in piano roll</source>
-        <translation>피아노 롤에서 노트 레이블 활성화</translation>
-    </message>
-    <message>
-        <source>MIDI File (*.mid)</source>
-        <translation>MIDI 파일 (*.mid)</translation>
-    </message>
-    <message>
-        <source>untitled</source>
-        <translation>제목 없음</translation>
-    </message>
-    <message>
-        <source>Select file for project-export...</source>
-        <translation>프로젝트를 내보낼 파일 선택하기...</translation>
-    </message>
-    <message>
-        <source>Select directory for writing exported tracks...</source>
-        <translation>내보낸 트랙을 저장할 디렉터리 선택하기...</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation>프로젝트 저장하기</translation>
-    </message>
-    <message>
-        <source>Project saved</source>
-        <translation>프로젝트 저장됨</translation>
-    </message>
-    <message>
-        <source>The project %1 is now saved.</source>
-        <translation>%1 프로젝트가 저장되었습니다.</translation>
-    </message>
-    <message>
-        <source>Project NOT saved.</source>
-        <translation>프로젝트가 저장되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>The project %1 was not saved!</source>
-        <translation>%1 프로젝트가 저장되지 않았습니다!</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation>파일 가져오기</translation>
-    </message>
-    <message>
-        <source>MIDI sequences</source>
-        <translation>MIDI 시퀀스</translation>
-    </message>
-    <message>
-        <source>Hydrogen projects</source>
-        <translation>Hydrogen 프로젝트</translation>
-    </message>
-    <message>
-        <source>All file types</source>
-        <translation>모든 파일 유형</translation>
-    </message>
-    <message>
-        <source>My Favorites</source>
-        <translation>즐겨찾기</translation>
-    </message>
-    <message>
         <source>Classic Project Unavailable</source>
         <translation>클래식 프로젝트를 사용할 수 없음</translation>
     </message>
@@ -11224,6 +10832,398 @@ LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translatio
     <message>
         <source>Open Audio Settings</source>
         <translation>오디오 설정 열기</translation>
+    </message>
+    <message>
+        <source>Configuration file</source>
+        <translation>구성 파일</translation>
+    </message>
+    <message>
+        <source>Error while parsing configuration file at line %1:%2: %3</source>
+        <translation>%1:%2 줄에서 구성 파일을 분석하는 동안 오류: %3</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>파일을 열 수 없음</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>쓰기 위한 %1 파일을 열 수 없습니다.
+파일 및 파일이 포함된 디렉터리에 대한 쓰기 권한이 있는지 확인한 후 다시 시도하세요!</translation>
+    </message>
+    <message>
+        <source>Project recovery</source>
+        <translation>프로젝트 복구</translation>
+    </message>
+    <message>
+        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
+        <translation>복구 파일이 존재합니다. 이전에 LMMS가 비정상 종료되었거나 여러 개의 LMMS 인스턴스가 동시에 실행 중인 것 같습니다. 복구 파일로부터 프로젝트를 복구하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Recover</source>
+        <translation>복구하기</translation>
+    </message>
+    <message>
+        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
+        <translation>파일을 복구합니다. 이 작업을 수행할 때 LMMS의 여러 인스턴스를 실행하지 마세요.</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>폐기하기</translation>
+    </message>
+    <message>
+        <source>Launch a default session and delete the restored files. This is not reversible.</source>
+        <translation>기본 세션을 시작하고 복원된 파일을 삭제합니다. 이 작업은 되돌릴 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation>버전 %1</translation>
+    </message>
+    <message>
+        <source>Preparing plugin browser</source>
+        <translation>플러그인 탐색기 준비하는 중</translation>
+    </message>
+    <message>
+        <source>Preparing file browsers</source>
+        <translation>파일 탐색기 준비하는 중</translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation>내 프로젝트</translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation>내 샘플</translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation>내 프리셋</translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation>내 홈</translation>
+    </message>
+    <message>
+        <source>Root Directory</source>
+        <translation>루트 디렉터리</translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation>볼륨</translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation>내 컴퓨터</translation>
+    </message>
+    <message>
+        <source>Loading background picture</source>
+        <translation>배경 사진 불러오는 중</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>파일(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation>새로 만들기(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Open...</source>
+        <translation>열기(&amp;O)...</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>저장(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>다른 이름으로 저장(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation>새 버전으로 저장(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Save as default template</source>
+        <translation>기본 템플릿으로 저장하기</translation>
+    </message>
+    <message>
+        <source>Import...</source>
+        <translation>가져오기...</translation>
+    </message>
+    <message>
+        <source>E&amp;xport...</source>
+        <translation>내보내기(&amp;X)...</translation>
+    </message>
+    <message>
+        <source>Export &amp;Tracks...</source>
+        <translation>트랙 내보내기(&amp;T)...</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>MIDI 내보내기(&amp;M)...</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>종료(&amp;Q)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>편집(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>실행 취소</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>다시 실행</translation>
+    </message>
+    <message>
+        <source>Scales and keymaps</source>
+        <translation>스케일 및 키맵</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>설정</translation>
+    </message>
+    <message>
+        <source>&amp;View</source>
+        <translation>보기(&amp;V)</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>도구(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>도움말(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation>온라인 도움말</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>도움말</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>정보</translation>
+    </message>
+    <message>
+        <source>Create new project</source>
+        <translation>새 프로젝트 만들기</translation>
+    </message>
+    <message>
+        <source>Create new project from template</source>
+        <translation>템플릿에서 새 프로젝트 만들기</translation>
+    </message>
+    <message>
+        <source>Open existing project</source>
+        <translation>기존 프로젝트 열기</translation>
+    </message>
+    <message>
+        <source>Recently opened projects</source>
+        <translation>최근에 열린 프로젝트</translation>
+    </message>
+    <message>
+        <source>Save current project</source>
+        <translation>현재 프로젝트 저장하기</translation>
+    </message>
+    <message>
+        <source>Export current project</source>
+        <translation>현재 프로젝트 내보내기</translation>
+    </message>
+    <message>
+        <source>Metronome</source>
+        <translation>메트로놈</translation>
+    </message>
+    <message>
+        <source>Song Editor</source>
+        <translation>곡 편집기</translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
+        <translation>패턴 편집기</translation>
+    </message>
+    <message>
+        <source>Piano Roll</source>
+        <translation>피아노 롤</translation>
+    </message>
+    <message>
+        <source>Automation Editor</source>
+        <translation>오토메이션 편집기</translation>
+    </message>
+    <message>
+        <source>Mixer</source>
+        <translation>믹서</translation>
+    </message>
+    <message>
+        <source>Show/hide controller rack</source>
+        <translation>컨트롤러 랙 표시하기/숨기기</translation>
+    </message>
+    <message>
+        <source>Show/hide project notes</source>
+        <translation>프로젝트 노트 표시하기/숨기기</translation>
+    </message>
+    <message>
+        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
+        <translation>재생용 오디오 장치를 설정하지 못했습니다. 오디오 장치 설정(예: 샘플레이트)을 조정한 후 LMMS를 다시 시작하세요.</translation>
+    </message>
+    <message>
+        <source>Untitled</source>
+        <translation>제목 없음</translation>
+    </message>
+    <message>
+        <source>Recover session. Please save your work!</source>
+        <translation>복구 세션입니다. 프로젝트 파일을 저장해 주세요!</translation>
+    </message>
+    <message>
+        <source>LMMS %1</source>
+        <translation>LMMS %1</translation>
+    </message>
+    <message>
+        <source>Recovered project not saved</source>
+        <translation>복구된 프로젝트가 저장되지 않음</translation>
+    </message>
+    <message>
+        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
+        <translation>이 프로젝트는 이전 세션에서 복구되었습니다. 현재 저장되지 않은 상태이며 저장하지 않으면 손실됩니다. 지금 저장하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Project not saved</source>
+        <translation>프로젝트 저장되지 않음</translation>
+    </message>
+    <message>
+        <source>The current project was modified since last saving. Do you want to save it now?</source>
+        <translation>현재 프로젝트는 마지막 저장 이후 수정되었습니다. 지금 저장하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation>프로젝트 열기</translation>
+    </message>
+    <message>
+        <source>LMMS (*.mmp *.mmpz)</source>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Save Project</source>
+        <translation>프로젝트 저장하기</translation>
+    </message>
+    <message>
+        <source>LMMS Project</source>
+        <translation>LMMS 프로젝트</translation>
+    </message>
+    <message>
+        <source>LMMS Project Template</source>
+        <translation>LMMS 프로젝트 템플릿</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation>프로젝트 템플릿 저장하기</translation>
+    </message>
+    <message>
+        <source>Overwrite default template?</source>
+        <translation>기본 템플릿을 덮어쓰시겠습니까?</translation>
+    </message>
+    <message>
+        <source>This will overwrite your current default template.</source>
+        <translation>이 작업은 현재의 기본 템플릿을 덮어씁니다.</translation>
+    </message>
+    <message>
+        <source>Help not available</source>
+        <translation>도움말 사용할 수 없음</translation>
+    </message>
+    <message>
+        <source>Currently there&apos;s no help available in LMMS.
+Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
+        <translation>현재 LMMS에서 사용할 수 있는 도움말이 없습니다.
+LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
+    </message>
+    <message>
+        <source>Controller Rack</source>
+        <translation>컨트롤러 랙</translation>
+    </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>프로젝트 노트</translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation>전체화면</translation>
+    </message>
+    <message>
+        <source>Detach all subwindows</source>
+        <translation>모든 하위 창 분리</translation>
+    </message>
+    <message>
+        <source>Attach all subwindows</source>
+        <translation>모든 하위 창 붙이기</translation>
+    </message>
+    <message>
+        <source>Smooth scroll</source>
+        <translation>부드러운 스크롤</translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation>피아노 롤에서 노트 레이블 활성화</translation>
+    </message>
+    <message>
+        <source>MIDI File (*.mid)</source>
+        <translation>MIDI 파일 (*.mid)</translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation>제목 없음</translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation>프로젝트를 내보낼 파일 선택하기...</translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation>내보낸 트랙을 저장할 디렉터리 선택하기...</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation>프로젝트 저장하기</translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation>프로젝트 저장됨</translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation>%1 프로젝트가 저장되었습니다.</translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation>프로젝트가 저장되지 않았습니다.</translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation>%1 프로젝트가 저장되지 않았습니다!</translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation>파일 가져오기</translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation>MIDI 시퀀스</translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation>Hydrogen 프로젝트</translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation>모든 파일 유형</translation>
+    </message>
+    <message>
+        <source>My Favorites</source>
+        <translation>즐겨찾기</translation>
     </message>
     <message>
         <source>New Node Workflow Project</source>

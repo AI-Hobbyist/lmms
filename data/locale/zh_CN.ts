@@ -6118,6 +6118,34 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>lmms::Song</name>
     <message>
+        <source>Custom node positions will be omitted.</source>
+        <translation>经典工程将省略自定义节点位置。</translation>
+    </message>
+    <message>
+        <source>Logical inputs and their connections will be omitted.</source>
+        <translation>经典工程将省略逻辑输入及其连线。</translation>
+    </message>
+    <message>
+        <source>Both Master output channels will be enabled.</source>
+        <translation>主输出的左右声道都将启用。</translation>
+    </message>
+    <message>
+        <source>Mixer send %1 → %2 will become stereo.</source>
+        <translation>混音发送 %1 → %2 将改为立体声。</translation>
+    </message>
+    <message>
+        <source>Effect node %1 will be represented as a mixer channel.</source>
+        <translation>效果节点 %1 将作为混音通道保留。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic stereo mixer assignment.</source>
+        <translation>轨道 %1 将使用其经典立体声混音分配。</translation>
+    </message>
+    <message>
+        <source>Track %1 will use its classic event and audio connections.</source>
+        <translation>轨道 %1 将使用其经典事件和音频连接。</translation>
+    </message>
+    <message>
         <source>Tempo</source>
         <translation>曲速</translation>
     </message>
@@ -6152,34 +6180,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>The following errors occurred while loading: </source>
         <translation>载入时发生以下错误：</translation>
-    </message>
-    <message>
-        <source>Custom node positions will be omitted.</source>
-        <translation>经典工程将省略自定义节点位置。</translation>
-    </message>
-    <message>
-        <source>Logical inputs and their connections will be omitted.</source>
-        <translation>经典工程将省略逻辑输入及其连线。</translation>
-    </message>
-    <message>
-        <source>Both Master output channels will be enabled.</source>
-        <translation>主输出的左右声道都将启用。</translation>
-    </message>
-    <message>
-        <source>Mixer send %1 → %2 will become stereo.</source>
-        <translation>混音发送 %1 → %2 将改为立体声。</translation>
-    </message>
-    <message>
-        <source>Effect node %1 will be represented as a mixer channel.</source>
-        <translation>效果节点 %1 将作为混音通道保留。</translation>
-    </message>
-    <message>
-        <source>Track %1 will use its classic stereo mixer assignment.</source>
-        <translation>轨道 %1 将使用其经典立体声混音分配。</translation>
-    </message>
-    <message>
-        <source>Track %1 will use its classic event and audio connections.</source>
-        <translation>轨道 %1 将使用其经典事件和音频连接。</translation>
     </message>
     <message>
         <source>Standalone step patterns will be omitted.</source>
@@ -8533,6 +8533,10 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
+        <source>Import as Node Project</source>
+        <translation>导入为节点工程</translation>
+    </message>
+    <message>
         <source>Finder</source>
         <translation>Finder</translation>
     </message>
@@ -8619,10 +8623,6 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>--- Factory files ---</source>
         <translation>---软件自带文件---</translation>
-    </message>
-    <message>
-        <source>Import as Node Project</source>
-        <translation>导入为节点工程</translation>
     </message>
 </context>
 <context>
@@ -10442,6 +10442,494 @@ Double click to pick a file.</source>
 <context>
     <name>lmms::gui::MainWindow</name>
     <message>
+        <source>VST scan progress</source>
+        <translation>VST 扫描进度</translation>
+    </message>
+    <message>
+        <source>Finding VST plug-ins…</source>
+        <translation>正在查找 VST 插件…</translation>
+    </message>
+    <message>
+        <source>Module: %1 (%2/%3)</source>
+        <translation>模块：%1（%2/%3）</translation>
+    </message>
+    <message>
+        <source>Exporting presets: %1</source>
+        <translation>正在导出预设：%1</translation>
+    </message>
+    <message>
+        <source>Scanning VST: %1</source>
+        <translation>正在扫描 VST：%1</translation>
+    </message>
+    <message>
+        <source> (%1/%2 processed)</source>
+        <translation>（已处理 %1/%2）</translation>
+    </message>
+    <message>
+        <source>Classic Project Unavailable</source>
+        <translation>无法使用经典工程</translation>
+    </message>
+    <message>
+        <source>Node Project Only</source>
+        <translation>仅支持节点工程</translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation>不再提示</translation>
+    </message>
+    <message>
+        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>已拒绝转换。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
+    </message>
+    <message>
+        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
+        <translation>已拒绝导入。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
+    </message>
+    <message>
+        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
+        <translation>经典工程格式无法保存轨道子图中新添加的节点和路由。添加此节点后，该工程将无法转为经典工程。</translation>
+    </message>
+    <message>
+        <source>Aggregation Settings</source>
+        <translation>聚合设置</translation>
+    </message>
+    <message>
+        <source>Merge Connections Sharing a Port</source>
+        <translation>合并共享同一端口的连线</translation>
+    </message>
+    <message>
+        <source>Connections Greater Than</source>
+        <translation>同端口连接数大于</translation>
+    </message>
+    <message>
+        <source>Aggregate Bus</source>
+        <translation>聚合总线</translation>
+    </message>
+    <message>
+        <source>Play Song</source>
+        <translation>播放歌曲</translation>
+    </message>
+    <message>
+        <source>Pause Song</source>
+        <translation>暂停歌曲</translation>
+    </message>
+    <message>
+        <source>Stop Song</source>
+        <translation>停止歌曲</translation>
+    </message>
+    <message>
+        <source>Input Port</source>
+        <translation>入口端口</translation>
+    </message>
+    <message>
+        <source>Output Port</source>
+        <translation>出口端口</translation>
+    </message>
+    <message>
+        <source>Instrument Track</source>
+        <translation>乐器轨</translation>
+    </message>
+    <message>
+        <source>Sample Track</source>
+        <translation>采样轨</translation>
+    </message>
+    <message>
+        <source>SVS Voice Track</source>
+        <translation>SVS 人声轨</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation>声道</translation>
+    </message>
+    <message>
+        <source>Open SVS Piano Roll</source>
+        <translation>打开 SVS 钢琴窗</translation>
+    </message>
+    <message>
+        <source>Logical input for graph routing</source>
+        <translation>图内路由逻辑入口</translation>
+    </message>
+    <message>
+        <source>Signal Type</source>
+        <translation>信号类型</translation>
+    </message>
+    <message>
+        <source>Connected Targets</source>
+        <translation>已连接目标</translation>
+    </message>
+    <message>
+        <source>Device Binding</source>
+        <translation>设备绑定</translation>
+    </message>
+    <message>
+        <source>Master connects to the configured audio output</source>
+        <translation>Master 连接到配置的主输出</translation>
+    </message>
+    <message>
+        <source>Independent Pattern step data</source>
+        <translation>独立 Pattern 步进数据</translation>
+    </message>
+    <message>
+        <source>Active Steps</source>
+        <translation>已激活步进</translation>
+    </message>
+    <message>
+        <source>Connected Tracks</source>
+        <translation>已连接轨道</translation>
+    </message>
+    <message>
+        <source>Open Step Sequencer</source>
+        <translation>打开步进音序器</translation>
+    </message>
+    <message>
+        <source>Supports notes, lyrics, and voice curves</source>
+        <translation>支持音符、歌词和歌声曲线</translation>
+    </message>
+    <message>
+        <source>The same clip can be edited from the graph or track</source>
+        <translation>同一片段可从节点图或轨道编辑</translation>
+    </message>
+    <message>
+        <source>Voice Notes</source>
+        <translation>歌声音符</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>音符</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>添加位置</translation>
+    </message>
+    <message>
+        <source>Standalone Node</source>
+        <translation>独立节点</translation>
+    </message>
+    <message>
+        <source>SVC Voice Track</source>
+        <translation>SVC 人声轨</translation>
+    </message>
+    <message>
+        <source>Plays converted audio from its clips</source>
+        <translation>播放当前片段的转换音频</translation>
+    </message>
+    <message>
+        <source>Audio Source</source>
+        <translation>音频来源</translation>
+    </message>
+    <message>
+        <source>Clip conversion result</source>
+        <translation>片段转换结果</translation>
+    </message>
+    <message>
+        <source>Open Conversion Settings</source>
+        <translation>打开转换设置</translation>
+    </message>
+    <message>
+        <source>Automation curves control bound parameters</source>
+        <translation>自动化曲线控制已绑定的参数</translation>
+    </message>
+    <message>
+        <source>Bound Parameters</source>
+        <translation>绑定参数</translation>
+    </message>
+    <message>
+        <source>Automation Clips</source>
+        <translation>自动化片段</translation>
+    </message>
+    <message>
+        <source>SVS Plugin</source>
+        <translation>SVS 插件</translation>
+    </message>
+    <message>
+        <source>Input preserves lyrics, curves, and clip timing</source>
+        <translation>输入保留歌词、曲线与片段时序</translation>
+    </message>
+    <message>
+        <source>Input Type</source>
+        <translation>输入类型</translation>
+    </message>
+    <message>
+        <source>Audio Output</source>
+        <translation>音频输出</translation>
+    </message>
+    <message>
+        <source>Open Voice Settings</source>
+        <translation>打开声库设置</translation>
+    </message>
+    <message>
+        <source>Instrument Plugin</source>
+        <translation>乐器插件</translation>
+    </message>
+    <message>
+        <source>Show VSTi-Exposed Ports</source>
+        <translation>显示 VSTi 暴露的端口</translation>
+    </message>
+    <message>
+        <source>Managed by the LMMS plugin host</source>
+        <translation>由现有 LMMS 宿主管理实例</translation>
+    </message>
+    <message>
+        <source>Plugin Identifier</source>
+        <translation>插件标识</translation>
+    </message>
+    <message>
+        <source>Instance Name</source>
+        <translation>实例名称</translation>
+    </message>
+    <message>
+        <source>Open Plugin</source>
+        <translation>打开插件</translation>
+    </message>
+    <message>
+        <source>Open Mixer</source>
+        <translation>打开调音台</translation>
+    </message>
+    <message>
+        <source>Add Mixer Channel</source>
+        <translation>添加通道</translation>
+    </message>
+    <message>
+        <source>Remove %1</source>
+        <translation>移除 %1</translation>
+    </message>
+    <message>
+        <source>Dynamic channels and sends</source>
+        <translation>动态通道与发送</translation>
+    </message>
+    <message>
+        <source>Selected Channel</source>
+        <translation>选中通道</translation>
+    </message>
+    <message>
+        <source>Send Target</source>
+        <translation>发送目标</translation>
+    </message>
+    <message>
+        <source>Send Amount</source>
+        <translation>发送量</translation>
+    </message>
+    <message>
+        <source>Audio Effect</source>
+        <translation>音频效果器</translation>
+    </message>
+    <message>
+        <source>Input / Output</source>
+        <translation>输入 / 输出</translation>
+    </message>
+    <message>
+        <source>2 inputs / 2 outputs</source>
+        <translation>2 输入 / 2 输出</translation>
+    </message>
+    <message>
+        <source>Bypass</source>
+        <translation>旁路</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>开启</translation>
+    </message>
+    <message>
+        <source>Open Effect Rack</source>
+        <translation>打开效果器机架</translation>
+    </message>
+    <message>
+        <source>Toggle Bypass</source>
+        <translation>切换旁路</translation>
+    </message>
+    <message>
+        <source>Default Project Layout</source>
+        <translation>默认节点工程</translation>
+    </message>
+    <message>
+        <source>LMMS default template tracks</source>
+        <translation>使用 LMMS 默认模板</translation>
+    </message>
+    <message>
+        <source>Tempo and Meter</source>
+        <translation>起始设置</translation>
+    </message>
+    <message>
+        <source>%1 BPM · %2/%3</source>
+        <translation>%1 BPM · %2/%3</translation>
+    </message>
+    <message>
+        <source>Other Tracks</source>
+        <translation>其他轨道</translation>
+    </message>
+    <message>
+        <source>Pattern Member</source>
+        <translation>节拍成员</translation>
+    </message>
+    <message>
+        <source>Open Song Editor</source>
+        <translation>打开歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Inspector</source>
+        <translation>检查器</translation>
+    </message>
+    <message>
+        <source>Uses the sample track clips and audio bus</source>
+        <translation>沿用采样轨的片段和音频总线</translation>
+    </message>
+    <message>
+        <source>Mixer Target</source>
+        <translation>混音目标</translation>
+    </message>
+    <message>
+        <source>2 × mono (L / R)</source>
+        <translation>2 × 单声道（L / R）</translation>
+    </message>
+    <message>
+        <source>Open Sample Clip</source>
+        <translation>打开采样片段</translation>
+    </message>
+    <message>
+        <source>MIDI is only for note entry from an external device</source>
+        <translation>MIDI 仅供外部设备录入音符</translation>
+    </message>
+    <message>
+        <source>Default sound source signal chain</source>
+        <translation>音源轨子图 · 默认信号链</translation>
+    </message>
+    <message>
+        <source>Independent L / R ports</source>
+        <translation>L / R 独立端口</translation>
+    </message>
+    <message>
+        <source>Back to Parent</source>
+        <translation>返回上层</translation>
+    </message>
+    <message>
+        <source>Multiple MIDI and per-channel audio inputs</source>
+        <translation>多个 MIDI 和逐声道音频入口</translation>
+    </message>
+    <message>
+        <source>MIDI Inputs</source>
+        <translation>MIDI 入口</translation>
+    </message>
+    <message>
+        <source>Audio Inputs</source>
+        <translation>音频入口</translation>
+    </message>
+    <message>
+        <source>Open Sample Track</source>
+        <translation>打开采样轨</translation>
+    </message>
+    <message>
+        <source>Back to Root Graph</source>
+        <translation>返回根图</translation>
+    </message>
+    <message>
+        <source>Pattern columns follow the arrangement timeline</source>
+        <translation>Pattern 列沿用现有编排时序</translation>
+    </message>
+    <message>
+        <source>Pattern Column</source>
+        <translation>Pattern 列</translation>
+    </message>
+    <message>
+        <source>Trigger Source</source>
+        <translation>触发来源</translation>
+    </message>
+    <message>
+        <source>Pattern clips in the arrangement</source>
+        <translation>编排中的 Pattern 片段</translation>
+    </message>
+    <message>
+        <source>Open Pattern Editor</source>
+        <translation>打开节拍编辑器</translation>
+    </message>
+    <message>
+        <source>Project audio, MIDI, and logical device connections</source>
+        <translation>工程的音频、MIDI 与逻辑设备连接</translation>
+    </message>
+    <message>
+        <source>Logical Inputs</source>
+        <translation>逻辑入口</translation>
+    </message>
+    <message>
+        <source>Open Multitrack Graph</source>
+        <translation>打开多轨子图</translation>
+    </message>
+    <message>
+        <source>Open Audio Settings</source>
+        <translation>打开音频设置</translation>
+    </message>
+    <message>
+        <source>Import Classic Project as Node Project…</source>
+        <translation>导入经典工程为节点工程…</translation>
+    </message>
+    <message>
+        <source>Import Classic Project</source>
+        <translation>导入经典工程</translation>
+    </message>
+    <message>
+        <source>Save Node Project</source>
+        <translation>保存节点工程</translation>
+    </message>
+    <message>
+        <source>Save Classic Project</source>
+        <translation>保存经典工程</translation>
+    </message>
+    <message>
+        <source>Add Step Subgraph</source>
+        <translation>添加步进子图</translation>
+    </message>
+    <message>
+        <source>Add Note Subgraph</source>
+        <translation>添加音符子图</translation>
+    </message>
+    <message>
+        <source>Add Audio Subgraph</source>
+        <translation>添加音频子图</translation>
+    </message>
+    <message>
+        <source>Convert to Classic Project</source>
+        <translation>转换为经典工程</translation>
+    </message>
+    <message>
+        <source>The classic copy will use these settings:</source>
+        <translation>经典工程副本将应用以下设置：</translation>
+    </message>
+    <message>
+        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
+        <translation>LMMS 节点工程 (*.mmpnz *.mmpn)</translation>
+    </message>
+    <message>
+        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
+        <translation>LMMS 经典工程 (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Workspace Mode</source>
+        <translation>工作区模式</translation>
+    </message>
+    <message>
+        <source>Classic Workspace</source>
+        <translation>经典工作区</translation>
+    </message>
+    <message>
+        <source>Node Workspace</source>
+        <translation>节点工作区</translation>
+    </message>
+    <message>
+        <source>Node Editor</source>
+        <translation>节点编辑器</translation>
+    </message>
+    <message>
+        <source>Show Node Editor</source>
+        <translation>显示节点编辑器</translation>
+    </message>
+    <message>
+        <source>Hide Node Editor</source>
+        <translation>隐藏节点编辑器</translation>
+    </message>
+    <message>
         <source>Configuration file</source>
         <translation>配置文件</translation>
     </message>
@@ -10832,466 +11320,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>My Favorites</source>
         <translation>我的收藏</translation>
-    </message>
-    <message>
-        <source>Classic Project Unavailable</source>
-        <translation>无法使用经典工程</translation>
-    </message>
-    <message>
-        <source>Node Project Only</source>
-        <translation>仅支持节点工程</translation>
-    </message>
-    <message>
-        <source>Do not show again</source>
-        <translation>不再提示</translation>
-    </message>
-    <message>
-        <source>Conversion was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
-        <translation>已拒绝转换。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
-    </message>
-    <message>
-        <source>Import was refused because the classic project format cannot store nodes and routing added inside track subgraphs.</source>
-        <translation>已拒绝导入。经典工程格式无法保存轨道子图中新添加的节点和路由。</translation>
-    </message>
-    <message>
-        <source>The classic project format cannot store nodes and routing added inside track subgraphs. Adding this node will prevent conversion to a classic project.</source>
-        <translation>经典工程格式无法保存轨道子图中新添加的节点和路由。添加此节点后，该工程将无法转为经典工程。</translation>
-    </message>
-    <message>
-        <source>Aggregation Settings</source>
-        <translation>聚合设置</translation>
-    </message>
-    <message>
-        <source>Merge Connections Sharing a Port</source>
-        <translation>合并共享同一端口的连线</translation>
-    </message>
-    <message>
-        <source>Connections Greater Than</source>
-        <translation>同端口连接数大于</translation>
-    </message>
-    <message>
-        <source>Aggregate Bus</source>
-        <translation>聚合总线</translation>
-    </message>
-    <message>
-        <source>Play Song</source>
-        <translation>播放歌曲</translation>
-    </message>
-    <message>
-        <source>Pause Song</source>
-        <translation>暂停歌曲</translation>
-    </message>
-    <message>
-        <source>Stop Song</source>
-        <translation>停止歌曲</translation>
-    </message>
-    <message>
-        <source>Input Port</source>
-        <translation>入口端口</translation>
-    </message>
-    <message>
-        <source>Output Port</source>
-        <translation>出口端口</translation>
-    </message>
-    <message>
-        <source>Instrument Track</source>
-        <translation>乐器轨</translation>
-    </message>
-    <message>
-        <source>Sample Track</source>
-        <translation>采样轨</translation>
-    </message>
-    <message>
-        <source>SVS Voice Track</source>
-        <translation>SVS 人声轨</translation>
-    </message>
-    <message>
-        <source>Channels</source>
-        <translation>声道</translation>
-    </message>
-    <message>
-        <source>Open SVS Piano Roll</source>
-        <translation>打开 SVS 钢琴窗</translation>
-    </message>
-    <message>
-        <source>Logical input for graph routing</source>
-        <translation>图内路由逻辑入口</translation>
-    </message>
-    <message>
-        <source>Signal Type</source>
-        <translation>信号类型</translation>
-    </message>
-    <message>
-        <source>Connected Targets</source>
-        <translation>已连接目标</translation>
-    </message>
-    <message>
-        <source>Device Binding</source>
-        <translation>设备绑定</translation>
-    </message>
-    <message>
-        <source>Master connects to the configured audio output</source>
-        <translation>Master 连接到配置的主输出</translation>
-    </message>
-    <message>
-        <source>Independent Pattern step data</source>
-        <translation>独立 Pattern 步进数据</translation>
-    </message>
-    <message>
-        <source>Active Steps</source>
-        <translation>已激活步进</translation>
-    </message>
-    <message>
-        <source>Connected Tracks</source>
-        <translation>已连接轨道</translation>
-    </message>
-    <message>
-        <source>Open Step Sequencer</source>
-        <translation>打开步进音序器</translation>
-    </message>
-    <message>
-        <source>Supports notes, lyrics, and voice curves</source>
-        <translation>支持音符、歌词和歌声曲线</translation>
-    </message>
-    <message>
-        <source>The same clip can be edited from the graph or track</source>
-        <translation>同一片段可从节点图或轨道编辑</translation>
-    </message>
-    <message>
-        <source>Voice Notes</source>
-        <translation>歌声音符</translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation>音符</translation>
-    </message>
-    <message>
-        <source>Placement</source>
-        <translation>添加位置</translation>
-    </message>
-    <message>
-        <source>Standalone Node</source>
-        <translation>独立节点</translation>
-    </message>
-    <message>
-        <source>SVC Voice Track</source>
-        <translation>SVC 人声轨</translation>
-    </message>
-    <message>
-        <source>Plays converted audio from its clips</source>
-        <translation>播放当前片段的转换音频</translation>
-    </message>
-    <message>
-        <source>Audio Source</source>
-        <translation>音频来源</translation>
-    </message>
-    <message>
-        <source>Clip conversion result</source>
-        <translation>片段转换结果</translation>
-    </message>
-    <message>
-        <source>Open Conversion Settings</source>
-        <translation>打开转换设置</translation>
-    </message>
-    <message>
-        <source>Automation curves control bound parameters</source>
-        <translation>自动化曲线控制已绑定的参数</translation>
-    </message>
-    <message>
-        <source>Bound Parameters</source>
-        <translation>绑定参数</translation>
-    </message>
-    <message>
-        <source>Automation Clips</source>
-        <translation>自动化片段</translation>
-    </message>
-    <message>
-        <source>SVS Plugin</source>
-        <translation>SVS 插件</translation>
-    </message>
-    <message>
-        <source>Input preserves lyrics, curves, and clip timing</source>
-        <translation>输入保留歌词、曲线与片段时序</translation>
-    </message>
-    <message>
-        <source>Input Type</source>
-        <translation>输入类型</translation>
-    </message>
-    <message>
-        <source>Audio Output</source>
-        <translation>音频输出</translation>
-    </message>
-    <message>
-        <source>Open Voice Settings</source>
-        <translation>打开声库设置</translation>
-    </message>
-    <message>
-        <source>Instrument Plugin</source>
-        <translation>乐器插件</translation>
-    </message>
-    <message>
-        <source>Managed by the LMMS plugin host</source>
-        <translation>由现有 LMMS 宿主管理实例</translation>
-    </message>
-    <message>
-        <source>Plugin Identifier</source>
-        <translation>插件标识</translation>
-    </message>
-    <message>
-        <source>Instance Name</source>
-        <translation>实例名称</translation>
-    </message>
-    <message>
-        <source>Open Plugin</source>
-        <translation>打开插件</translation>
-    </message>
-    <message>
-        <source>Open Mixer</source>
-        <translation>打开调音台</translation>
-    </message>
-    <message>
-        <source>Add Mixer Channel</source>
-        <translation>添加通道</translation>
-    </message>
-    <message>
-        <source>Remove %1</source>
-        <translation>移除 %1</translation>
-    </message>
-    <message>
-        <source>Dynamic channels and sends</source>
-        <translation>动态通道与发送</translation>
-    </message>
-    <message>
-        <source>Selected Channel</source>
-        <translation>选中通道</translation>
-    </message>
-    <message>
-        <source>Send Target</source>
-        <translation>发送目标</translation>
-    </message>
-    <message>
-        <source>Send Amount</source>
-        <translation>发送量</translation>
-    </message>
-    <message>
-        <source>Audio Effect</source>
-        <translation>音频效果器</translation>
-    </message>
-    <message>
-        <source>Input / Output</source>
-        <translation>输入 / 输出</translation>
-    </message>
-    <message>
-        <source>2 inputs / 2 outputs</source>
-        <translation>2 输入 / 2 输出</translation>
-    </message>
-    <message>
-        <source>Bypass</source>
-        <translation>旁路</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation>关闭</translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation>开启</translation>
-    </message>
-    <message>
-        <source>Open Effect Rack</source>
-        <translation>打开效果器机架</translation>
-    </message>
-    <message>
-        <source>Toggle Bypass</source>
-        <translation>切换旁路</translation>
-    </message>
-    <message>
-        <source>Default Project Layout</source>
-        <translation>默认节点工程</translation>
-    </message>
-    <message>
-        <source>LMMS default template tracks</source>
-        <translation>使用 LMMS 默认模板</translation>
-    </message>
-    <message>
-        <source>Tempo and Meter</source>
-        <translation>起始设置</translation>
-    </message>
-    <message>
-        <source>%1 BPM · %2/%3</source>
-        <translation>%1 BPM · %2/%3</translation>
-    </message>
-    <message>
-        <source>Other Tracks</source>
-        <translation>其他轨道</translation>
-    </message>
-    <message>
-        <source>Pattern Member</source>
-        <translation>节拍成员</translation>
-    </message>
-    <message>
-        <source>Open Song Editor</source>
-        <translation>打开歌曲编辑器</translation>
-    </message>
-    <message>
-        <source>Inspector</source>
-        <translation>检查器</translation>
-    </message>
-    <message>
-        <source>Uses the sample track clips and audio bus</source>
-        <translation>沿用采样轨的片段和音频总线</translation>
-    </message>
-    <message>
-        <source>Mixer Target</source>
-        <translation>混音目标</translation>
-    </message>
-    <message>
-        <source>2 × mono (L / R)</source>
-        <translation>2 × 单声道（L / R）</translation>
-    </message>
-    <message>
-        <source>Open Sample Clip</source>
-        <translation>打开采样片段</translation>
-    </message>
-    <message>
-        <source>MIDI is only for note entry from an external device</source>
-        <translation>MIDI 仅供外部设备录入音符</translation>
-    </message>
-    <message>
-        <source>Default sound source signal chain</source>
-        <translation>音源轨子图 · 默认信号链</translation>
-    </message>
-    <message>
-        <source>Independent L / R ports</source>
-        <translation>L / R 独立端口</translation>
-    </message>
-    <message>
-        <source>Back to Parent</source>
-        <translation>返回上层</translation>
-    </message>
-    <message>
-        <source>Multiple MIDI and per-channel audio inputs</source>
-        <translation>多个 MIDI 和逐声道音频入口</translation>
-    </message>
-    <message>
-        <source>MIDI Inputs</source>
-        <translation>MIDI 入口</translation>
-    </message>
-    <message>
-        <source>Audio Inputs</source>
-        <translation>音频入口</translation>
-    </message>
-    <message>
-        <source>Open Sample Track</source>
-        <translation>打开采样轨</translation>
-    </message>
-    <message>
-        <source>Back to Root Graph</source>
-        <translation>返回根图</translation>
-    </message>
-    <message>
-        <source>Pattern columns follow the arrangement timeline</source>
-        <translation>Pattern 列沿用现有编排时序</translation>
-    </message>
-    <message>
-        <source>Pattern Column</source>
-        <translation>Pattern 列</translation>
-    </message>
-    <message>
-        <source>Trigger Source</source>
-        <translation>触发来源</translation>
-    </message>
-    <message>
-        <source>Pattern clips in the arrangement</source>
-        <translation>编排中的 Pattern 片段</translation>
-    </message>
-    <message>
-        <source>Open Pattern Editor</source>
-        <translation>打开节拍编辑器</translation>
-    </message>
-    <message>
-        <source>Project audio, MIDI, and logical device connections</source>
-        <translation>工程的音频、MIDI 与逻辑设备连接</translation>
-    </message>
-    <message>
-        <source>Logical Inputs</source>
-        <translation>逻辑入口</translation>
-    </message>
-    <message>
-        <source>Open Multitrack Graph</source>
-        <translation>打开多轨子图</translation>
-    </message>
-    <message>
-        <source>Open Audio Settings</source>
-        <translation>打开音频设置</translation>
-    </message>
-    <message>
-        <source>Import Classic Project as Node Project…</source>
-        <translation>导入经典工程为节点工程…</translation>
-    </message>
-    <message>
-        <source>Import Classic Project</source>
-        <translation>导入经典工程</translation>
-    </message>
-    <message>
-        <source>Save Node Project</source>
-        <translation>保存节点工程</translation>
-    </message>
-    <message>
-        <source>Save Classic Project</source>
-        <translation>保存经典工程</translation>
-    </message>
-    <message>
-        <source>Add Step Subgraph</source>
-        <translation>添加步进子图</translation>
-    </message>
-    <message>
-        <source>Add Note Subgraph</source>
-        <translation>添加音符子图</translation>
-    </message>
-    <message>
-        <source>Add Audio Subgraph</source>
-        <translation>添加音频子图</translation>
-    </message>
-    <message>
-        <source>Convert to Classic Project</source>
-        <translation>转换为经典工程</translation>
-    </message>
-    <message>
-        <source>The classic copy will use these settings:</source>
-        <translation>经典工程副本将应用以下设置：</translation>
-    </message>
-    <message>
-        <source>LMMS Node Workflow Project (*.mmpnz *.mmpn)</source>
-        <translation>LMMS 节点工程 (*.mmpnz *.mmpn)</translation>
-    </message>
-    <message>
-        <source>LMMS Classic Projects (*.mmp *.mmpz)</source>
-        <translation>LMMS 经典工程 (*.mmp *.mmpz)</translation>
-    </message>
-    <message>
-        <source>Workspace Mode</source>
-        <translation>工作区模式</translation>
-    </message>
-    <message>
-        <source>Classic Workspace</source>
-        <translation>经典工作区</translation>
-    </message>
-    <message>
-        <source>Node Workspace</source>
-        <translation>节点工作区</translation>
-    </message>
-    <message>
-        <source>Node Editor</source>
-        <translation>节点编辑器</translation>
-    </message>
-    <message>
-        <source>Show Node Editor</source>
-        <translation>显示节点编辑器</translation>
-    </message>
-    <message>
-        <source>Hide Node Editor</source>
-        <translation>隐藏节点编辑器</translation>
     </message>
     <message>
         <source>New Node Workflow Project</source>
@@ -18327,6 +18355,10 @@ Latency: %2 ms</source>
 <context>
     <name>lmms::agent::chat::ChatDock</name>
     <message>
+        <source>Agent Settings</source>
+        <translation>Agent 设置</translation>
+    </message>
+    <message>
         <source>You</source>
         <translation>你</translation>
     </message>
@@ -18397,6 +18429,110 @@ Latency: %2 ms</source>
     <message>
         <source>Remove attachment: %1</source>
         <translation>移除附件：%1</translation>
+    </message>
+    <message>
+        <source>Expand Agent</source>
+        <translation>展开 Agent</translation>
+    </message>
+    <message>
+        <source>Collapse Agent</source>
+        <translation>收起 Agent</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <source>Toggle Pin</source>
+        <translation>切换置顶</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>取消归档</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>归档</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Delete Sessions</source>
+        <translation>删除会话</translation>
+    </message>
+    <message>
+        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
+        <translation>删除所选 %1 个会话？原始附件和工程素材不会被删除。</translation>
+    </message>
+    <message>
+        <source>Rename Session</source>
+        <translation>重命名会话</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>No approval required</source>
+        <translation>无需批准</translation>
+    </message>
+    <message>
+        <source>Request approval</source>
+        <translation>请求批准</translation>
+    </message>
+    <message>
+        <source>Close Chat Window</source>
+        <translation>关闭聊天窗口</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>当前工程</translation>
+    </message>
+    <message>
+        <source>Dock on the Right</source>
+        <translation>吸附回右侧</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>会话</translation>
+    </message>
+    <message>
+        <source>Expand Chat Window</source>
+        <translation>展开聊天窗口</translation>
+    </message>
+    <message>
+        <source>Undock or Redock</source>
+        <translation>分离 / 回接</translation>
+    </message>
+    <message>
+        <source>New Session</source>
+        <translation>新建会话</translation>
+    </message>
+    <message>
+        <source>Search Sessions</source>
+        <translation>搜索会话</translation>
+    </message>
+    <message>
+        <source>Session Management</source>
+        <translation>会话管理</translation>
+    </message>
+    <message>
+        <source>Session Actions</source>
+        <translation>会话操作</translation>
+    </message>
+    <message>
+        <source>Describe the arrangement you want…</source>
+        <translation>继续描述你想要的编配…</translation>
+    </message>
+    <message>
+        <source>Reasoning · Auto</source>
+        <translation>推理 · 自动</translation>
+    </message>
+    <message>
+        <source>Agent Chat</source>
+        <translation>Agent 聊天</translation>
     </message>
 </context>
 <context>
@@ -18803,326 +18939,6 @@ Latency: %2 ms</source>
         <source>Awaiting approval: %1</source>
         <translation>待批准：%1</translation>
     </message>
-    <message>
-        <source>New connection</source>
-        <translation>新连接</translation>
-    </message>
-    <message>
-        <source>Windows Credential Manager error %1.</source>
-        <translation>Windows 凭据管理器错误 %1。</translation>
-    </message>
-    <message>
-        <source>Invalid connection identifier, name or protocol.</source>
-        <translation>连接标识、名称或请求格式无效。</translation>
-    </message>
-    <message>
-        <source>API base URL must be HTTP(S), without credentials, query or fragment.</source>
-        <translation>API 基础地址须使用 HTTP(S)，且不能包含凭据、查询参数或片段。</translation>
-    </message>
-    <message>
-        <source>Temperature must be between 0 and 2.</source>
-        <translation>温度须介于 0 和 2 之间。</translation>
-    </message>
-    <message>
-        <source>Invalid API key header configuration.</source>
-        <translation>API Key 请求头配置无效。</translation>
-    </message>
-    <message>
-        <source>Invalid connection settings JSON or unsupported version.</source>
-        <translation>连接设置 JSON 无效或版本不受支持。</translation>
-    </message>
-    <message>
-        <source>Duplicate connection identifier.</source>
-        <translation>连接标识重复。</translation>
-    </message>
-    <message>
-        <source>Cannot create connection settings directory.</source>
-        <translation>无法创建连接设置目录。</translation>
-    </message>
-    <message>
-        <source>Connection not found.</source>
-        <translation>未找到连接。</translation>
-    </message>
-    <message>
-        <source>A valid connection and non-empty API key are required.</source>
-        <translation>需要有效连接和非空的 API Key。</translation>
-    </message>
-    <message>
-        <source>API key exceeds the Windows credential size limit.</source>
-        <translation>API Key 超过 Windows 凭据大小限制。</translation>
-    </message>
-    <message>
-        <source>Native API key storage is available on Windows only.</source>
-        <translation>原生 API Key 存储仅支持 Windows。</translation>
-    </message>
-    <message>
-        <source>Invalid connection identifier.</source>
-        <translation>连接标识无效。</translation>
-    </message>
-    <message>
-        <source>Selected attachments exceed the 64 MiB request limit.</source>
-        <translation>所选附件总大小超过 64 MiB 请求限制。</translation>
-    </message>
-    <message>
-        <source>Previous attachment: %1 (content unavailable; select it again to send).</source>
-        <translation>先前附件：%1（内容不可用；请重新选择后发送）。</translation>
-    </message>
-    <message>
-        <source>The model response contained invalid JSON.</source>
-        <translation>模型响应包含无效 JSON。</translation>
-    </message>
-    <message>
-        <source>The configured response text path did not contain a string.</source>
-        <translation>配置的响应文本路径未包含字符串。</translation>
-    </message>
-    <message>
-        <source>The model response did not contain the expected message fields.</source>
-        <translation>模型响应未包含预期的消息字段。</translation>
-    </message>
-    <message>
-        <source>Invalid, incomplete or unsupported tool history for this protocol.</source>
-        <translation>工具历史无效、不完整，或当前协议不支持该格式。</translation>
-    </message>
-    <message>
-        <source>Tool result</source>
-        <translation>工具结果</translation>
-    </message>
-    <message>
-        <source>Thought · Summary</source>
-        <translation>已思考 · 摘要</translation>
-    </message>
-    <message>
-        <source>Approved · %1</source>
-        <translation>已批准 · %1</translation>
-    </message>
-    <message>
-        <source>Ran automatically · %1</source>
-        <translation>已自动执行 · %1</translation>
-    </message>
-    <message>
-        <source>Completed</source>
-        <translation>已完成</translation>
-    </message>
-    <message>
-        <source>Denied · %1</source>
-        <translation>已拒绝 · %1</translation>
-    </message>
-    <message>
-        <source>Not executed; project unchanged</source>
-        <translation>未执行，工程未改动</translation>
-    </message>
-    <message>
-        <source>Canceled · %1</source>
-        <translation>已取消 · %1</translation>
-    </message>
-    <message>
-        <source>Failed · %1</source>
-        <translation>执行失败 · %1</translation>
-    </message>
-    <message>
-        <source>Not executed · %1</source>
-        <translation>未执行 · %1</translation>
-    </message>
-    <message>
-        <source>A chat tool cannot be represented as a model function: %1</source>
-        <translation>聊天工具无法表示为模型函数：%1</translation>
-    </message>
-    <message>
-        <source>Web search was turned off; the running search was canceled.</source>
-        <translation>联网搜索已关闭，正在进行的搜索已取消。</translation>
-    </message>
-    <message>
-        <source>Web search is turned off in the Agent settings.</source>
-        <translation>Agent 设置中已关闭联网搜索。</translation>
-    </message>
-    <message>
-        <source>Brave search needs an API key in the Agent settings.</source>
-        <translation>使用 Brave 搜索需要在 Agent 设置中填写 API Key。</translation>
-    </message>
-    <message>
-        <source>The response is not JSON (HTTP %1).</source>
-        <translation>响应不是 JSON（HTTP %1）。</translation>
-    </message>
-    <message>
-        <source>SearXNG search failed: %1</source>
-        <translation>SearXNG 搜索失败：%1</translation>
-    </message>
-    <message>
-        <source>Enable the json format under search.formats in the instance&apos;s settings.yml.</source>
-        <translation>请在该实例 settings.yml 的 search.formats 中启用 json 格式。</translation>
-    </message>
-    <message>
-        <source>Brave search failed: %1</source>
-        <translation>Brave 搜索失败：%1</translation>
-    </message>
-    <message>
-        <source>Only http and https page addresses can be read.</source>
-        <translation>只能读取 http 或 https 网页地址。</translation>
-    </message>
-    <message>
-        <source>The page is larger than the 2 MB reading limit.</source>
-        <translation>网页超过 2 MB 读取上限。</translation>
-    </message>
-    <message>
-        <source>Reading the page failed: %1</source>
-        <translation>读取网页失败：%1</translation>
-    </message>
-    <message>
-        <source>The page content type is not readable text: %1</source>
-        <translation>网页内容类型不是可读文本：%1</translation>
-    </message>
-    <message>
-        <source>The selected model does not support model-hosted web search.</source>
-        <translation>所选模型不支持模型自带联网搜索。</translation>
-    </message>
-    <message>
-        <source>Web search was turned off; the model request was stopped.</source>
-        <translation>联网搜索已关闭，模型请求已停止。</translation>
-    </message>
-    <message>
-        <source>The model provider runs web searches on its own servers during this turn; one turn may search several times. This approval applies to this turn only.</source>
-        <translation>模型厂商会在本轮中于其服务器上执行联网搜索，一轮可能搜索多次。本次批准仅适用于本轮。</translation>
-    </message>
-    <message>
-        <source>Web sources:</source>
-        <translation>联网来源：</translation>
-    </message>
-    <message>
-        <source>%1: not found at %2</source>
-        <translation>%1：在 %2 未找到</translation>
-    </message>
-    <message>
-        <source>%1: found, not listed in tools/manifest.json</source>
-        <translation>%1：已找到，未列入 tools/manifest.json</translation>
-    </message>
-    <message>
-        <source>%1: SHA256 does not match tools/manifest.json</source>
-        <translation>%1：SHA256 与 tools/manifest.json 不一致</translation>
-    </message>
-    <message>
-        <source>%1: verified against tools/manifest.json</source>
-        <translation>%1：已按 tools/manifest.json 校验</translation>
-    </message>
-    <message>
-        <source>Only http and https assets can be downloaded.</source>
-        <translation>只能下载 http 或 https 素材。</translation>
-    </message>
-    <message>
-        <source>A target folder is required.</source>
-        <translation>需要指定目标文件夹。</translation>
-    </message>
-    <message>
-        <source>Save the project first, or give an absolute target folder.</source>
-        <translation>请先保存工程，或指定绝对路径的目标文件夹。</translation>
-    </message>
-    <message>
-        <source>The file name is missing or not a plain file name.</source>
-        <translation>文件名缺失或不是单纯的文件名。</translation>
-    </message>
-    <message>
-        <source>%1 already exists; ask again with overwrite to replace it.</source>
-        <translation>%1 已存在；如需替换，请在请求中明确覆盖。</translation>
-    </message>
-    <message>
-        <source>Cannot create the download folder in %1.</source>
-        <translation>无法在 %1 中创建下载文件夹。</translation>
-    </message>
-    <message>
-        <source>aria2 could not be started.</source>
-        <translation>无法启动 aria2。</translation>
-    </message>
-    <message>
-        <source>aria2 exited with code %1. %2</source>
-        <translation>aria2 退出码 %1。%2</translation>
-    </message>
-    <message>
-        <source>Cannot move the download to %1.</source>
-        <translation>无法将下载文件移动到 %1。</translation>
-    </message>
-    <message>
-        <source>replaces a file with the same name</source>
-        <translation>覆盖同名文件</translation>
-    </message>
-    <message>
-        <source>keeps an existing file with the same name</source>
-        <translation>不覆盖同名文件</translation>
-    </message>
-    <message>
-        <source>Asset downloads are turned off in the Agent settings.</source>
-        <translation>Agent 设置中已关闭素材下载。</translation>
-    </message>
-    <message>
-        <source>aria2 was not found at %1. Check the tools in the Agent settings.</source>
-        <translation>在 %1 未找到 aria2，请在 Agent 设置中检查工具。</translation>
-    </message>
-    <message>
-        <source>7-Zip could not be started.</source>
-        <translation>无法启动 7-Zip。</translation>
-    </message>
-    <message>
-        <source>Downloaded to %1, but it was not extracted: %2</source>
-        <translation>已下载到 %1，但未解压：%2</translation>
-    </message>
-    <message>
-        <source>7-Zip cannot read it as an archive.</source>
-        <translation>7-Zip 无法将其识别为压缩包。</translation>
-    </message>
-    <message>
-        <source>the archive contains a link: %1</source>
-        <translation>压缩包包含链接：%1</translation>
-    </message>
-    <message>
-        <source>the archive member leaves the extraction folder: %1</source>
-        <translation>压缩包成员会越出解压目录：%1</translation>
-    </message>
-    <message>
-        <source>the archive is empty.</source>
-        <translation>压缩包为空。</translation>
-    </message>
-    <message>
-        <source>%1 is not empty; ask again with overwrite to merge into it.</source>
-        <translation>%1 不为空；如需合并，请在请求中明确覆盖。</translation>
-    </message>
-    <message>
-        <source>Cannot create the extraction folder in %1.</source>
-        <translation>无法在 %1 中创建解压文件夹。</translation>
-    </message>
-    <message>
-        <source>7-Zip exited with code %1.</source>
-        <translation>7-Zip 退出码 %1。</translation>
-    </message>
-    <message>
-        <source>an extracted entry is a link or outside the folder.</source>
-        <translation>解压出的条目是链接或位于目录之外。</translation>
-    </message>
-    <message>
-        <source>%1 already exists.</source>
-        <translation>%1 已存在。</translation>
-    </message>
-    <message>
-        <source>Cannot move %1 into place.</source>
-        <translation>无法将 %1 移动到位。</translation>
-    </message>
-    <message>
-        <source>extract to %1</source>
-        <translation>解压到 %1</translation>
-    </message>
-    <message>
-        <source>7-Zip was not found at %1. Check the tools in the Agent settings.</source>
-        <translation>在 %1 未找到 7-Zip，请在 Agent 设置中检查工具。</translation>
-    </message>
-    <message>
-        <source>Start a new music conversation.</source>
-        <translation>开始新的音乐创作会话。</translation>
-    </message>
-    <message>
-        <source>Request failed: %1</source>
-        <translation>请求失败：%1</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation>已停止</translation>
-    </message>
 </context>
 <context>
     <name>lmms::agent::chat::ChatDock</name>
@@ -19133,186 +18949,6 @@ Latency: %2 ms</source>
     <message>
         <source>Awaiting tool approval</source>
         <translation>等待工具批准</translation>
-    </message>
-    <message>
-        <source>Agent Settings</source>
-        <translation>Agent 设置</translation>
-    </message>
-    <message>
-        <source>You</source>
-        <translation>你</translation>
-    </message>
-    <message>
-        <source>Agent</source>
-        <translation>Agent</translation>
-    </message>
-    <message>
-        <source>Configure a model</source>
-        <translation>配置模型</translation>
-    </message>
-    <message>
-        <source>API and model settings</source>
-        <translation>API 与模型设置</translation>
-    </message>
-    <message>
-        <source>Stop current request</source>
-        <translation>停止当前请求</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>发送</translation>
-    </message>
-    <message>
-        <source>Model reasoning</source>
-        <translation>模型思考</translation>
-    </message>
-    <message>
-        <source>Request failed: %1</source>
-        <translation>请求失败：%1</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation>已停止</translation>
-    </message>
-    <message>
-        <source>Add attachments</source>
-        <translation>添加附件</translation>
-    </message>
-    <message>
-        <source> +%1</source>
-        <translation> +%1</translation>
-    </message>
-    <message>
-        <source>Enter to send · Shift+Enter for a new line</source>
-        <translation>Enter 发送 · Shift+Enter 换行</translation>
-    </message>
-    <message>
-        <source>Reading and encoding selected attachments…</source>
-        <translation>正在读取并编码所选附件…</translation>
-    </message>
-    <message>
-        <source>Request upload: %1 / %2 bytes</source>
-        <translation>请求上传：%1 / %2 字节</translation>
-    </message>
-    <message>
-        <source>Attachment: %1 (%2)</source>
-        <translation>附件：%1（%2）</translation>
-    </message>
-    <message>
-        <source>Export session (includes sent attachment content)</source>
-        <translation>导出会话（包含已发送的附件内容）</translation>
-    </message>
-    <message>
-        <source>Export JSON (includes sent attachment content)</source>
-        <translation>导出 JSON（包含已发送的附件内容）</translation>
-    </message>
-    <message>
-        <source>Remove attachment: %1</source>
-        <translation>移除附件：%1</translation>
-    </message>
-    <message>
-        <source>Expand Agent</source>
-        <translation>展开 Agent</translation>
-    </message>
-    <message>
-        <source>Collapse Agent</source>
-        <translation>收起 Agent</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>重命名</translation>
-    </message>
-    <message>
-        <source>Toggle Pin</source>
-        <translation>切换置顶</translation>
-    </message>
-    <message>
-        <source>Unarchive</source>
-        <translation>取消归档</translation>
-    </message>
-    <message>
-        <source>Archive</source>
-        <translation>归档</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>删除</translation>
-    </message>
-    <message>
-        <source>Delete Sessions</source>
-        <translation>删除会话</translation>
-    </message>
-    <message>
-        <source>Delete %1 selected sessions? Original attachments and project assets will be kept.</source>
-        <translation>删除所选 %1 个会话？原始附件和工程素材不会被删除。</translation>
-    </message>
-    <message>
-        <source>Rename Session</source>
-        <translation>重命名会话</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>名称</translation>
-    </message>
-    <message>
-        <source>No approval required</source>
-        <translation>无需批准</translation>
-    </message>
-    <message>
-        <source>Request approval</source>
-        <translation>请求批准</translation>
-    </message>
-    <message>
-        <source>Close Chat Window</source>
-        <translation>关闭聊天窗口</translation>
-    </message>
-    <message>
-        <source>Current Project</source>
-        <translation>当前工程</translation>
-    </message>
-    <message>
-        <source>Dock on the Right</source>
-        <translation>吸附回右侧</translation>
-    </message>
-    <message>
-        <source>Sessions</source>
-        <translation>会话</translation>
-    </message>
-    <message>
-        <source>Expand Chat Window</source>
-        <translation>展开聊天窗口</translation>
-    </message>
-    <message>
-        <source>Undock or Redock</source>
-        <translation>分离 / 回接</translation>
-    </message>
-    <message>
-        <source>New Session</source>
-        <translation>新建会话</translation>
-    </message>
-    <message>
-        <source>Search Sessions</source>
-        <translation>搜索会话</translation>
-    </message>
-    <message>
-        <source>Session Management</source>
-        <translation>会话管理</translation>
-    </message>
-    <message>
-        <source>Session Actions</source>
-        <translation>会话操作</translation>
-    </message>
-    <message>
-        <source>Describe the arrangement you want…</source>
-        <translation>继续描述你想要的编配…</translation>
-    </message>
-    <message>
-        <source>Reasoning · Auto</source>
-        <translation>推理 · 自动</translation>
-    </message>
-    <message>
-        <source>Agent Chat</source>
-        <translation>Agent 聊天</translation>
     </message>
 </context>
 <context>
