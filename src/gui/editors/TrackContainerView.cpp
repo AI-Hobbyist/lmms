@@ -474,8 +474,15 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	if( type == "instrument" )
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
-		auto ilt = new InstrumentLoaderThread(this, it, value);
-		ilt->start();
+		if (value == "native_vst_instrument")
+		{
+			it->loadInstrument(value, nullptr, true);
+		}
+		else
+		{
+			auto* loader = new InstrumentLoaderThread(this, it, value);
+			loader->start();
+		}
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}

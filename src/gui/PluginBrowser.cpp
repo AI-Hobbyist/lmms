@@ -25,6 +25,7 @@
 #include "lmmsconfig.h"
 #include "PluginBrowser.h"
 #include "SVSImageLoader.h"
+#include "ConfigManager.h"
 #ifdef LMMS_BUILD_WIN32
 #include "vsthost/CatalogJobs.h"
 #include <QTimer>
@@ -99,29 +100,25 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	addPlugins();
 #ifdef LMMS_BUILD_WIN32
 	auto* timer = new QTimer(this);
-	connect(timer, &QTimer::timeout, this, [this, published = std::uint64_t{0}]() mutable {
-		if (QApplication::mouseButtons() != Qt::NoButton)
-		{
-			return;
-		}
-		for (auto* loader : findChildren<QThread*>())
-		{
-			if (loader->isRunning())
+	connect(timer, &QTimer::timeout, this,
+		[this, published = std::uint64_t{0}, native = ConfigManager::inst()->nativeVstLoading()]() mutable {
+			if (QApplication::mouseButtons() != Qt::NoButton) { return; }
+			for (auto* loader : findChildren<QThread*>())
 			{
-				return;
+				if (loader->isRunning()) { return; }
 			}
-		}
-		if (const auto* jobs = Engine::vstCatalog(); jobs && jobs->snapshot().published != published)
-		{
-			published = jobs->snapshot().published;
-			addPlugins();
-			updateRootVisibilities();
-			if (const auto* search = m_view->findChild<QLineEdit*>())
+			const auto* jobs = Engine::vstCatalog();
+			const auto currentPublication = jobs ? jobs->snapshot().published : 0;
+			const bool currentMode = ConfigManager::inst()->nativeVstLoading();
+			if (currentPublication != published || currentMode != native)
 			{
-				onFilterChanged(search->text());
+				published = currentPublication;
+				native = currentMode;
+				addPlugins();
+				updateRootVisibilities();
+				if (const auto* search = m_view->findChild<QLineEdit*>()) { onFilterChanged(search->text()); }
 			}
-		}
-	});
+		});
 	timer->start(100);
 #endif
 
@@ -217,6 +214,12 @@ void PluginBrowser::addPlugins()
 	// Add all of the descriptors to the tree
 	for (const auto desc : descs)
 	{
+		const auto descriptorName = QString::fromUtf8(desc->name);
+		const bool nativeVst = descriptorName == "native_vst_instrument";
+		if (nativeVst && !ConfigManager::inst()->nativeVstLoading())
+		{
+			continue;
+		}
 		if (desc->subPluginFeatures)
 		{
 			// Fetch and sort all subplugins for this plugin descriptor
@@ -234,9 +237,13 @@ void PluginBrowser::addPlugins()
 			if (vst)
 			{
 				addPlugin(Plugin::Descriptor::SubPluginFeatures::Key(desc, "VeSTige"), lmmsRoot);
+				if (ConfigManager::inst()->nativeVstLoading())
+				{
+					continue;
+				}
 			}
-			const auto root = addRoot(vst ? tr("VST Instruments") : QString::fromUtf8(desc->displayName));
-			if (vst)
+			const auto root = addRoot(vst || nativeVst ? tr("VST Instruments") : QString::fromUtf8(desc->displayName));
+			if (vst || nativeVst)
 			{
 				root->setExpanded(true);
 			}
@@ -398,9 +405,14 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 
 void PluginDescWidget::openInNewInstrumentTrack(QString value)
 {
-	Engine::setDndPluginKey(&m_pluginKey);
 	TrackContainer* tc = Engine::getSong();
 	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+	if (value == "native_vst_instrument")
+	{
+		it->loadInstrument(value, &m_pluginKey);
+		return;
+	}
+	Engine::setDndPluginKey(&m_pluginKey);
 	auto ilt = new InstrumentLoaderThread(this, it, value);
 	ilt->start();
 }

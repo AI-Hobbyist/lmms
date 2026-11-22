@@ -183,6 +183,7 @@ private:
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
+	QComboBox* m_vstLoadingMode = nullptr;
 	QString m_vstEmbedMethod;
 	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;

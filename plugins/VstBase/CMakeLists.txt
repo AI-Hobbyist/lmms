@@ -19,6 +19,11 @@ ENDIF()
 
 ADD_SUBDIRECTORY(vstbase)
 
+if(LMMS_BUILD_WIN32)
+	add_subdirectory(native_vst_instrument)
+	add_subdirectory(native_vst_effect)
+endif()
+
 SET(EXTERNALPROJECT_ARGS
 	SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin"
 	#INSTALL_COMMAND ""

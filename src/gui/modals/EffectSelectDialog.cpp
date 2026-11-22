@@ -24,6 +24,7 @@
  */
 
 #include "EffectSelectDialog.h"
+#include "ConfigManager.h"
 #include "DummyEffect.h"
 #include "EffectChain.h"
 #include "embed.h"
@@ -77,7 +78,8 @@ void EffectSelectDialog::refreshVstKeys()
 	m_pluginList->selectionModel()->clear();
 	for (auto it = m_effectKeys.begin(); it != m_effectKeys.end();)
 	{
-		if (QString::fromUtf8(it->desc->name) == "vsteffect")
+		const auto name = QString::fromUtf8(it->desc->name);
+		if (name == "vsteffect" || name == "native_vst_effect")
 		{
 			it = m_effectKeys.erase(it);
 		}
@@ -86,9 +88,10 @@ void EffectSelectDialog::refreshVstKeys()
 			++it;
 		}
 	}
+	const auto activeVst = ConfigManager::inst()->nativeVstLoading() ? "native_vst_effect" : "vsteffect";
 	for (const auto* descriptor : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
-		if (QString::fromUtf8(descriptor->name) == "vsteffect" && descriptor->subPluginFeatures)
+		if (QString::fromUtf8(descriptor->name) == activeVst && descriptor->subPluginFeatures)
 		{
 			descriptor->subPluginFeatures->listSubPluginKeys(descriptor, m_effectKeys);
 		}
@@ -133,6 +136,12 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	EffectKeyList subPluginEffectKeys;
 	for (const auto desc : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
+		const auto descriptorName = QString::fromUtf8(desc->name);
+		const bool native = ConfigManager::inst()->nativeVstLoading();
+		if ((descriptorName == "native_vst_effect" && !native) || (descriptorName == "vsteffect" && native))
+		{
+			continue;
+		}
 		if (desc->subPluginFeatures)
 		{
 			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys);

@@ -601,6 +601,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto* vstControlsLayout = new QVBoxLayout(vstControls);
 	vstScroll->setWidget(vstControls);
 	vst_layout->addWidget(vstScroll);
+#ifdef LMMS_BUILD_WIN32
+	auto* loadingBox = new QGroupBox(tr("VST loading mode"), vstControls);
+	auto* loadingLayout = new QVBoxLayout(loadingBox);
+	m_vstLoadingMode = new QComboBox(loadingBox);
+	m_vstLoadingMode->setObjectName("vstLoadingMode");
+	m_vstLoadingMode->addItem(tr("Compatibility mode"), "compatibility");
+	m_vstLoadingMode->addItem(tr("Native mode"), "native");
+	m_vstLoadingMode->setCurrentIndex(ConfigManager::inst()->nativeVstLoading() ? 1 : 0);
+	loadingLayout->addWidget(m_vstLoadingMode);
+	vstControlsLayout->addWidget(loadingBox);
+#endif
 	QGroupBox* pluginsBox = new QGroupBox(tr("Plugin windows"), vstControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
@@ -1356,6 +1367,10 @@ void SetupDialog::accept()
 					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue("ui", "vstembedmethod",
 					m_vstEmbedComboBox->currentData().toString());
+	if (m_vstLoadingMode)
+	{
+		ConfigManager::inst()->setValue("ui", "vstloadingmode", m_vstLoadingMode->currentData().toString());
+	}
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",

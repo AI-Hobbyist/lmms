@@ -249,6 +249,15 @@ QString ConfigManager::vstEmbedMethod() const
 	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
 }
 
+bool ConfigManager::nativeVstLoading() const
+{
+#ifdef LMMS_BUILD_WIN32
+	return value("ui", "vstloadingmode") == "native";
+#else
+	return false;
+#endif
+}
+
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir(m_workingDir).exists();
