@@ -1,5 +1,6 @@
 #include "Vst3Module.h"
 #include "Vst3Instance.h"
+#include "WindowsCrashReport.h"
 #include "vsthost/AudioQueue.h"
 #include "vsthost/ControlChannel.h"
 #include "vsthost/SharedRegion.h"
@@ -54,6 +55,7 @@ Error scan(std::span<const std::uint8_t> payload, std::unique_ptr<Vst3Module>& m
 	}
 	module = std::make_unique<Vst3Module>();
 	std::string error;
+	lmms::windowsCrashReport::setPlugin(path);
 	if (!module->open(path, error))
 	{
 		return Error::LoadFailed;
@@ -83,6 +85,7 @@ int wmain(int argc, wchar_t** argv)
 		TerminateProcess(GetCurrentProcess(), exception->ExceptionRecord->ExceptionCode);
 		return EXCEPTION_EXECUTE_HANDLER;
 	});
+	lmms::windowsCrashReport::install(L"VST3", true);
 	if (argc != 7 || std::wstring_view(argv[1]) != L"--host-session")
 	{
 		return 2;
@@ -247,6 +250,7 @@ int wmain(int argc, wchar_t** argv)
 						std::wstring path(wideSize, L'\0');
 						MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, command.path.data(),
 							static_cast<int>(command.path.size()), path.data(), wideSize);
+						lmms::windowsCrashReport::setPlugin(path);
 						instance = std::make_unique<Vst3Instance>();
 						instance->open(path, command.cid);
 						instance->setup(command.sampleRate, command.maxFrames, command.offline);

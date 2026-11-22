@@ -146,6 +146,24 @@ ADD_EXECUTABLE(lmms
 )
 IF(WIN32)
 	add_dependencies(lmms RemoteCatalogIo)
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(crash_reporter LmmsCrashReporter64)
+		set(crash_reporter_subdir "")
+	else()
+		set(crash_reporter LmmsCrashReporter32)
+		set(crash_reporter_subdir "/32")
+	endif()
+	add_executable(${crash_reporter} ../tools/vsthost/LmmsCrashReporter.cpp)
+	target_include_directories(${crash_reporter} PRIVATE "${CMAKE_SOURCE_DIR}/include")
+	set_target_properties(${crash_reporter} PROPERTIES
+		AUTOMOC OFF
+		AUTOUIC OFF
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/plugins${crash_reporter_subdir}")
+	if(MINGW)
+		target_link_options(${crash_reporter} PRIVATE -municode)
+	endif()
+	add_dependencies(lmms ${crash_reporter})
+	install(TARGETS ${crash_reporter} RUNTIME DESTINATION "${PLUGIN_DIR}${crash_reporter_subdir}")
 ENDIF()
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}

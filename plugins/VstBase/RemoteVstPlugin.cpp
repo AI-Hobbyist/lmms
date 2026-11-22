@@ -34,6 +34,9 @@
 #include <span>
 
 #include "lmmsconfig.h"
+#ifdef LMMS_BUILD_WIN32
+#include "WindowsCrashReport.h"
+#endif
 
 #include "RemotePluginClient.h"
 
@@ -1123,7 +1126,11 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		return false;
 	}
 #ifndef NATIVE_LINUX_VST
-	if ((m_libInst = LoadLibraryW(toWString(_plugin_file).get())) == nullptr)
+	const auto widePath = toWString(_plugin_file);
+#ifdef LMMS_BUILD_WIN32
+	windowsCrashReport::setPlugin(widePath.get());
+#endif
+	if ((m_libInst = LoadLibraryW(widePath.get())) == nullptr)
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
@@ -1421,6 +1428,9 @@ const char * RemoteVstPlugin::pluginName()
 	buf[0] = 0;
 	pluginDispatch( effGetEffectName, 0, 0, buf );
 	buf[31] = 0;
+#ifdef LMMS_BUILD_WIN32
+	windowsCrashReport::setPluginName(buf, CP_ACP);
+#endif
 	return buf;
 }
 
@@ -2760,6 +2770,9 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 int main( int _argc, char * * _argv )
 {
 	using lmms::RemoteVstPlugin;
+#ifdef LMMS_BUILD_WIN32
+	lmms::windowsCrashReport::install(L"VST2", true);
+#endif
 
 #ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 4 )

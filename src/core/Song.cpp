@@ -23,6 +23,9 @@
  */
 
 #include "Song.h"
+#ifdef LMMS_BUILD_WIN32
+#include "WindowsCrashReport.h"
+#endif
 #include "AudioBusHandle.h"
 #include "Effect.h"
 #include "EffectChain.h"
@@ -82,6 +85,16 @@
 
 namespace lmms
 {
+namespace
+{
+void setProjectWorkspace(bool& isNodeProject, bool node)
+{
+	isNodeProject = node;
+#ifdef LMMS_BUILD_WIN32
+	windowsCrashReport::setNodeWorkspace(node);
+#endif
+}
+}
 
 tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
@@ -1040,7 +1053,7 @@ void Song::clearProject()
 	}
 #endif
 	using gui::getGUI;
-	m_nodeProject = false;
+	setProjectWorkspace(m_nodeProject, false);
 	m_nodeWorkflow = {};
 	m_deferredVstOutputs = {};
 	m_vstTrackAudio.clear();
@@ -1138,7 +1151,7 @@ void Song::clearProject()
 void Song::createNodeProject()
 {
 	createNewProject();
-	m_nodeProject = true;
+	setProjectWorkspace(m_nodeProject, true);
 }
 
 bool Song::convertToNodeProject(const QString& fileName)
@@ -1155,7 +1168,7 @@ bool Song::convertToNodeProject(const QString& fileName)
 	{
 		return false;
 	}
-	m_nodeProject = true;
+	setProjectWorkspace(m_nodeProject, true);
 	setProjectFileName(fileName);
 	setModified(false);
 	return true;
@@ -1548,7 +1561,7 @@ bool Song::convertToClassicProject(const QString& fileName)
 			targetChannel->m_nodeEffect = false;
 			targetChannel->m_nodeEffectPosition.reset();
 		}
-		m_nodeProject = false;
+		setProjectWorkspace(m_nodeProject, false);
 	}
 	emit nodeTrackRoutingChanged();
 	setProjectFileName(fileName);
@@ -4176,7 +4189,7 @@ void Song::restoreNodeWorkflow(DataFile& dataFile)
 	m_nodeInstrumentLayers.clear();
 	m_nodeCustomInstruments.clear();
 	m_nodeInstrumentTracks.reset();
-	m_nodeProject = dataFile.isNodeWorkflow();
+	setProjectWorkspace(m_nodeProject, dataFile.isNodeWorkflow());
 	m_nodeWorkflow = QDomDocument{};
 	m_deferredVstOutputs = {};
 	m_vstTrackAudio.clear();

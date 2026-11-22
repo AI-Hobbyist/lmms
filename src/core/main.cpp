@@ -38,7 +38,7 @@
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
-#include <windows.h>
+#include "WindowsCrashReport.h"
 #endif
 
 #ifdef LMMS_HAVE_PROCESS_H
@@ -246,6 +246,9 @@ int noInputFileError()
 int main( int argc, char * * argv )
 {
 	using namespace lmms;
+#ifdef LMMS_BUILD_WIN32
+	windowsCrashReport::install(L"lmms_classic", false);
+#endif
 
 	bool coreOnly = false;
 	bool fullscreen = true;

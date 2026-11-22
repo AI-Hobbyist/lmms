@@ -135,6 +135,11 @@ foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', '
         throw "Incomplete runtime: $required"
     }
 }
+foreach ($reporter in @('plugins/LmmsCrashReporter64.exe', 'plugins/32/LmmsCrashReporter32.exe')) {
+    if (-not $payload.ContainsKey($reporter)) {
+        throw "Missing crash reporter: $reporter"
+    }
+}
 foreach ($required in @('data/themes/default/svs_track.svg')) {
     if (-not $payload.ContainsKey($required)) {
         throw "Incomplete SVS runtime: $required"

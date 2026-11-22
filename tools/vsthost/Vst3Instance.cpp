@@ -1,4 +1,5 @@
 #include "Vst3Instance.h"
+#include "WindowsCrashReport.h"
 #include "vsthost/Vst3Commands.h"
 #include "Vst3StateStream.h"
 #include "vsthost/AudioQueue.h"
@@ -93,6 +94,7 @@ void Vst3Instance::open(
 	{
 		if (std::memcmp(info.ID().data(), cid.data(), cid.size()) == 0 && info.category() == kVstAudioEffectClass)
 		{
+			windowsCrashReport::setPluginName(info.name().c_str(), CP_UTF8);
 			selected = true;
 			break;
 		}
