@@ -42,6 +42,7 @@ namespace
 {
 constexpr qreal PortLabelPadding = 5;
 constexpr qreal PortLabelGap = 9;
+constexpr qreal PortLabelHeight = 18;
 constexpr qreal PairedLabelGap = 8;
 constexpr qreal PcbBusLaneSpacing = 20;
 constexpr qreal PcbBridgeRadius = 8;
@@ -669,9 +670,15 @@ void NodeWorkflowCanvas::setGraph(QList<Node> nodes, QList<Connection> connectio
 				width = std::max(width, port.labelWidth);
 			}
 		}
-		for (const auto& row : std::as_const(labelWidths))
+		for (auto row = labelWidths.cbegin(); row != labelWidths.cend(); ++row)
 		{
-			requiredWidth = std::max(requiredWidth, row[0] + row[1] + 2 * PortLabelGap + PairedLabelGap);
+			const auto firstOverlap = labelWidths.upperBound(row.key() - PortLabelHeight);
+			for (auto other = firstOverlap;
+				other != labelWidths.cend() && other.key() < row.key() + PortLabelHeight; ++other)
+			{
+				requiredWidth = std::max(requiredWidth,
+					row.value()[0] + other.value()[1] + 2 * PortLabelGap + PairedLabelGap);
+			}
 		}
 		const auto nodeWidth = std::max(node.bounds.width(), std::ceil(requiredWidth));
 		for (auto& port : ports)
@@ -681,8 +688,17 @@ void NodeWorkflowCanvas::setGraph(QList<Node> nodes, QList<Connection> connectio
 				const auto& row = labelWidths.value(port.position.y());
 				if (row[0] > 0 && row[1] > 0)
 				{
-					const auto remaining = nodeWidth - row[0] - row[1] - 2 * PortLabelGap - PairedLabelGap;
-					port.labelWidth = row[port.output ? 1 : 0] + remaining / 2;
+					const auto y = port.position.y();
+					const auto side = port.output ? 1 : 0;
+					qreal oppositeWidth = row[1 - side];
+					for (auto other = labelWidths.upperBound(y - PortLabelHeight);
+						other != labelWidths.cend() && other.key() < y + PortLabelHeight; ++other)
+					{
+						oppositeWidth = std::max(oppositeWidth, other.value()[1 - side]);
+					}
+					// Share only the space that also clears labels on staggered rows.
+					const auto remaining = nodeWidth - row[side] - oppositeWidth - 2 * PortLabelGap - PairedLabelGap;
+					port.labelWidth = row[side] + remaining / 2;
 				}
 			}
 		}
@@ -1006,7 +1022,7 @@ void NodeWorkflowCanvas::paintEvent(QPaintEvent*)
 		const auto background = port.labelBackground.isValid() ? port.labelBackground : m_portLabelBackground;
 		const auto labelWidth = port.labelWidth;
 		const QRectF label(port.position.x() + (port.output ? -labelWidth - PortLabelGap : PortLabelGap),
-			port.position.y() - 9, labelWidth, 18);
+			port.position.y() - PortLabelHeight / 2, labelWidth, PortLabelHeight);
 		painter.setBrush(background);
 		painter.drawRoundedRect(label, 3, 3);
 		painter.setPen(portLabelTextColor(background));
