@@ -11592,6 +11592,62 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <comment>node title</comment>
         <translation>パターンエディター</translation>
     </message>
+    <message>
+        <source>Show Signal Flow</source>
+        <translation>信号の流れを表示</translation>
+    </message>
+    <message>
+        <source>Stereo Audio</source>
+        <translation>ステレオ音声</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument…</source>
+        <translation>VST 音源を開く…</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument</source>
+        <translation>VST 音源を開く</translation>
+    </message>
+    <message>
+        <source>VST files (*.dll *.vst3)</source>
+        <translation>VST ファイル (*.dll *.vst3)</translation>
+    </message>
+    <message>
+        <source>SVS Voices</source>
+        <translation>SVS 音源</translation>
+    </message>
+    <message>
+        <source>SVC Models</source>
+        <translation>SVC モデル</translation>
+    </message>
+    <message>
+        <source>Add Custom Subgraph</source>
+        <translation>汎用サブグラフを追加</translation>
+    </message>
+    <message>
+        <source>Custom Subgraph</source>
+        <translation>汎用サブグラフ</translation>
+    </message>
+    <message>
+        <source>Rename Subgraph</source>
+        <translation>サブグラフの名前を変更</translation>
+    </message>
+    <message>
+        <source>Rename Port</source>
+        <translation>ポートの名前を変更</translation>
+    </message>
+    <message>
+        <source>PCB Bus Routing</source>
+        <translation>PCB 風のバス配線</translation>
+    </message>
+    <message>
+        <source>Global Triggers</source>
+        <translation>全体のトリガー</translation>
+    </message>
+    <message>
+        <source>Trigger Row Hide Delay</source>
+        <translation>トリガー行の非表示遅延</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -17415,6 +17471,10 @@ Latency: %2 ms</source>
     <message>
         <source>Delete Node</source>
         <translation>ノードを削除</translation>
+    </message>
+    <message>
+        <source>Rename Node</source>
+        <translation>ノードの名前を変更</translation>
     </message>
 </context>
 <context>

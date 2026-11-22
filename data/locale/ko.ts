@@ -11592,6 +11592,62 @@ LMMS에 대한 문서는 http://lmms.sf.net/wiki를 방문하세요.</translatio
         <comment>node title</comment>
         <translation>패턴 편집기</translation>
     </message>
+    <message>
+        <source>Show Signal Flow</source>
+        <translation>신호 흐름 표시</translation>
+    </message>
+    <message>
+        <source>Stereo Audio</source>
+        <translation>스테레오 오디오</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument…</source>
+        <translation>VST 악기 열기…</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument</source>
+        <translation>VST 악기 열기</translation>
+    </message>
+    <message>
+        <source>VST files (*.dll *.vst3)</source>
+        <translation>VST 파일 (*.dll *.vst3)</translation>
+    </message>
+    <message>
+        <source>SVS Voices</source>
+        <translation>SVS 음원</translation>
+    </message>
+    <message>
+        <source>SVC Models</source>
+        <translation>SVC 모델</translation>
+    </message>
+    <message>
+        <source>Add Custom Subgraph</source>
+        <translation>범용 하위 그래프 추가</translation>
+    </message>
+    <message>
+        <source>Custom Subgraph</source>
+        <translation>범용 하위 그래프</translation>
+    </message>
+    <message>
+        <source>Rename Subgraph</source>
+        <translation>하위 그래프 이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>Rename Port</source>
+        <translation>포트 이름 바꾸기</translation>
+    </message>
+    <message>
+        <source>PCB Bus Routing</source>
+        <translation>PCB 방식 버스 배선</translation>
+    </message>
+    <message>
+        <source>Global Triggers</source>
+        <translation>전체 트리거</translation>
+    </message>
+    <message>
+        <source>Trigger Row Hide Delay</source>
+        <translation>트리거 행 숨김 지연</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -17415,6 +17471,10 @@ Latency: %2 ms</source>
     <message>
         <source>Delete Node</source>
         <translation>노드 삭제</translation>
+    </message>
+    <message>
+        <source>Rename Node</source>
+        <translation>노드 이름 바꾸기</translation>
     </message>
 </context>
 <context>

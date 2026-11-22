@@ -11592,6 +11592,62 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <comment>node title</comment>
         <translation>节拍编辑器</translation>
     </message>
+    <message>
+        <source>Show Signal Flow</source>
+        <translation>显示信号流向</translation>
+    </message>
+    <message>
+        <source>Stereo Audio</source>
+        <translation>立体声音频</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument…</source>
+        <translation>打开 VST 乐器…</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument</source>
+        <translation>打开 VST 乐器</translation>
+    </message>
+    <message>
+        <source>VST files (*.dll *.vst3)</source>
+        <translation>VST 文件 (*.dll *.vst3)</translation>
+    </message>
+    <message>
+        <source>SVS Voices</source>
+        <translation>SVS 声库</translation>
+    </message>
+    <message>
+        <source>SVC Models</source>
+        <translation>SVC 模型</translation>
+    </message>
+    <message>
+        <source>Add Custom Subgraph</source>
+        <translation>添加通用子图</translation>
+    </message>
+    <message>
+        <source>Custom Subgraph</source>
+        <translation>通用子图</translation>
+    </message>
+    <message>
+        <source>Rename Subgraph</source>
+        <translation>重命名子图</translation>
+    </message>
+    <message>
+        <source>Rename Port</source>
+        <translation>重命名端口</translation>
+    </message>
+    <message>
+        <source>PCB Bus Routing</source>
+        <translation>PCB 总线走线</translation>
+    </message>
+    <message>
+        <source>Global Triggers</source>
+        <translation>全局触发</translation>
+    </message>
+    <message>
+        <source>Trigger Row Hide Delay</source>
+        <translation>触发条目隐藏延时</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -19300,6 +19356,10 @@ Latency: %2 ms</source>
     <message>
         <source>Delete Node</source>
         <translation>删除节点</translation>
+    </message>
+    <message>
+        <source>Rename Node</source>
+        <translation>重命名节点</translation>
     </message>
 </context>
 <context>

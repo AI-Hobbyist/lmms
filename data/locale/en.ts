@@ -11569,6 +11569,62 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <comment>node title</comment>
         <translation>Pattern Editor</translation>
     </message>
+    <message>
+        <source>Show Signal Flow</source>
+        <translation>Show Signal Flow</translation>
+    </message>
+    <message>
+        <source>Stereo Audio</source>
+        <translation>Stereo Audio</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument…</source>
+        <translation>Open VST Instrument…</translation>
+    </message>
+    <message>
+        <source>Open VST Instrument</source>
+        <translation>Open VST Instrument</translation>
+    </message>
+    <message>
+        <source>VST files (*.dll *.vst3)</source>
+        <translation>VST files (*.dll *.vst3)</translation>
+    </message>
+    <message>
+        <source>SVS Voices</source>
+        <translation>SVS Voices</translation>
+    </message>
+    <message>
+        <source>SVC Models</source>
+        <translation>SVC Models</translation>
+    </message>
+    <message>
+        <source>Add Custom Subgraph</source>
+        <translation>Add Custom Subgraph</translation>
+    </message>
+    <message>
+        <source>Custom Subgraph</source>
+        <translation>Custom Subgraph</translation>
+    </message>
+    <message>
+        <source>Rename Subgraph</source>
+        <translation>Rename Subgraph</translation>
+    </message>
+    <message>
+        <source>Rename Port</source>
+        <translation>Rename Port</translation>
+    </message>
+    <message>
+        <source>PCB Bus Routing</source>
+        <translation>PCB Bus Routing</translation>
+    </message>
+    <message>
+        <source>Global Triggers</source>
+        <translation>Global Triggers</translation>
+    </message>
+    <message>
+        <source>Trigger Row Hide Delay</source>
+        <translation>Trigger Row Hide Delay</translation>
+    </message>
 </context>
 <context>
     <name>lmms::gui::MalletsInstrumentView</name>
@@ -17371,6 +17427,10 @@ Latency: %2 ms</source>
     <message>
         <source>Delete Node</source>
         <translation>Delete Node</translation>
+    </message>
+    <message>
+        <source>Rename Node</source>
+        <translation>Rename Node</translation>
     </message>
 </context>
 <context>
