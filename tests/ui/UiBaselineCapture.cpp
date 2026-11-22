@@ -1303,6 +1303,60 @@ private slots:
 		QVERIFY(afterDelete.front().singingVoice);
 	}
 
+	void svsPianoRollOpen_data()
+	{
+		QTest::addColumn<bool>("nodeWorkspace");
+		QTest::newRow("classic") << false;
+		QTest::newRow("node") << true;
+	}
+
+	void svsPianoRollOpen()
+	{
+		QFETCH(bool, nodeWorkspace);
+		auto* song = Engine::getSong();
+		if (nodeWorkspace)
+		{
+			song->createNodeProject();
+		}
+		else
+		{
+			song->createNewProject();
+		}
+		QCOMPARE(song->isNodeProject(), nodeWorkspace);
+
+		auto* window = m_gui->mainWindow();
+		auto* songEditor = m_gui->songEditor();
+		auto* frame = qobject_cast<QMdiSubWindow*>(songEditor->parentWidget());
+		QVERIFY(frame);
+		frame->show();
+		window->workspace()->setActiveSubWindow(frame);
+
+		auto* track = Track::create(Track::Type::SVS, song);
+		QVERIFY(track);
+		auto* clip = track->createClip(TimePos{});
+		QVERIFY(clip);
+		const auto findClipView = [songEditor, clip]() -> SVSClipView* {
+			for (auto* view : songEditor->findChildren<SVSClipView*>())
+			{
+				if (view->getClip() == clip)
+				{
+					return view;
+				}
+			}
+			return nullptr;
+		};
+		QTRY_VERIFY(findClipView() && !findClipView()->visibleRegion().isEmpty());
+
+		const auto mode = Song::PlayMode::MidiClip;
+		song->getTimeline(mode).setTicks(2 * clip->length().getTicks());
+		auto* view = findClipView();
+		QTest::mouseDClick(view, Qt::LeftButton, Qt::NoModifier, view->rect().center());
+		auto* editor = window->findChild<SVSPianoRoll*>();
+		QTRY_VERIFY(editor && editor->isVisible());
+		QCOMPARE(song->getTimeline(mode).ticks(), clip->length().getTicks());
+		capture(window, nodeWorkspace ? "svs-piano-roll-open-node" : "svs-piano-roll-open-classic");
+	}
+
 	void nodeWorkflowSongClipPreviews()
 	{
 		auto* window = m_gui->mainWindow();

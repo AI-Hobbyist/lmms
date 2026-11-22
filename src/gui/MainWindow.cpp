@@ -1081,7 +1081,12 @@ void MainWindow::showNodeWorkflow()
 	breadcrumb->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 	breadcrumb->setFocusPolicy(Qt::StrongFocus);
 	controls->addWidget(breadcrumb);
-	const auto setBreadcrumb = [breadcrumb](const QList<QPair<QString, QString>>& segments) {
+	auto* showVstInstrumentPorts = makeTool("node_vsti_ports", tr("Show VSTi-Exposed Ports"));
+	showVstInstrumentPorts->setObjectName("nodeWorkflowVstInstrumentPorts");
+	showVstInstrumentPorts->setCheckable(true);
+	showVstInstrumentPorts->hide();
+	const auto setBreadcrumb = [breadcrumb, showVstInstrumentPorts](const QList<QPair<QString, QString>>& segments) {
+		showVstInstrumentPorts->hide();
 		breadcrumb->ensurePolished();
 		const auto linkColor = breadcrumb->palette().color(QPalette::WindowText).name();
 		QStringList parts;
@@ -1115,6 +1120,7 @@ void MainWindow::showNodeWorkflow()
 	refreshTransport();
 	controls->addWidget(play);
 	controls->addWidget(stop);
+	controls->addWidget(showVstInstrumentPorts);
 	auto* aggregate = makeTool("agent_chat_settings", tr("Aggregation Settings"));
 	aggregate->setObjectName("nodeWorkflowAggregation");
 	auto* aggregationMenu = new QMenu(aggregate);
@@ -1820,7 +1826,8 @@ void MainWindow::showNodeWorkflow()
 		}
 	};
 	const auto attachCustomConnections = [song, invalidVstConnections](const QString& scope, QList<NodeWorkflowCanvas::Port>& ports,
-		QList<NodeWorkflowCanvas::Connection>& cables, const std::function<void()>& redraw) {
+		QList<NodeWorkflowCanvas::Connection>& cables, const std::function<void()>& redraw,
+		const QHash<QString, bool>& hiddenVstPorts = {}) {
 		QHash<QString, qsizetype> endpoints;
 		auto inputs = std::make_shared<QStringList>();
 		const auto isNativeEndpoint = [](const QString& endpoint) {
@@ -1862,12 +1869,18 @@ void MainWindow::showNodeWorkflow()
 		{
 			const auto source = endpoints.constFind(edge.source);
 			const auto target = endpoints.constFind(edge.destination);
-			const bool connected = source != endpoints.cend() && target != endpoints.cend();
-			const bool nativeSource = isNativeEndpoint(edge.source);
-			const bool nativeTarget = isNativeEndpoint(edge.destination);
-			const bool invalid = (nativeSource || nativeTarget)
-				&& (!connected || (nativeSource && ports.at(*source).graphSignal.isEmpty())
-					|| (nativeTarget && ports.at(*target).graphSignal.isEmpty()));
+			const bool sourceVisible = source != endpoints.cend();
+			const bool targetVisible = target != endpoints.cend();
+			const bool connected = sourceVisible && targetVisible;
+			const auto available = [&](const QString& endpoint, auto position) {
+				if (position == endpoints.cend())
+				{
+					return hiddenVstPorts.value(endpoint, false);
+				}
+				return !isNativeEndpoint(endpoint) || !ports.at(*position).graphSignal.isEmpty();
+			};
+			const bool invalid = (isNativeEndpoint(edge.source) || isNativeEndpoint(edge.destination))
+				&& (!available(edge.source, source) || !available(edge.destination, target));
 			if (invalid)
 			{
 				unavailable.append(tr("%1 → %2").arg(edge.source, edge.destination));
@@ -1889,12 +1902,18 @@ void MainWindow::showNodeWorkflow()
 		invalidVstConnections->setVisible(!unavailable.isEmpty());
 	};
 	const auto appendVstPorts = [canvas](auto* plugin, const QString& prefix, NodeWorkflowCanvas::Node& node,
-		QList<NodeWorkflowCanvas::Port>& ports, unsigned inputRow, unsigned outputRow) {
+		QList<NodeWorkflowCanvas::Port>& ports, unsigned inputRow, unsigned outputRow,
+		QHash<QString, bool>* hiddenPorts = nullptr) {
 		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(plugin);
 		auto* processor = owner ? owner->vstNodeProcessor() : nullptr;
-		if (!processor) { return; }
+		if (!processor) { return false; }
 		for (const auto& spec : processor->nodePorts())
 		{
+			if (hiddenPorts)
+			{
+				hiddenPorts->insert(prefix + spec.key(), spec.available);
+				continue;
+			}
 			const bool output = spec.direction == vsthost::NodePortDirection::Output;
 			const bool audio = spec.media == vsthost::NodePortMedia::Audio;
 			const auto color = audio ? canvas->audioPortColor() : canvas->midiPortColor();
@@ -1909,7 +1928,11 @@ void MainWindow::showNodeWorkflow()
 				ports.back().graphSignal = signal;
 			}
 		}
-		node.bounds.setHeight(std::max(node.bounds.height(), qreal(48 + 27 * std::max(inputRow, outputRow))));
+		if (!hiddenPorts)
+		{
+			node.bounds.setHeight(std::max(node.bounds.height(), qreal(48 + 27 * std::max(inputRow, outputRow))));
+		}
+		return true;
 	};
 	const auto appendCustomEffects = [this, song, canvas, activeGraphScope, appendVstPorts](const QString& scope,
 		QList<NodeWorkflowCanvas::Node>& nodes, QList<NodeWorkflowCanvas::Port>& ports,
@@ -2094,7 +2117,8 @@ void MainWindow::showNodeWorkflow()
 	const auto appendCustomChildren = [appendCustomNodes, attachCustomConnections, customPath,
 		returnFromCustom = std::weak_ptr<std::function<void()>>(returnFromCustom), showCustom](
 		const QString& scope, QList<NodeWorkflowCanvas::Node>& nodes, QList<NodeWorkflowCanvas::Port>& ports,
-		QList<NodeWorkflowCanvas::Connection>& cables, const std::function<void()>& redraw) {
+		QList<NodeWorkflowCanvas::Connection>& cables, const std::function<void()>& redraw,
+		const QHash<QString, bool>& hiddenVstPorts = {}) {
 		appendCustomNodes(scope, nodes, ports, [customPath, returnFromCustom, showCustom, redraw](const auto& graph) {
 			if (const auto back = returnFromCustom.lock())
 			{
@@ -2103,7 +2127,7 @@ void MainWindow::showNodeWorkflow()
 				showCustom(showCustom, true);
 			}
 		}, redraw);
-		attachCustomConnections(scope, ports, cables, redraw);
+		attachCustomConnections(scope, ports, cables, redraw, hiddenVstPorts);
 	};
 	const auto bindProjectedOutput = [](NodeWorkflowCanvas::Port& required,
 		NodeWorkflowCanvas::Port& projected, QList<NodeWorkflowCanvas::Connection>& cables) {
@@ -2122,7 +2146,7 @@ void MainWindow::showNodeWorkflow()
 	};
 	const auto showSource = [this, canvas, song, activeTracks, activeSource, patternPanel, patternLayout, add, footerStatus,
 		inspectTriggers, clearTriggers, activeGraphScope, customPath, appendCustomChildren,
-		setBreadcrumb, setInspector, breadcrumb, appendBoundaryModules, appendVstPorts](
+		setBreadcrumb, setInspector, breadcrumb, appendBoundaryModules, appendVstPorts, showVstInstrumentPorts](
 		const auto& render, Track* track, bool fitCanvas) -> void
 	{
 		customPath->clear();
@@ -2712,6 +2736,9 @@ void MainWindow::showNodeWorkflow()
 			}
 		}
 		using Port = NodeWorkflowCanvas::Port;
+		QHash<QString, bool> hiddenVstPorts;
+		auto* hiddenPorts = showVstInstrumentPorts->isChecked() ? nullptr : &hiddenVstPorts;
+		bool hasVstInstrument = false;
 		QList<Port> ports{
 			{QPointF(185, 130), midi, tr("MIDI"), true, {}},
 			{QPointF(240, 130), midi, tr("MIDI"), false, {}},
@@ -2806,7 +2833,8 @@ void MainWindow::showNodeWorkflow()
 					}
 				}
 			}
-			appendVstPorts(instrument->instrument(), QStringLiteral("source-layer/") + layer.id + '/', node, ports, 1, 2);
+			hasVstInstrument |= appendVstPorts(instrument->instrument(), QStringLiteral("source-layer/") + layer.id + '/',
+				node, ports, 1, 2, hiddenPorts);
 			layerY += std::max(qreal(128), node.bounds.height() + 16);
 		}
 		for (const bool midiInput : {true, false})
@@ -2908,9 +2936,10 @@ void MainWindow::showNodeWorkflow()
 		if (!singing && hasPrimary)
 		{
 			const auto prefix = QStringLiteral("source-plugin/") + track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
-			appendVstPorts(static_cast<InstrumentTrack*>(track)->instrument(), prefix,
-				nodes[stepMode ? 1 : 2], ports, 1, 2);
+			hasVstInstrument |= appendVstPorts(static_cast<InstrumentTrack*>(track)->instrument(), prefix,
+				nodes[stepMode ? 1 : 2], ports, 1, 2, hiddenPorts);
 		}
+		showVstInstrumentPorts->setVisible(hasVstInstrument);
 		appendSourceEffects(nodes, ports);
 		appendSourceBoundaryPorts(QStringLiteral("source-audio"), nodes, cables, ports);
 		if (!stepMode && !connections.defaultMidiInput)
@@ -2931,7 +2960,7 @@ void MainWindow::showNodeWorkflow()
 				return primaryPort(cable.source) || primaryPort(cable.destination);
 			});
 		}
-		appendCustomChildren(layoutPrefix, nodes, ports, cables, redrawSource);
+		appendCustomChildren(layoutPrefix, nodes, ports, cables, redrawSource, hiddenVstPorts);
 		canvas->setGraph(std::move(nodes), std::move(cables), std::move(ports));
 		while (auto* item = patternLayout->takeAt(0))
 		{
@@ -5031,6 +5060,7 @@ void MainWindow::showNodeWorkflow()
 		}
 	};
 	connect(song, &Song::nodeTrackRoutingChanged, canvas, refreshRoutes, Qt::QueuedConnection);
+	connect(showVstInstrumentPorts, &QToolButton::toggled, canvas, refreshRoutes);
 	connect(Engine::mixer(), &Mixer::channelTopologyChanged, canvas, refreshRoutes, Qt::QueuedConnection);
 	connect(Engine::patternStore(), &PatternStore::currentPatternChanged, canvas, [activeSource, showSource, customPath] {
 		if (customPath->isEmpty() && *activeSource && (*activeSource)->trackContainer() == Engine::patternStore())
