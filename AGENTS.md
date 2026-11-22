@@ -30,6 +30,10 @@
 - 如果有其他任务正在该工程中运行，暂不执行编译；完成本任务改动后，只提交并推送本任务的改动，保留其他任务的工作区改动。
 - 在进度记录和交付说明中标记编译验证为 `PENDING（同工程其他任务运行中）`，不得报告编译通过。后续执行编译前须重新检查任务状态。
 
+### 强制编译入口
+
+- LMMS 的 Windows 编译一律从仓库根目录调用 `buildtools/build.py --window`，包括首次构建、增量构建和单目标重编。配置及目标参数以脚本支持的选项为准。编译由该脚本调用底层工具，禁止直接执行 `cmake --build`、`MSBuild`、`ninja` 或编译器绕过入口。
+
 4. **Strict Foreground Build & Logging Requirement**:
    - **一律在会话内以前台 PowerShell 交互方式**执行所有编译、构建、打包和测试。无论如何，用户必须能够展开本会话中的折叠执行记录，看到实际 PowerShell 命令及实时、完整的 stdout/stderr；不能只发送计划、口头进度或日志文件路径，让用户干等。
    - 使用能够将输出流式展示在折叠执行记录中的前台交互执行方式（PTY）。长命令跨工具等待时，必须保持同一个前台执行会话并持续回传新增输出；不得启动后台作业、脱离执行会话运行或静默等待，也不得隐藏、截断或丢弃实际执行日志。
@@ -39,13 +43,23 @@
    - ALWAYS capture `$LASTEXITCODE` and check build status immediately.
    - ALWAYS catch errors via reading `build.log`
 
-   **Standard Universal PowerShell Pattern** (Workspace/Project Root):
+   **Windows 编译示例**（仓库根目录）：
    ```powershell
-   # Universal execution template for ANY toolchain (cmake, dotnet, gradle, mvn, cargo, etc.)
-   & <BUILD_COMMAND> 2>&1 | Tee-Object -FilePath "build.log"
-   $buildExitCode =$LASTEXITCODE
-   if ($buildExitCode -ne 0) { exit$buildExitCode }
+   . ./buildtools/Enter-LmmsEnvironment.ps1
+   & python ./buildtools/build.py --window 2>&1 | Tee-Object -FilePath "build.log" -Encoding utf8
+   $buildExitCode = $LASTEXITCODE
+   if ($buildExitCode -ne 0) {
+       Get-Content -LiteralPath "build.log" -Tail 40
+       exit $buildExitCode
+   }
    ```
+
+### Windows 增量包交付
+
+- 每次通过 `buildtools/build.py --window` 成功编译本次任务的 Windows 产物后，必须在同一任务内生成增量替换包，完成下述校验，并在最终回复中提供自解压 EXE 的绝对路径。增量包通过校验后才算完成编译交付；打包或校验失败时，分别记录编译结果和未完成的交付步骤。
+- Windows 增量替换包必须交付为单文件自解压 `.exe`，使用 `buildtools/New-LmmsReplacementExe.ps1 -ArchivePath <ZIP> -Production` 封装。ZIP 仅用于封装和校验，不得作为最终增量包交付。
+- 增量包的安装目标必须固定为 `D:\Program Files\LMMS`。交付前确认启动器使用此路径，运行时无需手动选择目录。
+- 交付前校验自解压包内的替换清单及文件哈希。仅校验时使用 `VerifyOnly`，安装须有独立授权。
 
 ## Mandatory formatting for new feature code
 
