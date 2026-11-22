@@ -103,7 +103,7 @@ void probeVst3Layouts(CatalogEntry& entry, const HostSession::Configuration& con
 }
 
 void exportVst3Presets(CatalogEntry& entry, const QString& helper, const PluginCatalog::Options& options,
-	std::stop_token stop, CatalogReport& report, bool cached)
+	std::stop_token stop, CatalogReport& report, bool cached, const auto& beginExport)
 {
 	const auto directory = nativeVstPresetDirectory(options.presetDirectory, entry.identity.format,
 		isVstInstrument(entry), entry.name, entry.locator.modulePath);
@@ -113,7 +113,8 @@ void exportVst3Presets(CatalogEntry& entry, const QString& helper, const PluginC
 	Vst3Create create;
 	create.path = entry.locator.modulePath.toUtf8().toStdString();
 	create.cid = entry.identity.cid;
-	const HostSession::Configuration configuration{helper.toStdWString(), {}, options.timeoutMs};
+	const HostSession::Configuration configuration{
+		helper.toStdWString(), {}, options.timeoutMs, 0, entry.locator.modulePath.toStdWString()};
 	auto host = std::make_unique<Vst3HostProxy>();
 	if (!host->open(configuration, create))
 	{
@@ -124,6 +125,7 @@ void exportVst3Presets(CatalogEntry& entry, const QString& helper, const PluginC
 	{
 		recordVst3Layout(entry, host->metadata());
 		probeVst3Layouts(entry, configuration, create, stop);
+		beginExport();
 	}
 	const auto snapshot = host->state();
 	if (snapshot.error != Error::None || !validVst3State(snapshot.payload))
@@ -191,7 +193,8 @@ void exportVst2Presets(const CatalogEntry& entry, const QString& helper,
 
 	HostSession session;
 	std::stop_callback cancel(stop, [&session] { session.cancel(); });
-	if (session.open({helper.toStdWString(), {L"headless"}, options.timeoutMs}).get().error != Error::None)
+	if (session.open({helper.toStdWString(), {L"headless"}, options.timeoutMs, 0,
+			entry.locator.modulePath.toStdWString()}).get().error != Error::None)
 	{
 		++report.presetFailures;
 		return;
@@ -379,7 +382,8 @@ bool text(const QJsonObject& json, const char* key, QString& decoded, qsizetype 
 		&& !decoded.contains(QChar(0));
 }
 
-bool readDocument(const CatalogIo& io, const QString& path, const QString& version, QJsonArray& records, QString& error)
+bool readDocument(const CatalogIo& io, const QString& path, const QString& version, QJsonArray& records,
+	QString& error, const QJsonObject* expectedRoots = nullptr)
 {
 	const auto reply = io.request({{"op", "read-document"}, {"path", path}});
 	if (reply.error != Error::None || !reply.object.value("exists").isBool())
@@ -389,7 +393,7 @@ bool readDocument(const CatalogIo& io, const QString& path, const QString& versi
 	}
 	if (!reply.object.value("exists").toBool())
 	{
-		return true;
+		return expectedRoots == nullptr;
 	}
 	const auto object = reply.object.value("document").toObject();
 	if (reply.object.value("invalid").toBool(true) || !reply.object.value("document").isObject()
@@ -399,15 +403,20 @@ bool readDocument(const CatalogIo& io, const QString& path, const QString& versi
 		error = "Catalog cache schema/host mismatch or invalid JSON: " + path;
 		return false;
 	}
+	if (expectedRoots && object.contains("scanRoots") && object.value("scanRoots") != QJsonValue(*expectedRoots))
+	{
+		return false;
+	}
 	records = object.value("records").toArray();
 	return true;
 }
 
 bool readCache(
-	const CatalogIo& io, const QString& path, const QString& version, QMap<QString, Module>& cache, QString& error)
+	const CatalogIo& io, const QString& path, const QString& version, QMap<QString, Module>& cache, QString& error,
+	const QJsonObject* expectedRoots = nullptr, std::vector<CatalogEntry>* indexEntries = nullptr)
 {
 	QJsonArray records;
-	if (!readDocument(io, path, version, records, error))
+	if (!readDocument(io, path, version, records, error, expectedRoots))
 	{
 		return false;
 	}
@@ -482,6 +491,10 @@ bool readCache(
 		if (parsed.contains(module.key()))
 		{
 			return false;
+		}
+		if (indexEntries)
+		{
+			indexEntries->insert(indexEntries->end(), module.entries.begin(), module.entries.end());
 		}
 		parsed.insert(module.key(), std::move(module));
 	}
@@ -653,6 +666,38 @@ CatalogReport PluginCatalog::scan(
 		report.failures.push_back({{}, "configuration", Error::InvalidMessage});
 		return report;
 	}
+	QByteArray encodedRoots;
+	QString rootsError;
+	const bool validRoots = encodeScanRoots(roots, encodedRoots, rootsError);
+	const auto indexRoots = QJsonDocument::fromJson(encodedRoots).object();
+	if (options.preferIndex && !options.force && validRoots && !m_configuration.cacheFile.isEmpty())
+	{
+		QMap<QString, Module> index;
+		QString error;
+		std::vector<CatalogEntry> entries;
+		if (readCache(io, m_configuration.cacheFile, m_configuration.hostVersion, index, error, &indexRoots, &entries))
+		{
+			report.modules = static_cast<std::size_t>(index.size());
+			report.cachedModules = report.modules;
+			report.entries = std::move(entries);
+			const auto failures = readFailures(io, m_configuration.cacheFile + ".failures.json",
+				m_configuration.hostVersion);
+			for (const auto& failure : failures)
+			{
+				report.failures.push_back(failure);
+			}
+			report.cancelled = stop.stop_requested();
+			if (report.cancelled)
+			{
+				report.entries.clear();
+			}
+			return report;
+		}
+	}
+	if (progress)
+	{
+		progress({});
+	}
 	for (const auto& root : roots)
 	{
 		if (stop.stop_requested())
@@ -707,7 +752,7 @@ CatalogReport PluginCatalog::scan(
 		}
 		if (progress)
 		{
-			progress(module.path, processed, discovered.size());
+			progress({module.path, processed, discovered.size(), {}});
 		}
 		++processed;
 		CatalogFailure ioFailure;
@@ -801,8 +846,16 @@ CatalogReport PluginCatalog::scan(
 			}
 			else
 			{
+				std::function<void(std::string_view, std::uint32_t, std::uint32_t)> shellProgress;
+				if (progress)
+				{
+					shellProgress = [&](std::string_view name, std::uint32_t completed, std::uint32_t total) {
+						progress({module.path, processed - 1, discovered.size(),
+							QString::fromUtf8(name.data(), static_cast<qsizetype>(name.size())), completed, total});
+					};
+				}
 				const auto scan = scanVst2({helper.toStdWString(), {L"headless"}, options.timeoutMs},
-					module.binary.toUtf8().toStdString(), options.timeoutMs, stop);
+					module.binary.toUtf8().toStdString(), options.timeoutMs, stop, shellProgress);
 				error = scan.error;
 				fault = scan.fault;
 				for (const auto& info : scan.entries)
@@ -856,18 +909,29 @@ CatalogReport PluginCatalog::scan(
 			const auto& helper = module.format == Format::Vst3
 				? (x86 ? m_configuration.vst3Helper32 : m_configuration.vst3Helper64)
 				: (x86 ? m_configuration.vst2Helper32 : m_configuration.vst2Helper64);
-			for (auto& entry : module.entries)
+			for (std::size_t index = 0; index < module.entries.size(); ++index)
 			{
 				if (stop.stop_requested())
 				{
 					break;
 				}
+				auto& entry = module.entries[index];
+				const auto publish = [&](ScanStage stage) {
+					if (progress)
+					{
+						progress({module.path, processed - 1, discovered.size(), entry.name,
+							index, module.entries.size(), stage});
+					}
+				};
+				const auto beginExport = [&] { publish(ScanStage::ExportingPresets); };
 				if (module.format == Format::Vst3)
 				{
-					exportVst3Presets(entry, helper, options, stop, report, cached);
+					publish(cached ? ScanStage::ExportingPresets : ScanStage::Scanning);
+					exportVst3Presets(entry, helper, options, stop, report, cached, beginExport);
 				}
 				else
 				{
+					beginExport();
 					exportVst2Presets(entry, helper, options, stop, report);
 				}
 			}
@@ -909,8 +973,13 @@ CatalogReport PluginCatalog::scan(
 				{"error", static_cast<int>(failure.error)}, {"native", static_cast<double>(failure.nativeCode)},
 				{"fingerprint", QString::fromLatin1(failure.fingerprint.toHex())}});
 		}
+		QJsonObject index{{"schema", 1}, {"host", m_configuration.hostVersion}, {"records", modules}};
+		if (validRoots)
+		{
+			index.insert("scanRoots", indexRoots);
+		}
 		const auto published = io.request({{"op", "publish"}, {"path", m_configuration.cacheFile},
-			{"success", QJsonObject{{"schema", 1}, {"host", m_configuration.hostVersion}, {"records", modules}}},
+			{"success", index},
 			{"failures", QJsonObject{{"schema", 1}, {"host", m_configuration.hostVersion}, {"records", failures}}}});
 		if (published.error != Error::None)
 		{

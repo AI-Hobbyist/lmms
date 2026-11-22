@@ -42,6 +42,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLabel>
+#include <QProgressBar>
+#include <QStatusBar>
 #include <QLocale>
 #include <QMdiArea>
 #include <QPaintEvent>
@@ -80,6 +82,9 @@
 #include "vsthost/NativeVstPresetDrop.h"
 #include "EffectSelectDialog.h"
 #include "Engine.h"
+#ifdef LMMS_BUILD_WIN32
+#include "vsthost/CatalogJobs.h"
+#endif
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
@@ -269,6 +274,54 @@ MainWindow::MainWindow() :
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
+
+#ifdef LMMS_BUILD_WIN32
+	auto* scanStatus = statusBar();
+	scanStatus->setSizeGripEnabled(false);
+	auto* scanLabel = new QLabel(scanStatus);
+	scanLabel->setTextFormat(Qt::PlainText);
+	scanLabel->setMaximumWidth(420);
+	auto* scanBar = new QProgressBar(scanStatus);
+	scanBar->setFixedWidth(100);
+	scanBar->setAccessibleName(tr("VST scan progress"));
+	scanStatus->addPermanentWidget(scanLabel);
+	scanStatus->addPermanentWidget(scanBar);
+	scanStatus->hide();
+	auto* scanTimer = new QTimer(scanStatus);
+	connect(scanTimer, &QTimer::timeout, scanStatus, [scanStatus, scanLabel, scanBar] {
+		const auto* jobs = Engine::vstCatalog();
+		const auto current = jobs ? jobs->scanProgress() : std::nullopt;
+		scanStatus->setVisible(current.has_value());
+		if (!current)
+		{
+			return;
+		}
+		const auto& progress = *current;
+		if (progress.total == 0)
+		{
+			scanLabel->setText(tr("Finding VST plug-ins…"));
+			scanLabel->setToolTip({});
+			scanBar->setRange(0, 0);
+			return;
+		}
+		const auto module = tr("Module: %1 (%2/%3)")
+			.arg(progress.path, QString::number(progress.completed), QString::number(progress.total));
+		const auto plugin = progress.pluginName.isEmpty() ? QFileInfo(progress.path).fileName() : progress.pluginName;
+		const auto stage = progress.stage == vsthost::PluginCatalog::ScanStage::ExportingPresets
+			? tr("Exporting presets: %1") : tr("Scanning VST: %1");
+		auto activity = stage.arg(plugin);
+		if (progress.pluginsTotal > 0)
+		{
+			activity += tr(" (%1/%2 processed)").arg(progress.pluginsCompleted).arg(progress.pluginsTotal);
+		}
+		scanLabel->setText(activity);
+		scanLabel->setToolTip(activity + '\n' + module);
+		scanBar->setToolTip(module);
+		scanBar->setRange(0, static_cast<int>(progress.total));
+		scanBar->setValue(static_cast<int>(progress.completed));
+	});
+	scanTimer->start(150);
+#endif
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
 

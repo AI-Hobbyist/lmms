@@ -5,6 +5,7 @@
 #include "LegacyMessageCodec.h"
 #include "Vst2Messages.h"
 #include <charconv>
+#include <string_view>
 #include <unordered_set>
 
 namespace lmms::vsthost {
@@ -29,7 +30,8 @@ struct Vst2ScanResult
 // Control-worker API. Native entry, enumeration and close all run in a disposable
 // helper Job; the DAW only parses a bounded, validated wire result.
 inline Vst2ScanResult scanVst2(const HostSession::Configuration& config, const std::string& path,
-	DWORD timeoutMs = 15000, std::stop_token stop = {})
+	DWORD timeoutMs = 15000, std::stop_token stop = {},
+	const std::function<void(std::string_view, std::uint32_t, std::uint32_t)>& progress = {})
 {
 	Vst2ScanResult result;
 	if (stop.stop_requested())
@@ -40,15 +42,34 @@ inline Vst2ScanResult scanVst2(const HostSession::Configuration& config, const s
 	}
 	HostSession session;
 	std::stop_callback cancellation(stop, [&session] { session.cancel(); });
-	result.error = session.open(config).get().error;
+	auto configuration = config;
+	configuration.pluginPath = std::filesystem::u8path(path).wstring();
+	result.error = session.open(std::move(configuration)).get().error;
 	if (result.error == Error::None)
 	{
 		std::vector<std::uint8_t> packet;
-		const std::array<LegacyCommand, 1> commands{{{IdVstScanPlugin, {path}}}};
+		std::array<LegacyCommand, 1> commands{{{IdVstScanPlugin, {path}}}};
+		if (progress)
+		{
+			commands.front().arguments.emplace_back("progress");
+		}
 		result.error = encodeLegacy(commands, packet);
 		if (result.error == Error::None)
 		{
-			const auto reply = session.request(MessageType::Scan, std::move(packet), timeoutMs).get();
+			const auto reply = session.requestScan(std::move(packet), timeoutMs, [&](auto update) {
+				if (!progress || update.size() < 9 || update.size() > 71)
+				{
+					return false;
+				}
+				const auto completed = static_cast<std::uint32_t>(get(update, 0, 4));
+				const auto total = static_cast<std::uint32_t>(get(update, 4, 4));
+				if (completed >= total || total > 4096)
+				{
+					return false;
+				}
+				progress({reinterpret_cast<const char*>(update.data() + 8), update.size() - 8}, completed, total);
+				return true;
+			}).get();
 			result.error = reply.error;
 			std::vector<LegacyCommand> decoded;
 			if (result.error == Error::None)

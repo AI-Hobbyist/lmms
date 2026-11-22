@@ -26,6 +26,7 @@ public:
 	std::uint64_t refresh(std::vector<ScanRoot> roots, PluginCatalog::Options options);
 	void cancel();
 	Snapshot snapshot() const;
+	std::optional<PluginCatalog::ScanProgress> scanProgress() const;
 
 private:
 	struct Impl;

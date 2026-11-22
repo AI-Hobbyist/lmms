@@ -4,6 +4,7 @@
 #include "vsthost/Vst2Scanner.h"
 #include <filesystem>
 #include <iostream>
+#include <tuple>
 #include <tlhelp32.h>
 #include <cmath>
 
@@ -55,13 +56,41 @@ bool loadedInParent(const wchar_t* name)
 }
 int wmain(int argc, wchar_t** argv)
 {
-	if (argc != 3)
+	const bool progressOnly = argc == 4 && std::wstring_view(argv[3]) == L"--scan-progress";
+	const bool faultReports = argc == 4 && std::wstring_view(argv[3]) == L"--scan-fault-reports";
+	if (argc != 3 && !progressOnly && !faultReports)
 	{
 		return 2;
 	}
 	const HostSession::Configuration config{argv[1], {L"headless"}, 3000};
 	const std::filesystem::path fixtures(argv[2]);
 	const auto shell = utf8(fixtures / L"Vst2Shell.dll");
+	if (faultReports)
+	{
+		const auto timeout = scanVst2(config, utf8(fixtures / L"Vst2ShellHang.dll"), 800);
+		check(timeout.error == Error::Timeout, "blocked shell scanner reports a timeout");
+		const auto crash = scanVst2(config, utf8(fixtures / L"Vst2ShellCrash.dll"), 5000);
+		check(crash.error == Error::ProcessCrashed, "crashed shell scanner reports abnormal exit");
+		return failures != 0;
+	}
+	if (progressOnly)
+	{
+		using Update = std::tuple<std::string, std::uint32_t, std::uint32_t>;
+		std::vector<Update> updates;
+		const auto result = scanVst2(config, shell, 3000, {},
+			[&](std::string_view name, std::uint32_t completed, std::uint32_t total) {
+				updates.emplace_back(name, completed, total);
+			});
+		check(result.error == Error::None && result.shell && result.entries.size() == 2,
+			"Shell scan returns both children");
+		check(updates == std::vector<Update>{{"Shell Alpha", 0, 2}, {"Shell Beta", 1, 2}},
+			"Shell scan reports each child in order with its completed count");
+		if (!failures)
+		{
+			std::cout << "PASS VST2 Shell sub-plugin scan progress\n";
+		}
+		return failures != 0;
+	}
 	HostSession scanner;
 	check(scanner.open(config).get().error == Error::None, "scanner opens");
 	auto reply = call(scanner, {{IdVstScanPlugin, {shell}}}, MessageType::Scan);

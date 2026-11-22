@@ -71,12 +71,8 @@ void* Engine::s_dndPluginKey = nullptr;
 #ifdef LMMS_BUILD_WIN32
 namespace {
 std::unique_ptr<vsthost::CatalogJobs> catalogJobs;
-}
-vsthost::CatalogJobs* Engine::vstCatalog()
-{
-	return catalogJobs.get();
-}
-bool Engine::refreshVstCatalog(QString* error, bool force, std::optional<bool> skipVerified)
+
+bool queueVstCatalogRefresh(QString* error, bool force, std::optional<bool> skipVerified, bool preferIndex)
 {
 	if (error)
 	{
@@ -86,7 +82,7 @@ bool Engine::refreshVstCatalog(QString* error, bool force, std::optional<bool> s
 	{
 		if (error)
 		{
-			*error = tr("VST catalog is unavailable.");
+			*error = Engine::tr("VST catalog is unavailable.");
 		}
 		return false;
 	}
@@ -103,12 +99,24 @@ bool Engine::refreshVstCatalog(QString* error, bool force, std::optional<bool> s
 	vsthost::PluginCatalog::Options options;
 	options.force = force;
 	options.skipVerified = skipVerified;
-	if (skipVerified.has_value())
+	options.preferIndex = preferIndex;
+	if (skipVerified.has_value() || preferIndex)
 	{
 		options.presetDirectory = ConfigManager::inst()->userPresetsDir();
 	}
 	catalogJobs->refresh(std::move(roots), options);
 	return true;
+}
+}
+
+vsthost::CatalogJobs* Engine::vstCatalog()
+{
+	return catalogJobs.get();
+}
+
+bool Engine::refreshVstCatalog(QString* error, bool force, std::optional<bool> skipVerified)
+{
+	return queueVstCatalogRefresh(error, force, skipVerified, false);
 }
 #endif
 
@@ -158,7 +166,7 @@ void Engine::init( bool renderOnly )
 			"lmms-vst-catalog-3/" + ConfigManager::inst()->defaultVersion(), helper("RemoteCatalogIo.exe")});
 	if (!renderOnly)
 	{
-		refreshVstCatalog();
+		queueVstCatalogRefresh(nullptr, false, true, true);
 	}
 #endif
 

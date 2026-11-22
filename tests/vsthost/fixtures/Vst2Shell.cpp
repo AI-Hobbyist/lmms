@@ -22,6 +22,13 @@ LRESULT CALLBACK shellEditor(HWND window, UINT message, WPARAM word, LPARAM para
 {
 	auto* effect = reinterpret_cast<AEffect*>(GetWindowLongPtrW(window, GWLP_USERDATA));
 	auto& context = contexts.at(effect);
+	if (message == WM_APP + 40)
+	{
+		SetPropW(window, L"LMMSFixtureGuiBusy", reinterpret_cast<HANDLE>(1));
+		Sleep(350);
+		RemovePropW(window, L"LMMSFixtureGuiBusy");
+		return 1;
+	}
 	if (message == WM_APP + 37)
 	{
 		context.host(effect, audioMasterBeginEdit, 0, 0, nullptr, 0);

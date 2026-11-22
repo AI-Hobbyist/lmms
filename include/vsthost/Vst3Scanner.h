@@ -45,7 +45,7 @@ inline Vst3ScanResult scanVst3(
 	}
 	HostSession session;
 	std::stop_callback cancellation(stop, [&session] { session.cancel(); });
-	auto reply = session.open({helper, {}, timeoutMs}).get();
+	auto reply = session.open({helper, {}, timeoutMs, 0, path}).get();
 	if (reply.error == Error::None)
 	{
 		reply = session.request(MessageType::Scan, std::move(payload), timeoutMs).get();

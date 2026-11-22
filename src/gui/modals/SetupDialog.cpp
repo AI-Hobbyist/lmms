@@ -1081,9 +1081,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			cancel->setEnabled(state.busy);
 			if (state.busy)
 			{
-				status->setText(tr("Scanning: %1 (%2/%3)").arg(state.path).arg(state.completed).arg(state.total));
+				return;
 			}
-			else if (state.report)
+			if (state.report)
 			{
 				const auto instruments = std::count_if(
 					state.report->entries.begin(), state.report->entries.end(), vsthost::isVstInstrument);
@@ -1452,7 +1452,7 @@ void SetupDialog::accept()
 #ifdef LMMS_BUILD_WIN32
 	if (m_vstScanRoots && m_vstScanRoots->changed())
 	{
-		Engine::refreshVstCatalog();
+		Engine::refreshVstCatalog(nullptr, false, true);
 	}
 #endif
 }

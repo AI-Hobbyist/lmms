@@ -79,8 +79,24 @@ public:
 		std::uint32_t ioTimeoutMs = 30000;
 		std::optional<bool> skipVerified;
 		QString presetDirectory;
+		bool preferIndex = false;
 	};
-	using Progress = std::function<void(const QString&, std::size_t, std::size_t)>;
+	enum class ScanStage
+	{
+		Scanning,
+		ExportingPresets
+	};
+	struct ScanProgress
+	{
+		QString path;
+		std::size_t completed = 0;
+		std::size_t total = 0;
+		QString pluginName;
+		std::size_t pluginsCompleted = 0;
+		std::size_t pluginsTotal = 0;
+		ScanStage stage = ScanStage::Scanning;
+	};
+	using Progress = std::function<void(const ScanProgress&)>;
 	explicit PluginCatalog(Configuration configuration);
 	// Blocking control-worker operation, never an audio-thread API. Each call
 	// owns its native scan sessions; reports are immutable snapshots and do not

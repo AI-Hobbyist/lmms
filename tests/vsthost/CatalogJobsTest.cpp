@@ -31,7 +31,7 @@ private slots:
 			{
 				entered.release();
 				release.tryAcquire(1, 2000);
-				progress("stale", 99, 100);
+				progress({"stale", 99, 100, {}});
 			}
 			if (name == "middle")
 			{
@@ -61,7 +61,8 @@ private slots:
 		CatalogJobs jobs({}, [&](const auto& roots, auto, std::stop_token stop, auto progress) {
 			if (roots.front().path == "blocked")
 			{
-				progress("native scan", 1, 2);
+				progress({"native scan", 1, 2, "Shell child", 3, 10,
+					PluginCatalog::ScanStage::ExportingPresets});
 				entered.release();
 				while (!stop.stop_requested())
 				{
@@ -76,7 +77,13 @@ private slots:
 		const auto retained = jobs.snapshot().report;
 		jobs.refresh({{"blocked"}}, {});
 		QVERIFY(entered.tryAcquire(1, 2000));
-		QCOMPARE(jobs.snapshot().path, QString("native scan"));
+		const auto progress = jobs.scanProgress();
+		QVERIFY(progress);
+		QCOMPARE(progress->path, QString("native scan"));
+		QCOMPARE(progress->pluginName, QString("Shell child"));
+		QCOMPARE(progress->pluginsCompleted, std::size_t{3});
+		QCOMPARE(progress->pluginsTotal, std::size_t{10});
+		QCOMPARE(progress->stage, PluginCatalog::ScanStage::ExportingPresets);
 		jobs.cancel();
 		QTRY_VERIFY(!jobs.snapshot().busy);
 		QVERIFY(jobs.snapshot().cancelled);

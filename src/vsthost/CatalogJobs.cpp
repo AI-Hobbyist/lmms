@@ -20,6 +20,7 @@ struct CatalogJobs::Impl
 	std::optional<Job> pending;
 	std::stop_source activeStop;
 	Snapshot state;
+	std::optional<PluginCatalog::ScanProgress> scanProgress;
 	bool stopping = false;
 	std::uint64_t cancelled = 0;
 	std::jthread worker;
@@ -46,21 +47,17 @@ struct CatalogJobs::Impl
 				activeStop = std::stop_source{};
 				stop = activeStop.get_token();
 				state.running = job.generation;
-				state.path.clear();
-				state.completed = 0;
-				state.total = 0;
+				scanProgress.reset();
 			}
 			CatalogReport report;
 			try
 			{
 				report = execute(job.roots, job.options, stop,
-					[this, generation = job.generation](const QString& path, std::size_t completed, std::size_t total) {
+					[this, generation = job.generation](const PluginCatalog::ScanProgress& progress) {
 						std::lock_guard lock(mutex);
 						if (generation == state.requested && generation != cancelled && !stopping)
 						{
-							state.path = path;
-							state.completed = completed;
-							state.total = total;
+							scanProgress = progress;
 						}
 					});
 			}
@@ -77,9 +74,7 @@ struct CatalogJobs::Impl
 					state.published = job.generation;
 				}
 				state.running = 0;
-				state.path.clear();
-				state.completed = 0;
-				state.total = 0;
+				scanProgress.reset();
 			}
 		}
 	}
@@ -122,9 +117,7 @@ std::uint64_t CatalogJobs::refresh(std::vector<ScanRoot> roots, PluginCatalog::O
 			throw std::overflow_error("Catalog request generation exhausted");
 		}
 		generation = ++m_impl->state.requested;
-		m_impl->state.path.clear();
-		m_impl->state.completed = 0;
-		m_impl->state.total = 0;
+		m_impl->scanProgress.reset();
 		m_impl->pending = Impl::Job{generation, std::move(roots), options};
 		stop = m_impl->activeStop;
 	}
@@ -151,6 +144,22 @@ CatalogJobs::Snapshot CatalogJobs::snapshot() const
 	auto snapshot = m_impl->state;
 	snapshot.busy = m_impl->pending.has_value() || snapshot.running != 0;
 	snapshot.cancelled = snapshot.requested != 0 && snapshot.requested == m_impl->cancelled;
+	if (const auto& progress = m_impl->scanProgress)
+	{
+		snapshot.path = progress->path;
+		snapshot.completed = progress->completed;
+		snapshot.total = progress->total;
+	}
 	return snapshot;
+}
+
+std::optional<PluginCatalog::ScanProgress> CatalogJobs::scanProgress() const
+{
+	std::lock_guard lock(m_impl->mutex);
+	if (m_impl->state.requested == m_impl->cancelled)
+	{
+		return std::nullopt;
+	}
+	return m_impl->scanProgress;
 }
 } // namespace lmms::vsthost
