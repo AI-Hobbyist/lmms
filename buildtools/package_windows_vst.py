@@ -178,6 +178,13 @@ def main():
         paths = list(stage.rglob(filename))
         if len(paths) != 1 or pe(paths[0])[0] != machine:
             raise ValueError(f'Missing or incorrect helper: {filename}')
+    for filename, machine in (
+        ('LmmsCrashReporter64.exe', 0x8664),
+        ('LmmsCrashReporter32.exe', 0x14C),
+    ):
+        paths = list(stage.rglob(filename))
+        if paths != [stage / filename] or pe(paths[0])[0] != machine:
+            raise ValueError(f'Missing or incorrect crash reporter beside lmms.exe: {filename}')
     prohibited = [
         p
         for p in stage.rglob('*')

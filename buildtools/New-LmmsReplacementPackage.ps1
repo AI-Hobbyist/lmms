@@ -31,11 +31,12 @@ $removedSvs = @(
     'svs/SVSMinimal/SVSMinimal.dll',
     'svs/SVSMinimal/manifest.json'
 )
+$retiredPaths = $removedSvs + @('plugins/LmmsCrashReporter64.exe', 'plugins/32/LmmsCrashReporter32.exe')
 foreach ($file in Get-ChildItem -LiteralPath $runtime -File) {
     if ($file.Name -match '^(concrt140d|msvcp140(_[12])?d(_.*)?|vcruntime140(_1)?d|ucrtbased)\.dll$') {
         continue
     }
-    if ($file.Extension -eq '.dll' -or $file.Name -in @('lmms.exe', 'lmms.exe.manifest', 'lmms.VisualElementsManifest.xml')) {
+    if ($file.Extension -eq '.dll' -or $file.Name -in @('lmms.exe', 'lmms.exe.manifest', 'lmms.VisualElementsManifest.xml', 'LmmsCrashReporter64.exe', 'LmmsCrashReporter32.exe')) {
         $payload[$file.Name] = $file.FullName
     }
 }
@@ -87,7 +88,8 @@ foreach ($directory in @('plugins', 'assets', 'generic', 'iconengines', 'imagefo
         continue
     }
     foreach ($file in Get-ChildItem -LiteralPath $folder -File -Recurse) {
-        if ($file.Name -match '\.(disabled|pdb|lib|exp)$' -or $file.Name -like '*.disabled.*') {
+        $legacyReporter = $directory -eq 'plugins' -and $file.Name -in @('LmmsCrashReporter64.exe', 'LmmsCrashReporter32.exe')
+        if ($file.Name -match '\.(disabled|pdb|lib|exp)$' -or $file.Name -like '*.disabled.*' -or $legacyReporter) {
             continue
         }
         $payload[$file.FullName.Substring($runtime.Length + 1).Replace('\', '/')] = $file.FullName
@@ -135,7 +137,7 @@ foreach ($required in @('platforms/qwindows.dll', 'Qt6Core.dll', 'Qt6Gui.dll', '
         throw "Incomplete runtime: $required"
     }
 }
-foreach ($reporter in @('plugins/LmmsCrashReporter64.exe', 'plugins/32/LmmsCrashReporter32.exe')) {
+foreach ($reporter in @('LmmsCrashReporter64.exe', 'LmmsCrashReporter32.exe')) {
     if (-not $payload.ContainsKey($reporter)) {
         throw "Missing crash reporter: $reporter"
     }
@@ -180,7 +182,7 @@ $records = @($payload.Keys | Sort-Object | ForEach-Object {
         }
         [pscustomobject]@{Path = $_; Bytes = $file.Length; SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash }
     })
-$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records; RemoveFiles = $removedSvs }
+$manifest = [ordered]@{Format = 1; ProductCommit = $ProductCommit; Platform = 'Windows x64'; EnabledUiPluginCount = 52; Files = $records; RemoveFiles = $retiredPaths }
 $manifest.EnabledSvcPluginCount = 2
 if ($BaseManifest) {
     $base = Get-Content -LiteralPath $BaseManifest -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -191,12 +193,12 @@ if ($BaseManifest) {
     foreach ($entry in $base.Files) {
         if ($baseline.ContainsKey($entry.Path)) { throw "Duplicate baseline path: $($entry.Path)" }
         $baseline[$entry.Path] = $entry
-        if (-not $payload.ContainsKey($entry.Path) -and $entry.Path -notin $removedSvs) {
+        if (-not $payload.ContainsKey($entry.Path) -and $entry.Path -notin $retiredPaths) {
             throw "Unapproved file removal: $($entry.Path)"
         }
     }
     $records = @($records | Where-Object { -not $baseline.ContainsKey($_.Path) -or $_.SHA256 -ne $baseline[$_.Path].SHA256 })
-    if (-not $records.Count -and -not $removedSvs.Count) { throw 'No runtime changes relative to the full package.' }
+    if (-not $records.Count -and -not $retiredPaths.Count) { throw 'No runtime changes relative to the full package.' }
     $manifest.Files = $records
     $manifest.PackageKind = 'Incremental'
     $manifest.BasePackage = [IO.Path]::GetFileName($BaseManifest).Replace('.manifest.json', '')
@@ -251,6 +253,8 @@ LMMS 增量覆盖包（Windows x64）
 基包源码版本：$($manifest.BaseProductCommit)
 当前源码版本：$ProductCommit
 变更文件数：$($records.Count)
+主程序和 VST 调试符号位于本 ZIP 的 symbols/LMMS/ 和 symbols/VST/ 目录。
+双击自解压 EXE 时，增量安装固定使用 D:\Program Files\LMMS。
 
 1. 先安装上述全量基包，然后关闭 LMMS。
 2. 解压本包，双击 Install-Replace.cmd，选择包含 lmms.exe 的原安装目录。
@@ -337,8 +341,16 @@ try {
 finally {
     $archive.Dispose()
 }
+if ($BaseManifest) {
+    & python (Join-Path $PSScriptRoot 'package_vst_symbols.py') --build (Join-Path $project 'build') --archive $zipPath
+    if ($LASTEXITCODE -ne 0) {
+        Remove-Item -LiteralPath $zipPath
+        throw 'VST Release symbol packaging failed.'
+    }
+}
 $manifestText | Set-Content -LiteralPath ($zipPath + '.manifest.json') -Encoding UTF8
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
 "$hash  $([IO.Path]::GetFileName($zipPath))" | Set-Content -LiteralPath ($zipPath + '.sha256') -Encoding ASCII
 Write-Output "Created and verified $($records.Count) runtime files + 4 package entries: $zipPath"
 Write-Output "Bytes: $((Get-Item -LiteralPath $zipPath).Length); SHA256: $hash"
+& (Join-Path $PSScriptRoot 'New-LmmsReplacementExe.ps1') -ArchivePath $zipPath -Production:([bool]$BaseManifest)

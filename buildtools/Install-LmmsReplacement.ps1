@@ -73,11 +73,13 @@ try {
         'svs/SVSComputeExample/SVSComputeExample.dll',
         'svs/SVSComputeExample/manifest.json',
         'svs/SVSMinimal/SVSMinimal.dll',
-        'svs/SVSMinimal/manifest.json'
+        'svs/SVSMinimal/manifest.json',
+        'plugins/LmmsCrashReporter64.exe',
+        'plugins/32/LmmsCrashReporter32.exe'
     )
     foreach ($relative in $manifest.RemoveFiles) {
         if ($relative -notin $allowedRemovals -or $removals.ContainsKey($relative)) {
-            throw "Invalid or duplicate example removal: $relative"
+            throw "Invalid or duplicate retirement path: $relative"
         }
         $removals[$relative] = $true
     }
@@ -158,7 +160,7 @@ try {
         }
     }
     if ($VerifyOnly) {
-        Write-Output "Verified $($manifest.Files.Count) payload files, $($removals.Count) permitted example removals and installation paths. No changes made."
+        Write-Output "Verified $($manifest.Files.Count) payload files, $($removals.Count) permitted retirement paths and installation paths. No changes made."
         exit 0
     }
     foreach ($process in @(Get-Process -Name lmms -ErrorAction SilentlyContinue)) {
@@ -224,10 +226,10 @@ try {
             Write-Output "Removed from loadable paths: $relative (retained as disabled backup)"
         }
         if (Test-Path -LiteralPath $path) {
-            throw "Example removal failed: $relative"
+            throw "Retirement failed: $relative"
         }
     }
-    Write-Output "Replaced and verified $($manifest.Files.Count) files in $target; $($removals.Count) example paths absent. Personal configuration and projects were preserved."
+    Write-Output "Replaced and verified $($manifest.Files.Count) files in $target; $($removals.Count) retired paths absent. Personal configuration and projects were preserved."
 }
 finally {
     if ($archive) {
