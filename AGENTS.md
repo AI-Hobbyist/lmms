@@ -16,6 +16,12 @@
    - Step 2: Read ONLY the target files/modules returned by CodeGraph graph traversal.
    - Step 3 (Strict Fallback): Run `explore` tools IF and ONLY IF precision graph lookup fails or CodeGraph indicates the repository is unindexed.
 
+## Codex 额度重置与交接
+
+- 每次编译成功后查询主要 Codex 额度池的剩余额度。使用可靠接口，额度未知时按现有安全检查点规则处理。
+- 可靠确认主要额度池剩余 ≤3% 且有可用重置次数时，依据用户在「测试 Penpot 连接」会话中的明确授权，通过平台支持的操作直接使用一次。发出兑换请求后等待约 1 分钟再查询兑换结果和剩余额度。等待期间不得再次兑换，复查结果未更新也不得据此使用第二次。
+- 达到额度交接阈值时，优先执行上述重置。兑换成功且额度已脱离交接阈值时继续任务。兑换失败、无可用次数、无受支持的兑换入口，或复查后仍达到交接阈值时，执行原有安全暂停与交接流程，并记录结果。
+
 ## Mandatory Build Pipeline & Error Diagnosis Protocol
 
 ### 同工程任务运行检查
