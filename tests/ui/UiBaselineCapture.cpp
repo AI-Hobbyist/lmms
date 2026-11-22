@@ -41,6 +41,7 @@
 #include <QToolButton>
 #include <QToolTip>
 #include <QTranslator>
+#include <QtMath>
 #include <QtTest>
 
 #include "AudioDummy.h"
@@ -76,6 +77,7 @@
 #include <QAction>
 #include "MidiClip.h"
 #include "MidiClipView.h"
+#include "MidiEvent.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "NativePluginTranslation.h"
@@ -1661,33 +1663,338 @@ private slots:
 		capture(window, "node-workflow-instrument-layers");
 	}
 
+	void nodeWorkflowExplicitStereoBoundary()
+	{
+		auto* song = Engine::getSong();
+		song->createNodeProject();
+		auto* window = m_gui->mainWindow();
+		window->showNodeWorkflow();
+		auto* editor = window->findChild<QMdiSubWindow*>("nodeWorkflowEditor");
+		QVERIFY(editor);
+		auto* aggregate = editor->findChild<QToolButton*>("nodeWorkflowAggregation");
+		auto* signal = editor->findChild<QToolButton*>("nodeWorkflowSignalFlow");
+		auto* breadcrumb = editor->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		auto* canvas = editor->findChild<QWidget*>("nodeWorkflowCanvas");
+		QVERIFY(aggregate && signal && breadcrumb && canvas);
+		QCOMPARE(signal->popupMode(), aggregate->popupMode());
+		const auto buttons = canvas->window()->findChildren<QToolButton*>();
+		const auto add = std::find_if(buttons.cbegin(), buttons.cend(), [](const auto* button) {
+			return button->accessibleName() == QCoreApplication::translate("lmms::gui::MainWindow", "Add Node");
+		});
+		QVERIFY(add != buttons.cend());
+		QStringList entries;
+		const auto inspectMenu = [&] {
+			entries.clear();
+			QTimer::singleShot(0, canvas, [&] {
+				if (auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget()))
+				{
+					for (auto* action : menu->actions())
+					{
+						if (!action->isSeparator())
+						{
+							entries.append(action->text());
+						}
+					}
+					menu->close();
+				}
+			});
+			QTest::mouseClick(*add, Qt::LeftButton);
+		};
+		const auto label = [](const char* text) {
+			return QCoreApplication::translate("lmms::gui::MainWindow", text);
+		};
+		inspectMenu();
+		QVERIFY(entries.contains(label("Effect Plugin…")));
+		QVERIFY(!entries.contains(label("Empty Step Sequencer")));
+		QVERIFY(!entries.contains(label("Empty MIDI Piano Roll")));
+		QVERIFY(!entries.contains(label("Empty SVS Piano Roll")));
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		inspectMenu();
+		QVERIFY(entries.contains(label("Output Port")));
+		QVERIFY(!entries.contains(label("Add Step Subgraph")));
+		QVERIFY(!entries.contains(label("Instrument Plugins")));
+		breadcrumb->linkActivated(QStringLiteral("song"));
+		inspectMenu();
+		QVERIFY(entries.contains(label("Instrument Plugins")));
+		QVERIFY(entries.contains(label("SVS Voices")));
+		QVERIFY(entries.contains(label("SVC Models")));
+		QVERIFY(!entries.contains(label("Add Instrument Subgraph")));
+		QVERIFY(aggregate->menu());
+		auto* pcb = aggregate->menu()->findChild<QAction*>("nodeWorkflowPcbBusRouting");
+		QVERIFY(pcb && pcb->isCheckable() && pcb->isChecked());
+		pcb->setChecked(false);
+		QCOMPARE(song->nodePcbBusRouting(), std::optional<bool>{false});
+		pcb->setChecked(true);
+		QVERIFY(song->nodePcbBusRouting().value_or(false));
+		QTemporaryDir savedGraph;
+		QVERIFY(savedGraph.isValid());
+		const auto savedPath = savedGraph.filePath(QStringLiteral("pcb.mmpn"));
+		QVERIFY(song->saveProjectFile(savedPath));
+		QCOMPARE(DataFile(savedPath).nodeWorkflow().attribute("pcbBusRouting"), QStringLiteral("1"));
+
+		auto* midiOwner = song->tracks().front();
+		QCOMPARE(midiOwner->type(), Track::Type::Instrument);
+		const auto midiScope = QStringLiteral("source/")
+			+ midiOwner->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
+		breadcrumb->linkActivated(QStringLiteral("song"));
+		const auto graphPoint = [canvas](const QRectF& bounds, const QPointF& point) {
+			const auto scale = std::min({(canvas->width() - 80) / bounds.width(),
+				(canvas->height() - 80) / bounds.height(), qreal{1.5}});
+			return (QPointF(canvas->width(), canvas->height()) / 2 + (point - bounds.center()) * scale).toPoint();
+		};
+		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
+			graphPoint(QRectF(QPointF(35, 40), QPointF(990, 263)), QPointF(75, 57)));
+		QTRY_VERIFY(breadcrumb->text().contains(midiOwner->name()));
+		const auto midiNode = graphPoint(QRectF(QPointF(20, 80), QPointF(845, 192)), QPointF(100, 105));
+		const auto selectNodeAction = [canvas, midiNode](const char* label) {
+			bool selected = false;
+			QTimer chooseAction;
+			chooseAction.setSingleShot(true);
+			connect(&chooseAction, &QTimer::timeout, canvas, [&] {
+				auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+				if (!menu)
+				{
+					return;
+				}
+				for (auto* action : menu->actions())
+				{
+					if (action->text() == QCoreApplication::translate("lmms::gui::NodeWorkflowCanvas", label)
+						&& action->isEnabled())
+					{
+						selected = true;
+						menu->setActiveAction(action);
+						QTest::keyClick(menu, Qt::Key_Return);
+						return;
+					}
+				}
+				menu->close();
+			});
+			chooseAction.start(0);
+			QTest::mouseClick(canvas, Qt::RightButton, Qt::NoModifier, midiNode);
+			return selected;
+		};
+		QVERIFY(selectNodeAction("Copy Node"));
+		QVERIFY(selectNodeAction("Paste Node"));
+		const auto copiedMidi = song->nodeBoundaryPorts(midiScope);
+		QCOMPARE(copiedMidi.size(), 1);
+		QCOMPARE(copiedMidi.front().signal, QStringLiteral("midi"));
+		QVERIFY(!copiedMidi.front().output && copiedMidi.front().track.isEmpty());
+		song->removeNodeBoundaryPort(midiScope, copiedMidi.front().id);
+
+		const auto scope = QStringLiteral("pattern/");
+		QVERIFY(song->nodeBoundaryPorts(scope).isEmpty());
+		const auto stereo = song->createNodeBoundaryPort(scope, QStringLiteral("audio"), true, true);
+		QVERIFY(!stereo.isEmpty());
+		const auto ports = song->nodeBoundaryPorts(scope);
+		QCOMPARE(ports.size(), 2);
+		QCOMPARE(ports.at(0).stereoGroup, stereo);
+		QCOMPARE(ports.at(1).stereoGroup, stereo);
+		QCOMPARE(ports.at(0).stereoSide, 0);
+		QCOMPARE(ports.at(1).stereoSide, 1);
+		QVERIFY(ports.at(0).id != ports.at(1).id);
+		QVERIFY(ports.at(0).output && ports.at(1).output);
+		song->removeNodeBoundaryPort(scope, stereo);
+		QVERIFY(song->nodeBoundaryPorts(scope).isEmpty());
+
+		const auto parent = song->addNodeCustomGraph(scope, QStringLiteral("Container"));
+		QVERIFY(!parent.isEmpty());
+		const auto parentScope = QStringLiteral("custom/") + parent + '/';
+		const auto child = song->addNodeCustomGraph(parentScope, QStringLiteral("Child"));
+		QVERIFY(!child.isEmpty());
+		const auto childScope = QStringLiteral("custom/") + child + '/';
+		QVERIFY(song->renameNodeCustomGraph(child, QStringLiteral("Nested")));
+		QCOMPARE(song->nodeCustomGraphs(parentScope).front().name, QStringLiteral("Nested"));
+		const auto input = song->createNodeBoundaryPort(parentScope, QStringLiteral("midi"), false, false);
+		const auto childInput = song->createNodeBoundaryPort(childScope, QStringLiteral("midi"), false, false);
+		QVERIFY(song->setNodeCustomConnection(parentScope, input, childInput, true));
+		QVERIFY(song->renameNodeBoundaryPort(childScope, childInput, QStringLiteral("Notes")));
+		QCOMPARE(song->nodeCustomConnections(parentScope).front().destination, childInput);
+		QCOMPARE(song->nodeBoundaryPorts(childScope).front().name, QStringLiteral("Notes"));
+		const auto graphCopy = song->pasteNodeCustomGraph(scope, song->copyNodeCustomGraph(parent));
+		QVERIFY(!graphCopy.isEmpty() && graphCopy != parent);
+		const auto copiedScope = QStringLiteral("custom/") + graphCopy + '/';
+		QCOMPARE(song->nodeCustomGraphs(copiedScope).size(), 1);
+		const auto copiedChild = song->nodeCustomGraphs(copiedScope).front().id;
+		const auto copiedPorts = song->nodeBoundaryPorts(QStringLiteral("custom/") + copiedChild + '/');
+		QCOMPARE(copiedPorts.size(), 1);
+		QCOMPARE(copiedPorts.front().name, QStringLiteral("Notes"));
+		QVERIFY(copiedPorts.front().id != childInput);
+		QCOMPARE(song->nodeCustomConnections(copiedScope).size(), 1);
+		QCOMPARE(song->nodeCustomConnections(copiedScope).front().destination, copiedPorts.front().id);
+		song->removeNodeBoundaryPort(childScope, childInput);
+		QVERIFY(song->nodeCustomConnections(parentScope).isEmpty());
+
+		const auto root = QStringLiteral("root/");
+		const auto instrumentGraph = song->addNodeCustomGraph(root, QStringLiteral("Audio fan-out"));
+		QVERIFY(!instrumentGraph.isEmpty());
+		const auto instrumentScope = QStringLiteral("custom/") + instrumentGraph + '/';
+		const auto instrumentId = song->addNodeCustomInstrument(instrumentScope, QStringLiteral("kicker"), {});
+		QVERIFY(!instrumentId.isEmpty());
+		auto* original = song->nodeCustomInstruments(instrumentScope).front().second;
+		original->setVolume(75);
+		const auto copiedState = song->copyNodeInstrumentLayer(*original, {});
+		const auto copiedId = song->pasteNodeCustomInstrument(instrumentScope, copiedState);
+		QVERIFY(!copiedId.isEmpty() && copiedId != instrumentId);
+		auto* copy = song->nodeCustomInstruments(instrumentScope).back().second;
+		QVERIFY(copy != original);
+		QCOMPARE(copy->instrumentName(), original->instrumentName());
+		QCOMPARE(copy->volumeModel()->value(), original->volumeModel()->value());
+		const auto midiIn = song->createNodeBoundaryPort(instrumentScope, QStringLiteral("midi"), false, false);
+		const auto audioOut = song->createNodeBoundaryPort(instrumentScope, QStringLiteral("audio"), true, false);
+		song->addNodeLogicalInput(QStringLiteral("midi"));
+		const auto inputId = song->nodeLogicalInputs().back().id;
+		const auto instrumentEndpoint = QStringLiteral("instrument/") + instrumentId + '/';
+		auto* mixer = Engine::mixer();
+		const auto masterEndpoint = QStringLiteral("mixer/")
+			+ mixer->mixerChannel(0)->nodeWorkflowId().toString(QUuid::WithoutBraces);
+		QVERIFY(song->setNodeCustomConnection(root, QStringLiteral("logical-midi/") + inputId, midiIn, true));
+		QVERIFY(song->setNodeCustomConnection(instrumentScope, midiIn, instrumentEndpoint + "midi", true));
+		QVERIFY(song->setNodeCustomConnection(instrumentScope, instrumentEndpoint + "out-L", audioOut, true));
+		QVERIFY(song->setNodeCustomConnection(root, audioOut, masterEndpoint + "/in-L", true));
+		QVERIFY(song->setNodeCustomConnection(root, audioOut, masterEndpoint + "/in-R", true));
+
+		const auto copiedInstrumentGraph = song->pasteNodeCustomGraph(root, song->copyNodeCustomGraph(instrumentGraph));
+		QVERIFY(!copiedInstrumentGraph.isEmpty() && copiedInstrumentGraph != instrumentGraph);
+		const auto copiedInstrumentScope = QStringLiteral("custom/") + copiedInstrumentGraph + '/';
+		QCOMPARE(song->nodeCustomInstruments(copiedInstrumentScope).size(), 2);
+		QCOMPARE(song->nodeCustomConnections(copiedInstrumentScope).size(), 2);
+		QCOMPARE(song->nodeCustomConnections(root).size(), 3);
+
+		{
+			auto* engine = Engine::audioEngine();
+			bool available = false;
+			engine->storeAudioDevice();
+			engine->setAudioDevice(new UiManualAudioDevice(available, engine), false);
+			const auto restoreAudio = qScopeGuard([engine] { engine->restoreAudioDevice(); });
+			QVERIFY(available && NodeSignalActivity::monitoring());
+			const MidiEvent note(MidiNoteOn, 0, 60, 100, nullptr, MidiEvent::Source::Internal);
+			QCOMPARE(song->dispatchNodeMidiInput(inputId, note, TimePos{}, 0), 1);
+			for (int period = 0; period < 16 && !mixer->nodeMasterSignalActive(0); ++period)
+			{
+				engine->renderNextPeriod();
+			}
+			QVERIFY(mixer->nodeMasterSignalActive(0));
+			QVERIFY(mixer->nodeMasterSignalActive(1));
+			QVERIFY(song->setNodeCustomConnection(root, audioOut, masterEndpoint + "/in-R", false));
+			engine->renderNextPeriod();
+			QVERIFY(mixer->nodeMasterSignalActive(0));
+			QVERIFY(!mixer->nodeMasterSignalActive(1));
+
+			QVERIFY(song->setNodeCustomConnection(root, audioOut, masterEndpoint + "/in-L", false));
+			auto* owner = Engine::patternStore()->tracks().front();
+			const auto ownerId = owner->nodeWorkflowId().toString(QUuid::WithoutBraces);
+			const auto trackScope = QStringLiteral("source/") + ownerId + '/';
+			const auto trackOutput = QStringLiteral("track-output/") + ownerId + QStringLiteral("/in-L");
+			const auto snapshot = song->copyNodeCustomGraph(instrumentGraph);
+			const auto addBranch = [&] {
+				const auto id = song->pasteNodeCustomGraph(trackScope, snapshot);
+				const auto scope = QStringLiteral("custom/") + id + '/';
+				const auto ports = song->nodeBoundaryPorts(scope);
+				const auto port = std::find_if(ports.cbegin(), ports.cend(), [](const auto& item) { return item.output; });
+				if (port == ports.cend() || !song->setNodeCustomConnection(trackScope, port->id, trackOutput, true))
+				{
+					return QString{};
+				}
+				song->nodeCustomInstruments(scope).front().second->processInEvent(note, TimePos{}, 0);
+				return port->id;
+			};
+			const auto firstBranch = addBranch();
+			const auto secondBranch = addBranch();
+			QVERIFY(!firstBranch.isEmpty() && !secondBranch.isEmpty());
+			QCOMPARE(song->nodeCustomConnections(trackScope).size(), 2);
+			engine->renderNextPeriod();
+			QVERIFY(mixer->nodeMasterSignalActive(0));
+			QVERIFY(!mixer->nodeMasterSignalActive(1));
+			QVERIFY(song->setNodeCustomConnection(trackScope, firstBranch, trackOutput, false));
+			QCOMPARE(song->nodeCustomConnections(trackScope).size(), 1);
+			QCOMPARE(song->nodeCustomConnections(trackScope).front().source, secondBranch);
+			engine->renderNextPeriod();
+			QVERIFY(mixer->nodeMasterSignalActive(0));
+		}
+
+		const auto firstMidiIn = song->createNodeBoundaryPort(midiScope, QStringLiteral("midi"), false, false);
+		const auto secondMidiIn = song->createNodeBoundaryPort(midiScope, QStringLiteral("midi"), false, false);
+		song->addNodeLogicalInput(QStringLiteral("midi"));
+		const auto firstInputId = song->nodeLogicalInputs().back().id;
+		song->addNodeLogicalInput(QStringLiteral("midi"));
+		const auto secondInputId = song->nodeLogicalInputs().back().id;
+		QVERIFY(song->setNodeSourceMidiBoundary(firstMidiIn, *midiOwner));
+		QVERIFY(song->setNodeSourceMidiBoundary(secondMidiIn, *midiOwner));
+		QVERIFY(song->setNodeLogicalInputTarget(firstInputId, QStringLiteral("midi"),
+			*midiOwner, QStringLiteral("midi-in/") + firstMidiIn, true));
+		QVERIFY(song->setNodeLogicalInputTarget(secondInputId, QStringLiteral("midi"),
+			*midiOwner, QStringLiteral("midi-in/") + secondMidiIn, true));
+		const MidiEvent note(MidiNoteOn, 0, 60, 100, nullptr, MidiEvent::Source::Internal);
+		QCOMPARE(song->dispatchNodeMidiInput(firstInputId, note, TimePos{}, 0), 1);
+		QCOMPARE(song->dispatchNodeMidiInput(secondInputId, note, TimePos{}, 0), 1);
+		QVERIFY(song->nodeSourceConnections(*midiOwner).defaultMidiInput);
+		QVERIFY(song->removeDefaultNodeSourceMidiInput(*midiOwner));
+		QVERIFY(!song->nodeSourceConnections(*midiOwner).defaultMidiInput);
+		QCOMPARE(song->dispatchNodeMidiInput(secondInputId, note, TimePos{}, 0), 1);
+		QVERIFY(song->setNodeSourceMidiBoundary(firstMidiIn, *midiOwner, false));
+		QCOMPARE(song->dispatchNodeMidiInput(firstInputId, note, TimePos{}, 0), 0);
+		QCOMPARE(song->dispatchNodeMidiInput(secondInputId, note, TimePos{}, 0), 1);
+		QVERIFY(song->addNodeInstrumentLayer(*midiOwner, QStringLiteral("kicker"), false));
+		QCOMPARE(song->nodeInstrumentLayers(*midiOwner).size(), 1);
+		const auto songGraph = song->addNodeCustomGraph(midiScope, QStringLiteral("Song instrument routing"));
+		QVERIFY(!songGraph.isEmpty());
+		const auto songGraphScope = QStringLiteral("custom/") + songGraph + '/';
+		QVERIFY(!song->addNodeCustomInstrument(songGraphScope, QStringLiteral("kicker")).isEmpty());
+
+		auto* sample = Track::create(Track::Type::Sample, Engine::patternStore());
+		const auto sampleScope = QStringLiteral("source/") + sample->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
+		const auto sampleGraph = song->addNodeCustomGraph(sampleScope, QStringLiteral("Sample routing"));
+		QVERIFY(!sampleGraph.isEmpty());
+		const auto sampleGraphScope = QStringLiteral("custom/") + sampleGraph + '/';
+		const auto nestedGraph = song->addNodeCustomGraph(sampleGraphScope, QStringLiteral("Nested sample routing"));
+		QVERIFY(!nestedGraph.isEmpty());
+		const auto nestedScope = QStringLiteral("custom/") + nestedGraph + '/';
+		QVERIFY(song->addNodeCustomInstrument(nestedScope, QStringLiteral("kicker")).isEmpty());
+		const auto snapshot = song->copyNodeCustomGraph(instrumentGraph);
+		QVERIFY(!snapshot.isNull());
+		QVERIFY(song->pasteNodeCustomGraph(nestedScope, snapshot).isEmpty());
+		QVERIFY(song->nodeCustomGraphs(nestedScope).isEmpty());
+
+		auto* voice = static_cast<SVSTrack*>(Track::create(Track::Type::SVS, song));
+		QVERIFY(voice);
+		const auto voiceScope = QStringLiteral("source/") + voice->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
+		QVERIFY(song->addNodeCustomGraph(voiceScope, QStringLiteral("Not allowed")).isEmpty());
+		QVERIFY(!song->createNodeBoundaryPort(voiceScope, QStringLiteral("midi"), false, false).isEmpty());
+		const std::unique_ptr<QDialog> settings(createSVSPluginSettings(voice, window, true));
+		settings->show();
+		QVERIFY(QTest::qWaitForWindowExposed(settings.get()));
+		auto* speakers = settings->findChild<QComboBox*>("svsPluginSpeaker");
+		QVERIFY(speakers);
+		if (speakers->currentIndex() >= 0)
+		{
+			QVERIFY(speakers->currentData().toString().contains('\n'));
+		}
+		for (int index = 0; index < speakers->count(); ++index)
+		{
+			QVERIFY(speakers->itemData(index).toString().contains('\n'));
+		}
+	}
+
 	void nodeWorkflowTriggerLcd()
 	{
 		auto* window = m_gui->mainWindow();
 		auto* song = Engine::getSong();
-		const auto newProjectLabel = QCoreApplication::translate("lmms::gui::MainWindow", "New Node Workflow Project");
-		QAction* newProject = nullptr;
-		for (auto* action : window->findChildren<QAction*>())
-		{
-			if (action->text() == newProjectLabel)
-			{
-				newProject = action;
-				break;
-			}
-		}
-		QVERIFY(newProject);
 		song->setModified(false);
-		newProject->trigger();
-		auto* canvas = window->findChild<QWidget*>("nodeWorkflowCanvas");
-		auto* lcd = window->findChild<QScrollArea*>("nodeWorkflowTriggerLcd");
-		auto* breadcrumb = window->findChild<QLabel*>("nodeWorkflowBreadcrumb");
+		song->createNodeProject();
+		window->showNodeWorkflow();
+		auto* currentEditor = window->findChild<QMdiSubWindow*>("nodeWorkflowEditor");
+		QVERIFY(currentEditor);
+		auto* canvas = currentEditor->findChild<QWidget*>("nodeWorkflowCanvas");
+		auto* lcd = currentEditor->findChild<QScrollArea*>("nodeWorkflowTriggerLcd");
+		auto* breadcrumb = currentEditor->findChild<QLabel*>("nodeWorkflowBreadcrumb");
 		QVERIFY(canvas && lcd && breadcrumb);
 		QVERIFY(!lcd->isVisible());
 		breadcrumb->linkActivated(QStringLiteral("pattern"));
-		QVERIFY(!lcd->isVisible());
+		QVERIFY(lcd->isVisible());
+		capture(window, "node-trigger-lcd-entry");
 		QTest::mouseDClick(canvas, Qt::LeftButton, Qt::NoModifier,
-			QPoint(canvas->width() * 0.16, canvas->height() * 0.49));
-		auto* stepPanel = window->findChild<QWidget*>("nodeWorkflowPatternPanel");
+			QPoint(canvas->width() * 0.14, canvas->height() * 0.45));
+		auto* stepPanel = currentEditor->findChild<QWidget*>("nodeWorkflowPatternPanel");
 		QTRY_VERIFY(stepPanel && stepPanel->isVisible());
 		QVERIFY(lcd->isVisible());
 		QCOMPARE(lcd->height(), 148);
@@ -1738,7 +2045,7 @@ private slots:
 		});
 		QVERIFY(available);
 		song->playPattern();
-		QVERIFY(selectCable(0.29, 0.35, 0.47, 0.51));
+		QVERIFY(!lcd->property("wireSelected").toBool());
 		QVERIFY(lcd->widget());
 		QCOMPARE(lcd->widget()->objectName(), QStringLiteral("nodeWorkflowTriggerLcdIdle"));
 		(void) patterns->play(TimePos::stepPosition(3), engine->framesPerPeriod(), 0, 0);
@@ -1746,10 +2053,10 @@ private slots:
 		QVERIFY(rows().isEmpty());
 		QVERIFY(patterns->play(TimePos::stepPosition(4), engine->framesPerPeriod(), 0, 0));
 		QTRY_COMPARE(rows().size(), 1);
-		auto* stepScroll = lcd->findChild<QScrollArea*>("nodeWorkflowTriggerStepScroll");
-		QVERIFY(stepScroll && stepScroll->widget());
-		QCOMPARE(stepScroll->width(), 157);
-		auto* strip = stepScroll->widget();
+		auto* strip = lcd->findChild<QWidget*>("nodeWorkflowTriggerStepStrip");
+		QVERIFY(strip);
+		QCOMPARE(strip->geometry().right() + 1, strip->parentWidget()->width());
+		QVERIFY(!strip->findChild<QScrollBar*>());
 		QVERIFY(rows().front()->isVisible());
 		QVERIFY(rows().front()->width() > 0);
 		QTRY_COMPARE(strip->property("stepIndex").toInt(), 4);
@@ -1759,7 +2066,6 @@ private slots:
 
 		(void) patterns->play(TimePos::stepPosition(35), engine->framesPerPeriod(), 0, 0);
 		QTRY_COMPARE(strip->property("stepIndex").toInt(), 35);
-		QTRY_VERIFY(stepScroll->horizontalScrollBar()->value() > 0);
 		QVERIFY(patterns->play(TimePos::stepPosition(36), engine->framesPerPeriod(), 0, 0));
 		QTRY_COMPARE(strip->property("stepIndex").toInt(), 36);
 		QCOMPARE(lcd->height(), 148);
@@ -1767,12 +2073,13 @@ private slots:
 
 		QTest::mouseClick(canvas, Qt::LeftButton, Qt::NoModifier, QPoint(10, 10));
 		QTRY_VERIFY(!lcd->property("wireSelected").toBool());
+		song->stop();
 		QTRY_COMPARE(lcd->widget()->objectName(), QStringLiteral("nodeWorkflowTriggerLcdIdle"));
 		QCOMPARE(lcd->height(), 148);
 		capture(window, "node-trigger-lcd-idle");
 
 		breadcrumb->linkActivated(QStringLiteral("pattern"));
-		QVERIFY(!lcd->isVisible());
+		QVERIFY(lcd->isVisible());
 		QList<PatternTrack*> columns;
 		for (int index = 0; index < 8; ++index)
 		{
@@ -1805,11 +2112,13 @@ private slots:
 		QTRY_VERIFY(breadcrumb->text().contains(instrument->name()));
 		QCoreApplication::processEvents();
 		QVERIFY(selectCable(0.46, 0.55, 0.46, 0.51));
+		song->playPattern();
 		for (auto* column : columns)
 		{
 			QVERIFY(patterns->play(TimePos(0), engine->framesPerPeriod(), 0, column->patternIndex()));
 		}
 		QTRY_COMPARE(rows().size(), columns.size());
+		QTRY_VERIFY(lcd->verticalScrollBar()->isVisible());
 		auto* chordRow = rows().front();
 		auto* noteField = chordRow->parentWidget()->findChild<QLabel*>("nodeWorkflowTriggerLcdDetail");
 		QVERIFY(noteField);
@@ -1823,9 +2132,10 @@ private slots:
 		QCOMPARE(lcd->findChildren<QWidget*>("nodeWorkflowTriggerNotePreview").size(), columns.size());
 		auto* preview = chordRow->parentWidget()->findChild<QWidget*>("nodeWorkflowTriggerNotePreview");
 		QVERIFY(preview);
+		QCOMPARE(preview->geometry().right() + 1, preview->parentWidget()->width());
 		(void) patterns->play(TimePos(96), engine->framesPerPeriod(), 0, columns.front()->patternIndex());
 		QTRY_COMPARE(preview->property("playheadPosition").toDouble(), 0.5);
-		QVERIFY(lcd->verticalScrollBar()->isVisible() && lcd->verticalScrollBar()->maximum() > 0);
+		QVERIFY(lcd->verticalScrollBar()->maximum() > 0);
 		const auto lcdRows = rows();
 		const auto rowPosition = [lcd](const QLabel* label, const QPoint& point) {
 			return lcd->viewport()->mapFromGlobal(label->mapToGlobal(point));
@@ -1849,10 +2159,54 @@ private slots:
 		auto* sampleField = rows().front()->parentWidget()->findChild<QLabel*>("nodeWorkflowTriggerLcdDetail");
 		QVERIFY(sampleField);
 		QCOMPARE(sampleField->text(), QFileInfo(samplePath).fileName());
-		QCOMPARE(sampleField->width(), 157);
+		QCOMPARE(sampleField->geometry().right() + 1, sampleField->parentWidget()->width());
 		QVERIFY(sampleField->toolTip().isEmpty());
 		QCOMPARE(lcd->height(), 148);
 		capture(window, "node-trigger-lcd-sample");
+		breadcrumb->linkActivated(QStringLiteral("pattern"));
+		QVERIFY(lcd->isVisible());
+		QVERIFY(!lcd->property("wireSelected").toBool());
+		sampleClip->setIsPlaying(false);
+		QVERIFY(patterns->play(TimePos(0), engine->framesPerPeriod(), 0, columns.front()->patternIndex()));
+		QVERIFY(patterns->play(TimePos::stepPosition(4), engine->framesPerPeriod(), 0, 0));
+		QTRY_COMPARE(rows().size(), 3);
+		QStringList sources;
+		for (const auto* row : rows())
+		{
+			sources.append(row->text());
+		}
+		QVERIFY(sources.contains(columns.front()->name() + QStringLiteral(" · ") + instrument->name()));
+		QVERIFY(sources.contains(columns.front()->name() + QStringLiteral(" · ") + sampleTrack->name()));
+		QVERIFY(lcd->findChild<QWidget*>("nodeWorkflowTriggerStepStrip"));
+		QCOMPARE(lcd->height(), 148);
+		capture(window, "node-trigger-lcd-pattern");
+
+		auto* signalFlow = currentEditor->findChild<QToolButton*>("nodeWorkflowSignalFlow");
+		QVERIFY(signalFlow && signalFlow->menu());
+		auto* hideDelay = signalFlow->menu()->findChild<QSpinBox*>("nodeWorkflowTriggerHideDelay");
+		QVERIFY(hideDelay);
+		QCOMPARE(hideDelay->value(), 1000);
+		QCOMPARE(hideDelay->minimum(), 0);
+		QCOMPARE(hideDelay->maximum(), 30000);
+		hideDelay->setValue(5000);
+		columns.back()->setMuted(true);
+		patterns->setCurrentPattern(columns.back()->patternIndex());
+		const auto samplePeriods = qCeil(static_cast<double>(sampleClip->sample().sampleSize())
+			* engine->outputSampleRate() / sampleClip->sample().sampleRate() / engine->framesPerPeriod());
+		for (int period = 0; period < samplePeriods + 64; ++period)
+		{
+			engine->renderNextPeriod();
+		}
+		QVERIFY(!song->isStopped());
+		QTest::qWait(100);
+		QVERIFY(!rows().isEmpty());
+		hideDelay->setValue(0);
+		QTRY_VERIFY(rows().isEmpty());
+		QVERIFY(lcd->isVisible());
+		QVERIFY(!lcd->verticalScrollBar()->isVisible());
+		QCOMPARE(lcd->height(), 148);
+		QCOMPARE(lcd->widget()->objectName(), QStringLiteral("nodeWorkflowTriggerLcdIdle"));
+		hideDelay->setValue(1000);
 		breadcrumb->linkActivated(QStringLiteral("root"));
 		QVERIFY(!lcd->isVisible());
 	}
@@ -2174,6 +2528,42 @@ private slots:
 		QVERIFY(checkBundle(QPointF(220, 110), 0, QStringLiteral("Source 1 L")));
 		QVERIFY(checkBundle(QPointF(580, 110), 1, QStringLiteral("Target 1 L")));
 		capture(&canvas, "node-workflow-aggregate-input-output");
+		canvas.setPcbBusRouting(true);
+		QVERIFY(checkBundle(QPointF(150 + 140, 170), 0, QStringLiteral("Source 1 L")));
+		QVERIFY(checkBundle(QPointF(650 - 140, 170), 1, QStringLiteral("Target 1 L")));
+
+		QList<NodeWorkflowCanvas::Node> stereoNodes{
+			{QRectF(20, 40, 130, 430), QStringLiteral("Sources"), {}},
+			{QRectF(650, 40, 130, 430), QStringLiteral("Mixer"), {}},
+		};
+		QList<NodeWorkflowCanvas::Port> stereoPorts;
+		QList<NodeWorkflowCanvas::Connection> stereoWires;
+		for (int channel = 0; channel < 2; ++channel)
+		{
+			const auto label = channel == 0 ? QStringLiteral("Master L") : QStringLiteral("Master R");
+			const QPointF target(650, 110 + channel * 26);
+			stereoPorts.append({target, typeColor, label, false, {}});
+			for (int index = 0; index < 6; ++index)
+			{
+				const QPointF source(150, 110 + channel * 26 + index * 55);
+				stereoPorts.append({source, typeColor, label, true, {}});
+				stereoWires.append({source, target, typeColor});
+			}
+		}
+		canvas.setGraph(std::move(stereoNodes), std::move(stereoWires), std::move(stereoPorts));
+		canvas.fitGraph();
+		const qreal leftTrunk = 650 - 140;
+		QVERIFY(checkBundle(QPointF(leftTrunk, 230), 1, QStringLiteral("Master L")));
+		QVERIFY(checkBundle(QPointF(leftTrunk - 20, 230), 1, QStringLiteral("Master R")));
+		const auto grab = screen(QPointF(710, 58));
+		const auto drop = screen(QPointF(740, 58));
+		QTest::mousePress(&canvas, Qt::LeftButton, Qt::NoModifier, grab);
+		QTest::mouseMove(&canvas, drop);
+		QTest::mouseRelease(&canvas, Qt::LeftButton, Qt::NoModifier, drop);
+		const qreal movedTrunk = 680 - 140;
+		QVERIFY(checkBundle(QPointF(movedTrunk, 230), 1, QStringLiteral("Master L")));
+		QVERIFY(checkBundle(QPointF(movedTrunk - 20, 230), 1, QStringLiteral("Master R")));
+		capture(&canvas, "node-workflow-aggregate-pcb");
 	}
 
 	void nodeWorkflowRoot()
