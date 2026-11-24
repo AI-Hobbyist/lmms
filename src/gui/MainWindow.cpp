@@ -1081,12 +1081,7 @@ void MainWindow::showNodeWorkflow()
 	breadcrumb->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 	breadcrumb->setFocusPolicy(Qt::StrongFocus);
 	controls->addWidget(breadcrumb);
-	auto* showVstInstrumentPorts = makeTool("node_vsti_ports", tr("Show VSTi-Exposed Ports"));
-	showVstInstrumentPorts->setObjectName("nodeWorkflowVstInstrumentPorts");
-	showVstInstrumentPorts->setCheckable(true);
-	showVstInstrumentPorts->hide();
-	const auto setBreadcrumb = [breadcrumb, showVstInstrumentPorts](const QList<QPair<QString, QString>>& segments) {
-		showVstInstrumentPorts->hide();
+	const auto setBreadcrumb = [breadcrumb](const QList<QPair<QString, QString>>& segments) {
 		breadcrumb->ensurePolished();
 		const auto linkColor = breadcrumb->palette().color(QPalette::WindowText).name();
 		QStringList parts;
@@ -1120,7 +1115,6 @@ void MainWindow::showNodeWorkflow()
 	refreshTransport();
 	controls->addWidget(play);
 	controls->addWidget(stop);
-	controls->addWidget(showVstInstrumentPorts);
 	auto* aggregate = makeTool("agent_chat_settings", tr("Aggregation Settings"));
 	aggregate->setObjectName("nodeWorkflowAggregation");
 	auto* aggregationMenu = new QMenu(aggregate);
@@ -1902,18 +1896,12 @@ void MainWindow::showNodeWorkflow()
 		invalidVstConnections->setVisible(!unavailable.isEmpty());
 	};
 	const auto appendVstPorts = [canvas](auto* plugin, const QString& prefix, NodeWorkflowCanvas::Node& node,
-		QList<NodeWorkflowCanvas::Port>& ports, unsigned inputRow, unsigned outputRow,
-		QHash<QString, bool>* hiddenPorts = nullptr) {
+		QList<NodeWorkflowCanvas::Port>& ports, unsigned inputRow, unsigned outputRow) {
 		auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(plugin);
 		auto* processor = owner ? owner->vstNodeProcessor() : nullptr;
 		if (!processor) { return false; }
 		for (const auto& spec : processor->nodePorts())
 		{
-			if (hiddenPorts)
-			{
-				hiddenPorts->insert(prefix + spec.key(), spec.available);
-				continue;
-			}
 			const bool output = spec.direction == vsthost::NodePortDirection::Output;
 			const bool audio = spec.media == vsthost::NodePortMedia::Audio;
 			const auto color = audio ? canvas->audioPortColor() : canvas->midiPortColor();
@@ -1928,10 +1916,7 @@ void MainWindow::showNodeWorkflow()
 				ports.back().graphSignal = signal;
 			}
 		}
-		if (!hiddenPorts)
-		{
-			node.bounds.setHeight(std::max(node.bounds.height(), qreal(48 + 27 * std::max(inputRow, outputRow))));
-		}
+		node.bounds.setHeight(std::max(node.bounds.height(), qreal(48 + 27 * std::max(inputRow, outputRow))));
 		return true;
 	};
 	const auto appendCustomEffects = [this, song, canvas, activeGraphScope, appendVstPorts](const QString& scope,
@@ -2146,7 +2131,7 @@ void MainWindow::showNodeWorkflow()
 	};
 	const auto showSource = [this, canvas, song, activeTracks, activeSource, patternPanel, patternLayout, add, footerStatus,
 		inspectTriggers, clearTriggers, activeGraphScope, customPath, appendCustomChildren,
-		setBreadcrumb, setInspector, breadcrumb, appendBoundaryModules, appendVstPorts, showVstInstrumentPorts](
+		setBreadcrumb, setInspector, breadcrumb, appendBoundaryModules, appendVstPorts](
 		const auto& render, Track* track, bool fitCanvas) -> void
 	{
 		customPath->clear();
@@ -2736,9 +2721,26 @@ void MainWindow::showNodeWorkflow()
 			}
 		}
 		using Port = NodeWorkflowCanvas::Port;
-		QHash<QString, bool> hiddenVstPorts;
-		auto* hiddenPorts = showVstInstrumentPorts->isChecked() ? nullptr : &hiddenVstPorts;
-		bool hasVstInstrument = false;
+		const auto isVstInstrument = [](Instrument* plugin) -> bool {
+			auto* owner = dynamic_cast<vsthost::VstNodeOwner*>(plugin);
+			return owner && owner->vstNodeProcessor() != nullptr;
+		};
+		bool hasVstInstrument = !singing && hasPrimary
+			&& isVstInstrument(static_cast<InstrumentTrack*>(track)->instrument());
+		const auto& layers = song->nodeInstrumentLayers(*track);
+		for (const auto& layer : layers)
+		{
+			if (layer.instrument && isVstInstrument(layer.instrument->instrument()))
+			{
+				hasVstInstrument = true;
+				break;
+			}
+		}
+		const bool useStepToMidi = stepMode && hasVstInstrument;
+		const QPointF stepToMidiOrigin(420, 220);
+		const QPointF stepToMidiIn = stepToMidiOrigin + QPointF(0, 48);
+		const QPointF stepToMidiOut = stepToMidiOrigin + QPointF(130, 48);
+		bool stepToMidiInputConnected = false;
 		QList<Port> ports{
 			{QPointF(185, 130), midi, tr("MIDI"), true, {}},
 			{QPointF(240, 130), midi, tr("MIDI"), false, {}},
@@ -2746,7 +2748,6 @@ void MainWindow::showNodeWorkflow()
 			{QPointF(460, 130), eventColor, eventLabel, false, {}},
 		};
 		QStringList layerIds;
-		const auto& layers = song->nodeInstrumentLayers(*track);
 		qreal layerY = 365;
 		for (const auto& layer : layers)
 		{
@@ -2795,46 +2796,113 @@ void MainWindow::showNodeWorkflow()
 					render(render, owner.data(), false);
 				}
 			};
-			const QPointF input = origin + QPointF(0, 50);
-			ports.append({input, eventColor, eventLabel, false, {}, "source-events",
-				static_cast<unsigned>(layerIds.size()), {}});
-			if (stepMode ? layer.steps : layer.notes)
+			const bool layerIsVst = instrument && isVstInstrument(instrument->instrument());
+			if (layerIsVst)
 			{
-				cables.append({QPointF(405, 130), input, trackColor.value_or(eventColor),
-					[instrument] { return instrument && instrument->audioBusHandle()->nodeEventActive(1); },
-					[changeEvent] { changeEvent(false); }});
-				if (patternInstrument)
+				const int portStart = ports.size();
+				appendVstPorts(instrument->instrument(), QStringLiteral("source-layer/") + layer.id + '/',
+					node, ports, 0, 0);
+				std::optional<QPointF> vstMidiIn;
+				QList<QPointF> vstAudioOuts;
+				for (int i = portStart; i < ports.size(); ++i)
 				{
-					cables.back().select = triggerSelection(stepMode ? TriggerKind::Step : TriggerKind::Note);
-				}
-			}
-			for (ch_cnt_t side = 0; side < 2; ++side)
-			{
-				const auto source = origin + QPointF(165, 50 + 30 * side);
-				const auto changeOutput = [song, render, owner = QPointer<Track>(track),
-					id = layer.id, side](std::optional<ch_cnt_t> target) {
-					if (owner && song->setNodeInstrumentLayerOutput(*owner, id, side, target))
+					if (!ports[i].output && ports[i].graphSignal == QStringLiteral("midi") && !vstMidiIn)
 					{
-						render(render, owner.data(), false);
+						vstMidiIn = ports[i].position;
 					}
-				};
-				ports.append({source, audio, side == 0 ? tr("Audio L") : tr("Audio R"), true,
-					{}, "source-audio", side, [changeOutput](unsigned target) {
-						changeOutput(static_cast<ch_cnt_t>(target));
-					}});
-				if (const auto target = layer.outputs[side])
+					else if (ports[i].output && ports[i].graphSignal == QStringLiteral("audio") && vstAudioOuts.size() < 2)
+					{
+						vstAudioOuts.append(ports[i].position);
+					}
+				}
+				if ((stepMode ? layer.steps : layer.notes) && vstMidiIn)
 				{
-					cables.append({source, QPointF(680, 130 + 30 * *target), trackColor.value_or(audio),
-						[instrument, side] { return instrument && instrument->audioBusHandle()->nodeSignalActive(side); },
-						[changeOutput] { changeOutput(std::nullopt); }});
+					if (useStepToMidi)
+					{
+						if (!stepToMidiInputConnected)
+						{
+							cables.append({QPointF(405, 130), stepToMidiIn, trackColor.value_or(eventColor),
+								[instrument] { return instrument && instrument->audioBusHandle()->nodeEventActive(1); },
+								[changeEvent] { changeEvent(false); }});
+							stepToMidiInputConnected = true;
+						}
+						cables.append({stepToMidiOut, *vstMidiIn, trackColor.value_or(midi),
+							[instrument] { return instrument && instrument->audioBusHandle()->nodeEventActive(1); },
+							[changeEvent] { changeEvent(false); }});
+					}
+					else
+					{
+						cables.append({QPointF(405, 130), *vstMidiIn, trackColor.value_or(eventColor),
+							[instrument] { return instrument && instrument->audioBusHandle()->nodeEventActive(1); },
+							[changeEvent] { changeEvent(false); }});
+					}
 					if (patternInstrument)
 					{
-						cables.back().select = triggerSelection(std::nullopt);
+						cables.back().select = triggerSelection(stepMode ? TriggerKind::Step : TriggerKind::Note);
+					}
+				}
+				for (ch_cnt_t side = 0; side < 2 && side < vstAudioOuts.size(); ++side)
+				{
+					const auto changeOutput = [song, render, owner = QPointer<Track>(track),
+						id = layer.id, side](std::optional<ch_cnt_t> target) {
+						if (owner && song->setNodeInstrumentLayerOutput(*owner, id, side, target))
+						{
+							render(render, owner.data(), false);
+						}
+					};
+					if (const auto target = layer.outputs[side])
+					{
+						cables.append({vstAudioOuts[side], QPointF(680, 130 + 30 * *target), trackColor.value_or(audio),
+							[instrument, side] { return instrument && instrument->audioBusHandle()->nodeSignalActive(side); },
+							[changeOutput] { changeOutput(std::nullopt); }});
+						if (patternInstrument)
+						{
+							cables.back().select = triggerSelection(std::nullopt);
+						}
 					}
 				}
 			}
-			hasVstInstrument |= appendVstPorts(instrument->instrument(), QStringLiteral("source-layer/") + layer.id + '/',
-				node, ports, 1, 2, hiddenPorts);
+			else
+			{
+				const QPointF input = origin + QPointF(0, 50);
+				ports.append({input, eventColor, eventLabel, false, {}, "source-events",
+					static_cast<unsigned>(layerIds.size()), {}});
+				if (stepMode ? layer.steps : layer.notes)
+				{
+					cables.append({QPointF(405, 130), input, trackColor.value_or(eventColor),
+						[instrument] { return instrument && instrument->audioBusHandle()->nodeEventActive(1); },
+						[changeEvent] { changeEvent(false); }});
+					if (patternInstrument)
+					{
+						cables.back().select = triggerSelection(stepMode ? TriggerKind::Step : TriggerKind::Note);
+					}
+				}
+				for (ch_cnt_t side = 0; side < 2; ++side)
+				{
+					const auto source = origin + QPointF(165, 50 + 30 * side);
+					const auto changeOutput = [song, render, owner = QPointer<Track>(track),
+						id = layer.id, side](std::optional<ch_cnt_t> target) {
+						if (owner && song->setNodeInstrumentLayerOutput(*owner, id, side, target))
+						{
+							render(render, owner.data(), false);
+						}
+					};
+					ports.append({source, audio, side == 0 ? tr("Audio L") : tr("Audio R"), true,
+						{}, "source-audio", side, [changeOutput](unsigned target) {
+							changeOutput(static_cast<ch_cnt_t>(target));
+						}});
+					if (const auto target = layer.outputs[side])
+					{
+						cables.append({source, QPointF(680, 130 + 30 * *target), trackColor.value_or(audio),
+							[instrument, side] { return instrument && instrument->audioBusHandle()->nodeSignalActive(side); },
+							[changeOutput] { changeOutput(std::nullopt); }});
+						if (patternInstrument)
+						{
+							cables.back().select = triggerSelection(std::nullopt);
+						}
+					}
+				}
+			}
 			layerY += std::max(qreal(128), node.bounds.height() + 16);
 		}
 		for (const bool midiInput : {true, false})
@@ -2935,11 +3003,72 @@ void MainWindow::showNodeWorkflow()
 		}
 		if (!singing && hasPrimary)
 		{
-			const auto prefix = QStringLiteral("source-plugin/") + track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
-			hasVstInstrument |= appendVstPorts(static_cast<InstrumentTrack*>(track)->instrument(), prefix,
-				nodes[stepMode ? 1 : 2], ports, 1, 2, hiddenPorts);
+			auto* primaryInstrument = static_cast<InstrumentTrack*>(track)->instrument();
+			if (isVstInstrument(primaryInstrument))
+			{
+				const auto prefix = QStringLiteral("source-plugin/") + track->nodeWorkflowId().toString(QUuid::WithoutBraces) + '/';
+				const int portStart = ports.size();
+				appendVstPorts(primaryInstrument, prefix, nodes[stepMode ? 1 : 2], ports, 0, 0);
+				std::optional<QPointF> vstMidiIn;
+				QList<QPointF> vstAudioOuts;
+				for (int i = portStart; i < ports.size(); ++i)
+				{
+					if (!ports[i].output && ports[i].graphSignal == QStringLiteral("midi") && !vstMidiIn)
+					{
+						vstMidiIn = ports[i].position;
+					}
+					else if (ports[i].output && ports[i].graphSignal == QStringLiteral("audio") && vstAudioOuts.size() < 2)
+					{
+						vstAudioOuts.append(ports[i].position);
+					}
+				}
+				if (vstMidiIn)
+				{
+					for (int i = 0; i < cables.size(); ++i)
+					{
+						if (cables[i].source == QPointF(405, 130) && cables[i].destination == QPointF(460, 130))
+						{
+							if (useStepToMidi)
+							{
+								cables[i].destination = stepToMidiIn;
+								stepToMidiInputConnected = true;
+								cables.append({stepToMidiOut, *vstMidiIn, trackColor.value_or(midi),
+									cables[i].active, cables[i].disconnect});
+							}
+							else
+							{
+								cables[i].destination = *vstMidiIn;
+							}
+							break;
+						}
+					}
+				}
+				for (int i = 0; i < cables.size(); ++i)
+				{
+					for (int side = 0; side < 2 && side < vstAudioOuts.size(); ++side)
+					{
+						if (cables[i].source == QPointF(625, 130 + 30 * side))
+						{
+							cables[i].source = vstAudioOuts[side];
+							break;
+						}
+					}
+				}
+				ports.removeIf([](const Port& port) {
+					return port.position == QPointF(460, 130)
+						|| port.position == QPointF(625, 130)
+						|| port.position == QPointF(625, 160);
+				});
+			}
 		}
-		showVstInstrumentPorts->setVisible(hasVstInstrument);
+		if (useStepToMidi)
+		{
+			nodes.append({QRectF(stepToMidiOrigin, QSizeF(130, 84)), tr("Step to MIDI"), {}});
+			nodes.back().layoutKey = layoutPrefix + QStringLiteral("step-to-midi");
+			nodes.back().trackColor = trackColor.value_or(QColor{});
+			ports.append({stepToMidiIn, eventColor, eventLabel, false, {}});
+			ports.append({stepToMidiOut, midi, tr("MIDI"), true, {}});
+		}
 		appendSourceEffects(nodes, ports);
 		appendSourceBoundaryPorts(QStringLiteral("source-audio"), nodes, cables, ports);
 		if (!stepMode && !connections.defaultMidiInput)
@@ -2960,7 +3089,7 @@ void MainWindow::showNodeWorkflow()
 				return primaryPort(cable.source) || primaryPort(cable.destination);
 			});
 		}
-		appendCustomChildren(layoutPrefix, nodes, ports, cables, redrawSource, hiddenVstPorts);
+		appendCustomChildren(layoutPrefix, nodes, ports, cables, redrawSource, {});
 		canvas->setGraph(std::move(nodes), std::move(cables), std::move(ports));
 		while (auto* item = patternLayout->takeAt(0))
 		{
@@ -5060,7 +5189,6 @@ void MainWindow::showNodeWorkflow()
 		}
 	};
 	connect(song, &Song::nodeTrackRoutingChanged, canvas, refreshRoutes, Qt::QueuedConnection);
-	connect(showVstInstrumentPorts, &QToolButton::toggled, canvas, refreshRoutes);
 	connect(Engine::mixer(), &Mixer::channelTopologyChanged, canvas, refreshRoutes, Qt::QueuedConnection);
 	connect(Engine::patternStore(), &PatternStore::currentPatternChanged, canvas, [activeSource, showSource, customPath] {
 		if (customPath->isEmpty() && *activeSource && (*activeSource)->trackContainer() == Engine::patternStore())

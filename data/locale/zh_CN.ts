@@ -10662,8 +10662,8 @@ Double click to pick a file.</source>
         <translation>乐器插件</translation>
     </message>
     <message>
-        <source>Show VSTi-Exposed Ports</source>
-        <translation>显示 VSTi 暴露的端口</translation>
+        <source>Step to MIDI</source>
+        <translation>步进转 MIDI</translation>
     </message>
     <message>
         <source>Managed by the LMMS plugin host</source>
